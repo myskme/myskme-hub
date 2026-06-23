@@ -31,7 +31,7 @@ DEFAULT_DATA = {
              "desc": "学院谷地 RPG · 技能连招 · 探索成长 · 金叶与水晶经济系统。",
              "url": "https://myskme-expedition.netlify.app"},
         ]},
-        {"label": "课堂专用 · 老师投屏", "items": [
+        {"label": "课堂专用 · 老师投屏", "collapsible": True, "items": [
             {"key": "threek", "glyph": "国", "tag": "课堂游戏", "title": "三国军师争霸", "en": "Three Kingdoms Scoreboard",
              "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。",
              "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"},
@@ -123,6 +123,15 @@ header{text-align:center;margin-bottom:clamp(40px,7vw,72px);}
 .rule{display:flex;align-items:center;gap:20px;margin:18px 0 30px;}
 .rule::before,.rule::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--line),transparent);}
 .rule span{font-size:14px;letter-spacing:.34em;color:var(--gold);white-space:nowrap;text-shadow:0 0 18px rgba(201,166,74,.25);}
+.rule-toggle{cursor:pointer;}
+.rule .rule-caret{font-size:11px;letter-spacing:.12em;color:var(--gold2);white-space:nowrap;text-shadow:none;
+  border:1px solid var(--line);padding:2px 11px;transition:border-color .25s,box-shadow .25s,color .25s;}
+.rule-toggle:hover .rule-caret{border-color:var(--gold);color:var(--gold);box-shadow:var(--glow-gold);}
+.rule-caret::after{content:'收起 ▴';}
+.rule-toggle.collapsed .rule-caret::after{content:'展开 ▾';}
+section[data-collapsed="1"] .grid{display:none!important;}
+.fs-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.fs-actions .btn{font-size:12.5px;padding:7px 14px;}
 section{margin-top:clamp(36px,6vw,60px);}
 .grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));}
 
@@ -309,6 +318,8 @@ footer b{color:var(--ink2);font-weight:400;}
   section{margin:0 0 4mm!important;}
   .rule{margin:0 0 3mm!important;}
   .rule span{font-size:9pt!important;letter-spacing:.22em!important;text-shadow:none!important;}
+  .rule-caret{display:none!important;}
+  section[data-collapsed="1"] .grid{display:grid!important;}
   .grid{grid-template-columns:1fr 1fr!important;gap:4mm!important;}
   .card{opacity:1!important;transform:none!important;background:#fffdf8!important;border:1px solid var(--gold3)!important;
     box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;gap:2mm!important;padding:3mm 3.5mm!important;
@@ -381,7 +392,12 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function render(){
     var html='';
     DATA.sections.forEach(function(sec,si){
-      html+='<section><div class="rule"><span data-seclabel="'+si+'">'+esc(sec.label)+'</span></div><div class="grid">';
+      var collapsible=!!sec.collapsible, collapsed=false;
+      if(collapsible){collapsed=true;try{var s=localStorage.getItem('myskme-sec'+si);if(s!==null)collapsed=(s==='1');}catch(e){}}
+      var rule = collapsible
+        ? '<div class="rule rule-toggle'+(collapsed?' collapsed':'')+'" data-sec-toggle="'+si+'"><span data-seclabel="'+si+'">'+esc(sec.label)+'</span><span class="rule-caret"></span></div>'
+        : '<div class="rule"><span data-seclabel="'+si+'">'+esc(sec.label)+'</span></div>';
+      html+='<section data-section="'+si+'"'+(collapsed?' data-collapsed="1"':'')+'>'+rule+'<div class="grid">';
       sec.items.forEach(function(it,ii){html+=cardHTML(it,si,ii);});
       html+='<button class="add-work" data-addsec="'+si+'">＋ 添加作品</button></div></section>';
     });
@@ -389,6 +405,15 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     updateCounts();
     applyAdmin();
     reveal();
+  }
+  function toggleSection(si){
+    var sec=content.querySelector('section[data-section="'+si+'"]'); if(!sec)return;
+    var ruleEl=sec.querySelector('[data-sec-toggle]'), collapsed=sec.getAttribute('data-collapsed')==='1';
+    collapsed=!collapsed;
+    if(collapsed){sec.setAttribute('data-collapsed','1');ruleEl&&ruleEl.classList.add('collapsed');}
+    else{sec.removeAttribute('data-collapsed');ruleEl&&ruleEl.classList.remove('collapsed');
+      sec.querySelectorAll('.card').forEach(function(c){c.classList.add('in');});}
+    try{localStorage.setItem('myskme-sec'+si,collapsed?'1':'0');}catch(e){}
   }
 
   function renderHeader(){
@@ -514,6 +539,63 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     });
   }
 
+  // ---- 一键复制全部链接 ----
+  function countItems(){var n=0;DATA.sections.forEach(function(s){n+=(s.items||[]).length;});return n;}
+  function allLinksText(){
+    var lines=['MYSKME · 作品总目 — 狼先生与他的学生们'];
+    DATA.sections.forEach(function(sec){(sec.items||[]).forEach(function(it){lines.push(it.title+'  '+it.url);});});
+    if(DATA.hubUrl)lines.push('— 总目 '+DATA.hubUrl);
+    return lines.join('\n');
+  }
+  function copyAll(){
+    var t=allLinksText();
+    function ok(){toast('已复制全部链接（'+countItems()+' 条）');}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){fallback(t);ok();});}
+    else{fallback(t);ok();}
+  }
+
+  // ---- 竖版海报导出（1080×1920，含全部二维码）----
+  function drawQRon(ctx,url,x,y,size){
+    var qr=qrcode(0,'Q');qr.addData(url||'');try{qr.make();}catch(e){return;}
+    var n=qr.getModuleCount(),b=4,total=n+2*b,cell=size/total;
+    ctx.fillStyle='#f3e9cf';ctx.fillRect(x,y,size,size);
+    ctx.fillStyle='#16100a';
+    for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(qr.isDark(r,c))ctx.fillRect(x+(c+b)*cell,y+(r+b)*cell,Math.ceil(cell),Math.ceil(cell));
+  }
+  function fitText(ctx,s,maxw){s=String(s||'');if(ctx.measureText(s).width<=maxw)return s;
+    while(s.length>1&&ctx.measureText(s+'…').width>maxw)s=s.slice(0,-1);return s+'…';}
+  function buildPoster(){
+    var W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    var ctx=cv.getContext('2d');
+    ctx.fillStyle='#0a0a0c';ctx.fillRect(0,0,W,H);
+    var g=ctx.createRadialGradient(W/2,-60,80,W/2,260,920);
+    g.addColorStop(0,'rgba(201,166,74,.17)');g.addColorStop(1,'rgba(201,166,74,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,760);
+    ctx.strokeStyle='rgba(201,166,74,.5)';ctx.lineWidth=2;ctx.strokeRect(30,30,W-60,H-60);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#c9a64a';ctx.font='600 26px "Songti SC","Noto Serif SC",serif';ctx.fillText('MYSKME · 王老师 MR. WANG',W/2,132);
+    ctx.fillStyle='#f0e6d2';ctx.font='300 74px "Songti SC","Noto Serif SC",serif';ctx.fillText('狼先生与他的学生们',W/2,228);
+    ctx.fillStyle='#a8a090';ctx.font='400 27px "Songti SC",serif';ctx.fillText('Make Yourself Special & Kind · 作品总目',W/2,288);
+    var items=[];DATA.sections.forEach(function(s){(s.items||[]).forEach(function(it){items.push(it);});});items=items.slice(0,6);
+    var top=360,gx=60,gap=34,cw=(W-2*gx-gap)/2,rows=Math.ceil(items.length/2),areaH=H-top-150,ch=(areaH-(rows-1)*gap)/rows;
+    items.forEach(function(it,i){
+      var col=i%2,row=Math.floor(i/2),x=gx+col*(cw+gap),y=top+row*(ch+gap);
+      ctx.fillStyle='rgba(201,166,74,.045)';ctx.fillRect(x,y,cw,ch);
+      ctx.strokeStyle='rgba(201,166,74,.3)';ctx.lineWidth=1.5;ctx.strokeRect(x,y,cw,ch);
+      ctx.textAlign='center';ctx.fillStyle='#f0e6d2';ctx.font='500 29px "Songti SC",serif';
+      ctx.fillText(fitText(ctx,it.title,cw-44),x+cw/2,y+50);
+      var qs=Math.max(160,Math.min(236,cw-130,ch-150));
+      drawQRon(ctx,it.url,x+(cw-qs)/2,y+70,qs);
+      ctx.fillStyle='#8a7d62';ctx.font='400 17px ui-monospace,Menlo,monospace';
+      ctx.fillText(fitText(ctx,it.url.replace(/^https?:\/\//,''),cw-34),x+cw/2,y+ch-22);
+    });
+    ctx.fillStyle='#6a6458';ctx.font='400 22px "Songti SC",serif';ctx.fillText('扫描任意二维码即可打开 · 单文件离线可玩',W/2,H-92);
+    ctx.fillStyle='#c9a64a';ctx.font='600 23px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-56);
+    cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
+      var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);
+      toast('已导出竖版海报 1080×1920');},'image/png');
+  }
+
   // ---- 事件绑定 ----
   content.addEventListener('input',onEdit);
   header.addEventListener('input',onEdit);
@@ -523,6 +605,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   header.addEventListener('paste',onPaste);
 
   document.addEventListener('click',function(e){
+    var st=e.target.closest('[data-sec-toggle]');
+    if(st && !(isAdmin()&&e.target.closest('[data-seclabel]'))){toggleSection(+st.getAttribute('data-sec-toggle'));return;}
     var op=e.target.closest('[data-op]'); if(op){doOp(op);return;}
     var add=e.target.closest('[data-addsec]'); if(add){addWork(+add.getAttribute('data-addsec'));return;}
     var cp=e.target.closest('.btn-copy'); if(cp){copyLink(cp);return;}
@@ -563,6 +647,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   document.getElementById('themeBtn').addEventListener('click',cycleTheme);
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
   document.getElementById('shareBtn').addEventListener('click',doShare);
+  var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',copyAll);
+  var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',buildPoster);
 
   // ---- 启动 ----
   applyTheme(getPref());
@@ -625,6 +711,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       <div class="foot-share-text">
         <div class="fs-title">扫码打开 · 分享本页</div>
         <div class="fs-url" id="shareUrl"></div>
+        <div class="fs-actions">
+          <button class="btn" id="copyAllBtn">复制全部链接</button>
+          <button class="btn" id="posterBtn">导出竖版海报</button>
+        </div>
       </div>
     </div>
     <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
