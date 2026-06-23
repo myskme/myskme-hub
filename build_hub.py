@@ -15,6 +15,7 @@ DEFAULT_DATA = {
     "titleEm": "他的学生们",
     "motto": "Make Yourself Special & Kind · 作品总目",
     "hint": "投屏后 手机扫码即玩，或点击卡片 /「访问」直接打开 — 全部为单文件网页应用，离线可用。",
+    "hubUrl": "https://myskme.github.io/myskme-hub/",
     "sections": [
         {"label": "推荐 · 随时开玩", "items": [
             {"key": "quiz", "glyph": "题", "tag": "题库训练 · 内含 2 套", "title": "MYSKME 题库训练场", "en": "Quiz Trainer",
@@ -123,7 +124,7 @@ header{text-align:center;margin-bottom:clamp(40px,7vw,72px);}
 .rule::before,.rule::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--line),transparent);}
 .rule span{font-size:14px;letter-spacing:.34em;color:var(--gold);white-space:nowrap;text-shadow:0 0 18px rgba(201,166,74,.25);}
 section{margin-top:clamp(36px,6vw,60px);}
-.grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));}
+.grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));}
 
 .ornate{position:relative;}
 .ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;
@@ -141,9 +142,15 @@ section{margin-top:clamp(36px,6vw,60px);}
 .card.featured{border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 30px rgba(201,166,74,.06);}
 
 /* 预览截图（hero）：满宽出血到卡片边缘，缺图回退字形 */
-.thumb{margin:-24px -24px 0;position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--bg4);border-bottom:1px solid var(--line);}
-.thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .55s cubic-bezier(.16,1,.3,1);}
-.card:hover .thumb img{transform:scale(1.05);}
+.thumb{margin:-24px -24px 0;position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
+  background:var(--bg4);border-bottom:1px solid var(--line);text-decoration:none;cursor:pointer;}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;
+  filter:saturate(1.05);transition:transform .55s cubic-bezier(.16,1,.3,1),filter .4s;}
+.card:hover .thumb img{transform:scale(1.05);filter:saturate(1.1) brightness(1.05);}
+.thumb::after{content:'↗ 打开';position:absolute;top:10px;right:10px;font-size:11px;letter-spacing:.1em;
+  color:var(--gold2);background:rgba(10,10,12,.6);border:1px solid var(--line);padding:3px 9px;
+  opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;pointer-events:none;}
+.card:hover .thumb::after{opacity:1;transform:translateY(0);}
 .thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(201,166,74,.14),transparent 70%);}
 .thumb-fallback span{font-size:62px;font-weight:300;color:var(--gold);text-shadow:0 0 24px rgba(201,166,74,.35);transition:transform .5s cubic-bezier(.16,1,.3,1);}
 .card:hover .thumb-fallback span{transform:scale(1.08);}
@@ -165,7 +172,8 @@ section{margin-top:clamp(36px,6vw,60px);}
 .card-body h3 a{color:var(--ink);text-decoration:none;transition:color .3s,text-shadow .3s;}
 .card:hover .card-body h3 a{color:var(--gold2);text-shadow:0 0 18px rgba(201,166,74,.4);}
 .en{font-size:12px;letter-spacing:.24em;color:var(--ink3);text-transform:uppercase;}
-.card-desc{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.75;flex:1;}
+.card-desc{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.7;flex:1;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
 .card-foot{display:flex;gap:18px;align-items:center;padding-top:16px;border-top:1px solid var(--line2);}
 .qr-plate{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;
@@ -243,6 +251,12 @@ body.admin .admin-bar{display:flex;}
 
 footer{margin-top:64px;padding-top:30px;border-top:1px solid var(--line2);text-align:center;color:var(--ink3);font-size:13px;letter-spacing:.12em;line-height:2;}
 footer b{color:var(--ink2);font-weight:400;}
+.foot-share{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:26px;flex-wrap:wrap;}
+.share-plate{flex:0 0 auto;}
+.share-plate .qr-box,.share-plate .qr{width:86px;height:86px;}
+.foot-share-text{text-align:left;}
+.fs-title{color:var(--ink2);font-size:14px;letter-spacing:.12em;margin-bottom:5px;}
+.fs-url{color:var(--ink3);font-size:12px;font-family:ui-monospace,Menlo,monospace;word-break:break-all;}
 
 @keyframes titleIn{0%{opacity:0;letter-spacing:.42em;transform:translateY(18px);filter:blur(6px);}100%{opacity:1;letter-spacing:.16em;transform:translateY(0);filter:blur(0);}}
 @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -286,7 +300,7 @@ footer b{color:var(--ink2);font-weight:400;}
   body::before,body::after{display:none!important;}
   /* 一页汇总：隐藏图片/简介/按钮等，只留 标题 + 二维码 + 链接，紧凑排成一页 */
   .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb,
-  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.ribbon{display:none!important;}
+  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.ribbon,.foot-share{display:none!important;}
   .wrap{padding:8mm 9mm!important;max-width:none!important;}
   header{margin:0 0 5mm!important;}
   .title-hero{font-size:21pt!important;margin:0 0 1.5mm!important;letter-spacing:.08em!important;animation:none!important;}
@@ -341,9 +355,10 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   }
 
   function cardHTML(it,si,ii){
-    var thumb=it.shot
-      ? '<div class="thumb"><img loading="lazy" alt="" src="'+esc(it.shot)+'"></div>'
-      : '<div class="thumb"><div class="thumb-fallback"><span data-bind="glyph">'+esc(it.glyph)+'</span></div></div>';
+    var inner=it.shot
+      ? '<img loading="lazy" alt="" src="'+esc(it.shot)+'">'
+      : '<div class="thumb-fallback"><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
+    var thumb='<a class="thumb" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+inner+'</a>';
     return '<article class="card ornate'+(it.featured?' featured':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
       +(it.featured?'<span class="ribbon">HUB</span>':'')
       +thumb
@@ -426,6 +441,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
       var box=card.querySelector('.qr-box'); if(box)box.innerHTML=qrSVG(txt);
       var go=card.querySelector('.btn-go'); if(go)go.href=txt;
       var tl=card.querySelector('.title-link'); if(tl)tl.href=txt;
+      var th=card.querySelector('a.thumb'); if(th)th.href=txt;
       var cp=card.querySelector('.btn-copy'); if(cp)cp.setAttribute('data-url',txt);
     }
     dsave();
@@ -550,6 +566,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
 
   // ---- 启动 ----
   applyTheme(getPref());
+  var sq=document.getElementById('shareQr'); if(sq)sq.innerHTML='<div class="qr-box">'+qrSVG(DATA.hubUrl||location.href)+'</div>';
+  var su=document.getElementById('shareUrl'); if(su)su.textContent=(DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,'');
   renderHeader();
   render();
   statsAnim();
@@ -602,6 +620,13 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 %%HEADER%%
   <div id="content"></div>
   <footer>
+    <div class="foot-share">
+      <div class="qr-plate share-plate" id="shareQr"></div>
+      <div class="foot-share-text">
+        <div class="fs-title">扫码打开 · 分享本页</div>
+        <div class="fs-url" id="shareUrl"></div>
+      </div>
+    </div>
     <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
     <div>单文件离线作品总目 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
   </footer>
