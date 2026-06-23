@@ -284,25 +284,35 @@ footer b{color:var(--ink2);font-weight:400;}
   html,body{background:#fbf7ee!important;color:#241d12!important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   body::before,body::after{display:none!important;}
-  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb{display:none!important;}
-  .wrap{padding:6mm 8mm!important;max-width:none!important;}
-  header{margin-bottom:8mm!important;}
-  .kicker,.title-hero,.motto,.meta-row,.usehint{opacity:1!important;animation:none!important;}
-  section{margin-top:7mm!important;}
-  .grid{grid-template-columns:1fr 1fr!important;gap:6mm!important;}
+  /* 一页汇总：隐藏图片/简介/按钮等，只留 标题 + 二维码 + 链接，紧凑排成一页 */
+  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb,
+  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.ribbon{display:none!important;}
+  .wrap{padding:8mm 9mm!important;max-width:none!important;}
+  header{margin:0 0 5mm!important;}
+  .title-hero{font-size:21pt!important;margin:0 0 1.5mm!important;letter-spacing:.08em!important;animation:none!important;}
+  .title-hero em{text-shadow:none!important;}
+  .motto{font-size:9.5pt!important;margin:0!important;opacity:1!important;animation:none!important;}
+  section{margin:0 0 4mm!important;}
+  .rule{margin:0 0 3mm!important;}
+  .rule span{font-size:9pt!important;letter-spacing:.22em!important;text-shadow:none!important;}
+  .grid{grid-template-columns:1fr 1fr!important;gap:4mm!important;}
   .card{opacity:1!important;transform:none!important;background:#fffdf8!important;border:1px solid var(--gold3)!important;
-    box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;padding:14px 16px!important;
+    box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;gap:2mm!important;padding:3mm 3.5mm!important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .card:hover{transform:none!important;box-shadow:none!important;}
   .ornate::before,.ornate::after{display:none!important;}
-  .qr-plate{box-shadow:none!important;border:1px solid var(--gold3)!important;
+  .card-body{display:block!important;flex:0 0 auto!important;}
+  .card-body h3{font-size:11.5pt!important;margin:0!important;line-height:1.25!important;}
+  .card-body h3 a{text-shadow:none!important;}
+  .card-foot{padding-top:2mm!important;gap:3mm!important;border-top:1px solid var(--line2)!important;align-items:center!important;}
+  .qr-plate{box-shadow:none!important;border:1px solid var(--gold3)!important;padding:1.2mm!important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .qr-box,.qr{width:96px!important;height:96px!important;}
-  .url{color:#48402f!important;}
-  .ribbon{box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .badge-glyph,.tag,.rule span,.card-body h3 a,.title-hero em{text-shadow:none!important;}
+  .qr-box,.qr{width:24mm!important;height:24mm!important;}
+  .card-actions{flex:1!important;gap:1mm!important;}
+  .url{color:#48402f!important;font-size:8pt!important;text-align:left!important;}
+  footer{margin:5mm 0 0!important;padding-top:3mm!important;font-size:8pt!important;}
   a{text-decoration:none!important;}
-  @page{margin:12mm;}
+  @page{size:A4;margin:10mm;}
 }
 """
 
