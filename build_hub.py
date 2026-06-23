@@ -16,30 +16,43 @@ DEFAULT_DATA = {
     "motto": "Make Yourself Special & Kind · 作品总目",
     "hint": "投屏后 手机扫码即玩，或点击卡片 /「访问」直接打开 — 全部为单文件网页应用，离线可用。",
     "sections": [
-        {"label": "课堂积分 · 投屏即用", "items": [
-            {"glyph": "榜", "tag": "课堂工具", "title": "MYSKME 积分板", "en": "Classroom Scoreboard",
+        {"label": "推荐 · 随时开玩", "items": [
+            {"key": "quiz", "glyph": "题", "tag": "题库训练 · 内含 2 套", "title": "MYSKME 题库训练场", "en": "Quiz Trainer",
+             "desc": "题库训练入口，内含「词灵对决」单词训练 与「无名之原」答题闯关。",
+             "url": "https://myskme-games.netlify.app/", "featured": True},
+            {"key": "volvme", "glyph": "史", "tag": "叙事 · 世界观", "title": "世界编年史 II", "en": "VOLVME II",
+             "desc": "狼先生与他的学生们 · 世界编年史第二卷，剧情与设定档案。",
+             "url": "https://myskme-volvme-ii.netlify.app"},
+            {"key": "scoreboard", "glyph": "榜", "tag": "积分榜", "title": "MYSKME 积分板", "en": "Classroom Scoreboard",
              "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线 PWA。",
              "url": "https://myskme.github.io/myskme-scoreboard/"},
-            {"glyph": "国", "tag": "课堂游戏", "title": "三国军师争霸", "en": "Three Kingdoms Scoreboard",
+            {"key": "expedition", "glyph": "征", "tag": "RPG 冒险", "title": "远征录 · 笼中剑", "en": "Expedition",
+             "desc": "学院谷地 RPG · 技能连招 · 探索成长 · 金叶与水晶经济系统。",
+             "url": "https://myskme-expedition.netlify.app"},
+        ]},
+        {"label": "课堂专用 · 老师投屏", "items": [
+            {"key": "threek", "glyph": "国", "tag": "课堂游戏", "title": "三国军师争霸", "en": "Three Kingdoms Scoreboard",
              "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。",
              "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"},
-            {"glyph": "斗", "tag": "课堂游戏", "title": "MYSKME 大乱斗", "en": "MYSKME Brawl",
+            {"key": "brawl", "glyph": "斗", "tag": "课堂游戏", "title": "MYSKME 大乱斗", "en": "MYSKME Brawl",
              "desc": "课堂积分 + 黑域塔防 · 六系角色养成 · 可分享炫耀战报卡。",
              "url": "https://myskme.github.io/myskme-brawl/"},
         ]},
-        {"label": "游戏 · 世界观", "items": [
-            {"glyph": "征", "tag": "RPG 冒险", "title": "远征录 · 笼中剑", "en": "Expedition",
-             "desc": "学院谷地 RPG · 技能连招 · 探索成长 · 金叶与水晶经济系统。",
-             "url": "https://myskme-expedition.netlify.app"},
-            {"glyph": "史", "tag": "叙事 · 世界观", "title": "世界编年史 II", "en": "VOLVME II",
-             "desc": "狼先生与他的学生们 · 世界编年史第二卷，剧情与设定档案。",
-             "url": "https://myskme-volvme-ii.netlify.app"},
-            {"glyph": "题", "tag": "题库训练 · 内含 2 套", "title": "MYSKME 题库训练场", "en": "Quiz Trainer",
-             "desc": "题库训练入口，内含「词灵对决」单词训练 与「无名之原」答题闯关。",
-             "url": "https://myskme-games.netlify.app/", "featured": True},
-        ]},
     ],
 }
+
+# 预览截图：shots.json 由 capture_shots.sh 生成（key -> data URI）；缺失则回退到字形徽章
+SHOTS = {}
+_sp = os.path.join(HERE, "shots.json")
+if os.path.exists(_sp):
+    try:
+        SHOTS = json.load(open(_sp, encoding="utf-8"))
+    except Exception:
+        SHOTS = {}
+for _sec in DEFAULT_DATA["sections"]:
+    for _it in _sec["items"]:
+        if _it.get("key") in SHOTS:
+            _it["shot"] = SHOTS[_it["key"]]
 
 PASSWORD = "mrwolf4358"
 
@@ -126,6 +139,15 @@ section{margin-top:clamp(36px,6vw,60px);}
 .card.in{opacity:1;transform:translateY(0);transition-delay:calc(var(--i) * 70ms);}
 .card:hover{transform:translateY(-5px);border-color:var(--gold);box-shadow:var(--card-hover-shadow);}
 .card.featured{border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 30px rgba(201,166,74,.06);}
+
+/* 预览截图（hero）：满宽出血到卡片边缘，缺图回退字形 */
+.thumb{margin:-24px -24px 0;position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--bg4);border-bottom:1px solid var(--line);}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .55s cubic-bezier(.16,1,.3,1);}
+.card:hover .thumb img{transform:scale(1.05);}
+.thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(201,166,74,.14),transparent 70%);}
+.thumb-fallback span{font-size:62px;font-weight:300;color:var(--gold);text-shadow:0 0 24px rgba(201,166,74,.35);transition:transform .5s cubic-bezier(.16,1,.3,1);}
+.card:hover .thumb-fallback span{transform:scale(1.08);}
+.card-body{display:flex;flex-direction:column;gap:7px;flex:1;}
 .ribbon{position:absolute;top:14px;right:-30px;transform:rotate(45deg);background:var(--gold);
   color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.22em;padding:3px 34px;z-index:4;box-shadow:0 2px 10px rgba(0,0,0,.4);}
 
@@ -138,10 +160,10 @@ section{margin-top:clamp(36px,6vw,60px);}
 .card:hover .badge-glyph{transform:scale(1.12);text-shadow:0 0 34px rgba(201,166,74,.65);}
 
 .card-titles{min-width:0;flex:1;}
-.tag{display:inline-block;font-size:11px;letter-spacing:.2em;color:var(--gold);border:1px solid var(--line);padding:2px 9px;margin-bottom:7px;}
-.card-titles h3{margin:0;font-size:21px;font-weight:500;letter-spacing:.06em;line-height:1.35;}
-.card-titles h3 a{color:var(--ink);text-decoration:none;transition:color .3s,text-shadow .3s;}
-.card:hover .card-titles h3 a{color:var(--gold2);text-shadow:0 0 18px rgba(201,166,74,.4);}
+.tag{align-self:flex-start;font-size:11px;letter-spacing:.2em;color:var(--gold);border:1px solid var(--line);padding:2px 9px;}
+.card-body h3{margin:0;font-size:21px;font-weight:500;letter-spacing:.06em;line-height:1.35;}
+.card-body h3 a{color:var(--ink);text-decoration:none;transition:color .3s,text-shadow .3s;}
+.card:hover .card-body h3 a{color:var(--gold2);text-shadow:0 0 18px rgba(201,166,74,.4);}
 .en{font-size:12px;letter-spacing:.24em;color:var(--ink3);text-transform:uppercase;}
 .card-desc{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.75;flex:1;}
 
@@ -262,7 +284,7 @@ footer b{color:var(--ink2);font-weight:400;}
   html,body{background:#fbf7ee!important;color:#241d12!important;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   body::before,body::after{display:none!important;}
-  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row{display:none!important;}
+  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb{display:none!important;}
   .wrap{padding:6mm 8mm!important;max-width:none!important;}
   header{margin-bottom:8mm!important;}
   .kicker,.title-hero,.motto,.meta-row,.usehint{opacity:1!important;animation:none!important;}
@@ -278,7 +300,7 @@ footer b{color:var(--ink2);font-weight:400;}
   .qr-box,.qr{width:96px!important;height:96px!important;}
   .url{color:#48402f!important;}
   .ribbon{box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .badge-glyph,.tag,.rule span,.card-titles h3 a,.title-hero em{text-shadow:none!important;}
+  .badge-glyph,.tag,.rule span,.card-body h3 a,.title-hero em{text-shadow:none!important;}
   a{text-decoration:none!important;}
   @page{margin:12mm;}
 }
@@ -309,13 +331,16 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   }
 
   function cardHTML(it,si,ii){
+    var thumb=it.shot
+      ? '<div class="thumb"><img loading="lazy" alt="" src="'+esc(it.shot)+'"></div>'
+      : '<div class="thumb"><div class="thumb-fallback"><span data-bind="glyph">'+esc(it.glyph)+'</span></div></div>';
     return '<article class="card ornate'+(it.featured?' featured':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
       +(it.featured?'<span class="ribbon">HUB</span>':'')
-      +'<div class="card-head"><div class="badge"><span class="badge-glyph" data-bind="glyph">'+esc(it.glyph)+'</span></div>'
-        +'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'
+      +thumb
+      +'<div class="card-body"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'
         +'<h3><a class="title-link" href="'+esc(it.url)+'" target="_blank" rel="noopener" data-bind="title">'+esc(it.title)+'</a></h3>'
-        +'<span class="en" data-bind="en">'+esc(it.en)+'</span></div></div>'
-      +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p>'
+        +'<span class="en" data-bind="en">'+esc(it.en)+'</span>'
+        +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
       +'<div class="card-foot"><div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">扫码即玩</span></div>'
         +'<div class="card-actions"><span class="url" data-bind="url">'+esc(it.url)+'</span>'
         +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'" target="_blank" rel="noopener">访问 ↗</a>'
@@ -530,8 +555,8 @@ def static_header(d):
         f'    <p class="motto" data-h="motto">{d["motto"]}</p>\n'
         '    <div class="meta-row">\n'
         '      <div class="stat"><b id="stat-total">0</b><span>件作品</span></div>\n'
-        '      <div class="stat"><b id="stat-a">0</b><span>课堂积分器</span></div>\n'
-        '      <div class="stat"><b id="stat-b">0</b><span>游戏 / 世界观</span></div>\n'
+        '      <div class="stat"><b id="stat-a">0</b><span>推荐随玩</span></div>\n'
+        '      <div class="stat"><b id="stat-b">0</b><span>课堂专用</span></div>\n'
         '    </div>\n'
         f'    <p class="usehint" data-h="hint">{d["hint"]}</p>\n'
         '  </header>'

@@ -2,3 +2,12 @@
 __pycache__/
 *.pyc
 .DS_Store
+# capture intermediates & one-off / other-site working files
+thumbs/*.png
+thumbs/*.log
+*.log
+games-live.html
+games-patched.html
+retry_two.sh
+retry_volvme.sh
+netlify_deploy.py
