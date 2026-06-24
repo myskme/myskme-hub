@@ -192,7 +192,12 @@ var DEFAULT_WALL = {
     var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 800'><rect width='600' height='800' fill='%23f3e9cf'/><rect x='10' y='10' width='580' height='780' fill='none' stroke='%23d8c690' stroke-width='3'/><text x='52' y='84' font-family='Songti SC,serif' font-size='32' fill='%231c160c'>"+encodeURIComponent(title).replace(/'/g,'')+"</text>"+rows+"<g transform='translate(498,706)'><circle r='38' fill='none' stroke='%23a83030' stroke-width='3'/><text text-anchor='middle' y='6' font-family='Songti SC,serif' font-size='15' fill='%23a83030'>优秀</text></g><text x='300' y='430' text-anchor='middle' font-family='Songti SC,serif' font-size='20' fill='rgba(120,90,30,.22)'>样张 · 待替换为真实扫描件</text></svg>";
     return "data:image/svg+xml;charset=utf-8,"+svg;
   }
-  function imgOf(e){return e.img?e.img:placeholder(e.title||'作文');}
+  function imgOf(e){
+    if(!e.img)return placeholder(e.title||'作文');
+    var u=String(e.img);
+    if(/^(https?:|data:)/.test(u))return u;
+    return u.replace(/^\.?\//,'').replace(/^myskme-hub\//,'').replace(/^wall\//,'');
+  }
 
   function grades(){var g={};DATA.entries.forEach(function(e){if(e.grade)g[e.grade]=1;});return Object.keys(g);}
   function renderFilters(){

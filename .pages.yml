@@ -1,0 +1,38 @@
+# Pages CMS 配置 — MYSKME 荣誉殿堂 · 作文墙自助后台
+# 用法：app.pagescms.org → GitHub 登录 → 选 myskme/myskme-hub → 「作文墙」
+media:
+  input: wall/img
+  output: wall/img
+  extensions: [jpg, jpeg, png, webp]
+content:
+  - name: wall
+    label: 作文墙
+    type: file
+    path: wall/index.json
+    fields:
+      - name: subtitle
+        label: 副标题
+        type: string
+      - name: gate
+        label: 班级口令（留空 = 完全公开）
+        type: string
+      - name: entries
+        label: 作文
+        type: object
+        list: true
+        fields:
+          - { name: id, label: 编号（英文或数字，唯一）, type: string }
+          - { name: title, label: 标题, type: string }
+          - { name: author, label: 作者（化名）, type: string }
+          - name: grade
+            label: 年级
+            type: select
+            options:
+              values: [初一, 初二, 初三]
+          - { name: theme, label: 主题, type: string }
+          - { name: score, label: 评分 / 荣誉, type: string }
+          - { name: tag, label: 标签, type: string }
+          - { name: note, label: 王老师点评, type: text }
+          - { name: highlights, label: 亮点（可加多条）, type: string, list: true }
+          - { name: featured, label: 设为精选（金奖角标）, type: boolean }
+          - { name: img, label: 作文扫描图, type: image }
