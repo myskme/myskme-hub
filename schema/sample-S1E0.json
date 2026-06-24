@@ -1,0 +1,34 @@
+{
+  "ver": 1,
+  "name": "S1E0 开学暖身 · 示例题库",
+  "code": "S1E0",
+  "desc": "格式示例：两组配对 + 一组选择填空，供出库前比对。",
+  "date": "2026-06-24",
+  "mods": {
+    "m1": [
+      ["abandon", "v. 抛弃；放弃", 2],
+      ["ability", "n. 能力", 1],
+      ["achieve", "v. 实现；达到", 2]
+    ],
+    "m2": [
+      ["brave", "adj. 勇敢的", 1],
+      ["balance", "n. 平衡 v. 使平衡", 2]
+    ],
+    "m4": [
+      {
+        "q": "She finally ___ her dream of becoming a teacher.",
+        "ops": ["abandoned", "achieved", "avoided", "admired"],
+        "ans": 1,
+        "why": "achieve one's dream = 实现梦想。",
+        "lv": 2
+      },
+      {
+        "q": "He has the ___ to solve hard problems on his own.",
+        "ops": ["ability", "able", "enable", "ably"],
+        "ans": 0,
+        "why": "the ability to do sth = 有能力做某事，空格需名词。",
+        "lv": 1
+      }
+    ]
+  }
+}
