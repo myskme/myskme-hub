@@ -1,0 +1,19 @@
+{
+  "subtitle": "优秀英语作文展示墙 · 手写真迹",
+  "gate": "",
+  "entries": [
+    {
+      "id": "w1",
+      "title": "My Dream School",
+      "author": "初二 · 梓涵（化名）",
+      "grade": "初二",
+      "theme": "校园生活",
+      "date": "2026-06",
+      "score": "A+",
+      "note": "三段式清晰，过渡词 First / Besides / In a word 用得地道；卷面整洁。",
+      "highlights": ["not only...but also...", "连接词丰富", "卷面整洁"],
+      "featured": true,
+      "img": "img/w1.jpg"
+    }
+  ]
+}

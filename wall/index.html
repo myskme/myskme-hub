@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>学院谷地 · 荣誉殿堂 | MYSKME 优秀作文墙</title>
+<meta name="description" content="MYSKME × 英语王老师 · 优秀英语作文展示墙（荣誉殿堂）。">
+<style>
+:root{
+  --bg:#0a0a0c;--bg2:#111114;--bg3:#16161a;--bg4:#1c1c22;
+  --ink:#f0e6d2;--ink2:#a8a090;--ink3:#6a6458;
+  --gold:#c9a64a;--gold2:#e8c768;--gold3:#7a6320;--red:#a83030;
+  --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.1);
+  --glow:0 0 24px rgba(201,166,74,.4);
+  --serif:"Noto Serif SC","Songti SC","STSong",serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.7;overflow-x:hidden;
+  background-image:radial-gradient(1100px 640px at 50% -8%,rgba(201,166,74,.10),transparent 60%);background-attachment:fixed;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.26;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");}
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:clamp(34px,6vw,72px) clamp(16px,4vw,40px) 80px;}
+header{text-align:center;margin-bottom:clamp(28px,5vw,52px);}
+.kicker{font-size:12px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase;}
+h1{font-size:clamp(30px,5.6vw,60px);font-weight:300;letter-spacing:.16em;margin:.3em 0 .16em;}
+h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow);}
+.sub{color:var(--ink2);letter-spacing:.14em;font-size:clamp(13px,2vw,16px);}
+.filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
+.chip{font-size:13px;letter-spacing:.12em;color:var(--ink2);border:1px solid var(--line);padding:6px 16px;cursor:pointer;
+  background:transparent;transition:all .25s;font-family:var(--serif);}
+.chip:hover{border-color:var(--gold);color:var(--gold2);}
+.chip.on{border-color:var(--gold);color:#1a1208;background:var(--gold);font-weight:600;}
+
+/* masonry wall */
+.wall{columns:4 230px;column-gap:18px;margin-top:10px;}
+@media(max-width:900px){.wall{columns:3 200px;}}
+@media(max-width:620px){.wall{columns:2 150px;}}
+.card{break-inside:avoid;margin:0 0 18px;position:relative;border:1px solid var(--line);cursor:pointer;overflow:hidden;
+  background:var(--bg3);transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .4s;display:block;}
+.card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 16px 40px rgba(0,0,0,.5);}
+.card img{width:100%;display:block;}
+.card .cap{position:absolute;left:0;right:0;bottom:0;padding:32px 12px 12px;
+  background:linear-gradient(180deg,transparent,rgba(8,8,10,.92));}
+.card .ct{font-size:15px;font-weight:500;letter-spacing:.04em;line-height:1.3;}
+.card .cm{font-size:11.5px;color:var(--ink2);letter-spacing:.06em;margin-top:3px;}
+.card .score{position:absolute;top:10px;left:10px;font-size:12px;font-weight:700;letter-spacing:.06em;color:#1a1208;
+  background:var(--gold);padding:2px 9px;}
+.ribbon{position:absolute;top:13px;right:-30px;transform:rotate(45deg);background:var(--red);color:#fff;
+  font-size:10px;font-weight:700;letter-spacing:.2em;padding:3px 32px;box-shadow:0 2px 8px rgba(0,0,0,.4);}
+.hl{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.hl span{font-size:10px;letter-spacing:.04em;color:var(--gold2);border:1px solid var(--line);padding:1px 6px;}
+.empty{text-align:center;color:var(--ink3);padding:60px 0;letter-spacing:.1em;}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:60;display:none;background:rgba(0,0,0,.85);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  padding:24px;overflow:auto;}
+.lb.show{display:flex;align-items:flex-start;justify-content:center;}
+.lb-box{display:flex;gap:24px;max-width:1100px;width:100%;margin:auto;flex-wrap:wrap;}
+.lb-img{flex:1 1 300px;min-width:280px;}
+.lb-img img{width:100%;border:1px solid var(--gold3);box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.lb-info{flex:1 1 280px;min-width:260px;padding-top:6px;}
+.lb-info h3{margin:0 0 4px;font-size:24px;font-weight:500;letter-spacing:.05em;}
+.lb-meta{color:var(--ink2);font-size:13px;letter-spacing:.08em;margin-bottom:18px;}
+.lb-note{border-left:2px solid var(--gold);padding:6px 0 6px 14px;color:var(--ink);font-size:14.5px;line-height:1.8;margin-bottom:16px;}
+.lb-note b{color:var(--gold2);font-weight:500;}
+.lb-hl{display:flex;gap:7px;flex-wrap:wrap;}
+.lb-hl span{font-size:12px;color:var(--gold2);border:1px solid var(--line);padding:3px 10px;}
+.lb-close{position:fixed;top:18px;right:22px;font-size:26px;color:var(--ink2);cursor:pointer;z-index:61;line-height:1;}
+.lb-close:hover{color:var(--gold);}
+
+/* gate */
+.gate{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:var(--bg);}
+.gate.show{display:flex;}
+.gate-box{text-align:center;padding:30px;width:min(360px,90vw);}
+.gate-box h2{font-weight:300;letter-spacing:.14em;color:var(--gold);}
+.gate-box input{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ink);padding:11px 14px;
+  font-family:var(--serif);letter-spacing:.2em;text-align:center;outline:none;margin:14px 0;}
+.gate-box input:focus{border-color:var(--gold);}
+.gate-box button{background:linear-gradient(180deg,rgba(201,166,74,.22),rgba(201,166,74,.08));border:1px solid var(--gold3);
+  color:var(--ink);padding:10px 28px;letter-spacing:.14em;cursor:pointer;font-family:var(--serif);}
+
+/* admin */
+.fab{position:fixed;left:16px;bottom:16px;z-index:40;width:40px;height:40px;border:1px solid var(--line);background:var(--bg3);
+  color:var(--ink3);cursor:pointer;font-size:16px;opacity:.45;transition:all .3s;display:flex;align-items:center;justify-content:center;}
+.fab:hover{opacity:1;border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);}
+body.admin .fab{display:none;}
+.abar{position:sticky;top:0;z-index:45;display:none;align-items:center;gap:12px;flex-wrap:wrap;padding:11px clamp(14px,4vw,28px);
+  background:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));border-bottom:1px solid var(--gold3);box-shadow:0 6px 24px rgba(0,0,0,.5);}
+body.admin .abar{display:flex;}
+.abar .t{color:var(--gold2);letter-spacing:.14em;font-size:14px;margin-right:auto;}
+.abar button{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 14px;letter-spacing:.06em;cursor:pointer;font-family:var(--serif);font-size:13px;transition:all .2s;}
+.abar button:hover{border-color:var(--gold);color:var(--gold2);}
+.mask{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);}
+.mask.show{display:flex;}
+.pw{background:var(--bg3);border:1px solid var(--gold3);padding:28px;width:min(360px,90vw);box-shadow:var(--glow);}
+.pw h4{margin:0 0 6px;font-weight:500;letter-spacing:.1em;}
+.pw p{margin:0 0 14px;color:var(--ink3);font-size:13px;}
+.pw input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:11px 13px;font-family:ui-monospace,monospace;letter-spacing:.16em;outline:none;}
+.pw .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+.pw .row button{background:transparent;border:1px solid var(--line);color:var(--ink);padding:9px 18px;cursor:pointer;font-family:var(--serif);}
+.pw .row .pri{background:linear-gradient(180deg,rgba(201,166,74,.2),rgba(201,166,74,.07));border-color:var(--gold3);}
+[contenteditable="true"]{outline:1px dashed var(--gold3);outline-offset:2px;cursor:text;}
+.card-admin{display:none;gap:6px;padding:8px;background:rgba(10,10,12,.7);position:absolute;top:0;left:0;right:0;justify-content:center;}
+body.admin .card-admin{display:flex;}
+.card-admin button{font-size:11px;padding:3px 8px;background:var(--bg4);border:1px solid var(--line);color:var(--ink2);cursor:pointer;font-family:var(--serif);}
+.card-admin button:hover{border-color:var(--gold);color:var(--gold2);}
+.toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(16px);background:var(--bg4);border:1px solid var(--gold);
+  color:var(--gold2);padding:11px 24px;letter-spacing:.12em;font-size:14px;z-index:90;opacity:0;pointer-events:none;box-shadow:var(--glow);transition:all .3s;max-width:88vw;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-align:center;color:var(--ink3);font-size:12.5px;letter-spacing:.1em;line-height:1.9;}
+</style>
+</head>
+<body>
+<div class="abar" id="abar">
+  <span class="t">管理员 · <b style="color:var(--ink3);font-weight:400">点文字可改，「＋ 加作品」选扫描件自动嵌入</b></span>
+  <button id="aAdd">＋ 加作品</button>
+  <button id="aGate">设班级口令</button>
+  <button id="aExport">导出 index.html</button>
+  <button id="aExit">退出</button>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">MYSKME × 英语王老师</div>
+    <h1>学院谷地 · <em>荣誉殿堂</em></h1>
+    <p class="sub" data-h="subtitle">优秀英语作文展示墙 · 手写真迹</p>
+    <div class="filters" id="filters"></div>
+  </header>
+  <div class="wall" id="wall"></div>
+  <div class="empty" id="empty" style="display:none">这一类暂时还没有上墙的作品～</div>
+  <footer>
+    <div>MYSKME — Make Yourself Special &amp; Kind</div>
+    <div>每一笔，都值得被看见 · 单文件离线展示墙</div>
+  </footer>
+</div>
+
+<button class="fab" id="fab" title="管理员">✎</button>
+<div class="toast" id="toast"></div>
+
+<div class="lb" id="lb"><span class="lb-close" id="lbClose">✕</span><div class="lb-box" id="lbBox"></div></div>
+
+<div class="gate" id="gate"><div class="gate-box">
+  <h2>荣誉殿堂</h2>
+  <p style="color:var(--ink3);font-size:13px">输入班级口令进入</p>
+  <input id="gateIn" type="text" placeholder="班级口令" aria-label="班级口令">
+  <button id="gateOk">进入</button>
+</div></div>
+
+<input type="file" id="fileIn" accept="image/*" style="display:none">
+<div class="mask" id="mask"><div class="pw">
+  <h4>管理员模式</h4><p>输入密码以编辑展示墙。改动存在本机，导出后重新部署即更新。</p>
+  <input id="pwIn" type="password" autocomplete="off" placeholder="请输入密码">
+  <div class="row"><button id="pwCancel">取消</button><button id="pwOk" class="pri">进入</button></div>
+</div></div>
+
+<script>
+/*WALLDATA_START*/
+var DEFAULT_WALL = {
+  "subtitle": "优秀英语作文展示墙 · 手写真迹",
+  "gate": "",
+  "entries": [
+    {"id":"w1","title":"My Dream School","author":"初二 · 梓涵（化名）","grade":"初二","theme":"校园生活","date":"2026-06","score":"A+","note":"三段式清晰，过渡词 First / Besides / In a word 用得地道；卷面整洁，几乎零涂改。","highlights":["not only...but also...","连接词丰富","卷面整洁"],"featured":true,"img":""},
+    {"id":"w2","title":"A Trip to Dalian","author":"初三 · J.L.","grade":"初三","theme":"城市旅行","date":"2026-05","score":"A","note":"细节生动，过去时态全程准确，结尾自然点题。","highlights":["过去时态零失误","细节描写","点题结尾"],"featured":false,"img":""},
+    {"id":"w3","title":"How I Beat My Phone Addiction","author":"初三 · 王同学","grade":"初三","theme":"议论文","date":"2026-05","score":"A+","note":"论点—论据—结论结构完整，思辨有层次；用了 make a difference、in the long run 等高分短语。","highlights":["议论结构完整","高分短语","思辨清晰"],"featured":true,"img":""},
+    {"id":"w4","title":"My Favourite Festival","author":"初一 · Z.Y.","grade":"初一","theme":"节日庆典","date":"2026-04","score":"A","note":"词汇准确，句子简洁通顺，是初一进阶的好范本。","highlights":["词汇准确","句子通顺"],"featured":false,"img":""}
+  ]
+};
+/*WALLDATA_END*/
+
+(function(){
+  var LS='myskme-wall', SS='myskme-wall-admin', PW='mrwolf4358';
+  var DATA=load(), filter='全部';
+  var wallEl=document.getElementById('wall'), emptyEl=document.getElementById('empty'),
+      filtersEl=document.getElementById('filters'), toastEl=document.getElementById('toast');
+
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+  function load(){try{var s=localStorage.getItem(LS);if(s)return JSON.parse(s);}catch(e){}return clone(DEFAULT_WALL);}
+  function save(){try{localStorage.setItem(LS,JSON.stringify(DATA));}catch(e){}}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function isAdmin(){return document.body.classList.contains('admin');}
+  function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('show');},1800);}
+
+  function placeholder(title){
+    var rows='';
+    for(var i=0;i<15;i++){var y=118+i*43;
+      rows+="<line x1='52' y1='"+y+"' x2='548' y2='"+y+"' stroke='%23cdb98a' stroke-width='1'/>";
+      var x=58;while(x<516){var seg=22+Math.random()*58;
+        rows+="<path d='M"+x+" "+(y-7)+" q "+(seg/2).toFixed(0)+" -7 "+seg.toFixed(0)+" 0' stroke='%2333302a' stroke-width='2.2' fill='none' stroke-linecap='round' opacity='0.7'/>";
+        x+=seg+8+Math.random()*14;}}
+    var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 800'><rect width='600' height='800' fill='%23f3e9cf'/><rect x='10' y='10' width='580' height='780' fill='none' stroke='%23d8c690' stroke-width='3'/><text x='52' y='84' font-family='Songti SC,serif' font-size='32' fill='%231c160c'>"+encodeURIComponent(title).replace(/'/g,'')+"</text>"+rows+"<g transform='translate(498,706)'><circle r='38' fill='none' stroke='%23a83030' stroke-width='3'/><text text-anchor='middle' y='6' font-family='Songti SC,serif' font-size='15' fill='%23a83030'>优秀</text></g><text x='300' y='430' text-anchor='middle' font-family='Songti SC,serif' font-size='20' fill='rgba(120,90,30,.22)'>样张 · 待替换为真实扫描件</text></svg>";
+    return "data:image/svg+xml;charset=utf-8,"+svg;
+  }
+  function imgOf(e){return e.img?e.img:placeholder(e.title||'作文');}
+
+  function grades(){var g={};DATA.entries.forEach(function(e){if(e.grade)g[e.grade]=1;});return Object.keys(g);}
+  function renderFilters(){
+    var cats=['全部'].concat(grades());
+    filtersEl.innerHTML=cats.map(function(c){return '<button class="chip'+(c===filter?' on':'')+'" data-f="'+esc(c)+'">'+esc(c)+'</button>';}).join('');
+  }
+  function cardHTML(e,i){
+    return '<a class="card" data-i="'+i+'">'
+      +(e.featured?'<span class="ribbon">金奖</span>':'')
+      +(e.score?'<span class="score">'+esc(e.score)+'</span>':'')
+      +'<img loading="lazy" alt="" src="'+esc(imgOf(e))+'">'
+      +'<div class="cap"><div class="ct" data-bind="title" data-i="'+i+'">'+esc(e.title)+'</div>'
+      +'<div class="cm"><span data-bind="author" data-i="'+i+'">'+esc(e.author)+'</span> · '+esc(e.date||'')+'</div>'
+      +'<div class="hl">'+(e.highlights||[]).slice(0,3).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>'
+      +'<div class="card-admin"><button data-op="feat" data-i="'+i+'">★ 金奖</button><button data-op="edit" data-i="'+i+'">改</button><button data-op="del" data-i="'+i+'">删</button></div>'
+      +'</a>';
+  }
+  function render(){
+    var list=DATA.entries.map(function(e,i){return {e:e,i:i};}).filter(function(o){return filter==='全部'||o.e.grade===filter;});
+    wallEl.innerHTML=list.map(function(o){return cardHTML(o.e,o.i);}).join('');
+    emptyEl.style.display=list.length?'none':'block';
+    var sub=document.querySelector('[data-h="subtitle"]'); if(sub)sub.textContent=DATA.subtitle||'';
+    applyAdmin();
+  }
+  function applyAdmin(){
+    var on=isAdmin();
+    document.querySelectorAll('[data-bind],[data-h]').forEach(function(el){
+      if(on){el.setAttribute('contenteditable','true');el.setAttribute('spellcheck','false');}else el.removeAttribute('contenteditable');
+    });
+  }
+
+  // lightbox
+  var lb=document.getElementById('lb'), lbBox=document.getElementById('lbBox');
+  function openLB(i){
+    var e=DATA.entries[i];if(!e)return;
+    lbBox.innerHTML='<div class="lb-img"><img src="'+esc(imgOf(e))+'" alt=""></div>'
+      +'<div class="lb-info"><h3>'+esc(e.title)+(e.score?' <span style="color:var(--gold);font-size:18px">'+esc(e.score)+'</span>':'')+'</h3>'
+      +'<div class="lb-meta">'+esc(e.author||'')+' · '+esc(e.grade||'')+' · '+esc(e.theme||'')+' · '+esc(e.date||'')+'</div>'
+      +(e.note?'<div class="lb-note"><b>王老师点评 · </b>'+esc(e.note)+'</div>':'')
+      +'<div class="lb-hl">'+(e.highlights||[]).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>';
+    lb.classList.add('show');
+  }
+  document.getElementById('lbClose').onclick=function(){lb.classList.remove('show');};
+  lb.addEventListener('click',function(ev){if(ev.target===lb)lb.classList.remove('show');});
+
+  // events
+  filtersEl.addEventListener('click',function(ev){var b=ev.target.closest('[data-f]');if(b){filter=b.getAttribute('data-f');renderFilters();render();}});
+  wallEl.addEventListener('click',function(ev){
+    var op=ev.target.closest('[data-op]');
+    if(op){ev.preventDefault();var i=+op.getAttribute('data-i');doOp(op.getAttribute('data-op'),i);return;}
+    if(isAdmin()){ if(ev.target.closest('[data-bind]')) return; ev.preventDefault(); }   // 编辑时点卡不弹灯箱
+    var card=ev.target.closest('.card'); if(card)openLB(+card.getAttribute('data-i'));
+  });
+  wallEl.addEventListener('input',function(ev){
+    var el=ev.target, key=el.getAttribute('data-bind'); if(!key)return;
+    var i=+el.getAttribute('data-i'); if(DATA.entries[i]){DATA.entries[i][key]=el.textContent;save();}
+  });
+  document.querySelector('[data-h="subtitle"]').addEventListener('input',function(ev){DATA.subtitle=ev.target.textContent;save();});
+
+  function doOp(op,i){
+    var e=DATA.entries[i]; if(!e)return;
+    if(op==='feat'){e.featured=!e.featured;}
+    else if(op==='del'){if(!confirm('从墙上撤下「'+(e.title||'')+'」？'))return;DATA.entries.splice(i,1);}
+    else if(op==='edit'){editMeta(i);return;}
+    save();render();
+  }
+  function editMeta(i){
+    var e=DATA.entries[i];
+    var note=prompt('王老师点评：',e.note||''); if(note!==null)e.note=note;
+    var hl=prompt('高分亮点（逗号分隔）：',(e.highlights||[]).join('，')); if(hl!==null)e.highlights=hl.split(/[，,]/).map(function(s){return s.trim();}).filter(Boolean);
+    var sc=prompt('评级（如 A+ / 留空不显示）：',e.score||''); if(sc!==null)e.score=sc.trim();
+    var th=prompt('主题：',e.theme||''); if(th!==null)e.theme=th.trim();
+    save();render();
+  }
+
+  // add with image pick + downscale
+  var pendingNew=null, fileIn=document.getElementById('fileIn');
+  document.getElementById('aAdd').onclick=function(){pendingNew=true;fileIn.value='';fileIn.click();};
+  fileIn.onchange=function(){
+    var f=fileIn.files&&fileIn.files[0]; if(!f)return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var max=1000, sc=Math.min(1,max/im.width), w=Math.round(im.width*sc), h=Math.round(im.height*sc);
+        var cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);
+        var data=cv.toDataURL('image/jpeg',0.82);
+        var gr=prompt('年级（初一/初二/初三）：','初二')||'';
+        var ti=prompt('作文题目：','')||'未命名';
+        var au=prompt('作者（建议化名/学号/首字母）：','')||'';
+        DATA.entries.unshift({id:'w'+Date.now(),title:ti,author:au,grade:gr.trim(),theme:'',date:new Date().toISOString().slice(0,7),score:'',note:'',highlights:[],featured:false,img:data});
+        save();renderFilters();render();toast('已加入展示墙');
+      };
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(f);
+  };
+
+  // gate
+  var gate=document.getElementById('gate');
+  function checkGate(){
+    if(!DATA.gate){gate.classList.remove('show');return;}
+    if(sessionStorage.getItem('wall-gate-ok')==='1'){gate.classList.remove('show');return;}
+    gate.classList.add('show');
+  }
+  document.getElementById('gateOk').onclick=function(){
+    if(document.getElementById('gateIn').value.trim()===DATA.gate){sessionStorage.setItem('wall-gate-ok','1');gate.classList.remove('show');}
+    else toast('口令不对');
+  };
+  document.getElementById('gateIn').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('gateOk').click();});
+
+  // admin
+  var mask=document.getElementById('mask'), pwIn=document.getElementById('pwIn');
+  document.getElementById('fab').onclick=function(){mask.classList.add('show');pwIn.value='';setTimeout(function(){pwIn.focus();},50);};
+  document.getElementById('pwCancel').onclick=function(){mask.classList.remove('show');};
+  document.getElementById('pwOk').onclick=tryPw;
+  pwIn.addEventListener('keydown',function(e){if(e.key==='Enter')tryPw();if(e.key==='Escape')mask.classList.remove('show');});
+  function tryPw(){if(pwIn.value===PW){mask.classList.remove('show');document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}}
+  document.getElementById('aExit').onclick=function(){document.body.classList.remove('admin');sessionStorage.removeItem(SS);applyAdmin();toast('已退出');};
+  document.getElementById('aGate').onclick=function(){var g=prompt('设置班级口令（留空=公开，无门槛）：',DATA.gate||'');if(g!==null){DATA.gate=g.trim();save();toast(DATA.gate?'已设口令：'+DATA.gate:'已设为公开');}};
+  document.getElementById('aExport').onclick=function(){
+    save();var jsonStr=JSON.stringify(DATA,null,2);
+    fetch(location.pathname+location.search,{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
+      if(html.indexOf('/*WALLDATA_START*/')<0)throw 0;
+      html=html.replace(/\/\*WALLDATA_START\*\/[\s\S]*?\/\*WALLDATA_END\*\//,'/*WALLDATA_START*/\nvar DEFAULT_WALL = '+jsonStr+';\n/*WALLDATA_END*/');
+      var b=new Blob([html],{type:'text/html;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='index.html';document.body.appendChild(a);a.click();a.remove();
+      toast('已导出 index.html，重新部署即更新');
+    }).catch(function(){
+      var b=new Blob([jsonStr],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='wall-index.json';document.body.appendChild(a);a.click();a.remove();
+      toast('已导出 JSON');
+    });
+  };
+
+  // boot
+  fetch('index.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
+    if(j&&j.entries&&!localStorage.getItem(LS)){DATA=j;}
+  }).catch(function(){}).finally(function(){
+    renderFilters();render();checkGate();
+    if(sessionStorage.getItem(SS)==='1'){document.body.classList.add('admin');applyAdmin();}
+  });
+})();
+</script>
+</body>
+</html>
