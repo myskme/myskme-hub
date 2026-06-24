@@ -12,3 +12,7 @@ retry_two.sh
 retry_volvme.sh
 netlify_deploy.py
 volvme_big.sh
+deploy_wordduel.py
+games_deploy.py
+hub_netlify_deploy.py
+netlify_sites.py
