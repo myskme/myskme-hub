@@ -1,0 +1,191 @@
+{
+  "ver": 1,
+  "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
+  "code": "TRAP1",
+  "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
+  "date": "2026-06-24",
+  "mods": {
+    "m1": [
+      ["时态错配", "看时间状语：since/for 接完成时，ago 接过去时", 1],
+      ["假被动", "happen / break out / belong 等不及物动词没有被动", 2],
+      ["been / gone", "have been to = 去过(已回)；have gone to = 去了(没回)", 1],
+      ["主谓一致", "each / every / the number of 接单数动词", 2],
+      ["非谓语", "介词后、enjoy/finish 后用 doing；to do 表目的", 1],
+      ["从句引导", "指物用 which/that，指人用 who，所属用 whose", 2],
+      ["条件虚拟", "主将从现：if 条件句用一般现在表将来", 2],
+      ["易混搭配", "used to do=过去常；be used to doing=习惯于", 2]
+    ],
+    "m4": [
+      {
+        "q": "We ___ in this small town since 2015, and we still love it here.",
+        "ops": ["live", "lived", "have lived", "are living"],
+        "ans": 2,
+        "why": "since + 时间点要用现在完成时 have lived；其余三个都不能和 since 2015 搭配。",
+        "lv": 1
+      },
+      {
+        "q": "By the time the firefighters arrived, the wooden house ___ down.",
+        "ops": ["burns", "burned", "has burned", "had burned"],
+        "ans": 3,
+        "why": "“过去某动作之前已完成”用过去完成时；房子在他们到达前就烧塌，故 had burned。",
+        "lv": 2
+      },
+      {
+        "q": "Listen! Someone ___ at the back door. Could you go and check?",
+        "ops": ["knocks", "is knocking", "knocked", "has knocked"],
+        "ans": 1,
+        "why": "Listen! 提示此刻正在发生，用现在进行时 is knocking。",
+        "lv": 1
+      },
+      {
+        "q": "A serious traffic accident ___ on this road late last night.",
+        "ops": ["happened", "was happened", "is happened", "has happened"],
+        "ans": 0,
+        "why": "happen 是不及物动词，没有被动；last night 用一般过去时 happened，was/is happened 均错。",
+        "lv": 2
+      },
+      {
+        "q": "The Second World War ___ in September 1939.",
+        "ops": ["broke out", "was broken out", "is broken out", "breaks out"],
+        "ans": 0,
+        "why": "break out（爆发）不及物、无被动；in 1939 用过去时，故 broke out。",
+        "lv": 2
+      },
+      {
+        "q": "Your weekend plan ___ great. Let's do it together!",
+        "ops": ["is sounded", "sounds", "is sounding", "sounded"],
+        "ans": 1,
+        "why": "sound 作系动词“听起来”不用被动、不用进行；陈述现在用 sounds。",
+        "lv": 1
+      },
+      {
+        "q": "This old bike is broken. It really needs ___ before the trip.",
+        "ops": ["repair", "to repair", "repairing", "repaired"],
+        "ans": 2,
+        "why": "need doing 主动形式表被动含义（= need to be done），故 repairing。",
+        "lv": 2
+      },
+      {
+        "q": "— I can't reach Mr. Lee anywhere. — He ___ to Beijing on business and isn't back yet.",
+        "ops": ["has been", "has gone", "had gone", "is going"],
+        "ans": 1,
+        "why": "“去了还没回”用 have gone to；have been to 表“去过已回”，与 isn't back yet 矛盾。",
+        "lv": 1
+      },
+      {
+        "q": "— Your spoken English is amazing! — Thanks. I ___ to an English camp twice.",
+        "ops": ["have been", "have gone", "has been", "am"],
+        "ans": 0,
+        "why": "twice 表经历次数用 have been to（去过）；have gone to 表“去了没回”，不能配 twice。",
+        "lv": 1
+      },
+      {
+        "q": "Each of the new students ___ a school uniform on Monday morning.",
+        "ops": ["wear", "wears", "are wearing", "were wearing"],
+        "ans": 1,
+        "why": "each of + 复数名词作主语，谓语用单数 wears。",
+        "lv": 1
+      },
+      {
+        "q": "The number of online learners ___ growing fast these years.",
+        "ops": ["is", "are", "have", "were"],
+        "ans": 0,
+        "why": "the number of …（……的数量）作主语，谓语用单数 is；a number of 才用复数。",
+        "lv": 2
+      },
+      {
+        "q": "Neither my parents nor my little sister ___ ever been to the Great Wall.",
+        "ops": ["have", "has", "are", "is"],
+        "ans": 1,
+        "why": "neither … nor … 遵循就近原则，靠近 sister（单数），用 has。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "We had walked for hours, so we stopped ___ a short rest under a tree.",
+        "ops": ["have", "to have", "having", "had"],
+        "ans": 1,
+        "why": "stop to do=停下来去做另一件事；这里停下来“去”休息，用 to have。stop doing 才是停止正在做的事。",
+        "lv": 2
+      },
+      {
+        "q": "Thank you so much for ___ me with my maths these days.",
+        "ops": ["help", "to help", "helping", "helped"],
+        "ans": 2,
+        "why": "介词 for 后接动名词 doing，故 helping。",
+        "lv": 1
+      },
+      {
+        "q": "— Did you lock the door? — Yes, I clearly remember ___ it before we left.",
+        "ops": ["lock", "to lock", "locking", "locked"],
+        "ans": 2,
+        "why": "remember doing=记得做过（已发生）；门已锁，用 locking。remember to do 是记得去做（还没做）。",
+        "lv": 2
+      },
+      {
+        "q": "The really funny story made the whole class ___ out loud.",
+        "ops": ["laugh", "to laugh", "laughing", "laughed"],
+        "ans": 0,
+        "why": "make sb do sth 省略 to，用动词原形 laugh。",
+        "lv": 1
+      },
+      {
+        "q": "He gave me some advice, ___ helped me a lot in the final exam.",
+        "ops": ["that", "which", "what", "it"],
+        "ans": 1,
+        "why": "逗号后的非限制性定语从句指物只能用 which，不用 that；what 不引导定语从句。",
+        "lv": 2
+      },
+      {
+        "q": "I have a classmate ___ father runs a small bookshop downtown.",
+        "ops": ["who", "whose", "which", "that"],
+        "ans": 1,
+        "why": "先行词 classmate 与 father 是所属关系，用 whose（……的）。",
+        "lv": 1
+      },
+      {
+        "q": "I'm really not sure ___ or not he will join our study group tomorrow.",
+        "ops": ["if", "that", "whether", "what"],
+        "ans": 2,
+        "why": "…or not 紧跟引导词时只能用 whether，不能用 if。",
+        "lv": 2
+      },
+      {
+        "q": "Excuse me, could you tell me ___ the nearest subway station is?",
+        "ops": ["where", "where is", "that where", "is where"],
+        "ans": 0,
+        "why": "宾语从句用陈述语序：where the nearest subway station is。",
+        "lv": 1
+      },
+      {
+        "q": "If it ___ tomorrow, we will visit the science museum instead.",
+        "ops": ["rains", "will rain", "rained", "is raining"],
+        "ans": 0,
+        "why": "if 条件状语从句“主将从现”——主句将来时，从句用一般现在 rains。",
+        "lv": 1
+      },
+      {
+        "q": "I wish I ___ swim as well as you do; I always sink like a stone!",
+        "ops": ["can", "could", "will", "may"],
+        "ans": 1,
+        "why": "wish 后表与现在事实相反的愿望，用过去式 could（虚拟语气）。",
+        "lv": 2
+      },
+      {
+        "q": "There ___ a cinema on this corner, but it was pulled down last year.",
+        "ops": ["used to be", "is used to be", "was used to be", "uses to be"],
+        "ans": 0,
+        "why": "used to be=过去曾经是（如今不再）；be used to doing 才是“习惯于”，形式也不同。",
+        "lv": 2
+      },
+      {
+        "q": "It was ___ heavy rain last night that the football match was put off.",
+        "ops": ["so", "such", "such a", "very"],
+        "ans": 1,
+        "why": "such + 不可数名词 rain；so 接形容词/副词；rain 不可数，故不能用 such a。",
+        "lv": 2
+      }
+    ]
+  }
+}
