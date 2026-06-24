@@ -1,0 +1,263 @@
+{
+  "name": "时态错配炼狱 · 亦真亦假",
+  "code": "TRAP3",
+  "desc": "☠ 炼狱单项突破：时态线索亦真亦假混排，专治 has gone/has been、for+时间段、by the time/by next、主将从现、间接引语时态呼应等高频时态陷阱。初三冲刺·中考拔尖。",
+  "tier": "svip",
+  "level": "炼狱",
+  "cat": "语法陷阱",
+  "pack": "语法陷阱训练营",
+  "mods": {
+    "m1": [
+      [
+        "since 2018 / for years",
+        "现在完成时（持续到现在）have done",
+        1
+      ],
+      [
+        "by the time he arrived",
+        "过去完成时（过去的过去）had done",
+        2
+      ],
+      [
+        "at 8:00 last night",
+        "过去进行时（那一刻正在做）was doing",
+        2
+      ],
+      [
+        "as soon as you finish（从句表将来）",
+        "一般现在时（主将从现）finish",
+        2
+      ],
+      [
+        "It is the first time that...",
+        "现在完成时 have done",
+        2
+      ],
+      [
+        "He said he had left",
+        "间接引语时态后移（过去的过去）",
+        2
+      ]
+    ],
+    "m4": [
+      {
+        "q": "I ___ this book for two weeks, but I still haven't finished it.",
+        "ops": [
+          "have had",
+          "had",
+          "have",
+          "am having"
+        ],
+        "ans": 0,
+        "why": "for two weeks 持续到现在 + haven't finished → 现在完成 have had；have（own）是状态动词不用进行时。",
+        "lv": 2
+      },
+      {
+        "q": "By the time we got to the cinema, the film ___.",
+        "ops": [
+          "has begun",
+          "began",
+          "had begun",
+          "begins"
+        ],
+        "ans": 2,
+        "why": "By the time + 过去(got) → 主句过去完成 had begun（过去的过去）。",
+        "lv": 2
+      },
+      {
+        "q": "Listen! Someone ___ in the next room.",
+        "ops": [
+          "cries",
+          "is crying",
+          "cried",
+          "has cried"
+        ],
+        "ans": 1,
+        "why": "Listen! 提示此刻正在 → 现在进行 is crying。",
+        "lv": 1
+      },
+      {
+        "q": "— Where is Tom? — He ___ to the library; he'll be back soon.",
+        "ops": [
+          "has been",
+          "has gone",
+          "went",
+          "goes"
+        ],
+        "ans": 1,
+        "why": "人不在、去了还没回 → has gone to（去了那里没回）；has been to 表去过已回，与‘还没回来’矛盾。",
+        "lv": 2
+      },
+      {
+        "q": "I'll call you as soon as I ___ home tonight.",
+        "ops": [
+          "will get",
+          "get",
+          "got",
+          "am getting"
+        ],
+        "ans": 1,
+        "why": "as soon as 引导时间状语从句、主将从现 → 一般现在 get。",
+        "lv": 2
+      },
+      {
+        "q": "This is the first time I ___ such a wonderful Beijing opera.",
+        "ops": [
+          "see",
+          "saw",
+          "have seen",
+          "had seen"
+        ],
+        "ans": 2,
+        "why": "This is the first time (that) 从句固定用现在完成 → have seen。",
+        "lv": 2
+      },
+      {
+        "q": "He ___ in that factory for thirty years before he retired last month.",
+        "ops": [
+          "has worked",
+          "worked",
+          "works",
+          "has been working"
+        ],
+        "ans": 1,
+        "why": "动作已随 retired last month 终止、未延续到现在 → 一般过去 worked；has worked / has been working 都要求延续到说话此刻，works 是现在时，均与已结束的过去矛盾。",
+        "lv": 2
+      },
+      {
+        "q": "When I was a child, I ___ to school every day.",
+        "ops": [
+          "walk",
+          "walked",
+          "have walked",
+          "was walking"
+        ],
+        "ans": 1,
+        "why": "When I was a child 是过去习惯 → 一般过去 walked；was walking 强调某刻正在走，与 every day 习惯不符。",
+        "lv": 1
+      },
+      {
+        "q": "Our teacher told us that the moon ___ around the earth.",
+        "ops": [
+          "moved",
+          "moves",
+          "had moved",
+          "would move"
+        ],
+        "ans": 1,
+        "why": "客观真理在间接引语中时态不后移 → 一般现在 moves。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "— Has Mr. Lee come back? — Yes, he ___ to Shanghai, and he is in the office now.",
+        "ops": [
+          "has gone",
+          "has been",
+          "went",
+          "had been"
+        ],
+        "ans": 1,
+        "why": "他现在就在办公室（已回）→ has been to（去过已回）；has gone to 表去了没回，与‘now in the office’矛盾。",
+        "lv": 2
+      },
+      {
+        "q": "They ___ the new gym by the end of next month.",
+        "ops": [
+          "will have finished",
+          "had finished",
+          "have finished",
+          "finished"
+        ],
+        "ans": 0,
+        "why": "by + 将来时间(next month) → 将来完成 will have finished（到将来某时已完成）；had finished / have finished / finished 都不含将来意义，与 next month 矛盾。",
+        "lv": 2
+      },
+      {
+        "q": "It ___ heavily when I left the house this morning.",
+        "ops": [
+          "rained",
+          "was raining",
+          "has rained",
+          "rains"
+        ],
+        "ans": 1,
+        "why": "when I left（过去某刻）正在下 → 过去进行 was raining。",
+        "lv": 1
+      },
+      {
+        "q": "My pen pal and I ___ each other since we met online last year.",
+        "ops": [
+          "didn't see",
+          "haven't seen",
+          "don't see",
+          "hadn't seen"
+        ],
+        "ans": 1,
+        "why": "since + 过去点、持续到现在 → 现在完成 haven't seen。",
+        "lv": 1
+      },
+      {
+        "q": "My aunt ___ English in this school for ten years, and she still teaches here now.",
+        "ops": [
+          "taught",
+          "has taught",
+          "teaches",
+          "is teaching"
+        ],
+        "ans": 1,
+        "why": "for ten years + still teaches now（持续到现在）→ 现在完成 has taught。",
+        "lv": 2
+      },
+      {
+        "q": "He asked me where I ___ the day before.",
+        "ops": [
+          "have gone",
+          "went",
+          "had gone",
+          "go"
+        ],
+        "ans": 2,
+        "why": "间接引语 + the day before（过去的过去）→ 过去完成 had gone。",
+        "lv": 2
+      },
+      {
+        "q": "Look at the dark clouds! It ___.",
+        "ops": [
+          "rains",
+          "is going to rain",
+          "rained",
+          "has rained"
+        ],
+        "ans": 1,
+        "why": "有迹象(clouds)预测将来 → be going to rain；非一般现在、非过去。",
+        "lv": 1
+      },
+      {
+        "q": "By the end of last term, we ___ five hundred English words.",
+        "ops": [
+          "have learned",
+          "learned",
+          "had learned",
+          "were learning"
+        ],
+        "ans": 2,
+        "why": "By the end of last term（过去时间点之前）→ 过去完成 had learned。",
+        "lv": 2
+      },
+      {
+        "q": "— You look exhausted. — Yes, I ___ in the garden all morning.",
+        "ops": [
+          "worked",
+          "have been working",
+          "work",
+          "had worked"
+        ],
+        "ans": 1,
+        "why": "all morning 持续到说话现在、且 look exhausted 是现在结果 → 现在完成进行 have been working。",
+        "lv": 2
+      }
+    ]
+  }
+}
