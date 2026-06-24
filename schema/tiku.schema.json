@@ -12,6 +12,14 @@
     "code": { "type": "string", "pattern": "^[A-Za-z0-9_]{2,16}$", "description": "兑换码=卷号，如 S1E7。学生手输，仅限字母数字下划线。" },
     "desc": { "type": "string", "description": "一句话简介。" },
     "date": { "type": "string", "description": "出库日期，YYYY-MM-DD（可选）。" },
+    "cat": { "type": "string", "description": "分类，供公共书架按类浏览，如 “语法陷阱” / “词汇” / “听力” / “主题词汇”。" },
+    "pack": { "type": "string", "description": "系列/辑名，如 “语法陷阱训练营”。" },
+    "level": { "type": "string", "description": "难度档：常规 / 炼狱（可选）。" },
+    "tier": {
+      "type": "string",
+      "enum": ["free", "code", "svip"],
+      "description": "分层：free=公共书架(无码直浏)；code=本期限定(兑换码=卷号，约2周后下放free)；svip=至尊内殿(炼狱/押题/独家，靠段位或专属码解锁)。缺省按 free。"
+    },
     "mods": {
       "type": "object",
       "minProperties": 1,
