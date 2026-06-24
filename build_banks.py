@@ -30,14 +30,16 @@ def build_bank(src):
             for it in items:
                 if isinstance(it, list):  # 容错：已是数组配对，跳过
                     continue
-                o = {"q": it.get("q", ""), "ops": it.get("ops", []), "ans": int(it.get("ans", 0))}
+                _a = it.get("ans")
+                _ans = int(_a) if isinstance(_a, (int, float)) or (isinstance(_a, str) and _a.strip().lstrip("-").isdigit()) else -1
+                o = {"q": it.get("q", ""), "ops": it.get("ops", []), "ans": _ans}
                 if it.get("why"):
                     o["why"] = it["why"]
                 if it.get("lv"):
                     o["lv"] = int(it["lv"])
                 out.append(o)
             mods[k] = out
-    bank = {"name": src.get("name", ""), "code": src.get("code", ""), "desc": src.get("desc", "")}
+    bank = {"name": src.get("name", ""), "code": (src.get("code") or "").strip().upper(), "desc": src.get("desc", "")}
     for opt in ("tier", "level", "cat", "pack"):
         if src.get(opt):
             bank[opt] = src[opt]
@@ -79,9 +81,9 @@ def main():
     for sp in srcs:
         try:
             src = json.load(open(sp, encoding="utf-8"))
+            bank = build_bank(src)
         except Exception as e:
-            all_errs.append("%s JSON 解析失败：%s" % (os.path.basename(sp), e)); continue
-        bank = build_bank(src)
+            all_errs.append("%s 解析/构建失败：%s" % (os.path.basename(sp), e)); continue
         errs = validate(bank)
         if errs:
             all_errs += errs; continue
@@ -97,6 +99,12 @@ def main():
         for e in all_errs:
             print("  -", e)
         return 1
+    # 清理已删除题库的产物：banks/src 里没有的，就从书架移除（仅在全部校验通过时）
+    keep = {c["code"] for c in catalog}
+    for f in glob.glob(os.path.join(OUT, "*.json")):
+        base = os.path.splitext(os.path.basename(f))[0]
+        if base != "index" and base not in keep:
+            os.remove(f); print("  · 已下架旧题库：%s" % os.path.basename(f))
     json.dump({"catalog": catalog}, open(os.path.join(OUT, "index.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=2)
     print("✓ 构建完成：%d 个题库，已写 banks/<code>.json + banks/index.json" % len(catalog))

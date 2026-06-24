@@ -117,6 +117,7 @@ footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-a
   <button id="aAdd">＋ 加作品</button>
   <button id="aGate">设班级口令</button>
   <button id="aExport">导出 index.html</button>
+  <button id="aReload">丢弃本机草稿</button>
   <button id="aExit">退出</button>
 </div>
 
@@ -248,7 +249,7 @@ var DEFAULT_WALL = {
   wallEl.addEventListener('click',function(ev){
     var op=ev.target.closest('[data-op]');
     if(op){ev.preventDefault();var i=+op.getAttribute('data-i');doOp(op.getAttribute('data-op'),i);return;}
-    if(isAdmin()){ if(ev.target.closest('[data-bind]')) return; ev.preventDefault(); }   // 编辑时点卡不弹灯箱
+    if(isAdmin()){ ev.preventDefault(); return; }   // 编辑模式：点卡片一律不弹灯箱（含图片/角标/评分）
     var card=ev.target.closest('.card'); if(card)openLB(+card.getAttribute('data-i'));
   });
   wallEl.addEventListener('input',function(ev){
@@ -322,6 +323,7 @@ var DEFAULT_WALL = {
   pwIn.addEventListener('keydown',function(e){if(e.key==='Enter')tryPw();if(e.key==='Escape')mask.classList.remove('show');});
   function tryPw(){if(pwIn.value===PW){mask.classList.remove('show');document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}}
   document.getElementById('aExit').onclick=function(){document.body.classList.remove('admin');sessionStorage.removeItem(SS);applyAdmin();toast('已退出');};
+  document.getElementById('aReload').onclick=function(){if(!confirm('丢弃本机所有未导出的改动，重新载入线上最新内容？'))return;try{localStorage.removeItem(LS);}catch(e){}location.reload();};
   document.getElementById('aGate').onclick=function(){var g=prompt('设置班级口令（留空=公开，无门槛）：',DATA.gate||'');if(g!==null){DATA.gate=g.trim();save();toast(DATA.gate?'已设口令：'+DATA.gate:'已设为公开');}};
   document.getElementById('aExport').onclick=function(){
     save();var jsonStr=JSON.stringify(DATA,null,2);
