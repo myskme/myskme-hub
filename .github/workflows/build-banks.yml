@@ -25,7 +25,7 @@ jobs:
         run: |
           git config user.name "MYSKME 题库工坊"
           git config user.email "wzc1020@gmail.com"
-          git add banks/*.json
+          git add -A banks/
           if git diff --cached --quiet; then
             echo "书架无变化，跳过提交。"
           else
