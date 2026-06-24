@@ -49,7 +49,7 @@ MYSKME 题库工坊统一题库（“扩展题库”）格式。**出卷端**（
   - `code`：**本期限定**，兑换码=卷号（课上发），约 2 周后下放到 `free`。
   - `svip`：**至尊内殿**（炼狱/押题/独家），靠段位或专属码解锁。
 
-`banks/index.json` 的每条索引也带上 `cat/tier/level/date`，书架直接读它渲染分类目录。
+**目录文件 `banks/index.json` 用 `{ "catalog": [ … ] }` 包一层**（与线上《词灵对决》导入器一致），每条 `{code,name,desc,date,count}` 可再带 `cat/tier/level`，书架直接读它渲染分类目录。部署到 games 站时**只合并不覆盖**已有卷号。
 
 ## 出库前校验（必做）
 ```bash

@@ -99,10 +99,12 @@ def run(path):
         obj = json.load(open(path, encoding="utf-8"))
     except Exception as e:
         print(f"✗ {path}  JSON 解析失败：{e}"); return False
-    is_index = isinstance(obj, list) and obj and isinstance(obj[0], dict) and "code" in obj[0] and "mods" not in obj[0]
+    cat = obj.get("catalog") if isinstance(obj, dict) else None
+    is_index = isinstance(cat, list) or (isinstance(obj, list) and obj and isinstance(obj[0], dict) and "code" in obj[0] and "mods" not in obj[0])
     if is_index:
-        validate_index(obj, errs, warns)
-        summary = f"索引 {len(obj)} 条"
+        arr = cat if isinstance(cat, list) else obj
+        validate_index(arr, errs, warns)
+        summary = f"目录 {len(arr)} 条"
     else:
         c = validate_bank(obj, errs, warns)
         summary = f"{obj.get('code','?')} · 配对 {c['pair']} / 选择 {c['mcq']}（共 {c['pair']+c['mcq']} 题）"
