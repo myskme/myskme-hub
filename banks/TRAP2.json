@@ -1,0 +1,165 @@
+{
+  "ver": 1,
+  "name": "假被动炼狱 · 亦真亦假（陷阱套陷阱）",
+  "code": "TRAP2",
+  "desc": "☠ 炼狱单项突破：假被动 vs 真被动亦真亦假混排，专治“见被动就排除 / 见主动就放心”。初三冲刺·中考拔尖。",
+  "date": "2026-06-24",
+  "cat": "语法陷阱",
+  "pack": "语法陷阱训练营",
+  "level": "炼狱",
+  "tier": "svip",
+  "mods": {
+    "m1": [
+      ["happen / take place / break out", "不及物 · 永无被动（≠ was happened）", 2],
+      ["belong to / consist of", "不及物 · 无被动 · 无进行", 2],
+      ["sound / feel / taste / look", "系动词 · 用主动（sounds / feels…）", 1],
+      ["sell / open / cook（中动）", "物作主语 · 主动表被动（sells well）", 2],
+      ["die（瞬间动词）", "延续二十年 → has been dead，非 has died", 2],
+      ["build / invent / make（及物）", "真被动：was built / was invented", 1]
+    ],
+    "m4": [
+      {
+        "q": "A terrible earthquake ___ in that mountain area early this morning.",
+        "ops": ["was happened", "happened", "is happened", "has been happened"],
+        "ans": 1,
+        "why": "happen 不及物，永无被动（was/is happened 全错）；this morning 已过 → happened。",
+        "lv": 2
+      },
+      {
+        "q": "The opening ceremony ___ in the new stadium next Friday evening.",
+        "ops": ["is taken place", "takes place", "will take place", "will be taken place"],
+        "ans": 2,
+        "why": "take place（举行）不及物无被动；next Friday 表将来 → will take place。",
+        "lv": 2
+      },
+      {
+        "q": "A big fire ___ in the old market last night, but luckily no one got hurt.",
+        "ops": ["was broken out", "broke", "was broke", "broke out"],
+        "ans": 3,
+        "why": "break out（爆发）不及物无被动；只用 broke 意思变成“弄断”。",
+        "lv": 2
+      },
+      {
+        "q": "This umbrella ___ to my deskmate Lily, not to me.",
+        "ops": ["belongs", "is belonged", "belonging", "belonged"],
+        "ans": 0,
+        "why": "belong to 不及物、无被动、无进行；陈述现状用 belongs。",
+        "lv": 1
+      },
+      {
+        "q": "The sun ___ in the east every morning, and no one can ever change that.",
+        "ops": ["is risen", "is raised", "rises", "raises"],
+        "ans": 2,
+        "why": "rise（升起）不及物无被动 → rises；raise 是及物（举起/提高），不接这里。",
+        "lv": 2
+      },
+      {
+        "q": "This new mystery novel ___ really well; the shop has sold out twice.",
+        "ops": ["is sold", "has been sold", "sells", "sold"],
+        "ans": 2,
+        "why": "sell 表“卖得（好）”用中动主动 sells well；is sold / has been sold 是错误被动；sold（一般过去）与下文现在完成 has sold out 的语境不符。",
+        "lv": 2
+      },
+      {
+        "q": "I pushed and pushed for ten whole minutes, but no matter how hard I tried, the old rusty gate just ___.",
+        "ops": ["won't be opened", "isn't opened", "doesn't open", "won't open"],
+        "ans": 3,
+        "why": "物作主语、特定一次推不动 → 中动 won't open（=拒绝/纹丝不动）；doesn't open 是“习惯性打不开”，与“我使劲推这一回”语境冲突；won't be opened 强调没人去开，与“我使劲推”矛盾。",
+        "lv": 2
+      },
+      {
+        "q": "Real silk ___ soft and cool, which is exactly why so many people love it.",
+        "ops": ["is felt", "feels", "is feeling", "felt"],
+        "ans": 1,
+        "why": "feel 作系动词“摸起来”用主动 feels，不用被动/进行。",
+        "lv": 1
+      },
+      {
+        "q": "Your plan ___ reasonable, though it may be a little hard to carry out.",
+        "ops": ["sounds", "is sounded", "is sounding", "sounded"],
+        "ans": 0,
+        "why": "sound 系动词“听起来”用 sounds；不用被动/进行；陈述现在用 sounds。",
+        "lv": 1
+      },
+      {
+        "q": "The heavy storm ___ for three whole days and finally caused a flood.",
+        "ops": ["was lasted", "is lasted", "was last", "lasted"],
+        "ans": 3,
+        "why": "last（持续）不及物无被动；过去 → lasted。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "The Bird's Nest in Beijing ___ for the 2008 Olympic Games.",
+        "ops": ["built", "was built", "was build", "builds"],
+        "ans": 1,
+        "why": "build 及物，鸟巢“被建造”→ 真被动 was built。（故意混进来：别见被动就排除！）",
+        "lv": 2
+      },
+      {
+        "q": "Paper ___ by the ancient Chinese more than two thousand years ago.",
+        "ops": ["invented", "is invented", "was invent", "was invented"],
+        "ans": 3,
+        "why": "invent 及物，纸“被发明”→ was invented（真被动）；过去时间状语。",
+        "lv": 2
+      },
+      {
+        "q": "Look at this messy room! It really needs ___ before the guests arrive.",
+        "ops": ["to clean", "cleaning", "cleaned", "clean"],
+        "ans": 1,
+        "why": "need doing = 主动表被动（= needs to be cleaned）；cleaning 正确；to clean 意为“房间去打扫别处”，错。",
+        "lv": 2
+      },
+      {
+        "q": "This traditional fan ___ of bamboo and silk completely by hand.",
+        "ops": ["is made", "makes", "is making", "made"],
+        "ans": 0,
+        "why": "make 及物，扇子“被制作”→ is made of（真被动）。",
+        "lv": 1
+      },
+      {
+        "q": "His great-grandfather ___ for nearly twenty years, but the family still tells his stories.",
+        "ops": ["has died", "has been dead", "died", "has been died"],
+        "ans": 1,
+        "why": "die 是瞬间动词不能接“二十年”；延续要用系表 has been dead；has been died 是假被动错。",
+        "lv": 2
+      },
+      {
+        "q": "A beautiful double rainbow ___ in the sky just after the rain stopped.",
+        "ops": ["was appeared", "is appeared", "has appeared", "appeared"],
+        "ans": 3,
+        "why": "appear（出现）不及物无被动；rain stopped 表过去 → appeared。",
+        "lv": 2
+      },
+      {
+        "q": "The milk ___ bad because someone left it out of the fridge all day.",
+        "ops": ["was gone", "went", "is gone", "was went"],
+        "ans": 1,
+        "why": "go（变质）作系动词用主动 went bad；不用被动。is gone 意为“消失/离开”，义不符。",
+        "lv": 2
+      },
+      {
+        "q": "These thin rice noodles ___ much faster than thick ones, so keep an eye on the pot.",
+        "ops": ["cook", "are cooked", "are cooking", "cooked"],
+        "ans": 0,
+        "why": "物作主语表特性，中动主动 cook（cook = 容易煮熟）；“much faster than thick ones”是对两种面条固有属性的比较，排除进行时 are cooking；are cooked 强调“被煮”不合此习语。",
+        "lv": 2
+      },
+      {
+        "q": "The prices of fresh vegetables ___ sharply in the past few weeks.",
+        "ops": ["have been risen", "are risen", "have risen", "have raised"],
+        "ans": 2,
+        "why": "rise 不及物无被动；“in the past few weeks”用现在完成 have risen；raise 及物不接此处。",
+        "lv": 2
+      },
+      {
+        "q": "What ___ to the little boy by the gate? He looks like he's about to cry.",
+        "ops": ["was happened", "happened", "is happened", "did happen"],
+        "ans": 1,
+        "why": "happen 不及物无被动；What 作主语不用助动词，故非 did happen。",
+        "lv": 2
+      }
+    ]
+  }
+}
