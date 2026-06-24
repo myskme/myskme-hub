@@ -1,53 +1,54 @@
 {
-  "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
   "code": "TRAP1",
+  "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
   "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
-  "tier": "free",
-  "level": "常规",
+  "date": "2026-06-24",
   "cat": "语法陷阱",
   "pack": "语法陷阱训练营",
+  "level": "常规",
+  "tier": "free",
   "mods": {
     "m1": [
-      [
-        "时态错配",
-        "看时间状语：since/for 接完成时，ago 接过去时",
-        1
-      ],
-      [
-        "假被动",
-        "happen / break out / belong 等不及物动词没有被动",
-        2
-      ],
-      [
-        "been / gone",
-        "have been to = 去过(已回)；have gone to = 去了(没回)",
-        1
-      ],
-      [
-        "主谓一致",
-        "each / every / the number of 接单数动词",
-        2
-      ],
-      [
-        "非谓语",
-        "介词后、enjoy/finish 后用 doing；to do 表目的",
-        1
-      ],
-      [
-        "从句引导",
-        "指物用 which/that，指人用 who，所属用 whose",
-        2
-      ],
-      [
-        "条件虚拟",
-        "主将从现：if 条件句用一般现在表将来",
-        2
-      ],
-      [
-        "易混搭配",
-        "used to do=过去常；be used to doing=习惯于",
-        2
-      ]
+      {
+        "w": "时态错配",
+        "m": "看时间状语：since/for 接完成时，ago 接过去时",
+        "d": 1
+      },
+      {
+        "w": "假被动",
+        "m": "happen / break out / belong 等不及物动词没有被动",
+        "d": 2
+      },
+      {
+        "w": "been / gone",
+        "m": "have been to = 去过(已回)；have gone to = 去了(没回)",
+        "d": 1
+      },
+      {
+        "w": "主谓一致",
+        "m": "each / every / the number of 接单数动词",
+        "d": 2
+      },
+      {
+        "w": "非谓语",
+        "m": "介词后、enjoy/finish 后用 doing；to do 表目的",
+        "d": 1
+      },
+      {
+        "w": "从句引导",
+        "m": "指物用 which/that，指人用 who，所属用 whose",
+        "d": 2
+      },
+      {
+        "w": "条件虚拟",
+        "m": "主将从现：if 条件句用一般现在表将来",
+        "d": 2
+      },
+      {
+        "w": "易混搭配",
+        "m": "used to do=过去常；be used to doing=习惯于",
+        "d": 2
+      }
     ],
     "m4": [
       {

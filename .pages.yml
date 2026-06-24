@@ -36,3 +36,76 @@ content:
           - { name: highlights, label: 亮点（可加多条）, type: string, list: true }
           - { name: featured, label: 设为精选（金奖角标）, type: boolean }
           - { name: img, label: 作文扫描图, type: image }
+
+  - name: banks
+    label: 题库
+    type: collection
+    path: banks/src
+    filename: '{fields.code}.json'
+    view:
+      fields: [code, name, tier, level]
+    fields:
+      - { name: code, label: 兑换码 / 卷号（唯一，如 S1E7）, type: string }
+      - { name: name, label: 名称, type: string }
+      - { name: desc, label: 简介, type: text }
+      - { name: date, label: 日期（如 2026-06）, type: string }
+      - { name: cat, label: 分类（如 语法陷阱 / 词汇）, type: string }
+      - { name: pack, label: 系列, type: string }
+      - name: level
+        label: 难度
+        type: select
+        options:
+          values: [常规, 冲刺, 炼狱]
+      - name: tier
+        label: 门槛
+        type: select
+        options:
+          values: [free, code, svip]
+      - name: mods
+        label: 题目内容
+        type: object
+        fields:
+          - name: m1
+            label: 配对组 1（词 ↔ 义）
+            type: object
+            list: true
+            fields:
+              - { name: w, label: 词 / 项, type: string }
+              - { name: m, label: 义 / 解释, type: string }
+              - { name: d, label: 难度（1 基础 / 2 冲刺）, type: number }
+          - name: m2
+            label: 配对组 2
+            type: object
+            list: true
+            fields:
+              - { name: w, label: 词 / 项, type: string }
+              - { name: m, label: 义 / 解释, type: string }
+              - { name: d, label: 难度（1/2）, type: number }
+          - name: m3
+            label: 配对组 3
+            type: object
+            list: true
+            fields:
+              - { name: w, label: 词 / 项, type: string }
+              - { name: m, label: 义 / 解释, type: string }
+              - { name: d, label: 难度（1/2）, type: number }
+          - name: m4
+            label: 选择题组 1
+            type: object
+            list: true
+            fields:
+              - { name: q, label: 题干（空格用 ___）, type: string }
+              - { name: ops, label: 选项, type: string, list: true }
+              - { name: ans, label: 正确项下标（从 0 开始）, type: number }
+              - { name: why, label: 解析, type: text }
+              - { name: lv, label: 难度（1/2）, type: number }
+          - name: m5
+            label: 选择题组 2
+            type: object
+            list: true
+            fields:
+              - { name: q, label: 题干（空格用 ___）, type: string }
+              - { name: ops, label: 选项, type: string, list: true }
+              - { name: ans, label: 正确项下标（从 0 开始）, type: number }
+              - { name: why, label: 解析, type: text }
+              - { name: lv, label: 难度（1/2）, type: number }

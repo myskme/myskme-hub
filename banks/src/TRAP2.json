@@ -1,43 +1,44 @@
 {
-  "name": "假被动炼狱 · 亦真亦假（陷阱套陷阱）",
   "code": "TRAP2",
+  "name": "假被动炼狱 · 亦真亦假（陷阱套陷阱）",
   "desc": "☠ 炼狱单项突破：假被动 vs 真被动亦真亦假混排，专治“见被动就排除 / 见主动就放心”。初三冲刺·中考拔尖。",
-  "tier": "svip",
-  "level": "炼狱",
+  "date": "2026-06-24",
   "cat": "语法陷阱",
   "pack": "语法陷阱训练营",
+  "level": "炼狱",
+  "tier": "svip",
   "mods": {
     "m1": [
-      [
-        "happen / take place / break out",
-        "不及物 · 永无被动（≠ was happened）",
-        2
-      ],
-      [
-        "belong to / consist of",
-        "不及物 · 无被动 · 无进行",
-        2
-      ],
-      [
-        "sound / feel / taste / look",
-        "系动词 · 用主动（sounds / feels…）",
-        1
-      ],
-      [
-        "sell / open / cook（中动）",
-        "物作主语 · 主动表被动（sells well）",
-        2
-      ],
-      [
-        "die（瞬间动词）",
-        "延续二十年 → has been dead，非 has died",
-        2
-      ],
-      [
-        "build / invent / make（及物）",
-        "真被动：was built / was invented",
-        1
-      ]
+      {
+        "w": "happen / take place / break out",
+        "m": "不及物 · 永无被动（≠ was happened）",
+        "d": 2
+      },
+      {
+        "w": "belong to / consist of",
+        "m": "不及物 · 无被动 · 无进行",
+        "d": 2
+      },
+      {
+        "w": "sound / feel / taste / look",
+        "m": "系动词 · 用主动（sounds / feels…）",
+        "d": 1
+      },
+      {
+        "w": "sell / open / cook（中动）",
+        "m": "物作主语 · 主动表被动（sells well）",
+        "d": 2
+      },
+      {
+        "w": "die（瞬间动词）",
+        "m": "延续二十年 → has been dead，非 has died",
+        "d": 2
+      },
+      {
+        "w": "build / invent / make（及物）",
+        "m": "真被动：was built / was invented",
+        "d": 1
+      }
     ],
     "m4": [
       {
