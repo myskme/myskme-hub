@@ -30,6 +30,9 @@ DEFAULT_DATA = {
             {"key": "expedition", "glyph": "征", "tag": "RPG 冒险", "title": "远征录 · 笼中剑", "en": "Expedition",
              "desc": "学院谷地 RPG · 技能连招 · 探索成长 · 金叶与水晶经济系统。",
              "url": "https://myskme-expedition.netlify.app"},
+            {"key": "wall", "glyph": "范", "tag": "荣誉 · 优秀作文", "title": "学院谷地 · 荣誉殿堂", "en": "Wall of Fame",
+             "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
+             "url": "https://myskme.github.io/myskme-hub/wall/"},
         ]},
         {"label": "课堂专用 · 老师投屏", "collapsible": True, "items": [
             {"key": "threek", "glyph": "国", "tag": "课堂游戏", "title": "三国军师争霸", "en": "Three Kingdoms Scoreboard",
