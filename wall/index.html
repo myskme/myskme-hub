@@ -49,6 +49,7 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
   font-size:10px;font-weight:700;letter-spacing:.2em;padding:3px 32px;box-shadow:0 2px 8px rgba(0,0,0,.4);}
 .hl{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
 .hl span{font-size:10px;letter-spacing:.04em;color:var(--gold2);border:1px solid var(--line);padding:1px 6px;}
+.tagchip{font-size:10px;letter-spacing:.04em;color:var(--ink3);border:1px solid var(--line2);padding:1px 6px;background:rgba(255,255,255,.03);}
 .empty{text-align:center;color:var(--ink3);padding:60px 0;letter-spacing:.1em;}
 
 /* lightbox */
@@ -157,12 +158,13 @@ footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-a
 /*WALLDATA_START*/
 var DEFAULT_WALL = {
   "subtitle": "优秀英语作文展示墙 · 手写真迹",
-  "gate": "",
+  "gate": "MYSKME2026",
   "entries": [
-    {"id":"w1","title":"My Dream School","author":"初二 · 梓涵（化名）","grade":"初二","theme":"校园生活","date":"2026-06","score":"A+","note":"三段式清晰，过渡词 First / Besides / In a word 用得地道；卷面整洁，几乎零涂改。","highlights":["not only...but also...","连接词丰富","卷面整洁"],"featured":true,"img":""},
-    {"id":"w2","title":"A Trip to Dalian","author":"初三 · J.L.","grade":"初三","theme":"城市旅行","date":"2026-05","score":"A","note":"细节生动，过去时态全程准确，结尾自然点题。","highlights":["过去时态零失误","细节描写","点题结尾"],"featured":false,"img":""},
-    {"id":"w3","title":"How I Beat My Phone Addiction","author":"初三 · 王同学","grade":"初三","theme":"议论文","date":"2026-05","score":"A+","note":"论点—论据—结论结构完整，思辨有层次；用了 make a difference、in the long run 等高分短语。","highlights":["议论结构完整","高分短语","思辨清晰"],"featured":true,"img":""},
-    {"id":"w4","title":"My Favourite Festival","author":"初一 · Z.Y.","grade":"初一","theme":"节日庆典","date":"2026-04","score":"A","note":"词汇准确，句子简洁通顺，是初一进阶的好范本。","highlights":["词汇准确","句子通顺"],"featured":false,"img":""}
+    {"id":"w-lin","title":"A Letter to the Other You","author":"Lin（化名）","grade":"初三","theme":"书信 · 想象","date":"2026-06","score":"满分范文","tag":"美化版","note":"立意新颖——给“平行世界的另一个自己”写信，把“选择”写出了哲思。虚拟语气 what might have happened if I had made a different choice 用得准确老练；通篇书写如印刷体，几乎零涂改。","highlights":["虚拟语气准确","立意新颖","书写印刷级"],"featured":true,"img":""},
+    {"id":"w-hai","title":"Dear Other Me","author":"Hai（化名）","grade":"初三","theme":"书信 · 选择","date":"2026-06","score":"优秀","tag":"美化版","note":"同样写给“另一个自己”，却落到长兴岛求学的真实处境，情感细腻克制；I do not regret my choice、become our own heroes 收束有力，起承转合完整。","highlights":["情感细腻","结构完整","主题积极"],"featured":false,"img":""},
+    {"id":"w-luns","title":"An Object That Means a Lot to Me","author":"鹿女海（化名）","grade":"初二","theme":"记叙文 · 物品","date":"2026-06","score":"优秀","tag":"美化版","note":"记叙完整有起伏：球队失利 → 朋友一句 I know you can do well → 苦练逆转夺冠 → 收到礼物。直接引语生动，首尾呼应 This gift I will never forget!。","highlights":["故事有起伏","直接引语生动","首尾呼应"],"featured":false,"img":""},
+    {"id":"w-peter","title":"Dear Peter（西境奇遇）","author":"海（化名）","grade":"初一","theme":"书信 · 想象记叙","date":"2026-06","score":"创意之星","tag":"美化版","note":"想象力爆棚——把“狼先生”世界观写进作文：雪天寻狼、猫的劝阻、怪物与团队救援，teamwork 主题鲜明。语言仍有打磨空间（we meet→met、I not understand→didn't understand），但这份大胆与代入感值得上墙。","highlights":["想象大胆","融入狼先生世界观","主题鲜明"],"featured":false,"img":""},
+    {"id":"w-lihui","title":"Dear Eric（给笔友的建议）","author":"Li Hui（化名）","grade":"初三","theme":"书信 · 建议","date":"2026-06","score":"优秀","tag":"美化版","note":"标准建议信结构（First / Second / Third / Last but not least）一气呵成，针对“与父母沟通”给出可操作建议；keep a cool head and an open mind 等表达地道高级，条理清晰。","highlights":["建议信结构标准","高级短语","条理清晰"],"featured":true,"img":""}
   ]
 };
 /*WALLDATA_END*/
@@ -204,8 +206,8 @@ var DEFAULT_WALL = {
       +'<img loading="lazy" alt="" src="'+esc(imgOf(e))+'">'
       +'<div class="cap"><div class="ct" data-bind="title" data-i="'+i+'">'+esc(e.title)+'</div>'
       +'<div class="cm"><span data-bind="author" data-i="'+i+'">'+esc(e.author)+'</span> · '+esc(e.date||'')+'</div>'
-      +'<div class="hl">'+(e.highlights||[]).slice(0,3).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>'
-      +'<div class="card-admin"><button data-op="feat" data-i="'+i+'">★ 金奖</button><button data-op="edit" data-i="'+i+'">改</button><button data-op="del" data-i="'+i+'">删</button></div>'
+      +'<div class="hl">'+(e.tag?'<span class="tagchip">'+esc(e.tag)+'</span>':'')+(e.highlights||[]).slice(0,3).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>'
+      +'<div class="card-admin"><button data-op="img" data-i="'+i+'">换图</button><button data-op="feat" data-i="'+i+'">★ 金奖</button><button data-op="edit" data-i="'+i+'">改</button><button data-op="del" data-i="'+i+'">删</button></div>'
       +'</a>';
   }
   function render(){
@@ -230,7 +232,7 @@ var DEFAULT_WALL = {
       +'<div class="lb-info"><h3>'+esc(e.title)+(e.score?' <span style="color:var(--gold);font-size:18px">'+esc(e.score)+'</span>':'')+'</h3>'
       +'<div class="lb-meta">'+esc(e.author||'')+' · '+esc(e.grade||'')+' · '+esc(e.theme||'')+' · '+esc(e.date||'')+'</div>'
       +(e.note?'<div class="lb-note"><b>王老师点评 · </b>'+esc(e.note)+'</div>':'')
-      +'<div class="lb-hl">'+(e.highlights||[]).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>';
+      +'<div class="lb-hl">'+(e.tag?'<span class="tagchip">'+esc(e.tag)+'</span>':'')+(e.highlights||[]).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>';
     lb.classList.add('show');
   }
   document.getElementById('lbClose').onclick=function(){lb.classList.remove('show');};
@@ -255,6 +257,7 @@ var DEFAULT_WALL = {
     if(op==='feat'){e.featured=!e.featured;}
     else if(op==='del'){if(!confirm('从墙上撤下「'+(e.title||'')+'」？'))return;DATA.entries.splice(i,1);}
     else if(op==='edit'){editMeta(i);return;}
+    else if(op==='img'){pickImageFor(i);return;}
     save();render();
   }
   function editMeta(i){
@@ -267,8 +270,9 @@ var DEFAULT_WALL = {
   }
 
   // add with image pick + downscale
-  var pendingNew=null, fileIn=document.getElementById('fileIn');
-  document.getElementById('aAdd').onclick=function(){pendingNew=true;fileIn.value='';fileIn.click();};
+  var imgTargetIdx=null, fileIn=document.getElementById('fileIn');
+  function pickImageFor(i){imgTargetIdx=i;fileIn.value='';fileIn.click();}
+  document.getElementById('aAdd').onclick=function(){imgTargetIdx=null;fileIn.value='';fileIn.click();};
   fileIn.onchange=function(){
     var f=fileIn.files&&fileIn.files[0]; if(!f)return;
     var fr=new FileReader();
@@ -278,11 +282,14 @@ var DEFAULT_WALL = {
         var max=1000, sc=Math.min(1,max/im.width), w=Math.round(im.width*sc), h=Math.round(im.height*sc);
         var cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);
         var data=cv.toDataURL('image/jpeg',0.82);
-        var gr=prompt('年级（初一/初二/初三）：','初二')||'';
-        var ti=prompt('作文题目：','')||'未命名';
-        var au=prompt('作者（建议化名/学号/首字母）：','')||'';
-        DATA.entries.unshift({id:'w'+Date.now(),title:ti,author:au,grade:gr.trim(),theme:'',date:new Date().toISOString().slice(0,7),score:'',note:'',highlights:[],featured:false,img:data});
-        save();renderFilters();render();toast('已加入展示墙');
+        if(imgTargetIdx!=null && DATA.entries[imgTargetIdx]){DATA.entries[imgTargetIdx].img=data;save();render();toast('已换图');}
+        else{
+          var gr=prompt('年级（初一/初二/初三）：','初二')||'';
+          var ti=prompt('作文题目：','')||'未命名';
+          var au=prompt('作者（建议化名/学号/首字母）：','')||'';
+          DATA.entries.unshift({id:'w'+Date.now(),title:ti,author:au,grade:gr.trim(),theme:'',date:new Date().toISOString().slice(0,7),score:'',note:'',highlights:[],featured:false,img:data});
+          save();renderFilters();render();toast('已加入展示墙');
+        }
       };
       im.src=fr.result;
     };
