@@ -1,0 +1,42 @@
+{
+  "name": "主谓一致炼狱 · 就近与整体",
+  "code": "TRAP4",
+  "desc": "☠ 炼狱单项突破：主谓一致高频陷阱——either/neither/each/every、就近一致、a number of vs the number of、分数百分数、there be 就近、集合名词、不定式动名词作主语、time/money/distance 整体单数。初三冲刺·中考拔尖。",
+  "date": "2026-06-25",
+  "cat": "语法陷阱",
+  "pack": "语法陷阱训练营",
+  "level": "炼狱",
+  "tier": "svip",
+  "mods": {
+    "m1": [
+      { "w": "either / neither / each / every + 名词", "m": "谓语用单数", "d": 2 },
+      { "w": "neither...nor / either...or / not only...but also", "m": "就近一致：谓语跟最靠近的主语", "d": 2 },
+      { "w": "a number of + 复数名词", "m": "“许多”，谓语用复数", "d": 2 },
+      { "w": "the number of + 复数名词", "m": "“……的数量”，谓语用单数", "d": 2 },
+      { "w": "动名词 / 不定式作主语", "m": "谓语用单数", "d": 2 },
+      { "w": "time / money / distance 表整体", "m": "作主语时谓语用单数", "d": 2 }
+    ],
+    "m4": [
+      { "q": "Either you or he ___ right; let's check the answer.", "ops": ["are", "is", "am", "be"], "ans": 1, "why": "either...or 就近一致，靠后主语 he 是单数 → is。", "lv": 2 },
+      { "q": "Neither my parents nor my teacher ___ aware of the problem.", "ops": ["is", "are", "were", "have"], "ans": 0, "why": "neither...nor 就近一致，靠后主语 my teacher 单数 → is。", "lv": 2 },
+      { "q": "The number of the students in our school ___ about two thousand.", "ops": ["are", "were", "is", "have"], "ans": 2, "why": "the number of（……的数量）作主语 → 单数 is。", "lv": 2 },
+      { "q": "A number of trees ___ planted on the hill last spring.", "ops": ["was", "were", "is", "has been"], "ans": 1, "why": "a number of（许多）→ 复数；last spring 过去 + 被动 → were planted。", "lv": 2 },
+      { "q": "Each of the boys ___ a pen pal in England.", "ops": ["have", "are", "has", "were"], "ans": 2, "why": "each of + 复数名词作主语，谓语仍用单数 → has。", "lv": 2 },
+      { "q": "Reading aloud every morning ___ us a lot with our English.", "ops": ["help", "helps", "are helping", "have helped"], "ans": 1, "why": "动名词短语作主语视为单数 → helps（一般现在习惯）。", "lv": 2 },
+      { "q": "Every boy and girl in our class ___ to join the activity.", "ops": ["want", "are wanting", "wants", "have wanted"], "ans": 2, "why": "every...and... 强调每一个，谓语用单数 → wants。", "lv": 2 },
+      { "q": "The poor ___ more care and help from society.", "ops": ["needs", "need", "is needing", "has needed"], "ans": 1, "why": "the + 形容词（the poor）表一类人 → 复数 need。", "lv": 2 },
+      { "q": "Twenty kilometres ___ too long a way for the old man to walk.", "ops": ["are", "were", "is", "have been"], "ans": 2, "why": "distance（距离）作主语表整体 → 单数 is。", "lv": 2 }
+    ],
+    "m5": [
+      { "q": "Not only the students but also the teacher ___ fond of the new game.", "ops": ["is", "are", "were", "am"], "ans": 0, "why": "not only...but also 就近一致，靠后主语 the teacher 单数 → is。", "lv": 2 },
+      { "q": "Three quarters of the work ___ already been done.", "ops": ["have", "has", "were", "are"], "ans": 1, "why": "分数 of + 不可数(work) → 单数；already + 完成 → has (been done)。", "lv": 2 },
+      { "q": "Three quarters of the students ___ from the countryside.", "ops": ["is", "are", "was", "has been"], "ans": 1, "why": "分数 of + 可数复数(students) → 复数 are。", "lv": 2 },
+      { "q": "The bread and butter ___ what he has for breakfast every day.", "ops": ["are", "is", "were", "have been"], "ans": 1, "why": "bread and butter 是一个整体概念（黄油面包）→ 单数 is。", "lv": 2 },
+      { "q": "There ___ a ruler and three pencils in the pencil-box.", "ops": ["are", "is", "were", "have"], "ans": 1, "why": "there be 就近一致，靠后主语 a ruler 单数 → is。", "lv": 2 },
+      { "q": "Ten years ___ a long time to wait for a reply.", "ops": ["are", "is", "were", "have been"], "ans": 1, "why": "time（一段时间）作主语、看作一个整体 → 单数 is；are/were/have been 都与“整体作单数”相悖。", "lv": 2 },
+      { "q": "My family ___ all fond of pop music.", "ops": ["is", "are", "was", "has"], "ans": 1, "why": "family 强调成员（all fond）→ 复数 are。", "lv": 2 },
+      { "q": "To learn a foreign language well ___ not easy at all.", "ops": ["are", "is", "were", "have been"], "ans": 1, "why": "不定式短语作主语视为单数 → is。", "lv": 2 },
+      { "q": "Maths ___ thought to be a difficult but useful subject.", "ops": ["are", "is", "were", "have"], "ans": 1, "why": "学科名 maths 形式为复数、意义为单数 → is。", "lv": 2 }
+    ]
+  }
+}

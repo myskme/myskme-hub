@@ -1,0 +1,52 @@
+{
+  "name": "易混词辨析 · 第二辑（花费 / 到达 / 看听 / 形容词）",
+  "code": "MIX2",
+  "desc": "中考高频易混词第二弹：spend/cost/take/pay、reach/arrive/get to、look/see/watch/read、hear/listen to、interesting/interested、hard/hardly、alone/lonely。配对记义 + 句境选词。免费档。",
+  "date": "2026-06-25",
+  "cat": "词汇辨析",
+  "pack": "易混词训练营",
+  "level": "常规",
+  "tier": "free",
+  "mods": {
+    "m1": [
+      { "w": "spend", "m": "v. 花费（人作主语：spend time/money on sth 或 (in) doing）", "d": 1 },
+      { "w": "cost", "m": "v. 花费（物作主语：sth costs sb money）", "d": 1 },
+      { "w": "take", "m": "v. 花费（it takes sb time to do sth）", "d": 1 },
+      { "w": "pay", "m": "v. 付钱（pay (sb) money for sth）", "d": 1 },
+      { "w": "reach", "m": "v. 到达（及物，reach + 地点，后不加介词）", "d": 2 },
+      { "w": "arrive", "m": "v. 到达（不及物，arrive at 小地点 / in 大地点）", "d": 2 }
+    ],
+    "m2": [
+      { "w": "look", "m": "v. 看（强调动作，look at sth）", "d": 1 },
+      { "w": "see", "m": "v. 看见（强调结果，无意中看到）", "d": 1 },
+      { "w": "watch", "m": "v. 观看（看一段时间，watch TV / a match）", "d": 1 },
+      { "w": "read", "m": "v. 看 / 读（书报杂志）", "d": 1 },
+      { "w": "hear", "m": "v. 听见（强调结果，hear sb do/doing）", "d": 1 },
+      { "w": "listen to", "m": "v. 听（强调动作）", "d": 1 }
+    ],
+    "m3": [
+      { "w": "interesting", "m": "adj. 有趣的（修饰物 / 事）", "d": 1 },
+      { "w": "interested", "m": "adj. 感兴趣的（修饰人，be interested in）", "d": 1 },
+      { "w": "hard", "m": "adv. 努力地；adj. 困难的 / 硬的", "d": 2 },
+      { "w": "hardly", "m": "adv. 几乎不（含否定意义）", "d": 2 },
+      { "w": "alone", "m": "adj./adv. 独自（= by oneself，客观、无感情）", "d": 2 },
+      { "w": "lonely", "m": "adj. 孤独的（有感情色彩）", "d": 2 }
+    ],
+    "m4": [
+      { "q": "It ___ me two hours to finish the homework last night.", "ops": ["spent", "cost", "took", "paid"], "ans": 2, "why": "句型 it takes sb time to do sth → took；spend 人作主语，cost 物作主语。", "lv": 2 },
+      { "q": "The new mobile phone ___ him three thousand yuan.", "ops": ["spent", "cost", "took", "paid"], "ans": 1, "why": "物(phone)作主语：sth costs sb money → cost；spend/pay 人作主语。", "lv": 2 },
+      { "q": "He ___ three thousand yuan on the new mobile phone.", "ops": ["cost", "spent", "took", "paid"], "ans": 1, "why": "人作主语：spend money on sth → spent；cost 物作主语。", "lv": 2 },
+      { "q": "We ___ Shanghai at nine o'clock in the morning.", "ops": ["arrived", "got", "reached", "arrived at"], "ans": 2, "why": "reach 及物，后直接接地点 → reached；arrive 需 at/in，got 需 to。", "lv": 2 },
+      { "q": "What time did you ___ the airport yesterday?", "ops": ["arrive", "reach to", "get to", "arrive in"], "ans": 2, "why": "get to + 地点 → get to；reach 不接 to，arrive 接 at（airport 用 at，非 in）。", "lv": 2 },
+      { "q": "How much did you ___ for the concert ticket?", "ops": ["cost", "spend", "take", "pay"], "ans": 3, "why": "pay for sth（为……付钱）→ pay；cost/take 物或 it 作主语。", "lv": 2 }
+    ],
+    "m5": [
+      { "q": "Look! The boys ___ a basketball match over there.", "ops": ["are seeing", "are looking", "are watching", "are reading"], "ans": 2, "why": "观看比赛用 watch；see 强调“看见”结果，look 强调动作(look at)，read 是读书报。", "lv": 2 },
+      { "q": "Be quiet! I ___ someone knocking at the door.", "ops": ["listen to", "am listening", "can hear", "am hearing"], "ans": 2, "why": "“听见”(结果)用 hear，常与 can 连用、不用进行时；listen to 强调动作。", "lv": 2 },
+      { "q": "The science fiction is so ___ that I have read it twice.", "ops": ["interested", "interesting", "interest", "interestingly"], "ans": 1, "why": "修饰物/事用 -ing 形容词 interesting；interested 修饰人(be interested in)。", "lv": 2 },
+      { "q": "After his best friend moved away, he often felt ___ at home.", "ops": ["alone", "lonely", "only", "along"], "ans": 1, "why": "lonely 表“孤独”(情感)；alone 只表“独自”(客观状态)。", "lv": 2 },
+      { "q": "Jack works very ___, so he always does well in exams.", "ops": ["hardly", "hard", "harder", "hardness"], "ans": 1, "why": "hard 作副词意为“努力地”；hardly 是“几乎不”，意思相反。", "lv": 1 },
+      { "q": "It rained heavily, so ___ anyone came to the sports meeting.", "ops": ["hard", "hardly", "nearly", "almost"], "ans": 1, "why": "hardly anyone = 几乎没人（否定）；hard 是“努力/困难”，nearly/almost anyone 不合语义。", "lv": 2 }
+    ]
+  }
+}

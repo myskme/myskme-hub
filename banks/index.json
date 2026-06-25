@@ -12,6 +12,17 @@
       "count": 30
     },
     {
+      "code": "MIX2",
+      "name": "易混词辨析 · 第二辑（花费 / 到达 / 看听 / 形容词）",
+      "desc": "中考高频易混词第二弹：spend/cost/take/pay、reach/arrive/get to、look/see/watch/read、hear/listen to、interesting/interested、hard/hardly、alone/lonely。配对记义 + 句境选词。免费档。",
+      "date": "2026-06-25",
+      "cat": "词汇辨析",
+      "pack": "易混词训练营",
+      "level": "常规",
+      "tier": "free",
+      "count": 30
+    },
+    {
       "code": "TRAP1",
       "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
       "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
@@ -37,6 +48,17 @@
       "code": "TRAP3",
       "name": "时态错配炼狱 · 亦真亦假",
       "desc": "☠ 炼狱单项突破：时态线索亦真亦假混排，专治 has gone/has been、for+时间段、by the time/by next、主将从现、间接引语时态呼应等高频时态陷阱。初三冲刺·中考拔尖。",
+      "date": "2026-06-25",
+      "cat": "语法陷阱",
+      "pack": "语法陷阱训练营",
+      "level": "炼狱",
+      "tier": "svip",
+      "count": 24
+    },
+    {
+      "code": "TRAP4",
+      "name": "主谓一致炼狱 · 就近与整体",
+      "desc": "☠ 炼狱单项突破：主谓一致高频陷阱——either/neither/each/every、就近一致、a number of vs the number of、分数百分数、there be 就近、集合名词、不定式动名词作主语、time/money/distance 整体单数。初三冲刺·中考拔尖。",
       "date": "2026-06-25",
       "cat": "语法陷阱",
       "pack": "语法陷阱训练营",
