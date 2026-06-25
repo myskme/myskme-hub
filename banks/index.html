@@ -33,6 +33,9 @@ h1{font-size:clamp(30px,5.6vw,52px);font-weight:300;letter-spacing:.16em;margin:
 h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow)}
 .sub{color:var(--ink2);letter-spacing:.1em;font-size:15px;margin:0}
 .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:22px 0 4px;font-size:12.5px;color:var(--ink3);letter-spacing:.06em}
+.poster-btn{margin:18px auto 0;display:block;font-family:var(--serif);font-size:14px;letter-spacing:.1em;padding:9px 22px;cursor:pointer;background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border:1px solid var(--gold3);color:var(--ink);transition:all .25s}
+.poster-btn:hover{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow)}
+.poster-btn:active{transform:scale(.97)}
 .legend b{font-weight:400}
 .tier{display:inline-block;font-size:11px;letter-spacing:.14em;padding:2px 9px;border:1px solid var(--line)}
 .tier.free{color:var(--green);border-color:rgba(106,168,106,.5)}
@@ -77,6 +80,7 @@ footer a:hover{text-shadow:var(--glow)}
       <span><span class="tier code">CODE</span> <b>本期限定</b></span>
       <span><span class="tier svip">SVIP</span> <b>尊享 / 炼狱</b></span>
     </div>
+    <button class="poster-btn" id="posterBtn">📥 导出书架海报</button>
   </header>
   <div class="shelf" id="shelf"><div class="loading">正在取回书架……</div></div>
   <footer>
@@ -85,6 +89,8 @@ footer a:hover{text-shadow:var(--glow)}
 </div>
 <script>
 var GAME='https://myskme-games.netlify.app/word-duel?code=';
+var SHELF_URL='https://myskme.github.io/myskme-hub/banks/';
+var CATALOG=[];
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function tierOf(t){t=(t||'free').toLowerCase();return ['free','code','svip'].indexOf(t)<0?'free':t}
 function card(b){
@@ -104,7 +110,7 @@ function card(b){
     +'</div>';
 }
 fetch('index.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(o){
-  var list=(o&&o.catalog)||[];
+  var list=CATALOG=(o&&o.catalog)||[];
   var el=document.getElementById('shelf');
   if(!list.length){el.innerHTML='<div class="empty">书架还是空的——等王老师的下一期。</div>';return}
   var sum=function(arr){return arr.reduce(function(s,b){return s+(+b.count||0)},0)};
@@ -120,6 +126,49 @@ fetch('index.json',{cache:'no-store'}).then(function(r){return r.json()}).then(f
 }).catch(function(){
   document.getElementById('shelf').innerHTML='<div class="empty">书架暂时取不到，稍后再试。</div>';
 });
+function fitS(ctx,s,maxw){s=String(s||'');if(ctx.measureText(s).width<=maxw)return s;while(s.length>1&&ctx.measureText(s+'…').width>maxw)s=s.slice(0,-1);return s+'…';}
+function buildShelfPoster(){
+  if(!CATALOG.length){alert('题库还没加载好，稍等一下再点');return;}
+  var im=new Image();im.onload=function(){drawShelfPoster(im);};im.onerror=function(){drawShelfPoster(null);};
+  im.src='shelf-qr.png?cb='+Date.now();
+}
+function drawShelfPoster(qr){
+  var W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;var x=cv.getContext('2d');
+  x.fillStyle='#f5efe2';x.fillRect(0,0,W,H);
+  var g=x.createRadialGradient(W/2,-60,80,W/2,260,940);g.addColorStop(0,'rgba(201,166,74,.16)');g.addColorStop(1,'rgba(201,166,74,0)');x.fillStyle=g;x.fillRect(0,0,W,680);
+  x.strokeStyle='rgba(150,120,50,.55)';x.lineWidth=2;x.strokeRect(30,30,W-60,H-60);
+  x.textBaseline='alphabetic';x.textAlign='center';
+  x.fillStyle='#8a6d1e';x.font='600 26px "Songti SC",serif';x.fillText('MYSKME · 词灵对决',W/2,118);
+  x.fillStyle='#2a2218';x.font='300 72px "Songti SC",serif';x.fillText('题库书架',W/2,204);
+  x.fillStyle='#6a5f47';x.font='400 26px "Songti SC",serif';x.fillText('扫码进书架 · 输兑换码即刷同款题',W/2,254);
+  var total=CATALOG.reduce(function(s,b){return s+(+b.count||0)},0);
+  var freeN=CATALOG.filter(function(b){return (b.tier||'free').toLowerCase()==='free'}).reduce(function(s,b){return s+(+b.count||0)},0);
+  x.fillStyle='#8a6d1e';x.font='500 24px "Songti SC",serif';x.fillText(CATALOG.length+' 辑 · '+total+' 题 · 免费 '+freeN+' 题',W/2,298);
+  var gx=70,rw=W-2*gx,n=Math.min(CATALOG.length,6),ly=340,rowH=Math.min(176,(1450-ly)/Math.max(n,1)),pad=14;
+  for(var i=0;i<n;i++){
+    var b=CATALOG[i],y=ly+i*rowH,t=(b.tier||'free').toLowerCase();
+    x.fillStyle='#fffdf6';x.fillRect(gx,y,rw,rowH-pad);
+    x.strokeStyle='rgba(150,120,50,.4)';x.lineWidth=1.5;x.strokeRect(gx,y,rw,rowH-pad);
+    x.textAlign='left';
+    x.fillStyle='#8a6d1e';x.font='600 38px ui-monospace,Menlo,monospace';x.fillText(b.code,gx+28,y+58);
+    x.fillStyle='#2a2218';x.font='500 29px "Songti SC",serif';x.fillText(fitS(x,b.name,rw-300),gx+28,y+104);
+    x.fillStyle='#7a6f55';x.font='400 22px "Songti SC",serif';x.fillText((b.count||'')+' 题 · '+(b.level||''),gx+28,y+140);
+    var tag=t==='free'?'免费':t==='svip'?'尊享':'限定',tc=t==='free'?'#3f7a3f':t==='svip'?'#7a4fae':'#3f6aa0';
+    x.textAlign='right';x.fillStyle=tc;x.font='600 24px "Songti SC",serif';x.fillText(tag,gx+rw-28,y+58);
+  }
+  var fy=ly+n*rowH+18;x.textAlign='center';
+  x.strokeStyle='rgba(150,120,50,.4)';x.lineWidth=1;x.beginPath();x.moveTo(60,fy);x.lineTo(W-60,fy);x.stroke();
+  var qs=200,qx=(W-qs)/2,qy=fy+34;
+  if(qr){x.strokeStyle='rgba(150,120,50,.6)';x.lineWidth=2;x.strokeRect(qx-6,qy-6,qs+12,qs+12);x.drawImage(qr,qx,qy,qs,qs);}
+  x.fillStyle='#8a6d1e';x.font='600 30px "Songti SC",serif';x.fillText('扫码进书架',W/2,qy+qs+46);
+  x.fillStyle='#5a4f38';x.font='400 21px ui-monospace,Menlo,monospace';x.fillText('myskme.github.io/myskme-hub/banks',W/2,qy+qs+82);
+  x.fillStyle='#6a5f47';x.font='400 22px "Songti SC",serif';x.fillText('免费档人人可玩 · 尊享档刷押题炼狱',W/2,qy+qs+120);
+  x.fillStyle='#8a6d1e';x.font='600 21px serif';x.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
+  cv.toBlob(function(blob){if(!blob){alert('海报导出失败');return;}
+    var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-题库书架-海报.png';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);},'image/png');
+}
+document.getElementById('posterBtn').addEventListener('click',buildShelfPoster);
 </script>
 </body>
 </html>
