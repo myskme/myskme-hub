@@ -1,6 +1,17 @@
 {
   "catalog": [
     {
+      "code": "MIX1",
+      "name": "易混词辨析 · 第一辑（动词 / 数量 / 介词）",
+      "desc": "中考高频易混词一网打尽：affect/effect、rise/raise、lie/lay、borrow/lend、fewer/less、between/among、beside/besides、across/through。配对记义 + 句境选词。免费档，人人可练。",
+      "date": "2026-06-25",
+      "cat": "词汇辨析",
+      "pack": "易混词训练营",
+      "level": "常规",
+      "tier": "free",
+      "count": 30
+    },
+    {
       "code": "TRAP1",
       "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
       "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
