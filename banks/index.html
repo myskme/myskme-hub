@@ -32,7 +32,13 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
 .tier.free{color:var(--green);border-color:rgba(106,168,106,.5)}
 .tier.code{color:var(--blue);border-color:rgba(90,142,200,.5)}
 .tier.svip{color:var(--purple);border-color:rgba(157,114,214,.5)}
-.shelf{display:flex;flex-direction:column;gap:16px;margin-top:26px}
+.shelf{display:flex;flex-direction:column;gap:16px;margin-top:24px}
+.shelf-stat{text-align:center;color:var(--ink3);letter-spacing:.1em;font-size:13.5px}
+.shelf-stat b{color:var(--gold2);font-weight:500;font-size:16px;margin:0 1px}
+.pack-title{display:flex;align-items:center;gap:14px;margin-top:18px;color:var(--gold);letter-spacing:.16em;font-size:15px}
+.pack-title span{white-space:nowrap}
+.pack-title i{font-style:normal;font-size:11px;color:var(--ink3);letter-spacing:.1em;border:1px solid var(--line);padding:1px 8px}
+.pack-title::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
 .bank{position:relative;border:1px solid var(--line);background:linear-gradient(160deg,var(--bg3),var(--bg2));
   padding:20px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;
   transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .35s}
@@ -95,7 +101,16 @@ fetch('index.json',{cache:'no-store'}).then(function(r){return r.json()}).then(f
   var list=(o&&o.catalog)||[];
   var el=document.getElementById('shelf');
   if(!list.length){el.innerHTML='<div class="empty">书架还是空的——等王老师的下一期。</div>';return}
-  el.innerHTML=list.map(card).join('');
+  var sum=function(arr){return arr.reduce(function(s,b){return s+(+b.count||0)},0)};
+  var freeN=sum(list.filter(function(b){return tierOf(b.tier)==='free'}));
+  var stat='<div class="shelf-stat"><b>'+list.length+'</b> 辑 · <b>'+sum(list)+'</b> 题 · 免费 <b>'+freeN+'</b> 题</div>';
+  // 按系列(pack)分组，保持出现顺序；每组内免费在前
+  var groups=[],idx={};
+  list.forEach(function(b){var p=b.pack||'其他';if(idx[p]==null){idx[p]=groups.length;groups.push({pack:p,items:[]})}groups[idx[p]].items.push(b)});
+  groups.forEach(function(g){g.items.sort(function(a,c){return (tierOf(a.tier)==='free'?0:1)-(tierOf(c.tier)==='free'?0:1)})});
+  el.innerHTML=stat+groups.map(function(g){
+    return '<div class="pack-title"><span>'+esc(g.pack)+'</span><i>'+g.items.length+' 辑 · '+sum(g.items)+' 题</i></div>'+g.items.map(card).join('');
+  }).join('');
 }).catch(function(){
   document.getElementById('shelf').innerHTML='<div class="empty">书架暂时取不到，稍后再试。</div>';
 });
