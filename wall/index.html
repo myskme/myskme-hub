@@ -133,6 +133,7 @@ footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-a
     <h1>学院谷地 · <em>荣誉殿堂</em></h1>
     <p class="sub" data-h="subtitle">优秀英语作文展示墙 · 手写真迹</p>
     <div class="filters" id="filters"></div>
+    <button id="wPosterBtn" style="margin:14px auto 0;display:block;font:600 14px/1 var(--serif,serif);letter-spacing:.1em;padding:9px 22px;cursor:pointer;background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border:1px solid var(--gold3,#7a6320);color:var(--ink,#f0e6d2)">📥 导出作文墙海报</button>
   </header>
   <div class="wall" id="wall"></div>
   <div class="empty" id="empty" style="display:none">这一类暂时还没有上墙的作品～</div>
@@ -343,6 +344,47 @@ var DEFAULT_WALL = {
       toast('已导出 JSON');
     });
   };
+
+  // ---- 作文墙海报（浅色 + 范文 hero + 墙二维码）----
+  function buildWallPoster(){
+    var srcs=['wall-qr.png','img/w-lin.jpg'],imgs={},got=0,done=false;
+    function fin(){if(done)return;done=true;drawWallPoster(imgs['wall-qr.png'],imgs['img/w-lin.jpg']);}
+    srcs.forEach(function(s){var im=new Image();im.onload=function(){imgs[s]=im;if(++got===srcs.length)fin();};im.onerror=function(){if(++got===srcs.length)fin();};im.src=s+'?cb='+Date.now();});
+    setTimeout(fin,4500);
+  }
+  function drawWallPoster(qr,hero){
+    var W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;var x=cv.getContext('2d');
+    x.fillStyle='#f5efe2';x.fillRect(0,0,W,H);
+    var g=x.createRadialGradient(W/2,-60,80,W/2,260,940);g.addColorStop(0,'rgba(201,166,74,.16)');g.addColorStop(1,'rgba(201,166,74,0)');x.fillStyle=g;x.fillRect(0,0,W,680);
+    x.strokeStyle='rgba(150,120,50,.55)';x.lineWidth=2;x.strokeRect(30,30,W-60,H-60);
+    x.textAlign='center';x.textBaseline='alphabetic';
+    x.fillStyle='#8a6d1e';x.font='600 26px "Songti SC",serif';x.fillText('MYSKME × 英语王老师',W/2,118);
+    x.fillStyle='#2a2218';x.font='300 64px "Songti SC",serif';x.fillText('荣誉殿堂 · 优秀作文墙',W/2,202);
+    x.fillStyle='#6a5f47';x.font='400 26px "Songti SC",serif';x.fillText('学院谷地 · 手写真迹展示',W/2,250);
+    var hy=300;
+    if(hero){
+      var hw=Math.min(940,W-120),hh=hero.height*(hw/hero.width),hx;
+      if(hh>760){hh=760;hw=hero.width*(hh/hero.height);}
+      hx=(W-hw)/2;
+      x.fillStyle='#fffdf6';x.fillRect(hx-10,hy-10,hw+20,hh+20);
+      x.drawImage(hero,hx,hy,hw,hh);
+      x.strokeStyle='rgba(150,120,50,.6)';x.lineWidth=2;x.strokeRect(hx-10,hy-10,hw+20,hh+20);
+      x.fillStyle='#8a6d1e';x.font='600 26px "Songti SC",serif';x.fillText('满分范文 · 金奖',W/2,hy+hh+56);
+      hy=hy+hh+96;
+    } else { hy=620; }
+    var fy=Math.max(hy,1180);
+    x.strokeStyle='rgba(150,120,50,.4)';x.lineWidth=1;x.beginPath();x.moveTo(60,fy);x.lineTo(W-60,fy);x.stroke();
+    var qs=200,qx=(W-qs)/2,qy=fy+34;
+    if(qr){x.strokeStyle='rgba(150,120,50,.6)';x.lineWidth=2;x.strokeRect(qx-6,qy-6,qs+12,qs+12);x.drawImage(qr,qx,qy,qs,qs);}
+    x.textAlign='center';x.fillStyle='#8a6d1e';x.font='600 30px "Songti SC",serif';x.fillText('扫码看全部优秀范文',W/2,qy+qs+46);
+    x.fillStyle='#5a4f38';x.font='400 21px ui-monospace,Menlo,monospace';x.fillText('myskme.github.io/myskme-hub/wall',W/2,qy+qs+82);
+    if(DATA&&DATA.gate){x.fillStyle='#6a5f47';x.font='400 22px "Songti SC",serif';x.fillText('班级口令：'+DATA.gate,W/2,qy+qs+120);}
+    x.fillStyle='#8a6d1e';x.font='600 21px serif';x.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
+    cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
+      var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-优秀作文墙-海报.png';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);toast('已导出作文墙海报');},'image/png');
+  }
+  var wpb=document.getElementById('wPosterBtn');if(wpb)wpb.addEventListener('click',buildWallPoster);
 
   // boot
   fetch('index.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
