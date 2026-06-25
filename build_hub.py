@@ -699,6 +699,14 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：积分板、三国军师争霸、大乱斗、远征录、世界编年史、题库训练场。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
+<meta property="og:description" content="王老师的六大课堂英语作品 · 优秀作文墙 · 题库训练 —— 扫码即玩。">
+<meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
+<meta property="og:url" content="https://myskme.github.io/myskme-hub/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
+<meta name="twitter:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <style>%%CSS%%</style>
 </head>
 <body>
