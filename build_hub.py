@@ -574,33 +574,45 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function buildPoster(){
     var W=1080,H=1920,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     var ctx=cv.getContext('2d');
-    ctx.fillStyle='#0a0a0c';ctx.fillRect(0,0,W,H);
-    var g=ctx.createRadialGradient(W/2,-60,80,W/2,260,920);
-    g.addColorStop(0,'rgba(201,166,74,.17)');g.addColorStop(1,'rgba(201,166,74,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,760);
-    ctx.strokeStyle='rgba(201,166,74,.5)';ctx.lineWidth=2;ctx.strokeRect(30,30,W-60,H-60);
+    // 浅色羊皮纸底：省墨、好打印、好分享
+    ctx.fillStyle='#f5efe2';ctx.fillRect(0,0,W,H);
+    var g=ctx.createRadialGradient(W/2,-60,80,W/2,260,940);
+    g.addColorStop(0,'rgba(201,166,74,.16)');g.addColorStop(1,'rgba(201,166,74,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,720);
+    ctx.strokeStyle='rgba(150,120,50,.55)';ctx.lineWidth=2;ctx.strokeRect(30,30,W-60,H-60);
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    ctx.fillStyle='#c9a64a';ctx.font='600 26px "Songti SC","Noto Serif SC",serif';ctx.fillText('MYSKME · 王老师 MR. WANG',W/2,132);
-    ctx.fillStyle='#f0e6d2';ctx.font='300 74px "Songti SC","Noto Serif SC",serif';ctx.fillText('狼先生与他的学生们',W/2,228);
-    ctx.fillStyle='#a8a090';ctx.font='400 27px "Songti SC",serif';ctx.fillText('Make Yourself Special & Kind · 作品总目',W/2,288);
-    var items=[];DATA.sections.forEach(function(s){(s.items||[]).forEach(function(it){items.push(it);});});items=items.slice(0,6);
-    var top=360,gx=60,gap=34,cw=(W-2*gx-gap)/2,rows=Math.ceil(items.length/2),areaH=H-top-150,ch=(areaH-(rows-1)*gap)/rows;
+    ctx.fillStyle='#8a6d1e';ctx.font='600 26px "Songti SC","Noto Serif SC",serif';ctx.fillText('MYSKME · 王老师 MR. WANG',W/2,124);
+    ctx.fillStyle='#2a2218';ctx.font='300 74px "Songti SC","Noto Serif SC",serif';ctx.fillText('狼先生与他的学生们',W/2,214);
+    ctx.fillStyle='#6a5f47';ctx.font='400 27px "Songti SC",serif';ctx.fillText('Make Yourself Special & Kind · 作品总目',W/2,266);
+    var items=[];DATA.sections.forEach(function(s){(s.items||[]).forEach(function(it){items.push(it);});});
+    items=items.filter(function(it){return !/\/wall\//.test(it.url||'');}).slice(0,6);
+    var top=350,gx=60,gap=30,footerH=320,cw=(W-2*gx-gap)/2,rows=Math.ceil(items.length/2);
+    var areaH=H-top-footerH,ch=(areaH-(rows-1)*gap)/rows;
     items.forEach(function(it,i){
       var col=i%2,row=Math.floor(i/2),x=gx+col*(cw+gap),y=top+row*(ch+gap);
-      ctx.fillStyle='rgba(201,166,74,.045)';ctx.fillRect(x,y,cw,ch);
-      ctx.strokeStyle='rgba(201,166,74,.3)';ctx.lineWidth=1.5;ctx.strokeRect(x,y,cw,ch);
-      ctx.textAlign='center';ctx.fillStyle='#f0e6d2';ctx.font='500 29px "Songti SC",serif';
+      ctx.fillStyle='#fffdf6';ctx.fillRect(x,y,cw,ch);
+      ctx.strokeStyle='rgba(150,120,50,.4)';ctx.lineWidth=1.5;ctx.strokeRect(x,y,cw,ch);
+      ctx.textAlign='center';ctx.fillStyle='#2a2218';ctx.font='500 29px "Songti SC",serif';
       ctx.fillText(fitText(ctx,it.title,cw-44),x+cw/2,y+50);
-      var qs=Math.max(160,Math.min(236,cw-130,ch-150));
+      var qs=Math.max(160,Math.min(232,cw-130,ch-150));
       drawQRon(ctx,it.url,x+(cw-qs)/2,y+70,qs);
-      ctx.fillStyle='#8a7d62';ctx.font='400 17px ui-monospace,Menlo,monospace';
+      ctx.fillStyle='#7a6f55';ctx.font='400 17px ui-monospace,Menlo,monospace';
       ctx.fillText(fitText(ctx,it.url.replace(/^https?:\/\//,''),cw-34),x+cw/2,y+ch-22);
     });
-    ctx.fillStyle='#6a6458';ctx.font='400 22px "Songti SC",serif';ctx.fillText('扫描任意二维码即可打开 · 单文件离线可玩',W/2,H-92);
-    ctx.fillStyle='#c9a64a';ctx.font='600 23px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-56);
+    // 页脚带：作品总目自身的二维码（扫一下进全部）
+    var fy=H-footerH+20;
+    ctx.strokeStyle='rgba(150,120,50,.4)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,fy);ctx.lineTo(W-60,fy);ctx.stroke();
+    var hq=176,hx=84,hy=fy+34;
+    ctx.strokeStyle='rgba(150,120,50,.6)';ctx.lineWidth=2;ctx.strokeRect(hx-6,hy-6,hq+12,hq+12);
+    drawQRon(ctx,DATA.hubUrl||location.href,hx,hy,hq);
+    var tx=hx+hq+44;ctx.textAlign='left';
+    ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
+    ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('六大作品 + 作文墙 + 题库 · 一站直达',tx,hy+132);
+    ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
       document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);
-      toast('已导出竖版海报 1080×1920');},'image/png');
+      toast('已导出浅色竖版海报 1080×1920');},'image/png');
   }
 
   // ---- 事件绑定 ----
