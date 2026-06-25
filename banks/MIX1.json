@@ -1,0 +1,255 @@
+{
+  "name": "易混词辨析 · 第一辑（动词 / 数量 / 介词）",
+  "code": "MIX1",
+  "desc": "中考高频易混词一网打尽：affect/effect、rise/raise、lie/lay、borrow/lend、fewer/less、between/among、beside/besides、across/through。配对记义 + 句境选词。免费档，人人可练。",
+  "tier": "free",
+  "level": "常规",
+  "cat": "词汇辨析",
+  "pack": "易混词训练营",
+  "mods": {
+    "m1": [
+      [
+        "affect",
+        "v. 影响（动词）",
+        1
+      ],
+      [
+        "effect",
+        "n. 影响 / 效果（名词，have an effect on）",
+        1
+      ],
+      [
+        "rise",
+        "v. 上升 / 升起（不及物，rose-risen，无宾语）",
+        2
+      ],
+      [
+        "raise",
+        "v. 举起 / 筹集 / 提高（及物，raised，要宾语）",
+        2
+      ],
+      [
+        "lie",
+        "v. 躺 / 位于（不及物，lie-lay-lain，无宾语）",
+        2
+      ],
+      [
+        "lay",
+        "v. 放置 / 下蛋（及物，laid-laid，要宾语）",
+        2
+      ]
+    ],
+    "m2": [
+      [
+        "borrow",
+        "v. 借入（向别人把东西借进来）borrow … from",
+        1
+      ],
+      [
+        "lend",
+        "v. 借出（把东西借给别人）lend sb sth",
+        1
+      ],
+      [
+        "fewer",
+        "更少（+ 可数名词复数）",
+        1
+      ],
+      [
+        "less",
+        "更少（+ 不可数名词）",
+        1
+      ],
+      [
+        "between",
+        "介词：在（两者）之间",
+        1
+      ],
+      [
+        "among",
+        "介词：在（三者或以上）之中",
+        1
+      ]
+    ],
+    "m3": [
+      [
+        "advice",
+        "n. 建议（不可数，a piece of advice）",
+        1
+      ],
+      [
+        "advise",
+        "v. 建议（advise sb to do）",
+        1
+      ],
+      [
+        "beside",
+        "介词：在……旁边",
+        2
+      ],
+      [
+        "besides",
+        "介词 / 副词：除……之外（还有）；而且",
+        2
+      ],
+      [
+        "across",
+        "介词：横过（平面，到对面）",
+        2
+      ],
+      [
+        "through",
+        "介词：穿过（从内部 / 三维空间穿越）",
+        2
+      ]
+    ],
+    "m4": [
+      {
+        "q": "Could you ___ me your bike? Mine is broken.",
+        "ops": [
+          "lend",
+          "borrow",
+          "borrowed",
+          "lent"
+        ],
+        "ans": 0,
+        "why": "把车借给我=借出 → lend sb sth；borrow 是“借入”方向相反；borrowed/lent 是过去式，情态动词 could 后须用动词原形。",
+        "lv": 1
+      },
+      {
+        "q": "Staying up late will badly ___ your health.",
+        "ops": [
+          "effect",
+          "affect",
+          "affecting",
+          "effects"
+        ],
+        "ans": 1,
+        "why": "“影响”作动词用 affect；effect 是名词，不能作谓语动词。",
+        "lv": 2
+      },
+      {
+        "q": "The new study method has a good ___ on our grades.",
+        "ops": [
+          "affect",
+          "affecting",
+          "effect",
+          "effects"
+        ],
+        "ans": 2,
+        "why": "have a good effect on=对……有好效果，effect 名词；affect 是动词。",
+        "lv": 2
+      },
+      {
+        "q": "There is ___ traffic on the road on Sundays than on weekdays.",
+        "ops": [
+          "fewer",
+          "fewest",
+          "least",
+          "less"
+        ],
+        "ans": 3,
+        "why": "traffic 不可数、且 than 要用比较级 → less；fewer 修饰可数名词，fewest/least 是最高级不能与 than 连用。",
+        "lv": 2
+      },
+      {
+        "q": "I made ___ mistakes in this test than in the last one.",
+        "ops": [
+          "fewer",
+          "less",
+          "much",
+          "little"
+        ],
+        "ans": 0,
+        "why": "mistakes 可数复数 → fewer；less 修饰不可数。",
+        "lv": 2
+      },
+      {
+        "q": "You look tired. Please ___ down on the sofa and have a rest.",
+        "ops": [
+          "lay",
+          "lie",
+          "laid",
+          "lied"
+        ],
+        "ans": 1,
+        "why": "“躺下”=lie（不及物，无宾语）；lay 是“放置”（及物）需带宾语。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "He ___ his hand high to answer the teacher's question.",
+        "ops": [
+          "raised",
+          "rose",
+          "arose",
+          "rises"
+        ],
+        "ans": 0,
+        "why": "“举手”=raise（及物，带宾语 hand）→ raised；rise 不及物不能带宾语。",
+        "lv": 2
+      },
+      {
+        "q": "The price of houses has ___ sharply over the past few years.",
+        "ops": [
+          "raised",
+          "rose",
+          "risen",
+          "raise"
+        ],
+        "ans": 2,
+        "why": "价格“上涨”=rise（不及物）现在完成 has risen；raise 及物需宾语，此处无宾语。",
+        "lv": 2
+      },
+      {
+        "q": "What's the difference ___ the two English words?",
+        "ops": [
+          "between",
+          "among",
+          "from",
+          "in"
+        ],
+        "ans": 0,
+        "why": "两者(two words)之间 → between；among 用于三者及以上。",
+        "lv": 1
+      },
+      {
+        "q": "The teacher stood ___ all her students and smiled.",
+        "ops": [
+          "among",
+          "between",
+          "beside",
+          "besides"
+        ],
+        "ans": 0,
+        "why": "在“所有学生”(三者以上)之中 → among；between 用于两者。",
+        "lv": 2
+      },
+      {
+        "q": "___ Chinese and English, she can also speak a little Japanese.",
+        "ops": [
+          "Beside",
+          "Besides",
+          "Between",
+          "Except"
+        ],
+        "ans": 1,
+        "why": "“除……之外（还有）”→ Besides；beside 是“在旁边”。",
+        "lv": 2
+      },
+      {
+        "q": "Be careful when you walk ___ the busy street to the other side.",
+        "ops": [
+          "through",
+          "across",
+          "between",
+          "among"
+        ],
+        "ans": 1,
+        "why": "横过马路（平面、到对面）→ across；through 是从内部穿过。",
+        "lv": 1
+      }
+    ]
+  }
+}
