@@ -638,6 +638,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   pwInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tryPw();}if(e.key==='Escape')closePw();});
   mask.addEventListener('click',function(e){if(e.target===mask)closePw();});
   document.getElementById('abExport').addEventListener('click',exportHTML);
+  var abc=document.getElementById('abConsole');
+  if(abc)abc.addEventListener('click',function(){window.open('console/','_blank','noopener');});
   document.getElementById('abReset').addEventListener('click',function(){
     if(!confirm('重置为默认内容？将清除本机所有改动。'))return;
     try{localStorage.removeItem(LS);}catch(e){}DATA=clone(DEFAULT_DATA);renderHeader();render();toast('已重置为默认内容');
@@ -724,6 +726,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <body>
 <div class="admin-bar" id="adminBar">
   <span class="ab-title">管理员模式 · <b>直接点文字即可编辑，改动自动保存在本机</b></span>
+  <button id="abConsole">控制台 ↗</button>
   <button id="abExport">导出 index.html</button>
   <button id="abReset" class="danger">重置默认</button>
   <button id="abExit">退出</button>
