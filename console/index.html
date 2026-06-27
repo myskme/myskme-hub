@@ -147,6 +147,20 @@ header{text-align:center;margin-bottom:clamp(28px,5vw,46px);}
   cursor:pointer;padding:8px 12px;min-height:34px;border-radius:2px;transition:all .2s;}
 .cheat-row .copy:hover{border-color:var(--gold);color:var(--gold);}
 
+/* 排行榜审核 */
+.lba-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.lba-row{display:flex;align-items:center;gap:12px;background:var(--card-bg);border:1px solid var(--line);padding:10px 14px;margin-bottom:8px}
+.lba-row.hid{opacity:.5}
+.lba-who{flex:1;min-width:0}
+.lba-who .a{font-size:14px;letter-spacing:.02em}
+.lba-who .m{font-size:11px;color:var(--ink3);font-family:var(--mono);margin-top:2px}
+.lba-pow{font-family:var(--mono);color:var(--gold2);font-size:15px;font-weight:600;flex-shrink:0}
+.lba-act{display:flex;gap:6px;flex-shrink:0}
+.lba-act button{font-family:var(--serif);font-size:11px;padding:6px 11px;border:1px solid var(--line);background:transparent;color:var(--ink2);cursor:pointer;border-radius:2px;transition:border-color .2s,color .2s}
+.lba-act button:hover{border-color:var(--gold);color:var(--gold)}
+.lba-act button.del:hover{border-color:var(--red);color:var(--red2)}
+.lba-msg{color:var(--ink3);font-size:13px;padding:10px 2px}
+
 /* 右下角控制 */
 .ctrl{position:fixed;right:16px;bottom:16px;z-index:30;display:flex;gap:8px;background:var(--bar-bg);
   border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.35);}
@@ -200,6 +214,9 @@ footer{margin-top:60px;text-align:center;color:var(--ink4);font-size:11px;letter
 
   <div class="rule"><span>后 台 与 工 具</span></div>
   <div class="grid" id="tools"></div>
+
+  <div class="rule"><span>排 行 榜 审 核</span><small id="lbStat"></small></div>
+  <div id="lbAdmin"></div>
 
   <div class="rule"><span>口 令 速 查</span></div>
   <div class="cheat" id="cheat"></div>
@@ -370,13 +387,57 @@ function renderCheat(){
   }).join('');
 }
 
+/* ---- 排行榜审核（调词灵榜 Worker /admin，复用本页解锁密码）---- */
+var LB_API="https://myskme-leaderboard.wzc1020.workers.dev";
+function lbaCall(action,extra){
+  var b=extra||{}; b.pw=ADMIN_PW; b.action=action;
+  return fetch(LB_API+'/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json();});
+}
+function lbaLoad(){
+  var rows=$('#lbaRows'); if(!rows)return;
+  rows.innerHTML='<div class="lba-msg">读取中…</div>';
+  lbaCall('list').then(function(r){
+    if(!r||!r.ok){rows.innerHTML='<div class="lba-msg">读取失败：'+esc((r&&r.err)||'')+'</div>';return;}
+    var list=r.rows||[]; var st=$('#lbStat'); if(st)st.textContent=list.length+' 条';
+    if(!list.length){rows.innerHTML='<div class="lba-msg">词灵榜暂无记录。</div>';return;}
+    rows.innerHTML=list.map(function(x){
+      var scope=x.class_tag?'班级榜':'世界榜';
+      return '<div class="lba-row'+(x.hidden?' hid':'')+'" data-id="'+esc(x.id)+'">'
+        +'<div class="lba-who"><div class="a">'+esc(x.alias)+(x.faction?' · '+esc(x.faction):'')+(x.hidden?'（已隐藏）':'')+'</div>'
+        +'<div class="m">'+esc(x.rank_name||'')+' · '+scope+'</div></div>'
+        +'<div class="lba-pow">'+(+x.power||0)+'</div>'
+        +'<div class="lba-act">'
+        +'<button data-act="'+(x.hidden?'unhide':'hide')+'">'+(x.hidden?'显示':'隐藏')+'</button>'
+        +'<button class="del" data-act="delete">删除</button>'
+        +'</div></div>';
+    }).join('');
+  }).catch(function(){rows.innerHTML='<div class="lba-msg">连不上词灵榜后台。</div>';});
+}
+function renderLbAdmin(){
+  $('#lbAdmin').innerHTML='<div class="lba-bar">'
+    +'<button class="btn" id="lbaRefresh">刷新</button>'
+    +'<button class="btn" id="lbaReset">清空全部</button>'
+    +'<span style="font-size:12px;color:var(--ink3)">化名 / 灵力 / 段位 · 隐藏或删除可疑行</span></div>'
+    +'<div id="lbaRows"><div class="lba-msg">读取中…</div></div>';
+  $('#lbaRefresh').addEventListener('click',lbaLoad);
+  $('#lbaReset').addEventListener('click',function(){
+    if(!confirm('清空整个词灵榜？所有上榜记录（含示例行）将永久删除。'))return;
+    lbaCall('reset',{confirm:'RESET'}).then(function(r){toast(r&&r.ok?'已清空词灵榜':'清空失败');lbaLoad();});
+  });
+  lbaLoad();
+}
+
 function renderAll(){
-  renderWorks();renderBanks();renderTools();renderCheat();
+  renderWorks();renderBanks();renderTools();renderCheat();renderLbAdmin();
   $('#wallPw') && ($('#wallPw').textContent=WALL_GATE); // 元素由 renderWorks 注入，须在其后填充
-  // 事件委托：复制按钮
+  // 事件委托：复制按钮 + 排行榜审核操作
   document.addEventListener('click',function(e){
     var el=e.target.closest('[data-copy]');
-    if(el){copy(el.getAttribute('data-copy'),el.getAttribute('data-label')||el.getAttribute('data-copy'));}
+    if(el){copy(el.getAttribute('data-copy'),el.getAttribute('data-label')||el.getAttribute('data-copy'));return;}
+    var b=e.target.closest('#lbaRows [data-act]');
+    if(b){var row=b.closest('.lba-row'),id=row.getAttribute('data-id'),act=b.getAttribute('data-act');
+      if(act==='delete'&&!confirm('删除「'+row.querySelector('.a').textContent.replace('（已隐藏）','').trim()+'」这条记录？'))return;
+      lbaCall(act,{id:id}).then(function(r){toast(r&&r.ok?'操作成功':'操作失败');lbaLoad();});}
   });
 }
 
