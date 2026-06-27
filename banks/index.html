@@ -67,6 +67,36 @@ footer{margin-top:46px;padding-top:24px;border-top:1px solid var(--line2);text-a
 footer a{color:var(--gold2);text-decoration:none}
 footer a:hover{text-shadow:var(--glow)}
 @media(max-width:560px){.bank{gap:12px}.bank .go{width:100%;text-align:center}}
+/* ---- 名人天梯 · 词灵榜 ---- */
+.lb{margin:28px 0 8px;border:1px solid var(--line);background:linear-gradient(160deg,var(--bg3),var(--bg2));padding:20px 22px}
+.lb-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lb-top h2{margin:0;font-size:21px;font-weight:500;letter-spacing:.1em}
+.lb-top h2 em{font-style:normal;color:var(--gold2);text-shadow:var(--glow)}
+.lb-tabs{display:flex;gap:8px;margin-left:auto}
+.lb-tab{font-family:var(--serif);font-size:13px;letter-spacing:.08em;padding:6px 16px;cursor:pointer;color:var(--ink2);border:1px solid var(--line);background:transparent;transition:all .2s}
+.lb-tab.on{color:var(--gold2);border-color:var(--gold3);background:rgba(201,166,74,.08)}
+.lb-sub{color:var(--ink3);font-size:12.5px;letter-spacing:.04em;margin:8px 0 4px;line-height:1.6}
+.lb-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.lb-row{display:flex;align-items:center;gap:14px;padding:10px 14px;border:1px solid var(--line2)}
+.lb-row.top1{border-color:var(--gold3);background:rgba(201,166,74,.08)}
+.lb-no{flex:0 0 28px;text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:16px;color:var(--ink3)}
+.lb-row.top1 .lb-no,.lb-row.top2 .lb-no,.lb-row.top3 .lb-no{color:var(--gold2);font-weight:600}
+.lb-who{flex:1;min-width:0}
+.lb-alias{font-size:15px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:1px}
+.lb-meta b{color:var(--gold);font-weight:400}
+.lb-pow{flex:0 0 auto;text-align:right;font-family:ui-monospace,Menlo,monospace;line-height:1.15}
+.lb-pow b{color:var(--gold2);font-size:17px;font-weight:600}
+.lb-pow span{display:block;font-size:10px;color:var(--ink3);letter-spacing:.08em}
+.lb-gate{display:none;gap:8px;margin-top:12px}
+.lb-gate input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-family:var(--serif);font-size:14px;padding:9px 12px;outline:none}
+.lb-gate input:focus{border-color:var(--gold);box-shadow:var(--glow)}
+.lb-gate button{font-family:var(--serif);font-size:13px;letter-spacing:.06em;padding:9px 18px;cursor:pointer;color:var(--ink);border:1px solid var(--gold3);background:rgba(201,166,74,.1)}
+.lb-gate button:hover{border-color:var(--gold);color:var(--gold2)}
+.lb-cta{margin-top:14px;text-align:center;font-size:12.5px;color:var(--ink3);letter-spacing:.04em}
+.lb-cta a{color:var(--gold2);text-decoration:none}
+.lb-cta a:hover{text-shadow:var(--glow)}
+.lb-empty{text-align:center;color:var(--ink3);padding:18px;font-size:13px;letter-spacing:.06em}
 </style>
 </head>
 <body>
@@ -82,6 +112,22 @@ footer a:hover{text-shadow:var(--glow)}
     </div>
     <button class="poster-btn" id="posterBtn">📥 导出书架海报</button>
   </header>
+  <section class="lb" id="lb">
+    <div class="lb-top">
+      <h2>名人<em>天梯</em> · 词灵榜</h2>
+      <div class="lb-tabs">
+        <button class="lb-tab on" data-scope="world">世界榜</button>
+        <button class="lb-tab" data-scope="class">班级榜</button>
+      </div>
+    </div>
+    <p class="lb-sub">化名上榜 · 灵力 = 点亮词数 + 攻克错题 + 坚持打卡 + 通关题库。在词灵对决刷题积累，「上榜」入口即将开放。</p>
+    <div class="lb-gate" id="lbGate">
+      <input id="lbPw" type="password" placeholder="输入班级口令查看班级榜" autocomplete="off">
+      <button id="lbGo">查看</button>
+    </div>
+    <div class="lb-list" id="lbList"><div class="lb-empty">正在取回天梯……</div></div>
+    <div class="lb-cta">还没上榜？<a href="https://myskme-games.netlify.app/word-duel" target="_blank" rel="noopener">去词灵对决打卡刷题 →</a></div>
+  </section>
   <div class="shelf" id="shelf"><div class="loading">正在取回书架……</div></div>
   <footer>
     <a href="../">← 返回 MYSKME 作品总目</a>　·　Make Yourself Special &amp; Kind
@@ -169,6 +215,41 @@ function drawShelfPoster(qr){
     document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);},'image/png');
 }
 document.getElementById('posterBtn').addEventListener('click',buildShelfPoster);
+
+/* ---- 名人天梯 · 词灵榜 ---- */
+var LB_API='https://myskme-leaderboard.wzc1020.workers.dev';
+function lbSet(html){document.getElementById('lbList').innerHTML=html;}
+async function lbSha(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('');}
+function lbRow(r){
+  var cls='lb-row'+(r.rank<=3?' top'+r.rank:'');
+  var meta=[];if(r.rankName)meta.push('<b>'+esc(r.rankName)+'</b>');if(r.faction)meta.push(esc(r.faction));if(r.badges&&r.badges.length)meta.push('🏅'+r.badges.length);
+  return '<div class="'+cls+'"><div class="lb-no">'+r.rank+'</div>'
+    +'<div class="lb-who"><div class="lb-alias">'+esc(r.alias)+'</div><div class="lb-meta">'+meta.join(' · ')+'</div></div>'
+    +'<div class="lb-pow"><b>'+(+r.power||0)+'</b><span>灵力</span></div></div>';
+}
+function lbRender(rows,emptyMsg){
+  if(!rows||!rows.length){lbSet('<div class="lb-empty">'+(emptyMsg||'还没有人上榜——去词灵对决打卡，抢占头名！')+'</div>');return;}
+  lbSet(rows.map(lbRow).join(''));
+}
+function lbFetch(url,emptyMsg){
+  lbSet('<div class="lb-empty">正在取回天梯……</div>');
+  fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(o){lbRender(o&&o.rows,emptyMsg)})
+    .catch(function(){lbSet('<div class="lb-empty">天梯暂时取不到，稍后再试。</div>')});
+}
+function lbWorld(){document.getElementById('lbGate').style.display='none';lbFetch(LB_API+'/board?scope=world&limit=20');}
+function lbClassPrompt(){document.getElementById('lbGate').style.display='flex';lbSet('<div class="lb-empty">输入班级口令查看本班天梯。</div>');}
+async function lbClassGo(){
+  var pw=(document.getElementById('lbPw').value||'').trim();if(!pw)return;
+  var c=await lbSha(pw);
+  lbFetch(LB_API+'/board?scope=class&c='+c+'&limit=30','本口令下还没有人上榜（口令需与词灵对决里一致）。');
+}
+Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(t){t.addEventListener('click',function(){
+  Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(x){x.classList.remove('on')});t.classList.add('on');
+  if(t.getAttribute('data-scope')==='world')lbWorld();else lbClassPrompt();
+})});
+document.getElementById('lbGo').addEventListener('click',lbClassGo);
+document.getElementById('lbPw').addEventListener('keydown',function(e){if(e.key==='Enter')lbClassGo();});
+lbWorld();
 </script>
 </body>
 </html>
