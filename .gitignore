@@ -16,3 +16,7 @@ deploy_wordduel.py
 games_deploy.py
 hub_netlify_deploy.py
 netlify_sites.py
+# leaderboard 续期密钥 / 部署脚本（勿入公库）
+leaderboard/.lb_salt
+leaderboard/.lb_db_id
+leaderboard/deploy.py
