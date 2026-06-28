@@ -1,8 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark" data-themepref="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>(function(){try{var p=localStorage.getItem('myskme-theme')||'auto';var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p)}catch(e){}})();</script>
 <title>MYSKME 题库书架 · 词灵对决</title>
 <meta name="description" content="MYSKME · 词灵对决 题库目录：输入兑换码或点「去刷题」即可在线刷同款题。">
 <meta property="og:type" content="website">
@@ -21,6 +22,29 @@
   --glow:0 0 24px rgba(201,166,74,.4);
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
 }
+:root[data-theme="light"]{
+  --bg:#ece2cc;--bg2:#e4d8bc;--bg3:#f8f2e4;--bg4:#e0d3b3;
+  --ink:#2a2218;--ink2:#574b37;--ink3:#635943;
+  --gold:#6f5410;--gold2:#5f470e;--gold3:#b89a52;
+  --purple:#6b3fa0;--blue:#33548c;--green:#2f6a3e;
+  --line:rgba(120,90,20,.30);--line2:rgba(120,90,20,.13);
+  --glow:0 4px 16px rgba(120,90,20,.18);
+}
+:root[data-theme="light"] body{background-image:radial-gradient(1100px 640px at 50% -8%,rgba(190,160,80,.18),transparent 60%)}
+:root[data-theme="light"] body::before{opacity:.12;mix-blend-mode:multiply}
+:root[data-theme="light"] .bank{background:linear-gradient(160deg,var(--bg3),#f1e9d6)}
+:root[data-theme="light"] .bank .code,:root[data-theme="light"] .bank .go,:root[data-theme="light"] .poster-btn{background:linear-gradient(180deg,rgba(120,90,20,.12),rgba(120,90,20,.04))}
+:root[data-theme="light"] .lb-row.top1{background:rgba(120,90,20,.08)}
+:root[data-theme="light"] .lb-tab.on{background:rgba(120,90,20,.08)}
+body{transition:background-color .35s ease,color .35s ease}
+/* 右下角主题切换 */
+.ctrl{position:fixed;right:16px;bottom:16px;z-index:40;display:flex;gap:8px;
+  background:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+:root[data-theme="light"] .ctrl{background:linear-gradient(180deg,#f2e8d2,rgba(242,232,210,.97))}
+.ctrl button{width:40px;height:40px;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--ink);
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .25s,box-shadow .25s,color .25s}
+.ctrl button:hover{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow)}
+@media print{.ctrl{display:none}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.7;overflow-x:hidden;
   background-image:radial-gradient(1100px 640px at 50% -8%,rgba(201,166,74,.10),transparent 60%);background-attachment:fixed}
@@ -134,7 +158,18 @@ footer a:hover{text-shadow:var(--glow)}
     <a href="../">← 返回 MYSKME 作品总目</a>　·　Make Yourself Special &amp; Kind
   </footer>
 </div>
+<div class="ctrl"><button id="themeBtn" title="切换主题">◐</button></div>
 <script>
+/* 主题：跟随系统 / 浅色 / 深色（与总目/控制台共用 myskme-theme 偏好）*/
+(function(){var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function pref(){try{return localStorage.getItem(TLS)||'auto'}catch(e){return 'auto'}}
+function resolve(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p}
+function apply(p){var e=document.documentElement;e.setAttribute('data-theme',resolve(p));e.setAttribute('data-themepref',p);var b=document.getElementById('themeBtn');if(b){b.textContent=icon[p];b.title='主题：'+name[p]}}
+var btn=document.getElementById('themeBtn');
+if(btn)btn.addEventListener('click',function(){var nx=order[(order.indexOf(pref())+1)%order.length];try{localStorage.setItem(TLS,nx)}catch(e){}apply(nx)});
+if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(pref()==='auto')apply('auto')});
+apply(pref());
+})();
 var GAME='https://myskme-games.netlify.app/word-duel?code=';
 var SHELF_URL='https://myskme.github.io/myskme-hub/banks/';
 var CATALOG=[];
