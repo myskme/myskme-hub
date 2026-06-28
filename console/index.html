@@ -401,7 +401,7 @@ function lbaLoad(){
     var list=r.rows||[]; var st=$('#lbStat'); if(st)st.textContent=list.length+' 条';
     if(!list.length){rows.innerHTML='<div class="lba-msg">词灵榜暂无记录。</div>';return;}
     rows.innerHTML=list.map(function(x){
-      var scope=x.class_tag?'班级榜':'世界榜';
+      var scope=(x.is_class||x.class_tag)?'班级榜':'世界榜';
       return '<div class="lba-row'+(x.hidden?' hid':'')+'" data-id="'+esc(x.id)+'">'
         +'<div class="lba-who"><div class="a">'+esc(x.alias)+(x.faction?' · '+esc(x.faction):'')+(x.hidden?'（已隐藏）':'')+'</div>'
         +'<div class="m">'+esc(x.rank_name||'')+' · '+scope+'</div></div>'
@@ -416,10 +416,15 @@ function lbaLoad(){
 function renderLbAdmin(){
   $('#lbAdmin').innerHTML='<div class="lba-bar">'
     +'<button class="btn" id="lbaRefresh">刷新</button>'
+    +'<button class="btn" id="lbaSeal">封榜·开新赛季</button>'
     +'<button class="btn" id="lbaReset">清空全部</button>'
-    +'<span style="font-size:12px;color:var(--ink3)">化名 / 灵力 / 段位 · 隐藏或删除可疑行</span></div>'
+    +'<span style="font-size:12px;color:var(--ink3)">化名 / 赛季灵力 / 段位 · 隐藏或删除可疑行</span></div>'
     +'<div id="lbaRows"><div class="lba-msg">读取中…</div></div>';
   $('#lbaRefresh').addEventListener('click',lbaLoad);
+  $('#lbaSeal').addEventListener('click',function(){
+    if(!confirm('封榜并开新赛季？\n本赛季世界前 10（及各班前 3）将永久镌刻名人堂；随后所有人「赛季灵力」清零进入下一赛季，「终身灵力」保留。'))return;
+    lbaCall('seal',{confirm:'SEAL',top:10}).then(function(r){toast(r&&r.ok?('已封榜 '+(r.sealed||'')+' → 新赛季 '+(r.newSeason||'')):('封榜失败：'+((r&&r.err)||'')));lbaLoad();});
+  });
   $('#lbaReset').addEventListener('click',function(){
     if(!confirm('清空整个词灵榜？所有上榜记录（含示例行）将永久删除。'))return;
     lbaCall('reset',{confirm:'RESET'}).then(function(r){toast(r&&r.ok?'已清空词灵榜':'清空失败');lbaLoad();});
@@ -430,7 +435,8 @@ function renderLbAdmin(){
 function renderAll(){
   renderWorks();renderBanks();renderTools();renderCheat();renderLbAdmin();
   $('#wallPw') && ($('#wallPw').textContent=WALL_GATE); // 元素由 renderWorks 注入，须在其后填充
-  // 事件委托：复制按钮 + 排行榜审核操作
+  // 事件委托：复制按钮 + 排行榜审核操作（仅注册一次，避免重复解锁时重复绑定）
+  if(renderAll._wired)return; renderAll._wired=true;
   document.addEventListener('click',function(e){
     var el=e.target.closest('[data-copy]');
     if(el){copy(el.getAttribute('data-copy'),el.getAttribute('data-label')||el.getAttribute('data-copy'));return;}
