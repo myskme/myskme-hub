@@ -118,15 +118,16 @@ footer a:hover{text-shadow:var(--glow)}
       <div class="lb-tabs">
         <button class="lb-tab on" data-scope="world">世界榜</button>
         <button class="lb-tab" data-scope="class">班级榜</button>
+        <button class="lb-tab" data-scope="hall">名人堂</button>
       </div>
     </div>
-    <p class="lb-sub">化名上榜 · 灵力 = 点亮词数 + 攻克错题 + 坚持打卡 + 通关题库。在词灵对决刷题积累，「上榜」入口即将开放。</p>
+    <p class="lb-sub">化名上榜 · 灵力 = 点亮词数 + 攻克错题 + 坚持打卡 + 通关题库。按月赛季计分，封榜冠军永驻名人堂。在词灵对决战绩页「🏆 上榜」。</p>
     <div class="lb-gate" id="lbGate">
       <input id="lbPw" type="password" placeholder="输入班级口令查看班级榜" autocomplete="off">
       <button id="lbGo">查看</button>
     </div>
     <div class="lb-list" id="lbList"><div class="lb-empty">正在取回天梯……</div></div>
-    <div class="lb-cta">还没上榜？<a href="https://myskme-games.netlify.app/word-duel" target="_blank" rel="noopener">去词灵对决打卡刷题 →</a></div>
+    <div class="lb-cta">还没上榜？<a href="https://myskme-games.netlify.app/word-duel" target="_blank" rel="noopener">去词灵对决打卡刷题 →</a> · <a href="#" id="lbPoster">📥 榜单海报</a></div>
   </section>
   <div class="shelf" id="shelf"><div class="loading">正在取回书架……</div></div>
   <footer>
@@ -216,39 +217,76 @@ function drawShelfPoster(qr){
 }
 document.getElementById('posterBtn').addEventListener('click',buildShelfPoster);
 
-/* ---- 名人天梯 · 词灵榜 ---- */
+/* ---- 名人天梯 · 词灵榜 v2 ---- */
 var LB_API='https://myskme-leaderboard.wzc1020.workers.dev';
+var lbRows=[],lbMode='world';
 function lbSet(html){document.getElementById('lbList').innerHTML=html;}
-async function lbSha(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('');}
 function lbRow(r){
   var cls='lb-row'+(r.rank<=3?' top'+r.rank:'');
   var meta=[];if(r.rankName)meta.push('<b>'+esc(r.rankName)+'</b>');if(r.faction)meta.push(esc(r.faction));if(r.badges&&r.badges.length)meta.push('🏅'+r.badges.length);
+  var tag=r.tag?'<span style="color:var(--ink4);font-size:11px"> #'+esc(r.tag)+'</span>':'';
+  var life=(r.lifetime&&r.lifetime>r.power)?'<span>终身 '+(+r.lifetime||0)+'</span>':'<span>灵力</span>';
   return '<div class="'+cls+'"><div class="lb-no">'+r.rank+'</div>'
+    +'<div class="lb-who"><div class="lb-alias">'+esc(r.alias)+tag+'</div><div class="lb-meta">'+meta.join(' · ')+'</div></div>'
+    +'<div class="lb-pow"><b>'+(+r.power||0)+'</b>'+life+'</div></div>';
+}
+function lbHallRow(r){
+  var crown=r.rank===1?'👑':(r.rank<=3?'🥈🥉'[r.rank-2]:'');
+  var cls='lb-row'+(r.rank<=3?' top'+r.rank:'');
+  var meta=[];meta.push('<b>'+esc(r.season)+' 第'+r.rank+'</b>');if(r.faction)meta.push(esc(r.faction));if(r.badges&&r.badges.length)meta.push('🏅'+r.badges.length);
+  return '<div class="'+cls+'"><div class="lb-no">'+(crown||r.rank)+'</div>'
     +'<div class="lb-who"><div class="lb-alias">'+esc(r.alias)+'</div><div class="lb-meta">'+meta.join(' · ')+'</div></div>'
     +'<div class="lb-pow"><b>'+(+r.power||0)+'</b><span>灵力</span></div></div>';
 }
-function lbRender(rows,emptyMsg){
-  if(!rows||!rows.length){lbSet('<div class="lb-empty">'+(emptyMsg||'还没有人上榜——去词灵对决打卡，抢占头名！')+'</div>');return;}
-  lbSet(rows.map(lbRow).join(''));
+function lbRender(rows,emptyMsg,hall){
+  lbRows=rows||[];
+  if(!lbRows.length){lbSet('<div class="lb-empty">'+(emptyMsg||'还没有人上榜——去词灵对决打卡，抢占头名！')+'</div>');return;}
+  lbSet(lbRows.map(hall?lbHallRow:lbRow).join(''));
 }
-function lbFetch(url,emptyMsg){
+function lbFetch(url,emptyMsg,hall){
   lbSet('<div class="lb-empty">正在取回天梯……</div>');
-  fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(o){lbRender(o&&o.rows,emptyMsg)})
+  fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(o){lbRender(o&&o.rows,emptyMsg,hall)})
     .catch(function(){lbSet('<div class="lb-empty">天梯暂时取不到，稍后再试。</div>')});
 }
-function lbWorld(){document.getElementById('lbGate').style.display='none';lbFetch(LB_API+'/board?scope=world&limit=20');}
-function lbClassPrompt(){document.getElementById('lbGate').style.display='flex';lbSet('<div class="lb-empty">输入班级口令查看本班天梯。</div>');}
-async function lbClassGo(){
+function lbWorld(){lbMode='world';document.getElementById('lbGate').style.display='none';lbFetch(LB_API+'/board?scope=world&limit=20');}
+function lbHall(){lbMode='hall';document.getElementById('lbGate').style.display='none';lbFetch(LB_API+'/hall?scope=world&limit=60','本赛季进行中——月底封榜后，冠军在此永久镌刻。',true);}
+function lbClassPrompt(){lbMode='class';document.getElementById('lbGate').style.display='flex';lbSet('<div class="lb-empty">输入班级口令查看本班天梯。</div>');}
+function lbClassGo(){
   var pw=(document.getElementById('lbPw').value||'').trim();if(!pw)return;
-  var c=await lbSha(pw);
-  lbFetch(LB_API+'/board?scope=class&c='+c+'&limit=30','本口令下还没有人上榜（口令需与词灵对决里一致）。');
+  lbFetch(LB_API+'/board?scope=class&pw='+encodeURIComponent(pw)+'&limit=30','本口令下还没有人上榜（口令需与词灵对决里一致）。');
 }
 Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(t){t.addEventListener('click',function(){
   Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(x){x.classList.remove('on')});t.classList.add('on');
-  if(t.getAttribute('data-scope')==='world')lbWorld();else lbClassPrompt();
+  var sc=t.getAttribute('data-scope');
+  if(sc==='world')lbWorld();else if(sc==='hall')lbHall();else lbClassPrompt();
 })});
 document.getElementById('lbGo').addEventListener('click',lbClassGo);
 document.getElementById('lbPw').addEventListener('keydown',function(e){if(e.key==='Enter')lbClassGo();});
+/* 榜单海报：把当前所见榜单 top 12 画成浅色可分享图 */
+document.getElementById('lbPoster').addEventListener('click',function(e){
+  e.preventDefault();
+  if(!lbRows.length){alert('当前榜单为空，换个榜单再导。');return;}
+  var top=lbRows.slice(0,12),W=1080,H=420+top.length*86,cv=document.createElement('canvas');
+  cv.width=W;cv.height=H;var x=cv.getContext('2d');
+  x.fillStyle='#f5efe2';x.fillRect(0,0,W,H);
+  x.fillStyle='#7a6320';x.fillRect(0,0,W,10);
+  x.textAlign='center';x.fillStyle='#2a2218';x.font='600 52px "Noto Serif SC",serif';
+  var title=lbMode==='hall'?'名人堂 · 词灵榜':(lbMode==='class'?'班级榜 · 词灵榜':'世界榜 · 词灵榜');
+  x.fillText(title,W/2,110);
+  x.fillStyle='#7e6014';x.font='400 26px "Noto Serif SC",serif';x.fillText('MYSKME · 名人天梯',W/2,156);
+  x.textAlign='left';var y=240;
+  top.forEach(function(r,i){
+    var rank=lbMode==='hall'?(r.season+' 第'+r.rank):('第 '+(i+1));
+    x.fillStyle=i<3?'#7a6320':'#b6a988';x.font='700 40px "Noto Serif SC",serif';x.fillText(i+1,70,y+10);
+    x.fillStyle='#2a2218';x.font='600 38px "Noto Serif SC",serif';x.fillText(r.alias+(r.faction?'  ·  '+r.faction:''),150,y);
+    x.fillStyle='#574b37';x.font='400 24px "Noto Serif SC",serif';x.fillText((r.rankName||rank)+(r.badges&&r.badges.length?'  🏅'+r.badges.length:''),150,y+38);
+    x.textAlign='right';x.fillStyle='#7e6014';x.font='700 44px ui-monospace,Menlo,monospace';x.fillText((+r.power||0)+' 灵力',W-70,y+14);x.textAlign='left';
+    y+=86;
+  });
+  x.textAlign='center';x.fillStyle='#635943';x.font='400 22px "Noto Serif SC",serif';
+  x.fillText('扫码进词灵对决冲榜 · myskme-games.netlify.app/word-duel',W/2,H-40);
+  cv.toBlob(function(b){if(!b){alert('海报导出失败');return;}var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='MYSKME-词灵榜-'+lbMode+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);},'image/png');
+});
 lbWorld();
 </script>
 </body>
