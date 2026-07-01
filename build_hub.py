@@ -640,6 +640,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   document.getElementById('abExport').addEventListener('click',exportHTML);
   var abc=document.getElementById('abConsole');
   if(abc)abc.addEventListener('click',function(){window.open('console/','_blank','noopener');});
+  var abm=document.getElementById('abMaker');
+  if(abm)abm.addEventListener('click',function(){window.open('maker/','_blank','noopener');});
   document.getElementById('abReset').addEventListener('click',function(){
     if(!confirm('重置为默认内容？将清除本机所有改动。'))return;
     try{localStorage.removeItem(LS);}catch(e){}DATA=clone(DEFAULT_DATA);renderHeader();render();toast('已重置为默认内容');
@@ -727,6 +729,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <div class="admin-bar" id="adminBar">
   <span class="ab-title">管理员模式 · <b>直接点文字即可编辑，改动自动保存在本机</b></span>
   <button id="abConsole">控制台 ↗</button>
+  <button id="abMaker">出题工坊 ↗</button>
   <button id="abExport">导出 index.html</button>
   <button id="abReset" class="danger">重置默认</button>
   <button id="abExit">退出</button>
@@ -759,8 +762,6 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       <a href="https://myskme.github.io/myskme-hub/listen/" target="_blank" rel="noopener">听力训练场</a>
       <span>·</span>
       <a href="https://myskme.github.io/myskme-hub/print/" target="_blank" rel="noopener">打印中心</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/maker/" target="_blank" rel="noopener">出题工坊</a>
     </div>
     <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
     <div>单文件离线作品总目 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
