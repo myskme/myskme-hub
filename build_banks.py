@@ -37,6 +37,11 @@ def build_bank(src):
                     o["why"] = it["why"]
                 if it.get("lv"):
                     o["lv"] = int(it["lv"])
+                # 阅读/完形：携带短文与题型（词灵对决会渲染短文面板）
+                if it.get("passage"):
+                    o["passage"] = it["passage"]
+                if it.get("type"):
+                    o["type"] = it["type"]
                 out.append(o)
             mods[k] = out
     bank = {"name": src.get("name", ""), "code": (src.get("code") or "").strip().upper(), "desc": src.get("desc", "")}
