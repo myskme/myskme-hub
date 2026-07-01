@@ -1,0 +1,69 @@
+{
+  "code": "CLOZE2",
+  "name": "完形填空 · 第二辑（阅读的力量）",
+  "desc": "说明文完形，7 个空，练一般现在时 + 词义搭配 + 副词选择（中考完形高频点）。每空带全文面板。免费档。",
+  "cat": "完形填空",
+  "pack": "阅读训练营",
+  "level": "常规",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ① 空应选：",
+        "ops": ["open", "opens", "opening", "opened"],
+        "ans": 1,
+        "why": "主语 It 第三人称单数、一般现在时，用 opens（与后面 makes 并列）。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ② 空应选：",
+        "ops": ["interesting", "boring", "happy", "kind"],
+        "ans": 1,
+        "why": "but once…cannot stop 是转折，前面应是负面词 boring（枯燥）。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ③ 空应选：（每天）",
+        "ops": ["one", "every", "the", "some"],
+        "ans": 1,
+        "why": "every day = 每天；one day 意为「某一天」，the/some day 也不表「每天」，故选 every。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ④ 空应选：",
+        "ops": ["speak", "guess", "write", "count"],
+        "ans": 1,
+        "why": "遇到生词、根据上下文——guess its meaning（猜词义）。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ⑤ 空应选：（___ by little 逐渐地）",
+        "ops": ["Little", "Few", "Much", "Many"],
+        "ans": 0,
+        "why": "固定短语 little by little = 一点一点地、逐渐地。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ⑥ 空应选：",
+        "ops": ["worse", "better", "smaller", "colder"],
+        "ans": 1,
+        "why": "坚持读书英语会变好——get better（越来越好）。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Reading is a good habit. It ①___ your mind and makes you smarter. Some students think reading is ②___, but once they find a book they like, they cannot stop. You do not need to read fast — just read a little ③___ day. When you meet a new word, try to ④___ its meaning from the sentence around it. ⑤___ by little, your English will get ⑥___. If you keep reading every day, you will ⑦___ make progress.",
+        "q": "第 ⑦ 空应选：",
+        "ops": ["never", "surely", "hardly", "seldom"],
+        "ans": 1,
+        "why": "语气积极——will surely make progress（一定会进步）；never/hardly/seldom 都是否定，语义相反。"
+      }
+    ]
+  }
+}
