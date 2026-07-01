@@ -1,0 +1,103 @@
+{
+  "code": "READ1",
+  "name": "阅读理解 · 第一辑（短文 + 完形入门）",
+  "desc": "中考阅读数字化第一步：读短文→选答案。含 2 篇短文阅读（6 题）+ 1 篇完形填空（5 空）。免费档，人人可练。每题都带原文面板，边读边答。",
+  "cat": "阅读理解",
+  "pack": "阅读训练营",
+  "level": "常规",
+  "tier": "free",
+  "mods": {
+    "m4": [
+      {
+        "type": "reading",
+        "passage": "Mr. Wang is an English teacher. His students call him \"Mr. Wolf\" because he is brave and kind. Every morning he tells his class, \"Make yourself special and kind.\" Lin is a shy girl. She was afraid to speak English. Mr. Wolf gave her a small notebook and said, \"Write one new word every day.\" Three months later, Lin won the school English contest.",
+        "q": "Why do the students call Mr. Wang \"Mr. Wolf\"?",
+        "ops": ["Because he often gets angry", "Because he is brave and kind", "Because he keeps a real wolf", "Because he runs very fast"],
+        "ans": 1,
+        "why": "原文：he is brave and kind（勇敢又善良），所以学生叫他狼先生。"
+      },
+      {
+        "type": "reading",
+        "passage": "Mr. Wang is an English teacher. His students call him \"Mr. Wolf\" because he is brave and kind. Every morning he tells his class, \"Make yourself special and kind.\" Lin is a shy girl. She was afraid to speak English. Mr. Wolf gave her a small notebook and said, \"Write one new word every day.\" Three months later, Lin won the school English contest.",
+        "q": "What did Mr. Wolf give Lin?",
+        "ops": ["A big dictionary", "A gold prize", "A small notebook", "A new pen"],
+        "ans": 2,
+        "why": "原文：gave her a small notebook（给了她一个小本子）。"
+      },
+      {
+        "type": "reading",
+        "passage": "Mr. Wang is an English teacher. His students call him \"Mr. Wolf\" because he is brave and kind. Every morning he tells his class, \"Make yourself special and kind.\" Lin is a shy girl. She was afraid to speak English. Mr. Wolf gave her a small notebook and said, \"Write one new word every day.\" Three months later, Lin won the school English contest.",
+        "q": "What happened three months later?",
+        "ops": ["Lin won the school English contest", "Lin left Mr. Wolf's class", "Lin forgot all the words", "Lin became a teacher"],
+        "ans": 0,
+        "why": "原文：Three months later, Lin won the school English contest（三个月后林赢得了校英语比赛）。"
+      },
+      {
+        "type": "reading",
+        "passage": "Long Island is a quiet place far from the city. Hai studies there. At night he can see many stars. He misses his old friends, but he does not regret his choice. \"I will become my own hero,\" he says. He reads English stories before sleep and writes a diary in English every day.",
+        "q": "Where does Hai study?",
+        "ops": ["In the busy city", "On Long Island", "At a seaside hotel", "In Beijing"],
+        "ans": 1,
+        "why": "原文：Hai studies there（there 指前句的 Long Island 长岛）。"
+      },
+      {
+        "type": "reading",
+        "passage": "Long Island is a quiet place far from the city. Hai studies there. At night he can see many stars. He misses his old friends, but he does not regret his choice. \"I will become my own hero,\" he says. He reads English stories before sleep and writes a diary in English every day.",
+        "q": "How does Hai feel about his choice?",
+        "ops": ["He does not regret it", "He is very sad", "He wants to go home", "He feels angry"],
+        "ans": 0,
+        "why": "原文：he does not regret his choice（他不后悔自己的选择）。"
+      },
+      {
+        "type": "reading",
+        "passage": "Long Island is a quiet place far from the city. Hai studies there. At night he can see many stars. He misses his old friends, but he does not regret his choice. \"I will become my own hero,\" he says. He reads English stories before sleep and writes a diary in English every day.",
+        "q": "What does Hai do every day?",
+        "ops": ["He plays computer games", "He watches TV late", "He writes a diary in English", "He sleeps very early"],
+        "ans": 2,
+        "why": "原文：writes a diary in English every day（每天用英语写日记）。"
+      }
+    ],
+    "m5": [
+      {
+        "type": "cloze",
+        "passage": "Tom is a middle school student. He ①___ English very much. Every day he ②___ new words in a notebook. Last week he ③___ an English story for the first time. His teacher was very ④___ and gave him a star. Now Tom believes he ⑤___ learn English well.",
+        "q": "第 ① 空应选：",
+        "ops": ["like", "likes", "liked", "liking"],
+        "ans": 1,
+        "why": "主语 He 第三人称单数，一般现在时用 likes。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Tom is a middle school student. He ①___ English very much. Every day he ②___ new words in a notebook. Last week he ③___ an English story for the first time. His teacher was very ④___ and gave him a star. Now Tom believes he ⑤___ learn English well.",
+        "q": "第 ② 空应选：",
+        "ops": ["write down", "writes down", "wrote down", "writing down"],
+        "ans": 1,
+        "why": "Every day 提示一般现在时，主语 he 用 writes down。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Tom is a middle school student. He ①___ English very much. Every day he ②___ new words in a notebook. Last week he ③___ an English story for the first time. His teacher was very ④___ and gave him a star. Now Tom believes he ⑤___ learn English well.",
+        "q": "第 ③ 空应选：",
+        "ops": ["reads", "reading", "read", "will read"],
+        "ans": 2,
+        "why": "Last week 提示一般过去时，read 的过去式仍写作 read。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Tom is a middle school student. He ①___ English very much. Every day he ②___ new words in a notebook. Last week he ③___ an English story for the first time. His teacher was very ④___ and gave him a star. Now Tom believes he ⑤___ learn English well.",
+        "q": "第 ④ 空应选：",
+        "ops": ["sad", "angry", "tired", "happy"],
+        "ans": 3,
+        "why": "老师奖励小星星，说明老师很 happy（高兴），语义最搭。"
+      },
+      {
+        "type": "cloze",
+        "passage": "Tom is a middle school student. He ①___ English very much. Every day he ②___ new words in a notebook. Last week he ③___ an English story for the first time. His teacher was very ④___ and gave him a star. Now Tom believes he ⑤___ learn English well.",
+        "q": "第 ⑤ 空应选：",
+        "ops": ["can", "could not", "cannot", "must not"],
+        "ans": 0,
+        "why": "语境积极向上——Tom 相信自己 can（能）学好英语。"
+      }
+    ]
+  }
+}
