@@ -142,6 +142,7 @@ footer a:hover{text-shadow:var(--glow)}
       <div class="lb-tabs">
         <button class="lb-tab on" data-scope="world">世界榜</button>
         <button class="lb-tab" data-scope="class">班级榜</button>
+        <button class="lb-tab" data-scope="faction">门派榜</button>
         <button class="lb-tab" data-scope="hall">名人堂</button>
       </div>
     </div>
@@ -273,10 +274,18 @@ function lbHallRow(r){
     +'<div class="lb-who"><div class="lb-alias">'+esc(r.alias)+'</div><div class="lb-meta">'+meta.join(' · ')+'</div></div>'
     +'<div class="lb-pow"><b>'+(+r.power||0)+'</b><span>灵力</span></div></div>';
 }
+function lbFacRow(r){
+  var cls='lb-row'+(r.rank<=3?' top'+r.rank:'');
+  return '<div class="'+cls+'"><div class="lb-no">'+r.rank+'</div>'
+    +'<div class="lb-who"><div class="lb-alias">'+esc(r.faction||'（无门派）')+'</div><div class="lb-meta">'+(r.members||0)+' 人 · 人均 '+(+r.avg||0)+'</div></div>'
+    +'<div class="lb-pow"><b>'+(+r.power||0)+'</b><span>总灵力</span></div></div>';
+}
+function lbFactions(){lbMode='faction';document.getElementById('lbGate').style.display='none';lbFetch(LB_API+'/factions?scope=world&limit=30','还没有门派上榜——上榜时选个门派，为门派争光！');}
 function lbRender(rows,emptyMsg,hall){
   lbRows=rows||[];
   if(!lbRows.length){lbSet('<div class="lb-empty">'+(emptyMsg||'还没有人上榜——去词灵对决打卡，抢占头名！')+'</div>');return;}
-  lbSet(lbRows.map(hall?lbHallRow:lbRow).join(''));
+  var fn=lbMode==='faction'?lbFacRow:(hall?lbHallRow:lbRow);
+  lbSet(lbRows.map(fn).join(''));
 }
 function lbFetch(url,emptyMsg,hall){
   lbSet('<div class="lb-empty">正在取回天梯……</div>');
@@ -293,7 +302,7 @@ function lbClassGo(){
 Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(t){t.addEventListener('click',function(){
   Array.prototype.forEach.call(document.querySelectorAll('.lb-tab'),function(x){x.classList.remove('on')});t.classList.add('on');
   var sc=t.getAttribute('data-scope');
-  if(sc==='world')lbWorld();else if(sc==='hall')lbHall();else lbClassPrompt();
+  if(sc==='world')lbWorld();else if(sc==='hall')lbHall();else if(sc==='faction')lbFactions();else lbClassPrompt();
 })});
 document.getElementById('lbGo').addEventListener('click',lbClassGo);
 document.getElementById('lbPw').addEventListener('keydown',function(e){if(e.key==='Enter')lbClassGo();});
@@ -306,16 +315,19 @@ document.getElementById('lbPoster').addEventListener('click',function(e){
   x.fillStyle='#f5efe2';x.fillRect(0,0,W,H);
   x.fillStyle='#7a6320';x.fillRect(0,0,W,10);
   x.textAlign='center';x.fillStyle='#2a2218';x.font='600 52px "Noto Serif SC",serif';
-  var title=lbMode==='hall'?'名人堂 · 词灵榜':(lbMode==='class'?'班级榜 · 词灵榜':'世界榜 · 词灵榜');
+  var title=lbMode==='hall'?'名人堂 · 词灵榜':(lbMode==='class'?'班级榜 · 词灵榜':(lbMode==='faction'?'门派榜 · 词灵榜':'世界榜 · 词灵榜'));
   x.fillText(title,W/2,110);
   x.fillStyle='#7e6014';x.font='400 26px "Noto Serif SC",serif';x.fillText('MYSKME · 名人天梯',W/2,156);
   x.textAlign='left';var y=240;
   top.forEach(function(r,i){
     var rank=lbMode==='hall'?(r.season+' 第'+r.rank):('第 '+(i+1));
     x.fillStyle=i<3?'#7a6320':'#b6a988';x.font='700 40px "Noto Serif SC",serif';x.fillText(i+1,70,y+10);
-    x.fillStyle='#2a2218';x.font='600 38px "Noto Serif SC",serif';x.fillText(r.alias+(r.faction?'  ·  '+r.faction:''),150,y);
-    x.fillStyle='#574b37';x.font='400 24px "Noto Serif SC",serif';x.fillText((r.rankName||rank)+(r.badges&&r.badges.length?'  🏅'+r.badges.length:''),150,y+38);
-    x.textAlign='right';x.fillStyle='#7e6014';x.font='700 44px ui-monospace,Menlo,monospace';x.fillText((+r.power||0)+' 灵力',W-70,y+14);x.textAlign='left';
+    var isFac=lbMode==='faction';
+    var nm=isFac?(r.faction||'（无门派）'):(r.alias+(r.faction?'  ·  '+r.faction:''));
+    var sub=isFac?((r.members||0)+' 人 · 人均 '+(+r.avg||0)):((r.rankName||rank)+(r.badges&&r.badges.length?'  🏅'+r.badges.length:''));
+    x.fillStyle='#2a2218';x.font='600 38px "Noto Serif SC",serif';x.fillText(nm,150,y);
+    x.fillStyle='#574b37';x.font='400 24px "Noto Serif SC",serif';x.fillText(sub,150,y+38);
+    x.textAlign='right';x.fillStyle='#7e6014';x.font='700 44px ui-monospace,Menlo,monospace';x.fillText((+r.power||0)+(isFac?' 总灵力':' 灵力'),W-70,y+14);x.textAlign='left';
     y+=86;
   });
   x.textAlign='center';x.fillStyle='#635943';x.font='400 22px "Noto Serif SC",serif';
