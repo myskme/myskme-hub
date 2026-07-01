@@ -221,6 +221,30 @@ async function handleBoard(req, env, origin, url) {
   return json({ ok: true, season: sea, scope, count: (rows.results || []).length, rows: mapRows(rows.results) }, 200, origin);
 }
 
+async function handleFactions(req, env, origin, url) {
+  const sea = url.searchParams.get("season") || await getSeason(env);
+  const scope = url.searchParams.get("scope") || "world";
+  const limit = clampInt(url.searchParams.get("limit") || 30, 1, 60);
+  const sql = "SELECT faction, COUNT(*) AS n, SUM(power-base_power) AS total, MAX(power-base_power) AS top" +
+    " FROM leaderboard WHERE season=? AND hidden=0 AND faction!=''" +
+    "%CLASS% GROUP BY faction ORDER BY total DESC, n DESC LIMIT ?";
+  let rows;
+  if (scope === "class") {
+    const pw = (url.searchParams.get("pw") || "").trim();
+    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    const c = await sha256("class|" + pw + "|" + env.LB_SALT);
+    rows = await env.DB.prepare(sql.replace("%CLASS%", " AND class_tag=?")).bind(sea, c, limit).all();
+  } else {
+    rows = await env.DB.prepare(sql.replace("%CLASS%", "")).bind(sea, limit).all();
+  }
+  const list = (rows.results || []).map((r, i) => {
+    const total = Math.max(0, r.total || 0);
+    return { rank: i + 1, faction: r.faction, members: r.n || 0, power: total,
+             avg: r.n ? Math.round(total / r.n) : 0, top: Math.max(0, r.top || 0) };
+  });
+  return json({ ok: true, season: sea, scope, count: list.length, rows: list }, 200, origin);
+}
+
 async function handleHall(req, env, origin, url) {
   const limit = clampInt(url.searchParams.get("limit") || 60, 1, 200);
   const scope = url.searchParams.get("scope") || "world";
@@ -321,9 +345,10 @@ export default {
     try {
       if (p === "/board" && request.method === "GET") return await handleBoard(request, env, origin, url);
       if (p === "/hall" && request.method === "GET") return await handleHall(request, env, origin, url);
+      if (p === "/factions" && request.method === "GET") return await handleFactions(request, env, origin, url);
       if (p === "/submit" && request.method === "POST") return await handleSubmit(request, env, origin);
       if (p === "/admin" && request.method === "POST") return await handleAdmin(request, env, origin);
-      if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 2, season: await getSeason(env) }, 200, origin);
+      if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 3, season: await getSeason(env) }, 200, origin);
       return json({ ok: false, err: "not found" }, 404, origin);
     } catch (e) {
       console.error("LB worker error:", e && e.stack || e);
