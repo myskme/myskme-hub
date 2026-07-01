@@ -5,27 +5,24 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){try{var p=localStorage.getItem('myskme-theme')||'auto';var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p)}catch(e){}})();</script>
 <title>作文训练场 · MYSKME × 英语王老师</title>
-<meta name="description" content="MYSKME · 中考英语作文训练场：题目 + 句型支架 + 高级表达 + 实时自检（字数/连接词/时态/清单）。纯网页，离线可用。">
+<meta name="description" content="MYSKME · 中考英语作文训练场：题目 + 写作套路 + 标注版满分范文 + 高分句式库 + 实时自检。纯网页，离线可用。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="作文训练场 · MYSKME 英语王老师">
-<meta property="og:description" content="题目 + 句型支架 + 高级表达 + 实时自检。中考英语写作，边写边查。">
+<meta property="og:description" content="写作套路 + 标注满分范文 + 高分句式库 + 实时自检（字数/连接词/高分句型/重复词）。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <meta property="og:url" content="https://myskme.github.io/myskme-hub/write/">
 <style>
 :root{
   --bg:#0a0a0c;--bg2:#111114;--bg3:#16161a;--bg4:#1c1c22;
   --ink:#f0e6d2;--ink2:#a8a090;--ink3:#6a6458;--ink4:#3a382f;
-  --gold:#c9a64a;--gold2:#e8c768;--gold3:#7a6320;
-  --green:#6aa86a;--red:#d56060;--blue:#5a8ec8;
+  --gold:#c9a64a;--gold2:#e8c768;--gold3:#7a6320;--green:#6aa86a;--red:#d56060;--blue:#6ba0dd;
   --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.09);--glow:0 0 24px rgba(201,166,74,.4);
-  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 :root[data-theme="light"]{
   --bg:#ece2cc;--bg2:#e4d8bc;--bg3:#f8f2e4;--bg4:#e0d3b3;
-  --ink:#2a2218;--ink2:#574b37;--ink3:#635943;--ink4:#b6a988;
-  --gold:#6f5410;--gold2:#5f470e;--gold3:#b89a52;
-  --green:#2f6a3e;--red:#9a271d;--blue:#33548c;
+  --ink:#2a2218;--ink2:#574b37;--ink3:#635943;--ink4:#9c8f6f;
+  --gold:#6f5410;--gold2:#5f470e;--gold3:#b89a52;--green:#2f6a3e;--red:#9a271d;--blue:#33548c;
   --line:rgba(120,90,20,.30);--line2:rgba(120,90,20,.13);--glow:0 4px 16px rgba(120,90,20,.18);
 }
 *{box-sizing:border-box}
@@ -34,7 +31,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);lin
   transition:background-color .35s,color .35s}
 :root[data-theme="light"] body{background-image:radial-gradient(1100px 640px at 50% -8%,rgba(190,160,80,.18),transparent 60%)}
 .wrap{max-width:1060px;margin:0 auto;padding:clamp(28px,5vw,56px) clamp(14px,4vw,36px) 90px}
-header{text-align:center;margin-bottom:26px}
+header{text-align:center;margin-bottom:24px}
 .kicker{font-size:12px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase}
 h1{font-size:clamp(28px,5vw,46px);font-weight:300;letter-spacing:.14em;margin:.3em 0 .12em}
 h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow)}
@@ -44,7 +41,7 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
   border:1px solid var(--line);background:transparent;transition:all .2s;border-radius:2px}
 .g-tab.on{color:var(--gold2);border-color:var(--gold3);background:rgba(201,166,74,.08)}
 .grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:20px}
-@media(min-width:860px){.grid{grid-template-columns:1.15fr .85fr}}
+@media(min-width:880px){.grid{grid-template-columns:1.12fr .88fr}}
 .card{background:linear-gradient(160deg,var(--bg3),var(--bg2));border:1px solid var(--line);padding:20px 22px}
 :root[data-theme="light"] .card{background:linear-gradient(160deg,var(--bg3),#f1e9d6)}
 .eyebrow{font-size:11px;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin:0 0 8px}
@@ -55,12 +52,29 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
 .req span b{color:var(--gold);font-weight:500}
 .pts{margin:0 0 4px;padding-left:20px;color:var(--ink2);font-size:13.5px}
 .pts li{margin:3px 0}
+details{border:1px solid var(--line2);margin-top:12px;padding:0 14px;border-radius:4px;background:var(--bg)}
+details[open]{padding-bottom:12px}
+summary{cursor:pointer;list-style:none;padding:11px 0;font-size:13.5px;letter-spacing:.06em;color:var(--gold2)}
+summary::-webkit-details-marker{display:none}
+summary .ar{float:right;color:var(--ink3);transition:transform .2s}
+details[open] summary .ar{transform:rotate(90deg)}
+.steps{margin:2px 0 0;padding-left:20px;color:var(--ink2);font-size:13.5px}
+.steps li{margin:5px 0}
+.golden{font-size:13px;color:var(--ink2);line-height:1.8;margin:6px 0 0}
+.golden div{padding:5px 0;border-top:1px dashed var(--line2)}
+.golden div:first-child{border-top:0}
 .chips{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 2px}
-.chip{font-family:var(--mono);font-size:12.5px;color:var(--ink);border:1px dashed var(--line);background:var(--bg);
+.chip{font-family:var(--mono);font-size:12.5px;color:var(--ink);border:1px dashed var(--line);background:var(--bg2);
   padding:5px 10px;cursor:pointer;border-radius:3px;transition:all .18s}
 .chip:hover{border-color:var(--gold);color:var(--gold2);border-style:solid}
 .chip.up{border-color:color-mix(in srgb,var(--blue) 45%,transparent);color:var(--blue)}
-textarea{width:100%;min-height:300px;resize:vertical;background:var(--bg);color:var(--ink);border:1px solid var(--line);
+.model{margin-top:2px}
+.model .m-title{font-size:15px;color:var(--gold2);margin:4px 0 10px;letter-spacing:.02em}
+.m-line{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line2);align-items:baseline}
+.m-line:first-child{border-top:0}
+.m-en{flex:1;font-size:15px;line-height:1.7;white-space:pre-line}
+.m-tag{flex:0 0 auto;max-width:38%;font-size:11px;color:var(--gold);border:1px solid var(--line2);padding:2px 8px;border-radius:999px;text-align:center;line-height:1.5}
+textarea{width:100%;min-height:280px;resize:vertical;background:var(--bg);color:var(--ink);border:1px solid var(--line);
   font-family:var(--serif);font-size:16px;line-height:1.9;padding:16px 18px;outline:none;letter-spacing:.01em}
 textarea:focus{border-color:var(--gold);box-shadow:var(--glow)}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -68,11 +82,11 @@ textarea:focus{border-color:var(--gold);box-shadow:var(--glow)}
   background:transparent;color:var(--ink);cursor:pointer;border-radius:2px;transition:all .2s}
 .btn:hover{border-color:var(--gold);color:var(--gold2)}
 .btn.danger:hover{border-color:var(--red);color:var(--red)}
-.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.stat{flex:1;min-width:92px;background:var(--bg);border:1px solid var(--line2);padding:10px 12px;text-align:center}
-.stat b{display:block;font-size:22px;color:var(--gold2);font-weight:500;line-height:1.1;font-family:var(--mono)}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--bg);border:1px solid var(--line2);padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--gold2);font-weight:500;line-height:1.1;font-family:var(--mono)}
 .stat b.ok{color:var(--green)}.stat b.low{color:var(--ink3)}
-.stat span{font-size:11px;color:var(--ink3);letter-spacing:.08em}
+.stat span{font-size:10.5px;color:var(--ink3);letter-spacing:.04em}
 .check{margin:0;padding:0;list-style:none}
 .check li{display:flex;align-items:flex-start;gap:9px;padding:7px 0;font-size:14px;border-top:1px solid var(--line2)}
 .check li:first-child{border-top:0}
@@ -82,11 +96,21 @@ textarea:focus{border-color:var(--gold);box-shadow:var(--glow)}
 .check li.done.auto .mk{background:var(--gold);border-color:var(--gold)}
 .check .tx{flex:1}
 .check .tx small{display:block;color:var(--ink3);font-size:12px}
-.found{margin-top:6px;font-size:12.5px;color:var(--ink3);line-height:1.9}
+.found{margin-top:8px;font-size:12.5px;color:var(--ink3);line-height:1.9}
 .found b{color:var(--green);font-weight:500;font-family:var(--mono)}
+.found .warn{color:var(--red)}
 .tip{font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.6}
 .tip b{color:var(--gold)}
-footer{margin-top:44px;padding-top:22px;border-top:1px solid var(--line2);text-align:center;color:var(--ink3);font-size:13px;letter-spacing:.08em}
+.lib{margin-top:20px}
+.lib .pat{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:620px){.lib .pat{grid-template-columns:1fr 1fr}}
+.p-cell{border:1px solid var(--line2);padding:12px 14px;background:var(--bg)}
+.p-cat{font-size:11px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+.p-en{font-family:var(--mono);font-size:13px;color:var(--ink);margin:4px 0 3px;line-height:1.5}
+.p-cn{font-size:12.5px;color:var(--ink3);line-height:1.6}
+.p-eg{font-size:13px;color:var(--ink2);margin-top:6px;border-left:2px solid var(--gold3);padding:2px 0 2px 10px;cursor:pointer}
+.p-eg:hover{color:var(--gold2)}
+footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--line2);text-align:center;color:var(--ink3);font-size:13px;letter-spacing:.08em}
 footer a{color:var(--gold2);text-decoration:none}
 .ctrl{position:fixed;right:16px;bottom:16px;z-index:40;display:flex;gap:8px;background:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));
   border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
@@ -97,7 +121,7 @@ footer a{color:var(--gold2);text-decoration:none}
 #toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(16px);z-index:60;background:var(--bg4);
   border:1px solid var(--gold3);color:var(--ink);padding:10px 18px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;border-radius:3px}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media print{.ctrl,.genres,.tools,.g-hint{display:none}.grid{grid-template-columns:1fr}textarea{border:0;min-height:0}}
+@media print{.ctrl,.genres,.tools,details,.lib{display:none}.grid{grid-template-columns:1fr}textarea{border:0;min-height:0}}
 </style>
 </head>
 <body>
@@ -105,14 +129,14 @@ footer a{color:var(--gold2);text-decoration:none}
   <header>
     <div class="kicker">MYSKME × 英语王老师</div>
     <h1>作文 <em>训练场</em></h1>
-    <p class="sub">选题 → 看句型支架 → 动笔 → 右侧实时自检（字数 · 连接词 · 时态 · 清单）</p>
+    <p class="sub">选题 → 学套路 → 看标注范文 → 动笔 → 右侧实时自检（字数·连接词·高分句型·重复词）</p>
     <div class="genres" id="genres"></div>
   </header>
   <div class="grid">
     <div>
       <div class="card" id="brief"></div>
       <div style="margin-top:14px">
-        <textarea id="essay" placeholder="在这里写你的作文…（点上方句型支架可一键插入；内容自动存本机，换天回来还在）"></textarea>
+        <textarea id="essay" placeholder="在这里写你的作文…（点句型支架/高分句可一键插入；内容自动存本机，换天回来还在）"></textarea>
         <div class="tools">
           <button class="btn" id="btn-copy">复制草稿</button>
           <button class="btn" id="btn-print">打印 / 存 PDF</button>
@@ -126,13 +150,18 @@ footer a{color:var(--gold2);text-decoration:none}
         <div class="stat-row">
           <div class="stat"><b id="s-words">0</b><span id="s-words-lbl">词</span></div>
           <div class="stat"><b id="s-conn">0</b><span>连接词</span></div>
+          <div class="stat"><b id="s-hi">0</b><span>高分句型</span></div>
           <div class="stat"><b id="s-up">0</b><span>高级表达</span></div>
         </div>
         <ul class="check" id="check"></ul>
-        <div class="found" id="found-conn"></div>
+        <div class="found" id="found"></div>
         <div class="tip" id="tense-tip"></div>
       </div>
     </div>
+  </div>
+  <div class="lib card" style="margin-top:22px">
+    <div class="eyebrow">高分句式库 · 点例句可插入作文</div>
+    <div class="pat" id="patlib"></div>
   </div>
   <footer>
     <a href="../">← 作品总目</a>　·　<a href="../wall/">优秀作文墙 →</a>　·　MYSKME 作文训练场 · 内容存本机、离线可用
@@ -142,112 +171,199 @@ footer a{color:var(--gold2);text-decoration:none}
 <div id="toast"></div>
 <script>
 var GENRES=[
-  {key:"letter",name:"建议信",en:"Advice Letter",
-   prompt:"Your pen friend Peter is having trouble learning Chinese. Write him a letter (about 80–100 words) with some advice.",
-   cn:"笔友 Peter 学中文遇到困难，写信给他，给出 2–3 条建议并鼓励他。",
-   min:80,max:110,tense:"一般现在时 + 情态动词（should / can / had better）为主。",
-   points:["问候 + 点明写信目的","给 2–3 条具体建议（First… / What's more… / Last but not least…）","每条建议加一句原因或例子","鼓励 + 结尾落款（Yours, Li Hua）"],
-   frames:["Dear Peter,","I'm glad to hear from you.","Here is some advice for you.","First of all, you'd better …","What's more, it helps to …","Last but not least, don't be afraid to …","I'm sure you will make progress.","Yours,\nLi Hua"],
-   up:["you'd better …","it's a good idea to …","practise … every day","keep a diary in Chinese","don't give up"]},
-  {key:"story",name:"记叙文",en:"Narrative",
-   prompt:"Write about an unforgettable experience (about 90–110 words): what happened and how you felt.",
-   cn:"写一件难忘的事：起因、经过、结果和你的感受。",
-   min:90,max:120,tense:"一般过去时为主（was/were, did），感受可用一般现在时。",
-   points:["交代时间、地点、人物","起因 → 经过（用 then / after that 串起来）","高潮 / 转折","结果 + 你的感受与收获"],
-   frames:["It was a … day.","At first, …","Then, to my surprise, …","After that, …","In the end, …","I will never forget that day.","From then on, I learned that …"],
-   up:["to my surprise","little by little","couldn't help …ing","made up my mind to …","it was really … that …"]},
-  {key:"opinion",name:"观点议论",en:"Opinion",
-   prompt:"Some students think keeping pets is good, while others don't. What's your opinion? (about 90–110 words)",
-   cn:"就某话题（如养宠物 / 手机 / 网课）给出你的看法，说明理由。",
-   min:90,max:120,tense:"一般现在时为主。",
-   points:["引出话题（有人…有人…）","一方观点 + 理由","另一方观点 + 理由（On the other hand…）","亮出并总结你的看法（In my opinion… / All in all…）"],
-   frames:["Different people have different ideas about …","Some people think that …","On one hand, …","On the other hand, …","As for me, I believe …","In my opinion, …","All in all, …"],
-   up:["there is no doubt that …","what matters most is …","not only … but also …","play an important role in …","every coin has two sides"]},
-  {key:"intro",name:"应用文·介绍",en:"Introduction / Notice",
-   prompt:"Introduce your school (or a school activity) to a foreign friend. (about 80–100 words)",
-   cn:"向外国朋友介绍你的学校或一次活动：概况 + 细节 + 邀请。",
-   min:80,max:110,tense:"一般现在时为主；讲经历时用过去时。",
-   points:["概况（名字 / 位置 / 规模）","2–3 个具体细节（There are… / Every year we…）","一个亮点 / 你最喜欢的地方","欢迎 / 邀请对方（Welcome to…）"],
-   frames:["Let me introduce … to you.","Our school lies in …","There are … in our school.","Every year we …","What I like best is …","Welcome to our school!"],
-   up:["is well known for …","a great place to …","not only … but also …","play an important part in …","feel at home"]},
+ {key:"letter",name:"建议信",en:"Advice Letter",
+  prompt:"Your pen friend Hai is having trouble focusing on his studies. Write him a letter (about 90 words) with some advice.",
+  cn:"笔友 Hai 学习难专注，写信给他给 2–3 条建议并鼓励。",min:80,max:110,tense:"一般现在时 + 情态动词（should / can / had better）为主。",
+  points:["共情 + 点明写信目的","2–3 条具体建议（Why don't you… / You'd better… / I suggest…）","每条建议配一句原因或好处","鼓励 + 落款（Yours, Lin）"],
+  frames:["Dear Hai,","I'm sorry to hear that …","Here is some advice that may help.","First, why don't you …?","Second, you'd better …","What's more, I suggest that you …","I hope my advice helps.","Yours,\nLin"],
+  up:["Why don't you …?","you'd better …","in this way","so that …","I'm looking forward to your reply"],
+  method:{title:"建议信四步法：共情 → 支招 → 说理 → 鼓励",steps:["共情点题：先回应对方的困难，让笔友被理解，再自然说出「我想给你几条建议」。","分条支招（2–3 条）：每条用 Why don't you… / You'd better… / I suggest… 开头，一条只讲一件事。","建议配理由：每条后补一句 because / so that / in this way，讲清好处，让建议有说服力。","连接成层次：First… Second… What's more… 串起结构，方便阅卷老师找采分点。","鼓励收尾：一句暖心鼓励（可引座右铭）+ I hope my advice helps / Looking forward to your reply，落款 Yours, Lin。"]},
+  open:["I'm sorry to hear that you've been having a hard time with your studies. Don't worry—I'd like to share some advice that may help.","Thank you for your letter. I completely understand how you feel, because I once had the same problem.","It's really kind of you to trust me with your trouble. As your pen friend, I'm more than happy to offer some suggestions."],
+  end:["I do hope these suggestions help you out. As Mr. Wolf often says, \"Make yourself special and kind.\" Believe in yourself!","Rome wasn't built in a day, so please be patient with yourself. I'm looking forward to your reply and your good news!","I'm sure things will get better as long as you keep trying. Feel free to write to me whenever you need a hand."],
+  model:{title:"A Letter of Advice to My Pen Friend Hai",wc:105,lines:[
+   {en:"Dear Hai,",tag:"书信格式·称呼"},
+   {en:"I'm sorry to hear that you're finding it hard to focus on your studies.",tag:"共情开头·find it hard to do"},
+   {en:"Don't worry—here is some advice that may help you.",tag:"点明目的·破折号引出"},
+   {en:"First, why don't you make a study plan and stick to it every day?",tag:"建议一·Why don't you…?"},
+   {en:"In this way, you can finish your tasks step by step instead of leaving them all to the last minute.",tag:"讲好处·in this way + instead of"},
+   {en:"Second, you'd better put your phone away while reading, so that you won't be interrupted.",tag:"建议二·you'd better + so that"},
+   {en:"What's more, I suggest that you take a short walk when you feel tired.",tag:"建议三·I suggest (that) 从句"},
+   {en:"It really works for me in Mr. Wolf's class here in Academy Valley.",tag:"细节支撑·世界观水印"},
+   {en:"As our class motto goes, \"Make yourself special and kind,\" so please be patient with yourself.",tag:"引座右铭·As … goes"},
+   {en:"I hope my advice helps, and I'm looking forward to your reply.",tag:"首尾呼应·look forward to doing"},
+   {en:"Yours,\nLin",tag:"书信格式·落款"}]}},
+ {key:"story",name:"记叙文",en:"Narrative",
+  prompt:"Write about an unforgettable experience (about 100 words): what happened and how you felt.",
+  cn:"写一件难忘的事：起因、经过、结果和感受。",min:90,max:120,tense:"一般过去时为主（was/were, did），感受可用一般现在时。",
+  points:["交代时间、地点、人物","经过（First / Then / Suddenly 串起来）","高潮 / 转折","结果 + 你的感受与收获"],
+  frames:["I will never forget …","It happened last …","At first, …","Then, to my surprise, …","In the end, …","That moment taught me that …"],
+  up:["to my surprise","too … to …","only when …","from that day on","not … but …"],
+  method:{title:"记叙文六要素 + 起承转合",steps:["起因·点题开头：一句话交代时间地点人物，点明「难忘」（可倒叙：先给结果再回忆）。","经过·按序铺陈：First / Then / Suddenly / At last 分成 2–3 个动作层次，抓 1–2 个细节（对话/动作/心理）。","转折·制造波澜：写最紧张或最意外的一刻——这是高潮，得分点全在这里。","结果·收束事件：一句话交代最终结果，把故事讲完整，别虎头蛇尾。","感受·升华点题：结尾写懂得的道理或情感，与开头呼应，用一句座右铭式的话点亮主题。"]},
+  open:["I will never forget the day when I finally understood what my English teacher, Mr. Wolf, really meant.","It was a rainy afternoon in Academy Valley, and something happened that changed the way I see myself.","Everyone has an unforgettable moment, and mine came last spring in Mr. Wolf's classroom."],
+  end:["From that day on, I have kept Mr. Wolf's motto in mind: make yourself special and kind.","This experience taught me that courage is not about having no fear, but about trying anyway.","Whenever I feel like giving up, I think of that afternoon in Academy Valley, and I smile."],
+  model:{title:"The Speech That Changed Me",wc:104,lines:[
+   {en:"I will never forget the first time I spoke in front of my whole class.",tag:"悬念开头·the first time 定语从句"},
+   {en:"It happened last term in Mr. Wolf's English lesson in Academy Valley.",tag:"交代要素·世界观水印"},
+   {en:"Our teacher asked each of us to give a short speech, but I was too shy to raise my hand.",tag:"制造矛盾·too…to"},
+   {en:"My heart beat fast, and my hands started shaking.",tag:"心理+动作细节·画面感"},
+   {en:"Then Mr. Wolf looked at me kindly and said, \"Just be yourself, Lin.\"",tag:"对话推动·直接引语"},
+   {en:"Slowly, I stood up and began to speak.",tag:"时间连词过渡"},
+   {en:"At first my voice was low, but soon I forgot my fear and spoke from my heart.",tag:"转折高潮·at first…but soon"},
+   {en:"When I finished, the whole class clapped for me.",tag:"结果收束·when 状语从句"},
+   {en:"That moment taught me that we grow only when we dare to try.",tag:"感受升华·only when 强调"},
+   {en:"Now I always remember his motto: make yourself special and kind.",tag:"首尾呼应·引座右铭"}]}},
+ {key:"opinion",name:"观点议论",en:"Opinion",
+  prompt:"Some students think keeping smartphones is good, others don't. What's your opinion? (about 100 words)",
+  cn:"就某话题给出看法 + 理由（一分为二）。",min:90,max:120,tense:"一般现在时为主。",
+  points:["引出话题（有人…有人…）","一方观点 + 理由 + 例子","另一方观点 + 理由","亮出并总结你的看法（In my opinion / All in all）"],
+  frames:["When it comes to …","In my eyes, … is like a coin with two sides.","On the one hand, …","On the other hand, …","In my opinion, …","As long as …"],
+  up:["a coin with two sides","On the one hand … On the other hand …","rather than","As long as …","make all the difference"],
+  method:{title:"观点议论「一分为二」四步法",steps:["亮观点：先复述话题，再一句话表明整体看法（When it comes to… / Everything has two sides）。","说好处：1–2 个正面理由 + 例子，On the one hand / For example 领起。","提隐忧：客观承认另一面，On the other hand / However 转折，写出问题或代价。","收态度：不骑墙，给倾向立场与做法，In my opinion / All in all / As long as we…，首尾呼应。","加分：全篇串一条主线（如 balance 平衡），句型有长有短。"]},
+  open:["When it comes to using smartphones, opinions differ from person to person. In my eyes, it is like a coin with two sides.","Everything has both bright and dark sides, and using smartphones is no exception.","\"Make yourself special and kind.\" That is what Mr. Wolf often tells us. Guided by these words, I'd like to share my view."],
+  end:["All in all, as long as we keep a good balance, the good side will always win out over the bad.","In my opinion, nothing is perfect, but a wise choice makes all the difference.","So, instead of simply saying \"yes\" or \"no,\" why not enjoy its good points and avoid its bad ones?"],
+  model:{title:"Should Middle School Students Use Smartphones?",wc:105,lines:[
+   {en:"When it comes to smartphones, students in Mr. Wolf's class often argue about them.",tag:"总起·When it comes to + 水印"},
+   {en:"In my eyes, a smartphone is like a coin with two sides.",tag:"亮观点·比喻点题"},
+   {en:"On the one hand, it brings us great convenience.",tag:"正面理由·On the one hand"},
+   {en:"For example, we can look up new words, watch lessons and keep in touch with our parents easily.",tag:"举例·For example + 并列"},
+   {en:"On the other hand, spending too much time on it does harm as well.",tag:"反面转折·On the other hand"},
+   {en:"Some students play games late into the night, so they feel sleepy and can hardly focus in class.",tag:"反面例子·so 结果 + can hardly"},
+   {en:"In my opinion, the phone itself is not the problem; the way we use it is.",tag:"收态度·In my opinion + 分号对比"},
+   {en:"As long as we set clear rules and keep a good balance, it can be a helpful friend rather than a bad master.",tag:"条件状语·As long as + rather than"},
+   {en:"This is exactly what \"Make yourself special and kind\" teaches me.",tag:"首尾呼应·座右铭水印"}]}},
+ {key:"intro",name:"应用文·介绍",en:"Introduction",
+  prompt:"Introduce your school (or a school activity) to a foreign friend. (about 90 words)",
+  cn:"向外国朋友介绍学校/活动：概况 + 细节 + 邀请。",min:80,max:110,tense:"一般现在时为主；讲经历时用过去时。",
+  points:["概况（名字 / 位置 / 特点）","2–3 个具体细节（There are… / Every … we…）","一个亮点 / 你最喜欢的","欢迎 / 邀请对方（Welcome to…）"],
+  frames:["Let me introduce …","It lies in …","First, …","What's more, …","Besides, …","You are welcome to …"],
+  up:["with green hills on every side","so … that …","which is my favourite …","more than a place","I'm sure you will like it"],
+  method:{title:"介绍文三步法：总起 → 分点 → 邀请",steps:["总起点题：一句话说明要介绍的对象是什么、为什么值得介绍，给读者整体印象。","分点铺陈（2–3 点）：First / What's more / Besides 领起；每点配一个具体细节。","融入亮点：挑一处最有特色的展开一句（场景/一句话/数据），让介绍有画面。","收束邀请：总结印象或情感 + Welcome to… / I'm sure you will like it，首尾呼应。"]},
+  open:["Let me introduce my favorite place—Academy Valley, where I study with Mr. Wolf and my classmates.","Today I'd like to tell you about a person I admire most: my English teacher, whom we all call Mr. Wolf.","There is a special corner in our school that every student loves, and I can't wait to share it with you."],
+  end:["That is my school, a place full of kindness and dreams. You are welcome to visit us in Academy Valley one day!","This is Mr. Wolf, the teacher who taught me to make myself special and kind. I'm sure you would like him too.","In a word, it is more than a place—it is where I grow. I hope you will come and feel it for yourself."],
+  model:{title:"Welcome to My School, Academy Valley",wc:106,lines:[
+   {en:"Let me introduce my school, Academy Valley, which I love with all my heart.",tag:"总起·which 定语从句"},
+   {en:"It lies in a quiet valley, with green hills on every side.",tag:"环境·with 复合结构"},
+   {en:"First, our teachers are patient and kind, especially Mr. Wolf, my English teacher.",tag:"分点一·介绍人物 + 水印"},
+   {en:"He always tells us to make ourselves special and kind.",tag:"细节·座右铭自然嵌入"},
+   {en:"What's more, we have many colourful activities after class.",tag:"分点二·What's more 递进"},
+   {en:"For example, we read stories together every Friday, which is my favourite time of the week.",tag:"亮点·For example + which 非限定"},
+   {en:"Besides, the school library is so big that you can find almost any book you like.",tag:"分点三·so…that"},
+   {en:"Studying here, I feel happy and free every single day.",tag:"升华·现在分词作状语"},
+   {en:"You are welcome to visit Academy Valley, and I'm sure you will like it too.",tag:"收束邀请·首尾呼应"}]}},
+];
+var PATTERNS=[
+ {cat:"强调句",en:"It is/was + 被强调 + that/who + 其余",cn:"强调主语/宾语/状语；强调人可用 who。",eg:"It is kindness that makes Academy Valley a warm place to grow up."},
+ {cat:"强调句",en:"It was not until … that + 主谓",cn:"「直到……才」的强调结构，比 not…until 更高级。",eg:"It was not until Mr. Wolf smiled at me that I dared to speak in class."},
+ {cat:"定语从句",en:"…, which/who/that + 从句",cn:"修饰前面的名词，让句子更连贯；which 指物，who 指人。",eg:"Lin is a classmate who never gives up, no matter how hard the task is."},
+ {cat:"定语从句",en:"the + n. + where/when/why + 从句",cn:"关系副词引导，表地点/时间/原因。",eg:"I still remember the day when I first stepped into Mr. Wolf's classroom."},
+ {cat:"宾语从句",en:"I think/believe/find + (that) + 从句",cn:"让观点表达更完整；that 常可省略。",eg:"I believe that every small effort will pay off in the end."},
+ {cat:"宾语从句",en:"…+ what/how/why + 从句(陈述语序)",cn:"疑问词引导的宾语从句，用陈述语序，不倒装。",eg:"Now I understand why Mr. Wolf keeps telling us to be special and kind."},
+ {cat:"非谓语状语",en:"Doing …, 主句（现在分词，主动/伴随）",cn:"现在分词作状语，简洁地道。",eg:"Walking through Academy Valley, I felt the fresh air fill my chest."},
+ {cat:"非谓语状语",en:"Done …, 主句（过去分词，被动）",cn:"过去分词作状语，表被动或已完成。",eg:"Encouraged by Mr. Wolf, Hai finally raised his hand to answer."},
+ {cat:"非谓语状语",en:"To do …, 主句（不定式表目的）",cn:"不定式作目的状语，「为了……」，句首更醒目。",eg:"To catch the early bus to school, I get up at six every morning."},
+ {cat:"倒装",en:"Not only + 部分倒装 …, but also …",cn:"Not only 置句首引起部分倒装。",eg:"Not only did Lin finish her homework, but she also helped Hai with his."},
+ {cat:"倒装",en:"Only + 状语 + 部分倒装",cn:"Only 加状语置句首，主句部分倒装，语气更强。",eg:"Only by working together can we make our class truly special."},
+ {cat:"倒装",en:"Never/Hardly/Seldom + 部分倒装",cn:"否定副词置句首引起部分倒装，书面感强。",eg:"Never have I met a teacher as patient as Mr. Wolf."},
+ {cat:"there be 变体",en:"There stands/lies … / There seems to be …",cn:"用行为动词或 seem 替 be，更生动。",eg:"There stands an old tree at the gate of Academy Valley, guarding us all."},
+ {cat:"so…that",en:"so + adj./adv. + that + 从句",cn:"「如此……以至于……」，so 后接形容词/副词。",eg:"The story was so moving that the whole class fell silent."},
+ {cat:"such…that",en:"such + (a/an) + adj. + n. + that",cn:"「如此……以至于……」，such 后接名词短语。",eg:"It was such a kind act that everyone remembered Lin for it."},
+ {cat:"高级替换词",en:"good→beneficial / important→vital / think→hold",cn:"一句话升级词汇：beneficial 有益、vital 至关重要、hold 认为。",eg:"I firmly believe that reading is vital, for it is of great help to us all."},
+ {cat:"高级替换词",en:"because→thanks to / but→however",cn:"thanks to 后接名词；however 更正式，前后用逗号。",eg:"Thanks to Mr. Wolf's advice, I improved a lot; the road was hard, however."},
 ];
 var CONNECTORS=["first of all","first","second","third","then","next","after that","finally","in the end","last but not least",
-  "however","but","because","so","and","also","what's more","besides","for example","for instance","on one hand","on the other hand",
-  "in my opinion","as for me","all in all","in a word","by the way"];
+  "however","but","because","so that","so","also","what's more","besides","for example","for instance","on the one hand","on the other hand",
+  "in my opinion","as for me","all in all","in a word","as long as","instead of","when it comes to"];
+// 高分句型探测（正则近似，宁可少报不误报）
+var HI=[
+  {n:"强调句",re:/\bit (?:is|was)\b[^.?!]*\b(?:that|who)\b/i},
+  {n:"倒装",re:/(?:^|[.?!]\s+)(?:not only\b|never\b|hardly\b|seldom\b|only (?:by|then|in|when|after|if)\b)/i},
+  {n:"so/such…that",re:/\b(?:so|such)\b[^.?!]*\bthat\b/i},
+  {n:"非谓语状语",re:/(?:^|[.?!]\s+)(?:[A-Z][a-z]+ing|[A-Z][a-z]+ed|To [a-z])\b[^,.?!]*,/},
+  {n:"定语从句",re:/\b(?:,\s*(?:which|who)|(?:day|time|place|reason)\s+(?:when|where|why))\b/i},
+  {n:"宾语从句",re:/\b(?:believe|think|find|hope|know|understand|feel)\s+(?:that\b|why\b|how\b|what\b)/i},
+];
+var STOP={the:1,a:1,an:1,and:1,to:1,of:1,in:1,on:1,is:1,are:1,was:1,were:1,i:1,you:1,he:1,she:1,it:1,we:1,they:1,my:1,your:1,his:1,her:1,for:1,with:1,at:1,as:1,me:1,that:1,this:1,can:1,will:1,be:1,have:1,has:1,do:1,not:1};
+var WATCH=["very","good","and","so","but","think","nice","many","really"]; // 易重复/低级词
+
 var $=function(s){return document.querySelector(s)};
 var LS='myskme-write';
-var state={g:0, drafts:{}};
+var state={g:0,drafts:{}};
 try{var sv=JSON.parse(localStorage.getItem(LS)||'{}');if(sv.drafts)state.drafts=sv.drafts;if(sv.g)state.g=sv.g;}catch(e){}
 function persist(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show')},1700)}
 
-function renderGenres(){
-  $('#genres').innerHTML=GENRES.map(function(g,i){return '<button class="g-tab'+(i===state.g?' on':'')+'" data-i="'+i+'">'+esc(g.name)+'</button>'}).join('');
-}
+function renderGenres(){$('#genres').innerHTML=GENRES.map(function(g,i){return '<button class="g-tab'+(i===state.g?' on':'')+'" data-i="'+i+'">'+esc(g.name)+'</button>'}).join('')}
 function renderBrief(){
   var g=GENRES[state.g];
   var frames=g.frames.map(function(f){return '<span class="chip" data-ins="'+esc(f)+'">'+esc(f.replace(/\n/g,' ↵ '))+'</span>'}).join('');
   var ups=g.up.map(function(f){return '<span class="chip up" data-ins="'+esc(f)+'">'+esc(f)+'</span>'}).join('');
+  var steps=g.method.steps.map(function(s){return '<li>'+esc(s)+'</li>'}).join('');
+  var open=g.open.map(function(s){return '<div>'+esc(s)+'</div>'}).join('');
+  var end=g.end.map(function(s){return '<div>'+esc(s)+'</div>'}).join('');
+  var model=g.model.lines.map(function(l){return '<div class="m-line"><div class="m-en">'+esc(l.en)+'</div><div class="m-tag">'+esc(l.tag)+'</div></div>'}).join('');
   $('#brief').innerHTML=
     '<div class="eyebrow">题目 · '+esc(g.en)+'</div>'
-    +'<p class="prompt-en">'+esc(g.prompt)+'</p>'
-    +'<p class="prompt-cn">'+esc(g.cn)+'</p>'
+    +'<p class="prompt-en">'+esc(g.prompt)+'</p><p class="prompt-cn">'+esc(g.cn)+'</p>'
     +'<div class="req"><span>建议词数 <b>'+g.min+'–'+g.max+'</b></span><span>时态：<b>'+esc(g.tense.split('，')[0].split('（')[0])+'</b></span></div>'
-    +'<div class="eyebrow" style="margin-top:6px">要点 · Cover these</div>'
-    +'<ul class="pts">'+g.points.map(function(p){return '<li>'+esc(p)+'</li>'}).join('')+'</ul>'
-    +'<div class="eyebrow" style="margin-top:12px">句型支架 · 点击插入</div><div class="chips">'+frames+'</div>'
+    +'<div class="eyebrow" style="margin-top:6px">要点 · Cover these</div><ul class="pts">'+g.points.map(function(p){return '<li>'+esc(p)+'</li>'}).join('')+'</ul>'
+    +'<details><summary>✎ 写作套路：'+esc(g.method.title)+'<span class="ar">›</span></summary><ol class="steps">'+steps+'</ol></details>'
+    +'<details><summary>🌟 黄金开头 / 结尾<span class="ar">›</span></summary><div class="golden"><div style="color:var(--gold)">开头</div>'+open+'<div style="color:var(--gold);margin-top:6px">结尾</div>'+end+'</div></details>'
+    +'<details><summary>📖 标注版满分范文（'+g.model.wc+' 词）<span class="ar">›</span></summary><div class="model"><div class="m-title">'+esc(g.model.title)+'</div>'+model+'</div></details>'
+    +'<div class="eyebrow" style="margin-top:14px">句型支架 · 点击插入</div><div class="chips">'+frames+'</div>'
     +'<div class="eyebrow" style="margin-top:10px">高级表达 · 加分句</div><div class="chips">'+ups+'</div>';
   $('#tense-tip').innerHTML='<b>时态提醒：</b>'+esc(g.tense);
 }
-function wordCount(t){var m=t.trim().match(/[A-Za-z][A-Za-z'’-]*/g);return m?m.length:0}
-function analyze(){
-  var g=GENRES[state.g], t=$('#essay').value, low=t.toLowerCase();
-  var wc=wordCount(t);
-  var foundC=CONNECTORS.filter(function(c){return low.indexOf(c)>=0});
-  // 去重：first of all 命中时不再单独计 first（粗略）
-  var foundUp=g.up.filter(function(u){return low.indexOf(u.toLowerCase().replace(/…/g,'').trim().split(' ').slice(0,3).join(' '))>=0 && u.replace(/…/g,'').trim().length>3});
-  // stats
-  var sw=$('#s-words');sw.textContent=wc;sw.className=(wc>=g.min?(wc<=g.max+15?'ok':''):'low');
-  $('#s-words-lbl').textContent='词 (目标'+g.min+'+)';
-  var sc=$('#s-conn');sc.textContent=foundC.length;sc.className=foundC.length>=3?'ok':'low';
-  var su=$('#s-up');su.textContent=foundUp.length;su.className=foundUp.length>=1?'ok':'low';
-  $('#found-conn').innerHTML=foundC.length?('已用连接词：'+foundC.slice(0,12).map(function(c){return '<b>'+esc(c)+'</b>'}).join('、')):'还没用连接词——试试 First… / What\'s more… / However…';
-  // checklist (auto)
-  var checks=[
-    {k:'len',auto:true,done:wc>=g.min,tx:'字数达标（≥'+g.min+' 词）',sub:'当前 '+wc+' 词'},
-    {k:'conn',auto:true,done:foundC.length>=3,tx:'用了 3+ 个连接词',sub:'当前 '+foundC.length+' 个'},
-    {k:'up',auto:true,done:foundUp.length>=1,tx:'用了至少 1 个高级表达',sub:'当前 '+foundUp.length+' 个'},
-    {k:'open',auto:false,done:!!state.drafts['ck_'+g.key+'_open'],tx:'有清晰的开头和结尾'},
-    {k:'points',auto:false,done:!!state.drafts['ck_'+g.key+'_points'],tx:'覆盖了全部要点'},
-    {k:'read',auto:false,done:!!state.drafts['ck_'+g.key+'_read'],tx:'读了一遍、检查了时态和拼写'},
-  ];
-  $('#check').innerHTML=checks.map(function(c){
-    return '<li class="'+(c.done?'done ':'')+(c.auto?'auto':'')+'" data-ck="'+c.k+'"><span class="mk">✓</span>'
-      +'<span class="tx">'+esc(c.tx)+(c.sub?'<small>'+esc(c.sub)+'</small>':'')+'</span></li>';
+function renderLib(){
+  $('#patlib').innerHTML=PATTERNS.map(function(p){
+    return '<div class="p-cell"><div class="p-cat">'+esc(p.cat)+'</div><div class="p-en">'+esc(p.en)+'</div><div class="p-cn">'+esc(p.cn)+'</div><div class="p-eg" data-ins="'+esc(p.eg)+'" title="点击插入例句">“'+esc(p.eg)+'”</div></div>';
   }).join('');
 }
-function load(){var g=GENRES[state.g];$('#essay').value=state.drafts[g.key]||'';analyze();}
+function wordCount(t){var m=t.trim().match(/[A-Za-z][A-Za-z'’-]*/g);return m?m.length:0}
+function analyze(){
+  var g=GENRES[state.g],t=$('#essay').value,low=t.toLowerCase();
+  var wc=wordCount(t);
+  var foundC=CONNECTORS.filter(function(c){return low.indexOf(c)>=0});
+  var foundUp=g.up.filter(function(u){var k=u.toLowerCase().replace(/[….]/g,'').trim().split(' ').slice(0,3).join(' ');return k.length>3&&low.indexOf(k)>=0});
+  var foundHi=HI.filter(function(h){return h.re.test(t)});
+  // 重复词
+  var words=(low.match(/[a-z][a-z'’-]*/g)||[]),freq={};
+  words.forEach(function(w){if(w.length>2&&!STOP[w])freq[w]=(freq[w]||0)+1});
+  var over=Object.keys(freq).filter(function(w){return freq[w]>=4}).sort(function(a,b){return freq[b]-freq[a]}).slice(0,4);
+  var watch=WATCH.filter(function(w){return freq[w]>=3});
+  var sw=$('#s-words');sw.textContent=wc;sw.className=wc>=g.min?(wc<=g.max+15?'ok':''):'low';$('#s-words-lbl').textContent='词 (目标'+g.min+'+)';
+  var sc=$('#s-conn');sc.textContent=foundC.length;sc.className=foundC.length>=3?'ok':'low';
+  var sh=$('#s-hi');sh.textContent=foundHi.length;sh.className=foundHi.length>=1?'ok':'low';
+  var su=$('#s-up');su.textContent=foundUp.length;su.className=foundUp.length>=1?'ok':'low';
+  var lines=[];
+  lines.push(foundC.length?'连接词：'+foundC.slice(0,10).map(function(c){return '<b>'+esc(c)+'</b>'}).join('、'):'还没用连接词——试试 First… / What\'s more… / However…');
+  lines.push(foundHi.length?'高分句型：'+foundHi.map(function(h){return '<b>'+esc(h.n)+'</b>'}).join('、'):'还没高分句型——从右下「高分句式库」挑一个用上');
+  if(over.length||watch.length)lines.push('<span class="warn">重复偏多：'+over.concat(watch.filter(function(w){return over.indexOf(w)<0})).slice(0,5).map(function(w){return esc(w)+'×'+freq[w]}).join('、')+' —— 换个说法或用高级替换词</span>');
+  $('#found').innerHTML=lines.join('<br>');
+  var checks=[
+    {k:'len',auto:1,done:wc>=g.min,tx:'字数达标（≥'+g.min+' 词）',sub:'当前 '+wc+' 词'},
+    {k:'conn',auto:1,done:foundC.length>=3,tx:'用了 3+ 个连接词',sub:'当前 '+foundC.length+' 个'},
+    {k:'hi',auto:1,done:foundHi.length>=1,tx:'用了至少 1 个高分句型',sub:'当前 '+foundHi.length+' 个'},
+    {k:'open',auto:0,done:!!state.drafts['ck_'+g.key+'_open'],tx:'有清晰的开头和结尾'},
+    {k:'points',auto:0,done:!!state.drafts['ck_'+g.key+'_points'],tx:'覆盖了全部要点'},
+    {k:'read',auto:0,done:!!state.drafts['ck_'+g.key+'_read'],tx:'读了一遍、检查了时态和拼写'},
+  ];
+  $('#check').innerHTML=checks.map(function(c){return '<li class="'+(c.done?'done ':'')+(c.auto?'auto':'')+'" data-ck="'+c.k+'"><span class="mk">✓</span><span class="tx">'+esc(c.tx)+(c.sub?'<small>'+esc(c.sub)+'</small>':'')+'</span></li>'}).join('');
+}
+function loadDraft(){$('#essay').value=state.drafts[GENRES[state.g].key]||'';analyze();}
+function insert(ins){var ta=$('#essay'),v=ta.value,p=ta.selectionStart||v.length,sep=(v&&!/\s$/.test(v.slice(0,p)))?' ':'';
+  ta.value=v.slice(0,p)+sep+ins+' '+v.slice(p);ta.focus();state.drafts[GENRES[state.g].key]=ta.value;persist();analyze();}
 
-renderGenres();renderBrief();load();
+renderGenres();renderBrief();renderLib();loadDraft();
 document.addEventListener('click',function(e){
-  var gt=e.target.closest('.g-tab');
-  if(gt){state.g=+gt.getAttribute('data-i');persist();renderGenres();renderBrief();load();return;}
-  var chip=e.target.closest('.chip[data-ins]');
-  if(chip){var ta=$('#essay'),ins=chip.getAttribute('data-ins');
-    var v=ta.value,p=ta.selectionStart||v.length;
-    var sep=(v && !/\s$/.test(v.slice(0,p)))?' ':'';
-    ta.value=v.slice(0,p)+sep+ins+' '+v.slice(p);
-    ta.focus();var g=GENRES[state.g];state.drafts[g.key]=ta.value;persist();analyze();return;}
-  var li=e.target.closest('.check li:not(.auto)');
-  if(li){var g=GENRES[state.g],key='ck_'+g.key+'_'+li.getAttribute('data-ck');state.drafts[key]=!state.drafts[key];persist();analyze();return;}
+  var gt=e.target.closest('.g-tab');if(gt){state.g=+gt.getAttribute('data-i');persist();renderGenres();renderBrief();loadDraft();window.scrollTo({top:0,behavior:'smooth'});return;}
+  var ins=e.target.closest('[data-ins]');if(ins){insert(ins.getAttribute('data-ins'));toast('已插入');return;}
+  var li=e.target.closest('.check li:not(.auto)');if(li){var key='ck_'+GENRES[state.g].key+'_'+li.getAttribute('data-ck');state.drafts[key]=!state.drafts[key];persist();analyze();return;}
 });
-$('#essay').addEventListener('input',function(){var g=GENRES[state.g];state.drafts[g.key]=$('#essay').value;persist();analyze();});
-$('#btn-copy').addEventListener('click',function(){var t=$('#essay').value;if(!t.trim()){toast('还没写内容');return;}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('已复制草稿')},function(){toast('复制失败')})}else toast('请手动选中复制');});
+$('#essay').addEventListener('input',function(){state.drafts[GENRES[state.g].key]=$('#essay').value;persist();analyze();});
+$('#btn-copy').addEventListener('click',function(){var t=$('#essay').value;if(!t.trim()){toast('还没写内容');return;}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('已复制草稿')},function(){toast('复制失败')})}else toast('请手动选中复制')});
 $('#btn-print').addEventListener('click',function(){window.print()});
-$('#btn-clear').addEventListener('click',function(){if(!confirm('清空当前这篇草稿？'))return;var g=GENRES[state.g];state.drafts[g.key]='';persist();$('#essay').value='';analyze();toast('已清空');});
-// 主题
+$('#btn-clear').addEventListener('click',function(){if(!confirm('清空当前这篇草稿？'))return;state.drafts[GENRES[state.g].key]='';persist();$('#essay').value='';analyze();toast('已清空')});
 (function(){var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
 function pref(){try{return localStorage.getItem(TLS)||'auto'}catch(e){return 'auto'}}
 function resolve(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p}
