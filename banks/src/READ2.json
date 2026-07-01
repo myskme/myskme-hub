@@ -1,0 +1,85 @@
+{
+  "code": "READ2",
+  "name": "阅读理解 · 第二辑（应用文 / 记叙文 / 说明文）",
+  "desc": "中考三大常见文体各一篇：校园通知（应用文）、雨中故事（记叙文）、熊猫小知识（说明文），共 9 题。每题带原文面板，练「定位找答案」。免费档。",
+  "cat": "阅读理解",
+  "pack": "阅读训练营",
+  "level": "常规",
+  "tier": "free",
+  "mods": {
+    "m4": [
+      {
+        "type": "reading",
+        "passage": "NOTICE — English Corner\nTime: Every Friday, 4:00–5:00 p.m.\nPlace: Room 302\nThis week's topic: My Summer Plan\nEveryone is welcome. Please bring a pen and your notebook. If you have any questions, ask Mr. Wolf.\n— MYSKME English Club",
+        "q": "When is the English Corner held?",
+        "ops": ["Every Friday afternoon", "Every Monday morning", "Every weekend", "Every Friday night"],
+        "ans": 0,
+        "why": "Time: Every Friday, 4:00–5:00 p.m.（周五下午）。"
+      },
+      {
+        "type": "reading",
+        "passage": "NOTICE — English Corner\nTime: Every Friday, 4:00–5:00 p.m.\nPlace: Room 302\nThis week's topic: My Summer Plan\nEveryone is welcome. Please bring a pen and your notebook. If you have any questions, ask Mr. Wolf.\n— MYSKME English Club",
+        "q": "What should students bring?",
+        "ops": ["A dictionary and a bag", "A pen and a notebook", "Some money", "A mobile phone"],
+        "ans": 1,
+        "why": "Please bring a pen and your notebook（带笔和笔记本）。"
+      },
+      {
+        "type": "reading",
+        "passage": "NOTICE — English Corner\nTime: Every Friday, 4:00–5:00 p.m.\nPlace: Room 302\nThis week's topic: My Summer Plan\nEveryone is welcome. Please bring a pen and your notebook. If you have any questions, ask Mr. Wolf.\n— MYSKME English Club",
+        "q": "Who can answer your questions?",
+        "ops": ["The head teacher", "A classmate", "Mr. Wolf", "No one"],
+        "ans": 2,
+        "why": "If you have any questions, ask Mr. Wolf。"
+      },
+      {
+        "type": "reading",
+        "passage": "It was raining hard. Anna forgot her umbrella. She stood at the school gate and did not know what to do. Then a boy from her class came. He shared his umbrella and walked her home. Anna said thank you. The next day, she gave him a small gift to show her thanks.",
+        "q": "Why couldn't Anna go home at first?",
+        "ops": ["She had no umbrella in the rain", "She lost her key", "She felt ill", "She missed the bus"],
+        "ans": 0,
+        "why": "It was raining hard 且 Anna forgot her umbrella（下大雨又忘带伞）。"
+      },
+      {
+        "type": "reading",
+        "passage": "It was raining hard. Anna forgot her umbrella. She stood at the school gate and did not know what to do. Then a boy from her class came. He shared his umbrella and walked her home. Anna said thank you. The next day, she gave him a small gift to show her thanks.",
+        "q": "What did the boy do?",
+        "ops": ["He called her mother", "He shared his umbrella and walked her home", "He lent her some money", "He ran away"],
+        "ans": 1,
+        "why": "He shared his umbrella and walked her home。"
+      },
+      {
+        "type": "reading",
+        "passage": "It was raining hard. Anna forgot her umbrella. She stood at the school gate and did not know what to do. Then a boy from her class came. He shared his umbrella and walked her home. Anna said thank you. The next day, she gave him a small gift to show her thanks.",
+        "q": "How did Anna thank the boy?",
+        "ops": ["She gave him a small gift", "She wrote him a letter", "She bought him lunch", "She said nothing"],
+        "ans": 0,
+        "why": "she gave him a small gift to show her thanks。"
+      },
+      {
+        "type": "reading",
+        "passage": "Pandas are one of China's national treasures. They live mainly in the mountains of Sichuan. A panda spends about 12 hours a day eating bamboo. Baby pandas are very small when they are born — about the size of a mouse. Today people work hard to protect pandas, and their number is slowly growing.",
+        "q": "Where do pandas mainly live?",
+        "ops": ["In the mountains of Sichuan", "By the sea", "In the desert", "In big cities"],
+        "ans": 0,
+        "why": "They live mainly in the mountains of Sichuan。"
+      },
+      {
+        "type": "reading",
+        "passage": "Pandas are one of China's national treasures. They live mainly in the mountains of Sichuan. A panda spends about 12 hours a day eating bamboo. Baby pandas are very small when they are born — about the size of a mouse. Today people work hard to protect pandas, and their number is slowly growing.",
+        "q": "How long does a panda eat bamboo each day?",
+        "ops": ["About 2 hours", "Half an hour", "About 12 hours", "All day and all night"],
+        "ans": 2,
+        "why": "A panda spends about 12 hours a day eating bamboo。"
+      },
+      {
+        "type": "reading",
+        "passage": "Pandas are one of China's national treasures. They live mainly in the mountains of Sichuan. A panda spends about 12 hours a day eating bamboo. Baby pandas are very small when they are born — about the size of a mouse. Today people work hard to protect pandas, and their number is slowly growing.",
+        "q": "What are baby pandas like when they are born?",
+        "ops": ["As big as a dog", "About the size of a mouse", "Very heavy", "Black and strong"],
+        "ans": 1,
+        "why": "about the size of a mouse（刚出生只有老鼠大小）。"
+      }
+    ]
+  }
+}

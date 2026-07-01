@@ -1,0 +1,117 @@
+{
+  "name": "完形填空 · 第一辑（乡村之夏）",
+  "code": "CLOZE1",
+  "desc": "一篇记叙文完形，8 个空，练时态一致 + 词义搭配（中考完形核心）。每空带全文面板，联系上下文再选。免费档。",
+  "tier": "free",
+  "level": "常规",
+  "cat": "完形填空",
+  "pack": "阅读训练营",
+  "mods": {
+    "m5": [
+      {
+        "q": "第 ① 空应选：",
+        "ops": [
+          "go",
+          "went",
+          "going",
+          "goes"
+        ],
+        "ans": 1,
+        "why": "Last summer 提示一般过去时，go 的过去式 went。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ② 空应选：",
+        "ops": [
+          "dirty",
+          "fresh",
+          "loud",
+          "dark"
+        ],
+        "ans": 1,
+        "why": "乡村空气 + friendly 语境积极，fresh（清新）最搭。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ③ 空应选：（get up 早起）",
+        "ops": [
+          "get",
+          "gets",
+          "got",
+          "getting"
+        ],
+        "ans": 2,
+        "why": "过去时叙事，get up 的过去式 got up。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ④ 空应选：",
+        "ops": [
+          "find",
+          "finds",
+          "found",
+          "finding"
+        ],
+        "ans": 2,
+        "why": "One day 过去时，find 的过去式 found。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ⑤ 空应选：",
+        "ops": [
+          "give",
+          "gives",
+          "gave",
+          "given"
+        ],
+        "ans": 2,
+        "why": "过去时，give 的过去式 gave（喂了它一些面包）。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ⑥ 空应选：",
+        "ops": [
+          "follow",
+          "follows",
+          "following",
+          "followed"
+        ],
+        "ans": 3,
+        "why": "From then on 承接过去，follow 的过去式 followed（从此跟着我）。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ⑦ 空应选：",
+        "ops": [
+          "happy",
+          "sad",
+          "angry",
+          "bored"
+        ],
+        "ans": 1,
+        "why": "离别 say goodbye，felt sad（难过）最合上下文。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      },
+      {
+        "q": "第 ⑧ 空应选：（will never ___）",
+        "ops": [
+          "remember",
+          "forget",
+          "forgot",
+          "forgetting"
+        ],
+        "ans": 1,
+        "why": "will never 后接动词原形；never forget（永不忘记）符合怀念语气。",
+        "passage": "Last summer, I ①___ to a small village with my family. The air there was very ②___ and the people were friendly. Every morning I ③___ up early and helped the farmers. One day, I ④___ a little dog by the river. It was hungry, so I ⑤___ it some bread. From then on, the dog ⑥___ me everywhere. When we left, I felt ⑦___ to say goodbye. I will never ⑧___ that summer.",
+        "type": "cloze"
+      }
+    ]
+  }
+}
