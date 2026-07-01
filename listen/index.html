@@ -42,6 +42,8 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
 .dot.on{background:var(--gold);border-color:var(--gold);box-shadow:var(--glow)}.dot.today{border-color:var(--gold2)}
 .item{background:linear-gradient(160deg,var(--bg3),var(--bg2));border:1px solid var(--line);padding:18px 20px;margin-top:16px}
 :root[data-theme="light"] .item{background:linear-gradient(160deg,var(--bg3),#f1e9d6)}
+.sec-head{margin:26px 0 2px;display:flex;align-items:center;gap:12px;color:var(--gold);letter-spacing:.12em;font-size:14px}
+.sec-head::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}
 .it-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .it-top h3{margin:0;font-size:16px;font-weight:500}
 .kind{font-size:11px;letter-spacing:.1em;color:var(--gold2);border:1px solid var(--gold3);padding:2px 9px;border-radius:999px}
@@ -152,8 +154,11 @@ async function boot(){
   try{
     var m=await (await fetch('listen.json',{cache:'no-store'})).json();
     var items=m.items||[];TOTAL=items.reduce(function(s,it){return s+((it.qs||[]).length)},0);updProg();
-    var stage=$('#stage');stage.innerHTML='';
-    items.forEach(function(it){stage.appendChild(renderItem(it))});
+    var stage=$('#stage');stage.innerHTML='';var lastSec=null;
+    items.forEach(function(it){
+      if(it.sec&&it.sec!==lastSec){lastSec=it.sec;var h=document.createElement('div');h.className='sec-head';h.textContent=it.sec;stage.appendChild(h);}
+      stage.appendChild(renderItem(it));
+    });
     if(!items.length)stage.innerHTML='<div class="msg">听力材料还在路上——等王老师的下一期。</div>';
   }catch(e){$('#stage').innerHTML='<div class="msg">听力材料取不到，检查网络后刷新。</div>'}
 }

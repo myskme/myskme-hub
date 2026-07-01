@@ -3,8 +3,9 @@
  "items": [
   {
    "id": "d1",
+   "sec": "短对话 · Short Dialogues",
    "kind": "dialogue",
-   "title": "短对话 · 社团时间",
+   "title": "社团时间",
    "segments": [
     {
      "file": "d1a.mp3",
@@ -33,8 +34,9 @@
   },
   {
    "id": "d2",
+   "sec": "短对话 · Short Dialogues",
    "kind": "dialogue",
-   "title": "短对话 · 上学方式",
+   "title": "上学方式",
    "segments": [
     {
      "file": "d2a.mp3",
@@ -57,14 +59,15 @@
       "By car"
      ],
      "ans": 2,
-     "why": "today I took the bus because it was raining（今天下雨坐了公交）。"
+     "why": "today I took the bus because it was raining。"
     }
    ]
   },
   {
    "id": "d3",
+   "sec": "短对话 · Short Dialogues",
    "kind": "dialogue",
-   "title": "短对话 · 问路",
+   "title": "问路",
    "segments": [
     {
      "file": "d3a.mp3",
@@ -93,8 +96,9 @@
   },
   {
    "id": "d4",
+   "sec": "短对话 · Short Dialogues",
    "kind": "dialogue",
-   "title": "短对话 · 喜欢的科目",
+   "title": "喜欢的科目",
    "segments": [
     {
      "file": "d4a.mp3",
@@ -122,9 +126,170 @@
    ]
   },
   {
+   "id": "d5",
+   "sec": "短对话 · Short Dialogues",
+   "kind": "dialogue",
+   "title": "放学计划",
+   "segments": [
+    {
+     "file": "d5a.mp3",
+     "speaker": "B",
+     "text": "It's sunny today. Shall we play football after school?"
+    },
+    {
+     "file": "d5b.mp3",
+     "speaker": "A",
+     "text": "Good idea, but let's finish our homework first."
+    }
+   ],
+   "qs": [
+    {
+     "q": "What will they do first?",
+     "ops": [
+      "Play football",
+      "Finish their homework",
+      "Go home",
+      "Watch TV"
+     ],
+     "ans": 1,
+     "why": "let's finish our homework first（先做作业）。"
+    }
+   ]
+  },
+  {
+   "id": "d6",
+   "sec": "短对话 · Short Dialogues",
+   "kind": "dialogue",
+   "title": "文具店",
+   "segments": [
+    {
+     "file": "d6a.mp3",
+     "speaker": "A",
+     "text": "How much is this English dictionary?"
+    },
+    {
+     "file": "d6b.mp3",
+     "speaker": "B",
+     "text": "It's forty yuan, but there's a discount today, so it's only thirty."
+    }
+   ],
+   "qs": [
+    {
+     "q": "How much is the dictionary today?",
+     "ops": [
+      "Forty yuan",
+      "Thirty yuan",
+      "Fourteen yuan",
+      "Thirteen yuan"
+     ],
+     "ans": 1,
+     "why": "there's a discount today, so it's only thirty（打折后 30）。"
+    }
+   ]
+  },
+  {
+   "id": "d7",
+   "sec": "短对话 · Short Dialogues",
+   "kind": "dialogue",
+   "title": "看病",
+   "segments": [
+    {
+     "file": "d7a.mp3",
+     "speaker": "A",
+     "text": "You look pale, Lin. What's wrong?"
+    },
+    {
+     "file": "d7b.mp3",
+     "speaker": "A",
+     "text": "I have a bad cold and a headache."
+    },
+    {
+     "file": "d7c.mp3",
+     "speaker": "B",
+     "text": "You'd better drink more water and have a good rest."
+    }
+   ],
+   "qs": [
+    {
+     "q": "What's the advice for Lin?",
+     "ops": [
+      "Take some medicine and run",
+      "Drink more water and rest",
+      "Go to school as usual",
+      "Eat more ice cream"
+     ],
+     "ans": 1,
+     "why": "drink more water and have a good rest。"
+    }
+   ]
+  },
+  {
+   "id": "L1",
+   "sec": "长对话 · Long Dialogue",
+   "kind": "dialogue",
+   "title": "周末去图书馆",
+   "segments": [
+    {
+     "file": "L1a.mp3",
+     "speaker": "A",
+     "text": "Hi Hai, do you have any plans for Saturday?"
+    },
+    {
+     "file": "L1b.mp3",
+     "speaker": "B",
+     "text": "Not yet, Lin. Why do you ask?"
+    },
+    {
+     "file": "L1c.mp3",
+     "speaker": "A",
+     "text": "Mr. Wolf's book club is visiting the city library. Would you like to join us?"
+    },
+    {
+     "file": "L1d.mp3",
+     "speaker": "B",
+     "text": "That sounds great! What time shall we meet?"
+    },
+    {
+     "file": "L1e.mp3",
+     "speaker": "A",
+     "text": "Let's meet at the school gate at eight thirty in the morning."
+    },
+    {
+     "file": "L1f.mp3",
+     "speaker": "B",
+     "text": "Perfect. I'll bring my reading notes."
+    }
+   ],
+   "qs": [
+    {
+     "q": "Where are they going on Saturday?",
+     "ops": [
+      "The city library",
+      "The cinema",
+      "The museum",
+      "The park"
+     ],
+     "ans": 0,
+     "why": "visiting the city library。"
+    },
+    {
+     "q": "When and where will they meet?",
+     "ops": [
+      "At home at nine",
+      "At the school gate at eight thirty",
+      "At the library at eight",
+      "After lunch at the gate"
+     ],
+     "ans": 1,
+     "why": "meet at the school gate at eight thirty。"
+    }
+   ]
+  },
+  {
    "id": "p1",
+   "sec": "短文理解 · Passages",
    "kind": "passage",
-   "title": "短文 · 校园通知",
+   "title": "校园通知",
    "segments": [
     {
      "file": "p1.mp3",
@@ -159,8 +324,9 @@
   },
   {
    "id": "p2",
+   "sec": "短文理解 · Passages",
    "kind": "passage",
-   "title": "短文 · 林的演讲",
+   "title": "林的演讲",
    "segments": [
     {
      "file": "p2.mp3",
@@ -178,7 +344,7 @@
       "She wrote a story"
      ],
      "ans": 0,
-     "why": "She gave her first English speech in front of the whole school。"
+     "why": "She gave her first English speech。"
     },
     {
      "q": "How did Lin feel at first?",
@@ -194,9 +360,84 @@
    ]
   },
   {
+   "id": "p3",
+   "sec": "短文理解 · Passages",
+   "kind": "passage",
+   "title": "阅读的好处",
+   "segments": [
+    {
+     "file": "p3.mp3",
+     "speaker": "A",
+     "text": "Reading is one of the best habits in the world. It opens your mind and takes you to places you have never been. Scientists say that people who read every day feel happier and less stressed. So why not pick up a book today and read for just twenty minutes?"
+    }
+   ],
+   "qs": [
+    {
+     "q": "According to the passage, what does reading do for us?",
+     "ops": [
+      "It makes us tired",
+      "It opens our mind",
+      "It costs a lot",
+      "It wastes time"
+     ],
+     "ans": 1,
+     "why": "It opens your mind …。"
+    },
+    {
+     "q": "How long does the speaker suggest reading?",
+     "ops": [
+      "Two hours",
+      "All day",
+      "Twenty minutes",
+      "Ten minutes"
+     ],
+     "ans": 2,
+     "why": "read for just twenty minutes。"
+    }
+   ]
+  },
+  {
+   "id": "p4",
+   "sec": "短文理解 · Passages",
+   "kind": "passage",
+   "title": "认识狼先生",
+   "segments": [
+    {
+     "file": "p4.mp3",
+     "speaker": "B",
+     "text": "Mr. Wolf is not a real wolf, of course. He is our English teacher in Academy Valley. He is strict but kind, and he always tells us to make ourselves special and kind. Every Friday, he holds a reading club after class, where students share their favourite stories."
+    }
+   ],
+   "qs": [
+    {
+     "q": "Who is Mr. Wolf?",
+     "ops": [
+      "A real wolf",
+      "An English teacher",
+      "A librarian",
+      "A student"
+     ],
+     "ans": 1,
+     "why": "He is our English teacher。"
+    },
+    {
+     "q": "What does Mr. Wolf do every Friday?",
+     "ops": [
+      "He holds a reading club",
+      "He plays football",
+      "He goes home early",
+      "He gives a test"
+     ],
+     "ans": 0,
+     "why": "Every Friday, he holds a reading club。"
+    }
+   ]
+  },
+  {
    "id": "drill",
+   "sec": "听词跟读 · Repeat",
    "kind": "drill",
-   "title": "听词跟读 · 高频词",
+   "title": "高频词跟读",
    "segments": [
     {
      "file": "drill.mp3",
