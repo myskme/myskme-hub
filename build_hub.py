@@ -755,6 +755,8 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       <a href="https://myskme.github.io/myskme-hub/write/" target="_blank" rel="noopener">作文训练场</a>
       <span>·</span>
       <a href="https://myskme.github.io/myskme-hub/daily/" target="_blank" rel="noopener">每日一题</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/listen/" target="_blank" rel="noopener">听力训练场</a>
     </div>
     <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
     <div>单文件离线作品总目 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>

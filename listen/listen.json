@@ -1,0 +1,210 @@
+{
+ "title": "听力训练场",
+ "items": [
+  {
+   "id": "d1",
+   "kind": "dialogue",
+   "title": "短对话 · 社团时间",
+   "segments": [
+    {
+     "file": "d1a.mp3",
+     "speaker": "A",
+     "text": "Hi Hai, are you free after class? I want to join Mr. Wolf's reading club."
+    },
+    {
+     "file": "d1b.mp3",
+     "speaker": "B",
+     "text": "Sure, Lin! It meets every Friday at four in the school library."
+    }
+   ],
+   "qs": [
+    {
+     "q": "When does the reading club meet?",
+     "ops": [
+      "Every Monday at four",
+      "Every Friday at four",
+      "Every weekend",
+      "Every morning"
+     ],
+     "ans": 1,
+     "why": "男生说 every Friday at four in the library。"
+    }
+   ]
+  },
+  {
+   "id": "d2",
+   "kind": "dialogue",
+   "title": "短对话 · 上学方式",
+   "segments": [
+    {
+     "file": "d2a.mp3",
+     "speaker": "B",
+     "text": "Lin, how do you usually go to school?"
+    },
+    {
+     "file": "d2b.mp3",
+     "speaker": "A",
+     "text": "I usually ride my bike, but today I took the bus because it was raining."
+    }
+   ],
+   "qs": [
+    {
+     "q": "How did Lin go to school today?",
+     "ops": [
+      "By bike",
+      "On foot",
+      "By bus",
+      "By car"
+     ],
+     "ans": 2,
+     "why": "today I took the bus because it was raining（今天下雨坐了公交）。"
+    }
+   ]
+  },
+  {
+   "id": "d3",
+   "kind": "dialogue",
+   "title": "短对话 · 问路",
+   "segments": [
+    {
+     "file": "d3a.mp3",
+     "speaker": "A",
+     "text": "Excuse me, where is the school library?"
+    },
+    {
+     "file": "d3b.mp3",
+     "speaker": "B",
+     "text": "Go straight and turn left. It's next to the dining hall."
+    }
+   ],
+   "qs": [
+    {
+     "q": "Where is the library?",
+     "ops": [
+      "Next to the dining hall",
+      "Behind the gate",
+      "On the playground",
+      "Inside the office"
+     ],
+     "ans": 0,
+     "why": "It's next to the dining hall（在食堂旁边）。"
+    }
+   ]
+  },
+  {
+   "id": "d4",
+   "kind": "dialogue",
+   "title": "短对话 · 喜欢的科目",
+   "segments": [
+    {
+     "file": "d4a.mp3",
+     "speaker": "A",
+     "text": "What's your favourite subject, Hai?"
+    },
+    {
+     "file": "d4b.mp3",
+     "speaker": "B",
+     "text": "English! Mr. Wolf makes every lesson fun and warm."
+    }
+   ],
+   "qs": [
+    {
+     "q": "What is Hai's favourite subject?",
+     "ops": [
+      "Maths",
+      "Music",
+      "English",
+      "History"
+     ],
+     "ans": 2,
+     "why": "English! Mr. Wolf makes every lesson fun。"
+    }
+   ]
+  },
+  {
+   "id": "p1",
+   "kind": "passage",
+   "title": "短文 · 校园通知",
+   "segments": [
+    {
+     "file": "p1.mp3",
+     "speaker": "A",
+     "text": "Attention, please. This Saturday, Academy Valley will hold its yearly English Festival. There will be a speech contest in the morning and an English movie in the afternoon. Please come to the school hall at nine o'clock, and don't forget to bring your student card."
+    }
+   ],
+   "qs": [
+    {
+     "q": "When will the English Festival be held?",
+     "ops": [
+      "This Friday",
+      "This Saturday",
+      "Next Monday",
+      "Every day"
+     ],
+     "ans": 1,
+     "why": "This Saturday … English Festival。"
+    },
+    {
+     "q": "What should students bring?",
+     "ops": [
+      "A dictionary",
+      "Some money",
+      "Their student card",
+      "A gift"
+     ],
+     "ans": 2,
+     "why": "don't forget to bring your student card。"
+    }
+   ]
+  },
+  {
+   "id": "p2",
+   "kind": "passage",
+   "title": "短文 · 林的演讲",
+   "segments": [
+    {
+     "file": "p2.mp3",
+     "speaker": "B",
+     "text": "Yesterday was a special day for Lin. She gave her first English speech in front of the whole school. At first she was very nervous, but she remembered Mr. Wolf's words: make yourself special and kind. In the end, everyone clapped for her."
+    }
+   ],
+   "qs": [
+    {
+     "q": "What did Lin do yesterday?",
+     "ops": [
+      "She gave her first English speech",
+      "She won a race",
+      "She joined a club",
+      "She wrote a story"
+     ],
+     "ans": 0,
+     "why": "She gave her first English speech in front of the whole school。"
+    },
+    {
+     "q": "How did Lin feel at first?",
+     "ops": [
+      "Excited",
+      "Nervous",
+      "Bored",
+      "Angry"
+     ],
+     "ans": 1,
+     "why": "At first she was very nervous。"
+    }
+   ]
+  },
+  {
+   "id": "drill",
+   "kind": "drill",
+   "title": "听词跟读 · 高频词",
+   "segments": [
+    {
+     "file": "drill.mp3",
+     "speaker": "B",
+     "text": "Listen and repeat after me. Environment. Protect. Recycle. Weekend. Because. However. Little by little, we all improve."
+    }
+   ],
+   "qs": []
+  }
+ ]
+}
