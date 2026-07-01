@@ -1,6 +1,17 @@
 {
   "catalog": [
     {
+      "code": "CLOZE1",
+      "name": "完形填空 · 第一辑（乡村之夏）",
+      "desc": "一篇记叙文完形，8 个空，练时态一致 + 词义搭配（中考完形核心）。每空带全文面板，联系上下文再选。免费档。",
+      "date": "",
+      "cat": "完形填空",
+      "pack": "阅读训练营",
+      "level": "常规",
+      "tier": "free",
+      "count": 8
+    },
+    {
       "code": "MIX1",
       "name": "易混词辨析 · 第一辑（动词 / 数量 / 介词）",
       "desc": "中考高频易混词一网打尽：affect/effect、rise/raise、lie/lay、borrow/lend、fewer/less、between/among、beside/besides、across/through。配对记义 + 句境选词。免费档，人人可练。",
@@ -32,6 +43,17 @@
       "level": "常规",
       "tier": "free",
       "count": 11
+    },
+    {
+      "code": "READ2",
+      "name": "阅读理解 · 第二辑（应用文 / 记叙文 / 说明文）",
+      "desc": "中考三大常见文体各一篇：校园通知（应用文）、雨中故事（记叙文）、熊猫小知识（说明文），共 9 题。每题带原文面板，练「定位找答案」。免费档。",
+      "date": "",
+      "cat": "阅读理解",
+      "pack": "阅读训练营",
+      "level": "常规",
+      "tier": "free",
+      "count": 9
     },
     {
       "code": "TRAP1",
