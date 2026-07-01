@@ -109,9 +109,31 @@ footer a{color:var(--gold2);text-decoration:none}
 .ctrl button:hover{border-color:var(--gold);color:var(--gold2)}
 .toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%) translateY(12px);background:var(--bg4);border:1px solid var(--gold3);color:var(--gold2);padding:9px 18px;border-radius:6px;font-size:13px;opacity:0;pointer-events:none;transition:all .3s;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.gate{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);background-image:radial-gradient(1000px 600px at 50% -10%,rgba(201,166,74,.12),transparent 60%)}
+.gate-card{width:min(420px,100%);background:linear-gradient(160deg,var(--bg3),var(--bg2));border:1px solid var(--line);border-radius:10px;padding:36px 30px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+:root[data-theme="light"] .gate-card{background:linear-gradient(160deg,var(--bg3),#f1e9d6)}
+.gate-emblem{width:60px;height:60px;margin:0 auto 18px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--gold2);box-shadow:var(--glow)}
+.gate-card .gk{font-size:11px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.gate-card h2{font-size:24px;font-weight:300;letter-spacing:.16em;margin:0 0 10px;color:var(--ink)}
+.gate-card h2 em{font-style:normal;color:var(--gold);font-weight:500}
+.gate-card p{color:var(--ink2);font-size:13px;margin:0 0 20px;line-height:1.7}
+.gate-card input{text-align:center;letter-spacing:.1em;font-size:16px;margin-bottom:4px}
+.gate-card .err{color:var(--red);font-size:12.5px;min-height:18px;margin:6px 0 10px}
+.gate-card .btn{width:100%;padding:11px;justify-content:center}
 </style>
 </head>
 <body>
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-emblem">狼</div>
+    <div class="gk">MYSKME · 王老师专用</div>
+    <h2>出题 <em>工坊</em></h2>
+    <p>这是题库创作后台，仅供王老师本人使用。<br>请输入管理员密码解锁。</p>
+    <input id="gatePw" type="password" placeholder="管理员密码" autocomplete="off" spellcheck="false">
+    <div class="err" id="gateErr"></div>
+    <button class="btn primary" id="gateGo">解 锁</button>
+  </div>
+</div>
 <main class="wrap">
   <header>
     <div class="kicker">MYSKME × 英语王老师</div>
@@ -236,7 +258,7 @@ footer a{color:var(--gold2);text-decoration:none}
   <footer><a href="../">← 作品总目</a>　·　<a href="../banks/">题库书架</a>　·　<a href="../print/">打印中心</a>　·　MYSKME 题库工坊</footer>
 </main>
 
-<div class="ctrl"><button id="themeBtn" title="切换主题">◐</button></div>
+<div class="ctrl"><button id="themeBtn" title="切换主题">◐</button><button id="lockBtn" title="锁定退出（本机需重新输入密码）" hidden>🔒</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -508,7 +530,20 @@ function boot(){
     $('#impSel').innerHTML=opt;refresh();
   }).catch(function(){});
 }
-boot();
+/* ---------- 管理员软门（与控制台同一管理员口令的 sha256 校验；明文口令不写入源码） ---------- */
+var MAKER_HASH="660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2";
+var GK='myskme-maker-ok',booted=false;
+async function sha256hex(s){try{var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')}catch(e){return ''}}
+function openTool(){var g=$('#gate');if(g)g.style.display='none';var lb=$('#lockBtn');if(lb)lb.hidden=false;if(!booted){booted=true;boot();}}
+function tryUnlock(){var pw=($('#gatePw').value||'').trim();sha256hex(pw).then(function(h){if(h===MAKER_HASH){try{sessionStorage.setItem(GK,'1')}catch(e){}openTool();}else{$('#gateErr').textContent='密码不正确 · 本工坊为王老师专用';$('#gatePw').select();}})}
+(function initGate(){
+  var ok=false;try{ok=sessionStorage.getItem(GK)==='1'}catch(e){}
+  if(ok){openTool();return;}
+  $('#gateGo').addEventListener('click',tryUnlock);
+  $('#gatePw').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tryUnlock();}});
+  $('#gatePw').focus();
+})();
+var _lb=$('#lockBtn');if(_lb)_lb.addEventListener('click',function(){try{sessionStorage.removeItem(GK)}catch(e){}location.reload();});
 
 /* ---------- theme ---------- */
 (function(){var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
