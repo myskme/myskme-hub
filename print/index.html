@@ -58,6 +58,17 @@ select:focus{outline:none;border-color:var(--gold)}
 .sheet td.no{width:34px;text-align:center;color:#8a6d1e;font-family:var(--mono)}
 .sheet td.wr{height:30px}
 .sheet .foot{margin-top:22px;text-align:center;color:#8a6d1e;font-size:12px;border-top:1px solid #ddd;padding-top:10px}
+.lock{max-width:440px;margin:26px auto 0;background:linear-gradient(160deg,var(--bg3),var(--bg2));border:1px solid var(--line);border-radius:6px;padding:28px 26px;text-align:center}
+:root[data-theme="light"] .lock{background:linear-gradient(160deg,var(--bg3),#f1e9d6)}
+.lock .ic{font-size:34px;color:var(--gold);margin-bottom:8px}
+.lock h3{margin:0 0 6px;font-size:18px;font-weight:500}
+.lock p{color:var(--ink2);font-size:13.5px;margin:0 0 16px;line-height:1.7}
+.lock p b{color:var(--gold2)}
+.lock input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-family:var(--serif);font-size:16px;padding:11px 14px;text-align:center;letter-spacing:.1em;outline:none;border-radius:3px}
+.lock input:focus{border-color:var(--gold);box-shadow:var(--glow)}
+.lock button{margin-top:12px;width:100%;font-family:var(--serif);font-size:14px;padding:11px;border:1px solid var(--gold3);background:rgba(201,166,74,.1);color:var(--gold2);cursor:pointer;border-radius:3px}
+.lock button:hover{border-color:var(--gold)}
+.lock .err{color:#d56060;font-size:12.5px;min-height:16px;margin-top:8px}
 .msg{text-align:center;color:var(--ink3);padding:40px 0}
 footer{margin-top:36px;text-align:center;color:var(--ink3);font-size:13px}
 footer a{color:var(--gold2);text-decoration:none}
@@ -97,7 +108,21 @@ var $=function(s){return document.querySelector(s)};
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function blanks(s){return esc(s).replace(/___+/g,'<span class="blank">　　　</span>')}
 var CAT=[],BANK=null,MODE='paper';
-var MODES=[['paper','选择题卷'],['key','选择题·答案版'],['vocab','词表'],['dictation','词表·默写版']];
+var MODES=[['paper','选择题卷'],['key','选择题·答案版 🔒'],['vocab','词表'],['dictation','词表·默写版']];
+/* 答案+解析软门（密码 myskme2026，与作文墙口令同）——题目免费，答案/解析需密码 */
+var ANS_HASH="6bc05fd48828cf625c1ee53fd231cb69ffc5fd736f940b496549d443ad56cea0";
+function ansOK(){try{return sessionStorage.getItem('myskme-ans')==='1'}catch(e){return false}}
+async function sha256(s){try{var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')}catch(e){return ''}}
+function renderLock(){
+  $('#sheet').innerHTML='<div class="lock no-print"><div class="ic">🔒</div><h3>答案与解析已加密</h3>'
+    +'<p>题目可自由查看、打印；<b>答案和解析</b>需要密码解锁。<br>兑换码请联系 <b>MYSKME · 英语王老师</b>。</p>'
+    +'<input id="ansPw" type="password" placeholder="输入答案密码" autocomplete="off" spellcheck="false"><div class="err" id="ansErr"></div>'
+    +'<button id="ansGo">解 锁 答 案</button></div>';
+  var go=function(){sha256(($('#ansPw').value||'').trim()).then(function(h){if(h===ANS_HASH){try{sessionStorage.setItem('myskme-ans','1')}catch(e){}render()}else{$('#ansErr').textContent='密码不正确，请联系王老师'}})};
+  $('#ansGo').addEventListener('click',go);
+  $('#ansPw').addEventListener('keydown',function(e){if(e.key==='Enter')go()});
+  $('#ansPw').focus();
+}
 
 function renderModes(){$('#modes').innerHTML=MODES.map(function(m){return '<button class="mode'+(m[0]===MODE?' on':'')+'" data-m="'+m[0]+'">'+m[1]+'</button>'}).join('')}
 function mcqItems(b){return (b.mods&&b.mods.m4||[]).concat(b.mods&&b.mods.m5||[]).filter(function(it){return it&&it.ops&&it.ops.length>=2&&typeof it.ans==='number'})}
@@ -107,6 +132,7 @@ var K=['A','B','C','D','E'];
 function render(){
   var s=$('#sheet');
   if(!BANK){s.innerHTML='<div class="msg no-print">请选择一个题库。</div>';return}
+  if(MODE==='key'&&!ansOK()){renderLock();return}
   var b=BANK,head='<h2>'+esc(b.name||b.code)+'</h2><div class="code">兑换码 '+esc(b.code)+' · MYSKME 题库工坊</div>';
   var html;
   if(MODE==='vocab'||MODE==='dictation'){
