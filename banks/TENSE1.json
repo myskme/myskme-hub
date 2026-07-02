@@ -1,0 +1,327 @@
+{
+  "name": "中考动词时态专项 · 第一辑（主将从现 / 完成时 / 时态呼应 / 被动）",
+  "code": "TENSE1",
+  "desc": "中考动词时态一网打尽：主将从现、since/for/ago 标志词、by the time 过去完成、宾语从句时态呼应、真理不变时态、各时态被动、used to 辨析、瞬间 vs 延续动词。配对记规则 + 句境选时态，答案唯一、每题带解析。进阶免费档，人人可练。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "语法专项",
+  "pack": "时态突破营",
+  "mods": {
+    "m1": [
+      [
+        "since + 过去时间点",
+        "现在完成时 have/has done（从过去持续到现在）",
+        1
+      ],
+      [
+        "for + 一段时间",
+        "现在完成时 + 延续性动词（持续了多久）",
+        1
+      ],
+      [
+        "…ago",
+        "一般过去时（明确过去时间，不与完成时连用）",
+        1
+      ],
+      [
+        "by the time + 过去",
+        "过去完成时 had done（过去的过去）",
+        2
+      ],
+      [
+        "as soon as / when 从句（主句将来）",
+        "从句用一般现在时表将来（主将从现）",
+        2
+      ],
+      [
+        "already / yet / just / ever / never",
+        "现在完成时的标志副词",
+        1
+      ]
+    ],
+    "m2": [
+      [
+        "现在完成时",
+        "have/has + 过去分词（have done）",
+        1
+      ],
+      [
+        "过去完成时",
+        "had + 过去分词（had done，过去的过去）",
+        2
+      ],
+      [
+        "过去进行时",
+        "was/were + doing（过去某刻正在进行）",
+        1
+      ],
+      [
+        "一般将来被动",
+        "will be + 过去分词（will be done）",
+        2
+      ],
+      [
+        "现在完成被动",
+        "have/has been + 过去分词（has been done）",
+        2
+      ],
+      [
+        "过去将来时",
+        "would + do（过去的将来，多见于宾语从句时态呼应）",
+        2
+      ]
+    ],
+    "m3": [
+      [
+        "has gone to",
+        "去了（还没回来，人不在这里）",
+        2
+      ],
+      [
+        "has been to",
+        "去过（已经回来，人在这里）",
+        2
+      ],
+      [
+        "used to do",
+        "过去常常（现在不再这样了）",
+        2
+      ],
+      [
+        "be used to doing",
+        "习惯于做（说的是此刻的习惯）",
+        2
+      ],
+      [
+        "瞬间动词 + for/how long",
+        "不能直接连用；须换成延续性动词（buy→have, borrow→keep）",
+        3
+      ],
+      [
+        "真理 / 客观事实",
+        "宾语从句中永远用一般现在时，不受主句时态影响",
+        2
+      ]
+    ],
+    "m4": [
+      {
+        "q": "I'll call you as soon as I ___ at the airport.",
+        "ops": [
+          "arrive",
+          "will arrive",
+          "arrived",
+          "am arriving"
+        ],
+        "ans": 0,
+        "why": "as soon as 引导时间状语从句，主句用将来(will call)，从句用一般现在时表将来（主将从现）→ arrive；从句里不能用 will arrive；arrived 是过去时；am arriving 进行时不表将来的这一动作。",
+        "lv": 2
+      },
+      {
+        "q": "My uncle ___ this factory since it opened ten years ago.",
+        "ops": [
+          "runs",
+          "ran",
+          "has run",
+          "is running"
+        ],
+        "ans": 2,
+        "why": "since + 过去时间 → 现在完成时 has run（持续经营到现在）；runs 一般现在与 since 冲突；ran 过去时不能表持续至今；is running 进行时不表从过去到现在的持续。",
+        "lv": 1
+      },
+      {
+        "q": "By the time we got to the cinema, the film ___ already.",
+        "ops": [
+          "has begun",
+          "had begun",
+          "was beginning",
+          "began"
+        ],
+        "ans": 1,
+        "why": "在过去(got)之前就已发生 → 过去完成时 had begun（过去的过去），already 再次印证；has begun 现在完成与过去时间冲突；was beginning 进行时不表已完成；began 一般过去分不出先后。",
+        "lv": 2
+      },
+      {
+        "q": "The teacher told us that light ___ faster than sound.",
+        "ops": [
+          "travels",
+          "traveled",
+          "had traveled",
+          "will travel"
+        ],
+        "ans": 0,
+        "why": "客观真理在宾语从句中永远用一般现在时，不受主句 told 影响 → travels；其余三种时态都会错误地把真理“时态化”。",
+        "lv": 2
+      },
+      {
+        "q": "When I called him last night, he told me he ___ dinner already.",
+        "ops": [
+          "has had",
+          "had had",
+          "has",
+          "was having"
+        ],
+        "ans": 1,
+        "why": "主句是过去(told)，“在告诉之前已吃完” + already → 过去完成时 had had；has had 现在完成与过去时间冲突；has 现在时不合呼应；was having 进行时不表“已完成”。",
+        "lv": 2
+      },
+      {
+        "q": "A new library ___ in our town next year.",
+        "ops": [
+          "builds",
+          "is built",
+          "will be built",
+          "was built"
+        ],
+        "ans": 2,
+        "why": "图书馆是“被建造”→ 被动；next year 是将来 → 一般将来被动 will be built；builds 是主动；is built 现在被动与 next year 冲突；was built 是过去被动。",
+        "lv": 2
+      },
+      {
+        "q": "Don't worry — the problem ___ already, so everything is fine now.",
+        "ops": [
+          "has solved",
+          "has been solved",
+          "was solving",
+          "solves"
+        ],
+        "ans": 1,
+        "why": "问题是“被解决”→ 被动，already 表已完成 → 现在完成被动 has been solved；has solved 缺被动(问题不会自己解决)；was solving 进行时且非被动；solves 现在主动错。",
+        "lv": 2
+      },
+      {
+        "q": "There ___ a cinema near my home, but it was pulled down last year.",
+        "ops": [
+          "used to be",
+          "is used to being",
+          "was used to",
+          "uses to be"
+        ],
+        "ans": 0,
+        "why": "“过去曾经有(现在没有了)”→ used to be；is used to being 意为“习惯于”，语义不通；was used to 结构不完整；uses to be 无此用法。",
+        "lv": 2
+      },
+      {
+        "q": "My grandpa ___ this old watch for over thirty years.",
+        "ops": [
+          "has bought",
+          "bought",
+          "has had",
+          "buys"
+        ],
+        "ans": 2,
+        "why": "for + 一段时间表持续 → 现在完成 + 延续性动词 has had；buy 是瞬间动词不能接 for 时间段(要换成 have)；bought 过去时不表持续到现在；buys 现在时。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "By nine o'clock last night, I ___ my homework and was ready for bed.",
+        "ops": [
+          "finished",
+          "had finished",
+          "have finished",
+          "was finishing"
+        ],
+        "ans": 1,
+        "why": "by + 过去时间点表“到那时之前已完成”→ 过去完成时 had finished；finished 一般过去不突出“更早完成”；have finished 现在完成与过去时间冲突；was finishing 进行时不表完成。",
+        "lv": 2
+      },
+      {
+        "q": "You can't see Mr. Li now — he ___ to Beijing on business.",
+        "ops": [
+          "has gone",
+          "has been",
+          "went",
+          "goes"
+        ],
+        "ans": 0,
+        "why": "去了北京、还没回来(所以现在见不到)→ has gone to；has been to 是“去过已回来”，与“现在见不到”矛盾；went 过去时不解释现在状态；goes 现在时错。",
+        "lv": 2
+      },
+      {
+        "q": "If it ___ tomorrow, we will stay at home and watch a film.",
+        "ops": [
+          "rain",
+          "rains",
+          "will rain",
+          "rained"
+        ],
+        "ans": 1,
+        "why": "if 引导条件状语从句，主句将来(will stay)，从句用一般现在时表将来 → rains(主语 it 用第三人称单数)；rain 缺 -s；will rain 从句不用 will；rained 过去时。",
+        "lv": 1
+      },
+      {
+        "q": "He said he ___ me with my English the next weekend.",
+        "ops": [
+          "helps",
+          "helped",
+          "would help",
+          "will help"
+        ],
+        "ans": 2,
+        "why": "主句是过去(said)，从句表“过去看来的将来”(the next weekend)→ 过去将来时 would help；will help 破坏时态呼应；helped 一般过去不表将来；helps 现在时。",
+        "lv": 2
+      },
+      {
+        "q": "— Have you finished the storybook? — Yes, I ___ it last night.",
+        "ops": [
+          "finish",
+          "finished",
+          "have finished",
+          "had finished"
+        ],
+        "ans": 1,
+        "why": "答句有明确过去时间 last night → 一般过去时 finished；现在完成 have finished 不能与具体过去时间点连用；finish 现在时；had finished 过去完成缺参照点。",
+        "lv": 2
+      },
+      {
+        "q": "English ___ in many countries all over the world.",
+        "ops": [
+          "speaks",
+          "is speaking",
+          "is spoken",
+          "spoke"
+        ],
+        "ans": 2,
+        "why": "英语是“被说”→ 一般现在被动 is spoken；speaks 主动错(英语不会“说”)；is speaking 进行时错；spoke 过去时。",
+        "lv": 1
+      },
+      {
+        "q": "It's the best English speech that I ___ ever heard.",
+        "ops": [
+          "have",
+          "had",
+          "am",
+          "was"
+        ],
+        "ans": 0,
+        "why": "“the best … that I have ever heard”是固定套路，用现在完成 → 助动词 have(have heard)；had 过去完成无过去参照；am/was 无法与 heard 构成完成时。",
+        "lv": 2
+      },
+      {
+        "q": "While the teacher ___ the lesson, a bird flew into the classroom.",
+        "ops": [
+          "explains",
+          "explained",
+          "was explaining",
+          "has explained"
+        ],
+        "ans": 2,
+        "why": "while 引导的背景动作用过去进行时 was explaining，flew(短暂动作)将其打断；explained 一般过去不突出“正在进行的背景”；explains/has explained 时态不符。",
+        "lv": 2
+      },
+      {
+        "q": "I ___ you the moment I ___ the news from the school.",
+        "ops": [
+          "will tell / get",
+          "tell / will get",
+          "will tell / will get",
+          "told / got"
+        ],
+        "ans": 0,
+        "why": "the moment 相当于 as soon as，引导时间状语从句，主句将来、从句一般现在(主将从现)→ will tell / get；从句不用 will get；told / got 全过去，与“还没收到消息”矛盾。",
+        "lv": 2
+      }
+    ]
+  }
+}
