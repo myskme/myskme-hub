@@ -13,7 +13,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：积分板、三国军师争霸、大乱斗、远征录、世界编年史、题库训练场。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的六大课堂英语作品 · 优秀作文墙 · 题库训练 —— 扫码即玩。">
+<meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <meta property="og:url" content="https://myskme.github.io/myskme-hub/">
 <meta name="twitter:card" content="summary_large_image">
@@ -325,7 +325,7 @@ footer b{color:var(--ink2);font-weight:400;}
     <div class="meta-row">
       <div class="stat"><b id="stat-total">0</b><span>件作品</span></div>
       <div class="stat"><b id="stat-a">0</b><span>推荐随玩</span></div>
-      <div class="stat"><b id="stat-b">0</b><span>课堂专用</span></div>
+      <div class="stat"><b id="stat-b">0</b><span>随堂练</span></div>
     </div>
     <p class="usehint" data-h="hint">投屏后 手机扫码即玩，或点击卡片 /「访问」直接打开 — 全部为单文件网页应用，离线可用。</p>
   </header>
@@ -2747,6 +2747,56 @@ var DEFAULT_DATA = {
       ]
     },
     {
+      "label": "随堂练 · 中考四板块（免后端 · Pages）",
+      "items": [
+        {
+          "key": "banks",
+          "glyph": "库",
+          "tag": "题库 · 词灵对决",
+          "title": "题库书架",
+          "en": "Question Banks",
+          "desc": "中考题库总目 · 兑换码即卷号 · 点开即玩「词灵对决」，含时态 / 完形 / 阅读 / 语法陷阱专项。",
+          "url": "https://myskme.github.io/myskme-hub/banks/"
+        },
+        {
+          "key": "listen",
+          "glyph": "听",
+          "tag": "听力",
+          "title": "听力训练场",
+          "en": "Listening",
+          "desc": "中考听力精练 · 多语音朗读 · 逐句跟读 · 浏览器直接播放，免下载。",
+          "url": "https://myskme.github.io/myskme-hub/listen/"
+        },
+        {
+          "key": "write",
+          "glyph": "写",
+          "tag": "写作",
+          "title": "作文训练场",
+          "en": "Writing",
+          "desc": "中考写作分步训练 · 范文 · 句式脚手架 · 自评清单。",
+          "url": "https://myskme.github.io/myskme-hub/write/"
+        },
+        {
+          "key": "daily",
+          "glyph": "日",
+          "tag": "每日打卡",
+          "title": "每日一题",
+          "en": "Daily Quiz",
+          "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
+          "url": "https://myskme.github.io/myskme-hub/daily/"
+        },
+        {
+          "key": "print",
+          "glyph": "印",
+          "tag": "打印 / PDF",
+          "title": "打印中心",
+          "en": "Print Center",
+          "desc": "从题库一键生成 选择卷 / 答案版 / 词表 / 默写版，A4 存 PDF。答案版需口令。",
+          "url": "https://myskme.github.io/myskme-hub/print/"
+        }
+      ]
+    },
+    {
       "label": "课堂专用 · 老师投屏",
       "collapsible": true,
       "items": [
@@ -2865,9 +2915,14 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='mrwolf4358';
 
   function setNum(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
   function updateCounts(){
-    var a=DATA.sections[0]?DATA.sections[0].items.length:0;
-    var b=DATA.sections[1]?DATA.sections[1].items.length:0;
-    setNum('stat-total',a+b);setNum('stat-a',a);setNum('stat-b',b);
+    var secs=DATA.sections||[],total=0,rec=0,study=0,i,it,lb;
+    for(i=0;i<secs.length;i++){
+      it=(secs[i].items&&secs[i].items.length)||0;lb=secs[i].label||'';
+      total+=it;
+      if(lb.indexOf('推荐')===0)rec=it;
+      if(lb.indexOf('随堂练')===0)study=it;
+    }
+    setNum('stat-total',total);setNum('stat-a',rec);setNum('stat-b',study);
   }
   function statsAnim(){
     document.querySelectorAll('.stat b').forEach(function(el){
@@ -3034,7 +3089,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='mrwolf4358';
     var tx=hx+hq+44;ctx.textAlign='left';
     ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
     ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
-    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('六大作品 + 作文墙 + 题库 · 一站直达',tx,hy+132);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('六大作品 · 中考四板块 · 一站直达',tx,hy+132);
     ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
