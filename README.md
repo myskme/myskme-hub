@@ -13,6 +13,7 @@
 | 远征录 · 笼中剑 | https://myskme-expedition.netlify.app |
 | 世界编年史 II | https://myskme-volvme-ii.netlify.app |
 | MYSKME 题库训练场 | https://myskme-games.netlify.app/ |
+| MYSKME自鸣棋 · 课堂肉鸽自走棋 | https://myskme.github.io/myskme-zimingqi/ |
 
 ## 学习工具（本仓库托管 · GitHub Pages · 免后端）
 中考四板块（词汇语法 / 阅读完形 / 写作 / 听力）全数字化，纯静态、扫码即用：
