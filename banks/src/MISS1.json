@@ -1,0 +1,55 @@
+{
+  "name": "中考作文 · 5 大失分黑洞（纠错专项）",
+  "code": "MISS1",
+  "desc": "把中考阅卷扣得最快的 5 个洞逐个堵上：时态滑坡 / 中式搭配 / 介词冠词漏字 / 主谓一致 / 句子粘连破碎。配对记口诀 + 句境纠错单选，答案唯一、每题带解析。改编自王老师《5 大失分黑洞》诊断书。进阶免费档。",
+  "date": "2026-07-03",
+  "cat": "写作纠错",
+  "pack": "中考作文急救",
+  "level": "进阶",
+  "tier": "free",
+  "mods": {
+    "m1": [
+      ["时态滑坡", "叙事一不留神跳回现在时；开头过去就一过到底", 1],
+      ["中式搭配", "直译成 Chinglish；say + 人 是错的，须 tell + 人", 1],
+      ["介词冠词漏字", "漏 to / the / for / in / at；小词最先被扣分", 1],
+      ["主谓一致", "everyone / each / news 后面跟单数动词", 1],
+      ["句子粘连 / 破碎", "多句无连词=粘连；从句独立成句=破碎", 1]
+    ],
+    "m2": [
+      ["开门", "open the door", 1],
+      ["开灯", "turn on the light（≠ open）", 1],
+      ["开会", "hold a meeting", 1],
+      ["开车", "drive a car", 1],
+      ["开店", "run a shop", 1],
+      ["吃药", "take medicine（≠ eat）", 1]
+    ],
+    "m3": [
+      ["say + 人", "错！“告诉某人”用 tell sb", 1],
+      ["喝汤", "have / drink the soup（≠ eat）", 2],
+      ["arrive 大地点", "arrive in（小地点用 arrive at）", 2],
+      ["news / advice / information", "不可数，后跟单数动词", 1],
+      ["in the rain", "在雨中（不是 under the rain）", 2],
+      ["run-on 粘连句", "加连词 and / but / so 或句号断开", 2]
+    ],
+    "m4": [
+      { "q": "I went to the shop yesterday. The line ___ huge and my friend ___ she loved it.", "ops": ["is; says", "was; said", "was; says", "is; said"], "ans": 1, "why": "叙事过去要一致：was + said；一混现在时就是“时态滑坡”。", "lv": 1 },
+      { "q": "The shop owner smiled and ___ us the soup was special.", "ops": ["said", "told", "talked", "spoke"], "ans": 1, "why": "“告诉某人某事”= tell sb sth → told；say 不能直接接人(said us 错)，talk / speak 不接双宾。", "lv": 1 },
+      { "q": "We arrived ___ Donggang ___ noon and waited ___ line ___ an hour.", "ops": ["at; in; on; in", "in; at; in; for", "in; at; on; for", "at; at; in; for"], "ans": 1, "why": "arrive in 大地点；at noon；in line；for + 时间段——四个小词一个都不能漏。", "lv": 2 },
+      { "q": "Everyone in our family ___ the soup, and the news ___ surprising.", "ops": ["like; are", "likes; is", "like; is", "likes; are"], "ans": 1, "why": "everyone + 单数 likes；news 不可数 + 单数 is。", "lv": 1 },
+      { "q": "选出没有语病的一项：", "ops": ["It was hot and salty I ate so much I felt sleepy.", "It was hot and salty, and I ate so much that I felt sleepy.", "It was hot and salty. Because I ate so much.", "It is hot and salty, I eat too much, I feel sleepy."], "ans": 1, "why": "B 用 and / so...that 串成因果且时态过去；A 粘连、C 破碎、D 逗号粘连 + 时态错。", "lv": 2 },
+      { "q": "It got dark, so he ___ the light.", "ops": ["opened", "turned on", "closed", "made"], "ans": 1, "why": "开灯 = turn on（open the light 是中式）。", "lv": 1 },
+      { "q": "I felt sick, so I ___ some medicine after I ___ the soup.", "ops": ["ate; ate", "took; had", "took; ate", "ate; had"], "ans": 1, "why": "吃药 = take medicine；喝汤 = have / drink（都不用 eat）。", "lv": 2 },
+      { "q": "When I was a child, I ___ cartoons every evening.", "ops": ["like", "likes", "liked", "am liking"], "ans": 2, "why": "when I was a child 是过去锚点，全句锁定过去 → liked。", "lv": 1 }
+    ],
+    "m5": [
+      { "q": "选出没有错误的一项：", "ops": ["My friend say she loves it.", "He open the light.", "The shop owner told us the soup was special.", "Everyone like spicy food."], "ans": 2, "why": "只有 C 全对(tell sb + 过去时)；A say→said、B open→turned on、D like→likes。", "lv": 2 },
+      { "q": "选出没有错误的一项：", "ops": ["We arrived Donggang at noon.", "Every student have a dream.", "The news are surprising.", "I waited in line for an hour."], "ans": 3, "why": "只有 D 对(in line, for an hour)；A 漏 in / the、B have→has、C are→is。", "lv": 2 },
+      { "q": "I went ___ the restaurant and stood ___ line.", "ops": ["to; in", "to; on", "at; in", "to; at"], "ans": 0, "why": "go to + 地点；stand / wait in line。", "lv": 1 },
+      { "q": "选出完整且正确的句子：", "ops": ["Because the line was long.", "The line was long, so we waited.", "The line was long we waited.", "The line was long, we waited."], "ans": 1, "why": "B 用连词 so 连接；A 从句破碎、C 无连词粘连、D 逗号粘连。", "lv": 2 },
+      { "q": "My father ___ a small shop and my mother ___ a car to work.", "ops": ["opens; opens", "runs; drives", "opens; drives", "runs; opens"], "ans": 1, "why": "开店 = run；开车 = drive（都不是 open）。", "lv": 2 },
+      { "q": "Each of the students ___ a dream, and everybody ___ to succeed.", "ops": ["have; want", "has; wants", "has; want", "have; wants"], "ans": 1, "why": "each / everybody 后跟单数动词 → has; wants。", "lv": 2 },
+      { "q": "Yesterday I ___ to the market, ___ many snacks and ___ some mango rice.", "ops": ["go; see; buy", "went; saw; bought", "went; see; buy", "go; saw; bought"], "ans": 1, "why": "叙事全过去：went / saw / bought，时态一致。", "lv": 1 },
+      { "q": "We waited ___ line ___ almost an hour ___ the rain.", "ops": ["in; for; in", "on; for; in", "in; for; under", "at; in; in"], "ans": 0, "why": "in line；for + 时间；in the rain（中式 under the rain 是错的）。", "lv": 2 }
+    ]
+  }
+}
