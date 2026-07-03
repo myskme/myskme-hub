@@ -175,6 +175,17 @@
       "level": "炼狱",
       "tier": "svip",
       "count": 24
+    },
+    {
+      "code": "WRITE1",
+      "name": "中考作文 · 5 大文体高分句型（22→28 拔高）",
+      "desc": "五种文体各 4 句招牌句式，出现一句加一档：书信(I'm writing to / It would mean a lot to me if)、记叙(It was not until…that / No sooner had I…than / 分词伴随)、议论(There is no doubt that / While 让步 / Not only 倒装)、说明(定从 which / known as / Take…as an example)、万金油(As the saying goes / The more…the more / What…is)。配对记句式 + 句境选句式，答案唯一带解析。改编自王老师《5 大文体高分句型》，与 MISS1 是「堵漏 + 拔高」一对。进阶免费档。",
+      "date": "2026-07-03",
+      "cat": "写作句型",
+      "pack": "中考作文急救",
+      "level": "进阶",
+      "tier": "free",
+      "count": 36
     }
   ]
 }

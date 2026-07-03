@@ -1,0 +1,313 @@
+{
+  "name": "中考作文 · 5 大文体高分句型（22→28 拔高）",
+  "code": "WRITE1",
+  "desc": "五种文体各 4 句招牌句式，出现一句加一档：书信(I'm writing to / It would mean a lot to me if)、记叙(It was not until…that / No sooner had I…than / 分词伴随)、议论(There is no doubt that / While 让步 / Not only 倒装)、说明(定从 which / known as / Take…as an example)、万金油(As the saying goes / The more…the more / What…is)。配对记句式 + 句境选句式，答案唯一带解析。改编自王老师《5 大文体高分句型》，与 MISS1 是「堵漏 + 拔高」一对。进阶免费档。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "写作句型",
+  "pack": "中考作文急救",
+  "mods": {
+    "m1": [
+      [
+        "I'm writing to + do",
+        "书信开篇万能模板（比 I want to 高三档）",
+        1
+      ],
+      [
+        "It would mean a lot to me if…",
+        "委婉请求（比 Please 礼貌十倍）",
+        2
+      ],
+      [
+        "I'd appreciate it if you could + do",
+        "正式书信「恳请」招牌",
+        2
+      ],
+      [
+        "Looking forward to + doing",
+        "书信收尾必杀（别忘 Yours / Sincerely）",
+        1
+      ],
+      [
+        "It was not until … that …",
+        "强调结构：直到那时我才…（叙事高潮）",
+        2
+      ],
+      [
+        "Holding / Walking …, I + 动词",
+        "现在分词作伴随：一句同时给画面和动作",
+        2
+      ],
+      [
+        "No sooner had I + done + than …",
+        "倒装 + 过去完成：我刚…就…",
+        2
+      ]
+    ],
+    "m2": [
+      [
+        "「…，」+ 动词 + 人",
+        "直接引语：给故事加声音，瞬间生动",
+        1
+      ],
+      [
+        "There is no doubt that …",
+        "亮观点首选（比 I think 高一档）",
+        1
+      ],
+      [
+        "While + 从句, 主句",
+        "让步式开头：同句既看对立面又表态",
+        2
+      ],
+      [
+        "Not only … but also …（倒装）",
+        "递进 + 倒装：Not only 提句首 → 助动词倒装",
+        2
+      ],
+      [
+        "In a word / All in all, …",
+        "议论收尾金句（比 So I think 高三档）",
+        2
+      ],
+      [
+        "…, which + 从句",
+        "定语从句加分：给名词补一句解释",
+        2
+      ],
+      [
+        "First of all / What's more / Last but not least",
+        "三段式分点（别用 firstly / secondly）",
+        1
+      ]
+    ],
+    "m3": [
+      [
+        "…, known as / called + 名词",
+        "过去分词作后置定语（比 which is called 简洁）",
+        2
+      ],
+      [
+        "Take … as an example / for instance",
+        "举例：抽象概念立刻具体化",
+        1
+      ],
+      [
+        "As the saying goes, 「…」",
+        "引谚语：开头或论点支撑",
+        1
+      ],
+      [
+        "What + 主语 + 动词 + is / was …",
+        "主语从句强调：最让我…的是…",
+        2
+      ],
+      [
+        "The more …, the more …",
+        "越…越…：句式工整，逻辑感强",
+        1
+      ],
+      [
+        "Some … while others …",
+        "对比结构（比 and 高三档）",
+        2
+      ]
+    ],
+    "m4": [
+      {
+        "q": "Not only ___ reading expand our minds, but it also makes us calmer.",
+        "ops": [
+          "does",
+          "do",
+          "is",
+          "did"
+        ],
+        "ans": 0,
+        "why": "Not only 置于句首，其后主句部分倒装用助动词；reading 三单 → does。",
+        "lv": 2
+      },
+      {
+        "q": "No sooner ___ I sat down ___ the rain suddenly stopped.",
+        "ops": [
+          "had; than",
+          "have; then",
+          "did; than",
+          "had; then"
+        ],
+        "ans": 0,
+        "why": "No sooner had + done + than…（倒装 + 过去完成，「我刚…就…」）。",
+        "lv": 2
+      },
+      {
+        "q": "It was not until that moment ___ I understood what he really meant.",
+        "ops": [
+          "that",
+          "when",
+          "then",
+          "which"
+        ],
+        "ans": 0,
+        "why": "It was not until … that … 强调结构，空处只能填 that。",
+        "lv": 2
+      },
+      {
+        "q": "___ the warm bowl in my hands, I suddenly felt at home.",
+        "ops": [
+          "Held",
+          "Holding",
+          "To hold",
+          "Hold"
+        ],
+        "ans": 1,
+        "why": "现在分词作伴随状语，逻辑主语 I 主动「拿着」→ Holding。",
+        "lv": 2
+      },
+      {
+        "q": "___ I read, ___ I realize how little I know.",
+        "ops": [
+          "The more; the more",
+          "More; more",
+          "The most; the most",
+          "The more; more"
+        ],
+        "ans": 0,
+        "why": "The more…, the more… 「越…越…」固定句式。",
+        "lv": 1
+      },
+      {
+        "q": "___ that exercise plays a key role in our daily life.",
+        "ops": [
+          "There is no doubt",
+          "It is no doubt",
+          "There is doubt",
+          "No doubt there is"
+        ],
+        "ans": 0,
+        "why": "There is no doubt that + 从句（毫无疑问…），亮观点首选。",
+        "lv": 1
+      },
+      {
+        "q": "___ phones make life easier, they also waste a lot of our time.",
+        "ops": [
+          "While",
+          "Because",
+          "So",
+          "Unless"
+        ],
+        "ans": 0,
+        "why": "While 引导让步「虽然」，同句既看对立面又表态；其余逻辑不通。",
+        "lv": 1
+      },
+      {
+        "q": "选出书信开篇的「招牌高分句式」：",
+        "ops": [
+          "I want to thank you for your help.",
+          "I'm writing to thank you for your help.",
+          "Thank you for your help.",
+          "I write this letter to thank you."
+        ],
+        "ans": 1,
+        "why": "书信开篇招牌 = I'm writing to + do（比 I want to / Thank you 高一档）；D 生硬。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "There is a special tea, ___ 「morning sun」 by the locals.",
+        "ops": [
+          "known as",
+          "knowing as",
+          "which known as",
+          "know as"
+        ],
+        "ans": 0,
+        "why": "过去分词 known as 作后置定语（被当地人称为…）。",
+        "lv": 2
+      },
+      {
+        "q": "It is a traditional festival ___ brings families together every year.",
+        "ops": [
+          "which",
+          "what",
+          "who",
+          "where"
+        ],
+        "ans": 0,
+        "why": "定语从句修饰物 festival，关系词用 which / that；what 不引导定语从句。",
+        "lv": 1
+      },
+      {
+        "q": "___, 「Where there is a will, there is a way.」",
+        "ops": [
+          "As the saying goes",
+          "As the saying says",
+          "Like the saying go",
+          "As saying goes"
+        ],
+        "ans": 0,
+        "why": "As the saying goes 是「常言道」引谚语的固定说法。",
+        "lv": 1
+      },
+      {
+        "q": "___ my grandma ___ — she still wakes up at 5 every day.",
+        "ops": [
+          "Take; as an example",
+          "Make; as an example",
+          "Take; for a example",
+          "Bring; as example"
+        ],
+        "ans": 0,
+        "why": "Take … as an example / for instance 举例固定搭配。",
+        "lv": 1
+      },
+      {
+        "q": "___ surprised me most ___ the smile on her face.",
+        "ops": [
+          "What; was",
+          "That; was",
+          "Which; is",
+          "What; were"
+        ],
+        "ans": 0,
+        "why": "What 引导主语从句作主语，谓语用单数 was。",
+        "lv": 2
+      },
+      {
+        "q": "Some students love math, ___ others find it hard.",
+        "ops": [
+          "while",
+          "when",
+          "which",
+          "and"
+        ],
+        "ans": 0,
+        "why": "Some … while others … 对比结构，while 表「而」。",
+        "lv": 1
+      },
+      {
+        "q": "选出用了「招牌收尾金句」的一项：",
+        "ops": [
+          "So I think time is important.",
+          "All in all, what really matters is how we use our time.",
+          "In the end time is important.",
+          "I think time is very important so."
+        ],
+        "ans": 1,
+        "why": "All in all + What…is 是议论收尾金句（比 So I think 高三档）；其余平淡或语病。",
+        "lv": 2
+      },
+      {
+        "q": "同样表达「你今年进步很大」，最地道的招牌句是：",
+        "ops": [
+          "There is no doubt that you have grown a lot this year.",
+          "No doubt you grow a lot this year.",
+          "It is no doubt you have grown a lot.",
+          "I no doubt you grew much this year."
+        ],
+        "ans": 0,
+        "why": "There is no doubt that + 从句 是固定招牌；B 缺 that/时态错、C 句型错、D 无此用法。",
+        "lv": 2
+      }
+    ]
+  }
+}
