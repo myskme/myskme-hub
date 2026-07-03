@@ -101,8 +101,8 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .hero-figure .hero-halo{position:absolute;inset:6% 10% 0;z-index:-1;border-radius:50%;
   background:radial-gradient(ellipse at 50% 42%,rgba(201,166,74,.22),transparent 66%);filter:blur(6px);}
 /* 缺立绘时：金环「狼」字大徽 */
-.hero-crestbig{position:relative;width:clamp(180px,26vw,270px);height:clamp(180px,26vw,270px);
-  display:flex;align-items:center;justify-content:center;animation:heroRise 1.4s .2s cubic-bezier(.16,1,.3,1) both;}
+.hero-crestbig{display:none;position:relative;width:clamp(180px,26vw,270px);height:clamp(180px,26vw,270px);
+  align-items:center;justify-content:center;animation:heroRise 1.4s .2s cubic-bezier(.16,1,.3,1) both;}
 .hero-crestbig::before{content:'';position:absolute;inset:0;border-radius:50%;
   border:1px solid var(--gold3);box-shadow:inset 0 0 60px rgba(201,166,74,.14),var(--glow-gold);}
 .hero-crestbig::after{content:'';position:absolute;inset:8%;border-radius:50%;border:1px solid var(--line);}
