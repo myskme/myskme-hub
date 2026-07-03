@@ -1,0 +1,303 @@
+{
+  "name": "中考从句专项 · 第一辑（定语 / 宾语 / 状语从句）",
+  "code": "CLAUSE1",
+  "desc": "中考三大从句一网打尽：定语从句(who/which/that/whose/where/when、最高级用 that、介词+which)、宾语从句(陈述语序、whether/if、时态呼应、what vs that)、状语从句(because≠so 连用、although≠but、so/such…that、unless、主将从现)。配对记规则 + 句境选词，答案唯一带解析。进阶免费档。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "语法专项",
+  "pack": "从句突破营",
+  "mods": {
+    "m1": [
+      [
+        "who / whom",
+        "指人：who 作主语、whom 作宾语（The man who called…）",
+        1
+      ],
+      [
+        "which",
+        "指物，作主语或宾语（The book which…）",
+        1
+      ],
+      [
+        "that",
+        "指人或物；先行词含 the only / 最高级 / 序数 / all 时首选",
+        2
+      ],
+      [
+        "whose",
+        "表所属：谁的（The boy whose father…）",
+        2
+      ],
+      [
+        "where",
+        "关系副词 = in / at which，先行词是地点（the town where…）",
+        2
+      ],
+      [
+        "when",
+        "关系副词 = in / on which，先行词是时间（the day when…）",
+        2
+      ]
+    ],
+    "m2": [
+      [
+        "宾语从句用陈述语序",
+        "Do you know where he lives（不是 does he live）",
+        2
+      ],
+      [
+        "whether / if",
+        "引导「是否」；介词后、or not 前只能用 whether",
+        2
+      ],
+      [
+        "that（宾语从句）",
+        "陈述内容，常可省略（I think (that)…）",
+        1
+      ],
+      [
+        "宾从时态呼应",
+        "主句过去 → 从句相应用过去（He said he was…）",
+        2
+      ],
+      [
+        "what（引导从句）",
+        "在从句中作成分「什么」（≠ that 不作成分）",
+        2
+      ],
+      [
+        "主句现在 → 从句时态不限",
+        "I think he is / was / will be…（不受制约）",
+        1
+      ]
+    ],
+    "m3": [
+      [
+        "because 不与 so 连用",
+        "「因为…所以…」英文只留一个连词",
+        2
+      ],
+      [
+        "although / though 不与 but 连用",
+        "「虽然…但是…」只留一个",
+        2
+      ],
+      [
+        "so + 形容词 / 副词 + that",
+        "如此…以至于（so tired that…）",
+        2
+      ],
+      [
+        "such + (a/an) + 名词 + that",
+        "such a good book that…（so 接形容词，such 接名词）",
+        2
+      ],
+      [
+        "unless = if not",
+        "除非（引导条件，主将从现）",
+        2
+      ],
+      [
+        "as soon as / until / while",
+        "时间状语从句常用连词",
+        1
+      ]
+    ],
+    "m4": [
+      {
+        "q": "The girl ___ won the first prize is my classmate.",
+        "ops": [
+          "who",
+          "which",
+          "whom",
+          "whose"
+        ],
+        "ans": 0,
+        "why": "先行词 the girl 指人、在从句中作主语 → who；which 指物；whom 作宾语；whose 表所属。",
+        "lv": 1
+      },
+      {
+        "q": "This is the most interesting book ___ I have ever read.",
+        "ops": [
+          "who",
+          "which",
+          "that",
+          "what"
+        ],
+        "ans": 2,
+        "why": "先行词被最高级 most 修饰，关系词只能用 that；what 不引导定语从句。",
+        "lv": 2
+      },
+      {
+        "q": "I know a boy ___ father is a famous doctor.",
+        "ops": [
+          "who",
+          "whose",
+          "which",
+          "that"
+        ],
+        "ans": 1,
+        "why": "表所属「他的父亲」→ whose。",
+        "lv": 2
+      },
+      {
+        "q": "This is the small village ___ I spent my childhood.",
+        "ops": [
+          "which",
+          "that",
+          "where",
+          "when"
+        ],
+        "ans": 2,
+        "why": "先行词 village 是地点、从句不缺宾语 → 关系副词 where(= in which)；which / that 需再补介词。",
+        "lv": 2
+      },
+      {
+        "q": "Could you tell me ___?",
+        "ops": [
+          "where is the post office",
+          "where the post office is",
+          "where does the post office lie",
+          "the post office where is"
+        ],
+        "ans": 1,
+        "why": "宾语从句用陈述语序 → where the post office is。",
+        "lv": 2
+      },
+      {
+        "q": "I'm not sure ___ he will come or not.",
+        "ops": [
+          "that",
+          "if",
+          "whether",
+          "what"
+        ],
+        "ans": 2,
+        "why": "「是否」+ or not 只能用 whether（不用 if）；that 不表「是否」。",
+        "lv": 2
+      },
+      {
+        "q": "He wanted to know ___.",
+        "ops": [
+          "where I lived",
+          "where did I live",
+          "where do I live",
+          "where I live"
+        ],
+        "ans": 0,
+        "why": "主句过去(wanted)，宾从时态呼应用过去 + 陈述语序 → where I lived。",
+        "lv": 2
+      },
+      {
+        "q": "The old house ___ we once lived is being pulled down.",
+        "ops": [
+          "which",
+          "in which",
+          "who",
+          "what"
+        ],
+        "ans": 1,
+        "why": "live in the house → 介词 + 关系代词 = in which(= where)；which 单独用缺了介词。",
+        "lv": 2
+      }
+    ],
+    "m5": [
+      {
+        "q": "选出没有错误的一项：",
+        "ops": [
+          "Because he was ill, so he stayed at home.",
+          "Because he was ill, he stayed at home.",
+          "He was ill, so because he stayed home.",
+          "Although he was ill, but he stayed home."
+        ],
+        "ans": 1,
+        "why": "「因为…所以…」「虽然…但是…」英文只留一个连词 → B 对；A because+so 重复、C 语序错、D although+but 重复。",
+        "lv": 2
+      },
+      {
+        "q": "The box was ___ heavy ___ I couldn't lift it at all.",
+        "ops": [
+          "so; that",
+          "such; that",
+          "too; to",
+          "very; that"
+        ],
+        "ans": 0,
+        "why": "so + 形容词(heavy) + that…「如此…以至于…」；such 接名词、too…to 接动词、very 不接 that 从句。",
+        "lv": 2
+      },
+      {
+        "q": "It was ___ that everyone wanted to read it.",
+        "ops": [
+          "so interesting book",
+          "such an interesting book",
+          "so an interesting book",
+          "such interesting book"
+        ],
+        "ans": 1,
+        "why": "such + a/an + 形容词 + 单数名词 → such an interesting book；so 只接形容词/副词。",
+        "lv": 2
+      },
+      {
+        "q": "You will miss the early train ___ you hurry up.",
+        "ops": [
+          "if",
+          "unless",
+          "because",
+          "when"
+        ],
+        "ans": 1,
+        "why": "unless = if not「除非」，符合「除非快点，否则赶不上」。",
+        "lv": 1
+      },
+      {
+        "q": "We won't start the meeting ___ everyone ___ here.",
+        "ops": [
+          "until; arrives",
+          "until; will arrive",
+          "when; arrived",
+          "unless; arrive"
+        ],
+        "ans": 0,
+        "why": "until 引导时间状语从句，主句将来、从句用一般现在(主将从现)，everyone → arrives。",
+        "lv": 2
+      },
+      {
+        "q": "___ he said at the meeting made us think a lot.",
+        "ops": [
+          "What",
+          "That",
+          "Which",
+          "It"
+        ],
+        "ans": 0,
+        "why": "What 引导主语从句并在从句中作 said 的宾语；That 引导时从句不缺成分(此处缺宾语) → 用 What。",
+        "lv": 2
+      },
+      {
+        "q": "He spoke loudly ___ everyone at the back could hear him.",
+        "ops": [
+          "so that",
+          "so...that",
+          "such that",
+          "in order"
+        ],
+        "ans": 0,
+        "why": "so that 引导目的状语从句「以便」；so…that 是「如此…以至于」的结果状语，语义不同。",
+        "lv": 2
+      },
+      {
+        "q": "I believe ___ honesty matters most, and that is ___ this story teaches us.",
+        "ops": [
+          "that; what",
+          "what; that",
+          "that; that",
+          "what; what"
+        ],
+        "ans": 0,
+        "why": "第一空宾语从句不缺成分 → that(可省)；第二空「这个故事教给我们的东西」缺宾语 → what。",
+        "lv": 2
+      }
+    ]
+  }
+}

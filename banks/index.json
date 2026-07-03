@@ -1,6 +1,17 @@
 {
   "catalog": [
     {
+      "code": "CLAUSE1",
+      "name": "中考从句专项 · 第一辑（定语 / 宾语 / 状语从句）",
+      "desc": "中考三大从句一网打尽：定语从句(who/which/that/whose/where/when、最高级用 that、介词+which)、宾语从句(陈述语序、whether/if、时态呼应、what vs that)、状语从句(because≠so 连用、although≠but、so/such…that、unless、主将从现)。配对记规则 + 句境选词，答案唯一带解析。进阶免费档。",
+      "date": "2026-07-03",
+      "cat": "语法专项",
+      "pack": "从句突破营",
+      "level": "进阶",
+      "tier": "free",
+      "count": 34
+    },
+    {
       "code": "CLOZE1",
       "name": "完形填空 · 第一辑（乡村之夏）",
       "desc": "一篇记叙文完形，8 个空，练时态一致 + 词义搭配（中考完形核心）。每空带全文面板，联系上下文再选。免费档。",
