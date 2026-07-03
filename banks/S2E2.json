@@ -1,0 +1,399 @@
+{
+  "name": "S2E2 群星渡口",
+  "code": "S2E2",
+  "desc": "外援降临，平行宇宙世界杯，地理生物双副本。24 题炼狱级——每题皆陷阱、陷阱套陷阱，生词从简，胜负在脑。",
+  "tier": "free",
+  "level": "炼狱",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第二季",
+  "mods": {
+    "m1": [
+      [
+        "be tired of doing",
+        "厌倦做某事",
+        1
+      ],
+      [
+        "a piece of cake",
+        "小菜一碟、轻而易举",
+        1
+      ],
+      [
+        "be famous for",
+        "以……闻名",
+        1
+      ],
+      [
+        "belong to",
+        "属于",
+        1
+      ],
+      [
+        "step forward",
+        "站出来、向前一步",
+        1
+      ],
+      [
+        "give up",
+        "放弃",
+        1
+      ]
+    ],
+    "m2": [
+      [
+        "It is ... that ...",
+        "强调句型",
+        2
+      ],
+      [
+        "No sooner ... than ...",
+        "一……就……（句首须部分倒装）",
+        3
+      ],
+      [
+        "too ... to ...",
+        "太……以致不能（本身已含否定）",
+        2
+      ],
+      [
+        "neither ... nor ...",
+        "既不……也不……（谓语就近原则）",
+        2
+      ],
+      [
+        "wish + 过去式 / could",
+        "但愿……（与现在相反的虚拟语气）",
+        3
+      ],
+      [
+        "be made to do",
+        "使役动词 make 变被动后 to 要还原",
+        3
+      ]
+    ],
+    "m3": [
+      [
+        "the number of",
+        "……的数目（作主语用单数）",
+        2
+      ],
+      [
+        "a number of",
+        "许多（作主语用复数）",
+        2
+      ],
+      [
+        "happen",
+        "发生（不及物动词，没有被动语态）",
+        2
+      ],
+      [
+        "whose",
+        "关系词：……的（表所属）",
+        2
+      ],
+      [
+        "which / that",
+        "关系词：指物，或在从句中作宾语",
+        2
+      ],
+      [
+        "where",
+        "关系词：指地点、在从句中作状语",
+        2
+      ]
+    ],
+    "m4": [
+      {
+        "q": "For three years, the Ye-Wang-She group ___ every challenger who dared to step forward.",
+        "ops": [
+          "defeats",
+          "defeated",
+          "has defeated",
+          "had defeated"
+        ],
+        "ans": 2,
+        "why": "for+时间段 + 持续影响到现在 = 现在完成时 has defeated。",
+        "lv": 1
+      },
+      {
+        "q": "The moment Yue rushed in, a powerful spell ___ at her by the enemy.",
+        "ops": [
+          "threw",
+          "was thrown",
+          "throws",
+          "has thrown"
+        ],
+        "ans": 1,
+        "why": "受动者 spell + 过去（the moment...rushed in）= was thrown。",
+        "lv": 1
+      },
+      {
+        "q": "Just as Yue was about to give up, a stranger ___ — someone who did not belong to this world.",
+        "ops": [
+          "appeared",
+          "appears",
+          "has appeared",
+          "was appearing"
+        ],
+        "ans": 0,
+        "why": "突然出现的瞬间动作，一般过去 appeared，呼应 was about to 的过去背景。",
+        "lv": 1
+      },
+      {
+        "q": "The outsider, ___ face was hidden behind a mask, said nothing and simply raised one hand.",
+        "ops": [
+          "who",
+          "whom",
+          "whose",
+          "which"
+        ],
+        "ans": 2,
+        "why": "whose face = 外援的脸，所属格关系词。",
+        "lv": 1
+      },
+      {
+        "q": "【找出有语病的一处】 Messi is famous for (A) create wonderful chances; (B) known as the king, he makes moves that (C) seem impossible, and the crowd (D) loves every second.",
+        "ops": [
+          "for create",
+          "known as the king",
+          "that seem impossible",
+          "the crowd loves"
+        ],
+        "ans": 0,
+        "why": "病句在 A：for 是介词，后接动名词：for creating。这是",
+        "lv": 1
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Lin couldn't understand why was the dungeon so quiet.",
+          "Lin couldn't understand why the dungeon was so quiet.",
+          "Lin couldn't understand why the dungeon is so quiet.",
+          "Lin couldn't understand that why the dungeon was so quiet."
+        ],
+        "ans": 1,
+        "why": "陈述语序 + 主从时态一致（couldn't...was），正确。",
+        "lv": 1
+      }
+    ],
+    "m5": [
+      {
+        "q": "No one expected what ___ next — Yue fell, defeated.",
+        "ops": [
+          "was happened",
+          "is happened",
+          "has been happened",
+          "happened"
+        ],
+        "ans": 3,
+        "why": "what happened next 固定表达，主动过去时。",
+        "lv": 2
+      },
+      {
+        "q": "\"Yue ___ rushed in so fast,\" Mr. Wang sighed. \"If she had waited, the outsider would have arrived in time.\"",
+        "ops": [
+          "needn't have",
+          "shouldn't have",
+          "couldn't have",
+          "mustn't have"
+        ],
+        "ans": 1,
+        "why": "shouldn't have rushed = 本不该（这么快）冲，对过去行为的责备与遗憾，呼应后句「若等一下就好了」。",
+        "lv": 2
+      },
+      {
+        "q": "【找出有语病的一处】 Haaland runs (A) faster than any other player, and his shots are (B) more powerful than a cannon; (C) neither the keeper nor the defenders (D) was ready for him.",
+        "ops": [
+          "faster than any other player",
+          "more powerful than a cannon",
+          "neither the keeper nor the defenders",
+          "was ready"
+        ],
+        "ans": 3,
+        "why": "病句在 D：neither...nor 就近一致，就近的 defenders 是复数 → were ready。这是",
+        "lv": 2
+      },
+      {
+        "q": "【找出有语病的一处】 Everyone (A) watched Neymar (B) dancing past three players; that night, they saw the best move they (C) have ever known, and no one (D) could believe it.",
+        "ops": [
+          "watched",
+          "dancing past",
+          "have ever known",
+          "could believe"
+        ],
+        "ans": 2,
+        "why": "病句在 C：过去框架(saw / that night)下，「曾见过的最…」用过去完成 had ever known；have 现在完成与过去时间冲突。",
+        "lv": 2
+      },
+      {
+        "q": "【找出有语病的一处】 (A) The number of fans (B) were growing every minute, all (C) shouting his name, and Ronaldo (D) raised his arms.",
+        "ops": [
+          "The number of fans",
+          "were growing",
+          "shouting his name",
+          "raised his arms"
+        ],
+        "ans": 1,
+        "why": "病句在 B：the number of... 谓语用单数 was growing；were 错。",
+        "lv": 2
+      },
+      {
+        "q": "【找出有语病的一处】 The referee was (A) too surprised to not blow his whistle; the match was (B) so exciting that no one (C) could sit still, and even he (D) forgot the rules.",
+        "ops": [
+          "too surprised to not blow",
+          "so exciting that",
+          "could sit still",
+          "forgot the rules"
+        ],
+        "ans": 0,
+        "why": "病句在 A：too surprised to blow = 惊讶得吹不了哨；多一个 not 逻辑全反。",
+        "lv": 2
+      },
+      {
+        "q": "【找出有语病的一处】 (A) The game were just beginning when, (B) cheered by millions, the four stars (C) walked onto the field (D) with the score still zero.",
+        "ops": [
+          "The game were just beginning",
+          "cheered by millions",
+          "walked onto the field",
+          "with the score still zero"
+        ],
+        "ans": 0,
+        "why": "病句在 A：the game 单数主语 → was just beginning。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "The place that Lin entered was full of strange maps.",
+          "The place which Lin entered were full of strange maps.",
+          "The place where Lin entered was full of strange maps.",
+          "The place what Lin entered was full of strange maps."
+        ],
+        "ans": 0,
+        "why": "that Lin entered（that 作 entered 的宾语）+ was（the place 单数），全对。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Hui must have been frightened by something inside.",
+          "Hui must have frightened by something inside.",
+          "Hui must has been frightened by something inside.",
+          "Hui must have been frighten by something inside."
+        ],
+        "ans": 0,
+        "why": "must have been frightened：情态完成式被动，「一定是被吓到了」，三段齐全。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "As soon as Lin will solve the puzzle, the door opened by itself.",
+          "No sooner Lin solved the puzzle than the door opened.",
+          "The moment when Lin solved the puzzle, the door opened.",
+          "As soon as Lin solved the puzzle, the door opened by itself."
+        ],
+        "ans": 3,
+        "why": "As soon as + 过去, 主句过去，正确。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Xuan and Hui were tired of try again and again.",
+          "Xuan and Hui were tiring of trying again and again.",
+          "Xuan and Hui were tired of trying again and again.",
+          "Xuan and Hui were tired to trying again and again."
+        ],
+        "ans": 2,
+        "why": "be tired of doing，正确。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Hui wishes she can leave the dungeon right now.",
+          "Hui wishes she leaves the dungeon right now.",
+          "Hui wishes she will leave the dungeon right now.",
+          "Hui wishes she could leave the dungeon right now."
+        ],
+        "ans": 3,
+        "why": "wishes she could leave，虚拟语气正确。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Tony: \"Real exams are much more easier than Mr. Wang's papers.\"",
+          "Mia: \"Compared with our training, the real exam was a piece of cake.\"",
+          "Leo: \"The real exam wasn't as harder as the lessons we take.\"",
+          "Amy: \"I finished the exam more quicklier than I expected.\""
+        ],
+        "ans": 1,
+        "why": "Compared with...引导 + a piece of cake 习语，整句无误。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Ben: \"Since I joined Mr. Wang's class, exams never scared me.\"",
+          "Eva: \"Since joining the class for three years ago, exams are easy.\"",
+          "Sam: \"Since I joined Mr. Wang's class, exams have never scared me.\"",
+          "Kim: \"Since I have joined Mr. Wang's class, exams scared me no more.\""
+        ],
+        "ans": 2,
+        "why": "Since I joined..., exams have never scared me，主从时态标准搭配。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Lily: \"In class we are made think, not just remember.\"",
+          "Max: \"In class we are make to think every lesson.\"",
+          "Joe: \"In class we are made to think, not just to remember.\"",
+          "Nina: \"In class we make to think every single lesson.\""
+        ],
+        "ans": 2,
+        "why": "are made to think：主动 make sb do 变被动后 to 还原，正确。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Rob: \"Mr. Wang is one of the teachers who makes us love English.\"",
+          "Sue: \"Mr. Wang is the only one of the teachers who make learning fun.\"",
+          "Tim: \"Mr. Wang is one of those teacher who make us think.\"",
+          "Pat: \"Mr. Wang is one of the few teachers who make hard things simple.\""
+        ],
+        "ans": 3,
+        "why": "one of the few teachers who make，who 指复数 teachers → make，正确。",
+        "lv": 2
+      },
+      {
+        "q": "【选出完全正确的一句】",
+        "ops": [
+          "Dan: \"It is Mr. Wang's training what makes hard exams feel easy.\"",
+          "Cara: \"It is Mr. Wang's training that makes hard exams feel easy.\"",
+          "Eli: \"It is Mr. Wang's training makes hard exams feel easy.\"",
+          "Fay: \"It Mr. Wang's training that makes hard exams feel easy.\""
+        ],
+        "ans": 1,
+        "why": "It is...training that makes...，强调主语的完整强调句。",
+        "lv": 2
+      },
+      {
+        "q": "【规则逆转 · 找出唯一有语法错误的一句】",
+        "ops": [
+          "\"This summer, the training will be harder than ever before.\"",
+          "\"You will have more chances to go online and face real opponents.\"",
+          "\"By the end of August, you will have met traps you never imagined.\"",
+          "\"The mysterious helper have not decided which side to join.\""
+        ],
+        "ans": 3,
+        "why": "病句在 D：The mysterious helper 单数主语 → has not decided；have 错。这是唯一错误句。",
+        "lv": 2
+      }
+    ]
+  }
+}

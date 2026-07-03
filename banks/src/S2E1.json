@@ -1,0 +1,217 @@
+{
+  "name": "S2E1 复工协议",
+  "code": "S2E1",
+  "desc": "第二季开篇·物品大罢工。与同名试卷配套：罢工/劳工主题词汇 + 初三+高阶语法陷阱（非谓语·倒装·情态完成式·虚拟·从句·错综条件）。",
+  "date": "2026-06-18",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第二季",
+  "level": "炼狱",
+  "tier": "free",
+  "mods": {
+    "m1": [
+      [
+        "strike",
+        "罢工",
+        1
+      ],
+      [
+        "unfair",
+        "不公平的",
+        1
+      ],
+      [
+        "idle",
+        "闲置的、没活干",
+        1
+      ],
+      [
+        "overtime",
+        "加班",
+        1
+      ],
+      [
+        "negotiate",
+        "协商、谈判",
+        1
+      ]
+    ],
+    "m2": [
+      [
+        "walkout",
+        "全面罢工、撂挑子",
+        2
+      ],
+      [
+        "occupation",
+        "占领（车间）",
+        2
+      ],
+      [
+        "settlement",
+        "和解协议、解决",
+        2
+      ],
+      [
+        "spread",
+        "蔓延、传开",
+        2
+      ],
+      [
+        "complaint",
+        "抱怨、不满",
+        2
+      ]
+    ],
+    "m3": [
+      [
+        "over time",
+        "随时间推移（≠overtime 加班）",
+        2
+      ],
+      [
+        "lazy",
+        "懒惰的（主观不想干，≠idle）",
+        2
+      ],
+      [
+        "quarrel",
+        "争吵（≠negotiate 协商）",
+        2
+      ],
+      [
+        "roughly",
+        "粗暴地、大致地",
+        2
+      ],
+      [
+        "refuse",
+        "拒绝",
+        1
+      ]
+    ],
+    "m4": [
+      {
+        "q": "___, the whole house overslept and missed the bus.",
+        "ops": [
+          "With the alarm clock refusing to ring",
+          "With the alarm clock refused to ring",
+          "Because the alarm clock refusing to ring",
+          "The alarm clock refusing to ring it"
+        ],
+        "ans": 0,
+        "why": "with + 名词 + 现在分词，逻辑主动用 doing。",
+        "lv": 2
+      },
+      {
+        "q": "The owner ___ it long ago, but he never listened.",
+        "ops": [
+          "should oil",
+          "should have oiled",
+          "must have oiled",
+          "should have been oiled"
+        ],
+        "ans": 1,
+        "why": "过去本应做却没做，用 should have done。",
+        "lv": 2
+      },
+      {
+        "q": "The question of ___ remained unanswered all evening.",
+        "ops": [
+          "if the chair started it",
+          "whether the chair started it",
+          "whether did the chair start it",
+          "that the chair started it"
+        ],
+        "ans": 1,
+        "why": "介词后只能 whether（非 if），从句用陈述语序。",
+        "lv": 2
+      },
+      {
+        "q": "___ the armchair's complaints that even the bookshelf nodded.",
+        "ops": [
+          "So bitter was",
+          "Such bitter were",
+          "So bitter were",
+          "So bitter they were"
+        ],
+        "ans": 2,
+        "why": "So+adj 置句首倒装；complaints 复数用 were。",
+        "lv": 2
+      },
+      {
+        "q": "I ___ get a day off. Not once in three years.",
+        "ops": [
+          "ever",
+          "never",
+          "always",
+          "sometimes"
+        ],
+        "ans": 1,
+        "why": "not once 锁定 never；肯定句不用 ever 表“从不”。",
+        "lv": 1
+      }
+    ],
+    "m5": [
+      {
+        "q": "\"It ___ this by itself.\" Someone opened that door from outside.",
+        "ops": [
+          "can't do",
+          "can't have done",
+          "mustn't do",
+          "couldn't do"
+        ],
+        "ans": 1,
+        "why": "对过去的否定推测，用 can't have done。",
+        "lv": 2
+      },
+      {
+        "q": "If the chair ___ the first to whisper 'strike' that morning, the house ___ so quiet now.",
+        "ops": [
+          "wasn't; wouldn't be",
+          "hadn't been; wouldn't be",
+          "hadn't been; wouldn't have been",
+          "weren't; wouldn't be"
+        ],
+        "ans": 1,
+        "why": "错综条件：过去条件 hadn't been + 现在结果 wouldn't be。",
+        "lv": 2
+      },
+      {
+        "q": "Two loads a day for ten years. I want to be paid for all this ___.",
+        "ops": [
+          "over time",
+          "overtime",
+          "overwork",
+          "overworking"
+        ],
+        "ans": 1,
+        "why": "overtime 一个词=加班；over time 两个词=随时间推移。",
+        "lv": 2
+      },
+      {
+        "q": "The harder he tried, the ___ the house became.",
+        "ops": [
+          "more quiet",
+          "quieter",
+          "quietest",
+          "quiet"
+        ],
+        "ans": 1,
+        "why": "the+比较级…；quiet 的比较级是 quieter，不是 more quiet。",
+        "lv": 2
+      },
+      {
+        "q": "We've held this family up for fifteen years. It's high time we ___ replaced.",
+        "ops": [
+          "are",
+          "were",
+          "will be",
+          "have been"
+        ],
+        "ans": 1,
+        "why": "It's high time + 主语 + 过去式（虚拟）。",
+        "lv": 2
+      }
+    ]
+  }
+}

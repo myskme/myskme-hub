@@ -1,0 +1,302 @@
+{
+  "name": "S2E3 阴沟里翻船",
+  "code": "S2E3",
+  "desc": "中考方向·低生词·高迷惑陷阱专项 · 24 题（马虎/轻敌/记忆混淆/情景交际）。难点不在生词，在选项迷惑与马虎·轻敌·记忆混淆。暗号 ALERT。",
+  "date": "2026-06-30",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第二季",
+  "level": "进阶",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "Either my brother or my parents ___ going camping this summer holiday.",
+        "ops": [
+          "is",
+          "are",
+          "am",
+          "was"
+        ],
+        "ans": 1,
+        "why": "就近于 parents（复数）→ are。",
+        "lv": 2
+      },
+      {
+        "q": "These days my little sister never ___ her homework until bedtime.",
+        "ops": [
+          "do",
+          "did",
+          "does",
+          "doing"
+        ],
+        "ans": 2,
+        "why": "现在习惯 + 三单 → does。",
+        "lv": 1
+      },
+      {
+        "q": "It took him ___ hour and a half to finish such an easy job.",
+        "ops": [
+          "a",
+          "the",
+          "an",
+          "/"
+        ],
+        "ans": 2,
+        "why": "an hour（h 不发音）。",
+        "lv": 1
+      },
+      {
+        "q": "There are ___ story-books in our library, and I've read many of them.",
+        "ops": [
+          "hundred",
+          "hundreds of",
+          "hundreds",
+          "two hundreds"
+        ],
+        "ans": 1,
+        "why": "hundreds of + 名词。",
+        "lv": 2
+      },
+      {
+        "q": "There is little milk left in the glass, ___?",
+        "ops": [
+          "is there",
+          "isn't there",
+          "is it",
+          "isn't it"
+        ],
+        "ans": 0,
+        "why": "little(否定)→肯定 is there；milk→there。",
+        "lv": 2
+      },
+      {
+        "q": "We don't have ___ time left, so please be quick.",
+        "ops": [
+          "much",
+          "many",
+          "few",
+          "a few"
+        ],
+        "ans": 0,
+        "why": "much + 不可数 time。",
+        "lv": 1
+      },
+      {
+        "q": "The early bus leaves ___ 7:15 ___ weekday mornings, so set your alarm.",
+        "ops": [
+          "at; in",
+          "in; on",
+          "at; on",
+          "on; at"
+        ],
+        "ans": 2,
+        "why": "at 7:15 + on weekday mornings。",
+        "lv": 2
+      },
+      {
+        "q": "Tom runs faster than ___ in his class.",
+        "ops": [
+          "any boy",
+          "another boys",
+          "all the boys",
+          "any other boy"
+        ],
+        "ans": 3,
+        "why": "than any other boy（把自己排除）。",
+        "lv": 2
+      },
+      {
+        "q": "By the time we got to the cinema, the film ___.",
+        "ops": [
+          "left",
+          "has begun",
+          "begins",
+          "had begun"
+        ],
+        "ans": 3,
+        "why": "过去的过去 → had begun。",
+        "lv": 2
+      },
+      {
+        "q": "It was ___ fine weather that we all went out for a walk.",
+        "ops": [
+          "such",
+          "so",
+          "such a",
+          "so a"
+        ],
+        "ans": 0,
+        "why": "such + 不可数名词短语。",
+        "lv": 1
+      },
+      {
+        "q": "There ___ a small shop on the corner, but it closed down last year.",
+        "ops": [
+          "used to have",
+          "was used to be",
+          "used to be",
+          "used to being"
+        ],
+        "ans": 2,
+        "why": "There used to be（过去曾有）。",
+        "lv": 2
+      },
+      {
+        "q": "— I don't think this problem is easy.  — ___, but we can work it out together.",
+        "ops": [
+          "Neither do I",
+          "So do I",
+          "So it is",
+          "Nor am I"
+        ],
+        "ans": 0,
+        "why": "附和否定 → Neither do I。",
+        "lv": 2
+      },
+      {
+        "q": "This dictionary ___ me fifty yuan last week — a real bargain.",
+        "ops": [
+          "spent",
+          "paid",
+          "took",
+          "cost"
+        ],
+        "ans": 3,
+        "why": "物作主语 → cost sb money。",
+        "lv": 2
+      },
+      {
+        "q": "Study hard, ___ you will fall behind the others.",
+        "ops": [
+          "and",
+          "or",
+          "so",
+          "but"
+        ],
+        "ans": 1,
+        "why": "祈使句 + or = 否则。",
+        "lv": 1
+      },
+      {
+        "q": "I don't want this blue cap. Could you show me ___?",
+        "ops": [
+          "other",
+          "the other",
+          "another",
+          "others"
+        ],
+        "ans": 2,
+        "why": "another=另一个(泛指)。",
+        "lv": 1
+      },
+      {
+        "q": "I ___ him my umbrella yesterday, but he still hasn't given it back.",
+        "ops": [
+          "borrowed",
+          "kept",
+          "lent",
+          "lended"
+        ],
+        "ans": 2,
+        "why": "借出用 lend，过去式 lent。",
+        "lv": 2
+      },
+      {
+        "q": "— Shall we meet on Friday or Saturday?  — ___ is fine; I'm free all weekend.",
+        "ops": [
+          "Neither",
+          "Both",
+          "All",
+          "Either"
+        ],
+        "ans": 3,
+        "why": "两者任一 → Either is。",
+        "lv": 2
+      },
+      {
+        "q": "Quick — the bell has just ___. We're going to be late for class.",
+        "ops": [
+          "rang",
+          "ring",
+          "ringed",
+          "rung"
+        ],
+        "ans": 3,
+        "why": "has + 过去分词 rung。",
+        "lv": 2
+      },
+      {
+        "q": "The soup is ___ hot for the baby to drink right now.",
+        "ops": [
+          "too",
+          "so",
+          "very",
+          "enough"
+        ],
+        "ans": 0,
+        "why": "too + 形容词 + to do。",
+        "lv": 1
+      },
+      {
+        "q": "My uncle isn't at home. He has ___ to Shanghai and will be back next week.",
+        "ops": [
+          "been",
+          "gone",
+          "went",
+          "being"
+        ],
+        "ans": 1,
+        "why": "has gone to=去了仍未回。",
+        "lv": 1
+      },
+      {
+        "q": "— ___ will the film start?  — In about ten minutes.",
+        "ops": [
+          "How long",
+          "How soon",
+          "How often",
+          "How far"
+        ],
+        "ans": 1,
+        "why": "‘in ten minutes’(多久后)对应 How soon。",
+        "lv": 2
+      },
+      {
+        "q": "— Thanks a lot for helping me carry the boxes.  — ___",
+        "ops": [
+          "It's my pleasure.",
+          "Never mind.",
+          "Not really.",
+          "The same to you."
+        ],
+        "ans": 0,
+        "why": "回应致谢 → It's my pleasure。",
+        "lv": 1
+      },
+      {
+        "q": "— Would you mind my opening the window?  — ___ It's really cold in here.",
+        "ops": [
+          "No, go ahead.",
+          "Of course not.",
+          "Better not.",
+          "Yes, please."
+        ],
+        "ans": 2,
+        "why": "因为冷 → 委婉拒绝 Better not。",
+        "lv": 2
+      },
+      {
+        "q": "— How about going hiking this Saturday?  — ___ Let's meet at the gate at eight.",
+        "ops": [
+          "That's all right.",
+          "Never mind.",
+          "It doesn't matter.",
+          "Sounds great!"
+        ],
+        "ans": 3,
+        "why": "接受提议 → Sounds great。",
+        "lv": 1
+      }
+    ]
+  }
+}
