@@ -85,15 +85,9 @@ DEFAULT_DATA = {
 # 预览截图：shots.json 由 capture_shots.sh 生成（key -> data URI）；缺失则回退到字形徽章
 SHOTS = {}
 _sp = os.path.join(HERE, "shots.json")
-if os.path.exists(_sp):
-    try:
-        SHOTS = json.load(open(_sp, encoding="utf-8"))
-    except Exception:
-        SHOTS = {}
-for _sec in DEFAULT_DATA["sections"]:
-    for _it in _sec["items"]:
-        if _it.get("key") in SHOTS:
-            _it["shot"] = SHOTS[_it["key"]]
+# 2026-07-04：改用策展式 cover（黑金封面），不再自动注入 shots.json 截图。
+# 旧的自动截图（作文墙/记分/三国等）与新封面/字形徽风格不统一，故停用，改由 cover 字段统一。
+SHOTS = {}  # 停用截图自动注入
 
 PASSWORD = "mrwolf4358"
 
@@ -513,7 +507,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function catIcon(cat){var d=CAT_PATH[cat]||CAT_PATH.tool;
     return '<span class="cat-icon" title="'+(CAT_NAME[cat]||'作品')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
   function cardHTML(it,si,ii){
-    var cover=it.cover||it.shot||'';
+    var cover=it.cover||'';
     var fb='<div class="thumb-fallback"'+(cover?' style="display:none"':'')+'><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
     var img=cover?'<img class="cover-img" loading="lazy" alt="" src="'+esc(cover)+'" onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
