@@ -4,7 +4,7 @@
 QR 默认值与 segno 校验过的矩阵一致（见 structural_verify.py / qr_ref.json）。"""
 import json, os
 
-HERE = "/Users/wangzhongcheng/2claudecode"
+HERE = os.path.dirname(os.path.abspath(__file__))  # 脚本所在目录（仓库根），任何机器可跑
 OUT = os.path.join(HERE, "index.html")
 LIB = open(os.path.join(HERE, "qrcode-generator.js"), encoding="utf-8").read()
 
@@ -30,6 +30,9 @@ DEFAULT_DATA = {
             {"key": "expedition", "glyph": "征", "tag": "RPG 冒险", "title": "远征录 · 笼中剑", "en": "Expedition",
              "desc": "学院谷地 RPG · 技能连招 · 探索成长 · 金叶与水晶经济系统。",
              "url": "https://myskme-expedition.netlify.app"},
+            {"key": "starling", "glyph": "灵", "tag": "电子宠物 · 养成", "title": "星灵远征", "en": "Starling",
+             "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回寓言信件。",
+             "url": "https://myskme.github.io/myskme-starling/"},
             {"key": "wall", "glyph": "范", "tag": "荣誉 · 优秀作文", "title": "学院谷地 · 荣誉殿堂", "en": "Wall of Fame",
              "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
              "url": "https://myskme.github.io/myskme-hub/wall/"},
@@ -736,7 +739,7 @@ var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'lig
 var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p);}catch(err){}})();
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：积分板、三国军师争霸、大乱斗、远征录、世界编年史、题库训练场。">
+<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：积分板、三国军师争霸、大乱斗、远征录、星灵远征、世界编年史、题库训练场。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
 <meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">

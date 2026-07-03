@@ -11,6 +11,7 @@
 | 三国军师争霸积分器 | https://myskme.github.io/three-kingdoms-classroom-scoreboard/ |
 | MYSKME 大乱斗 | https://myskme.github.io/myskme-brawl/ |
 | 远征录 · 笼中剑 | https://myskme-expedition.netlify.app |
+| 星灵远征 · 电子宠物 | https://myskme.github.io/myskme-starling/ |
 | 世界编年史 II | https://myskme-volvme-ii.netlify.app |
 | MYSKME 题库训练场 | https://myskme-games.netlify.app/ |
 | MYSKME自鸣棋 · 课堂肉鸽自走棋 | https://myskme.github.io/myskme-zimingqi/ |
