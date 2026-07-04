@@ -1246,7 +1246,7 @@ function quickAdd(){
    主题 / 门禁 / 启动
    ================================================================== */
 var PW_HASH='660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2';
-var SS_KEY='myskme-almanac-ok';
+var SS_KEY='myskme-almanac-ok'; // 解锁标记：本机记住（localStorage），输一次口令长期有效
 async function sha256hex(s){
   try{var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
     return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
@@ -1266,7 +1266,7 @@ function bindChrome(){
   $$('#botnav .bi').forEach(function(b){b.onclick=function(){setView(b.dataset.v);};});
   $('#fab').onclick=quickAdd;
   $('#termBadge').onclick=function(){setView('settings');};
-  $('#lockBtn').onclick=function(){try{sessionStorage.removeItem(SS_KEY);}catch(e){}location.reload();};
+  $('#lockBtn').onclick=function(){try{localStorage.removeItem(SS_KEY);}catch(e){}location.reload();};
   /* 主题：跟随系统→浅→深 */
   var order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'};
   var mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
@@ -1283,11 +1283,11 @@ function unlock(){$('#gate').hidden=true;$('#app').hidden=false;$('#botnav').sty
 async function tryPw(pw){
   if(!pw){$('#pwErr').textContent='请输入口令';return;}
   var h=await sha256hex(pw);
-  if(h===PW_HASH){try{sessionStorage.setItem(SS_KEY,'1');}catch(e){}unlock();}
+  if(h===PW_HASH){try{localStorage.setItem(SS_KEY,'1');}catch(e){}unlock();}
   else{$('#pwErr').textContent='口令不正确';$('#pwIn').select();}
 }
 (function initGate(){
-  try{if(sessionStorage.getItem(SS_KEY)==='1'){unlock();return;}}catch(e){}
+  try{if(localStorage.getItem(SS_KEY)==='1'){unlock();return;}}catch(e){}
   $('#pwOk').addEventListener('click',function(){tryPw($('#pwIn').value.trim());});
   $('#pwIn').addEventListener('keydown',function(e){if(e.key==='Enter')tryPw($('#pwIn').value.trim());});
   $('#pwIn').addEventListener('input',function(){$('#pwErr').textContent='';});
