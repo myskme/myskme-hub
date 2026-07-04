@@ -20,7 +20,7 @@ DEFAULT_DATA = {
         {"label": "卷一 · 远征录", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 白昼推开冒险之门",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
-             "tag": "动作肉鸽 · RPG", "title": "热血远征 · 笼中剑", "en": "BLAZING EXPEDITION",
+             "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
              "desc": "学院谷地动作肉鸽 · 技能连招 · 探索成长 · 金叶与水晶经济 —— 狼先生宇宙的旗舰远征。",
              "url": "https://myskme-expedition.netlify.app", "featured": True},
             {"key": "starling", "glyph": "灵", "cat": "game", "rarity": "SSR", "cover": "assets/cover-starling.webp",
@@ -905,7 +905,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：记分编年史、三国军师争霸、大乱斗、热血远征、星灵远征、世界编年史、题库训练场。">
+<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：记分编年史、三国军师争霸、大乱斗、远征录、星灵远征、世界编年史、题库训练场。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
 <meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
