@@ -1,7 +1,7 @@
 #!/bin/bash
 # 抓取 6 个站点预览图 -> 480px JPEG -> shots.json。--headless=new + kill -9 看门狗，逐站日志。
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-OUT=/Users/wangzhongcheng/2claudecode
+OUT="$HOME/2claudecode"
 mkdir -p "$OUT/thumbs"
 
 keys=(scoreboard threek brawl expedition volvme quiz)

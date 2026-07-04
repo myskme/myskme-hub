@@ -24,7 +24,7 @@ jobs:
       - name: 提交构建结果（若有变化）
         run: |
           git config user.name "MYSKME 题库工坊"
-          git config user.email "wzc1020@gmail.com"
+          git config user.email "274490646+myskme@users.noreply.github.com"
           git add -A banks/
           if git diff --cached --quiet; then
             echo "书架无变化，跳过提交。"

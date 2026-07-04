@@ -13,14 +13,14 @@ DEFAULT_DATA = {
     "kicker": "THE MYSKME CHRONICLES · 王老师 MR. WANG",
     "titlePre": "MYSKME",
     "titleEm": "编年史",
-    "motto": "Make Yourself Special & Kind — 狼先生与他学生们的远征编年",
-    "hint": "最好的囚笼，让人心甘情愿地走进去。往下翻阅两卷 —— 每一件都可扫码即玩、离线可用、投屏可讲。",
+    "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
+    "hint": "往下翻阅两卷 —— 每一件都可扫码即玩、离线可用、投屏可讲。",
     "hubUrl": "https://myskme.github.io/myskme-hub/",
     "sections": [
         {"label": "卷一 · 远征录", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 白昼推开冒险之门",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
-             "tag": "动作肉鸽 · RPG", "title": "热血远征 · 笼中剑", "en": "BLOODLINE EXPEDITION",
+             "tag": "动作肉鸽 · RPG", "title": "热血远征 · 笼中剑", "en": "BLAZING EXPEDITION",
              "desc": "学院谷地动作肉鸽 · 技能连招 · 探索成长 · 金叶与水晶经济 —— 狼先生宇宙的旗舰远征。",
              "url": "https://myskme-expedition.netlify.app", "featured": True},
             {"key": "starling", "glyph": "灵", "cat": "game", "rarity": "SSR", "cover": "assets/cover-starling.webp",
@@ -63,7 +63,7 @@ DEFAULT_DATA = {
              "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
              "url": "https://myskme.github.io/myskme-hub/daily/"},
             {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "",
-             "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 作文墙", "en": "WALL OF FAME",
+             "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
              "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
              "url": "https://myskme.github.io/myskme-hub/wall/"},
             {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "",
@@ -776,7 +776,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var tx=hx+hq+44;ctx.textAlign='left';
     ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
     ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
-    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('六大作品 · 中考四板块 · 一站直达',tx,hy+132);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('远征与学堂 · 中考四板块 · 一站直达',tx,hy+132);
     ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
@@ -904,7 +904,7 @@ var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'lig
 var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p);}catch(err){}})();
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：积分板、三国军师争霸、大乱斗、远征录、星灵远征、世界编年史、题库训练场。">
+<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：记分编年史、三国军师争霸、大乱斗、热血远征、星灵远征、世界编年史、题库训练场。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
 <meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
