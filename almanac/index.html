@@ -74,6 +74,13 @@ a{color:inherit;}
 .gate-card input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);
   font-family:var(--serif);font-size:16px;padding:12px 14px;text-align:center;letter-spacing:.1em;outline:none;}
 .gate-card input:focus{border-color:var(--gold);box-shadow:var(--glow-gold);}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:46px;}
+.pw-eye{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:36px;height:36px;
+  border:0;background:transparent;color:var(--ink3);cursor:pointer;font-size:16px;border-radius:6px;opacity:.65;
+  display:flex;align-items:center;justify-content:center;transition:opacity .2s,color .2s;}
+.pw-eye:hover{opacity:1;color:var(--gold);}
+.pw-eye.on{color:var(--gold);opacity:1;}
 .gate-card .err{color:var(--red2);font-size:12px;min-height:18px;margin-top:10px;letter-spacing:.04em;}
 .gate-card button{margin-top:8px;width:100%;}
 
@@ -324,8 +331,11 @@ label.fl{display:block;font-size:11px;letter-spacing:.14em;color:var(--ink3);tex
     </div>
     <h1>授业历</h1>
     <div class="gk">MYSKME Almanac</div>
-    <p>狼先生的私人授业年鉴 · 排课与编年<br>请输入管理员口令</p>
-    <input id="pwIn" type="password" placeholder="口令" autocomplete="off" spellcheck="false">
+    <p>狼先生的私人授业年鉴 · 排课与编年<br>请输入管理员口令（全小写，区分大小写）</p>
+    <div class="pw-wrap">
+      <input id="pwIn" type="password" placeholder="口令" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text">
+      <button type="button" id="pwEye" class="pw-eye" aria-label="显示口令" title="显示 / 隐藏口令">👁</button>
+    </div>
     <div class="err" id="pwErr"></div>
     <button class="btn btn-gold" id="pwOk">进  入</button>
   </div>
@@ -1284,13 +1294,18 @@ async function tryPw(pw){
   if(!pw){$('#pwErr').textContent='请输入口令';return;}
   var h=await sha256hex(pw);
   if(h===PW_HASH){try{localStorage.setItem(SS_KEY,'1');}catch(e){}unlock();}
-  else{$('#pwErr').textContent='口令不正确';$('#pwIn').select();}
+  else{$('#pwErr').textContent='口令不正确 · 区分大小写，请检查是否误大写或含空格（可点 👁 查看）';$('#pwIn').select();}
 }
 (function initGate(){
   try{if(localStorage.getItem(SS_KEY)==='1'){unlock();return;}}catch(e){}
   $('#pwOk').addEventListener('click',function(){tryPw($('#pwIn').value.trim());});
   $('#pwIn').addEventListener('keydown',function(e){if(e.key==='Enter')tryPw($('#pwIn').value.trim());});
   $('#pwIn').addEventListener('input',function(){$('#pwErr').textContent='';});
+  var eye=$('#pwEye');
+  if(eye)eye.addEventListener('click',function(){
+    var inp=$('#pwIn'), show=inp.type==='password';
+    inp.type=show?'text':'password';eye.classList.toggle('on',show);inp.focus();
+  });
   setTimeout(function(){var i=$('#pwIn');if(i)i.focus();},100);
 })();
 
