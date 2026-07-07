@@ -29,7 +29,7 @@ DEFAULT_DATA = {
              "url": "https://myskme.github.io/myskme-starling/"},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 单文件离线 · 扫码 / 投屏即用，一局一场随机远征。",
+             "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码 / 投屏即用。",
              "url": "https://myskme.github.io/myskme-zimingqi/"},
             {"key": "brawl", "glyph": "斗", "cat": "game", "rarity": "SR", "cover": "assets/cover-brawl.webp",
              "tag": "积分对战 · 塔防", "title": "MYSKME 大乱斗", "en": "MYSKME BRAWL",
