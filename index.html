@@ -409,6 +409,7 @@ footer b{color:var(--ink2);font-weight:400;}
   <span class="ab-title">管理员模式 · <b>直接点文字即可编辑，改动自动保存在本机</b></span>
   <button id="abConsole">控制台 ↗</button>
   <button id="abMaker">出题工坊 ↗</button>
+  <button id="abForge">命题铸炉 ↗</button>
   <button id="abExport">导出 index.html</button>
   <button id="abReset" class="danger">重置默认</button>
   <button id="abExit">退出</button>
@@ -3328,6 +3329,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='mrwolf4358';
   if(abc)abc.addEventListener('click',function(){window.open('console/','_blank','noopener');});
   var abm=document.getElementById('abMaker');
   if(abm)abm.addEventListener('click',function(){window.open('maker/','_blank','noopener');});
+  var abf=document.getElementById('abForge');
+  if(abf)abf.addEventListener('click',function(){window.open('forge/','_blank','noopener');});
   document.getElementById('abReset').addEventListener('click',function(){
     if(!confirm('重置为默认内容？将清除本机所有改动。'))return;
     try{localStorage.removeItem(LS);}catch(e){}DATA=clone(DEFAULT_DATA);renderHeader();render();toast('已重置为默认内容');

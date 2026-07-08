@@ -125,6 +125,10 @@ footer a{color:var(--gold2);text-decoration:none}
   background:color-mix(in srgb,var(--gold) 12%,var(--bg));font-size:12.5px;color:var(--ink2);letter-spacing:.02em}
 .forge-banner b{color:var(--gold2);font-weight:600}
 .forge-banner a{color:var(--gold);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ie-struct{display:grid;gap:9px;margin-top:6px}
+.ie-frame{display:grid;gap:3px}
+.ie-role{font-size:11px;color:var(--gold);letter-spacing:.04em}
+.ie-frame small{color:var(--ink3);font-size:11.5px;line-height:1.5}
 @media print{.ctrl,.genres,.tools,details,.lib{display:none}.grid{grid-template-columns:1fr}textarea{border:0;min-height:0}}
 </style>
 </head>
@@ -297,12 +301,17 @@ try{var sv=JSON.parse(localStorage.getItem(LS)||'{}');if(sv.drafts)state.drafts=
 var GMAP={letter:0,story:1,opinion:2,intro:3};
 var INJ=null;
 try{var _fq=new URLSearchParams(location.search).get('forge');if(_fq){INJ=JSON.parse(decodeURIComponent(_fq));if(INJ&&GMAP[INJ.g]!=null)state.g=GMAP[INJ.g];}}catch(e){INJ=null;}
+// 雅思档：分档感知
+var IELTS_MODE=!!(INJ&&INJ.tier==='ielts');
+var COMPANION={"struct": {"items": [{"tt": "opinion", "name_cn": "观点类 · 同意与否 (Agree/Disagree)", "frames": [{"role": "引入-改写题目背景", "cn": "开头句：用同义改写复述题目论点，切忌照抄原题。", "en": "It is often argued that …, a view that has gained considerable currency in recent years."}, {"role": "亮明立场 (thesis)", "cn": "引言末句表态：先小让步 (not entirely without merit)，再明确己方立场。", "en": "While this claim is not entirely without merit, I would strongly argue that … ."}, {"role": "主体段1 主题句", "cn": "第一主体段首句：抛出最有力的理由，随后展开解释与举例。", "en": "The most compelling reason for taking this position is that … ."}, {"role": "主体段2 主题句", "cn": "第二主体段首句：引出另一条独立理由，须与第一段不重叠。", "en": "A second, equally important consideration is that … ."}, {"role": "举例展开", "cn": "论据句：主体段用具体实例支撑理由，Band 7+ 要求充分展开论证。", "en": "This is well illustrated by …, which demonstrates just how … ."}, {"role": "让步反驳", "cn": "让步反驳：先承认反方观点再驳回，展现思辨深度，可置于主体段内。", "en": "Admittedly, it might be argued that …; such reservations, however, are outweighed by … ."}, {"role": "结论重申", "cn": "结论段：重申立场、不引入新论点，呼应引言表态。", "en": "In conclusion, for the reasons set out above, I firmly believe that … ."}]}, {"tt": "discussion", "name_cn": "讨论类 · 双方观点+己见 (Discuss both views)", "frames": [{"role": "引入-改写题目", "cn": "开头句：用 whether … or … 结构改写呈现题目中两种对立看法。", "en": "Opinion is sharply divided over whether … or, conversely, … ."}, {"role": "预告+亮明立场", "cn": "引言末句：预告将讨论双方，并提前点明自己更认同哪一方。", "en": "This essay will weigh both positions before explaining why I ultimately side with those who … ."}, {"role": "主体段1 一方观点", "cn": "第一主体段：客观陈述一方立场及理由，用第三人称转述。", "en": "On the one hand, advocates of … contend that … ."}, {"role": "主体段2 另一方观点", "cn": "第二主体段：客观陈述另一方立场，与第一段形成对照。", "en": "On the other hand, those who take the opposing view maintain that … ."}, {"role": "举例展开", "cn": "论据句：为所陈述的观点补充具体实例，避免空泛论述。", "en": "A clear example of this can be seen in …, where … ."}, {"role": "己见", "cn": "亮出个人观点：不可骑墙，须明确倾向并给出核心理由。", "en": "Having considered both sides, I find the latter argument the more convincing, principally because … ."}, {"role": "结论重申", "cn": "结论段：承认双方各有道理，再重申己方立场收束全文。", "en": "In conclusion, while both views have their merits, I am firmly of the opinion that … ."}]}, {"tt": "problem", "name_cn": "问题对策类 (Problems & Solutions / Causes & Solutions)", "frames": [{"role": "引入-改写题目", "cn": "开头句：点明问题的严重性与背景，用同义改写代替原题。", "en": "In recent decades, … has developed into one of the most pressing challenges confronting … ."}, {"role": "预告结构", "cn": "引言末句：预告先析原因、后提对策，结构一目了然。", "en": "This essay will first examine the root causes of this trend before proposing several practical measures to address it."}, {"role": "主体段1 问题/原因主题句", "cn": "第一主体段首句：锁定一个主要成因，再展开因果链。", "en": "A primary cause of this problem can be traced to the fact that … ."}, {"role": "主体段2 对策主题句", "cn": "第二主体段首句：给出与上文对应的具体可行对策（谁+做什么）。", "en": "The most effective solution would be for governments to … ."}, {"role": "对策论证/预期效果", "cn": "用虚拟条件句论证对策的可行性与预期成效，增强说服力。", "en": "Were such a policy to be adopted, … would be far less likely to … ."}, {"role": "举例佐证", "cn": "论据句：用国家/机构实例佐证成因或对策，让论证落地。", "en": "Countries such as …, for instance, have already shown that … ."}, {"role": "结论重申", "cn": "结论段：概括问题与对策，以 provided that 附条件收尾。", "en": "In conclusion, although … presents a formidable challenge, it is by no means insurmountable, provided that … ."}]}, {"tt": "adv", "name_cn": "利弊类 (Advantages & Disadvantages)", "frames": [{"role": "引入-改写题目", "cn": "开头句：交代现象背景，用同义改写复述题目主题。", "en": "In recent years, … has become an integral part of … ."}, {"role": "预告立场 (是否利大于弊)", "cn": "引言末句：若题目问 outweigh，须明确回答利大还是弊大。", "en": "This essay will argue that, notwithstanding certain drawbacks, the benefits of … far outweigh the disadvantages."}, {"role": "主体段1 优势主题句", "cn": "第一主体段首句：给出最主要的一项好处，再解释+举例。", "en": "The most significant advantage of … is that … ."}, {"role": "主体段2 劣势主题句", "cn": "第二主体段首句：客观承认一项弊端，保持论证平衡。", "en": "That said, this development is not without its drawbacks, the most serious of which is that … ."}, {"role": "举例展开", "cn": "论据句：为优势或劣势补充具体实例，Band 7+ 要求有据可依。", "en": "This can be seen most clearly in the case of …, where … ."}, {"role": "权衡", "cn": "权衡句：把弊端与利处对比，为最终判断铺垫。", "en": "Nevertheless, this disadvantage seems relatively trivial when weighed against … ."}, {"role": "结论重申", "cn": "结论段：重申利大于弊（或反之）的判断，与引言呼应。", "en": "In conclusion, although … does carry certain disadvantages, these are clearly outweighed by the benefits it brings."}]}]}, "frames": {"items": [{"func": "亮明立场", "en": "This essay will argue that the benefits of … far outweigh the drawbacks, for the reasons outlined below.", "cn": "引言段开门见山亮立场并预告论证方向，适合 outweigh 利弊题。"}, {"func": "亮明立场", "en": "From my perspective, … is, on the whole, a positive development, primarily because …", "cn": "个人立场句，用于引言或结论表明态度，比 I think 更学术。"}, {"func": "让步转折", "en": "While it is true that …, this does not necessarily mean that …", "cn": "先承认对方合理之处再转折反驳，展现思辨（concession）。"}, {"func": "让步转折", "en": "Admittedly, …; nevertheless, the more pressing concern is …", "cn": "让步之后把论述重心拉回己方更重要的论点。"}, {"func": "因果", "en": "As a direct consequence of …, … has become increasingly widespread.", "cn": "表达因果链条，用于主体段展开某现象的影响。"}, {"func": "因果", "en": "This trend can largely be attributed to …", "cn": "归因句型，把某现象归结于其成因。"}, {"func": "举例", "en": "A case in point is …, where …", "cn": "引出具体例证支撑论点，替代 for example。"}, {"func": "举例", "en": "This is well illustrated by the way in which …", "cn": "用具体情形说明抽象观点，衔接更自然。"}, {"func": "对比", "en": "Whereas … tends to …, the opposite is true of …", "cn": "对照两种事物或观点的差异（复合句）。"}, {"func": "对比", "en": "… stands in stark contrast to …", "cn": "强调两者反差鲜明，提升句式与词汇多样性。"}, {"func": "强调", "en": "It is precisely … that …", "cn": "强调句（cleft），突出关键因素或成因。"}, {"func": "强调", "en": "What is often overlooked is that …", "cn": "点出易被忽视的要点，增加论述深度。"}, {"func": "概括总结", "en": "In conclusion, having weighed both sides, I maintain that …", "cn": "结论段收束全文并重申立场。"}, {"func": "概括总结", "en": "On balance, the evidence suggests that …", "cn": "权衡利弊后给出总体判断，语气审慎。"}, {"func": "客观 hedging", "en": "It could be argued that …, though this view is not without its critics.", "cn": "委婉提出观点并保留客观距离，避免绝对化。"}, {"func": "客观 hedging", "en": "… may, to some extent, contribute to …", "cn": "用 may / to some extent 弱化断言，体现学术审慎。"}, {"func": "数据引用", "en": "According to recent figures, … account(s) for roughly … of …", "cn": "引用数据或比例支撑论点（Task 2 议论或 Task 1 描述）。"}, {"func": "数据引用", "en": "The figure rose sharply from … to …, before levelling off at …", "cn": "Task 1 描述趋势先急升后趋稳的动词搭配。"}]}};
+function curKey(){return IELTS_MODE?('ielts_'+((INJ&&INJ.tt)||'t2')):GENRES[state.g].key;}
 function persist(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show')},1700)}
 
-function renderGenres(){$('#genres').innerHTML=GENRES.map(function(g,i){return '<button class="g-tab'+(i===state.g?' on':'')+'" data-i="'+i+'">'+esc(g.name)+'</button>'}).join('')}
+function renderGenres(){if(IELTS_MODE){$('#genres').innerHTML='';return;}$('#genres').innerHTML=GENRES.map(function(g,i){return '<button class="g-tab'+(i===state.g?' on':'')+'" data-i="'+i+'">'+esc(g.name)+'</button>'}).join('')}
 function renderBrief(){
+  if(IELTS_MODE)return renderIeltsBrief();
   var g=GENRES[state.g];
   var frames=g.frames.map(function(f){return '<span class="chip" data-ins="'+esc(f)+'">'+esc(f.replace(/\n/g,' ↵ '))+'</span>'}).join('');
   var ups=g.up.map(function(f){return '<span class="chip up" data-ins="'+esc(f)+'">'+esc(f)+'</span>'}).join('');
@@ -331,13 +340,14 @@ function renderBrief(){
   $('#tense-tip').innerHTML='<b>时态提醒：</b>'+esc(useInj&&INJ.tense?INJ.tense:g.tense);
   var _ci=$('#clrInj');if(_ci)_ci.onclick=function(e){e.preventDefault();INJ=null;try{history.replaceState(null,'',location.pathname)}catch(_){}renderBrief();loadDraft();toast('已换回默认题');};
 }
-function renderLib(){
+function renderLib(){var _lib=document.querySelector('.lib');if(IELTS_MODE){if(_lib)_lib.style.display='none';return;}if(_lib)_lib.style.display='';
   $('#patlib').innerHTML=PATTERNS.map(function(p){
     return '<div class="p-cell"><div class="p-cat">'+esc(p.cat)+'</div><div class="p-en">'+esc(p.en)+'</div><div class="p-cn">'+esc(p.cn)+'</div><div class="p-eg" data-ins="'+esc(p.eg)+'" title="点击插入例句">“'+esc(p.eg)+'”</div></div>';
   }).join('');
 }
 function wordCount(t){var m=t.trim().match(/[A-Za-z][A-Za-z'’-]*/g);return m?m.length:0}
 function analyze(){
+  if(IELTS_MODE)return ieltsAnalyze();
   var g=GENRES[state.g],t=$('#essay').value,low=t.toLowerCase();
   var wc=wordCount(t);
   var foundC=CONNECTORS.filter(function(c){return low.indexOf(c)>=0});
@@ -367,20 +377,75 @@ function analyze(){
   ];
   $('#check').innerHTML=checks.map(function(c){return '<li class="'+(c.done?'done ':'')+(c.auto?'auto':'')+'" data-ck="'+c.k+'"><span class="mk">✓</span><span class="tx">'+esc(c.tx)+(c.sub?'<small>'+esc(c.sub)+'</small>':'')+'</span></li>'}).join('');
 }
-function loadDraft(){$('#essay').value=state.drafts[GENRES[state.g].key]||'';analyze();}
+function loadDraft(){$('#essay').value=state.drafts[curKey()]||'';analyze();}
 function insert(ins){var ta=$('#essay'),v=ta.value,p=ta.selectionStart||v.length,sep=(v&&!/\s$/.test(v.slice(0,p)))?' ':'';
-  ta.value=v.slice(0,p)+sep+ins+' '+v.slice(p);ta.focus();state.drafts[GENRES[state.g].key]=ta.value;persist();analyze();}
+  ta.value=v.slice(0,p)+sep+ins+' '+v.slice(p);ta.focus();state.drafts[curKey()]=ta.value;persist();analyze();}
 
+var RUB_T2=[['Task Response','立场清晰、充分回应，论点有展开+例证'],['Coherence & Cohesion','分段合理、逻辑连贯、衔接自然不堆砌'],['Lexical Resource','词汇丰富精准、搭配地道、少重复'],['Grammatical Range','句式多样(复合/让步/强调)、语法准确']];
+var RUB_T1=[['Task Achievement','有 overview 概述、选关键特征、数据准确'],['Coherence & Cohesion','按特征分组、趋势/顺序清楚'],['Lexical Resource','趋势/比较/数据描述词准确多样'],['Grammatical Range','时态正确、被动与比较级']];
+var IE_TTN={opinion:'Task 2 · 观点 Opinion',discussion:'Task 2 · 讨论 Discussion',problem:'Task 2 · 问题对策 Problem–Solution',adv:'Task 2 · 利弊 Adv/Disadv',t1a:'Task 1 · 学术图表 Academic',t1g:'Task 1 · 书信 GT'};
+var IE_LINKERS=['however','therefore','moreover','furthermore','nevertheless','consequently','in addition','in contrast','by contrast','whereas','admittedly','on balance','in conclusion','for instance','for example','as a result','on the one hand','on the other hand','to some extent','that said','what is more','not only','can be attributed to','a case in point','having considered'];
+var IE_ACAD=['outweigh','significant','considerable','crucial','beneficial','detrimental','arguably','contend','maintain','tend to','it is often argued','stark contrast','overlooked','pressing','compelling','undermine','mitigate','address the','a growing number','play a vital role'];
+function setStatLabels(a,b,c){var L=document.querySelectorAll('.stat span');if(L[1])L[1].textContent=a;if(L[2])L[2].textContent=b;if(L[3])L[3].textContent=c;}
+function renderIeltsBrief(){
+  var tt=(INJ.tt||'opinion'),isT1=/^t1/.test(tt),ttn=IE_TTN[tt]||'IELTS Writing';
+  var ideas=(INJ.ideas||[]),descr=isT1?RUB_T1:RUB_T2;
+  var st=COMPANION.struct.items.filter(function(s){return s.tt===tt;})[0];
+  var structChips=st?st.frames.map(function(f){return '<div class="ie-frame"><span class="ie-role">'+esc(f.role)+'</span><span class="chip" data-ins="'+esc(f.en)+'">'+esc(f.en)+'</span><small>'+esc(f.cn)+'</small></div>';}).join(''):'';
+  var frameChips=COMPANION.frames.items.map(function(f){return '<span class="chip" data-ins="'+esc(f.en)+'" title="'+esc(f.cn)+'">'+esc(f.func)+'：'+esc(f.en)+'</span>';}).join('');
+  var ideasH=ideas.length?'<ul class="pts">'+ideas.map(function(p){return '<li>'+esc(p.cn||'')+(p.en?'<br><span style="color:var(--ink3)">'+esc(p.en)+'</span>':'')+'</li>';}).join('')+'</ul>':'<p class="prompt-cn">（本题未附论点参考，自行构思）</p>';
+  var descrH=descr.map(function(d){return '<div class="m-line"><div class="m-en">'+esc(d[1])+'</div><div class="m-tag">'+esc(d[0])+'</div></div>';}).join('');
+  $('#brief').innerHTML=
+    '<div class="forge-banner">📥 雅思题 · <b>命题铸炉</b>　'+esc(INJ.band||'Band 7')+'　<a id="clrInj">换回默认题</a></div>'
+    +'<div class="eyebrow">IELTS · '+esc(ttn)+'</div>'
+    +'<p class="prompt-en">'+esc(INJ.en)+'</p>'+(INJ.cn?'<p class="prompt-cn">'+esc(INJ.cn)+'</p>':'')
+    +'<div class="req"><span>目标词数 <b>'+esc(INJ.words||(isT1?'≈150':'≈250'))+'</b></span><span>目标 <b>'+esc(INJ.band||'Band 7')+'</b></span><span>建议用时 <b>'+(isT1?'20 分钟':'40 分钟')+'</b></span></div>'
+    +'<div class="eyebrow" style="margin-top:6px">论点参考 · Ideas to develop</div>'+ideasH
+    +'<details><summary>📏 评分标准 · Band descriptors<span class="ar">›</span></summary><div class="model">'+descrH+'</div></details>'
+    +(structChips?'<details open><summary>🧱 段落结构 · 点击插入<span class="ar">›</span></summary><div class="ie-struct">'+structChips+'</div></details>':'')
+    +'<details><summary>✍️ Band 8 句型 · 点击插入<span class="ar">›</span></summary><div class="chips" style="margin-top:6px">'+frameChips+'</div></details>';
+  $('#tense-tip').innerHTML='<b>提示：</b>'+(isT1?'客观描述、避免个人观点；先写 overview 概述主要特征。':'四段式：引言(改写题目+亮明立场) → 主体段1 → 主体段2 → 结论(重申立场)。');
+  var _ci=$('#clrInj');if(_ci)_ci.onclick=function(e){e.preventDefault();INJ=null;IELTS_MODE=false;setStatLabels('连接词','高分句型','高级表达');try{history.replaceState(null,'',location.pathname)}catch(_){}renderGenres();renderBrief();renderLib();loadDraft();toast('已换回默认题');};
+}
+function ieltsAnalyze(){
+  var t=$('#essay').value,low=t.toLowerCase();
+  var wc=(t.trim().match(/[A-Za-z][A-Za-z'’-]*/g)||[]).length;
+  var paras=t.split(/\n\s*\n/).map(function(s){return s.trim();}).filter(Boolean).length;
+  var isT1=/^t1/.test(INJ.tt||'');
+  var wtarget=parseInt(String(INJ.words||(isT1?'150':'250')).replace(/[^0-9]/g,''),10)||(isT1?150:250);
+  var ptarget=isT1?3:4;
+  var foundL=IE_LINKERS.filter(function(c){return low.indexOf(c)>=0;});
+  var foundA=IE_ACAD.filter(function(c){return low.indexOf(c)>=0;});
+  setStatLabels('段落 (≥'+ptarget+')','衔接手段','学术词句');
+  var sw=$('#s-words');sw.textContent=wc;sw.className=wc>=wtarget?'ok':'low';$('#s-words-lbl').textContent='词 (目标'+wtarget+'+)';
+  var sc=$('#s-conn');sc.textContent=paras;sc.className=paras>=ptarget?'ok':'low';
+  var sh=$('#s-hi');sh.textContent=foundL.length;sh.className=foundL.length>=4?'ok':'low';
+  var su=$('#s-up');su.textContent=foundA.length;su.className=foundA.length>=2?'ok':'low';
+  var lines=[];
+  lines.push(foundL.length?'衔接手段：'+foundL.slice(0,12).map(function(c){return '<b>'+esc(c)+'</b>';}).join('、'):'还没用衔接手段——从下方 Band 8 句型挑一个用上');
+  lines.push(foundA.length?'学术词句：'+foundA.slice(0,10).map(function(c){return '<b>'+esc(c)+'</b>';}).join('、'):'<span class="warn">学术词偏少——试试 outweigh / arguably / attributed to / compelling</span>');
+  $('#found').innerHTML=lines.join('<br>');
+  var K=curKey();
+  var checks=[
+    {k:'len',auto:1,done:wc>=wtarget,tx:'字数达标（≥'+wtarget+' 词）',sub:'当前 '+wc+' 词'},
+    {k:'para',auto:1,done:paras>=ptarget,tx:'段落分明（≥'+ptarget+' 段）',sub:'当前 '+paras+' 段'},
+    {k:'link',auto:1,done:foundL.length>=4,tx:'用了 4+ 种衔接手段',sub:'当前 '+foundL.length+' 种'},
+    {k:'thesis',auto:0,done:!!state.drafts['ck_'+K+'_thesis'],tx:(isT1?'写了 overview 概述句':'引言点明立场（thesis）')},
+    {k:'dev',auto:0,done:!!state.drafts['ck_'+K+'_dev'],tx:(isT1?'覆盖主要特征 + 关键数据':'每段有主题句 + 论据/举例')},
+    {k:'proof',auto:0,done:!!state.drafts['ck_'+K+'_proof'],tx:'检查了时态、语法与拼写'}
+  ];
+  $('#check').innerHTML=checks.map(function(c){return '<li class="'+(c.done?'done ':'')+(c.auto?'auto':'')+'" data-ck="'+c.k+'"><span class="mk">✓</span><span class="tx">'+esc(c.tx)+(c.sub?'<small>'+esc(c.sub)+'</small>':'')+'</span></li>';}).join('');
+}
 renderGenres();renderBrief();renderLib();loadDraft();
 document.addEventListener('click',function(e){
   var gt=e.target.closest('.g-tab');if(gt){state.g=+gt.getAttribute('data-i');persist();renderGenres();renderBrief();loadDraft();window.scrollTo({top:0,behavior:'smooth'});return;}
   var ins=e.target.closest('[data-ins]');if(ins){insert(ins.getAttribute('data-ins'));toast('已插入');return;}
-  var li=e.target.closest('.check li:not(.auto)');if(li){var key='ck_'+GENRES[state.g].key+'_'+li.getAttribute('data-ck');state.drafts[key]=!state.drafts[key];persist();analyze();return;}
+  var li=e.target.closest('.check li:not(.auto)');if(li){var key='ck_'+curKey()+'_'+li.getAttribute('data-ck');state.drafts[key]=!state.drafts[key];persist();analyze();return;}
 });
-$('#essay').addEventListener('input',function(){state.drafts[GENRES[state.g].key]=$('#essay').value;persist();analyze();});
+$('#essay').addEventListener('input',function(){state.drafts[curKey()]=$('#essay').value;persist();analyze();});
 $('#btn-copy').addEventListener('click',function(){var t=$('#essay').value;if(!t.trim()){toast('还没写内容');return;}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('已复制草稿')},function(){toast('复制失败')})}else toast('请手动选中复制')});
 $('#btn-print').addEventListener('click',function(){window.print()});
-$('#btn-clear').addEventListener('click',function(){if(!confirm('清空当前这篇草稿？'))return;state.drafts[GENRES[state.g].key]='';persist();$('#essay').value='';analyze();toast('已清空')});
+$('#btn-clear').addEventListener('click',function(){if(!confirm('清空当前这篇草稿？'))return;state.drafts[curKey()]='';persist();$('#essay').value='';analyze();toast('已清空')});
 (function(){var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
 function pref(){try{return localStorage.getItem(TLS)||'auto'}catch(e){return 'auto'}}
 function resolve(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p}
