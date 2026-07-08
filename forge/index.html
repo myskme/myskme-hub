@@ -138,7 +138,54 @@ footer a{color:var(--gold2);text-decoration:none}
 #toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(14px);z-index:60;background:var(--panel2);border:1px solid var(--gold-line);color:var(--ink);padding:10px 18px;font-size:13px;border-radius:3px;opacity:0;pointer-events:none;transition:all .3s}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-@media print{.tiers,.presets,.ctrl,.forge-top,.ctrlbtn,.tcard-ft{display:none}.tcard{box-shadow:none}}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.tbtn{font-family:var(--serif);font-size:12.5px;color:var(--ink2);border:1px solid var(--line);background:transparent;padding:6px 13px;cursor:pointer;border-radius:999px;transition:all .18s}
+.tbtn:hover{border-color:var(--gold);color:var(--gold2)}
+.stats{font-size:12px;color:var(--ink3);letter-spacing:.03em}
+.stats b{color:var(--gold2);font-weight:600;font-variant-numeric:tabular-nums}
+.pity{font-size:11px;color:var(--ink3);text-align:center;letter-spacing:.02em}
+.pity b{color:var(--gold2);font-variant-numeric:tabular-nums}
+.ftbtn.saved{border-color:var(--gold-line);color:var(--gold2);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.beam.ssrburst{animation:ssrb 1.15s ease}
+@keyframes ssrb{0%{opacity:0}12%{opacity:1}32%{opacity:.9}100%{opacity:0}}
+.tcard.ssr{box-shadow:0 0 0 1px var(--gold-line),0 14px 42px color-mix(in srgb,var(--gold) 26%,rgba(0,0,0,.32))}
+.tcard.ssr .rar{animation:ssrpulse 1.8s ease infinite}
+@keyframes ssrpulse{0%,100%{box-shadow:0 0 0 rgba(201,166,74,0)}50%{box-shadow:0 0 13px rgba(201,166,74,.7)}}
+.modal{position:fixed;inset:0;z-index:70;display:none;align-items:flex-start;justify-content:center;background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);padding:24px 14px;overflow:auto}
+.modal.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--gold-line);border-radius:6px;max-width:920px;width:100%;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line2)}
+.modal-hd h3{margin:0;font-size:16px;font-weight:500;letter-spacing:.06em;color:var(--gold2);margin-right:auto}
+.modal-x{font-size:22px;color:var(--ink3);cursor:pointer;line-height:1;background:none;border:none}
+.modal-x:hover{color:var(--gold)}
+.modal-bd{padding:16px 18px}
+.dex-counts{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12.5px;color:var(--ink3)}
+.dex-counts b{color:var(--gold2);font-family:var(--mono)}
+.dex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px}
+.dex-card{border:1px solid var(--line2);border-left:4px solid var(--dc,var(--gold));border-radius:4px;padding:10px 12px;background:var(--panel2);font-size:12.5px}
+.dex-card .dh{display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap}
+.dex-card .dr{font-size:10px;font-weight:700;color:var(--paper);background:var(--dc);padding:1px 7px;border-radius:2px}
+:root[data-theme="light"] .dex-card .dr,:root:not([data-theme]) .dex-card .dr{color:#fff8ea}
+.dex-card .dm{color:var(--ink3);font-size:11px}
+.dex-card .de{color:var(--ink);line-height:1.45;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dex-card .da{display:flex;gap:6px}
+.dex-card .da button{font-size:11px;color:var(--ink2);border:1px solid var(--line);background:none;padding:3px 9px;cursor:pointer;border-radius:3px}
+.dex-card .da button:hover{border-color:var(--gold);color:var(--gold2)}
+.dex-empty{color:var(--ink3);text-align:center;padding:30px;grid-column:1/-1}
+.adm-field{margin-bottom:12px}
+.adm-field label{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.adm-field input,.adm-field textarea,.adm-field select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:9px 11px;font-family:var(--serif);font-size:14px;border-radius:3px;outline:none}
+.adm-field textarea{min-height:56px;resize:vertical;line-height:1.6}
+.adm-field input:focus,.adm-field textarea:focus,.adm-field select:focus{border-color:var(--gold)}
+.adm-row{display:flex;gap:10px;flex-wrap:wrap}
+.adm-row .adm-field{flex:1;min-width:130px}
+.adm-list{margin-top:14px;border-top:1px solid var(--line2);padding-top:12px}
+.adm-item{display:flex;gap:8px;align-items:baseline;font-size:12.5px;color:var(--ink2);padding:6px 0;border-bottom:1px solid var(--line2)}
+.adm-item .ax{margin-left:auto;color:var(--red);cursor:pointer;border:none;background:none;font-size:14px}
+.gate-in{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:11px 13px;font-family:var(--mono);letter-spacing:.16em;border-radius:3px;outline:none}
+.admin-fab{position:fixed;left:16px;bottom:16px;z-index:40;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink3);font-size:15px;cursor:pointer;opacity:.5;display:flex;align-items:center;justify-content:center;transition:all .25s}
+.admin-fab:hover{opacity:1;border-color:var(--gold);color:var(--gold2)}
+@media print{.tiers,.presets,.toolbar,.ctrl,.forge-top,.ctrlbtn,.admin-fab,.tcard-ft,.modal{display:none}.tcard{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -154,6 +201,11 @@ footer a{color:var(--gold2);text-decoration:none}
   </header>
   <div class="tiers" id="tiers"></div>
   <div class="presets" id="presets"></div>
+  <div class="toolbar">
+    <button class="tbtn" id="btnDaily">☀ 今日一题</button>
+    <button class="tbtn" id="btnDex">📖 题卡图鉴</button>
+    <span class="stats" id="stats"></span>
+  </div>
   <section class="forge" aria-label="命题铸炉">
     <div class="forge-top"><span class="ttl" id="tierTtl">中考 · 初中</span><div class="modes" id="modes"></div></div>
     <div class="forge-body">
@@ -161,6 +213,7 @@ footer a{color:var(--gold2);text-decoration:none}
         <div><div class="lab" id="lvlLab">年级 · 难度</div><div class="seg" id="levels"></div></div>
         <button class="fire" id="fire">✦ 铸 一 道 题</button>
         <div class="mini"><button id="reroll" disabled>↻ 重掷</button><button id="up" disabled>▲ 难</button><button id="down" disabled>▼ 易</button></div>
+        <div class="pity" id="pity"></div>
         <div><div class="lab">品阶掉率（≠难度）</div><div class="rleg">
           <div class="rr"><b style="color:var(--blue)">常规卷</b><span>日常真题式 · R</span></div>
           <div class="rr"><b style="color:var(--purple)">匠心题</b><span>有趣/结构变体 · SR</span></div>
@@ -177,7 +230,11 @@ footer a{color:var(--gold2);text-decoration:none}
     MYSKME — Make Yourself Special &amp; Kind · 单文件 · 离线可用 · 王老师专用出题台
   </footer>
 </div>
+<button class="admin-fab" id="adminFab" title="老师后台">✎</button>
 <button class="ctrlbtn" id="themeBtn" title="切换主题">◐</button>
+<div class="modal" id="dexModal"><div class="modal-box"><div class="modal-hd"><h3>📖 题卡图鉴 · 我收藏的题</h3><button class="modal-x" data-close>✕</button></div><div class="modal-bd"><div class="dex-counts" id="dexCounts"></div><div class="dex-grid" id="dexGrid"></div></div></div></div>
+<div class="modal" id="gateModal"><div class="modal-box" style="max-width:360px"><div class="modal-hd"><h3>老师后台</h3><button class="modal-x" data-close>✕</button></div><div class="modal-bd"><p style="color:var(--ink3);font-size:13px;margin:0 0 12px">输入管理员口令，进入自定义词库（存在本机，可导出）。</p><input class="gate-in" id="gateIn" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="口令"><div class="adm-row" style="justify-content:flex-end;margin-top:14px"><button class="ftbtn pri" id="gateOk">进入</button></div></div></div></div>
+<div class="modal" id="admModal"><div class="modal-box"><div class="modal-hd"><h3>✎ 自定义词库 · 王老师后台</h3><button class="modal-x" data-close>✕</button></div><div class="modal-bd" id="admBody"></div></div></div>
 <div id="toast"></div>
 <script>
 (function(){
@@ -263,16 +320,34 @@ footer a{color:var(--gold2);text-decoration:none}
   var TIERS={mid:{label:'中考 · 初中',ttl:'中考 · 初中',lvlLab:'年级 · 难度',levels:GRADES,order:['初一','初二','初三'],def:'初二',modes:MID_MODES,presets:MID_PRESETS,chip:lvlChip,locked:false},
     ielts:{label:'雅思 · IELTS',ttl:'雅思 · IELTS · 最高级别',lvlLab:'目标 Band',levels:BANDS,order:['Band 6','Band 7','Band 8+'],def:'Band 7',modes:IELTS_MODES,presets:IELTS_PRESETS,chip:bandChip,locked:(IELTS==null)}};
 
-  var state={tier:'mid',mode:'pro',level:'初二',seed:null};
+  var state={tier:'mid',mode:'pro',level:'初二',seed:null,rar:null,isDaily:false};
+  // ---- 复玩/收藏/后台 状态（localStorage）----
+  var FLS='myskme-forge-v1',PITY_MAX=10,ADMIN_HASH='660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2';
+  var FS=(function(){try{return JSON.parse(localStorage.getItem(FLS))||{};}catch(e){return{};}})();
+  FS.pity=FS.pity||{mid:0,ielts:0};FS.dex=FS.dex||[];FS.drawn=FS.drawn||0;FS.daily=FS.daily||{streak:0,lastDone:''};FS.custom=FS.custom||{};
+  function fsave(){try{localStorage.setItem(FLS,JSON.stringify(FS));}catch(e){}}
+  function pad(n){return('0'+n).slice(-2);}
+  function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  function today(){return dstr(new Date());}
+  function yday(){var d=new Date();d.setDate(d.getDate()-1);return dstr(d);}
+  var BASE={fun:MID.fun.slice(),cross:MID.cross.slice()};
+  function mergeCustom(){MID.fun=BASE.fun.concat(FS.custom.fun||[]);MID.cross=BASE.cross.concat(FS.custom.cross||[]);}
+  mergeCustom();
 
   function renderTiers(){var el=$('#tiers');el.innerHTML='';Object.keys(TIERS).forEach(function(k){var T=TIERS[k];var b=document.createElement('button');b.className='tier'+(k===state.tier?' on':'');b.innerHTML=esc(T.label)+(T.locked?'<span class="lk">🔒</span>':'');b.onclick=function(){if(T.locked){toast('雅思 · 最高级别档 · 内容准备中，稍后开放');return;}switchTier(k);};el.appendChild(b);});}
-  function switchTier(k){state.tier=k;var T=TIERS[k];state.mode=Object.keys(T.modes)[0];state.level=T.def;state.seed=null;$('#tierTtl').textContent=T.ttl;$('#lvlLab').textContent=T.lvlLab;var st=$('#stage');var old=st.querySelector('.tcard');if(old)old.remove();$('#empty').style.display='';$('#reroll').disabled=$('#up').disabled=$('#down').disabled=true;renderTiers();renderPresets();renderModes();renderLevels();}
+  function switchTier(k){state.tier=k;var T=TIERS[k];state.mode=Object.keys(T.modes)[0];state.level=T.def;state.seed=null;state.rar=null;state.isDaily=false;$('#tierTtl').textContent=T.ttl;$('#lvlLab').textContent=T.lvlLab;var st=$('#stage');var old=st.querySelector('.tcard');if(old)old.remove();$('#empty').style.display='';$('#reroll').disabled=$('#up').disabled=$('#down').disabled=true;renderTiers();renderPresets();renderModes();renderLevels();renderPity();}
   function renderPresets(){var el=$('#presets');var T=TIERS[state.tier];el.innerHTML='';T.presets.forEach(function(p){var b=document.createElement('button');b.className='preset'+(p.star?' star':'');b.textContent=p.label;b.onclick=function(){state.mode=p.mode;state.level=p.level;renderModes();renderLevels();fire(false);};el.appendChild(b);});}
   function renderModes(){var el=$('#modes');var T=TIERS[state.tier];el.innerHTML='';Object.keys(T.modes).forEach(function(k){var b=document.createElement('button');b.className='mode'+(k===state.mode?' on':'');b.textContent=T.modes[k].label;b.onclick=function(){state.mode=k;renderModes();fire(true);};el.appendChild(b);});}
   function renderLevels(){var el=$('#levels');var T=TIERS[state.tier];el.innerHTML='';T.order.forEach(function(g){var b=document.createElement('button');b.className=(g===state.level?'on':'');b.textContent=g;b.onclick=function(){state.level=g;renderLevels();if(state.seed)draw();};el.appendChild(b);});}
 
-  function fire(keep){if(!keep||!state.seed)state.seed=newSeed();var T=TIERS[state.tier];var beam=$('#beam');var r0=rngOf(state.seed+'|'+state.tier+'|'+state.mode+'|'+state.level);var rar=rollRar(r0,T.modes[state.mode].w);if(!reduce){beam.style.background='radial-gradient(120% 90% at 50% 0%,'+BEAMC[rar]+'44,transparent 60%)';beam.classList.remove('fire2');void beam.offsetWidth;beam.classList.add('fire2');}setTimeout(draw,reduce?0:340);$('#reroll').disabled=$('#up').disabled=$('#down').disabled=false;}
-  function draw(){var T=TIERS[state.tier];var r=rngOf(state.seed+'|'+state.tier+'|'+state.mode+'|'+state.level);var rar=rollRar(r,T.modes[state.mode].w);var card=T.modes[state.mode].build(r,state.level,rar);var rd=RAR[card.rar];var lc=T.chip(state.level);
+  function fire(keep){if(!keep||!state.seed)state.seed=newSeed();state.isDaily=false;var T=TIERS[state.tier];var beam=$('#beam');
+    var base=rollRar(rngOf(state.seed+'|'+state.tier+'|'+state.mode+'|'+state.level),T.modes[state.mode].w);
+    var pk=state.tier,pity=FS.pity[pk]||0,rar=base;
+    if(pity+1>=PITY_MAX&&base!=='SSR')rar='SSR';
+    FS.pity[pk]=(rar==='SSR')?0:pity+1;FS.drawn=(FS.drawn||0)+1;fsave();state.rar=rar;
+    if(!reduce){beam.style.background='radial-gradient(120% 90% at 50% 0%,'+BEAMC[rar]+'44,transparent 60%)';beam.classList.remove('fire2','ssrburst');void beam.offsetWidth;beam.classList.add('fire2');if(rar==='SSR')beam.classList.add('ssrburst');}
+    setTimeout(draw,reduce?0:340);$('#reroll').disabled=$('#up').disabled=$('#down').disabled=false;renderStats();renderPity();}
+  function draw(){var T=TIERS[state.tier];var r=rngOf(state.seed+'|'+state.tier+'|'+state.mode+'|'+state.level);var base=rollRar(r,T.modes[state.mode].w);var rar=state.rar||base;var card=T.modes[state.mode].build(r,state.level,rar);var rd=RAR[card.rar];var lc=T.chip(state.level);var dexKey=state.seed+'|'+state.tier+'|'+state.mode+'|'+state.level;var saved=FS.dex.some(function(d){return d.key===dexKey;});
     var st=$('#stage');var old=st.querySelector('.tcard');if(old)old.remove();$('#empty').style.display='none';
     var extra='';
     if(card.emojiSeq)extra+='<div class="emoji-seq">'+card.emojiSeq.map(function(e){return '<span>'+esc(e)+'</span>';}).join('<i>›</i>')+'</div>';
@@ -290,7 +365,7 @@ footer a{color:var(--gold2);text-decoration:none}
       else{payload={g:card.fmt.wkey,en:card.en,cn:card.cn,pts:card.pts,words:card.words,tense:card.tenseNote,fmt:card.fmt.name};}
       cta='<a class="ftbtn pri" target="_blank" rel="noopener" href="../write/?forge='+encodeURIComponent(JSON.stringify(payload))+'">用这道题去训练场 →</a>';}
     else cta='<button class="ftbtn pri" id="copyPrompt">复制题面</button>';
-    var div=document.createElement('div');div.className='tcard';div.style.setProperty('--rar',rd.c);
+    var div=document.createElement('div');div.className='tcard'+(card.rar==='SSR'?' ssr':'');div.style.setProperty('--rar',rd.c);
     div.innerHTML='<div class="tcard-hd"><span class="rar" style="background:'+rd.c+'">'+card.rar+' · '+rd.k+'</span><span class="fmt">'+esc(card.fmt.name)+'<small>'+esc(card.fmt.en)+'</small></span><span class="lchip" style="--lc:'+lc.c+'">'+esc(lc.txt)+'</span></div>'
       +'<div class="tcard-bd">'+extra+'<p class="q-en">'+esc(card.en)+'</p>'+(card.cn?'<p class="q-cn">'+esc(card.cn)+'</p>':'')
       +'<div class="meta-row">'+wchip+tchip+tags+'</div>'
@@ -299,11 +374,13 @@ footer a{color:var(--gold2);text-decoration:none}
       +'<div class="blab">'+(state.tier==='ielts'?'评分标准 · Band descriptors':'四线采分卡 · 对齐训练场自检')+'</div><div class="rubric">'+rub+'</div>'
       +(card.flavor?'<div class="rline" style="margin-top:12px;border-left:2px solid var(--gold-line);padding-left:11px;color:var(--ink3);font-style:italic;display:block">'+esc(card.flavor)+'</div>':'')
       +'</div>'
-      +'<div class="tcard-ft"><span class="seed">种子 <b>'+esc(state.seed)+'</b> · 同种子必得同题</span>'+cta+'<button class="ftbtn" id="copyAll">复制全部</button></div>';
+      +'<div class="tcard-ft"><span class="seed">种子 <b>'+esc(state.seed)+'</b></span>'+cta+'<button class="ftbtn'+(saved?' saved':'')+'" id="collectBtn">'+(saved?'★ 已收藏':'★ 收藏')+'</button>'+(state.isDaily?'<button class="ftbtn pri" id="dailyDone">✓ 今日打卡</button>':'')+'<button class="ftbtn" id="copyAll">复制全部</button></div>';
     st.appendChild(div);if(!reduce)void div.offsetWidth;div.classList.add('in');
     function copytext(){var s=card.en+(card.cn?'\n'+card.cn:'');(card.pts||[]).forEach(function(p){s+='\n· '+p.cn+(p.en?' / '+p.en:'');});return s;}
     var cp=$('#copyPrompt');if(cp)cp.onclick=function(){doCopy(card.en+(card.cn?'\n'+card.cn:''),this);};
     $('#copyAll').onclick=function(){doCopy(copytext(),this);};
+    var cb=$('#collectBtn');if(cb)cb.onclick=function(){collect(card,dexKey);this.textContent='★ 已收藏';this.classList.add('saved');};
+    var db=$('#dailyDone');if(db)db.onclick=function(){dailyDone(this);};
   }
   function doCopy(txt,btn){var lab=btn.textContent;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){btn.textContent='已复制 ✓';setTimeout(function(){btn.textContent=lab;},1300);});}else toast('请手动选择复制');}
 
@@ -312,7 +389,60 @@ footer a{color:var(--gold2);text-decoration:none}
   $('#up').onclick=function(){var T=TIERS[state.tier];var i=T.order.indexOf(state.level);if(i<T.order.length-1){state.level=T.order[i+1];renderLevels();if(state.seed)draw();}};
   $('#down').onclick=function(){var T=TIERS[state.tier];var i=T.order.indexOf(state.level);if(i>0){state.level=T.order[i-1];renderLevels();if(state.seed)draw();}};
 
-  renderTiers();renderPresets();renderModes();renderLevels();
+  // ---- 统计 / 保底 ----
+  function renderStats(){var s=$('#stats');if(s)s.innerHTML='已抽 <b>'+(FS.drawn||0)+'</b> · 收藏 <b>'+FS.dex.length+'</b> · 连胜 <b>'+(FS.daily.streak||0)+'</b> 天';}
+  function renderPity(){var p=$('#pity');if(!p)return;var n=PITY_MAX-(FS.pity[state.tier]||0);p.innerHTML=n<=0?'✦ 下一抽必出<b>传世题</b>':'距保底还差 <b>'+n+'</b> 抽出传世题';}
+  // ---- 收藏 / 图鉴 ----
+  function modeLabel(tier,mode){var T=TIERS[tier];return (T&&T.modes[mode]&&T.modes[mode].label)||mode;}
+  function collect(card,key){if(FS.dex.some(function(d){return d.key===key;})){toast('已在图鉴中');return;}FS.dex.unshift({key:key,tier:state.tier,mode:state.mode,rar:card.rar,fmt:card.fmt.name,en:card.en,cn:card.cn,level:state.level,words:card.words,cta:card.cta,tt:card.tt||'',pts:card.pts||[],tense:card.tenseNote||'',ts:today()});if(FS.dex.length>300)FS.dex.pop();fsave();renderStats();toast('已收藏进题卡图鉴 ★');}
+  function openModal(id){$('#'+id).classList.add('show');}
+  function closeModal(el){if(el)el.classList.remove('show');}
+  function dexWriteHref(d){var payload;if(d.tier==='ielts'){payload={tier:'ielts',tt:d.tt,band:d.level,en:d.en,cn:d.cn,words:d.words,ideas:d.pts};}else{var wk={'建议信':'letter','记叙文':'story','观点议论':'opinion','应用文·介绍':'intro'}[d.fmt]||'opinion';payload={g:wk,en:d.en,cn:d.cn,pts:d.pts,words:d.words,tense:d.tense,fmt:d.fmt};}return '../write/?forge='+encodeURIComponent(JSON.stringify(payload));}
+  function renderDex(){var g=$('#dexGrid'),c=$('#dexCounts');var by={R:0,SR:0,SSR:0};FS.dex.forEach(function(d){by[d.rar]=(by[d.rar]||0)+1;});
+    c.innerHTML='总计 <b>'+FS.dex.length+'</b> 张　·　常规 <b>'+(by.R||0)+'</b>　匠心 <b>'+(by.SR||0)+'</b>　传世 <b>'+(by.SSR||0)+'</b>';
+    if(!FS.dex.length){g.innerHTML='<div class="dex-empty">还没收藏题卡。铸题后点卡片上的「★ 收藏」把好题存进来。</div>';return;}
+    g.innerHTML=FS.dex.map(function(d,i){return '<div class="dex-card" style="--dc:'+RAR[d.rar].c+'"><div class="dh"><span class="dr" style="background:'+RAR[d.rar].c+'">'+d.rar+'</span><span class="dm">'+esc(modeLabel(d.tier,d.mode))+' · '+esc(d.level)+'</span></div><div class="de">'+esc(d.en)+'</div><div class="da"><button data-dcopy="'+i+'">复制</button>'+(d.cta==='write'?'<button data-dwrite="'+i+'">去写</button>':'')+'<button data-ddel="'+i+'">删</button></div></div>';}).join('');}
+  $('#dexGrid').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    if(b.hasAttribute('data-dcopy')){var d=FS.dex[+b.getAttribute('data-dcopy')];doCopy(d.en+(d.cn?'\n'+d.cn:''),b);}
+    else if(b.hasAttribute('data-dwrite')){window.open(dexWriteHref(FS.dex[+b.getAttribute('data-dwrite')]),'_blank','noopener');}
+    else if(b.hasAttribute('data-ddel')){FS.dex.splice(+b.getAttribute('data-ddel'),1);fsave();renderDex();renderStats();}});
+  // ---- 每日一题 + 连胜 ----
+  function daily(){state.tier='mid';state.mode='daily';state.isDaily=true;state.seed='D'+today();var T=TIERS.mid;state.rar=rollRar(rngOf(state.seed+'|mid|daily|'+state.level),T.modes.daily.w);$('#tierTtl').textContent='中考 · 今日一题';$('#lvlLab').textContent=T.lvlLab;renderTiers();renderPresets();renderModes();renderLevels();$('#reroll').disabled=$('#up').disabled=$('#down').disabled=false;renderPity();draw();var f=document.querySelector('.forge');if(f)f.scrollIntoView({behavior:'smooth'});}
+  function dailyDone(btn){if(FS.daily.lastDone===today()){toast('今天已打卡 ✓');return;}FS.daily.streak=(FS.daily.lastDone===yday())?((FS.daily.streak||0)+1):1;FS.daily.lastDone=today();fsave();renderStats();if(btn){btn.textContent='✓ 已打卡·连胜'+FS.daily.streak;btn.disabled=true;}toast('打卡成功 · 连胜 '+FS.daily.streak+' 天 🔥');}
+  // ---- 老师后台：自定义词库 ----
+  function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(buf){return [].map.call(new Uint8Array(buf),function(b){return('0'+b.toString(16)).slice(-2);}).join('');});}
+  function parsePts(txt){return txt.split(/\n+/).map(function(l){var p=l.split('|');return p[0].trim()?{cn:p[0].trim(),en:(p[1]||'').trim()}:null;}).filter(Boolean);}
+  function renderAdmin(){var cf=FS.custom.fun||[],cc=FS.custom.cross||[];
+    var list=cf.map(function(x,i){return '<div class="adm-item"><b style="color:var(--purple)">脑洞</b>&nbsp;'+esc(x.cn)+'<button class="ax" data-del="fun:'+i+'">✕</button></div>';})
+      .concat(cc.map(function(x,i){return '<div class="adm-item"><b style="color:var(--blue)">联动</b>&nbsp;'+esc(x.cn)+' <span style="color:var(--ink3)">· '+esc(x.by||'')+'</span><button class="ax" data-del="cross:'+i+'">✕</button></div>';})).join('');
+    $('#admBody').innerHTML='<p style="color:var(--ink3);font-size:12.5px;margin:0 0 14px">给「有趣·脑洞」或「联动·谷地」加自定义题。存本机、即时进铸炉；可导出 JSON 发给我并入源码。</p>'
+      +'<div class="adm-row"><div class="adm-field"><label>加到哪个模式</label><select id="afMode"><option value="fun">有趣 · 脑洞</option><option value="cross">联动 · 学院谷地</option></select></div><div class="adm-field"><label>体裁</label><select id="afFmt"><option value="narr">记叙文</option><option value="intro">应用文·介绍</option></select></div></div>'
+      +'<div class="adm-field"><label>题目中文名（图鉴/标签用）</label><input id="afCn" placeholder="如：醒来变成一支粉笔"></div>'
+      +'<div class="adm-field"><label>英文题面（完整，含约几词）</label><textarea id="afEn" placeholder="One morning you wake up as ... Write a story of about 80 words ..."></textarea></div>'
+      +'<div class="adm-field"><label>中文题面</label><textarea id="afHcn" placeholder="一天早晨你醒来变成了……写一篇约80词的故事……"></textarea></div>'
+      +'<div class="adm-field"><label>要点（每行一条，格式：中文 | English）</label><textarea id="afPts" placeholder="用一般过去时叙述 | Tell the story in the past tense"></textarea></div>'
+      +'<div class="adm-row" id="afCrossOnly" style="display:none"><div class="adm-field"><label>出题人（联动）</label><input id="afBy" placeholder="鹿女海 / 猫女琳 / 狼先生"></div><div class="adm-field"><label>世界观风味语</label><input id="afFlavor" placeholder="一句点缀"></div></div>'
+      +'<div class="adm-row" style="margin-top:8px"><button class="ftbtn pri" id="afAdd">＋ 添加进铸炉</button><button class="ftbtn" id="afExport">导出自定义 JSON</button><button class="ftbtn" id="afClear">清空自定义</button></div>'
+      +'<div class="adm-list">'+(list||'<span style="color:var(--ink3);font-size:12.5px">暂无自定义题</span>')+'</div>';
+    var mSel=$('#afMode');mSel.onchange=function(){$('#afCrossOnly').style.display=mSel.value==='cross'?'flex':'none';};
+    $('#afAdd').onclick=function(){var mode=mSel.value,fmt=$('#afFmt').value,cn=$('#afCn').value.trim(),en=$('#afEn').value.trim(),hcn=$('#afHcn').value.trim(),pts=parsePts($('#afPts').value);
+      if(!cn||!en||!hcn){toast('中文名/英文题面/中文题面必填');return;}
+      var item={cn:cn,en:cn,fmt:fmt,h_en:en,h_cn:hcn,pts:pts.length?pts:[{cn:'覆盖题目要点',en:'cover the points'}]};
+      if(mode==='cross'){item.by=$('#afBy').value.trim()||'狼先生';item.flavor=$('#afFlavor').value.trim()||'愿你在谷地里成为特别又善良的人。';}
+      FS.custom[mode]=FS.custom[mode]||[];FS.custom[mode].push(item);fsave();mergeCustom();renderAdmin();renderStats();toast('已加入「'+(mode==='fun'?'有趣·脑洞':'联动·谷地')+'」');};
+    $('#afExport').onclick=function(){var blob=new Blob([JSON.stringify(FS.custom,null,2)],{type:'application/json'});var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='forge-custom.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},2000);toast('已导出 forge-custom.json');};
+    $('#afClear').onclick=function(){if(!confirm('清空所有自定义题？'))return;FS.custom={};fsave();mergeCustom();renderAdmin();renderStats();toast('已清空自定义');};
+    var al=$('#admBody').querySelector('.adm-list');if(al)al.addEventListener('click',function(e){var x=e.target.closest('[data-del]');if(!x)return;var pr=x.getAttribute('data-del').split(':');FS.custom[pr[0]].splice(+pr[1],1);fsave();mergeCustom();renderAdmin();renderStats();});}
+  // ---- 按钮接线 ----
+  $('#btnDaily').onclick=daily;
+  $('#btnDex').onclick=function(){renderDex();openModal('dexModal');};
+  $('#adminFab').onclick=function(){if(sessionStorage.getItem('forge-admin')==='1'){renderAdmin();openModal('admModal');}else openModal('gateModal');};
+  $('#gateOk').onclick=function(){var v=$('#gateIn').value;sha256hex(v).then(function(h){if(h===ADMIN_HASH){sessionStorage.setItem('forge-admin','1');closeModal($('#gateModal'));$('#gateIn').value='';renderAdmin();openModal('admModal');}else toast('口令不对');});};
+  $('#gateIn').addEventListener('keydown',function(e){if(e.key==='Enter')$('#gateOk').click();});
+  document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){closeModal(b.closest('.modal'));};});
+  document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)closeModal(m);});});
+
+  renderTiers();renderPresets();renderModes();renderLevels();renderStats();renderPity();
 })();
 </script>
 </body>
