@@ -1,202 +1,224 @@
 {
-  "catalog": [
-    {
-      "code": "CLAUSE1",
-      "name": "中考从句专项 · 第一辑（定语 / 宾语 / 状语从句）",
-      "desc": "中考三大从句一网打尽：定语从句(who/which/that/whose/where/when、最高级用 that、介词+which)、宾语从句(陈述语序、whether/if、时态呼应、what vs that)、状语从句(because≠so 连用、although≠but、so/such…that、unless、主将从现)。配对记规则 + 句境选词，答案唯一带解析。进阶免费档。",
-      "date": "2026-07-03",
-      "cat": "语法专项",
-      "pack": "从句突破营",
-      "level": "进阶",
-      "tier": "free",
-      "count": 34
-    },
-    {
-      "code": "CLOZE1",
-      "name": "完形填空 · 第一辑（乡村之夏）",
-      "desc": "一篇记叙文完形，8 个空，练时态一致 + 词义搭配（中考完形核心）。每空带全文面板，联系上下文再选。免费档。",
-      "date": "",
-      "cat": "完形填空",
-      "pack": "阅读训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 8
-    },
-    {
-      "code": "CLOZE2",
-      "name": "完形填空 · 第二辑（阅读的力量）",
-      "desc": "说明文完形，7 个空，练一般现在时 + 词义搭配 + 副词选择（中考完形高频点）。每空带全文面板。免费档。",
-      "date": "",
-      "cat": "完形填空",
-      "pack": "阅读训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 7
-    },
-    {
-      "code": "MISS1",
-      "name": "中考作文 · 5 大失分黑洞（纠错专项）",
-      "desc": "把中考阅卷扣得最快的 5 个洞逐个堵上：时态滑坡 / 中式搭配 / 介词冠词漏字 / 主谓一致 / 句子粘连破碎。配对记口诀 + 句境纠错单选，答案唯一、每题带解析。改编自王老师《5 大失分黑洞》诊断书。进阶免费档。",
-      "date": "2026-07-03",
-      "cat": "写作纠错",
-      "pack": "中考作文急救",
-      "level": "进阶",
-      "tier": "free",
-      "count": 33
-    },
-    {
-      "code": "MIX1",
-      "name": "易混词辨析 · 第一辑（动词 / 数量 / 介词）",
-      "desc": "中考高频易混词一网打尽：affect/effect、rise/raise、lie/lay、borrow/lend、fewer/less、between/among、beside/besides、across/through。配对记义 + 句境选词。免费档，人人可练。",
-      "date": "2026-06-25",
-      "cat": "词汇辨析",
-      "pack": "易混词训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 30
-    },
-    {
-      "code": "MIX2",
-      "name": "易混词辨析 · 第二辑（花费 / 到达 / 看听 / 形容词）",
-      "desc": "中考高频易混词第二弹：spend/cost/take/pay、reach/arrive/get to、look/see/watch/read、hear/listen to、interesting/interested、hard/hardly、alone/lonely。配对记义 + 句境选词。免费档。",
-      "date": "2026-06-25",
-      "cat": "词汇辨析",
-      "pack": "易混词训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 30
-    },
-    {
-      "code": "READ1",
-      "name": "阅读理解 · 第一辑（短文 + 完形入门）",
-      "desc": "中考阅读数字化第一步：读短文→选答案。含 2 篇短文阅读（6 题）+ 1 篇完形填空（5 空）。免费档，人人可练。每题都带原文面板，边读边答。",
-      "date": "",
-      "cat": "阅读理解",
-      "pack": "阅读训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 11
-    },
-    {
-      "code": "READ2",
-      "name": "阅读理解 · 第二辑（应用文 / 记叙文 / 说明文）",
-      "desc": "中考三大常见文体各一篇：校园通知（应用文）、雨中故事（记叙文）、熊猫小知识（说明文），共 9 题。每题带原文面板，练「定位找答案」。免费档。",
-      "date": "",
-      "cat": "阅读理解",
-      "pack": "阅读训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 9
-    },
-    {
-      "code": "READ3",
-      "name": "阅读理解 · 第三辑（主旨 / 推断 / 猜词）",
-      "desc": "中考高阶题型专练：主旨大意、推理判断、结合上下文猜词义——不是只找原句，要读懂。2 篇短文共 7 题，均带原文面板。免费档。",
-      "date": "",
-      "cat": "阅读理解",
-      "pack": "阅读训练营",
-      "level": "进阶",
-      "tier": "free",
-      "count": 7
-    },
-    {
-      "code": "S2E1",
-      "name": "S2E1 复工协议",
-      "desc": "第二季开篇·物品大罢工。与同名试卷配套：罢工/劳工主题词汇 + 初三+高阶语法陷阱（非谓语·倒装·情态完成式·虚拟·从句·错综条件）。",
-      "date": "2026-06-18",
-      "cat": "剧集专项",
-      "pack": "MYSKME 第二季",
-      "level": "炼狱",
-      "tier": "free",
-      "count": 25
-    },
-    {
-      "code": "S2E2",
-      "name": "S2E2 群星渡口",
-      "desc": "外援降临，平行宇宙世界杯，地理生物双副本。24 题炼狱级——每题皆陷阱、陷阱套陷阱，生词从简，胜负在脑。",
-      "date": "2026-06-25",
-      "cat": "剧集专项",
-      "pack": "MYSKME 第二季",
-      "level": "炼狱",
-      "tier": "free",
-      "count": 42
-    },
-    {
-      "code": "S2E3",
-      "name": "S2E3 阴沟里翻船",
-      "desc": "中考方向·低生词·高迷惑陷阱专项 · 24 题（马虎/轻敌/记忆混淆/情景交际）。难点不在生词，在选项迷惑与马虎·轻敌·记忆混淆。暗号 ALERT。",
-      "date": "2026-06-30",
-      "cat": "剧集专项",
-      "pack": "MYSKME 第二季",
-      "level": "进阶",
-      "tier": "free",
-      "count": 24
-    },
-    {
-      "code": "TENSE1",
-      "name": "中考动词时态专项 · 第一辑（主将从现 / 完成时 / 时态呼应 / 被动）",
-      "desc": "中考动词时态一网打尽：主将从现、since/for/ago 标志词、by the time 过去完成、宾语从句时态呼应、真理不变时态、各时态被动、used to 辨析、瞬间 vs 延续动词。配对记规则 + 句境选时态，答案唯一、每题带解析。进阶免费档，人人可练。",
-      "date": "2026-07-02",
-      "cat": "语法专项",
-      "pack": "时态突破营",
-      "level": "进阶",
-      "tier": "free",
-      "count": 36
-    },
-    {
-      "code": "TRAP1",
-      "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
-      "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
-      "date": "2026-06-24",
-      "cat": "语法陷阱",
-      "pack": "语法陷阱训练营",
-      "level": "常规",
-      "tier": "free",
-      "count": 32
-    },
-    {
-      "code": "TRAP2",
-      "name": "假被动炼狱 · 亦真亦假（陷阱套陷阱）",
-      "desc": "☠ 炼狱单项突破：假被动 vs 真被动亦真亦假混排，专治“见被动就排除 / 见主动就放心”。初三冲刺·中考拔尖。",
-      "date": "2026-06-24",
-      "cat": "语法陷阱",
-      "pack": "语法陷阱训练营",
-      "level": "炼狱",
-      "tier": "svip",
-      "count": 26
-    },
-    {
-      "code": "TRAP3",
-      "name": "时态错配炼狱 · 亦真亦假",
-      "desc": "☠ 炼狱单项突破：时态线索亦真亦假混排，专治 has gone/has been、for+时间段、by the time/by next、主将从现、间接引语时态呼应等高频时态陷阱。初三冲刺·中考拔尖。",
-      "date": "2026-06-25",
-      "cat": "语法陷阱",
-      "pack": "语法陷阱训练营",
-      "level": "炼狱",
-      "tier": "svip",
-      "count": 24
-    },
-    {
-      "code": "TRAP4",
-      "name": "主谓一致炼狱 · 就近与整体",
-      "desc": "☠ 炼狱单项突破：主谓一致高频陷阱——either/neither/each/every、就近一致、a number of vs the number of、分数百分数、there be 就近、集合名词、不定式动名词作主语、time/money/distance 整体单数。初三冲刺·中考拔尖。",
-      "date": "2026-06-25",
-      "cat": "语法陷阱",
-      "pack": "语法陷阱训练营",
-      "level": "炼狱",
-      "tier": "svip",
-      "count": 24
-    },
-    {
-      "code": "WRITE1",
-      "name": "中考作文 · 5 大文体高分句型（22→28 拔高）",
-      "desc": "五种文体各 4 句招牌句式，出现一句加一档：书信(I'm writing to / It would mean a lot to me if)、记叙(It was not until…that / No sooner had I…than / 分词伴随)、议论(There is no doubt that / While 让步 / Not only 倒装)、说明(定从 which / known as / Take…as an example)、万金油(As the saying goes / The more…the more / What…is)。配对记句式 + 句境选句式，答案唯一带解析。改编自王老师《5 大文体高分句型》，与 MISS1 是「堵漏 + 拔高」一对。进阶免费档。",
-      "date": "2026-07-03",
-      "cat": "写作句型",
-      "pack": "中考作文急救",
-      "level": "进阶",
-      "tier": "free",
-      "count": 36
-    }
-  ]
+ "catalog": [
+  {
+   "code": "CLAUSE1",
+   "name": "中考从句专项 · 第一辑（定语 / 宾语 / 状语从句）",
+   "desc": "中考三大从句一网打尽：定语从句(who/which/that/whose/where/when、最高级用 that、介词+which)、宾语从句(陈述语序、whether/if、时态呼应、what vs that)、状语从句(because≠so 连用、although≠but、so/such…that、unless、主将从现)。配对记规则 + 句境选词，答案唯一带解析。进阶免费档。",
+   "date": "2026-07-03",
+   "cat": "语法专项",
+   "pack": "从句突破营",
+   "level": "进阶",
+   "tier": "free",
+   "count": 34
+  },
+  {
+   "code": "CLOZE1",
+   "name": "完形填空 · 第一辑（乡村之夏）",
+   "desc": "一篇记叙文完形，8 个空，练时态一致 + 词义搭配（中考完形核心）。每空带全文面板，联系上下文再选。免费档。",
+   "date": "",
+   "cat": "完形填空",
+   "pack": "阅读训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 8
+  },
+  {
+   "code": "CLOZE2",
+   "name": "完形填空 · 第二辑（阅读的力量）",
+   "desc": "说明文完形，7 个空，练一般现在时 + 词义搭配 + 副词选择（中考完形高频点）。每空带全文面板。免费档。",
+   "date": "",
+   "cat": "完形填空",
+   "pack": "阅读训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 7
+  },
+  {
+   "code": "MISS1",
+   "name": "中考作文 · 5 大失分黑洞（纠错专项）",
+   "desc": "把中考阅卷扣得最快的 5 个洞逐个堵上：时态滑坡 / 中式搭配 / 介词冠词漏字 / 主谓一致 / 句子粘连破碎。配对记口诀 + 句境纠错单选，答案唯一、每题带解析。改编自王老师《5 大失分黑洞》诊断书。进阶免费档。",
+   "date": "2026-07-03",
+   "cat": "写作纠错",
+   "pack": "中考作文急救",
+   "level": "进阶",
+   "tier": "free",
+   "count": 33
+  },
+  {
+   "code": "MIX1",
+   "name": "易混词辨析 · 第一辑（动词 / 数量 / 介词）",
+   "desc": "中考高频易混词一网打尽：affect/effect、rise/raise、lie/lay、borrow/lend、fewer/less、between/among、beside/besides、across/through。配对记义 + 句境选词。免费档，人人可练。",
+   "date": "2026-06-25",
+   "cat": "词汇辨析",
+   "pack": "易混词训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 30
+  },
+  {
+   "code": "MIX2",
+   "name": "易混词辨析 · 第二辑（花费 / 到达 / 看听 / 形容词）",
+   "desc": "中考高频易混词第二弹：spend/cost/take/pay、reach/arrive/get to、look/see/watch/read、hear/listen to、interesting/interested、hard/hardly、alone/lonely。配对记义 + 句境选词。免费档。",
+   "date": "2026-06-25",
+   "cat": "词汇辨析",
+   "pack": "易混词训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 30
+  },
+  {
+   "code": "READ1",
+   "name": "阅读理解 · 第一辑（短文 + 完形入门）",
+   "desc": "中考阅读数字化第一步：读短文→选答案。含 2 篇短文阅读（6 题）+ 1 篇完形填空（5 空）。免费档，人人可练。每题都带原文面板，边读边答。",
+   "date": "",
+   "cat": "阅读理解",
+   "pack": "阅读训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 11
+  },
+  {
+   "code": "READ2",
+   "name": "阅读理解 · 第二辑（应用文 / 记叙文 / 说明文）",
+   "desc": "中考三大常见文体各一篇：校园通知（应用文）、雨中故事（记叙文）、熊猫小知识（说明文），共 9 题。每题带原文面板，练「定位找答案」。免费档。",
+   "date": "",
+   "cat": "阅读理解",
+   "pack": "阅读训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 9
+  },
+  {
+   "code": "READ3",
+   "name": "阅读理解 · 第三辑（主旨 / 推断 / 猜词）",
+   "desc": "中考高阶题型专练：主旨大意、推理判断、结合上下文猜词义——不是只找原句，要读懂。2 篇短文共 7 题，均带原文面板。免费档。",
+   "date": "",
+   "cat": "阅读理解",
+   "pack": "阅读训练营",
+   "level": "进阶",
+   "tier": "free",
+   "count": 7
+  },
+  {
+   "code": "S2E1",
+   "name": "S2E1 复工协议",
+   "desc": "第二季开篇·物品大罢工。与同名试卷配套：罢工/劳工主题词汇 + 初三+高阶语法陷阱（非谓语·倒装·情态完成式·虚拟·从句·错综条件）。",
+   "date": "2026-06-18",
+   "cat": "剧集专项",
+   "pack": "MYSKME 第二季",
+   "level": "炼狱",
+   "tier": "free",
+   "count": 25
+  },
+  {
+   "code": "S2E2",
+   "name": "S2E2 群星渡口",
+   "desc": "外援降临，平行宇宙世界杯，地理生物双副本。24 题炼狱级——每题皆陷阱、陷阱套陷阱，生词从简，胜负在脑。",
+   "date": "2026-06-25",
+   "cat": "剧集专项",
+   "pack": "MYSKME 第二季",
+   "level": "炼狱",
+   "tier": "free",
+   "count": 42
+  },
+  {
+   "code": "S2E3",
+   "name": "S2E3 阴沟里翻船",
+   "desc": "中考方向·低生词·高迷惑陷阱专项 · 24 题（马虎/轻敌/记忆混淆/情景交际）。难点不在生词，在选项迷惑与马虎·轻敌·记忆混淆。暗号 ALERT。",
+   "date": "2026-06-30",
+   "cat": "剧集专项",
+   "pack": "MYSKME 第二季",
+   "level": "进阶",
+   "tier": "free",
+   "count": 24
+  },
+  {
+   "code": "S2E4",
+   "name": "S2E4 无间道之夏",
+   "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态情态/从句非谓语/词汇辨析）。低生词、高选项迷惑；世界观：期末结束、闻浩无间道败走、初代弟子将归来。暗号 RETURN。",
+   "date": "2026-07-09",
+   "cat": "剧集专项",
+   "pack": "MYSKME 第二季",
+   "level": "进阶",
+   "tier": "free",
+   "count": 15
+  },
+  {
+   "code": "S2E5",
+   "name": "S2E5 归途",
+   "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态/从句非谓语连词/词汇辨析）。低生词、高选项迷惑；世界观：初代双璧梓与增归来，七年空课桌有了主人，黑域噤声。暗号 HOMEROOM。",
+   "date": "2026-07-11",
+   "cat": "剧集专项",
+   "pack": "MYSKME 第二季",
+   "level": "进阶",
+   "tier": "free",
+   "count": 15
+  },
+  {
+   "code": "TENSE1",
+   "name": "中考动词时态专项 · 第一辑（主将从现 / 完成时 / 时态呼应 / 被动）",
+   "desc": "中考动词时态一网打尽：主将从现、since/for/ago 标志词、by the time 过去完成、宾语从句时态呼应、真理不变时态、各时态被动、used to 辨析、瞬间 vs 延续动词。配对记规则 + 句境选时态，答案唯一、每题带解析。进阶免费档，人人可练。",
+   "date": "2026-07-02",
+   "cat": "语法专项",
+   "pack": "时态突破营",
+   "level": "进阶",
+   "tier": "free",
+   "count": 36
+  },
+  {
+   "code": "TRAP1",
+   "name": "语法陷阱训练营 · 第一辑（八类陷阱）",
+   "desc": "纯初二及以上 · 八类中考高频陷阱 · 答案唯一无争议。m1 识别口诀配对，m4/m5 陷阱选择。",
+   "date": "2026-06-24",
+   "cat": "语法陷阱",
+   "pack": "语法陷阱训练营",
+   "level": "常规",
+   "tier": "free",
+   "count": 32
+  },
+  {
+   "code": "TRAP2",
+   "name": "假被动炼狱 · 亦真亦假（陷阱套陷阱）",
+   "desc": "☠ 炼狱单项突破：假被动 vs 真被动亦真亦假混排，专治“见被动就排除 / 见主动就放心”。初三冲刺·中考拔尖。",
+   "date": "2026-06-24",
+   "cat": "语法陷阱",
+   "pack": "语法陷阱训练营",
+   "level": "炼狱",
+   "tier": "svip",
+   "count": 26
+  },
+  {
+   "code": "TRAP3",
+   "name": "时态错配炼狱 · 亦真亦假",
+   "desc": "☠ 炼狱单项突破：时态线索亦真亦假混排，专治 has gone/has been、for+时间段、by the time/by next、主将从现、间接引语时态呼应等高频时态陷阱。初三冲刺·中考拔尖。",
+   "date": "2026-06-25",
+   "cat": "语法陷阱",
+   "pack": "语法陷阱训练营",
+   "level": "炼狱",
+   "tier": "svip",
+   "count": 24
+  },
+  {
+   "code": "TRAP4",
+   "name": "主谓一致炼狱 · 就近与整体",
+   "desc": "☠ 炼狱单项突破：主谓一致高频陷阱——either/neither/each/every、就近一致、a number of vs the number of、分数百分数、there be 就近、集合名词、不定式动名词作主语、time/money/distance 整体单数。初三冲刺·中考拔尖。",
+   "date": "2026-06-25",
+   "cat": "语法陷阱",
+   "pack": "语法陷阱训练营",
+   "level": "炼狱",
+   "tier": "svip",
+   "count": 24
+  },
+  {
+   "code": "WRITE1",
+   "name": "中考作文 · 5 大文体高分句型（22→28 拔高）",
+   "desc": "五种文体各 4 句招牌句式，出现一句加一档：书信(I'm writing to / It would mean a lot to me if)、记叙(It was not until…that / No sooner had I…than / 分词伴随)、议论(There is no doubt that / While 让步 / Not only 倒装)、说明(定从 which / known as / Take…as an example)、万金油(As the saying goes / The more…the more / What…is)。配对记句式 + 句境选句式，答案唯一带解析。改编自王老师《5 大文体高分句型》，与 MISS1 是「堵漏 + 拔高」一对。进阶免费档。",
+   "date": "2026-07-03",
+   "cat": "写作句型",
+   "pack": "中考作文急救",
+   "level": "进阶",
+   "tier": "free",
+   "count": 36
+  }
+ ]
 }
