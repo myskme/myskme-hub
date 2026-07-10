@@ -1,0 +1,189 @@
+{
+  "name": "S2E4 无间道之夏",
+  "code": "S2E4",
+  "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态情态/从句非谓语/词汇辨析）。低生词、高选项迷惑；世界观：期末结束、闻浩无间道败走、初代弟子将归来。暗号 RETURN。",
+  "mods": {
+    "m5": [
+      {
+        "q": "By the time the final exams ended, Yue ___ her brother for months without knowing his secret.",
+        "ops": [
+          "trusted",
+          "has trusted",
+          "had trusted",
+          "trusts"
+        ],
+        "ans": 2,
+        "why": "By the time+过去，信任发生得更早→过去完成 had trusted。",
+        "lv": 2
+      },
+      {
+        "q": "The clever spy ___ by the light camp last week, and his whole plan fell apart.",
+        "ops": [
+          "caught",
+          "was caught",
+          "is caught",
+          "was catching"
+        ],
+        "ans": 1,
+        "why": "上周被抓→一般过去被动 was caught。",
+        "lv": 1
+      },
+      {
+        "q": "The moment the alarm rang, the false helper ___ through the back gate — nobody could stop him.",
+        "ops": [
+          "escaped",
+          "was escaped",
+          "had been escaped",
+          "was escaping from"
+        ],
+        "ans": 0,
+        "why": "escape 此处不及物，主动一般过去 escaped=逃走。",
+        "lv": 2
+      },
+      {
+        "q": "Yue stared at the proof and went pale. “My own brother a spy? It simply ___ be true!”",
+        "ops": [
+          "can't",
+          "mustn't",
+          "needn't",
+          "may not"
+        ],
+        "ans": 0,
+        "why": "simply can't be true=绝不可能是真的（强烈否定推测）。",
+        "lv": 2
+      },
+      {
+        "q": "Look up — the summer sun has ___ over the swamp, but the traitor is already gone.",
+        "ops": [
+          "rose",
+          "raised",
+          "risen",
+          "rising"
+        ],
+        "ans": 2,
+        "why": "has risen，rise-rose-risen 不及物‘升起’。",
+        "lv": 2
+      },
+      {
+        "q": "___ at last by Mr. Wolf, the spy dropped his mask and fled the valley.",
+        "ops": [
+          "Exposing",
+          "Exposed",
+          "To expose",
+          "Expose"
+        ],
+        "ans": 1,
+        "why": "Exposed=被识破(过去分词作状语，spy 与 expose 是被动关系)。",
+        "lv": 2
+      },
+      {
+        "q": "___ he was clever enough to fool the crowd, he could never fool Mr. Wolf.",
+        "ops": [
+          "Because",
+          "Though",
+          "So",
+          "Unless"
+        ],
+        "ans": 1,
+        "why": "Though=尽管(聪明却骗不过老师)，让步。",
+        "lv": 2
+      },
+      {
+        "q": "The traitor did not stop pretending ___ the whole truth finally came out.",
+        "ops": [
+          "until",
+          "unless",
+          "after",
+          "when"
+        ],
+        "ans": 0,
+        "why": "not…until=直到…才(停)。",
+        "lv": 1
+      },
+      {
+        "q": "___ that the game was over, the false helper turned and ran into the mist.",
+        "ops": [
+          "Realizing",
+          "Realized",
+          "To realize",
+          "Realize"
+        ],
+        "ans": 0,
+        "why": "Realizing=意识到(现在分词作状语，与主语主动、同时)。",
+        "lv": 2
+      },
+      {
+        "q": "___ how hard the spy had tried, he could not win the students' hearts.",
+        "ops": [
+          "Whatever",
+          "However hard",
+          "Even",
+          "No matter"
+        ],
+        "ans": 3,
+        "why": "No matter how hard…=无论多努力(让步状语从句)。",
+        "lv": 2
+      },
+      {
+        "q": "The victory party ___ Mr. Wolf quite a lot of money, but he said every coin was worth it.",
+        "ops": [
+          "spent",
+          "paid",
+          "cost",
+          "took"
+        ],
+        "ans": 2,
+        "why": "物/事作主语 + cost + 人 + 钱。",
+        "lv": 1
+      },
+      {
+        "q": "Wen Hao is gone, but who knows — the valley may meet ___ spy someday.",
+        "ops": [
+          "other",
+          "others",
+          "the other",
+          "another"
+        ],
+        "ans": 3,
+        "why": "another + 单数名词=另一个(泛指)。",
+        "lv": 2
+      },
+      {
+        "q": "“Where's Yue?” “She has ___ to the swamp to look for clues — she isn't back yet.”",
+        "ops": [
+          "been",
+          "went",
+          "gone",
+          "being"
+        ],
+        "ans": 2,
+        "why": "has gone to=去了还没回，与‘还没回来’一致。",
+        "lv": 2
+      },
+      {
+        "q": "News of the traitor spread fast and soon ___ every classroom in the school.",
+        "ops": [
+          "arrived",
+          "got",
+          "arrived in",
+          "reached"
+        ],
+        "ans": 3,
+        "why": "reach 及物，直接接地点=到达/传到。",
+        "lv": 2
+      },
+      {
+        "q": "The whole school found the spy story so ___ that everyone kept talking about it for days.",
+        "ops": [
+          "excited",
+          "exciting",
+          "excite",
+          "excitement"
+        ],
+        "ans": 1,
+        "why": "story 令人兴奋→-ing 形容词 exciting。",
+        "lv": 1
+      }
+    ]
+  }
+}
