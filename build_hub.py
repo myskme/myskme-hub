@@ -8,6 +8,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))  # 脚本所在目录（仓库
 OUT = os.path.join(HERE, "index.html")
 LIB = open(os.path.join(HERE, "qrcode-generator.js"), encoding="utf-8").read()
 
+# ---------- 已收起的作品（2026-07-11 王老师指示：大乱斗 / 三国不常用、仅自己用，从主页收起）----------
+# 数据完整保留于此，需要恢复就把对应 item 加回下面 sections 的 items 数组即可：
+#   卷一 · {"key": "brawl", "glyph": "斗", "cat": "game", "rarity": "SR", "cover": "assets/cover-brawl.webp", "tag": "积分对战 · 塔防", "title": "MYSKME 大乱斗", "en": "MYSKME BRAWL", "desc": "课堂积分对战 + 黑域塔防 · 六系角色养成 · 可分享炫耀战报卡。", "url": "https://myskme.github.io/myskme-brawl/"}
+#   卷二 · {"key": "threek", "glyph": "国", "cat": "tool", "rarity": "R", "cover": "assets/cover-threek.webp", "tag": "课堂游戏", "title": "三国军师争霸", "en": "THREE KINGDOMS", "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。", "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"}
 # ---------- 默认内容（管理员模式编辑后存 localStorage / 导出可覆盖此处） ----------
 DEFAULT_DATA = {
     "kicker": "THE MYSKME CHRONICLES · 王老师 MR. WANG",
@@ -31,10 +35,6 @@ DEFAULT_DATA = {
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
              "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码 / 投屏即用。",
              "url": "https://myskme.github.io/myskme-zimingqi/"},
-            {"key": "brawl", "glyph": "斗", "cat": "game", "rarity": "SR", "cover": "assets/cover-brawl.webp",
-             "tag": "积分对战 · 塔防", "title": "MYSKME 大乱斗", "en": "MYSKME BRAWL",
-             "desc": "课堂积分对战 + 黑域塔防 · 六系角色养成 · 可分享炫耀战报卡。",
-             "url": "https://myskme.github.io/myskme-brawl/"},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
              "desc": "狼先生与他的学生们 · 正典叙事与设定档案第二卷 —— 一切远征的源头。",
@@ -70,10 +70,6 @@ DEFAULT_DATA = {
              "tag": "课堂 · 积分榜", "title": "记分编年史", "en": "SCOREBOARD",
              "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线 PWA。",
              "url": "https://myskme.github.io/myskme-scoreboard/"},
-            {"key": "threek", "glyph": "国", "cat": "tool", "rarity": "R", "cover": "assets/cover-threek.webp",
-             "tag": "课堂游戏", "title": "三国军师争霸", "en": "THREE KINGDOMS",
-             "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。",
-             "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"},
             {"key": "print", "glyph": "印", "cat": "tool", "rarity": "N", "cover": "",
              "tag": "打印 / PDF", "title": "打印中心", "en": "PRINT CENTER",
              "desc": "从题库一键生成 选择卷 / 答案版 / 词表 / 默写版，A4 存 PDF。答案版需口令。",
@@ -911,7 +907,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：记分编年史、三国军师争霸、大乱斗、远征录、星灵远征、世界编年史、题库训练场。">
+<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：远征录、星灵远征、自鸣棋、世界编年史、题库训练场、记分编年史。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
 <meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
