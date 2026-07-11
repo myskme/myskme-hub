@@ -165,7 +165,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 
 /* ---------- 英雄区 · 编年史卷首 ---------- */
 .hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(20px,4vw,56px);
-  align-items:center;min-height:clamp(360px,62vh,560px);padding:clamp(40px,7vw,72px) 0 clamp(28px,5vw,44px);}
+  align-items:center;min-height:clamp(300px,46vh,430px);padding:clamp(26px,4vw,48px) 0 clamp(18px,3vw,28px);}
 .hero-art{position:relative;align-self:stretch;display:flex;align-items:flex-end;justify-content:center;min-height:280px;}
 .hero-figure{position:relative;width:100%;max-width:420px;aspect-ratio:1/1.12;}
 .hero-figure img{width:100%;height:100%;object-fit:contain;object-position:bottom center;
@@ -215,7 +215,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .stat span{font-size:11px;letter-spacing:.2em;color:var(--ink3);}
 .usehint{margin-top:26px;color:var(--ink3);font-size:12.5px;letter-spacing:.06em;line-height:1.8;max-width:40em;opacity:0;animation:fade 1.1s 1s both;}
 /* hero 底部星图分隔，暗示往下是同一世界的篇章 */
-.starmap{position:relative;z-index:2;height:60px;margin:0 auto clamp(30px,5vw,48px);opacity:.5;
+.starmap{position:relative;z-index:2;height:42px;margin:0 auto clamp(14px,2.5vw,26px);opacity:.5;
   -webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
 .starmap svg{width:100%;height:100%;display:block;}
 
@@ -239,7 +239,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 section[data-collapsed="1"] .grid{display:none!important;}
 .fs-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .fs-actions .btn{font-size:12.5px;padding:7px 14px;}
-section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
+section{margin-top:clamp(30px,5vw,54px);scroll-margin-top:76px;}
 .grid{display:grid;gap:clamp(13px,1.7vw,18px);grid-template-columns:repeat(auto-fill,minmax(248px,1fr));grid-auto-rows:1fr;}
 .card.featured{grid-column:span 1;}
 
