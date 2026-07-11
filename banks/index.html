@@ -152,7 +152,7 @@ footer a:hover{text-shadow:var(--glow)}
       <button id="lbGo">查看</button>
     </div>
     <div class="lb-list" id="lbList"><div class="lb-empty">正在取回天梯……</div></div>
-    <div class="lb-cta">还没上榜？<a href="https://myskme-games.netlify.app/word-duel" target="_blank" rel="noopener">去词灵对决打卡刷题 →</a> · <a href="#" id="lbPoster">📥 榜单海报</a></div>
+    <div class="lb-cta">还没上榜？<a href="https://myskme.github.io/myskme-quiz/word-duel.html" target="_blank" rel="noopener">去词灵对决打卡刷题 →</a> · <a href="#" id="lbPoster">📥 榜单海报</a></div>
   </section>
   <div class="shelf" id="shelf"><div class="loading">正在取回书架……</div></div>
   <footer>
@@ -171,7 +171,7 @@ if(btn)btn.addEventListener('click',function(){var nx=order[(order.indexOf(pref(
 if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(pref()==='auto')apply('auto')});
 apply(pref());
 })();
-var GAME='https://myskme-games.netlify.app/word-duel?code=';
+var GAME='https://myskme.github.io/myskme-quiz/word-duel.html?code=';
 var SHELF_URL='https://myskme.github.io/myskme-hub/banks/';
 var CATALOG=[];
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -331,7 +331,7 @@ document.getElementById('lbPoster').addEventListener('click',function(e){
     y+=86;
   });
   x.textAlign='center';x.fillStyle='#635943';x.font='400 22px "Noto Serif SC",serif';
-  x.fillText('扫码进词灵对决冲榜 · myskme-games.netlify.app/word-duel',W/2,H-40);
+  x.fillText('进词灵对决冲榜 · myskme.github.io/myskme-quiz/word-duel.html',W/2,H-40);
   cv.toBlob(function(b){if(!b){alert('海报导出失败');return;}var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='MYSKME-词灵榜-'+lbMode+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},3000);},'image/png');
 });
 lbWorld();

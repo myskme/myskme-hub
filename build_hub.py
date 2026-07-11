@@ -45,7 +45,7 @@ DEFAULT_DATA = {
             {"key": "quiz", "glyph": "题", "cat": "tool", "rarity": "UR", "cover": "assets/cover-quiz.webp",
              "tag": "题库训练 · 内含 2 套", "title": "题库训练场", "en": "QUIZ TRAINER",
              "desc": "两个玩法：「词灵对决」自己刷单词、输兑换码复习做过的卷；「无名之原」课堂肉鸽跟老师一起玩。",
-             "url": "https://myskme-games.netlify.app/", "featured": True},
+             "url": "https://myskme.github.io/myskme-quiz/", "featured": True},
             {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
              "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
              "desc": "中考题库总目 · 兑换码即卷号 · 点开即玩「词灵对决」，含时态 / 完形 / 阅读 / 语法陷阱专项。",

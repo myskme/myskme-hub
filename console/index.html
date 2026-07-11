@@ -233,7 +233,7 @@ footer{margin-top:60px;text-align:center;color:var(--ink4);font-size:11px;letter
 
 <script>
 /* ======================== 数据（可直接改） ======================== */
-var GAMES = "https://myskme-games.netlify.app";
+var GAMES = "https://myskme.github.io/myskme-quiz";
 
 /* 作品分组：每个作品 = {t标题, en, url, plat平台标签, note后台说明(HTML)} */
 var GROUPS = [
@@ -245,17 +245,17 @@ var GROUPS = [
     {t:"荣誉殿堂 · 作文墙", en:"Wall of Fame", url:"https://myskme.github.io/myskme-hub/wall/", plat:"pages",
      note:'班级口令 <code id="wallPw"></code> 进入；左下角 <b>✎</b> → 输入<b>本页密码</b> → <b>＋ 加作品</b>(作文扫描件) / <b>换图</b> / <b>📥 导出作文墙海报</b>。'},
   ]},
-  {label:"题库训练场 · Netlify（无 git 自动部署）", sub:"myskme-games", items:[
-    {t:"题库训练场 入口", en:"Quiz Trainer", url:GAMES+"/", plat:"netlify",
-     note:'启动页(网站根 index)，分流到词灵对决 / 无名之原。改启动页需整站重新部署；只改词灵对决才用 <code>deploy_wordduel.py</code>（仅换 word-duel.html，要 Netlify 令牌）。'},
-    {t:"词灵对决", en:"Word Duel", url:GAMES+"/word-duel", plat:"netlify",
+  {label:"题库训练场 · GitHub Pages（git push 即上线）", sub:"myskme-quiz", items:[
+    {t:"题库训练场 入口", en:"Quiz Trainer", url:GAMES+"/", plat:"pages",
+     note:'启动页(网站根 index)，分流到词灵对决 / 无名之原。2026-07-12 起搬 GitHub Pages（repo <code>myskme/myskme-quiz</code>），改文件 push 即上线，不再需要 Netlify 令牌；旧址 myskme-games.netlify.app 保留在线、不再更新。'},
+    {t:"词灵对决", en:"Word Duel", url:GAMES+"/word-duel.html", plat:"pages",
      note:'兑换码装题库；扫卷尾码 <code>?code=卷号</code> 自动装当期；战绩页「<b>📋 家长周报</b>」导出周报卡（已上线）。'},
-    {t:"无名之原", en:"Nameless Plain", url:GAMES+"/plain", plat:"netlify",
+    {t:"无名之原", en:"Nameless Plain", url:GAMES+"/plain.html", plat:"pages",
      note:'答题闯关。题库来源同书架（跨域读 hub <code>banks/</code>）。'},
   ]},
   {label:"课堂积分 / 叙事", sub:"scoreboards · RPG · lore", items:[
-    {t:"世界编年史 II", en:"VOLVME II", url:"https://myskme-volvme-ii.netlify.app", plat:"netlify",
-     note:'剧情 / 世界观档案。Netlify 拖拽部署，<b>无 git 仓库</b>。'},
+    {t:"世界编年史 II", en:"VOLVME II", url:"https://myskme.github.io/myskme-chronicle/", plat:"pages",
+     note:'完整八章故事版。2026-07-11 起搬 GitHub Pages（repo <code>myskme/myskme-chronicle</code>），push 即更新；旧 Netlify 图鉴站不再指向。'},
     {t:"远征录 · 笼中剑", en:"Expedition", url:"https://myskme-expedition.netlify.app", plat:"netlify",
      note:'学院谷地 RPG。Netlify 拖拽部署，<b>无 git 仓库</b>。'},
     {t:"积分板", en:"Scoreboard", url:"https://myskme.github.io/myskme-scoreboard/", plat:"pages",
@@ -343,7 +343,7 @@ function renderBanks(){
   var free=0,svip=0;
   var html=BANKS.map(function(b){
     if(b.tier==='free')free++;else if(b.tier==='svip')svip++;
-    var deep=GAMES+'/word-duel?code='+b.code;
+    var deep=GAMES+'/word-duel.html?code='+b.code;
     var tierLabel=b.tier==='free'?'免费':(b.tier==='svip'?'☠ 炼狱(SVIP)':'兑换码');
     return '<div class="bank">'
       +'<div class="code">'+esc(b.code)+'</div>'

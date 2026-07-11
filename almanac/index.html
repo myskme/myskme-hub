@@ -1200,8 +1200,8 @@ function openLesson(o){
     var starVal=stars;
     $$('#lgStars span').forEach(function(sp){sp.onclick=function(){starVal=+sp.dataset.v;$$('#lgStars span').forEach(function(x){x.classList.toggle('lit',+x.dataset.v<=starVal);});};});
     function drawLink(){var c=$('#lgCode').value.trim().toUpperCase();
-      $('#lgLink').innerHTML=c?('<div class="deeplink"><a href="https://myskme-games.netlify.app/word-duel?code='+encodeURIComponent(c)+'" target="_blank" rel="noopener">word-duel?code='+esc(c)+'</a><button class="btn btn-sm" id="lgCopy" style="min-height:26px;padding:3px 9px">复制</button></div>'):'';
-      var cp=$('#lgCopy');if(cp)cp.onclick=function(){navigator.clipboard&&navigator.clipboard.writeText('https://myskme-games.netlify.app/word-duel?code='+c);toast('链接已复制');};
+      $('#lgLink').innerHTML=c?('<div class="deeplink"><a href="https://myskme.github.io/myskme-quiz/word-duel.html?code='+encodeURIComponent(c)+'" target="_blank" rel="noopener">word-duel?code='+esc(c)+'</a><button class="btn btn-sm" id="lgCopy" style="min-height:26px;padding:3px 9px">复制</button></div>'):'';
+      var cp=$('#lgCopy');if(cp)cp.onclick=function(){navigator.clipboard&&navigator.clipboard.writeText('https://myskme.github.io/myskme-quiz/word-duel.html?code='+c);toast('链接已复制');};
     }
     $('#lgCode').addEventListener('input',drawLink);drawLink();
     $('#lgSave').onclick=function(){
