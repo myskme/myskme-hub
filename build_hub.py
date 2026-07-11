@@ -18,10 +18,10 @@ DEFAULT_DATA = {
     "titlePre": "MYSKME",
     "titleEm": "编年史",
     "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
-    "hint": "往下翻阅两卷 —— 每一件都可扫码即玩、离线可用、投屏可讲。",
+    "hint": "往下是 娱乐 与 学习 两区 —— 每一件都扫码即玩、离线可用、手机直接开。",
     "hubUrl": "https://myskme.github.io/myskme-hub/",
     "sections": [
-        {"label": "卷一 · 远征录", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 白昼推开冒险之门",
+        {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
              "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
@@ -33,18 +33,18 @@ DEFAULT_DATA = {
              "url": "https://myskme.github.io/myskme-starling/"},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码 / 投屏即用。",
-             "url": "https://myskme.github.io/myskme-zimingqi/"},
+             "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码即玩。",
+             "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
              "desc": "狼先生与他的学生们 · 正典叙事与设定档案第二卷 —— 一切远征的源头。",
              "url": "https://myskme-volvme-ii.netlify.app"},
         ]},
-        {"label": "卷二 · 学堂器物志", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 夜里以茶与尺执教",
-         "epigraph": "把中考四板块，做成可玩、可讲、可投屏的器物。", "icon": "book", "items": [
+        {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考四板块",
+         "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
             {"key": "quiz", "glyph": "题", "cat": "tool", "rarity": "UR", "cover": "assets/cover-quiz.webp",
              "tag": "题库训练 · 内含 2 套", "title": "题库训练场", "en": "QUIZ TRAINER",
-             "desc": "题库训练总入口 · 内含「词灵对决」单词训练 与「无名之原」答题闯关。做过的卷就是粮。",
+             "desc": "两个玩法：「词灵对决」自己刷单词、输兑换码复习做过的卷；「无名之原」课堂肉鸽跟老师一起玩。",
              "url": "https://myskme-games.netlify.app/", "featured": True},
             {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
              "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
@@ -584,9 +584,9 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var fb='<div class="thumb-fallback"'+(cover?' style="display:none"':'')+'><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
     var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'" onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
-    var badges=catIcon(it.cat)+'<span class="rarity-badge" aria-hidden="true">'+rar+'</span>';
+    var badges=catIcon(it.cat);
     var thumb='<a class="thumb" href="'+esc(it.url)+'" target="_blank" rel="noopener" aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
-    return '<article class="card ornate rar-'+rar+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
+    return '<article class="card ornate'+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
       +thumb
       +'<div class="card-body"><div class="card-heading">'+workMark(it)+'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'
         +'<h3><a class="title-link" href="'+esc(it.url)+'" target="_blank" rel="noopener" data-bind="title">'+esc(it.title)+'</a></h3>'
@@ -851,7 +851,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var tx=hx+hq+44;ctx.textAlign='left';
     ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
     ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
-    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('远征与学堂 · 中考四板块 · 一站直达',tx,hy+132);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('娱乐与学习 · 中考四板块 · 一站直达',tx,hy+132);
     ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
@@ -964,8 +964,8 @@ def static_header(d):
         f'      <p class="epilogue" data-h="hint">{d["hint"]}</p>\n'
         '      <div class="meta-row">\n'
         '        <div class="stat"><b id="stat-total">0</b><span>部作品</span></div>\n'
-        '        <div class="stat"><b id="stat-a">0</b><span>卷一 · 远征</span></div>\n'
-        '        <div class="stat"><b id="stat-b">0</b><span>卷二 · 学堂</span></div>\n'
+        '        <div class="stat"><b id="stat-a">0</b><span>娱乐</span></div>\n'
+        '        <div class="stat"><b id="stat-b">0</b><span>学习</span></div>\n'
         '      </div>\n'
         '    </div>\n'
         '  </header>\n'
