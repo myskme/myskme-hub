@@ -37,8 +37,8 @@ DEFAULT_DATA = {
              "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
-             "desc": "狼先生与他的学生们 · 正典叙事与设定档案第二卷 —— 一切远征的源头。",
-             "url": "https://myskme-volvme-ii.netlify.app"},
+             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。",
+             "url": "https://myskme.github.io/myskme-chronicle/"},
         ]},
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考四板块",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
