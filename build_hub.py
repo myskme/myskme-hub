@@ -240,9 +240,8 @@ section[data-collapsed="1"] .grid{display:none!important;}
 .fs-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .fs-actions .btn{font-size:12.5px;padding:7px 14px;}
 section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
-.grid{display:grid;gap:clamp(16px,2.2vw,22px);grid-template-columns:repeat(auto-fill,minmax(288px,1fr));grid-auto-rows:1fr;}
-.card.featured{grid-column:span 2;}
-@media (max-width:960px){.card.featured{grid-column:span 1;}}
+.grid{display:grid;gap:clamp(13px,1.7vw,18px);grid-template-columns:repeat(auto-fill,minmax(248px,1fr));grid-auto-rows:1fr;}
+.card.featured{grid-column:span 1;}
 
 .ornate{position:relative;}
 .ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;
@@ -257,9 +256,9 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
   opacity:0;transform:translateY(24px);}
 .card.in{opacity:1;transform:translateY(0);transition-delay:calc(var(--i) * 60ms);}
 .card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:var(--card-hover-shadow);}
-.card.featured{grid-column:span 2;border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 34px rgba(201,166,74,.07);}
-.card.featured .thumb{aspect-ratio:16/8.4;}
-.card.featured .card-body h3{font-size:24px;}
+.card.featured{border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 34px rgba(201,166,74,.07);}
+.card.featured .thumb{aspect-ratio:16/7;}
+.card.featured .card-body h3{font-size:21px;}
 /* 稀有度左描边点缀（同游戏卡稀有度色码，学生一眼对得上） */
 .card.rar-UR{--rc:#ffb13c}.card.rar-SSR{--rc:#c77dff}.card.rar-SR{--rc:#5aa9ff}.card.rar-R{--rc:#9fb0c0}.card.rar-N{--rc:#c2925a}
 .card[class*="rar-"]{border-left:2px solid color-mix(in srgb,var(--rc,var(--gold)) 55%,var(--line));}
@@ -276,7 +275,7 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .card.rar-N .rarity-badge{color:var(--ink);background:transparent;border:1px solid var(--rc);box-shadow:none;}
 
 /* 预览截图（hero）：满宽出血到卡片边缘，缺图回退字形 */
-.thumb{margin:-24px -24px 0;position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
+.thumb{margin:-24px -24px 0;position:relative;display:block;aspect-ratio:16/7;overflow:hidden;
   background:var(--bg4);border-bottom:1px solid var(--line);text-decoration:none;cursor:pointer;}
 .thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;
   filter:saturate(1.05);transition:transform .55s cubic-bezier(.16,1,.3,1),filter .4s;}
@@ -309,16 +308,18 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .card-desc{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.7;flex:1;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-.card-foot{display:flex;gap:18px;align-items:center;padding-top:16px;border-top:1px solid var(--line2);}
-.qr-plate{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;
+.card-foot{display:flex;flex-direction:column;gap:11px;padding-top:13px;border-top:1px solid var(--line2);}
+.qr-plate{display:none;flex-direction:column;align-items:center;gap:6px;padding:8px;align-self:center;
   background:#f3e9cf;border:1px solid var(--gold3);box-shadow:var(--plate-shadow);
   transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s;}
+.qr-plate.show{display:flex;animation:fade .35s both;}
 .qr-plate:hover{transform:scale(1.05);box-shadow:0 6px 22px rgba(0,0,0,.55),var(--glow-gold);}
-.qr-box{width:108px;height:108px;}
-.qr{width:108px;height:108px;display:block;}
+.qr-box{width:86px;height:86px;}
+.qr{width:86px;height:86px;display:block;}
 .qr-hint{font-size:10px;letter-spacing:.22em;color:#7a6320;font-weight:700;}
 .card-actions{flex:1;min-width:0;display:flex;flex-direction:column;gap:11px;}
-.url{font-size:12px;color:var(--ink3);word-break:break-all;letter-spacing:.02em;font-family:ui-monospace,Menlo,monospace;}
+.url{display:none;}
+body.admin .url{display:block;font-size:12px;color:var(--ink3);word-break:break-all;letter-spacing:.02em;font-family:ui-monospace,Menlo,monospace;}
 .btn-row{display:flex;gap:9px;flex-wrap:wrap;}
 .btn{font-family:var(--serif);font-size:13px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;
   border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;
@@ -519,10 +520,12 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
         +'<h3><a class="title-link" href="'+esc(it.url)+'" target="_blank" rel="noopener" data-bind="title">'+esc(it.title)+'</a></h3>'
         +'<span class="en" data-bind="en">'+esc(it.en)+'</span>'
         +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
-      +'<div class="card-foot"><div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">扫码即玩</span></div>'
-        +'<div class="card-actions"><span class="url" data-bind="url">'+esc(it.url)+'</span>'
-        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'" target="_blank" rel="noopener">访问 ↗</a>'
-        +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">复制链接</button></div></div></div>'
+      +'<div class="card-foot">'
+        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'" target="_blank" rel="noopener">打开 ↗</a>'
+        +'<button class="btn btn-qr">扫码</button>'
+        +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">复制</button></div>'
+        +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
+        +'<div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">扫码即玩 · 投屏给学生扫</span></div></div>'
       +'<div class="card-admin">'
         +'<button data-op="up" title="上移">↑ 上移</button><button data-op="down" title="下移">↓ 下移</button>'
         +'<button data-op="move" title="移到另一区">⇄ 换区</button>'
@@ -798,6 +801,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var op=e.target.closest('[data-op]'); if(op){doOp(op);return;}
     var add=e.target.closest('[data-addsec]'); if(add){addWork(+add.getAttribute('data-addsec'));return;}
     var cp=e.target.closest('.btn-copy'); if(cp){copyLink(cp);return;}
+    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card');var qp=qc&&qc.querySelector('.qr-plate');if(qp)qp.classList.toggle('show');return;}
     if(isAdmin()){var a=e.target.closest('a');if(a)e.preventDefault();}  // 编辑时不跳转
   });
 
