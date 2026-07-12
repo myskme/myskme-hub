@@ -35,7 +35,9 @@ DEFAULT_DATA = {
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
              "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码即玩。",
              "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
-            {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/cover-volvme.webp",
+            {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
+             "coverLegacy": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
              "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。",
              "url": "https://myskme.github.io/myskme-chronicle/"},
@@ -62,11 +64,15 @@ DEFAULT_DATA = {
              "tag": "每日打卡", "title": "每日一题", "en": "DAILY QUIZ",
              "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
              "url": "https://myskme.github.io/myskme-hub/daily/"},
-            {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/cover-wall.webp",
+            {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-wall-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
+             "coverLegacy": "assets/cover-wall.webp",
              "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
              "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
              "url": "https://myskme.github.io/myskme-hub/wall/"},
-            {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/cover-scoreboard.webp",
+            {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-scoreboard-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
+             "coverLegacy": "assets/cover-scoreboard.webp",
              "tag": "课堂 · 积分榜", "title": "记分编年史", "en": "SCOREBOARD",
              "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线 PWA。",
              "url": "https://myskme.github.io/myskme-scoreboard/"},
@@ -522,7 +528,8 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function mergeVisualDefaults(data){
     (data.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){
       var d=it.key&&DEFAULT_ITEM_BY_KEY[it.key]; if(!d)return;
-      if(!it.cover&&d.cover)it.cover=d.cover;
+      if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
+      if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
       if(!it.icon&&d.icon)it.icon=d.icon;
     });});
     return data;
@@ -581,8 +588,10 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     return '<span class="work-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
   function cardHTML(it,si,ii){
     var cover=it.cover||'';
+    var coverSmall=it.coverSmall||'';
     var fb='<div class="thumb-fallback"'+(cover?' style="display:none"':'')+'><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
-    var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'" onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
+    var srcset=coverSmall?' srcset="'+esc(coverSmall)+' 640w, '+esc(cover)+' 1280w" sizes="(max-width:720px) 94vw, 600px"':'';
+    var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'"'+srcset+' onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
     var badges=catIcon(it.cat);
     var thumb='<a class="thumb" href="'+esc(it.url)+'" target="_blank" rel="noopener" aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
