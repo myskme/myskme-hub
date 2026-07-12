@@ -58,7 +58,7 @@ flowchart LR
 
 数据契约：`schema/tiku.schema.json` + `schema/validate_tiku.py`；三层书架 `free / code / svip`。
 
-**公开题库书架页**：https://myskme.github.io/myskme-hub/banks/ —— 读 `index.json` 自动展示全部已发布题库（兑换码 · 题量 · 难度 · 门槛 + 「去刷题」直达 `word-duel?code=`）。CMS 一发布即自动上架，零维护。可印在卷子上或发家长群当总目录。
+**公开题库书架页**：https://myskme.github.io/myskme-hub/banks/ —— 读 `index.json` 自动展示全部已发布题库（兑换码 · 题量 · 难度 · 门槛 + 「去刷题」直达 `word-duel.html?code=`）。CMS 一发布即自动上架，零维护。可印在卷子上或发家长群当总目录。
 
 ## 四、词灵对决增强
 
