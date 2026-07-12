@@ -26,7 +26,7 @@ DEFAULT_DATA = {
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
              "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
              "desc": "学院谷地动作肉鸽 · 技能连招 · 探索成长 · 金叶与水晶经济 —— 狼先生宇宙的旗舰远征。",
-             "url": "https://myskme-expedition.netlify.app", "featured": True},
+             "url": "https://myskme.github.io/myskme-expedition-web/", "featured": True},
             {"key": "starling", "glyph": "灵", "cat": "game", "rarity": "SSR", "cover": "assets/cover-starling.webp",
              "tag": "电子宠物 · 养成", "title": "星灵远征", "en": "STARLING",
              "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回一封封寓言信。",

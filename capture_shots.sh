@@ -9,9 +9,9 @@ urls=(
   "https://myskme.github.io/myskme-scoreboard/"
   "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"
   "https://myskme.github.io/myskme-brawl/"
-  "https://myskme-expedition.netlify.app"
-  "https://myskme-volvme-ii.netlify.app"
-  "https://myskme-games.netlify.app/"
+  "https://myskme.github.io/myskme-expedition-web/"
+  "https://myskme.github.io/myskme-chronicle/"
+  "https://myskme.github.io/myskme-quiz/"
 )
 
 for i in "${!keys[@]}"; do
