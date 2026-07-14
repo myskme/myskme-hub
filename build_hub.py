@@ -18,22 +18,22 @@ DEFAULT_DATA = {
     "titlePre": "MYSKME",
     "titleEm": "编年史",
     "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
-    "hint": "往下是 娱乐 与 学习 两区 —— 每一件都扫码即玩、离线可用、手机直接开。",
+    "hint": "往下是 娱乐 与 学习 两区 —— 每一件都免下载免安装，扫码即玩，手机直接开。",
     "hubUrl": "https://myskme.github.io/myskme-hub/",
     "sections": [
         {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
              "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
-             "desc": "学院谷地动作肉鸽 · 技能连招 · 探索成长 · 金叶与水晶经济 —— 狼先生宇宙的旗舰远征。",
+             "desc": "学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备 —— 狼先生宇宙的旗舰。",
              "url": "https://myskme.github.io/myskme-expedition-web/", "featured": True},
             {"key": "starling", "glyph": "灵", "cat": "game", "rarity": "SSR", "cover": "assets/cover-starling.webp",
              "tag": "电子宠物 · 养成", "title": "星灵远征", "en": "STARLING",
              "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回一封封寓言信。",
              "url": "https://myskme.github.io/myskme-starling/"},
-            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SR", "cover": "assets/cover-zimingqi.webp",
+            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码即玩。",
+             "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 35 位正典角色，扫码即玩。",
              "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
@@ -42,16 +42,12 @@ DEFAULT_DATA = {
              "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。",
              "url": "https://myskme.github.io/myskme-chronicle/"},
         ]},
-        {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考四板块",
+        {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
             {"key": "quiz", "glyph": "题", "cat": "tool", "rarity": "UR", "cover": "assets/cover-quiz.webp",
-             "tag": "题库训练 · 内含 2 套", "title": "题库训练场", "en": "QUIZ TRAINER",
-             "desc": "两个玩法：「词灵对决」自己刷单词、输兑换码复习做过的卷；「无名之原」课堂肉鸽跟老师一起玩。",
+             "tag": "题库训练 · 两种玩法", "title": "题库训练场", "en": "QUIZ TRAINER",
+             "desc": "『词灵对决』自己刷：输兑换码，做过的卷变游戏；『无名之原』课堂肉鸽跟老师一起玩。",
              "url": "https://myskme.github.io/myskme-quiz/", "featured": True},
-            {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
-             "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
-             "desc": "中考题库总目 · 兑换码即卷号 · 点开即玩「词灵对决」，含时态 / 完形 / 阅读 / 语法陷阱专项。",
-             "url": "https://myskme.github.io/myskme-hub/banks/"},
             {"key": "listen", "glyph": "听", "cat": "tool", "rarity": "R", "cover": "assets/cover-listen.webp",
              "tag": "中考 · 听力", "title": "听力训练场", "en": "LISTENING",
              "desc": "中考听力精练 · 多语音朗读 · 逐句跟读 · 浏览器直接播放，免下载。",
@@ -64,6 +60,10 @@ DEFAULT_DATA = {
              "tag": "每日打卡", "title": "每日一题", "en": "DAILY QUIZ",
              "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
              "url": "https://myskme.github.io/myskme-hub/daily/"},
+            {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
+             "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
+             "desc": "词灵对决的书架 · 全部题库亮在架上点开即玩 · 时态 / 完形 / 阅读 / 陷阱专项 + 剧集卷。",
+             "url": "https://myskme.github.io/myskme-hub/banks/"},
             {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-wall-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
              "coverLegacy": "assets/cover-wall.webp",
@@ -74,7 +74,7 @@ DEFAULT_DATA = {
              "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
              "coverLegacy": "assets/cover-scoreboard.webp",
              "tag": "课堂 · 积分榜", "title": "记分编年史", "en": "SCOREBOARD",
-             "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线 PWA。",
+             "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理 —— 老师投屏上课用，免安装、断网也能记。",
              "url": "https://myskme.github.io/myskme-scoreboard/"},
             {"key": "print", "glyph": "印", "cat": "tool", "rarity": "N", "cover": "assets/cover-print.webp",
              "tag": "打印 / PDF", "title": "打印中心", "en": "PRINT CENTER",
@@ -111,6 +111,7 @@ CSS = r"""
   --card-hover-shadow:0 18px 50px rgba(0,0,0,.5),inset 0 0 40px rgba(201,166,74,.05);
   --plate-shadow:0 4px 16px rgba(0,0,0,.4);
   --bar-bg:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));
+  --nav-bg:linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8));
 }
 /* ---- 浅色（羊皮纸）主题：data-theme 由脚本按 跟随系统/浅/深 解析后写入 ---- */
 :root[data-theme="light"]{
@@ -129,6 +130,7 @@ CSS = r"""
   --card-hover-shadow:0 14px 36px rgba(120,90,30,.20),inset 0 0 40px rgba(201,166,74,.06);
   --plate-shadow:0 4px 14px rgba(120,90,30,.25);
   --bar-bg:linear-gradient(180deg,#f2e8d2,rgba(242,232,210,.97));
+  --nav-bg:linear-gradient(180deg,rgba(236,226,204,.96),rgba(236,226,204,.86));
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -151,7 +153,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 
 /* ---------- 卷目录 · sticky 顶栏 ---------- */
 .volnav{position:sticky;top:0;z-index:35;
-  background:linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8));
+  background:var(--nav-bg,linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8))); /* 浅色主题下原硬编码深底会压出不可读白字 */
   -webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);
   border-bottom:1px solid var(--line);}
 .volnav-inner{max-width:1220px;margin:0 auto;width:100%;
@@ -160,8 +162,9 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .volnav-brand{font-family:var(--serif);font-size:14px;letter-spacing:.24em;color:var(--gold2);
   white-space:nowrap;margin-right:14px;padding-right:14px;border-right:1px solid var(--line2);flex:0 0 auto;}
 .volnav-brand b{font-weight:400;}
+a.volnav-brand{text-decoration:none;}a.volnav-brand:hover{color:var(--gold);}
 .vlink{font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;color:var(--ink3);text-decoration:none;
-  white-space:nowrap;padding:6px 13px;border-radius:2px;position:relative;transition:color .3s;flex:0 0 auto;}
+  white-space:nowrap;padding:11px 13px;border-radius:2px;position:relative;transition:color .3s;flex:0 0 auto;}
 .vlink:hover{color:var(--ink);}
 .vlink.on{color:var(--gold2);}
 .vlink.on::after{content:'';position:absolute;left:13px;right:13px;bottom:1px;height:1px;background:var(--gold);box-shadow:var(--glow-gold);}
@@ -189,6 +192,12 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .hero-figure.nofig{display:flex;align-items:center;justify-content:center;aspect-ratio:auto;min-height:280px;}
 .hero-figure.nofig .hero-crestbig{display:flex;}
 .hero-figure.nofig .hero-halo{display:none;}
+@media (max-width:560px){ /* 小屏 hero 瘦身:原首屏≈550px 只见英雄区,一张作品卡都看不到;选择器加 .hero 前缀提特异性,防被后面 820 断点同名规则按源顺序覆盖 */
+  .hero .hero-figure img{max-width:150px;}
+  .hero .motto{font-size:13px;}
+  .hero .epilogue{font-size:12px;}
+  .hero .meta-row .stat b{font-size:20px;}
+}
 @media (max-width:820px){
   .hero{grid-template-columns:1fr;text-align:center;min-height:auto;gap:6px;padding:32px 0 22px;}
   .hero-art{order:-1;min-height:180px;align-items:center;}
@@ -263,8 +272,6 @@ section{margin-top:clamp(30px,5vw,54px);scroll-margin-top:76px;}
 .card.in{opacity:1;transform:translateY(0);transition-delay:calc(var(--i) * 60ms);}
 .card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:var(--card-hover-shadow);}
 .card.featured{border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 34px rgba(201,166,74,.07);}
-.card.featured .thumb{aspect-ratio:16/7;}
-.card.featured .card-body h3{font-size:21px;}
 @media (min-width:1101px){
   .card.finale{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
     grid-template-areas:"thumb thumb" "body foot";align-items:stretch;column-gap:22px;}
@@ -305,8 +312,6 @@ section{margin-top:clamp(30px,5vw,54px);scroll-margin-top:76px;}
 .thumb-fallback span{font-size:62px;font-weight:300;color:var(--gold);text-shadow:0 0 24px rgba(201,166,74,.35);transition:transform .5s cubic-bezier(.16,1,.3,1);}
 .card:hover .thumb-fallback span{transform:scale(1.08);}
 .card-body{display:flex;flex-direction:column;gap:9px;flex:1;}
-.ribbon{position:absolute;top:14px;right:-30px;transform:rotate(45deg);background:var(--gold);
-  color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.22em;padding:3px 34px;z-index:4;box-shadow:0 2px 10px rgba(0,0,0,.4);}
 
 .card-head{display:flex;gap:15px;align-items:center;}
 .badge{flex:0 0 64px;width:64px;height:64px;border:1px solid var(--line);position:relative;
@@ -326,6 +331,9 @@ section{margin-top:clamp(30px,5vw,54px);scroll-margin-top:76px;}
 .card:hover .work-mark::after{border-color:var(--gold3);transform:rotate(135deg);}
 .card-titles{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px;}
 .tag{align-self:flex-start;font-size:11px;letter-spacing:.2em;color:var(--gold);border:1px solid var(--line);padding:2px 9px;}
+.feat-tag{color:#141008;background:var(--gold);border-color:var(--gold);font-weight:700;}
+.card-titles{flex-direction:row !important;flex-wrap:wrap;align-items:center;column-gap:8px;}
+.card-titles h3,.card-titles .en{flex-basis:100%;}
 .card-body h3{margin:0;font-size:21px;font-weight:500;letter-spacing:.06em;line-height:1.35;}
 .card-body h3 a{color:var(--ink);text-decoration:none;transition:color .3s,text-shadow .3s;}
 .card:hover .card-body h3 a{color:var(--gold2);text-shadow:0 0 18px rgba(201,166,74,.4);}
@@ -432,12 +440,12 @@ footer b{color:var(--ink2);font-weight:400;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 
 @media (max-width:760px){
+  .card-desc{-webkit-line-clamp:3;} /* 2行会把最长几张主推卡的后半句卖点截掉 */
   .grid{grid-template-columns:1fr;}
   .card-foot{flex-direction:column;align-items:stretch;}
   .qr-plate{align-self:center;}
   .card-actions{align-items:center;text-align:center;}
   .url{text-align:center;}
-  .ribbon{font-size:10px;padding:3px 30px;}
   .admin-bar .ab-title{width:100%;margin-bottom:4px;}
   .ctrl{right:10px;bottom:10px;gap:6px;flex-direction:column;}
   .toast{bottom:78px;max-width:82vw;}
@@ -474,7 +482,7 @@ footer b{color:var(--ink2);font-weight:400;}
   body::before,body::after{display:none!important;}
   /* 一页汇总：隐藏图片/简介/按钮等，只留 标题 + 二维码 + 链接，紧凑排成一页 */
   .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb,.work-mark,
-  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.ribbon,.foot-share,
+  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.foot-share,
   .volnav,.hero-art,.starmap,.chap-era,.chap-epi,.cat-icon,.rarity-badge,.rule-caret{display:none!important;}
   .hero{display:block!important;min-height:0!important;padding:0!important;}
   .rule{margin-bottom:2mm!important;}
@@ -593,16 +601,18 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var srcset=coverSmall?' srcset="'+esc(coverSmall)+' 640w, '+esc(cover)+' 1280w" sizes="(max-width:720px) 94vw, 600px"':'';
     var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'"'+srcset+' onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
-    var badges=catIcon(it.cat);
-    var thumb='<a class="thumb" href="'+esc(it.url)+'" target="_blank" rel="noopener" aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
-    return '<article class="card ornate'+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
+    var ext=(it.url||'').indexOf('myskme.github.io/myskme-hub/')<0; // hub 自家子页当前标签打开,保住返回键;外站才开新标签
+    var tgt=ext?' target="_blank" rel="noopener"':'';
+    var badges=catIcon(it.cat)+'<span class="rarity-badge">'+rar+'</span>'; // 稀有度角标接线——CSS 早就写好(rar-* 左描边+角标),markup 一直没输出
+    var thumb='<a class="thumb" href="'+esc(it.url)+'"'+tgt+' aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
+    return '<article class="card ornate rar-'+rar+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
       +thumb
-      +'<div class="card-body"><div class="card-heading">'+workMark(it)+'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'
-        +'<h3><a class="title-link" href="'+esc(it.url)+'" target="_blank" rel="noopener" data-bind="title">'+esc(it.title)+'</a></h3>'
+      +'<div class="card-body"><div class="card-heading">'+workMark(it)+'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'+(it.featured?'<span class="tag feat-tag">★ 主推</span>':'')
+        +'<h3><a class="title-link" href="'+esc(it.url)+'"'+tgt+' data-bind="title">'+esc(it.title)+'</a></h3>'
         +'<span class="en" data-bind="en">'+esc(it.en)+'</span></div></div>'
         +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
       +'<div class="card-foot">'
-        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+uiIcon('external')+'<span>访问</span></a>'
+        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'"'+tgt+'>'+uiIcon('external')+'<span>访问</span></a>'
         +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
         +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
         +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
@@ -610,7 +620,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
       +'<div class="card-admin">'
         +'<button data-op="up" title="上移">↑ 上移</button><button data-op="down" title="下移">↓ 下移</button>'
         +'<button data-op="move" title="移到另一区">⇄ 换区</button>'
-        +'<button data-op="feat" title="HUB 角标开关">★ 角标</button>'
+        +'<button data-op="feat" title="主推开关(金色边框+★主推章)">★ 主推</button>'
         +'<button data-op="del" class="danger" title="删除此作品">删除</button>'
       +'</div></article>';
   }
@@ -627,7 +637,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   }
   function buildNav(){
     var nav=document.getElementById('volnav-inner'); if(!nav)return;
-    var h='<span class="volnav-brand">✦ <b>MYSKME 编年史</b></span>';
+    var h='<a class="volnav-brand" href="#top" title="回到顶部">✦ <b>MYSKME 总目</b></a>'; // 品牌可点=回顶;自称统一「总目」,让「编年史」独属世界编年史
     DATA.sections.forEach(function(sec,si){
       var anc=sec.anchor||('vol-'+(si+1));
       h+='<a class="vlink" href="#'+anc+'" data-nav="'+anc+'">'+(sec.vol?'<span class="vl-num">'+esc(sec.vol)+'</span>':'')+esc((sec.label||'').replace(/^卷[一二三四五六七八九十]+\s*·\s*/,''))+'</a>';
@@ -860,7 +870,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var tx=hx+hq+44;ctx.textAlign='left';
     ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
     ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
-    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('娱乐与学习 · 中考四板块 · 一站直达',tx,hy+132);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('娱乐与学习 · 中考修行 · 一站直达',tx,hy+132);
     ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
@@ -997,10 +1007,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：远征录、星灵远征、自鸣棋、世界编年史、题库训练场、记分编年史。">
+<meta name="description" content="王老师的原创作品总目：远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
+<meta property="og:description" content="王老师的原创作品总目：远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <meta property="og:url" content="https://myskme.github.io/myskme-hub/">
 <meta name="twitter:card" content="summary_large_image">
@@ -1019,6 +1029,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
   <button id="abExit">退出</button>
 </div>
 
+<a id="top"></a>
 <nav class="volnav" id="volnav"><div class="volnav-inner" id="volnav-inner"></div></nav>
 
 <div class="wrap">
@@ -1037,20 +1048,29 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       </div>
     </div>
     <div class="foot-links">
-      <a href="https://myskme.github.io/myskme-hub/banks/" target="_blank" rel="noopener">题库书架</a>
+      <a href="https://myskme.github.io/myskme-expedition-web/" target="_blank" rel="noopener">远征录</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/wall/" target="_blank" rel="noopener">优秀作文墙</a>
+      <a href="https://myskme.github.io/myskme-starling/" target="_blank" rel="noopener">星灵远征</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/write/" target="_blank" rel="noopener">作文训练场</a>
+      <a href="https://myskme.github.io/myskme-zimingqi/" target="_blank" rel="noopener">自鸣棋</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/daily/" target="_blank" rel="noopener">每日一题</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/listen/" target="_blank" rel="noopener">听力训练场</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/print/" target="_blank" rel="noopener">打印中心</a>
+      <a href="https://myskme.github.io/myskme-chronicle/" target="_blank" rel="noopener">世界编年史</a>
     </div>
-    <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
-    <div>单文件离线作品总目 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
+    <div class="foot-links">
+      <a href="https://myskme.github.io/myskme-hub/banks/">题库书架</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/wall/">优秀作文墙</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/write/">作文训练场</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/daily/">每日一题</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/listen/">听力训练场</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/print/">打印中心</a>
+    </div>
+    <div><b>MYSKME</b> — Make Yourself Special &amp; Kind · Mr. Wang（王老师）</div>
+    <div>免下载免安装 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
   </footer>
 </div>
 
