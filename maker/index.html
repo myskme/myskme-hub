@@ -531,7 +531,7 @@ function boot(){
   }).catch(function(){});
 }
 /* ---------- 管理员软门（与控制台同一管理员口令的 sha256 校验；明文口令不写入源码） ---------- */
-var MAKER_HASH="660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2";
+var MAKER_HASH="4f25090d6fd1faaafc8e801097c637011e95ce24832554056a258726f15e6585";
 var GK='myskme-maker-ok',booted=false;
 async function sha256hex(s){try{var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')}catch(e){return ''}}
 function openTool(){var g=$('#gate');if(g)g.style.display='none';var lb=$('#lockBtn');if(lb)lb.hidden=false;if(!booted){booted=true;boot();}}

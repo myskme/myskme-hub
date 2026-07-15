@@ -18,7 +18,7 @@
 - **正式名**：授业历 · MYSKME Almanac（备选：狼历 / 排课编年史，如用户另有偏好可换，路由不变）
 - **一句话**：狼先生的私人授业年鉴——排课是「计划」，消课是「落印」，记录是「编年」。
 - **性质**：王老师**个人后台工具**（同控制台/出题工坊定位）：
-  - 软门：SHA-256 管理员口令校验（哈希 `660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2`，与 console/maker 同一枚；**明文不入源码含注释**），sessionStorage 记住解锁，右下 🔒 退出。
+  - 软门：SHA-256 管理员口令校验（哈希 `PW_HASH`，与 console/maker/forge/wall/hub 同一枚·随口令轮换统一更新；**明文不入源码含注释**），sessionStorage 记住解锁，右下 🔒 退出。
   - `<meta name="robots" content="noindex">`；不放 hub 公开卡片/页脚。
   - 入口：console「作品速达」加一项 + hub 管理员模式 admin-bar 加「授业历 ↗」（改 `build_hub.py`）。
   - 学生数据只存 localStorage，**永不入 git**。学生姓名建议沿用作文墙的化名习惯。

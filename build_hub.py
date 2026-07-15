@@ -93,7 +93,7 @@ SHOTS = {}  # 停用截图自动注入
 
 # 管理口令以 sha256 存储，明文不入源码（与 maker/almanac/forge/console 同范式）。
 # 值 = sha256(管理口令)。改口令：printf '%s' '新口令' | shasum -a 256，把输出填这里。
-PASSWORD_HASH = "660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2"
+PASSWORD_HASH = "4f25090d6fd1faaafc8e801097c637011e95ce24832554056a258726f15e6585"
 
 CSS = r"""
 :root{
