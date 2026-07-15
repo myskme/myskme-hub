@@ -3029,7 +3029,8 @@ var DEFAULT_DATA = {
 };
 /*DATA_END*/
 
-var LS='myskme-hub-data', SS='myskme-admin', PW='mrwolf4358';
+var LS='myskme-hub-data', SS='myskme-admin', PW_HASH='660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2';
+function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0');}).join('');}).catch(function(){return '';});}
 (function(){
   var content=document.getElementById('content');
   var header=document.querySelector('header');
@@ -3288,8 +3289,10 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='mrwolf4358';
   function openPw(){mask.classList.add('show');pwBox.classList.remove('err');pwInput.value='';setTimeout(function(){pwInput.focus();},60);}
   function closePw(){mask.classList.remove('show');}
   function tryPw(){
-    if(pwInput.value===PW){closePw();setAdmin(true);toast('已进入管理员模式');}
-    else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    sha256hex((pwInput.value||'').trim()).then(function(h){
+      if(h===PW_HASH){closePw();setAdmin(true);toast('已进入管理员模式');}
+      else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    });
   }
   function setAdmin(on){
     document.body.classList.toggle('admin',on);

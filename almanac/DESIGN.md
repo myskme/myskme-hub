@@ -2,7 +2,7 @@
 
 > **状态（2026-07-05）**：**P0 + P1 已上线**（`almanac/index.html`，Pages 已部署，浏览器全流程验收通过）。
 > P0=排课/消课/门生/周历/今日/设置。**P1 已完成**：① 统计视图(KPI 完成节数·课时·课酬👁 + 门生分布彩条 + 月度热力图·点格跳周历·今日描金 + 编年小结 + 本周/本月切换) ② 一句话排课(确定性正则，识别门生/星期集合/相对日/M.D/下午N点半，实时预览) ③ 周历课块拖拽改期(两档·断代保历史)。上次记录骨架预填、待落印提醒已在 P0 完成。
-> 门禁已防呆：👁 显示口令 + `autocapitalize=none/autocorrect=off`（修手机自动大写导致登录失败）+ 解锁状态存 localStorage（本机记一次）。口令明文 `mrwolf4358`（全小写）。
+> 门禁已防呆：👁 显示口令 + `autocapitalize=none/autocorrect=off`（修手机自动大写导致登录失败）+ 解锁状态存 localStorage（本机记一次）。口令为王老师管理口令（全小写，sha256 哈希存储，明文不入源码）。
 > **下一步候选**：家长课程简报(一键生成可复制文字摘要)、待办/提醒中心(待落印+低余额+欠补汇总)、A4 打印周表、ICS 导出、console/hub-admin 入口接线(需先读新版 build_hub.py)、可选云档同步。
 > 施工经验：① 门禁/弹层用 class 选 `display` 会压过 `[hidden]` 属性 → 全局 `[hidden]{display:none!important}` 别删。② `file://` 无 `crypto.subtle`，软门走内置纯 JS SHA-256 兜底(geraintluff 版，已验证)；线上 Pages 走 crypto.subtle。③ **Pages deploy 步骤偶发 transient 失败**(build 成功、deploy 失败、error 描述为空)→ 推空 commit 重触发即可(本仓库历史反复出现)。④ 统计/热力图密度并入无排课实例的孤儿落印记录，避免与 KPI(按 logs 计)不一致。
 

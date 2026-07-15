@@ -91,7 +91,9 @@ _sp = os.path.join(HERE, "shots.json")
 # 旧的自动截图（作文墙/记分/三国等）与新封面/字形徽风格不统一，故停用，改由 cover 字段统一。
 SHOTS = {}  # 停用截图自动注入
 
-PASSWORD = "mrwolf4358"
+# 管理口令以 sha256 存储，明文不入源码（与 maker/almanac/forge/console 同范式）。
+# 值 = sha256(管理口令)。改口令：printf '%s' '新口令' | shasum -a 256，把输出填这里。
+PASSWORD_HASH = "660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2"
 
 CSS = r"""
 :root{
@@ -520,7 +522,8 @@ footer b{color:var(--ink2);font-weight:400;}
 """
 
 APP_JS = r"""
-var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
+var LS='myskme-hub-data', SS='myskme-admin', PW_HASH='%%PWHASH%%';
+function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0');}).join('');}).catch(function(){return '';});}
 (function(){
   var content=document.getElementById('content');
   var header=document.querySelector('header');
@@ -779,8 +782,10 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function openPw(){mask.classList.add('show');pwBox.classList.remove('err');pwInput.value='';setTimeout(function(){pwInput.focus();},60);}
   function closePw(){mask.classList.remove('show');}
   function tryPw(){
-    if(pwInput.value===PW){closePw();setAdmin(true);toast('已进入管理员模式');}
-    else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    sha256hex((pwInput.value||'').trim()).then(function(h){
+      if(h===PW_HASH){closePw();setAdmin(true);toast('已进入管理员模式');}
+      else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    });
   }
   function setAdmin(on){
     document.body.classList.toggle('admin',on);
@@ -992,7 +997,7 @@ def static_header(d):
     )
 
 data_json = json.dumps(DEFAULT_DATA, ensure_ascii=False, indent=2)
-app = APP_JS.replace("%%PW%%", PASSWORD)
+app = APP_JS.replace("%%PWHASH%%", PASSWORD_HASH)
 
 PAGE = """<!doctype html>
 <html lang="zh-CN" data-theme="dark" data-themepref="auto">
@@ -1116,4 +1121,4 @@ page = (PAGE
 
 with open(OUT, "w", encoding="utf-8") as f:
     f.write(page)
-print("WROTE", OUT, len(page), "bytes; password:", PASSWORD)
+print("WROTE", OUT, len(page), "bytes; 管理口令走 sha256 哈希门（明文不入源码/日志）")

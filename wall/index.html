@@ -209,7 +209,8 @@ var DEFAULT_WALL = {
 /*WALLDATA_END*/
 
 (function(){
-  var LS='myskme-wall', SS='myskme-wall-admin', PW='mrwolf4358';
+  var LS='myskme-wall', SS='myskme-wall-admin', PW_HASH='660f6c10b837bfafe392f871ec01c410c5adcd25f263bde0e3fa1dd0295827d2'; // sha256(管理口令)，明文不入源码（同 maker/almanac/hub 范式）
+  function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0');}).join('');}).catch(function(){return '';});}
   var DATA=load(), filter='全部';
   var wallEl=document.getElementById('wall'), emptyEl=document.getElementById('empty'),
       filtersEl=document.getElementById('filters'), toastEl=document.getElementById('toast');
@@ -359,7 +360,7 @@ var DEFAULT_WALL = {
   document.getElementById('pwCancel').onclick=function(){mask.classList.remove('show');};
   document.getElementById('pwOk').onclick=tryPw;
   pwIn.addEventListener('keydown',function(e){if(e.key==='Enter')tryPw();if(e.key==='Escape')mask.classList.remove('show');});
-  function tryPw(){if(pwIn.value===PW){mask.classList.remove('show');document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}}
+  function tryPw(){sha256hex((pwIn.value||'').trim()).then(function(h){if(h===PW_HASH){mask.classList.remove('show');document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}});}
   document.getElementById('aExit').onclick=function(){document.body.classList.remove('admin');sessionStorage.removeItem(SS);applyAdmin();toast('已退出');};
   document.getElementById('aReload').onclick=function(){if(!confirm('丢弃本机所有未导出的改动，重新载入线上最新内容？'))return;try{localStorage.removeItem(LS);}catch(e){}location.reload();};
   document.getElementById('aGate').onclick=function(){var g=prompt('设置班级口令（留空=公开，无门槛）：',DATA.gate||'');if(g!==null){DATA.gate=g.trim();save();toast(DATA.gate?'已设口令：'+DATA.gate:'已设为公开');}};
