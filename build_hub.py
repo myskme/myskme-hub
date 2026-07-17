@@ -39,8 +39,9 @@ DEFAULT_DATA = {
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
              "coverLegacy": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
-             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。",
-             "url": "https://myskme.github.io/myskme-chronicle/"},
+             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。",
+             "url": "https://myskme.github.io/myskme-chronicle/",
+             "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月"},
         ]},
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
@@ -365,6 +366,8 @@ body.admin .url{display:block;font-size:12px;color:var(--ink3);word-break:break-
 .btn:active{transform:scale(.96);}
 .btn-go{background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border-color:var(--gold3);}
 .btn-go:hover{background:linear-gradient(180deg,rgba(201,166,74,.3),rgba(201,166,74,.12));}
+.btn-go2{border-color:var(--gold3);color:var(--gold2);}
+.btn-go2:hover{background:rgba(201,166,74,.10);}
 a:focus-visible,button:focus-visible,input:focus-visible,[contenteditable="true"]:focus-visible{
   outline:2px solid var(--gold2);outline-offset:3px;box-shadow:0 0 0 5px rgba(201,166,74,.14);}
 
@@ -616,6 +619,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
         +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
       +'<div class="card-foot">'
         +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'"'+tgt+'>'+uiIcon('external')+'<span>访问</span></a>'
+        +(it.url2?'<a class="btn btn-go2" href="'+esc(it.url2)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url2label||'更多')+'</span></a>':'')
         +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
         +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
         +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
