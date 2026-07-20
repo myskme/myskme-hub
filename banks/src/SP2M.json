@@ -1,0 +1,170 @@
+{
+  "name": "SP2M 十一封未烧的信·诺（人物传VOL.1·中级）",
+  "code": "SP2M",
+  "desc": "人物传 VOL.1 中级档（传主：诺·学徒版） · 13 道自包含单选（三单否定/现在完成入门/hers/often 位置/any/How 感叹/there be/进行否定/Whose/eleventh/wrote/want to/图证反选）。",
+  "date": "2026-07-21",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "level": "进阶",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. Nuo ___ like to talk much.",
+        "ops": [
+          "don't",
+          "isn't",
+          "not",
+          "doesn't"
+        ],
+        "ans": 3,
+        "why": "三单否定 → doesn't like。",
+        "lv": 1
+      },
+      {
+        "q": "7. Nuo ___ the letters for eleven years.",
+        "ops": [
+          "keeps",
+          "kept",
+          "is keeping",
+          "has kept"
+        ],
+        "ans": 3,
+        "why": "for eleven years + 延续至今 → 现在完成。",
+        "lv": 2
+      },
+      {
+        "q": "8. The letters are ___ — every one of them.",
+        "ops": [
+          "her",
+          "hers",
+          "she",
+          "she's"
+        ],
+        "ans": 1,
+        "why": "名词性物主代词 hers=her letters。",
+        "lv": 2
+      },
+      {
+        "q": "9. Nuo ___ at night, with the window open.",
+        "ops": [
+          "often reads",
+          "reads often",
+          "is often read",
+          "often reading"
+        ],
+        "ans": 0,
+        "why": "频度副词在实义动词前。",
+        "lv": 2
+      },
+      {
+        "q": "10. There isn't ___ fire on the candle now.",
+        "ops": [
+          "some",
+          "many",
+          "any",
+          "a"
+        ],
+        "ans": 2,
+        "why": "否定句 + 不可数 → any。",
+        "lv": 1
+      },
+      {
+        "q": "11. ___ quiet the room is!",
+        "ops": [
+          "What",
+          "What a",
+          "How",
+          "How a"
+        ],
+        "ans": 2,
+        "why": "How + adj + it is。",
+        "lv": 2
+      },
+      {
+        "q": "14. There ___ an empty chair near the desk.",
+        "ops": [
+          "are",
+          "has",
+          "is",
+          "be"
+        ],
+        "ans": 2,
+        "why": "单数 → There is。",
+        "lv": 1
+      },
+      {
+        "q": "15. Look! The candle ___ now.",
+        "ops": [
+          "doesn't burn",
+          "isn't burn",
+          "not burning",
+          "isn't burning"
+        ],
+        "ans": 3,
+        "why": "Look!+now → 进行时否定。",
+        "lv": 2
+      },
+      {
+        "q": "16. — ___ chair is that near the desk? — It was Wan's.",
+        "ops": [
+          "Who",
+          "Which",
+          "Whose",
+          "What"
+        ],
+        "ans": 2,
+        "why": "问所属 → Whose chair。",
+        "lv": 2
+      },
+      {
+        "q": "17. The ___ letter arrived the day Wan disappeared.",
+        "ops": [
+          "eleventh",
+          "eleven",
+          "eleventeen",
+          "eleventy"
+        ],
+        "ans": 0,
+        "why": "the + eleventh。",
+        "lv": 2
+      },
+      {
+        "q": "18. Before she disappeared, Wan ___ Nuo a letter every spring.",
+        "ops": [
+          "writes",
+          "writed",
+          "writing",
+          "wrote"
+        ],
+        "ans": 3,
+        "why": "过去习惯 → wrote。",
+        "lv": 2
+      },
+      {
+        "q": "19. Nuo wants ___ the last letter again tonight.",
+        "ops": [
+          "read",
+          "to read",
+          "reading",
+          "reads"
+        ],
+        "ans": 1,
+        "why": "want to do。",
+        "lv": 1
+      },
+      {
+        "q": "20. 对照观星房再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "There are eleven letters on the wall.",
+          "Every letter have a pin on it.",
+          "The candle isn't burning now.",
+          "The chair near the desk is empty."
+        ],
+        "ans": 1,
+        "why": "every letter 三单 → has a pin。",
+        "lv": 2
+      }
+    ]
+  }
+}

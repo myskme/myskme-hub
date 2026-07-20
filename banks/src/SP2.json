@@ -1,0 +1,194 @@
+{
+  "name": "SP2 十一封未烧的信·诺（人物传VOL.1）",
+  "code": "SP2",
+  "desc": "2026 暑假特辑·人物传 VOL.1 高级档（传主：诺） · 15 道自包含单选（宾从语序/感叹/since/情态推测/as…as/被动/完成被动/whose/分词/倒装/过去完成/反义疑问/图证反选）。传记阅读与菀的答卷在纸卷上。",
+  "date": "2026-07-21",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "level": "炼狱",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. Nobody knows why ___.",
+        "ops": [
+          "does she never burn the letters",
+          "never she burns the letters",
+          "did she burn the letters",
+          "she never burns the letters"
+        ],
+        "ans": 3,
+        "why": "宾语从句陈述语序。",
+        "lv": 2
+      },
+      {
+        "q": "7. ___ patient reader she is!",
+        "ops": [
+          "How a",
+          "What",
+          "What a",
+          "How"
+        ],
+        "ans": 2,
+        "why": "What a + adj + 单数名词。",
+        "lv": 1
+      },
+      {
+        "q": "8. Nuo has kept the letters ___ she was eleven.",
+        "ops": [
+          "for",
+          "when",
+          "before",
+          "since"
+        ],
+        "ans": 3,
+        "why": "since + 从句(过去时点)。",
+        "lv": 1
+      },
+      {
+        "q": "9. The writer can't ___ a stranger — every letter knows her favourite star.",
+        "ops": [
+          "is",
+          "been",
+          "be",
+          "to be"
+        ],
+        "ans": 2,
+        "why": "情态动词后接原形 be。",
+        "lv": 2
+      },
+      {
+        "q": "10. No one in the valley watches as ___ as Nuo.",
+        "ops": [
+          "patiently",
+          "patient",
+          "more patiently",
+          "most patiently"
+        ],
+        "ans": 0,
+        "why": "as + 副词原级 + as。",
+        "lv": 2
+      },
+      {
+        "q": "11. On clear nights, the stars ___ best from her window.",
+        "ops": [
+          "see",
+          "are seen",
+          "are seeing",
+          "saw"
+        ],
+        "ans": 1,
+        "why": "一般现在被动。",
+        "lv": 2
+      },
+      {
+        "q": "12. The letters on the wall ___ for eleven years.",
+        "ops": [
+          "haven't been burned",
+          "haven't burned",
+          "weren't burned",
+          "aren't burned"
+        ],
+        "ans": 0,
+        "why": "for eleven years+被动 → 现在完成被动。",
+        "lv": 2
+      },
+      {
+        "q": "13. The eleven letters show ___ the friendship has lasted.",
+        "ops": [
+          "how often",
+          "how long",
+          "how soon",
+          "how many"
+        ],
+        "ans": 1,
+        "why": "一年一封记录的是时长。",
+        "lv": 2
+      },
+      {
+        "q": "14. All eleven letters ___ unburned on the wall.",
+        "ops": [
+          "remains",
+          "remain",
+          "are remained",
+          "remaining"
+        ],
+        "ans": 1,
+        "why": "letters 复数 + remain 系动词=保持。",
+        "lv": 2
+      },
+      {
+        "q": "15. The empty chair, ___ owner left years ago, still faces the desk.",
+        "ops": [
+          "which",
+          "who",
+          "that",
+          "whose"
+        ],
+        "ans": 3,
+        "why": "'它的'主人 → 关系代词所有格 whose。",
+        "lv": 2
+      },
+      {
+        "q": "16. ___ open on the desk, the last letter seems to be waiting for an answer.",
+        "ops": [
+          "Leaving",
+          "Left",
+          "To leave",
+          "Leave"
+        ],
+        "ans": 1,
+        "why": "信与 leave 是被动关系 → Left。",
+        "lv": 2
+      },
+      {
+        "q": "17. Above the desk ___ a map of stars.",
+        "ops": [
+          "hang",
+          "hanging",
+          "hung",
+          "hangs"
+        ],
+        "ans": 3,
+        "why": "完全倒装，主语 a map 单数 → hangs。",
+        "lv": 2
+      },
+      {
+        "q": "18. When the candle went out, Nuo ___ the last letter three times already.",
+        "ops": [
+          "had read",
+          "has read",
+          "read",
+          "was reading"
+        ],
+        "ans": 0,
+        "why": "在 went out 之前完成 → had read。",
+        "lv": 2
+      },
+      {
+        "q": "19. Let's count the stars from Nuo's window tonight, ___?",
+        "ops": [
+          "will you",
+          "won't we",
+          "do we",
+          "shall we"
+        ],
+        "ans": 3,
+        "why": "Let's 开头的附加疑问用 shall we。",
+        "lv": 1
+      },
+      {
+        "q": "20. 对照观星房再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "Every letters on the wall has a pin.",
+          "The candle on the desk has gone out.",
+          "What hangs above the desk is a map of stars.",
+          "Eleven letters stay pinned above the desk."
+        ],
+        "ans": 0,
+        "why": "every 后接单数 → Every letter has。",
+        "lv": 2
+      }
+    ]
+  }
+}
