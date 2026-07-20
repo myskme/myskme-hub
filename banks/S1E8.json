@@ -1,0 +1,301 @@
+{
+  "name": "S1E8 心甘情愿的笼",
+  "code": "S1E8",
+  "desc": "陷阱猎人版 · 素笼特辑 · 题干小词与答题心态 24 题（词汇 6 + 语法 14 + 综合 4）",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第一季",
+  "mods": {
+    "m5": [
+      {
+        "q": "Look! The white fox ___ in the garden.",
+        "ops": [
+          "dances",
+          "dance",
+          "is dancing",
+          "danced"
+        ],
+        "ans": 2,
+        "why": "Look! 是现在进行时的信号词→is dancing；dances/dance 是一般现在，danced 是过去，都对不上眼前正在发生。",
+        "lv": 1
+      },
+      {
+        "q": "There ___ some milk and two apples on the table.",
+        "ops": [
+          "are",
+          "have",
+          "is",
+          "has"
+        ],
+        "ans": 2,
+        "why": "there be 就近原则，看最近的 milk（不可数）→ is；have/has 不用于 there be 句型。",
+        "lv": 2
+      },
+      {
+        "q": "I need ___ useful map and ___ hour to walk through the garden.",
+        "ops": [
+          "a; an",
+          "an; an",
+          "a; a",
+          "an; a"
+        ],
+        "ans": 0,
+        "why": "冠词看读音：useful 以辅音音 /j/ 开头→a；hour 的 h 不发音、元音开头→an。",
+        "lv": 2
+      },
+      {
+        "q": "— Whose mask is this? — It must be ___.",
+        "ops": [
+          "her",
+          "my",
+          "their",
+          "hers"
+        ],
+        "ans": 3,
+        "why": "答语后无名词，要用名词性物主代词 hers；her/my/their 是形容词性物主代词，后面必须接名词。",
+        "lv": 1
+      },
+      {
+        "q": "The snake with his two masks ___ on the wall every evening.",
+        "ops": [
+          "sit",
+          "sits",
+          "are sitting",
+          "sitting"
+        ],
+        "ans": 1,
+        "why": "主语是 The snake（单数），with his two masks 只是修饰不影响谓语→sits；被 masks 带歪选复数正是陷阱。",
+        "lv": 3
+      },
+      {
+        "q": "There are five ___ and two foxes in the garden.",
+        "ops": [
+          "sheep",
+          "sheeps",
+          "sheepes",
+          "a sheep"
+        ],
+        "ans": 0,
+        "why": "sheep 单复数同形，复数仍是 sheep；sheeps/sheepes 是杜撰，a sheep 是单数。",
+        "lv": 1
+      },
+      {
+        "q": "The fox ___ home until the fight ended last night.",
+        "ops": [
+          "went not",
+          "doesn't go",
+          "don't go",
+          "didn't go"
+        ],
+        "ans": 3,
+        "why": "last night 锁一般过去，否定用 didn't go；not until 的否定要放助动词上，went not 语序错。",
+        "lv": 2
+      },
+      {
+        "q": "— How ___ is it from the school to the garden? — About ten minutes' walk.",
+        "ops": [
+          "long",
+          "often",
+          "far",
+          "soon"
+        ],
+        "ans": 2,
+        "why": "问 from...to... 的距离用 how far；答语是路程→far；how long 问时长，how often 问频率。",
+        "lv": 3
+      },
+      {
+        "q": "Mr. Wolf told us the sun ___ in the east.",
+        "ops": [
+          "rose",
+          "rises",
+          "was rising",
+          "raised"
+        ],
+        "ans": 1,
+        "why": "客观真理（太阳东升）即使在过去时主句后也用一般现在 rises；raise 是及物动词“举起”，用错词。",
+        "lv": 3
+      },
+      {
+        "q": "— ___ do you visit the old garden? — Once a month.",
+        "ops": [
+          "How often",
+          "How long",
+          "How soon",
+          "How much"
+        ],
+        "ans": 0,
+        "why": "答语 once a month 表频率→How often；how long 问时长，how soon 问多久之后。",
+        "lv": 1
+      },
+      {
+        "q": "Nobody knew ___ at that time.",
+        "ops": [
+          "where does the queen live",
+          "where the queen lived",
+          "where the queen lives",
+          "where did the queen live"
+        ],
+        "ans": 1,
+        "why": "宾语从句用陈述语序、且主句 knew（过去）→从句呼应用 lived；带 does/did 的是疑问语序，错。",
+        "lv": 2
+      },
+      {
+        "q": "Neither the foxes nor the snake ___ afraid of the dark now.",
+        "ops": [
+          "are",
+          "is",
+          "am",
+          "be"
+        ],
+        "ans": 1,
+        "why": "neither...nor 就近原则看 the snake（单数）→is；被 foxes 带去选 are 是陷阱。",
+        "lv": 2
+      },
+      {
+        "q": "My shoes are too old. I need to buy a new ___.",
+        "ops": [
+          "one",
+          "pair",
+          "ones",
+          "shoes"
+        ],
+        "ans": 1,
+        "why": "shoes 成双，买一双新的用 a new pair；one/ones 指代单只或多只都不合“一双”，shoes 与 a new 冲突。",
+        "lv": 3
+      },
+      {
+        "q": "___ of the students ___ the story of the white fox.",
+        "ops": [
+          "Two third; knows",
+          "Two thirds; knows",
+          "Two third; know",
+          "Two thirds; know"
+        ],
+        "ans": 3,
+        "why": "分数分子大于一，分母用复数→two thirds；of the students（复数）作主语，谓语用 know。",
+        "lv": 2
+      },
+      {
+        "q": "— Must I hand in the notebook now? — No, you ___.",
+        "ops": [
+          "needn't",
+          "mustn't",
+          "can't",
+          "won't"
+        ],
+        "ans": 0,
+        "why": "对 Must I...? 的否定回答固定用 needn't（不必）；mustn't 是“禁止”，意思相反。",
+        "lv": 1
+      },
+      {
+        "q": "The little fox is ___ young ___ beat the queen.",
+        "ops": [
+          "so; that",
+          "very; to",
+          "too; to",
+          "so; to"
+        ],
+        "ans": 2,
+        "why": "too...to do＝太…以致不能…（太小打不过）；so...that 后接从句不接 to do，very 不与 to 搭配此结构。",
+        "lv": 2
+      },
+      {
+        "q": "— I'm sorry I lost your notebook. — ___.",
+        "ops": [
+          "You're welcome",
+          "Yes, please",
+          "Thank you",
+          "It doesn't matter"
+        ],
+        "ans": 3,
+        "why": "回应别人道歉用 It doesn't matter（没关系）；You're welcome 回应感谢，场景不符。",
+        "lv": 1
+      },
+      {
+        "q": "The white fox is ___ of the two fighters.",
+        "ops": [
+          "brave",
+          "the braver",
+          "the bravest",
+          "braver"
+        ],
+        "ans": 1,
+        "why": "of the two（两者之中）固定用 the+比较级→the braver；最高级 the bravest 用于三者及以上。",
+        "lv": 2
+      },
+      {
+        "q": "The number of the books ___ small, but a number of them ___ interesting.",
+        "ops": [
+          "is; are",
+          "are; is",
+          "is; is",
+          "are; are"
+        ],
+        "ans": 0,
+        "why": "the number of（…的数量）作主语谓语用单数 is；a number of（许多）后接复数、谓语用复数 are。",
+        "lv": 3
+      },
+      {
+        "q": "The fox will challenge the queen again if it ___ tomorrow.",
+        "ops": [
+          "won't rain",
+          "isn't raining",
+          "doesn't rain",
+          "didn't rain"
+        ],
+        "ans": 2,
+        "why": "if 引导条件状语从句“主将从现”：主句 will challenge，从句用一般现在 doesn't rain；反射填 won't rain 是陷阱。",
+        "lv": 2
+      },
+      {
+        "q": "— Could you please tell me the way to the garden? — ___.",
+        "ops": [
+          "Yes, I could",
+          "No, I couldn't",
+          "You could",
+          "Sure, of course"
+        ],
+        "ans": 3,
+        "why": "Could you...? 是礼貌请求，答应用 Sure, of course；这里 could 不表过去，不能机械答 Yes, I could。",
+        "lv": 2
+      },
+      {
+        "q": "It's very brave ___ the fox to say no, but it's hard ___ her to win.",
+        "ops": [
+          "of; for",
+          "for; of",
+          "of; of",
+          "for; for"
+        ],
+        "ans": 0,
+        "why": "brave 是评价人品格的形容词→of the fox；hard 评价事情难易→for her；两者搭配相反正是考点。",
+        "lv": 3
+      },
+      {
+        "q": "I found the test easy, but I made several ___ mistakes.",
+        "ops": [
+          "careful",
+          "careless",
+          "carefully",
+          "carelessly"
+        ],
+        "ans": 1,
+        "why": "修饰名词 mistakes 要用形容词，且语境是“粗心的”错误→careless；carefully/carelessly 是副词不能修饰名词。",
+        "lv": 1
+      },
+      {
+        "q": "___ exciting news it is!",
+        "ops": [
+          "How",
+          "What a",
+          "What",
+          "What an"
+        ],
+        "ans": 2,
+        "why": "news 是不可数名词，感叹句 What+不可数名词不加冠词→What exciting news；What a/an 用于可数单数，How 后接形容词/副词。",
+        "lv": 3
+      }
+    ]
+  }
+}

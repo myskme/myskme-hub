@@ -1,189 +1,189 @@
 {
- "name": "S2E5 归途",
- "code": "S2E5",
- "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态/从句非谓语连词/词汇辨析）。低生词、高选项迷惑；世界观：初代双璧梓与增归来，七年空课桌有了主人，黑域噤声。暗号 HOMEROOM。",
- "mods": {
-  "m5": [
-   {
-    "q": "The two desks by the window ___ empty since the first students left the valley.",
-    "ops": [
-     "were",
-     "have been",
-     "are",
-     "had been"
-    ],
-    "ans": 1,
-    "why": "since＋延续到说话此刻（课桌至今空着）→ 现在完成时 have been。",
-    "lv": 2
-   },
-   {
-    "q": "That night, word of the return ___ at every corner of the swamp.",
-    "ops": [
-     "was appeared",
-     "has appeared",
-     "appeared",
-     "was appearing"
-    ],
-    "ans": 2,
-    "why": "appear 是不及物动词，没有被动语态；that night 锁一般过去 → appeared。",
-    "lv": 2
-   },
-   {
-    "q": "A wide welcome banner was ___ across the homeroom door by the little ones the night before.",
-    "ops": [
-     "hanged",
-     "hung",
-     "hanging",
-     "hang"
-    ],
-    "ans": 1,
-    "why": "was＋过去分词构成被动；『悬挂』的变化是 hang-hung-hung（hanged 只用于绞刑）→ was hung。核心词 hung。",
-    "lv": 2
-   },
-   {
-    "q": "___ when the bell rang did the whole class believe it was real.",
-    "ops": [
-     "Only",
-     "Just",
-     "Even",
-     "Right"
-    ],
-    "ans": 0,
-    "why": "Only＋状语置于句首引起部分倒装（did the class believe）；其余词不触发倒装。核心词 Only。",
-    "lv": 2
-   },
-   {
-    "q": "“You ___ be Zi! The deer-horned senior from the legend!” the little ones cried.",
-    "ops": [
-     "can",
-     "need",
-     "should",
-     "must"
-    ],
-    "ans": 3,
-    "why": "肯定推测『你一定是』→ must be；语气最强、最贴合又惊又喜的情境。核心词 must。",
-    "lv": 2
-   },
-   {
-    "q": "___ the room had changed a lot, she found her old seat in three seconds.",
-    "ops": [
-     "As if",
-     "Now that",
-     "Even though",
-     "In case"
-    ],
-    "ans": 2,
-    "why": "『尽管教室大变，她仍三秒找到』→ 让步 Even though。核心词 Even。",
-    "lv": 2
-   },
-   {
-    "q": "___ after seven years, the two seniors still remembered every corner of the valley.",
-    "ops": [
-     "Returning",
-     "Returned",
-     "To return",
-     "Being returned"
-    ],
-    "ans": 0,
-    "why": "主语 seniors 主动发出 return（不及物）→ 现在分词 Returning 作状语。核心词 Returning。",
-    "lv": 2
-   },
-   {
-    "q": "___ the deer-horned senior stepped in, the noisy room went quiet.",
-    "ops": [
-     "While",
-     "Unless",
-     "Whether",
-     "Once"
-    ],
-    "ans": 3,
-    "why": "『一旦/当她一走进来，教室就安静了』→ Once。核心词 Once。",
-    "lv": 2
-   },
-   {
-    "q": "Hurry up, ___ we'll miss the opening of the welcome ceremony!",
-    "ops": [
-     "and",
-     "or",
-     "but",
-     "so"
-    ],
-    "ans": 1,
-    "why": "祈使句＋or＝否则（快点，否则就错过开场）。核心词 or。",
-    "lv": 2
-   },
-   {
-    "q": "At that moment, everyone understood what the chalk line had ___ all these years.",
-    "ops": [
-     "means",
-     "meaning",
-     "meant",
-     "mean"
-    ],
-    "ans": 2,
-    "why": "had＋过去分词构成过去完成时 → meant；宾语从句保持陈述语序。核心词 meant。",
-    "lv": 2
-   },
-   {
-    "q": "Could you ___ me your class album? I'll give it back right after the ceremony.",
-    "ops": [
-     "borrow",
-     "keep",
-     "return",
-     "lend"
-    ],
-    "ans": 3,
-    "why": "把东西借给我＝lend me sth；说话人稍后归还，方向是『借出』。",
-    "lv": 2
-   },
-   {
-    "q": "The bear senior ___ his big hand first, just like seven years ago.",
-    "ops": [
-     "raised",
-     "rose",
-     "has risen",
-     "arose"
-    ],
-    "ans": 0,
-    "why": "及物动词 raise＋宾语 his hand（举起手）；叙事过去 → raised。",
-    "lv": 2
-   },
-   {
-    "q": "Seven years is long, but ___ things in the homeroom have really changed — the desks, the chalk, even the smell are all the same.",
-    "ops": [
-     "a few",
-     "little",
-     "few",
-     "a little"
-    ],
-    "ans": 2,
-    "why": "后文『全都没变』锁定否定义『几乎没有』；things 可数复数 → few。",
-    "lv": 2
-   },
-   {
-    "q": "Oh no, I ___ my welcome gift for the seniors at home!",
-    "ops": [
-     "forgot",
-     "left",
-     "lost",
-     "missed"
-    ],
-    "ans": 1,
-    "why": "『把东西忘在某地』必须用 leave＋地点（left ... at home）；forget 不接地点。",
-    "lv": 2
-   },
-   {
-    "q": "The little ones are looking forward to ___ the legend duel with their own eyes.",
-    "ops": [
-     "watching",
-     "watch",
-     "watched",
-     "be watching"
-    ],
-    "ans": 0,
-    "why": "look forward to 中 to 是介词，后接动名词 watching。",
-    "lv": 2
-   }
-  ]
- }
+  "name": "S2E5 归途",
+  "code": "S2E5",
+  "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态/从句非谓语连词/词汇辨析）。低生词、高选项迷惑；世界观：初代双璧梓与增归来，七年空课桌有了主人，黑域噤声。暗号 HOMEROOM。",
+  "mods": {
+    "m5": [
+      {
+        "q": "The two desks by the window ___ empty since the first students left the valley.",
+        "ops": [
+          "were",
+          "have been",
+          "are",
+          "had been"
+        ],
+        "ans": 1,
+        "why": "since＋延续到说话此刻（课桌至今空着）→ 现在完成时 have been。",
+        "lv": 2
+      },
+      {
+        "q": "That night, word of the return ___ at every corner of the swamp.",
+        "ops": [
+          "was appeared",
+          "has appeared",
+          "appeared",
+          "was appearing"
+        ],
+        "ans": 2,
+        "why": "appear 是不及物动词，没有被动语态；that night 锁一般过去 → appeared。",
+        "lv": 2
+      },
+      {
+        "q": "A wide welcome banner was ___ across the homeroom door by the little ones the night before.",
+        "ops": [
+          "hanged",
+          "hung",
+          "hanging",
+          "hang"
+        ],
+        "ans": 1,
+        "why": "was＋过去分词构成被动；『悬挂』的变化是 hang-hung-hung（hanged 只用于绞刑）→ was hung。核心词 hung。",
+        "lv": 2
+      },
+      {
+        "q": "___ when the bell rang did the whole class believe it was real.",
+        "ops": [
+          "Only",
+          "Just",
+          "Even",
+          "Right"
+        ],
+        "ans": 0,
+        "why": "Only＋状语置于句首引起部分倒装（did the class believe）；其余词不触发倒装。核心词 Only。",
+        "lv": 2
+      },
+      {
+        "q": "“You ___ be Zi! The deer-horned senior from the legend!” the little ones cried.",
+        "ops": [
+          "can",
+          "need",
+          "should",
+          "must"
+        ],
+        "ans": 3,
+        "why": "肯定推测『你一定是』→ must be；语气最强、最贴合又惊又喜的情境。核心词 must。",
+        "lv": 2
+      },
+      {
+        "q": "___ the room had changed a lot, she found her old seat in three seconds.",
+        "ops": [
+          "As if",
+          "Now that",
+          "Even though",
+          "In case"
+        ],
+        "ans": 2,
+        "why": "『尽管教室大变，她仍三秒找到』→ 让步 Even though。核心词 Even。",
+        "lv": 2
+      },
+      {
+        "q": "___ after seven years, the two seniors still remembered every corner of the valley.",
+        "ops": [
+          "Returning",
+          "Returned",
+          "To return",
+          "Being returned"
+        ],
+        "ans": 0,
+        "why": "主语 seniors 主动发出 return（不及物）→ 现在分词 Returning 作状语。核心词 Returning。",
+        "lv": 2
+      },
+      {
+        "q": "___ the deer-horned senior stepped in, the noisy room went quiet.",
+        "ops": [
+          "While",
+          "Unless",
+          "Whether",
+          "Once"
+        ],
+        "ans": 3,
+        "why": "『一旦/当她一走进来，教室就安静了』→ Once。核心词 Once。",
+        "lv": 2
+      },
+      {
+        "q": "Hurry up, ___ we'll miss the opening of the welcome ceremony!",
+        "ops": [
+          "and",
+          "or",
+          "but",
+          "so"
+        ],
+        "ans": 1,
+        "why": "祈使句＋or＝否则（快点，否则就错过开场）。核心词 or。",
+        "lv": 2
+      },
+      {
+        "q": "At that moment, everyone understood what the chalk line had ___ all these years.",
+        "ops": [
+          "means",
+          "meaning",
+          "meant",
+          "mean"
+        ],
+        "ans": 2,
+        "why": "had＋过去分词构成过去完成时 → meant；宾语从句保持陈述语序。核心词 meant。",
+        "lv": 2
+      },
+      {
+        "q": "Could you ___ me your class album? I'll give it back right after the ceremony.",
+        "ops": [
+          "borrow",
+          "keep",
+          "return",
+          "lend"
+        ],
+        "ans": 3,
+        "why": "把东西借给我＝lend me sth；说话人稍后归还，方向是『借出』。",
+        "lv": 2
+      },
+      {
+        "q": "The bear senior ___ his big hand first, just like seven years ago.",
+        "ops": [
+          "raised",
+          "rose",
+          "has risen",
+          "arose"
+        ],
+        "ans": 0,
+        "why": "及物动词 raise＋宾语 his hand（举起手）；叙事过去 → raised。",
+        "lv": 2
+      },
+      {
+        "q": "Seven years is long, but ___ things in the homeroom have really changed — the desks, the chalk, even the smell are all the same.",
+        "ops": [
+          "a few",
+          "little",
+          "few",
+          "a little"
+        ],
+        "ans": 2,
+        "why": "后文『全都没变』锁定否定义『几乎没有』；things 可数复数 → few。",
+        "lv": 2
+      },
+      {
+        "q": "Oh no, I ___ my welcome gift for the seniors at home!",
+        "ops": [
+          "forgot",
+          "left",
+          "lost",
+          "missed"
+        ],
+        "ans": 1,
+        "why": "『把东西忘在某地』必须用 leave＋地点（left ... at home）；forget 不接地点。",
+        "lv": 2
+      },
+      {
+        "q": "The little ones are looking forward to ___ the legend duel with their own eyes.",
+        "ops": [
+          "watching",
+          "watch",
+          "watched",
+          "be watching"
+        ],
+        "ans": 0,
+        "why": "look forward to 中 to 是介词，后接动名词 watching。",
+        "lv": 2
+      }
+    ]
+  }
 }

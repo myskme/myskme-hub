@@ -1,0 +1,182 @@
+{
+  "name": "SP1M 小蛇的红笔·学徒篇",
+  "code": "SP1M",
+  "desc": "2026 暑假特辑·学徒篇 · 中级档（与 SP1 高级配对） · 14 道自包含单选（形容词位置/频度副词/then-than/三单/复数/冠词读音/some-any/was-were/can/祈使/宾格/反选）。初一初二基础命门。看图题、接龙、红笔翻案在纸卷上。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "特辑机关卷",
+  "pack": "2026 暑假特辑",
+  "date": "2026-07-18",
+  "mods": {
+    "m5": [
+      {
+        "q": "8. There are three ___ in the cup on the queen's desk.",
+        "ops": [
+          "red pen",
+          "pens red",
+          "reds pen",
+          "red pens"
+        ],
+        "ans": 3,
+        "why": "形容词在前 + 复数 → three red pens。",
+        "lv": 2
+      },
+      {
+        "q": "9. The smallest snake ___ late for grading.",
+        "ops": [
+          "is never",
+          "never is",
+          "is no",
+          "never be"
+        ],
+        "ans": 0,
+        "why": "频度副词放 be 动词之后 → is never。",
+        "lv": 2
+      },
+      {
+        "q": "10. First check the name, ___ check the answers.",
+        "ops": [
+          "than",
+          "but",
+          "so",
+          "then"
+        ],
+        "ans": 3,
+        "why": "First…, then…=先…然后…。",
+        "lv": 1
+      },
+      {
+        "q": "11. Please write your name ___ you start the paper.",
+        "ops": [
+          "before",
+          "after",
+          "until",
+          "because"
+        ],
+        "ans": 0,
+        "why": "开始做卷之前先写名 → before。",
+        "lv": 2
+      },
+      {
+        "q": "12. ___ the grading, the three snakes drink a big cup of tea.",
+        "ops": [
+          "Under",
+          "On",
+          "After",
+          "At"
+        ],
+        "ans": 2,
+        "why": "批完之后喝茶 → After。",
+        "lv": 1
+      },
+      {
+        "q": "13. The little snake ___ every answer twice.",
+        "ops": [
+          "checks",
+          "check",
+          "checkes",
+          "checking"
+        ],
+        "ans": 0,
+        "why": "三单 → checks。",
+        "lv": 1
+      },
+      {
+        "q": "14. There are many ___ in the summer school.",
+        "ops": [
+          "childs",
+          "childes",
+          "children",
+          "child"
+        ],
+        "ans": 2,
+        "why": "child 的复数是 children。",
+        "lv": 2
+      },
+      {
+        "q": "15. It is ___ useful book about grammar.",
+        "ops": [
+          "an",
+          "a",
+          "the",
+          "不填"
+        ],
+        "ans": 1,
+        "why": "useful 首音是 /j/（辅音）→ a useful。",
+        "lv": 2
+      },
+      {
+        "q": "16. — Do you have ___ questions? — No, I don't.",
+        "ops": [
+          "some",
+          "a",
+          "an",
+          "any"
+        ],
+        "ans": 3,
+        "why": "疑问句 → any。",
+        "lv": 1
+      },
+      {
+        "q": "17. The three snakes ___ very tired last night.",
+        "ops": [
+          "were",
+          "was",
+          "are",
+          "is"
+        ],
+        "ans": 0,
+        "why": "复数 + 过去 → were。",
+        "lv": 1
+      },
+      {
+        "q": "18. The smallest snake can ___ many English words.",
+        "ops": [
+          "spells",
+          "spell",
+          "spelling",
+          "spelt"
+        ],
+        "ans": 1,
+        "why": "can + 原形 spell。",
+        "lv": 1
+      },
+      {
+        "q": "19. ___ laugh in the grading room — look at the sign on the wall!",
+        "ops": [
+          "Don't",
+          "Not",
+          "No",
+          "Doesn't"
+        ],
+        "ans": 0,
+        "why": "否定祈使 → Don't laugh。",
+        "lv": 2
+      },
+      {
+        "q": "20. Mr. Wolf teaches ___ English on weekends.",
+        "ops": [
+          "we",
+          "us",
+          "our",
+          "ours"
+        ],
+        "ans": 1,
+        "why": "teach 后接宾格 us。",
+        "lv": 2
+      },
+      {
+        "q": "21. 下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "She is drinking tea now.",
+          "He don't like wrong answers.",
+          "There are five books on the shelf.",
+          "We were happy yesterday."
+        ],
+        "ans": 1,
+        "why": "He 是三单 → doesn't like。",
+        "lv": 2
+      }
+    ]
+  }
+}
