@@ -216,7 +216,9 @@ a.volnav-brand{text-decoration:none;}a.volnav-brand:hover{color:var(--gold);}
   opacity:0;animation:fade 1s .1s both;}
 .kicker .crest{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--gold3);border-radius:50%;
   display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold2);letter-spacing:0;text-transform:none;box-shadow:inset 0 0 14px rgba(201,166,74,.2);}
-.title-hero{font-size:clamp(44px,8.5vw,104px);font-weight:700;letter-spacing:.02em;line-height:1.02;margin:.2em 0 .16em;
+/* 下限 44px 会让「MYSKME 编年史」在窄屏折成「MYSKME 编 / 年史」——把词劈开了。
+   降到 32px 后 375px 宽的手机上仍能整词成行；上限与增长率不变,大屏观感照旧。 */
+.title-hero{font-size:clamp(32px,8.5vw,104px);font-weight:700;letter-spacing:.02em;line-height:1.02;margin:.2em 0 .16em;
   font-family:var(--serif);animation:titleIn 1.4s cubic-bezier(.16,1,.3,1) both;}
 .title-hero span{display:inline-block;}
 .title-hero em{font-style:normal;font-weight:700;
@@ -545,6 +547,11 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
       if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
       if(!it.icon&&d.icon)it.icon=d.icon;
+      // 次链接也要回填：0718 给「世界编年史」加的「剧情图册·无月」原本只有清空过
+      // localStorage 的人看得见——老访客(尤其是王老师自己这台)存档里没有 url2,
+      // 永远刷不出来。只补缺失的,不覆盖用户改过的。
+      if(!it.url2&&d.url2)it.url2=d.url2;
+      if(!it.url2label&&d.url2label)it.url2label=d.url2label;
     });});
     return data;
   }
