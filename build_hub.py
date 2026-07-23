@@ -41,7 +41,8 @@ DEFAULT_DATA = {
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
              "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。",
              "url": "https://myskme.github.io/myskme-chronicle/",
-             "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月"},
+             "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月",
+             "url3": "https://myskme.github.io/myskme-chronicle/locations.html", "url3label": "正典地点"},
         ]},
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
@@ -552,6 +553,9 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       // 永远刷不出来。只补缺失的,不覆盖用户改过的。
       if(!it.url2&&d.url2)it.url2=d.url2;
       if(!it.url2label&&d.url2label)it.url2label=d.url2label;
+      // 0723 又给「世界编年史」加了第三链接「正典地点」——老访客同理要回填,否则永远刷不出来
+      if(!it.url3&&d.url3)it.url3=d.url3;
+      if(!it.url3label&&d.url3label)it.url3label=d.url3label;
     });});
     return data;
   }
@@ -627,6 +631,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       +'<div class="card-foot">'
         +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'"'+tgt+'>'+uiIcon('external')+'<span>访问</span></a>'
         +(it.url2?'<a class="btn btn-go2" href="'+esc(it.url2)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url2label||'更多')+'</span></a>':'')
+        +(it.url3?'<a class="btn btn-go2" href="'+esc(it.url3)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url3label||'更多')+'</span></a>':'')
         +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
         +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
         +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
