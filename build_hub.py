@@ -43,7 +43,8 @@ DEFAULT_DATA = {
              "url": "https://myskme.github.io/myskme-chronicle/",
              "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月",
              "url3": "https://myskme.github.io/myskme-chronicle/locations.html", "url3label": "正典地点",
-             "url4": "https://myskme.github.io/myskme-chronicle/relics.html", "url4label": "正典信物"},
+             "url4": "https://myskme.github.io/myskme-chronicle/relics.html", "url4label": "正典信物",
+             "url5": "https://myskme.github.io/myskme-chronicle/moments.html", "url5label": "正典名场面"},
         ]},
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
@@ -559,6 +560,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(!it.url3label&&d.url3label)it.url3label=d.url3label;
       if(!it.url4&&d.url4)it.url4=d.url4;
       if(!it.url4label&&d.url4label)it.url4label=d.url4label;
+      if(!it.url5&&d.url5)it.url5=d.url5;
+      if(!it.url5label&&d.url5label)it.url5label=d.url5label;
     });});
     return data;
   }
@@ -636,6 +639,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
         +(it.url2?'<a class="btn btn-go2" href="'+esc(it.url2)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url2label||'更多')+'</span></a>':'')
         +(it.url3?'<a class="btn btn-go2" href="'+esc(it.url3)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url3label||'更多')+'</span></a>':'')
         +(it.url4?'<a class="btn btn-go2" href="'+esc(it.url4)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url4label||'更多')+'</span></a>':'')
+        +(it.url5?'<a class="btn btn-go2" href="'+esc(it.url5)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url5label||'更多')+'</span></a>':'')
         +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
         +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
         +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
