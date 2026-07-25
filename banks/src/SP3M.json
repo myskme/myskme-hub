@@ -1,0 +1,170 @@
+{
+  "name": "SP3M 第一个囚徒·叶王（人物传VOL.2·中级）",
+  "code": "SP3M",
+  "desc": "人物传 VOL.2 中级档（传主：叶王·学徒版） · 13 道自包含单选（所有格 Hang's/used to be/比较级 -er/an old/May I/反义疑问前肯后否/there are/三单 watches/宾格 them/was/Don't 祈使/enjoy doing/图证反选）。",
+  "date": "2026-07-25",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "level": "进阶",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. The purple mask on the wall is ___ .",
+        "ops": [
+          "Hang",
+          "Hangs",
+          "of Hang",
+          "Hang's"
+        ],
+        "ans": 3,
+        "why": "正确：航的面具 → Hang's。",
+        "lv": 1
+      },
+      {
+        "q": "7. The Queen ___ a student long ago — believe it or not.",
+        "ops": [
+          "is used to be",
+          "used to being",
+          "uses to be",
+          "used to be"
+        ],
+        "ans": 3,
+        "why": "正确：used to be。",
+        "lv": 2
+      },
+      {
+        "q": "8. No cage is ___ than hers.",
+        "ops": [
+          "stronger",
+          "strong",
+          "strongest",
+          "more strong"
+        ],
+        "ans": 0,
+        "why": "正确：stronger than。",
+        "lv": 1
+      },
+      {
+        "q": "9. There is ___ old desk behind the curtain.",
+        "ops": [
+          "a",
+          "an",
+          "two",
+          "some"
+        ],
+        "ans": 1,
+        "why": "正确：an old。",
+        "lv": 2
+      },
+      {
+        "q": "10. — ___ I come in, my Queen? — Yes, please.",
+        "ops": [
+          "Am",
+          "Is",
+          "May",
+          "Be"
+        ],
+        "ans": 2,
+        "why": "正确：May I come in 请求许可。",
+        "lv": 1
+      },
+      {
+        "q": "11. She is the queen of the forest, ___ she?",
+        "ops": [
+          "is",
+          "doesn't",
+          "does",
+          "isn't"
+        ],
+        "ans": 3,
+        "why": "正确：前句肯定 → isn't she。",
+        "lv": 2
+      },
+      {
+        "q": "14. There ___ four tokens on the wall.",
+        "ops": [
+          "are",
+          "is",
+          "has",
+          "be"
+        ],
+        "ans": 0,
+        "why": "正确：复数 → There are。",
+        "lv": 1
+      },
+      {
+        "q": "15. The snake guard ___ the gate day and night.",
+        "ops": [
+          "watch",
+          "watching",
+          "watches",
+          "is watch"
+        ],
+        "ans": 2,
+        "why": "正确：三单 → watches。",
+        "lv": 1
+      },
+      {
+        "q": "16. The Queen reads all the letters and answers ___ .",
+        "ops": [
+          "they",
+          "them",
+          "their",
+          "it"
+        ],
+        "ans": 1,
+        "why": "正确：宾格 them 指 letters。",
+        "lv": 2
+      },
+      {
+        "q": "17. Long ago, she ___ a student at the academy.",
+        "ops": [
+          "is",
+          "was",
+          "were",
+          "be"
+        ],
+        "ans": 1,
+        "why": "正确：过去 + 单数 → was。",
+        "lv": 2
+      },
+      {
+        "q": "18. The sign by the little door means: \"___ come in!\"",
+        "ops": [
+          "Not",
+          "No",
+          "Don't",
+          "Doesn't"
+        ],
+        "ans": 2,
+        "why": "正确：Don't come in。",
+        "lv": 1
+      },
+      {
+        "q": "19. The Queen enjoys ___ letters at night.",
+        "ops": [
+          "read",
+          "to read",
+          "reading",
+          "reads"
+        ],
+        "ans": 2,
+        "why": "正确：enjoy doing。",
+        "lv": 2
+      },
+      {
+        "q": "20. 对照王座厅再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "The curtain are half open.",
+          "The crown has a red gem.",
+          "There is one paper on the desk.",
+          "The purple mask is Hang's."
+        ],
+        "ans": 0,
+        "why": "正确（此句有错）：curtain 单数 → is。",
+        "lv": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "name": "SP3 第一个囚徒·叶王（人物传VOL.2）",
+  "code": "SP3",
+  "desc": "2026 暑假特辑·人物传 VOL.2 高级档（传主：叶王） · 15 道自包含单选（反义疑问 never/where 定从/would rather/stop doing/find it/used to/each of/两门比较级/双冠词读音/stop from doing/交际拒绝/neither 倒装/过去进行/It takes/图证反选）。传记阅读与航的答卷在纸卷上。",
+  "date": "2026-07-25",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "level": "炼狱",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. The Queen never makes mistakes now, ___ she?",
+        "ops": [
+          "doesn't",
+          "is",
+          "isn't",
+          "does"
+        ],
+        "ans": 3,
+        "why": "正确：never 使前句为否定 → 后肯 does she。",
+        "lv": 2
+      },
+      {
+        "q": "7. The palace is a place ___ every answer must be perfect.",
+        "ops": [
+          "which",
+          "where",
+          "that",
+          "what"
+        ],
+        "ans": 1,
+        "why": "正确：从句不缺主宾 → 关系副词 where。",
+        "lv": 2
+      },
+      {
+        "q": "8. She would rather keep one mistake than ___ the door.",
+        "ops": [
+          "forgetting",
+          "to forget",
+          "forgets",
+          "forget"
+        ],
+        "ans": 3,
+        "why": "正确：would rather A than B，两端都用原形。",
+        "lv": 2
+      },
+      {
+        "q": "9. At the academy she stopped ___ questions — that was the first brick of the wall.",
+        "ops": [
+          "to ask",
+          "ask",
+          "asking",
+          "asked"
+        ],
+        "ans": 2,
+        "why": "正确：停止提问 → stop asking。",
+        "lv": 2
+      },
+      {
+        "q": "10. Visitors find ___ hard to say no to the Queen.",
+        "ops": [
+          "that",
+          "this",
+          "one",
+          "it"
+        ],
+        "ans": 3,
+        "why": "正确：find it hard to do 固定结构。",
+        "lv": 2
+      },
+      {
+        "q": "11. She ___ be a student like you — few believe it now.",
+        "ops": [
+          "was used to",
+          "is used to",
+          "used to",
+          "uses to"
+        ],
+        "ans": 2,
+        "why": "正确：过去曾是 → used to be。",
+        "lv": 1
+      },
+      {
+        "q": "12. Each of the four tokens on the wall ___ its own story.",
+        "ops": [
+          "tells",
+          "tell",
+          "are telling",
+          "have told"
+        ],
+        "ans": 0,
+        "why": "正确：each 作主语核心 → 单数 tells。",
+        "lv": 2
+      },
+      {
+        "q": "13. Of the two doors in the hall, ___ one leads to the secret room.",
+        "ops": [
+          "the smallest",
+          "smaller",
+          "the small",
+          "the smaller"
+        ],
+        "ans": 3,
+        "why": "正确：of the two → the smaller。",
+        "lv": 2
+      },
+      {
+        "q": "14. Behind the curtain there is ___ old desk and ___ one-mistake paper.",
+        "ops": [
+          "a; an",
+          "an; an",
+          "a; a",
+          "an; a"
+        ],
+        "ans": 3,
+        "why": "正确：an old / a one-mistake。",
+        "lv": 2
+      },
+      {
+        "q": "15. No guard can stop new letters ___ to the palace.",
+        "ops": [
+          "to come",
+          "come",
+          "from coming",
+          "for coming"
+        ],
+        "ans": 2,
+        "why": "正确：stop…from doing。",
+        "lv": 2
+      },
+      {
+        "q": "16. — May I look behind the curtain? — ___ , young snake.",
+        "ops": [
+          "Never mind",
+          "You're welcome",
+          "I'm afraid not",
+          "That's right"
+        ],
+        "ans": 2,
+        "why": "正确：委婉拒绝。",
+        "lv": 1
+      },
+      {
+        "q": "17. Hang has never seen behind the curtain, and ___ have the others.",
+        "ops": [
+          "so",
+          "neither",
+          "too",
+          "either"
+        ],
+        "ans": 1,
+        "why": "正确：前句否定 → neither have the others。",
+        "lv": 2
+      },
+      {
+        "q": "18. When the last visitor left at midnight, the Queen ___ the new letters.",
+        "ops": [
+          "was still reading",
+          "still read",
+          "is still reading",
+          "has still read"
+        ],
+        "ans": 0,
+        "why": "正确：午夜那一刻正在读 → 过去进行。",
+        "lv": 2
+      },
+      {
+        "q": "19. It takes real courage ___ at the palace gate.",
+        "ops": [
+          "to knock",
+          "knocking",
+          "knock",
+          "knocked"
+        ],
+        "ans": 0,
+        "why": "正确：It takes courage to do。",
+        "lv": 2
+      },
+      {
+        "q": "20. 对照王座厅再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "The curtain of the side room is half open.",
+          "The number of letters on the steps are growing.",
+          "There is one paper on the old desk.",
+          "The crown on the throne has a red gem."
+        ],
+        "ans": 1,
+        "why": "正确（此句有错）：the number of… → is growing。",
+        "lv": 2
+      }
+    ]
+  }
+}
