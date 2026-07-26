@@ -1039,6 +1039,12 @@ data_json = json.dumps(DEFAULT_DATA, ensure_ascii=False, indent=2)
 app = APP_JS.replace("%%PWHASH%%", PASSWORD_HASH)
 
 PAGE = """<!doctype html>
+<!--
+  本文件由 build_hub.py 自动生成，请勿手改。
+  手改会在下次运行生成器时被静默覆盖。
+  要改内容：先改 build_hub.py，再重新运行它生成本文件。
+  页面里的「导出 index.html」按钮同理，导出物只作备份，不要当作源文件回填仓库。
+-->
 <html lang="zh-CN" data-theme="dark" data-themepref="auto">
 <head>
 <meta charset="utf-8">
