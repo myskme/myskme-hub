@@ -23,6 +23,10 @@ DEFAULT_DATA = {
     "sections": [
         {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
+            {"key": "star-dungeon", "glyph": "牢", "cat": "game", "rarity": "UR", "cover": "assets/cover-star-dungeon.jpg",
+             "tag": "课堂肉鸽 · 策略地牢", "title": "星徒地牢", "en": "STAR DUNGEON",
+             "desc": "3–4 人最佳的课堂像素战术地牢 · 5–6 题集中判分，再由全队布局行动 · 机关、计谋、二周目与云端排行，手机可装到主屏。",
+             "url": "https://myskme.github.io/myskme-star-dungeon/", "featured": True},
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
              "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
              "desc": "学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备 —— 狼先生宇宙的旗舰。",
@@ -545,7 +549,9 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
 
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function mergeVisualDefaults(data){
+    var present={};
     (data.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){
+      if(it.key)present[it.key]=true;
       var d=it.key&&DEFAULT_ITEM_BY_KEY[it.key]; if(!d)return;
       if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
       if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
@@ -563,6 +569,14 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(!it.url5&&d.url5)it.url5=d.url5;
       if(!it.url5label&&d.url5label)it.url5label=d.url5label;
     });});
+    // 0726 新增「星徒地牢」。老访客的管理员存档里没有这张卡；
+    // 只在完全缺失时补到娱乐卷首，不覆盖文案、不改变其他自定义作品。
+    var entertainment=data.sections&&data.sections[0];
+    var starDungeon=DEFAULT_ITEM_BY_KEY['star-dungeon'];
+    if(entertainment&&starDungeon&&!present['star-dungeon']){
+      entertainment.items=entertainment.items||[];
+      entertainment.items.unshift(clone(starDungeon));
+    }
     return data;
   }
   function load(){try{var s=localStorage.getItem(LS);if(s)return mergeVisualDefaults(JSON.parse(s));}catch(e){}return mergeVisualDefaults(clone(DEFAULT_DATA));}
@@ -584,6 +598,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     lore:'<path d="M5 4h11v13a3 3 0 003 3H8a3 3 0 01-3-3V4z"/><path d="M16 4a3 3 0 013 3a1 1 0 01-1 1h-2"/>',
     tool:'<path d="M4 4h7v15H6a2 2 0 01-2-2V4zM20 4h-7v15h5a2 2 0 002-2V4z"/>'};
   var ITEM_PATH={
+    'star-dungeon':'<path d="M5 20V7l7-4 7 4v13"/><path d="M8 20v-7h8v7M9 8h6M12 10v3"/><path d="M4 20h16"/>',
     expedition:'<path d="M14.5 3.5l6 6L11 19l-4 1 1-4z"/><path d="M13 5l6 6M9 15l-4-4M5 19l-2 2"/>',
     starling:'<path d="M12 3c-3.8 3.7-6 8-6 12a6 6 0 0012 0c0-4-2.2-8.3-6-12z"/><path d="M12 8l1.2 2.4 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4z"/>',
     zimingqi:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/><circle cx="12" cy="12" r="2.2"/>',
@@ -1036,10 +1051,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="王老师的原创作品总目：远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
+<meta name="description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的原创作品总目：远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
+<meta property="og:description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <meta property="og:url" content="https://myskme.github.io/myskme-hub/">
 <meta name="twitter:card" content="summary_large_image">
@@ -1077,6 +1092,8 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       </div>
     </div>
     <div class="foot-links">
+      <a href="https://myskme.github.io/myskme-star-dungeon/" target="_blank" rel="noopener">星徒地牢</a>
+      <span>·</span>
       <a href="https://myskme.github.io/myskme-expedition-web/" target="_blank" rel="noopener">远征录</a>
       <span>·</span>
       <a href="https://myskme.github.io/myskme-starling/" target="_blank" rel="noopener">星灵远征</a>

@@ -7,6 +7,7 @@
 ## 收录作品
 | 作品 | 地址 |
 |---|---|
+| 星徒地牢 | https://myskme.github.io/myskme-star-dungeon/ |
 | MYSKME 积分板 | https://myskme.github.io/myskme-scoreboard/ |
 | 三国军师争霸积分器 | https://myskme.github.io/three-kingdoms-classroom-scoreboard/ |
 | MYSKME 大乱斗 | https://myskme.github.io/myskme-brawl/ |
