@@ -48,7 +48,8 @@ DEFAULT_DATA = {
              "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月",
              "url3": "https://myskme.github.io/myskme-chronicle/locations.html", "url3label": "正典地点",
              "url4": "https://myskme.github.io/myskme-chronicle/relics.html", "url4label": "正典信物",
-             "url5": "https://myskme.github.io/myskme-chronicle/moments.html", "url5label": "正典名场面"},
+             "url5": "https://myskme.github.io/myskme-chronicle/moments.html", "url5label": "正典名场面",
+             "url6": "https://myskme.github.io/myskme-chronicle/characters.html", "url6label": "正典角色"},
         ]},
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
@@ -568,6 +569,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(!it.url4label&&d.url4label)it.url4label=d.url4label;
       if(!it.url5&&d.url5)it.url5=d.url5;
       if(!it.url5label&&d.url5label)it.url5label=d.url5label;
+      if(!it.url6&&d.url6)it.url6=d.url6;
+      if(!it.url6label&&d.url6label)it.url6label=d.url6label;
     });});
     // 0726 新增「星徒地牢」。老访客的管理员存档里没有这张卡；
     // 只在完全缺失时补到娱乐卷首，不覆盖文案、不改变其他自定义作品。
@@ -655,6 +658,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
         +(it.url3?'<a class="btn btn-go2" href="'+esc(it.url3)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url3label||'更多')+'</span></a>':'')
         +(it.url4?'<a class="btn btn-go2" href="'+esc(it.url4)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url4label||'更多')+'</span></a>':'')
         +(it.url5?'<a class="btn btn-go2" href="'+esc(it.url5)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url5label||'更多')+'</span></a>':'')
+        +(it.url6?'<a class="btn btn-go2" href="'+esc(it.url6)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url6label||'更多')+'</span></a>':'')
         +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
         +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
         +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
