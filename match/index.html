@@ -1,0 +1,2937 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" data-themepref="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<script>(function(){try{var p=localStorage.getItem('myskme-theme')||'auto';var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p)}catch(e){}})();</script>
+<title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
+<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
+<meta property="og:title" content="灵石远征 · MYSKME 消消乐">
+<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局 —— 一上手就停不下来。">
+<meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
+<style>
+:root{
+  --bg:#0a0a0c;--bg2:#111114;--panel:#16161a;--panel2:#1c1c22;--edge:#26262e;
+  --ink:#f0e6d2;--ink2:#a8a090;--ink3:#6a6458;
+  --gold:#c9a64a;--gold2:#e8c768;--gold-hi:#e8c768;--gold-line:#7a6320;
+  --red:#d56060;--green:#6aa86a;--blue:#6ba0dd;--purple:#c199e6;
+  --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.10);
+  --glow:0 0 24px rgba(201,166,74,.4);--glow-soft:0 0 14px rgba(201,166,74,.25);
+  --paper:#14110b;--noise-op:.24;--noise-blend:overlay;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --mine:#0d0d11;--mine2:#131318;--mine-edge:#2a2820;
+}
+:root[data-theme="light"]{
+  --bg:#ece2cc;--bg2:#e6dabf;--panel:#f8f2e4;--panel2:#efe6cf;--edge:#e2d5b4;
+  --ink:#2a2218;--ink2:#574b37;--ink3:#7a6e52;
+  --gold:#6f5410;--gold2:#5f470e;--gold-hi:#8a6d1e;--gold-line:#b89a52;
+  --red:#9a271d;--green:#2f6a3e;--blue:#33548c;--purple:#6a3d8c;
+  --line:rgba(120,90,20,.30);--line2:rgba(120,90,20,.13);
+  --glow:0 4px 16px rgba(120,90,20,.20);--glow-soft:0 2px 10px rgba(120,90,20,.15);
+  --paper:#fffdf6;--noise-op:.10;--noise-blend:multiply;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;
+  background-image:radial-gradient(1100px 640px at 50% -8%,color-mix(in srgb,var(--gold) 12%,transparent),transparent 60%);
+  transition:background-color .35s,color .35s;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:var(--noise-op);mix-blend-mode:var(--noise-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* 环境光斑：缓慢漂移，永不死寂 */
+#amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+#amb i{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(60px);opacity:.07;
+  background:radial-gradient(circle,var(--gold),transparent 62%);animation:ambDrift 26s ease-in-out infinite alternate}
+#amb i:nth-child(2){left:60%;top:55%;width:38vmax;height:38vmax;opacity:.05;animation-duration:34s;animation-delay:-12s}
+@keyframes ambDrift{0%{transform:translate(-6%,-4%) scale(1)}100%{transform:translate(7%,6%) scale(1.12)}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+/* ============ 通用 ============ */
+#app{position:relative;z-index:2;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;overflow-x:hidden;
+  padding:max(10px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom))}
+.scr.on{display:flex}
+.btn{font-family:var(--serif);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
+  color:var(--ink);padding:12px 22px;font-size:17px;letter-spacing:.14em;cursor:pointer;position:relative;
+  transition:transform .12s,box-shadow .12s,border-color .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--glow-soft);border-color:var(--gold)}
+.btn:active{transform:translateY(1px) scale(.97);box-shadow:none;transition-duration:.05s}
+.btn.primary{border-color:var(--gold-line);color:var(--gold2);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 16%,var(--panel2)),var(--panel))}
+.btn.big{font-size:20px;padding:15px 34px;letter-spacing:.22em}
+.btn.ghost{background:transparent;border-color:var(--line2);color:var(--ink2);font-size:14px;padding:9px 16px}
+.ornate{position:relative;border:1px solid var(--line)}
+.ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;border:1px solid var(--gold);transition:all .3s;pointer-events:none}
+.ornate::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.ornate::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.ornate:hover::before,.ornate:hover::after{width:24px;height:24px}
+.kicker{font-size:12px;letter-spacing:.42em;color:var(--ink3);text-transform:uppercase}
+.gold{color:var(--gold)}
+.hr{width:min(340px,70%);height:1px;margin:14px auto;background:linear-gradient(90deg,transparent,var(--line),transparent);position:relative}
+.hr::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:8px;color:var(--gold);opacity:.8}
+
+/* ============ 主菜单 ============ */
+#scr-menu{justify-content:center;gap:6px;text-align:center}
+.title-hero{font-size:clamp(40px,9vw,76px);font-weight:300;letter-spacing:.18em;margin:6px 0 0;line-height:1.25;
+  animation:titleIn 1.3s cubic-bezier(.16,1,.3,1) both}
+.title-hero em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
+@keyframes titleIn{0%{opacity:0;letter-spacing:.4em;transform:translateY(18px);filter:blur(6px)}100%{opacity:1;letter-spacing:.18em;transform:translateY(0);filter:blur(0)}}
+.subtitle{color:var(--ink2);font-size:14px;letter-spacing:.2em;margin:2px 0 0}
+#menu-gems{height:64px;margin:8px 0 2px}
+.wolf-badge{width:92px;height:92px;margin:4px auto 0;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--gold) 14%,transparent),transparent 70%)}
+.wolf-badge::before{content:'';position:absolute;inset:6px;border:1px solid var(--gold-line);opacity:.45;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s}
+.wolf-badge::after{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 24s linear infinite}
+.wolf-badge svg{position:absolute;width:70%;height:70%;opacity:.16}
+.wolf-badge b{font-size:44px;font-weight:300;color:var(--gold);text-shadow:0 0 24px color-mix(in srgb,var(--gold) 40%,transparent);transition:transform .6s,text-shadow .4s;position:relative}
+.wolf-badge:hover::before{opacity:.9;transform:rotate(45deg) scale(1.1)}
+.wolf-badge:hover b{transform:scale(1.12)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.menu-btns{display:flex;flex-direction:column;gap:12px;margin-top:16px;width:min(320px,86vw)}
+.menu-btns .btn{width:100%}
+.btn .sub{display:block;font-size:11px;letter-spacing:.24em;color:var(--ink3);margin-top:3px}
+.btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
+.menu-sub{display:flex;gap:10px;justify-content:center;margin-top:2px}
+.menu-sub .btn{flex:1}
+#menu-stats{margin-top:14px;font-size:13px;color:var(--ink2);letter-spacing:.1em}
+#menu-stats b{color:var(--gold);font-weight:500}
+.menu-foot{margin-top:18px;font-size:12px;color:var(--ink3);letter-spacing:.12em;line-height:2}
+.menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
+.menu-foot a:hover{color:var(--gold)}
+/* 小黑猫 */
+/* 小黑猫是彩蛋，藏在角落即可 —— 但不能压住页脚的「作品总目」链接 */
+#cat{position:fixed;right:16px;bottom:calc(56px + env(safe-area-inset-bottom));width:54px;height:47px;
+  cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3}
+#cat:hover{opacity:.95;transform:translateY(-3px)}
+#cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
+@keyframes tailFlick{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-16deg)}94%{transform:rotate(6deg)}}
+#cat.found{opacity:.9}
+#cat .eyes{animation:catBlink 6s infinite}
+@keyframes catBlink{0%,92%,100%{opacity:1}95%,97%{opacity:0}}
+
+/* ============ 地脉图（选关） ============ */
+#scr-map{gap:8px}
+.map-head{text-align:center;margin-top:8px}
+.map-head h2{font-size:26px;font-weight:300;letter-spacing:.28em;margin:2px 0}
+.map-head h2 em{font-style:normal;color:var(--gold)}
+.map-era{font-size:12px;color:var(--ink3);letter-spacing:.3em}
+.map-epi{font-size:13px;color:var(--ink2);margin-top:6px;letter-spacing:.08em}
+.map-nav{display:flex;align-items:center;gap:14px;margin:8px 0 4px}
+.map-nav .btn{padding:8px 16px;font-size:15px}
+.map-nav .chname{min-width:150px;text-align:center;font-size:15px;letter-spacing:.2em;color:var(--gold2)}
+#map-grid{display:grid;grid-template-columns:repeat(4,minmax(64px,84px));gap:14px;margin:10px 0 4px}
+.lv{aspect-ratio:1;border:1px solid var(--line);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));cursor:pointer;transition:transform .15s,box-shadow .2s,border-color .2s}
+.lv:hover{transform:translateY(-3px);box-shadow:var(--glow-soft);border-color:var(--gold)}
+.lv:active{transform:scale(.96)}
+.lv .n{font-size:22px;color:var(--ink);letter-spacing:.05em}
+.lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:2px;min-height:14px}
+.lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
+.lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.lv.cur{border-color:var(--gold);animation:curPulse 2.2s ease-in-out infinite}
+@keyframes curPulse{50%{box-shadow:0 0 18px color-mix(in srgb,var(--gold) 38%,transparent)}}
+.lv.boss .n{color:var(--red)}
+.lv .bosscrown{position:absolute;top:4px;right:6px;font-size:11px;color:var(--red);letter-spacing:0}
+.lv.done{border-color:color-mix(in srgb,var(--gold) 40%,var(--edge))}
+#map-endless{margin-top:6px;font-size:13px;color:var(--ink2);letter-spacing:.1em;text-align:center}
+
+/* ============ 游戏局内 ============ */
+#scr-game{padding:max(8px,env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));justify-content:flex-start;overflow-y:auto}
+/* auto-margin 居中：比 justify-content:center 安全，内容超高时不会把顶部裁掉 */
+#scr-game::before{content:'';margin-top:auto}
+#scr-game::after{content:'';margin-bottom:auto}
+#hud{width:min(520px,100%);display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
+.hud-box{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 10px;text-align:center}
+#hud-moves{min-width:74px;display:flex;flex-direction:column;justify-content:center}
+#hud-moves .num{font-size:30px;line-height:1.1;color:var(--ink);font-weight:500;transition:color .3s}
+#hud-moves.low .num{color:var(--red);animation:lowPulse 1s ease-in-out infinite}
+@keyframes lowPulse{50%{transform:scale(1.12);text-shadow:0 0 14px color-mix(in srgb,var(--red) 60%,transparent)}}
+#hud-moves .lbl,#hud-goals .lbl{font-size:10px;letter-spacing:.3em;color:var(--ink3)}
+#hud-goals{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px}
+#goal-row{display:flex;justify-content:center;gap:14px;align-items:center;min-height:40px}
+.goal{display:flex;flex-direction:column;align-items:center;gap:1px;position:relative}
+.goal canvas{width:30px;height:30px;display:block}
+.goal .cnt{font-size:12px;color:var(--ink);letter-spacing:.04em;line-height:1}
+.goal.done .cnt{color:var(--green)}
+.goal .tick{position:absolute;top:-2px;right:-8px;font-size:13px;color:var(--green);opacity:0;transform:scale(.4)}
+.goal.done .tick{opacity:1;transform:scale(1);transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.goal.bump canvas{animation:goalBump .3s ease}
+@keyframes goalBump{40%{transform:scale(1.35)}}
+#hud-score{min-width:96px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+#score-num{font-size:17px;color:var(--gold2);letter-spacing:.05em;line-height:1;font-variant-numeric:tabular-nums}
+.sbar{height:7px;background:var(--bg2);overflow:hidden;position:relative;border:1px solid var(--edge)}
+.sbar i{display:block;height:100%;width:0%;transition:width .45s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,var(--gold-line),var(--gold))}
+.sbar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:sheen 2.4s ease-in-out infinite;transform:translateX(-100%)}
+@keyframes sheen{60%,100%{transform:translateX(100%)}}
+.sbar .stars{position:absolute;inset:0;pointer-events:none}
+.sbar .stars s{position:absolute;top:50%;transform:translate(-50%,-54%);font-size:9px;color:var(--ink3);text-decoration:none;transition:color .3s,text-shadow .3s}
+.sbar .stars s.lit{color:var(--gold2);text-shadow:0 0 8px color-mix(in srgb,var(--gold) 70%,transparent)}
+/* Boss 条 */
+#boss-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--red) 8%,var(--panel2)),var(--panel));padding:5px 10px;position:relative}
+#boss-bar.on{display:flex}
+#boss-face{width:46px;height:46px;flex:none}
+#boss-face svg{width:100%;height:100%}
+#boss-bar.hit #boss-face{animation:hitFlash .35s ease}
+@keyframes hitFlash{0%{filter:brightness(2.2);transform:translateX(0) scale(1.04)}30%{transform:translateX(-5px)}60%{transform:translateX(4px)}100%{filter:brightness(1);transform:translateX(0) scale(1)}}
+#boss-mid{flex:1;min-width:0}
+#boss-name{font-size:13px;letter-spacing:.2em;color:var(--red);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#boss-hpbar{height:9px;background:var(--bg2);border:1px solid var(--edge);position:relative;overflow:hidden;margin-top:3px}
+#boss-hpbar i{display:block;height:100%;width:100%;transition:width .4s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,#7a1f1f,var(--red))}
+#boss-hpbar.low i{animation:hpWarn 1s ease-in-out infinite}
+@keyframes hpWarn{50%{filter:brightness(1.6)}}
+#boss-hp-num{font-size:11px;color:var(--ink2);min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+#boss-say{position:absolute;left:56px;top:-30px;background:var(--panel);border:1px solid var(--line);padding:3px 10px;font-size:12px;color:var(--ink2);
+  opacity:0;transition:opacity .3s,transform .3s;transform:translateY(6px);pointer-events:none;max-width:76%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#boss-say.on{opacity:1;transform:translateY(0)}
+/* 棋盘 */
+#board-wrap{position:relative;width:min(94vw,520px);margin:0 auto;flex:none}
+#board{display:block;width:100%;touch-action:none;
+  border:1px solid var(--mine-edge);background:var(--mine);
+  box-shadow:inset 0 0 44px rgba(0,0,0,.55),0 6px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(201,166,74,.08)}
+#board-wrap::before,#board-wrap::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);opacity:.7;pointer-events:none;z-index:3}
+#board-wrap::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+#board-wrap::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+#fly-layer{position:fixed;inset:0;pointer-events:none;z-index:60}
+.flygem{position:fixed;width:30px;height:30px;pointer-events:none;z-index:61}
+#combo-banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);pointer-events:none;z-index:5;text-align:center;opacity:0}
+#combo-banner.go{animation:comboIn .9s cubic-bezier(.16,1,.3,1) both}
+#combo-banner .zh{font-size:clamp(30px,7vw,44px);letter-spacing:.3em;color:var(--gold2);font-weight:300;
+  text-shadow:0 0 24px color-mix(in srgb,var(--gold) 55%,transparent),0 2px 4px rgba(0,0,0,.6)}
+#combo-banner .en{font-size:13px;letter-spacing:.5em;color:var(--ink);opacity:.85;margin-top:2px;text-transform:uppercase}
+@keyframes comboIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6);filter:blur(5px)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.08);filter:blur(0)}30%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-62%) scale(1.02)}}
+.float-num{position:absolute;font-size:22px;font-weight:600;pointer-events:none;z-index:30;color:var(--gold2);
+  text-shadow:0 2px 8px rgba(0,0,0,.85);animation:floatUp 1s ease forwards;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+@keyframes floatUp{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}25%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
+#game-foot{width:min(520px,100%);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+#quip-line{flex:1;font-size:12.5px;color:var(--ink3);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .4s}
+#quip-line b{color:var(--ink2);font-weight:500}
+.iconbtn{width:40px;height:40px;flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink2);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--serif)}
+.iconbtn:hover{color:var(--gold);border-color:var(--gold);box-shadow:var(--glow-soft)}
+.iconbtn:active{transform:scale(.94)}
+/* 矿灯将熄 · 限时 */
+#rush-bar{width:min(520px,100%);display:none;margin-bottom:6px;border:1px solid var(--line);background:var(--panel);padding:5px 10px}
+#rush-bar.on{display:block}
+#rush-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.14em;margin-bottom:3px}
+#rush-time{color:var(--gold2);font-size:15px;font-variant-numeric:tabular-nums}
+#rush-track{height:9px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden}
+#rush-track i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold))}
+#rush-bar.crit #rush-track i{background:linear-gradient(90deg,#7a1f1f,var(--red))}
+#rush-bar.crit #rush-time{color:var(--red);animation:lowPulse 1s infinite}
+/* 同伴 · 助战 */
+#ally{width:min(520px,100%);display:flex;align-items:center;gap:10px;margin-top:8px;
+  border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:7px 10px;
+  cursor:default;transition:border-color .25s,box-shadow .3s}
+#ally.ready{border-color:var(--gold);box-shadow:var(--glow);cursor:pointer;animation:armedPulse 1.8s ease-in-out infinite}
+#ally-badge{width:44px;height:44px;flex:none;position:relative;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);background:radial-gradient(ellipse at center,var(--ally-glow,rgba(201,166,74,.16)),transparent 72%)}
+#ally-badge::before{content:'';position:absolute;inset:4px;border:1px solid var(--gold-line);opacity:.4;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .3s}
+#ally.ready #ally-badge::before{opacity:.95;transform:rotate(45deg) scale(1.08)}
+/* 同伴色：深色主题用灵石本色，浅色主题换成同色系的深色版，
+   否则星屑(米白)这类颜色在羊皮纸底上等于隐形 */
+#ally,.ally-opt{--ally-c:var(--ally-base,var(--gold))}
+:root[data-theme="light"] #ally,:root[data-theme="light"] .ally-opt{--ally-c:var(--ally-dark,var(--gold))}
+#ally-badge b{font-size:23px;font-weight:300;color:var(--ally-c);font-style:normal;
+  text-shadow:0 0 16px var(--ally-glow,rgba(201,166,74,.5));position:relative}
+#ally-mid{flex:1;min-width:0}
+#ally-name{font-size:12.5px;letter-spacing:.14em;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ally-name em{font-style:normal;color:var(--ink3);font-size:11px;letter-spacing:.2em}
+#ally.ready #ally-name{color:var(--gold2)}
+#ally-track{height:7px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;margin-top:4px;position:relative}
+#ally-track i{display:block;height:100%;width:0%;transition:width .4s cubic-bezier(.16,1,.3,1);
+  background:linear-gradient(90deg,var(--gold-line),var(--ally-c))}
+#ally.ready #ally-track i::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  animation:sheen 1.6s ease-in-out infinite;transform:translateX(-100%)}
+#ally-fire{flex:none;font-family:var(--serif);font-size:13px;letter-spacing:.16em;padding:8px 12px;
+  border:1px solid var(--line2);background:transparent;color:var(--ink3);cursor:default;transition:all .2s}
+#ally.ready #ally-fire{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 14%,transparent);cursor:pointer}
+#ally.ready #ally-fire:active{transform:scale(.95)}
+/* 同伴选择（开场卡） */
+.ally-pick{display:flex;gap:5px;justify-content:center;margin:14px 0 2px}
+.ally-opt{flex:1;min-width:0;max-width:56px;padding:6px 1px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s;position:relative}
+.ally-opt .g{font-size:20px;font-weight:300;color:var(--ink3);line-height:1.1;transition:all .25s}
+.ally-opt .n{font-size:10px;letter-spacing:0;color:var(--ink3);white-space:nowrap}
+.ally-opt:hover:not(.lock){transform:translateY(-3px);border-color:var(--gold)}
+.ally-opt.sel{border-color:var(--gold);box-shadow:var(--glow-soft);background:color-mix(in srgb,var(--gold) 10%,var(--bg2))}
+.ally-opt.sel .g{color:var(--ally-c);text-shadow:0 0 14px var(--ag)}
+.ally-opt.sel .n{color:var(--gold2)}
+.ally-opt.lock{opacity:.3;cursor:default}
+.ally-opt.lock::after{content:'第 'attr(data-u)' 关';position:absolute;bottom:-15px;left:0;right:0;font-size:9px;color:var(--ink3);letter-spacing:.04em}
+#ally-desc{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;margin-top:20px;min-height:34px;line-height:1.7}
+#ally-desc b{color:var(--gold2);font-weight:500}
+/* 编年史片段（地脉通关联动卡） */
+#ovl-lore .ovl-card{max-width:420px}
+#lore-body{font-size:14px;color:var(--ink);line-height:2;letter-spacing:.04em;text-align:left;margin:14px 0 4px}
+#lore-body em{font-style:normal;color:var(--gold2)}
+.lore-link{display:block;margin-top:14px;border:1px solid var(--line);background:var(--bg2);padding:11px 13px;
+  text-decoration:none;text-align:left;transition:all .22s}
+.lore-link:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--glow-soft)}
+.lore-link .lk{font-size:10.5px;letter-spacing:.3em;color:var(--ink3)}
+.lore-link .lt{font-size:15px;letter-spacing:.12em;color:var(--gold2);margin-top:2px}
+.lore-link .ld{font-size:12px;color:var(--ink2);letter-spacing:.03em;margin-top:2px;line-height:1.6}
+/* 灵器栏 */
+#toolbar{width:min(520px,100%);display:flex;gap:8px;margin-top:8px}
+.tool{flex:1;position:relative;display:flex;align-items:center;justify-content:center;gap:7px;
+  font-family:var(--serif);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
+  color:var(--ink2);padding:9px 4px;font-size:13.5px;letter-spacing:.1em;cursor:pointer;
+  transition:transform .12s,box-shadow .16s,border-color .2s,color .2s}
+.tool .ic{font-size:17px;line-height:1;color:var(--gold)}
+.tool:hover:not(:disabled){transform:translateY(-2px);border-color:var(--gold);color:var(--ink);box-shadow:var(--glow-soft)}
+.tool:active:not(:disabled){transform:translateY(1px) scale(.97);transition-duration:.05s}
+.tool .cnt{position:absolute;top:-7px;right:-6px;min-width:19px;height:19px;line-height:17px;padding:0 4px;
+  border:1px solid var(--gold-line);background:var(--bg);color:var(--gold2);font-size:11px;font-style:normal;
+  font-variant-numeric:tabular-nums;text-align:center}
+.tool:disabled{opacity:.34;cursor:default}
+.tool:disabled .ic{color:var(--ink3)}
+.tool.armed{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);animation:armedPulse 1.5s ease-in-out infinite}
+@keyframes armedPulse{50%{box-shadow:0 0 32px color-mix(in srgb,var(--gold) 55%,transparent)}}
+#tool-hint{width:min(520px,100%);margin-top:6px;font-size:12.5px;color:var(--gold2);letter-spacing:.08em;
+  text-align:center;min-height:0;height:0;overflow:hidden;transition:height .25s,margin .25s}
+#tool-hint.on{height:22px;margin-top:6px}
+/* 每日矿灯 / 星辰宝箱 */
+.claimcard{width:min(320px,86vw);margin:14px auto 0;border:1px solid var(--gold-line);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 13%,var(--panel2)),var(--panel));
+  padding:12px 14px;display:none;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
+.claimcard.on{display:block}
+.claimcard .ck{font-size:11px;letter-spacing:.34em;color:var(--ink3)}
+.claimcard .ct{font-size:16px;letter-spacing:.14em;color:var(--gold2);margin:3px 0 2px}
+.claimcard .cd{font-size:12px;color:var(--ink2);letter-spacing:.06em}
+.claimcard .btn{margin-top:9px;width:100%;padding:9px;font-size:15px}
+.streakdots{display:flex;gap:5px;justify-content:center;margin-top:7px}
+.streakdots i{width:9px;height:9px;border:1px solid var(--line);display:block}
+.streakdots i.lit{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px color-mix(in srgb,var(--gold) 60%,transparent)}
+#star-meter{width:min(340px,90vw);margin:4px auto 0}
+#star-meter .sm-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.1em;margin-bottom:4px}
+#star-meter .sm-top b{color:var(--gold2);font-weight:500}
+#star-meter .bar{height:8px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;position:relative}
+#star-meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold));transition:width .5s cubic-bezier(.16,1,.3,1)}
+#chest-btn{margin-top:8px;display:none}
+#chest-btn.on{display:inline-block;animation:curPulse 2s ease-in-out infinite}
+body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(3px,-1px)}30%,70%{transform:translate(-4px,2px)}40%,60%{transform:translate(4px,-2px)}50%{transform:translate(-3px,1px)}}
+#flash{position:fixed;inset:0;pointer-events:none;z-index:80;opacity:0;background:radial-gradient(ellipse at center,rgba(255,255,255,.9),rgba(255,255,255,.28))}
+#flash.go{animation:flashOut .5s ease-out}
+#flash.red{background:radial-gradient(ellipse at center,rgba(200,40,40,.62),rgba(120,20,20,.25))}
+@keyframes flashOut{0%{opacity:.85}100%{opacity:0}}
+
+/* ============ 覆盖层 ============ */
+.ovl{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;
+  background:color-mix(in srgb,var(--bg) 62%,transparent)}
+:root[data-theme="dark"] .ovl{background:rgba(4,4,6,.72)}
+.ovl.on{display:flex}
+.ovl-card{width:min(400px,94vw);max-height:88dvh;overflow-y:auto;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
+  padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ovl-card::before,.ovl-card::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);pointer-events:none}
+.ovl-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.ovl-card::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.ovl-kick{font-size:11px;letter-spacing:.4em;color:var(--ink3)}
+.ovl-title{font-size:27px;font-weight:300;letter-spacing:.2em;margin:8px 0 2px}
+.ovl-title em{font-style:normal;color:var(--gold)}
+.ovl-sub{font-size:13px;color:var(--ink2);letter-spacing:.1em}
+.ovl-goals{display:flex;justify-content:center;gap:18px;margin:16px 0 4px;min-height:44px}
+.ovl-goals .goal canvas{width:38px;height:38px}
+.ovl-goals .goal .cnt{font-size:13px}
+.obst-notes{margin:10px auto 0;text-align:left;max-width:300px;font-size:12.5px;color:var(--ink2);line-height:1.8}
+.obst-notes b{color:var(--gold2);font-weight:500}
+.quip{margin:14px auto 4px;font-size:13.5px;color:var(--ink2);max-width:300px;line-height:1.8}
+.quip::before{content:'「'}.quip::after{content:'」—— 狼先生'}
+.quip.boss::after{content:'」'}
+.ovl-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.stars-row{display:flex;justify-content:center;gap:16px;margin:14px 0 4px;height:52px}
+.stars-row s{font-size:44px;line-height:1;text-decoration:none;color:var(--ink3);opacity:.28;transform:scale(.6);transition:none}
+.stars-row s.lit{color:var(--gold2);opacity:1;text-shadow:0 0 22px color-mix(in srgb,var(--gold) 65%,transparent);animation:starPop .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes starPop{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25) rotate(6deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+#end-score{font-size:34px;color:var(--gold2);letter-spacing:.06em;margin:6px 0 0;font-variant-numeric:tabular-nums}
+#end-detail{font-size:12.5px;color:var(--ink3);letter-spacing:.14em;margin-top:4px;line-height:2}
+#end-detail b{color:var(--ink2);font-weight:500}
+/* Boss 登场 */
+#ovl-boss .ovl-card{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
+#boss-intro-face{width:120px;height:120px;margin:8px auto}
+#boss-intro-face svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(168,48,48,.4))}
+#boss-intro-name{font-size:30px;font-weight:300;letter-spacing:.3em;color:var(--red);animation:titleIn 1s cubic-bezier(.16,1,.3,1) both}
+#boss-intro-title{font-size:12px;letter-spacing:.4em;color:var(--ink3);margin-top:4px}
+/* 成就 */
+#ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.ach{border:1px solid var(--line2);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--bg2);transition:all .2s}
+.ach .ic{font-size:23px;filter:grayscale(1);opacity:.35}
+.ach .nm{font-size:11px;color:var(--ink3);letter-spacing:.08em;text-align:center}
+.ach.got{border-color:var(--line)}
+.ach.got .ic{filter:none;opacity:1}
+.ach.got .nm{color:var(--gold2)}
+.ach.got:hover{box-shadow:var(--glow-soft);transform:translateY(-2px)}
+/* 通用弹出提示 */
+#toast{position:fixed;left:50%;bottom:calc(74px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:90;
+  background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:10px 18px;font-size:13.5px;letter-spacing:.08em;
+  opacity:0;transition:all .35s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:86vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast b{color:var(--gold2);font-weight:500}
+/* 教学提示条 */
+#tut{position:absolute;left:50%;bottom:-2px;transform:translate(-50%,110%);z-index:6;background:color-mix(in srgb,var(--panel) 88%,transparent);
+  border:1px solid var(--line);padding:7px 14px;font-size:12.5px;color:var(--ink2);letter-spacing:.06em;white-space:nowrap;
+  opacity:0;transition:opacity .4s;pointer-events:none}
+#tut.on{opacity:1}
+#tut b{color:var(--gold2);font-weight:500}
+/* 角落固定件 */
+#chip-home{position:fixed;left:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:85;font-size:12px;letter-spacing:.1em;
+  color:var(--ink2);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:7px 12px;display:none;transition:all .2s}
+#chip-home:hover{color:var(--gold);border-color:var(--gold)}
+#chip-home.on{display:block}
+#corner-ctl{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:85;display:none;gap:8px}
+#corner-ctl.on{display:flex}
+#corner-ctl .iconbtn{width:36px;height:36px;font-size:15px}
+@media (max-width:420px){
+  #hud-moves{min-width:62px}
+  #hud-moves .num{font-size:25px}
+  #hud-score{min-width:84px}
+  .menu-btns{gap:10px}
+  #map-grid{grid-template-columns:repeat(4,minmax(58px,76px));gap:10px}
+}
+@media (max-height:640px){
+  .title-hero{font-size:36px}
+  #menu-gems{height:44px}
+  .wolf-badge{width:72px;height:72px}
+}
+</style>
+</head>
+<body>
+<div id="amb"><i></i><i></i></div>
+<div id="flash"></div>
+<div id="app">
+
+  <!-- 主菜单 -->
+  <section id="scr-menu" class="scr">
+    <div class="kicker">THE MYSKME CHRONICLES · GEMFALL</div>
+    <h1 class="title-hero">灵石<em>远征</em></h1>
+    <div class="subtitle">MYSKME 消消乐 · 狼先生与他的学生们</div>
+    <canvas id="menu-gems" width="10" height="10"></canvas>
+    <div class="wolf-badge" id="wolf-badge">
+      <svg viewBox="0 0 100 100"><path fill="currentColor" d="M22 78 Q18 54 30 40 Q26 26 34 16 Q44 24 46 32 Q50 30 54 30 Q58 30 62 32 Q64 24 74 16 Q82 26 78 40 Q90 54 86 78 Q70 70 54 71 Q38 70 22 78 Z M54 50 Q60 56 68 56 M54 50 Q48 56 40 56"/></svg>
+      <b>狼</b>
+    </div>
+    <div class="menu-btns">
+      <button class="btn primary big ornate" id="btn-adventure">⚒ 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
+      <button class="btn ornate" id="btn-rush">🕯 矿灯将熄 · 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
+      <div class="menu-sub">
+        <button class="btn ghost" id="btn-ach">🏅 成就</button>
+        <button class="btn ghost" id="btn-how">卷轴 · 玩法</button>
+      </div>
+    </div>
+    <div class="claimcard" id="daily-card">
+      <div class="ck">今日矿灯 · DAILY</div>
+      <div class="ct" id="daily-title">矿灯已续 · 连续 0 天</div>
+      <div class="cd" id="daily-desc">领取今日补给</div>
+      <div class="streakdots" id="daily-dots"></div>
+      <button class="btn primary" id="daily-claim">领 取</button>
+    </div>
+    <div id="menu-stats"></div>
+    <div class="hr"></div>
+    <div class="menu-foot">
+      把灵石三三对齐，沉睡的灵力就会醒来。<br>
+      <a href="../">← 作品总目</a>　·　MYSKME × 英语王老师
+    </div>
+    <div id="cat" title="……">
+      <svg viewBox="0 0 64 56" fill="#0c0c0e" stroke="rgba(201,166,74,.35)" stroke-width="1">
+        <path class="tail" d="M8 46 Q-2 40 4 30 Q6 26 10 28 Q6 36 14 42 Z"/>
+        <path d="M18 20 L22 8 L30 16 Q36 14 42 16 L50 8 L54 20 Q60 30 56 42 Q54 50 36 50 Q18 50 16 42 Q12 30 18 20 Z"/>
+        <g class="eyes" fill="#c9a64a" stroke="none"><ellipse cx="29" cy="30" rx="2.6" ry="3.4"/><ellipse cx="43" cy="30" rx="2.6" ry="3.4"/></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 地脉图 -->
+  <section id="scr-map" class="scr">
+    <div class="map-head">
+      <div class="kicker">EXPEDITION MAP</div>
+      <h2>地脉 · <em id="map-chname">晨光浅脉</em></h2>
+      <div class="map-era" id="map-era">第一地脉</div>
+      <div class="map-epi" id="map-epi"></div>
+    </div>
+    <div class="map-nav">
+      <button class="btn ghost" id="map-prev">◀</button>
+      <div class="chname" id="map-chip"></div>
+      <button class="btn ghost" id="map-next">▶</button>
+    </div>
+    <div id="star-meter">
+      <div class="sm-top"><span>星辰宝箱</span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
+      <div class="bar"><i id="sm-fill"></i></div>
+      <button class="btn primary" id="chest-btn">✦ 开启星辰宝箱</button>
+    </div>
+    <div id="map-grid"></div>
+    <div id="map-endless"></div>
+    <div class="ovl-btns"><button class="btn ghost" id="map-back">← 回大厅</button></div>
+  </section>
+
+  <!-- 游戏 -->
+  <section id="scr-game" class="scr">
+    <div id="rush-bar"><div id="rush-top"><span>矿灯将熄 · LAMPLIGHT</span><span id="rush-time">90.0</span><span id="rush-best">最佳 —</span></div><div id="rush-track"><i></i></div></div>
+    <div id="boss-bar">
+      <div id="boss-face"></div>
+      <div id="boss-mid">
+        <div id="boss-name"></div>
+        <div id="boss-hpbar"><i></i></div>
+      </div>
+      <div id="boss-hp-num"></div>
+      <div id="boss-say"></div>
+    </div>
+    <div id="hud">
+      <div class="hud-box" id="hud-moves"><div class="num">0</div><div class="lbl">步数</div></div>
+      <div class="hud-box" id="hud-goals"><div id="goal-row"></div><div class="lbl" id="goal-lbl">目标</div></div>
+      <div class="hud-box" id="hud-score"><div id="score-num">0</div><div class="sbar"><i id="score-fill"></i><div class="stars" id="score-stars"></div></div></div>
+    </div>
+    <div id="board-wrap">
+      <canvas id="board"></canvas>
+      <div id="combo-banner"><div class="zh"></div><div class="en"></div></div>
+      <div id="tut"></div>
+    </div>
+    <div id="ally">
+      <div id="ally-badge"><b>狼</b></div>
+      <div id="ally-mid">
+        <div id="ally-name">狼先生 · <em>执灯人</em></div>
+        <div id="ally-track"><i></i></div>
+      </div>
+      <button id="ally-fire">执 灯</button>
+    </div>
+    <div id="toolbar">
+      <button class="tool" data-t="pick"><span class="ic">⛏</span>矿镐<i class="cnt">0</i></button>
+      <button class="tool" data-t="swap"><span class="ic">⇄</span>换位符<i class="cnt">0</i></button>
+      <button class="tool" data-t="mix"><span class="ic">✦</span>重整令<i class="cnt">0</i></button>
+    </div>
+    <div id="tool-hint"></div>
+    <div id="game-foot">
+      <button class="iconbtn" id="btn-pause" title="暂停">Ⅱ</button>
+      <div id="quip-line"></div>
+      <button class="iconbtn" id="btn-sound" title="音效">♪</button>
+    </div>
+  </section>
+</div>
+
+<!-- 关卡开场 -->
+<div class="ovl" id="ovl-intro"><div class="ovl-card">
+  <div class="ovl-kick" id="intro-kick">第一地脉 · 晨光浅脉</div>
+  <div class="ovl-title" id="intro-title">第 <em>1</em> 关</div>
+  <div class="ovl-sub" id="intro-sub">步数 24</div>
+  <div class="ovl-goals" id="intro-goals"></div>
+  <div class="obst-notes" id="intro-notes"></div>
+  <div class="ovl-kick" style="margin-top:16px">带谁同行 · ALLY</div>
+  <div class="ally-pick" id="ally-pick"></div>
+  <div id="ally-desc"></div>
+  <div class="quip" id="intro-quip"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="intro-back">回图</button>
+    <button class="btn primary big" id="intro-go">出 发</button>
+  </div>
+</div></div>
+
+<!-- Boss 登场 -->
+<div class="ovl" id="ovl-boss"><div class="ovl-card">
+  <div class="ovl-kick">矿脉深处 · 有东西醒了</div>
+  <div id="boss-intro-face"></div>
+  <div id="boss-intro-name">叶王</div>
+  <div id="boss-intro-title">红笔判官</div>
+  <div class="quip boss" id="boss-intro-line"></div>
+  <div class="ovl-btns"><button class="btn primary big" id="boss-go">应 战</button></div>
+</div></div>
+
+<!-- 结算 -->
+<div class="ovl" id="ovl-end"><div class="ovl-card">
+  <div class="ovl-kick" id="end-kick">EXPEDITION</div>
+  <div class="ovl-title" id="end-title">脉 · <em>通</em></div>
+  <div class="stars-row" id="end-stars"><s>★</s><s>★</s><s>★</s></div>
+  <div id="end-score">0</div>
+  <div id="end-detail"></div>
+  <div class="quip" id="end-quip"></div>
+  <div class="ovl-btns">
+    <button class="btn primary big" id="end-continue" style="display:none;width:100%">⛏ 续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
+    <button class="btn ghost" id="end-menu">回图</button>
+    <button class="btn" id="end-retry">再来</button>
+    <button class="btn primary" id="end-next">下一关 →</button>
+  </div>
+</div></div>
+
+<!-- 暂停 -->
+<div class="ovl" id="ovl-pause"><div class="ovl-card">
+  <div class="ovl-kick">小 憩</div>
+  <div class="ovl-title">茶 · <em>歇</em></div>
+  <div class="quip">矿不会跑，茶要趁热。缓口气再挖。</div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="pause-quit">离开本关</button>
+    <button class="btn" id="pause-retry">重开</button>
+    <button class="btn primary" id="pause-resume">继续</button>
+  </div>
+</div></div>
+
+<!-- 成就 -->
+<div class="ovl" id="ovl-ach"><div class="ovl-card">
+  <div class="ovl-kick">HONOR BADGES</div>
+  <div class="ovl-title">成就 · <em>徽记</em></div>
+  <div id="ach-grid"></div>
+  <div class="ovl-btns"><button class="btn ghost" id="ach-close">合上</button></div>
+</div></div>
+
+<!-- 编年史片段 · 地脉通关联动 -->
+<div class="ovl" id="ovl-lore"><div class="ovl-card">
+  <div class="ovl-kick" id="lore-kick">编年史片段 · CHRONICLE</div>
+  <div class="ovl-title" id="lore-title">地脉 · <em>通</em></div>
+  <div id="lore-body"></div>
+  <a class="lore-link" id="lore-link" target="_blank" rel="noopener">
+    <div class="lk">同一个世界 · CROSSOVER</div>
+    <div class="lt"></div>
+    <div class="ld"></div>
+  </a>
+  <div class="ovl-btns"><button class="btn primary" id="lore-close">继续下潜 →</button></div>
+</div></div>
+
+<!-- 玩法卷轴 -->
+<div class="ovl" id="ovl-how"><div class="ovl-card" style="text-align:left">
+  <div class="ovl-kick" style="text-align:center">SCROLL OF RULES</div>
+  <div class="ovl-title" style="text-align:center">矿脉 · <em>手册</em></div>
+  <div class="obst-notes" style="max-width:none" id="how-body"></div>
+  <div class="ovl-btns"><button class="btn ghost" id="how-close">合上</button></div>
+</div></div>
+
+<div id="toast"></div>
+<a id="chip-home" href="../">← 作品总目</a>
+<div id="corner-ctl"><button class="iconbtn" id="themeBtn" title="主题">◐</button></div>
+
+<script>
+'use strict';
+/* ============================================================
+   灵石远征 · GEMFALL —— MYSKME × 英语王老师
+   单文件 · 离线可玩 · 黑金编年史
+   ============================================================ */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- 存档 ---------- */
+const SKEY='myskme-match-v1';
+const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
+  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{}};
+function loadSave(){
+  let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
+  const out=Object.assign({},SAVE_DEF,s);
+  out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
+  out.daily=Object.assign({},SAVE_DEF.daily,s.daily||{});
+  out.fails=s.fails||{};
+  return out;
+}
+const SAVE=loadSave();
+let saveT=null;
+function persist(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(SKEY,JSON.stringify(SAVE))}catch(e){}},120)}
+
+/* ---------- 随机 ---------- */
+function xmur3(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return h>>>0}}
+function mulberry32(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rngOf=seed=>mulberry32(xmur3(String(seed))());
+const rnd=Math.random;
+
+/* ---------- 灵石图鉴 ---------- */
+/* dk = 浅色主题专用深色版（羊皮纸底上要过 WCAG 大字 3:1，星屑尤其不能直接用本色） */
+const GEMS=[
+  {name:'金曜',en:'AURUM', base:'#f2c14e',hi:'#ffe9ad',lo:'#9a6f16',dk:'#6f5410',shape:'hex'},
+  {name:'赤晶',en:'EMBER', base:'#e0524f',hi:'#ffb3a8',lo:'#8f2424',dk:'#8f2424',shape:'tri'},
+  {name:'蓝月',en:'LUNA',  base:'#4da3e8',hi:'#bfe4ff',lo:'#1f5a94',dk:'#1f5a94',shape:'orb'},
+  {name:'翠叶',en:'VERDE', base:'#57c26c',hi:'#c0f2c8',lo:'#1f6b36',dk:'#1f6b36',shape:'leaf'},
+  {name:'紫辉',en:'VIOLA', base:'#a97fe8',hi:'#e5d0ff',lo:'#58368f',dk:'#58368f',shape:'dia'},
+  {name:'星屑',en:'STELLA',base:'#ece2c8',hi:'#ffffff',lo:'#8f866c',dk:'#5f5844',shape:'star'},
+];
+const KIND={N:'n',H:'H',V:'V',B:'B',O:'O',BELL:'bell'};
+
+/* ---------- 地脉与反派 ---------- */
+const CHAPTERS=[
+  {name:'晨光浅脉',era:'第一地脉',epi:'矿灯初亮，灵石在浅层打盹。'},
+  {name:'墨渊支脉',era:'第二地脉',epi:'叶王的墨汁渗进石缝，把灵石封在了下面。'},
+  {name:'猫铃矿道',era:'第三地脉',epi:'小黑猫的铃铛滚落深处——送它们回到矿底。'},
+  {name:'岩壳深堑',era:'第四地脉',epi:'老矿道塌了一半，岩壳要一层层敲开。'},
+  {name:'蛇窟缠层',era:'第五地脉',epi:'蛇女的信使先到一步，石头被缠得结结实实。'},
+  {name:'双生裂谷',era:'第六地脉',epi:'墨与岩互相掩护，这里开始考真功夫。'},
+  {name:'风暴矿心',era:'第七地脉',epi:'矿脉的心跳越来越快，稳住你的手。'},
+  {name:'王座熔窟',era:'第八地脉',epi:'两位不速之客，都在最深处等你。'},
+];
+const BOSSES={
+  ye:{key:'ye',short:'叶王',name:'叶王 · 红笔判官',title:'红笔判官',act:'seal',every:3,
+    intro:'这些灵石，本王判它们——统统不许动！',
+    hurt:['放肆！','哼，雕虫小技。','别碰本王的批注！','这一笔不算！'],
+    doing:['判！不许动！','再批一笔。','朱批到此。'],
+    ko:'本王的红笔……居然批不动了……'},
+  she:{key:'she',short:'蛇女',name:'蛇女 · 缠丝夫人',title:'缠丝夫人',act:'snake',every:3,
+    intro:'嘶——多可爱的猎物。慢慢来，急什么呢？',
+    hurt:['嘶——！','疼、疼的呢。','你这孩子，好没耐心。'],
+    doing:['缠上了哦。','别挣扎，乖。','嘶嘶……'],
+    ko:'好吧……这一次，算你利落。'},
+  both:{key:'both',short:'双王',name:'叶王 & 蛇女 · 王座同盟',title:'熔窟里的两位',act:'both',every:2,
+    intro:'「一起上。」「嘶——难得意见一致。」',
+    hurt:['「可恶！」','「嘶——好痛！」','「稳住！」'],
+    doing:['「判！」','「缠住！」','「一个都别放过。」'],
+    ko:'「不可能……」「嘶……撤、撤退！」'},
+};
+
+/* ---------- 狼先生台词（原创 · 轻松第一） ---------- */
+const Q_INTRO=[
+  '矿灯我提好了，你只管把灵石对齐。',
+  '三个一排，是矿脉的礼仪。',
+  'Take it easy——但别太 easy。',
+  '手感这种东西，挖两下就回来了。',
+  '今天的矿味不错，适合大丰收。',
+  '别急着赢，先赢一步。',
+  '四连出疾风，五连出万象——记住这句就够了。',
+  '茶我先放这儿，回来应该还是热的。',
+  '深呼吸。灵石听得见你的节奏。',
+  '慢就是稳，稳就是快。Ready?',
+];
+const Q_WIN=[
+  '漂亮。这波灵力，够泡三壶好茶。',
+  'Nice work! 矿脉都替你鼓掌了。',
+  '这手法，老矿工看了都要眯眼睛。',
+  '灵石醒得心服口服。',
+  '收工！今天的矿灯格外亮。',
+  '我就说吧，你有这个手感。',
+  'Well done。下一层的灵石已经开始紧张了。',
+  '这一关的故事，可以写进编年史了。',
+];
+const Q_LOSE=[
+  '差一步而已。矿脉又不会跑。',
+  '换个角度，再来一铲。',
+  '刚才那个五连的机会，下次别放过它。',
+  'No worries——矿工的字典里没有「白挖」。',
+  '灵石还在，手感还在，你也还在。齐了。',
+  '这局算探路。下一局算真的。',
+];
+const Q_RUSH_END=[
+  '手速可以，心跳也可以。',
+  '90 秒能挖成这样，白天肯定没少练。',
+  '矿灯灭了，战果留下了。',
+  '灯油见底，收成不错。',
+];
+const COMBO_WORDS=[null,null,
+  ['妙','NICE'],['绝妙','GREAT'],['华丽','AMAZING'],['璀璨','SPECTACULAR'],['传说','LEGENDARY'],['神话','MYTHIC']];
+const comboWord=c=>COMBO_WORDS[clamp(c,2,7)];
+
+/* ---------- 机关图解 ---------- */
+const OBST_INFO={
+  ink:  {ic:'ink',  nm:'墨封',  tip:'在墨渍上消除灵石，就能揭掉一层墨。深墨要揭两层。'},
+  bell: {ic:'bell', nm:'猫铃',  tip:'铃铛不能消除，但可以交换——把它一路送到矿底最后一行。'},
+  crate:{ic:'crate',nm:'岩壳',  tip:'在岩壳旁边消除、或用灵技轰它，就能敲碎。厚壳要敲两下。'},
+  cage: {ic:'cage', nm:'石笼',  tip:'被锁住的灵石不能移动，但把它连进三连或用灵技命中，即可破笼。'},
+  seal: {ic:'seal', nm:'红判',  tip:'叶王的朱批封印，当岩壳敲碎即可。'},
+  snake:{ic:'cage', nm:'蛇缠',  tip:'蛇女的缠丝，同石笼——连消或灵技可解。'},
+  boss: {ic:'boss', nm:'讨伐',  tip:'每一次消除都在削减对方的气势，灵技与连锁伤害更高。'},
+};
+
+/* ---------- 同伴助战：六位学院谷地的熟人，各自应一色灵石 ----------
+   充能 = 消除对应色灵石；满了放大招。带谁出门，取决于这一关卡在哪 */
+const COMPANIONS=[
+  {id:'wolf',g:'狼',name:'狼先生',title:'执灯人',   col:0,need:42,ult:'执灯',unlock:1,
+   desc:'全盘已炼成的灵石<b>同时引爆</b>。攒一手特殊灵石再放，场面最好看。'},
+  {id:'lin', g:'林',name:'林',    title:'噬词者',   col:1,need:38,ult:'焚脉',unlock:4,
+   desc:'把三颗灵石就地炼成<b>爆裂灵石</b>。清岩壳、破石笼的快刀。'},
+  {id:'hai', g:'海',name:'海',    title:'鹿女',     col:2,need:38,ult:'涤脉',unlock:10,
+   desc:'洗净<b>一行一列</b>。猫铃卡住时最好用 —— 底下一空，铃自己就下去了。'},
+  {id:'he',  g:'禾',name:'禾',    title:'习字者',   col:3,need:34,ult:'春生',unlock:16,
+   desc:'再给你 <b>3 步</b>（限时局则加 <b>8 秒</b>）。差一口气时的救命稻草。'},
+  {id:'mo',  g:'墨',name:'墨',    title:'驭灵师',   col:4,need:46,ult:'引渡',unlock:24,
+   desc:'凭空引出一颗<b>万象灵珠</b>。想凑组合技，就靠她。'},
+  {id:'zi',  g:'梓',name:'梓璇',  title:'初代大弟子',col:5,need:40,ult:'破封',unlock:32,
+   desc:'全场<b>墨封 / 岩壳 / 石笼各褪一层</b>。机关关的万能解。'},
+];
+const compById=id=>COMPANIONS.find(c=>c.id===id)||COMPANIONS[0];
+const compUnlocked=c=>SAVE.lv>=c.unlock;
+
+/* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
+const LORE=[
+  {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
+   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案 —— 一切远征的源头。',u:'https://myskme-volvme-ii.netlify.app'},
+  {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页批改过的作业。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，批完还得讲。」',
+   t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评 —— 被红笔改过、又被夸过的那些。',u:'../wall/'},
+  {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
+   t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
+  {ch:4,body:'敲开最后一层岩壳，里面是一把锈住的短剑。<br>「笼中剑，」狼先生认出来了，「有人在这儿等过很久。」',
+   t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 技能连招 · 探索成长 —— 旗舰远征。',u:'https://myskme-expedition.netlify.app'},
+  {ch:5,body:'蛇女的缠丝断在你手里，散成一地细字。<br>凑近看，每一根都是一个被记错的单词。「她收集这些，」狼先生皱眉，「收集了很久。」',
+   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来 —— 兑换码即卷号，扫码即玩。',u:'https://myskme-games.netlify.app/'},
+  {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
+   t:'自鸣棋',d:'课堂肉鸽自走棋 · 多人对战 + 单人十关试炼，扫码 / 投屏即用。',u:'https://myskme.github.io/myskme-zimingqi/'},
+  {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
+   t:'记分编年史',d:'英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
+  {ch:8,body:'王座熔窟安静下来。叶王的红笔断在地上，蛇女的缠丝烧成了灰。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
+   t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'../'},
+];
+
+/* ---------- 成就 ---------- */
+const ACHS=[
+  {id:'a1', ic:'⛏', nm:'初执矿灯', tip:'完成第一次消除'},
+  {id:'a2', ic:'🌪', nm:'疾风初啸', tip:'首次炼成疾风灵石（四连）'},
+  {id:'a3', ic:'💥', nm:'爆裂初鸣', tip:'首次炼成爆裂灵石（L/T 形）'},
+  {id:'a4', ic:'🔮', nm:'万象初开', tip:'首次炼成万象灵珠（五连）'},
+  {id:'a5', ic:'☯', nm:'双珠合璧', tip:'两颗万象灵珠相撞'},
+  {id:'a6', ic:'⚡', nm:'五重连锁', tip:'一次交换引发 5 连锁'},
+  {id:'a7', ic:'🌋', nm:'灵脉共鸣', tip:'一次交换引发 7 连锁'},
+  {id:'a8', ic:'🏆', nm:'十万灵力', tip:'单关得分突破 100,000'},
+  {id:'a9', ic:'📕', nm:'合上朱笔', tip:'首次击退叶王'},
+  {id:'a10',ic:'🐍', nm:'请蛇出窟', tip:'首次击退蛇女'},
+  {id:'a11',ic:'👑', nm:'谷地全通', tip:'通关全部 64 关'},
+  {id:'a12',ic:'🐈‍⬛',nm:'猫铃司铃', tip:'在大厅找到小黑猫'},
+  {id:'a13',ic:'🕯', nm:'执灯之人', tip:'首次放出同伴大招'},
+  {id:'a14',ic:'🤝', nm:'谷地同行', tip:'六位同伴各放出一次大招'},
+  {id:'a15',ic:'📜', nm:'编年史官', tip:'读完全部八段编年史片段'},
+];
+
+/* ---------- 布局图案（种子确定） ---------- */
+const PAT={
+  rowsBottom:k=>{const a=[];for(let r=8-k;r<8;r++)for(let c=0;c<8;c++)a.push([r,c]);return a},
+  rowsMid:k=>{const a=[];const r0=Math.floor((8-k)/2);for(let r=r0;r<r0+k;r++)for(let c=0;c<8;c++)a.push([r,c]);return a},
+  ring:()=>{const a=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(r===0||r===7||c===0||c===7)a.push([r,c]);return a},
+  innerRing:()=>{const a=[];for(let r=2;r<6;r++)for(let c=2;c<6;c++)if(r===2||r===5||c===2||c===5)a.push([r,c]);return a},
+  pillars:()=>{const a=[];for(const c of[2,5])for(let r=2;r<7;r++)a.push([r,c]);return a},
+  corners:k=>{const a=[];for(let r=0;r<k;r++)for(let c=0;c<k;c++){a.push([r,c],[r,7-c],[7-r,c],[7-r,7-c])}return a},
+  center:()=>{const a=[];for(let r=3;r<5;r++)for(let c=3;c<5;c++)a.push([r,c]);return a},
+  checkerMid:()=>{const a=[];for(let r=2;r<6;r++)for(let c=0;c<8;c++)if((r+c)%2===0)a.push([r,c]);return a},
+  sideWalls:()=>{const a=[];for(const c of[0,7])for(let r=1;r<7;r++)a.push([r,c]);return a},
+  diamond:()=>{const a=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=Math.abs(r-3.5)+Math.abs(c-3.5);if(d>2.4&&d<=3.6)a.push([r,c])}return a},
+  scatter:(rng,k,r0,r1)=>{const cand=[];for(let r=r0;r<=r1;r++)for(let c=0;c<8;c++)cand.push([r,c]);
+    for(let i=cand.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[cand[i],cand[j]]=[cand[j],cand[i]]}return cand.slice(0,k)},
+};
+
+/* ---------- 关卡生成 ---------- */
+function levelDef(n){
+  const endless=n>64;
+  const ch=endless?9:Math.ceil(n/8);
+  const pos=endless?0:(n-1)%8+1;
+  const depth=endless?n-64:0;
+  const rng=rngOf('lv'+n);
+  const L={n,ch,pos,endless,depth,colors:5,moves:23,goals:[],ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss:null,s1:0,s2:0,s3:0,
+    chName:endless?'无尽矿脉':CHAPTERS[ch-1].name,era:endless?('深度 '+depth):CHAPTERS[ch-1].era,epi:endless?'没有尽头，只有更深。矿灯管够。':CHAPTERS[ch-1].epi};
+  const pickColors=k=>{const idx=[0,1,2,3,4,5];const out=[];while(out.length<k){out.push(idx.splice(Math.floor(rng()*idx.length),1)[0])}return out};
+  const collectGoal=(k,per)=>{for(const c of pickColors(k))L.goals.push({type:'collect',col:c,need:per})};
+  if(!endless&&pos===8){ /* Boss 关 */
+    L.boss=n===64?'both':(ch%2?'ye':'she');
+    L.moves=26; L.colors=5;
+    L.bossHP=n===64?420:(140+ch*30);
+    L.goals.push({type:'boss',need:L.bossHP});
+    if(ch>=4){L.ink=PAT.corners(2).slice(0,8)}
+  }else if(endless){
+    L.moves=Math.max(17,22-Math.floor(depth/6));
+    L.colors=depth>6?6:5;
+    const arch=depth%6;
+    if(depth%8===0){L.boss=depth%16===0?'she':'ye';L.bossHP=190+depth*4;L.moves=25;L.goals.push({type:'boss',need:L.bossHP})}
+    else if(arch===1){L.ink=PAT.rowsBottom(3);L.ink2=depth>10?PAT.rowsBottom(1):[];L.goals.push({type:'ink',need:0});collectGoal(1,28)}
+    else if(arch===2){L.bells=3+(depth>8?1:0);L.goals.push({type:'bell',need:L.bells});collectGoal(1,24)}
+    else if(arch===3){L.crates=PAT.pillars();L.crates2=depth>10?PAT.center():[];L.goals.push({type:'crate',need:0})}
+    else if(arch===4){L.cages=PAT.scatter(rng,8+Math.min(4,depth>>2),2,5);L.goals.push({type:'cage',need:0});collectGoal(1,26)}
+    else if(arch===5){L.ink=PAT.checkerMid();L.crates=PAT.corners(2);L.goals.push({type:'ink',need:0},{type:'crate',need:0})}
+    else {collectGoal(2,34);L.ink=PAT.diamond()}
+    if(L.ink.length&&!L.goals.some(g=>g.type==='ink'))L.goals.push({type:'ink',need:0});
+  }else{
+    /* 常规关：按地脉主题 */
+    const M=[0,24,23,23,22,22,21,20,20][ch]||21; L.moves=M;
+    if(ch>=6&&(pos===6||pos===7))L.colors=6;
+    if(ch===7&&pos>=5)L.colors=6;
+    switch(ch){
+      case 1:
+        if(pos===1){L.moves=24;L.goals.push({type:'score',need:0})}
+        else if(pos===2)collectGoal(1,18);
+        else if(pos===3)collectGoal(2,16);
+        else if(pos===4){L.goals.push({type:'score',need:0});L.moves=22}
+        else if(pos===5)collectGoal(2,20);
+        else if(pos===6)collectGoal(3,16);
+        else collectGoal(2,26);
+        break;
+      case 2:{
+        const pats=[()=>PAT.rowsBottom(2),()=>PAT.checkerMid(),()=>PAT.rowsBottom(3),()=>PAT.diamond(),()=>PAT.innerRing(),()=>PAT.rowsMid(3),()=>PAT.rowsBottom(3)];
+        L.ink=pats[pos-1]();
+        if(pos>=5)L.ink2=L.ink.filter((_,i)=>i%3===0);
+        L.goals.push({type:'ink',need:0});
+        if(pos>=3)collectGoal(1,22);
+        break}
+      case 3:
+        L.bells=[2,2,3,3,3,4,4][pos-1];
+        L.goals.push({type:'bell',need:L.bells});
+        if(pos>=3)collectGoal(1,20);
+        if(pos>=6){L.ink=PAT.rowsBottom(2);L.goals.push({type:'ink',need:0})}
+        break;
+      case 4:{
+        const pats=[()=>PAT.corners(2),()=>PAT.pillars(),()=>PAT.sideWalls(),()=>PAT.center().concat(PAT.corners(2)),()=>PAT.pillars().concat(PAT.corners(1)),()=>PAT.innerRing(),()=>PAT.sideWalls().concat(PAT.center())];
+        L.crates=pats[pos-1]();
+        if(pos>=5)L.crates2=L.crates.filter((_,i)=>i%3===0);
+        L.goals.push({type:'crate',need:0});
+        if(pos>=4)collectGoal(1,24);
+        break}
+      case 5:
+        L.cages=PAT.scatter(rng,5+pos,2,5);
+        if(pos>=5)L.snakes=L.cages.splice(0,3);
+        L.goals.push({type:'cage',need:0});
+        collectGoal(1,20+pos*2);
+        break;
+      case 6:{
+        const mix=pos%2;
+        if(mix){L.ink=PAT.rowsBottom(2);L.crates=PAT.corners(2);L.goals.push({type:'ink',need:0},{type:'crate',need:0})}
+        else {L.bells=3;L.cages=PAT.scatter(rng,6,2,5);L.goals.push({type:'bell',need:3},{type:'cage',need:0})}
+        break}
+      case 7:{
+        const mix=pos%3;
+        if(mix===1){L.ink=PAT.checkerMid();L.ink2=L.ink.filter((_,i)=>i%2===0);L.crates=PAT.corners(2);L.crates2=L.crates.filter((_,i)=>i%2===0);L.goals.push({type:'ink',need:0},{type:'crate',need:0})}
+        else if(mix===2){L.bells=4;L.ink=PAT.rowsBottom(2);L.goals.push({type:'bell',need:4},{type:'ink',need:0})}
+        else {L.cages=PAT.scatter(rng,8,2,5);L.crates=PAT.pillars().slice(0,6);L.goals.push({type:'cage',need:0},{type:'crate',need:0});collectGoal(1,26)}
+        break}
+      case 8:{
+        const mix=pos%3;
+        if(mix===1){L.ink=PAT.diamond();L.ink2=L.ink;L.cages=PAT.scatter(rng,6,2,5);L.goals.push({type:'ink',need:0},{type:'cage',need:0})}
+        else if(mix===2){L.crates=PAT.innerRing();L.crates2=L.crates.filter((_,i)=>i%2===0);L.bells=3;L.goals.push({type:'crate',need:0},{type:'bell',need:3})}
+        else {L.ink=PAT.rowsBottom(3);L.crates=PAT.corners(2);L.crates2=PAT.corners(1);L.goals.push({type:'ink',need:0},{type:'crate',need:0});collectGoal(1,30)}
+        break}
+    }
+  }
+  /* 铃铛关不许在最底行铺岩壳（可破也别恶心人） */
+  if(L.bells>0){L.crates=L.crates.filter(([r])=>r<7);L.cages=L.cages.filter(([r])=>r<7);L.snakes=L.snakes.filter(([r])=>r<7)}
+  /* 目标数量回填 */
+  for(const g of L.goals){
+    if(g.type==='ink')g.need=L.ink.length+L.ink2.length;
+    if(g.type==='crate')g.need=L.crates.length+L.crates2.length;
+    if(g.type==='cage')g.need=L.cages.length+L.snakes.length;
+    g.got=0;
+  }
+  /* 星级门槛 */
+  const oBonus=(L.ink.length+L.ink2.length)*36+(L.crates.length+L.crates2.length)*46+(L.cages.length+L.snakes.length)*46+L.bells*210+(L.boss?L.bossHP*11:0);
+  L.s1=Math.round((L.moves*245+oBonus*.55)/500)*500;
+  L.s2=Math.round(L.s1*1.75/500)*500;
+  L.s3=Math.round(L.s1*2.7/500)*500;
+  const sg=L.goals.find(g=>g.type==='score'); if(sg)sg.need=L.s1;
+  return L;
+}
+
+/* ---------- 音效引擎（合成，零素材） ---------- */
+const AU={ctx:null,noiseBuf:null,
+  ensure(){if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;this.ctx=new AC();
+    const len=this.ctx.sampleRate*1.2,b=this.ctx.createBuffer(1,len,this.ctx.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=Math.random()*2-1;this.noiseBuf=b}
+    if(this.ctx.state==='suspended')this.ctx.resume();return this.ctx},
+  tone(f0,dur,o={}){if(SAVE.mute)return;const c=this.ensure();if(!c)return;
+    const t=c.currentTime+(o.delay||0);const osc=c.createOscillator(),g=c.createGain();
+    osc.type=o.type||'sine';osc.frequency.setValueAtTime(f0,t);
+    if(o.f1)osc.frequency.exponentialRampToValueAtTime(Math.max(1,o.f1),t+dur);
+    const v=(o.vol||.15);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+(o.a||.008));
+    g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    osc.connect(g).connect(c.destination);osc.start(t);osc.stop(t+dur+.05)},
+  noise(dur,o={}){if(SAVE.mute)return;const c=this.ensure();if(!c)return;
+    const t=c.currentTime+(o.delay||0);const src=c.createBufferSource();src.buffer=this.noiseBuf;
+    let node=src;
+    if(o.bp){const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=o.bp;f.Q.value=o.q||1;node.connect(f);node=f}
+    if(o.lp){const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=o.lp;node.connect(f);node=f}
+    if(o.hp){const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=o.hp;node.connect(f);node=f}
+    const g=c.createGain();const v=o.vol||.12;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0008,t+dur);
+    node.connect(g).connect(c.destination);src.start(t);src.stop(t+dur+.05)},
+};
+const PENTA=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760];
+const SFX={
+  click(){AU.tone(680,.06,{type:'triangle',vol:.1})},
+  swap(){AU.noise(.07,{hp:1400,vol:.07});AU.tone(430,.09,{f1:640,type:'sine',vol:.07})},
+  fail(){AU.tone(210,.16,{f1:135,type:'triangle',vol:.16})},
+  pop(chain){const i=clamp(chain-1,0,PENTA.length-1);AU.tone(PENTA[i],.15,{type:'triangle',vol:.17});AU.tone(PENTA[i]*2,.07,{type:'sine',vol:.05});AU.noise(.04,{hp:2400,vol:.05})},
+  made(){AU.tone(784,.26,{type:'sine',vol:.14});AU.tone(1174.7,.3,{type:'sine',vol:.1,delay:.03});AU.noise(.2,{hp:3800,vol:.05})},
+  rocket(){AU.tone(320,.26,{f1:1500,type:'sawtooth',vol:.11});AU.noise(.2,{hp:900,vol:.11})},
+  bomb(){AU.tone(105,.5,{f1:36,type:'sine',vol:.5});AU.noise(.32,{lp:420,vol:.35})},
+  orb(){for(let i=0;i<5;i++)AU.tone(PENTA[i+2],.14,{type:'sine',vol:.12,delay:i*.045});AU.noise(.3,{hp:4200,vol:.06})},
+  boardClear(){for(let i=0;i<8;i++)AU.tone(PENTA[i],.16,{type:'sine',vol:.12,delay:i*.05});AU.tone(98,1.5,{type:'sine',vol:.32,delay:.15});AU.tone(196,1.1,{type:'sine',vol:.14,delay:.15})},
+  bell(){AU.tone(1318.5,.5,{type:'sine',vol:.2});AU.tone(3140,.28,{type:'sine',vol:.08});AU.tone(1975,.4,{type:'sine',vol:.07,delay:.02})},
+  crate(){AU.noise(.11,{bp:270,q:1.4,vol:.3});AU.tone(140,.1,{f1:90,type:'triangle',vol:.16})},
+  ink(){AU.tone(540,.15,{f1:190,type:'sine',vol:.17});AU.noise(.07,{lp:800,vol:.08})},
+  win(){[523.25,659.25,783.99,1046.5].forEach((f,i)=>AU.tone(f,.24,{type:'triangle',vol:.15,delay:i*.1}));AU.tone(1318.5,.6,{type:'sine',vol:.1,delay:.42})},
+  lose(){[392,330,262].forEach((f,i)=>AU.tone(f,.3,{type:'sine',vol:.12,delay:i*.16}))},
+  star(i){AU.tone(1046.5*Math.pow(1.25,i),.3,{type:'triangle',vol:.15});AU.noise(.1,{hp:5000,vol:.05})},
+  bossHit(){AU.noise(.1,{bp:220,q:1,vol:.26});AU.tone(150,.14,{f1:85,type:'sawtooth',vol:.14})},
+  bossAct(){AU.tone(233,.3,{f1:196,type:'sawtooth',vol:.15});AU.tone(80,.24,{type:'sine',vol:.26,delay:.02})},
+  bossKO(){AU.tone(160,.7,{f1:50,type:'sawtooth',vol:.25});AU.noise(.5,{lp:600,vol:.3});[523.25,659.25,783.99].forEach((f,i)=>AU.tone(f,.3,{type:'triangle',vol:.13,delay:.5+i*.1}))},
+  meow(){AU.tone(720,.16,{f1:1150,type:'sine',vol:.13});AU.tone(1050,.2,{f1:520,type:'sine',vol:.12,delay:.15})},
+  tick(){AU.tone(880,.05,{type:'square',vol:.05})},
+  crush(){AU.tone(659.25,.2,{type:'triangle',vol:.14});AU.tone(987.77,.24,{type:'triangle',vol:.1,delay:.06})},
+};
+const vib=ms=>{try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}};
+/* ==================================================================
+   [ 平台适配层 · PLATFORM ADAPTER ]
+   本层是「换壳」的唯一接口。移植到微信小游戏 / iOS 原生时，
+   只需重写下面这个 PLAT 对象，其余引擎与渲染代码一行不用改。
+   详见同目录 PORTING.md。
+   ================================================================== */
+const PLAT={
+  name:'web',
+  store:{
+    get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+    set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  },
+  vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}},
+  now(){return performance.now()},
+  raf(fn){return requestAnimationFrame(fn)},
+  dpr(){return Math.min(window.devicePixelRatio||1,2.5)},
+  canvas(){return $('#board')},
+  sfx:SFX,
+};
+
+/* ==================================================================
+   [ 纯逻辑引擎 · PORTABLE CORE ]
+   零 DOM、零 Canvas、零平台 API —— 可整段拷进任何 JS 运行时。
+   双层网格（关键：墨封/岩壳属于「格子」，灵石属于「棋子」，重力只搬棋子）
+     T[r][c] = {ink:0..2, crate:0..2}          格子（静止）
+     B[r][c] = 棋子对象 | null                  棋子（会坠落）
+       g    : 灵石色号 0..5
+       k    : 'n'常规 'H'疾风横 'V'疾风纵 'B'爆裂 'O'万象
+       bell : 猫铃（不可消除，只能交换与坠落，坠到底行即送达）
+       cage : 石笼 0/1，被锁住不可交换
+   ================================================================== */
+const N=8;
+let B=[], T=[], idSeq=1, ENG={colors:5};
+
+const inB=(r,c)=>r>=0&&r<N&&c>=0&&c<N;
+const canHold=(r,c)=>T[r][c].crate===0;                       // 该格能否容纳棋子
+const P=(r,c)=>inB(r,c)?B[r][c]:null;                          // 取棋子
+const has=(r,c)=>inB(r,c)&&B[r][c]!==null;
+const isGem=(r,c)=>{const p=P(r,c);return !!p&&p.g>=0&&!p.bell};
+const gemAt=(r,c)=>isGem(r,c)?B[r][c].g:-1;
+const swappable=(r,c)=>inB(r,c)&&canHold(r,c)&&has(r,c)&&B[r][c].cage===0;
+
+function newPiece(o){return Object.assign({g:0,k:'n',bell:false,cage:0,snake:false,id:idSeq++,vx:0,vy:0,sc:1,al:1,spin:0,glow:0,born:0},o||{})}
+function randColor(rng){return Math.floor((rng||rnd)()*ENG.colors)}
+
+/* ---- 找出所有三连及以上（返回若干「组」） ---- */
+function scanRuns(){
+  const runs=[];
+  for(let r=0;r<N;r++){let s=0;while(s<N){
+    if(!isGem(r,s)){s++;continue}
+    const g=gemAt(r,s);
+    let e=s+1;while(e<N&&isGem(r,e)&&gemAt(r,e)===g)e++;
+    if(e-s>=3)runs.push({dir:'h',r,c:s,len:e-s,g});
+    s=e}}
+  for(let c=0;c<N;c++){let s=0;while(s<N){
+    if(!isGem(s,c)){s++;continue}
+    const g=gemAt(s,c);
+    let e=s+1;while(e<N&&isGem(e,c)&&gemAt(e,c)===g)e++;
+    if(e-s>=3)runs.push({dir:'v',r:s,c,len:e-s,g});
+    s=e}}
+  return runs;
+}
+const runCells=run=>{const a=[];for(let i=0;i<run.len;i++)a.push(run.dir==='h'?[run.r,run.c+i]:[run.r+i,run.c]);return a};
+
+/* 把相交的 run 合并成「组」，并判定该组应炼成什么特殊灵石 */
+function findGroups(){
+  const runs=scanRuns(); if(!runs.length)return [];
+  const key=(r,c)=>r*N+c;
+  const owner=new Map(); const groups=[];
+  for(const run of runs){
+    const cs=runCells(run);
+    let g=null;
+    for(const [r,c] of cs){const o=owner.get(key(r,c)); if(o!=null){g=o;break}}
+    if(g==null){g={cells:new Set(),runs:[],color:run.g};groups.push(g)}
+    g.runs.push(run);
+    for(const [r,c] of cs){g.cells.add(key(r,c));owner.set(key(r,c),g)}
+  }
+  /* 合并被后来的 run 串起来的组 */
+  const merged=[];
+  for(const g of groups){
+    if(g.dead)continue;
+    for(const h of groups){
+      if(h===g||h.dead)continue;
+      let touch=false; for(const k of h.cells)if(g.cells.has(k)){touch=true;break}
+      if(touch){for(const k of h.cells)g.cells.add(k);g.runs.push(...h.runs);h.dead=true}
+    }
+    merged.push(g);
+  }
+  for(const g of merged){
+    const hs=g.runs.filter(x=>x.dir==='h'), vs=g.runs.filter(x=>x.dir==='v');
+    const maxH=hs.reduce((m,x)=>Math.max(m,x.len),0), maxV=vs.reduce((m,x)=>Math.max(m,x.len),0);
+    g.size=g.cells.size;
+    if(hs.length&&vs.length){g.make='B'}                       // L / T 形 → 爆裂
+    else if(maxH>=5||maxV>=5){g.make='O'}                      // 五连 → 万象
+    else if(maxH===4){g.make='H'}                              // 横四 → 疾风·横扫
+    else if(maxV===4){g.make='V'}                              // 纵四 → 疾风·纵贯
+    else g.make=null;
+    /* 炼成位置：优先玩家刚动过的那颗，其次交点，最后取中点 */
+    g.at=null;
+    const list=[...g.cells].map(k=>[Math.floor(k/N),k%N]);
+    if(ENG.lastMove){
+      const hit=list.find(([r,c])=>ENG.lastMove.some(p=>p[0]===r&&p[1]===c));
+      if(hit)g.at=hit;
+    }
+    if(!g.at&&hs.length&&vs.length){
+      for(const h of hs)for(const v of vs){
+        if(v.c>=h.c&&v.c<h.c+h.len&&h.r>=v.r&&h.r<v.r+v.len){g.at=[h.r,v.c];break}
+      }
+    }
+    if(!g.at){const longest=g.runs.reduce((m,x)=>x.len>m.len?x:m,g.runs[0]);
+      const cs=runCells(longest); g.at=cs[Math.floor(cs.length/2)]}
+  }
+  return merged;
+}
+
+/* ---- 特殊灵石的爆发范围（可递归引爆） ---- */
+const KEY=(r,c)=>r*N+c, UNKEY=k=>[Math.floor(k/N),k%N];
+function blastAdd(out,r,c){
+  if(!inB(r,c))return false;
+  const p=P(r,c);
+  if(p&&p.bell)return false;                                   // 猫铃免疫一切爆发
+  if(!p&&T[r][c].crate===0&&T[r][c].ink===0)return false;      // 空格且无机关，不必记
+  out.add(KEY(r,c));return true;
+}
+function expandBlast(seed){
+  const out=new Set(), fx=[], queue=[], fired=new Set();
+  for(const [r,c] of seed){
+    blastAdd(out,r,c);
+    if(isGem(r,c)&&B[r][c].k!=='n')queue.push([r,c]);
+  }
+  let guard=0;
+  while(queue.length&&guard++<260){
+    const [r,c]=queue.shift();
+    if(fired.has(KEY(r,c)))continue;
+    if(!isGem(r,c)||B[r][c].k==='n')continue;
+    fired.add(KEY(r,c));
+    const k=B[r][c].k;
+    const hit=(rr,cc)=>{if(blastAdd(out,rr,cc)&&isGem(rr,cc)&&B[rr][cc].k!=='n'&&!fired.has(KEY(rr,cc)))queue.push([rr,cc])};
+    if(k==='H'){fx.push({t:'row',r,c});for(let i=0;i<N;i++)hit(r,i)}
+    else if(k==='V'){fx.push({t:'col',r,c});for(let i=0;i<N;i++)hit(i,c)}
+    else if(k==='B'){fx.push({t:'bomb',r,c});for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)hit(r+dr,c+dc)}
+    else if(k==='O'){const col=commonColor();fx.push({t:'orb',r,c,col});
+      for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(isGem(i,j)&&B[i][j].g===col)hit(i,j)}
+  }
+  return {cells:[...out].map(UNKEY),fx};
+}
+function commonColor(){
+  const cnt=new Array(6).fill(0);
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].k==='n')cnt[B[r][c].g]++;
+  let best=0;for(let i=1;i<6;i++)if(cnt[i]>cnt[best])best=i;
+  return cnt[best]?best:randColor();
+}
+
+/* ---- 两颗特殊灵石相撞的组合技 ---- */
+function comboBlast(a,b){
+  const [ar,ac]=a,[br,bc]=b;
+  const A=P(ar,ac), C=P(br,bc);
+  if(!A||!C||!isGem(ar,ac)||!isGem(br,bc))return null;
+  const ks=[A.k,C.k].sort().join('');
+  const out=new Set(), fx=[];
+  const add=(r,c)=>blastAdd(out,r,c);
+  const row=r=>{for(let i=0;i<N;i++)add(r,i)}, col=c=>{for(let i=0;i<N;i++)add(i,c)};
+  const box=(r,c,k)=>{for(let dr=-k;dr<=k;dr++)for(let dc=-k;dc<=k;dc++)add(r+dr,c+dc)};
+  let name=null, deep=[];
+  if(ks==='HV'||ks==='HH'||ks==='VV'){                         // 疾风 × 疾风 → 十字贯通
+    name='十字贯通';row(ar);col(ac);row(br);col(bc);
+    fx.push({t:'row',r:br,c:bc},{t:'col',r:br,c:bc});
+  }else if(ks==='BH'||ks==='BV'){                              // 疾风 × 爆裂 → 三行三列
+    name='巨风碾压';for(let d=-1;d<=1;d++){row(clamp(br+d,0,N-1));col(clamp(bc+d,0,N-1))}
+    fx.push({t:'megacross',r:br,c:bc});
+  }else if(ks==='BB'){                                         // 爆裂 × 爆裂 → 双星巨爆
+    name='双星巨爆';box(br,bc,2);box(ar,ac,2);fx.push({t:'bigbomb',r:br,c:bc});
+  }else if(ks==='HO'||ks==='OV'){                              // 万象 × 疾风 → 全色化疾风
+    const other=A.k==='O'?C:A, tgt=other.g;
+    name='万象疾风';
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].g===tgt&&B[r][c].k==='n'){B[r][c].k=(r+c)%2?'H':'V';deep.push([r,c])}
+    add(ar,ac);add(br,bc);fx.push({t:'orbstorm',r:br,c:bc,col:tgt});
+  }else if(ks==='BO'){                                         // 万象 × 爆裂 → 全色化爆裂
+    const other=A.k==='O'?C:A, tgt=other.g;
+    name='万象天崩';
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].g===tgt&&B[r][c].k==='n'){B[r][c].k='B';deep.push([r,c])}
+    add(ar,ac);add(br,bc);fx.push({t:'orbstorm',r:br,c:bc,col:tgt});
+  }else if(ks==='OO'){                                         // 双万象 → 清空全场
+    name='双珠合璧';for(let r=0;r<N;r++)for(let c=0;c<N;c++)add(r,c);fx.push({t:'boardclear',r:br,c:bc});
+  }else if(A.k==='O'||C.k==='O'){                              // 万象 × 常规 → 吞掉该色
+    const orbAt=A.k==='O'?a:b, other=A.k==='O'?C:A, tgt=other.g;
+    if(tgt<0)return null;
+    name='万象吞色';
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].g===tgt)add(r,c);
+    add(orbAt[0],orbAt[1]);fx.push({t:'orb',r:orbAt[0],c:orbAt[1],col:tgt});
+  }else return null;
+  if(deep.length){const ex=expandBlast(deep);for(const [r,c] of ex.cells)add(r,c);fx.push(...ex.fx)}
+  return {cells:[...out].map(UNKEY),fx,name};
+}
+/* 两颗棋子相撞能否触发组合技 */
+function isComboPair(a,b){
+  const A=P(a[0],a[1]), C=P(b[0],b[1]);
+  if(!A||!C||A.bell||C.bell)return false;
+  if(A.k==='O'&&C.k==='O')return true;
+  if(A.k==='O'||C.k==='O')return true;                         // 万象 + 任意棋子
+  return A.k!=='n'&&C.k!=='n';
+}
+
+/* ---- 交换是否会产生消除 ---- */
+function swapPieces(a,b){const t=B[a[0]][a[1]];B[a[0]][a[1]]=B[b[0]][b[1]];B[b[0]][b[1]]=t}
+function wouldMatch(a,b){
+  const A=P(a[0],a[1]), C=P(b[0],b[1]);
+  if(!A||!C)return false;
+  if(A.bell&&C.bell)return false;
+  if(isComboPair(a,b))return true;
+  swapPieces(a,b);
+  const ok=scanRuns().length>0;
+  swapPieces(a,b);
+  return ok;
+}
+/* ---- 找一个可行走法（提示 / 死局判定共用） ---- */
+function findMove(all){
+  const cands=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(!swappable(r,c))continue;
+    for(const [dr,dc] of [[0,1],[1,0]]){
+      const nr=r+dr,nc=c+dc;
+      if(!swappable(nr,nc))continue;
+      if(B[r][c].bell&&B[nr][nc].bell)continue;
+      if(wouldMatch([r,c],[nr,nc])){cands.push([[r,c],[nr,nc]]);if(!all)return cands[0]}
+    }
+  }
+  return all?cands:(cands.length?cands[0]:null);
+}
+function anyMove(){return !!findMove()}
+function hintMove(){const all=findMove(true);return all.length?all[Math.floor(rnd()*all.length)]:null}
+
+/* ---- 重力：先直落，被岩壳挡住则斜滑；顶部补落；最后就地补漏 ---- */
+function gravityPass(){
+  let moved=false;
+  for(let r=N-2;r>=0;r--)for(let c=0;c<N;c++){
+    if(!has(r,c))continue;
+    if(canHold(r+1,c)&&!has(r+1,c)){movePiece(r,c,r+1,c);moved=true;continue}
+    if(T[r+1][c].crate>0){                                     // 被岩壳挡住 → 尝试斜滑绕行
+      const order=rnd()<.5?[-1,1]:[1,-1];
+      for(const dc of order){
+        const nc=c+dc; if(!inB(r,nc))continue;
+        if(canHold(r+1,nc)&&!has(r+1,nc)&&canHold(r,nc)){movePiece(r,c,r+1,nc);moved=true;break}
+      }
+    }
+  }
+  return moved;
+}
+function movePiece(r,c,nr,nc){
+  const p=B[r][c];
+  p.vx+=(c-nc)*ENG.cs; p.vy+=(r-nr)*ENG.cs;                    // 视觉上先留在原处，再补间归位
+  B[nr][nc]=p; B[r][c]=null;
+}
+function spawnTop(){
+  let n=0;
+  for(let c=0;c<N;c++){
+    if(canHold(0,c)&&!has(0,c)){
+      const p=newPiece({g:randColor()});
+      p.vy=-ENG.cs*1.2; p.born=PLAT.now();
+      B[0][c]=p; n++;
+    }
+  }
+  return n;
+}
+function patchHoles(){                                          // 兜底：绝不留永久空洞
+  let n=0;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(canHold(r,c)&&!has(r,c)){
+      const p=newPiece({g:randColor()});p.sc=.25;p.al=0;p.born=PLAT.now();
+      B[r][c]=p;n++;
+    }
+  }
+  return n;
+}
+
+/* ---- 建盘：无初始三连、且保证有解 ---- */
+function buildBoard(L){
+  ENG.colors=L.colors;
+  T=[];for(let r=0;r<N;r++){const row=[];for(let c=0;c<N;c++)row.push({ink:0,crate:0});T.push(row)}
+  const markT=(list,prop,val)=>{for(const [r,c] of list||[])if(inB(r,c))T[r][c][prop]=val};
+  markT(L.ink,'ink',1); markT(L.ink2,'ink',2);
+  markT(L.crates,'crate',1); markT(L.crates2,'crate',2);
+  for(let tries=0;tries<80;tries++){
+    B=[];for(let r=0;r<N;r++){const row=[];for(let c=0;c<N;c++)row.push(null);B.push(row)}
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      if(T[r][c].crate>0)continue;
+      let g,guard=0;
+      do{g=randColor();guard++}while(guard<40&&(
+        (c>=2&&gemAt(r,c-1)===g&&gemAt(r,c-2)===g)||(r>=2&&gemAt(r-1,c)===g&&gemAt(r-2,c)===g)));
+      B[r][c]=newPiece({g});
+    }
+    for(const [r,c] of L.cages||[])if(inB(r,c)&&B[r][c])B[r][c].cage=1;
+    for(const [r,c] of L.snakes||[])if(inB(r,c)&&B[r][c]){B[r][c].cage=1;B[r][c].snake=true}
+    /* 放猫铃：顶部分散列 */
+    if(L.bells>0){
+      const cols=[];for(let c=0;c<N;c++)if(T[0][c].crate===0)cols.push(c);
+      for(let i=cols.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
+      for(let i=0;i<L.bells&&cols.length;i++){
+        const c=cols[i%cols.length], r=Math.floor(i/cols.length);
+        if(inB(r,c)&&T[r][c].crate===0)B[r][c]=newPiece({g:-1,bell:true});
+      }
+    }
+    if(scanRuns().length===0&&anyMove())return true;
+  }
+  return true;
+}
+function shuffleBoard(){
+  const slots=[],pool=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+    if(isGem(r,c)&&B[r][c].k==='n'&&B[r][c].cage===0){slots.push([r,c]);pool.push(B[r][c].g)}
+  for(let t=0;t<80;t++){
+    for(let i=pool.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+    slots.forEach(([r,c],i)=>{B[r][c].g=pool[i]});
+    if(scanRuns().length===0&&anyMove())return true;
+  }
+  /* 洗不出来就直接重掷颜色 */
+  for(let t=0;t<200;t++){
+    slots.forEach(([r,c])=>{B[r][c].g=randColor()});
+    if(scanRuns().length===0&&anyMove())return true;
+  }
+  return anyMove();
+}
+/* ==================================================================
+   [ 渲染层 · RENDERER ] Canvas 2D —— 小游戏平台可直接复用（API 同名）
+   ================================================================== */
+const cv=PLAT.canvas(), cx=cv.getContext('2d');
+let CSS_W=0, DPR=1;
+function fitCanvas(){
+  const wrap=$('#board-wrap');
+  const w=Math.max(200,Math.floor(wrap.clientWidth));
+  CSS_W=w; DPR=PLAT.dpr();
+  cv.width=Math.round(w*DPR); cv.height=Math.round(w*DPR);
+  cv.style.height=w+'px';
+  ENG.cs=w/N;
+  cx.setTransform(DPR,0,0,DPR,0,0);
+}
+const CSU=()=>ENG.cs;
+const cxOf=c=>(c+.5)*ENG.cs, cyOf=r=>(r+.5)*ENG.cs;
+
+/* ---- 灵石形状 ---- */
+function gemPath(ctx,x,y,R,shape,rot){
+  ctx.beginPath();
+  const pt=(a,rr)=>[x+Math.cos(a+rot)*rr,y+Math.sin(a+rot)*rr];
+  if(shape==='hex'){for(let i=0;i<6;i++){const [px,py]=pt(Math.PI/6+i*Math.PI/3,R);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath()}
+  else if(shape==='dia'){for(let i=0;i<4;i++){const [px,py]=pt(-Math.PI/2+i*Math.PI/2,R*1.06);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath()}
+  else if(shape==='tri'){for(let i=0;i<3;i++){const [px,py]=pt(-Math.PI/2+i*2*Math.PI/3,R*1.12);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.closePath()}
+  else if(shape==='orb'){ctx.arc(x,y,R*.94,0,Math.PI*2)}
+  else if(shape==='leaf'){
+    ctx.save();ctx.translate(x,y);ctx.rotate(rot-Math.PI/4);
+    ctx.moveTo(0,-R*1.1);ctx.quadraticCurveTo(R*.92,-R*.2,0,R*1.1);ctx.quadraticCurveTo(-R*.92,-R*.2,0,-R*1.1);
+    ctx.closePath();ctx.restore()}
+  else if(shape==='star'){
+    for(let i=0;i<10;i++){const [px,py]=pt(-Math.PI/2+i*Math.PI/5,i%2?R*.46:R*1.12);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+    ctx.closePath()}
+}
+/* ---- 画一颗灵石（HUD 小图标与棋盘共用） ---- */
+function drawGem(ctx,x,y,size,gi,kind,o){
+  o=o||{};
+  const G=GEMS[gi]||GEMS[0], R=size*.42, rot=o.rot||0, t=o.t||0;
+  ctx.save();
+  if(o.alpha!=null)ctx.globalAlpha=o.alpha;
+  if(o.scale&&o.scale!==1){ctx.translate(x,y);ctx.scale(o.scale,o.scale);ctx.translate(-x,-y)}
+  /* 底光（军规四·氛围层） */
+  const amb=ctx.createRadialGradient(x,y,R*.2,x,y,R*1.9);
+  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));amb.addColorStop(1,hexA(G.base,0));
+  ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,R*1.9,0,Math.PI*2);ctx.fill();
+  if(kind==='O'){                                              // 万象：虹彩球
+    const g=ctx.createRadialGradient(x-R*.3,y-R*.35,R*.1,x,y,R*1.05);
+    g.addColorStop(0,'#ffffff');
+    for(let i=0;i<6;i++)g.addColorStop(.18+i*.14,GEMS[i].base);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,R*1.02,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=Math.max(1,size*.035);
+    ctx.beginPath();ctx.arc(x,y,R*1.02,0,Math.PI*2);ctx.stroke();
+    ctx.save();ctx.translate(x,y);ctx.rotate(t*.0016);
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=Math.max(1,size*.03);
+    for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,R*.85,R*.3,i*Math.PI/3,0,Math.PI*2);ctx.stroke()}
+    ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.beginPath();ctx.arc(x-R*.3,y-R*.36,R*.2,0,Math.PI*2);ctx.fill();
+    ctx.restore();return;
+  }
+  /* 主体：渐变 + 描边 + 高光（四层构图） */
+  const grd=ctx.createLinearGradient(x-R,y-R,x+R*.7,y+R);
+  grd.addColorStop(0,G.hi);grd.addColorStop(.42,G.base);grd.addColorStop(1,G.lo);
+  gemPath(ctx,x,y,R,G.shape,rot);
+  ctx.fillStyle=grd;ctx.fill();
+  ctx.lineWidth=Math.max(1,size*.035);
+  ctx.strokeStyle=kind==='n'?hexA(G.lo,.9):'rgba(255,255,255,.92)';
+  ctx.stroke();
+  /* 内刻面 */
+  ctx.save();ctx.clip();
+  ctx.globalAlpha=.55;ctx.fillStyle=G.hi;
+  ctx.beginPath();ctx.moveTo(x-R,y-R*.9);ctx.lineTo(x+R*.25,y-R*1.1);ctx.lineTo(x-R*.55,y+R*.2);ctx.closePath();ctx.fill();
+  ctx.globalAlpha=.28;ctx.fillStyle='#000';
+  ctx.beginPath();ctx.moveTo(x+R,y+R*.95);ctx.lineTo(x-R*.2,y+R*1.1);ctx.lineTo(x+R*.6,y-R*.1);ctx.closePath();ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha=.9;ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.beginPath();ctx.ellipse(x-R*.34,y-R*.4,R*.24,R*.15,-.7,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+  /* 特殊标记 */
+  if(kind==='H'||kind==='V'){
+    ctx.save();ctx.translate(x,y);if(kind==='V')ctx.rotate(Math.PI/2);
+    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.4,size*.05);ctx.lineCap='round';
+    for(const s of [-1,1]){
+      ctx.beginPath();ctx.moveTo(s*R*.28,0);ctx.lineTo(s*R*.86,0);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(s*R*.58,-R*.26);ctx.lineTo(s*R*.88,0);ctx.lineTo(s*R*.58,R*.26);ctx.stroke();
+    }
+    ctx.restore();
+  }else if(kind==='B'){
+    ctx.save();ctx.translate(x,y);ctx.rotate(t*.0011);
+    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.3,size*.045);
+    ctx.beginPath();ctx.arc(0,0,R*.5,0,Math.PI*2);ctx.stroke();
+    ctx.setLineDash([R*.22,R*.2]);ctx.globalAlpha=.85;
+    ctx.beginPath();ctx.arc(0,0,R*.8,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ctx.restore();
+    const p=.5+.5*Math.sin(t*.006);
+    ctx.fillStyle='rgba(255,255,255,'+(.55+p*.4)+')';
+    ctx.beginPath();ctx.arc(x,y,R*.22,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
+}
+function hexA(h,a){
+  const n=parseInt(h.slice(1),16);
+  return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
+}
+/* ---- 机关绘制 ---- */
+/* 墨封铺满整格 —— 灵石会盖住格子中央，画成小墨点等于看不见 */
+function drawInk(ctx,x,y,s,layers,t){
+  ctx.save();
+  const h=s/2, x0=x-h, y0=y-h;
+  const deep=layers>1;
+  const g=ctx.createLinearGradient(x0,y0,x0+s,y0+s);
+  if(deep){g.addColorStop(0,'rgba(74,32,92,.96)');g.addColorStop(.55,'rgba(48,18,66,.96)');g.addColorStop(1,'rgba(28,10,44,.96)')}
+  else {g.addColorStop(0,'rgba(96,58,132,.80)');g.addColorStop(.55,'rgba(66,38,100,.80)');g.addColorStop(1,'rgba(44,24,72,.80)')}
+  ctx.fillStyle=g;ctx.fillRect(x0,y0,s,s);
+  /* 墨迹边缘：不规则的一圈，避免看起来像纯色方块 */
+  ctx.fillStyle=deep?'rgba(20,6,34,.55)':'rgba(30,14,52,.45)';
+  ctx.beginPath();
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2;
+    const rr=h*(.96+.10*Math.sin(i*2.3+(x+y)*.05));
+    const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;
+    i?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+  ctx.closePath();ctx.fill('evenodd');
+  ctx.strokeStyle=deep?'rgba(214,96,96,.75)':'rgba(178,142,232,.6)';
+  ctx.lineWidth=Math.max(1.2,s*.045);
+  ctx.strokeRect(x0+ctx.lineWidth/2,y0+ctx.lineWidth/2,s-ctx.lineWidth,s-ctx.lineWidth);
+  if(deep){                                                    // 深墨：叶王的朱批一撇压在角上
+    ctx.strokeStyle='rgba(226,84,72,.9)';ctx.lineWidth=Math.max(1.6,s*.075);ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(x0+s*.16,y0+s*.20);ctx.quadraticCurveTo(x,y,x0+s*.84,y0+s*.82);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x0+s*.80,y0+s*.24);ctx.lineTo(x0+s*.86,y0+s*.18);ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawCrate(ctx,x,y,s,layers){
+  const R=s*.44;
+  ctx.save();
+  const g=ctx.createLinearGradient(x-R,y-R,x+R,y+R);
+  if(layers>1){g.addColorStop(0,'#6b6355');g.addColorStop(.5,'#4a4438');g.addColorStop(1,'#2c281f')}
+  else {g.addColorStop(0,'#8a7f68');g.addColorStop(.5,'#615943');g.addColorStop(1,'#3b3529')}
+  ctx.fillStyle=g;
+  roundRect(ctx,x-R,y-R,R*2,R*2,s*.07);ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=Math.max(1,s*.04);ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.14)';ctx.lineWidth=Math.max(1,s*.03);
+  ctx.beginPath();ctx.moveTo(x-R*.75,y-R*.15);ctx.lineTo(x+R*.2,y-R*.5);ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.42)';ctx.lineWidth=Math.max(1,s*.035);
+  ctx.beginPath();ctx.moveTo(x-R*.5,y+R*.62);ctx.lineTo(x+R*.1,y+R*.05);ctx.lineTo(x+R*.72,y+R*.5);ctx.stroke();
+  if(layers>1){ctx.beginPath();ctx.moveTo(x-R*.7,y-R*.55);ctx.lineTo(x-R*.1,y+R*.1);ctx.stroke()}
+  ctx.restore();
+}
+function drawCage(ctx,x,y,s,snake,t){
+  const R=s*.46;
+  ctx.save();
+  ctx.strokeStyle=snake?'rgba(120,200,140,.9)':'rgba(196,186,160,.85)';
+  ctx.lineWidth=Math.max(1.4,s*.055);ctx.lineCap='round';
+  if(snake){
+    ctx.beginPath();
+    for(let i=0;i<=18;i++){const p=i/18, ang=p*Math.PI*2.2+t*.001;
+      const rr=R*(.95-p*.12), px=x+Math.cos(ang)*rr, py=y+Math.sin(ang)*rr*.62+(p-.5)*R*.55;
+      i?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+    ctx.stroke();
+  }else{
+    roundRect(ctx,x-R,y-R,R*2,R*2,s*.05);ctx.stroke();
+    ctx.lineWidth=Math.max(1.1,s*.04);
+    for(const d of [-.34,.34]){ctx.beginPath();ctx.moveTo(x+d*R*2,y-R);ctx.lineTo(x+d*R*2,y+R);ctx.stroke()}
+    ctx.beginPath();ctx.moveTo(x-R,y);ctx.lineTo(x+R,y);ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawBell(ctx,x,y,s,t){
+  const R=s*.36;
+  ctx.save();
+  const sw=Math.sin(t*.0032)*.16;
+  ctx.translate(x,y-R*.5);ctx.rotate(sw);ctx.translate(0,R*.5);
+  const g=ctx.createLinearGradient(0,-R,0,R);
+  g.addColorStop(0,'#ffe9ad');g.addColorStop(.45,'#e8c768');g.addColorStop(1,'#8a6a1c');
+  ctx.fillStyle=g;
+  ctx.beginPath();
+  ctx.moveTo(-R*.92,R*.6);
+  ctx.quadraticCurveTo(-R*.86,-R*.62,0,-R*.86);
+  ctx.quadraticCurveTo(R*.86,-R*.62,R*.92,R*.6);
+  ctx.closePath();ctx.fill();
+  ctx.strokeStyle='rgba(70,50,10,.75)';ctx.lineWidth=Math.max(1,s*.035);ctx.stroke();
+  ctx.fillStyle='#6d5412';
+  ctx.beginPath();ctx.ellipse(0,R*.62,R*1.02,R*.2,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(0,R*.86,R*.19,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.6)';
+  ctx.beginPath();ctx.ellipse(-R*.34,-R*.18,R*.16,R*.3,-.3,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(240,230,200,.9)';ctx.lineWidth=Math.max(1,s*.045);
+  ctx.beginPath();ctx.arc(0,-R*.92,R*.2,Math.PI*.15,Math.PI*.85,true);ctx.stroke();
+  ctx.restore();
+  const p=.5+.5*Math.sin(t*.004);
+  ctx.save();ctx.globalAlpha=.25+p*.3;
+  const gg=ctx.createRadialGradient(x,y,R*.4,x,y,R*2.1);
+  gg.addColorStop(0,'rgba(232,199,104,.6)');gg.addColorStop(1,'rgba(232,199,104,0)');
+  ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,R*2.1,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+/* ---- 特效层 ---- */
+const FX={parts:[],beams:[],rings:[],marks:[]};
+function fxBurst(x,y,color,n,spd){
+  for(let i=0;i<(n||14);i++){
+    const a=rnd()*Math.PI*2, v=(spd||1)*(.9+rnd()*2.4);
+    FX.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.1,life:1,dec:.016+rnd()*.02,
+      s:ENG.cs*(.06+rnd()*.09),c:color,sq:rnd()<.4,rot:rnd()*6});
+  }
+}
+function fxBeam(r,c,dir,color){FX.beams.push({r,c,dir,life:1,c2:color||'#e8c768'})}
+function fxRing(x,y,color,max){FX.rings.push({x,y,life:1,c:color||'#e8c768',max:max||ENG.cs*3})}
+function fxMark(r,c,kind){FX.marks.push({r,c,kind,life:1})}
+function stepFX(dt){
+  for(let i=FX.parts.length-1;i>=0;i--){const p=FX.parts[i];
+    p.vy+=.19;p.x+=p.vx;p.y+=p.vy;p.life-=p.dec;p.rot+=.16;if(p.life<=0)FX.parts.splice(i,1)}
+  for(let i=FX.beams.length-1;i>=0;i--){FX.beams[i].life-=.055;if(FX.beams[i].life<=0)FX.beams.splice(i,1)}
+  for(let i=FX.rings.length-1;i>=0;i--){FX.rings[i].life-=.045;if(FX.rings[i].life<=0)FX.rings.splice(i,1)}
+  for(let i=FX.marks.length-1;i>=0;i--){FX.marks[i].life-=.05;if(FX.marks[i].life<=0)FX.marks.splice(i,1)}
+}
+function drawFX(t){
+  const s=ENG.cs;
+  for(const b of FX.beams){
+    const e=1-b.life, a=Math.sin(b.life*Math.PI);
+    cx.save();cx.globalCompositeOperation='lighter';
+    const grd=b.dir==='h'?cx.createLinearGradient(0,0,CSS_W,0):cx.createLinearGradient(0,0,0,CSS_W);
+    grd.addColorStop(0,hexA(b.c2,0));grd.addColorStop(.5,hexA(b.c2,.85*a));grd.addColorStop(1,hexA(b.c2,0));
+    cx.fillStyle=grd;
+    const th=s*(.32+e*.5);
+    if(b.dir==='h')cx.fillRect(0,cyOf(b.r)-th/2,CSS_W,th);else cx.fillRect(cxOf(b.c)-th/2,0,th,CSS_W);
+    cx.restore();
+  }
+  for(const rg of FX.rings){
+    const e=1-rg.life;
+    cx.save();cx.globalCompositeOperation='lighter';
+    cx.strokeStyle=hexA(rg.c,rg.life*.75);cx.lineWidth=Math.max(1.5,s*.11*rg.life);
+    cx.beginPath();cx.arc(rg.x,rg.y,rg.max*Math.pow(e,.6),0,Math.PI*2);cx.stroke();cx.restore();
+  }
+  for(const p of FX.parts){
+    cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.rot);
+    cx.fillStyle=p.c;
+    if(p.sq)cx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
+    else {cx.beginPath();cx.arc(0,0,p.s/2,0,Math.PI*2);cx.fill()}
+    cx.restore();
+  }
+}
+
+/* ---- 主绘制 ---- */
+let selCell=null, hintCell=null, dragTo=null;
+function draw(t){
+  const s=ENG.cs;
+  cx.clearRect(0,0,CSS_W,CSS_W);
+  /* 矿底：格纹 + 暗角 */
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const x=c*s,y=r*s;
+    cx.fillStyle=(r+c)%2?'rgba(255,255,255,.022)':'rgba(0,0,0,.16)';
+    cx.fillRect(x,y,s,s);
+  }
+  cx.strokeStyle='rgba(201,166,74,.055)';cx.lineWidth=1;
+  for(let i=1;i<N;i++){cx.beginPath();cx.moveTo(i*s,0);cx.lineTo(i*s,CSS_W);cx.stroke();
+    cx.beginPath();cx.moveTo(0,i*s);cx.lineTo(CSS_W,i*s);cx.stroke()}
+  /* 墨封（在灵石之下） */
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(T[r][c].ink>0)drawInk(cx,cxOf(c),cyOf(r),s,T[r][c].ink,t);
+  /* 底行提示（猫铃关） */
+  if(GS.L&&GS.L.bells>0){
+    const a=.10+.06*Math.sin(t*.003);
+    cx.save();cx.fillStyle='rgba(232,199,104,'+a+')';cx.fillRect(0,(N-1)*s,CSS_W,s);
+    cx.strokeStyle='rgba(232,199,104,.4)';cx.setLineDash([s*.18,s*.14]);cx.lineWidth=1.5;
+    cx.beginPath();cx.moveTo(0,(N-1)*s);cx.lineTo(CSS_W,(N-1)*s);cx.stroke();cx.setLineDash([]);cx.restore();
+  }
+  /* 提示走法的柔光 */
+  if(hintCell){
+    const p=.5+.5*Math.sin(t*.006);
+    for(const [r,c] of hintCell){
+      cx.save();cx.globalCompositeOperation='lighter';
+      const g=cx.createRadialGradient(cxOf(c),cyOf(r),s*.1,cxOf(c),cyOf(r),s*.8);
+      g.addColorStop(0,'rgba(232,199,104,'+(.16+p*.2)+')');g.addColorStop(1,'rgba(232,199,104,0)');
+      cx.fillStyle=g;cx.fillRect(c*s,r*s,s,s);cx.restore();
+    }
+  }
+  /* 岩壳 */
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(T[r][c].crate>0)drawCrate(cx,cxOf(c),cyOf(r),s,T[r][c].crate);
+  /* 棋子 */
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const p=B[r][c]; if(!p)continue;
+    const x=cxOf(c)+p.vx, y=cyOf(r)+p.vy;
+    if(p.bell){drawBell(cx,x,y,s*p.sc,t);continue}
+    const sel=selCell&&selCell[0]===r&&selCell[1]===c;
+    drawGem(cx,x,y,s*.96,p.g,p.k,{alpha:p.al,scale:p.sc*(sel?1.1:1),rot:p.spin,t});
+    if(p.cage>0)drawCage(cx,x,y,s,p.snake,t);
+    if(sel){                                                   // 选中：旋转虚线环（军规四）
+      cx.save();cx.translate(x,y);cx.rotate(t*.0022);
+      cx.strokeStyle='rgba(232,199,104,.95)';cx.lineWidth=Math.max(1.4,s*.045);
+      cx.setLineDash([s*.16,s*.12]);
+      cx.beginPath();cx.arc(0,0,s*.48,0,Math.PI*2);cx.stroke();cx.setLineDash([]);
+      cx.restore();
+    }
+  }
+  /* 拖拽方向指示 */
+  if(selCell&&dragTo){
+    const [r,c]=selCell,[nr,nc]=dragTo;
+    cx.save();cx.strokeStyle='rgba(232,199,104,.5)';cx.lineWidth=Math.max(1.5,s*.05);cx.lineCap='round';
+    cx.beginPath();cx.moveTo(cxOf(c),cyOf(r));cx.lineTo(cxOf(nc),cyOf(nr));cx.stroke();cx.restore();
+  }
+  drawFX(t);
+}
+/* ==================================================================
+   [ 游戏流程 · CONTROLLER ]
+   ================================================================== */
+const GS={mode:'adv',L:null,moves:0,score:0,over:false,busy:true,goals:[],
+  boss:null,hp:0,hpMax:0,bossTick:0,bells:0,rushT:0,rushOn:false,idle:0,chainMax:0,specials:0,started:0};
+const DYING=[];
+const sleep=ms=>new Promise(r=>setTimeout(r,REDUCED?Math.min(ms,40):ms));
+
+function toast(msg,ms){
+  const el=$('#toast'); el.innerHTML=msg; el.classList.add('on');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),ms||1900);
+}
+function shake(){if(REDUCED)return;document.body.classList.remove('shaking');void document.body.offsetWidth;document.body.classList.add('shaking');setTimeout(()=>document.body.classList.remove('shaking'),420)}
+function flash(red){const f=$('#flash');f.classList.toggle('red',!!red);f.classList.remove('go');void f.offsetWidth;f.classList.add('go');setTimeout(()=>f.classList.remove('go'),520)}
+function floatNum(r,c,txt,color){
+  const wrap=$('#board-wrap'), d=document.createElement('div');
+  d.className='float-num';d.textContent=txt;if(color)d.style.color=color;
+  d.style.left=cxOf(c)+'px';d.style.top=(cyOf(r)-ENG.cs*.3)+'px';
+  wrap.appendChild(d);setTimeout(()=>d.remove(),1020);
+}
+function comboBanner(n,label){
+  const el=$('#combo-banner');
+  const w=label?[label,'COMBO']:comboWord(n);
+  el.querySelector('.zh').textContent=w[0];
+  el.querySelector('.en').textContent=w[1];
+  el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+}
+function showTut(html,ms){
+  const el=$('#tut'); if(!html){el.classList.remove('on');return}
+  el.innerHTML=html;el.classList.add('on');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),ms||4200);
+}
+function tutOnce(key,html,ms){if(SAVE.tut[key])return;SAVE.tut[key]=1;persist();showTut(html,ms)}
+
+/* ---- 目标与 HUD ---- */
+function goalIcon(g,size){
+  const c=document.createElement('canvas');
+  const S=size||30, d=Math.min(devicePixelRatio||1,2.5);
+  c.width=S*d;c.height=S*d;c.style.width=S+'px';c.style.height=S+'px';
+  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);
+  const cxp=S/2, cyp=S/2;
+  if(g.type==='collect')drawGem(x,cxp,cyp,S*.92,g.col,'n',{t:0});
+  else if(g.type==='ink')drawInk(x,cxp,cyp,S*.9,1,0);
+  else if(g.type==='crate')drawCrate(x,cxp,cyp,S*.9,1);
+  else if(g.type==='cage'){drawGem(x,cxp,cyp,S*.8,4,'n',{t:0});drawCage(x,cxp,cyp,S*.82,false,0)}
+  else if(g.type==='bell')drawBell(x,cxp,cyp,S*.94,0);
+  else if(g.type==='boss'){x.fillStyle='#d56060';x.font=(S*.7)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('讨',cxp,cyp+S*.03)}
+  else {x.fillStyle='#e8c768';x.font=(S*.66)+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('分',cxp,cyp+S*.02)}
+  return c;
+}
+function renderGoals(host,size){
+  host.innerHTML='';
+  GS.goals.forEach((g,i)=>{
+    const d=document.createElement('div');d.className='goal';d.dataset.i=i;
+    d.appendChild(goalIcon(g,size));
+    const n=document.createElement('div');n.className='cnt';n.textContent=goalText(g);
+    d.appendChild(n);
+    const tk=document.createElement('div');tk.className='tick';tk.textContent='✓';d.appendChild(tk);
+    if(g.got>=g.need)d.classList.add('done');
+    host.appendChild(d);
+  });
+}
+function goalText(g){
+  if(g.type==='boss')return Math.max(0,g.need-g.got);
+  if(g.type==='score')return Math.min(g.got,g.need)+'/'+g.need;
+  return Math.max(0,g.need-g.got);
+}
+function bumpGoal(type,col,n){
+  let hit=false;
+  GS.goals.forEach((g,i)=>{
+    if(g.type!==type)return;
+    if(type==='collect'&&g.col!==col)return;
+    const was=g.got>=g.need;
+    g.got=Math.min(g.need,g.got+n);hit=true;
+    const el=$('#goal-row').children[i]; if(!el)return;
+    el.querySelector('.cnt').textContent=goalText(g);
+    el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),320);
+    if(g.got>=g.need&&!was){el.classList.add('done');SFX.crush()}
+  });
+  return hit;
+}
+function goalsMet(){return GS.goals.every(g=>g.got>=g.need)}
+function updHUD(){
+  const mv=$('#hud-moves');
+  if(GS.rushOn){mv.querySelector('.num').textContent=GS.chainMax||'—';mv.querySelector('.lbl').textContent='最长连锁'}
+  else {mv.querySelector('.num').textContent=GS.moves;mv.querySelector('.lbl').textContent='步数'}
+  mv.classList.toggle('low',GS.moves<=5&&!GS.rushOn);
+  $('#score-num').textContent=GS.score.toLocaleString('en-US');
+  const L=GS.L, pct=clamp(GS.score/L.s3*100,0,100);
+  $('#score-fill').style.width=pct+'%';
+  const st=$('#score-stars').children;
+  if(st.length===3){
+    st[0].classList.toggle('lit',GS.score>=L.s1);
+    st[1].classList.toggle('lit',GS.score>=L.s2);
+    st[2].classList.toggle('lit',GS.score>=L.s3);
+  }
+}
+function addScore(n,r,c,color){
+  GS.score+=n;updHUD();
+  if(r!=null&&n>=100)floatNum(r,c,'+'+n,color);
+  const sg=GS.goals.find(g=>g.type==='score');
+  if(sg){sg.got=GS.score;const el=$('#goal-row').children[GS.goals.indexOf(sg)];
+    if(el){el.querySelector('.cnt').textContent=goalText(sg);if(sg.got>=sg.need)el.classList.add('done')}}
+}
+
+/* ---- 清除一批格子 ---- */
+function killPiece(r,c,opts){
+  const p=B[r][c]; if(!p)return null;
+  DYING.push({x:cxOf(c)+p.vx,y:cyOf(r)+p.vy,g:p.g,k:p.k,bell:p.bell,life:1,spin:(rnd()-.5)*.3,cage:p.cage,snake:p.snake});
+  B[r][c]=null; return p;
+}
+function damageAdjacentCrates(cells,acc){
+  const seen=new Set();
+  for(const [r,c] of cells){
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]){
+      const nr=r+dr,nc=c+dc;
+      if(!inB(nr,nc))continue;
+      const k=KEY(nr,nc); if(seen.has(k))continue;
+      if(T[nr][nc].crate>0){seen.add(k);acc.push([nr,nc])}
+    }
+  }
+}
+/* 返回：{gems, colors, specials} 统计 */
+function clearCells(cells,chain,noCrateSplash){
+  let gems=0, specials=0; const colors={};
+  const crateHits=[], gemCells=[];
+  for(const [r,c] of cells){
+    if(!inB(r,c))continue;
+    const p=B[r][c];
+    /* 岩壳：被直接命中就受损（且岩壳自身不再向外溅射，否则一炸连片） */
+    if(T[r][c].crate>0){crateHits.push([r,c]);continue}
+    gemCells.push([r,c]);
+    if(!p)  {if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()} continue}
+    if(p.bell)continue;
+    if(p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);SFX.crate();
+      fxBurst(cxOf(c),cyOf(r),'#c9b78a',7,.8)}
+    if(p.k!=='n')specials++;
+    gems++;colors[p.g]=(colors[p.g]||0)+1;
+    if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()}
+    fxBurst(cxOf(c)+p.vx,cyOf(r)+p.vy,GEMS[p.g]?GEMS[p.g].base:'#e8c768',p.k==='n'?7:14,p.k==='n'?1:1.5);
+    killPiece(r,c);
+  }
+  if(!noCrateSplash)damageAdjacentCrates(gemCells,crateHits);
+  const done=new Set();
+  for(const [r,c] of crateHits){
+    const k=KEY(r,c); if(done.has(k))continue; done.add(k);
+    if(T[r][c].crate>0){
+      T[r][c].crate--;bumpGoal('crate',null,1);SFX.crate();
+      fxBurst(cxOf(c),cyOf(r),'#7a705c',10,1.1);
+      if(T[r][c].crate===0)fxRing(cxOf(c),cyOf(r),'#9a8c68',ENG.cs*1.6);
+    }
+  }
+  for(const g in colors)bumpGoal('collect',+g,colors[g]);
+  allyChargeFrom(colors);
+  return {gems,specials,colors};
+}
+
+/* ---- Boss ---- */
+function bossFaceSVG(key,big){
+  const st='stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
+  if(key==='she'||key==='both'&&big===2)
+    return '<svg viewBox="0 0 100 100" style="color:#d56060"><g '+st+'><path d="M50 14c-16 0-27 12-27 27 0 14 9 20 9 30 0 8-6 10-6 15h48c0-5-6-7-6-15 0-10 9-16 9-30 0-15-11-27-27-27z"/><path d="M36 42c3-4 9-4 12 0M52 42c3-4 9-4 12 0"/><path d="M42 62c4 4 12 4 16 0"/><path d="M50 68v8M46 76h8"/></g><g fill="#d56060"><ellipse cx="41" cy="45" rx="2.6" ry="4"/><ellipse cx="59" cy="45" rx="2.6" ry="4"/></g></svg>';
+  return '<svg viewBox="0 0 100 100" style="color:#d56060"><g '+st+'><path d="M26 22h48v56H26z"/><path d="M26 34h48"/><path d="M36 48h22M36 58h28M36 68h16"/><path d="M70 20l14 10-30 42-16 6 4-17z"/></g><path d="M70 20l14 10-5 7-14-10z" fill="#d56060"/></svg>';
+}
+function bossSay(txt){
+  const el=$('#boss-say');el.textContent=txt;el.classList.add('on');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2100);
+}
+function bossHurt(dmg){
+  if(!GS.boss||GS.hp<=0)return;
+  GS.hp=Math.max(0,GS.hp-dmg);
+  const g=GS.goals.find(x=>x.type==='boss');
+  if(g){g.got=GS.hpMax-GS.hp;const el=$('#goal-row').children[GS.goals.indexOf(g)];
+    if(el)el.querySelector('.cnt').textContent=goalText(g)}
+  const pct=GS.hp/GS.hpMax*100;
+  $('#boss-hpbar').querySelector('i').style.width=pct+'%';
+  $('#boss-hpbar').classList.toggle('low',pct<30);
+  $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;
+  const bar=$('#boss-bar');bar.classList.remove('hit');void bar.offsetWidth;bar.classList.add('hit');
+  SFX.bossHit();
+  if(rnd()<.3)bossSay(pick2(BOSSES[GS.boss].hurt));
+}
+const pick2=a=>a[Math.floor(rnd()*a.length)];
+async function bossAct(){
+  const bo=BOSSES[GS.boss]; if(!bo||GS.hp<=0)return;
+  GS.bossTick++;
+  if(GS.bossTick%bo.every!==0)return;
+  let act=bo.act;
+  if(act==='both')act=(GS.bossTick/bo.every)%2?'seal':'snake';
+  bossSay(pick2(bo.doing));SFX.bossAct();flash(true);shake();
+  await sleep(240);
+  const spots=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(act==='seal'&&T[r][c].ink===0&&T[r][c].crate===0&&isGem(r,c))spots.push([r,c]);
+    if(act==='snake'&&isGem(r,c)&&B[r][c].cage===0&&B[r][c].k==='n')spots.push([r,c]);
+  }
+  for(let i=spots.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]]}
+  const n=Math.min(spots.length,act==='seal'?3:2);
+  for(let i=0;i<n;i++){
+    const [r,c]=spots[i];
+    if(act==='seal'){T[r][c].ink=1;fxRing(cxOf(c),cyOf(r),'#d56060',ENG.cs*1.4)}
+    else {B[r][c].cage=1;B[r][c].snake=true;fxRing(cxOf(c),cyOf(r),'#6aa86a',ENG.cs*1.4)}
+    await sleep(90);
+  }
+  /* 万一封成死局，立刻重组 */
+  if(!anyMove()){shuffleBoard();toast('矿脉重组 · <b>手感还在</b>')}
+}
+
+/* ---- 核心回合 ---- */
+async function settleBoard(firstChain){
+  let chain=firstChain||0, total=0;
+  while(true){
+    const groups=findGroups();
+    if(!groups.length)break;
+    chain++;GS.chainMax=Math.max(GS.chainMax,chain);
+    /* 先记下要炼成的特殊灵石 */
+    const makes=[];
+    const all=new Set();
+    for(const g of groups){
+      for(const k of g.cells)all.add(k);
+      if(g.make)makes.push({at:g.at,k:g.make,g:g.color});
+    }
+    for(const m of makes)all.delete(KEY(m.at[0],m.at[1]));
+    const seed=[...all].map(UNKEY);
+    const ex=expandBlast(seed);
+    playBlastFX(ex.fx);
+    const res=clearCells(ex.cells,chain);
+    const base=Math.round(60*res.gems*(1+(chain-1)*.55)+res.specials*140);
+    total+=base;
+    const anchor=seed[0]||[0,0];
+    addScore(base,anchor[0],anchor[1],chain>=3?'#e8c768':null);
+    if(GS.boss)bossHurt(res.gems+res.specials*5);
+    SFX.pop(chain);
+    if(chain>=3){comboBanner(chain);vib(chain>=5?30:14)}
+    if(chain>=5)shake();
+    /* 炼成特殊灵石 */
+    for(const m of makes){
+      const [r,c]=m.at;
+      B[r][c]=newPiece({g:m.g,k:m.k});B[r][c].sc=.2;
+      fxRing(cxOf(c),cyOf(r),m.k==='O'?'#ffffff':GEMS[m.g].base,ENG.cs*2.2);
+      SFX.made();GS.specials++;
+      addScore(m.k==='O'?900:m.k==='B'?520:320,r,c,'#e8c768');
+      if(m.k==='H'||m.k==='V'){grant('a2');tutOnce('sp1','四连炼成 <b>疾风灵石</b> —— 点它可横扫整行/整列')}
+      if(m.k==='B'){grant('a3');tutOnce('sp2','L 形炼成 <b>爆裂灵石</b> —— 炸开周围一圈')}
+      if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b> —— 与任意灵石交换，吞掉全场同色')}
+    }
+    grant('a1');
+    await sleep(REDUCED?30:200);
+    await dropAndFill();
+  }
+  if(chain>=5)grant('a6');
+  if(chain>=7){grant('a7');flash()}
+  return total;
+}
+function playBlastFX(fx){
+  for(const f of fx){
+    if(f.t==='row'){fxBeam(f.r,f.c,'h');SFX.rocket()}
+    else if(f.t==='col'){fxBeam(f.r,f.c,'v');SFX.rocket()}
+    else if(f.t==='bomb'){fxRing(cxOf(f.c),cyOf(f.r),'#ffb060',ENG.cs*2.4);SFX.bomb();shake();vib(24)}
+    else if(f.t==='orb'){fxRing(cxOf(f.c),cyOf(f.r),'#ffffff',ENG.cs*5);SFX.orb();vib(20)}
+    else if(f.t==='megacross'){for(let d=-1;d<=1;d++){fxBeam(clamp(f.r+d,0,N-1),f.c,'h');fxBeam(f.r,clamp(f.c+d,0,N-1),'v')}SFX.bomb();SFX.rocket();shake();flash();vib(40)}
+    else if(f.t==='bigbomb'){fxRing(cxOf(f.c),cyOf(f.r),'#ffb060',ENG.cs*4.2);SFX.bomb();shake();flash();vib(45)}
+    else if(f.t==='orbstorm'){fxRing(cxOf(f.c),cyOf(f.r),'#ffffff',ENG.cs*6);SFX.orb();SFX.bomb();shake();flash();vib(50)}
+    else if(f.t==='boardclear'){fxRing(cxOf(f.c),cyOf(f.r),'#ffffff',ENG.cs*9);SFX.boardClear();shake();flash();vib([30,40,60])}
+  }
+}
+async function dropAndFill(){
+  let guard=0;
+  while(guard++<40){
+    let moved=gravityPass();
+    const spawned=spawnTop();
+    if(!moved&&!spawned)break;
+    await sleep(REDUCED?12:62);
+  }
+  const patched=patchHoles();
+  if(patched)await sleep(80);
+  await checkBells();
+}
+async function checkBells(){
+  if(!GS.L.bells)return;
+  let got=0;
+  for(let c=0;c<N;c++){
+    const p=B[N-1][c];
+    if(p&&p.bell){
+      killPiece(N-1,c);
+      fxRing(cxOf(c),cyOf(N-1),'#e8c768',ENG.cs*3);
+      fxBurst(cxOf(c),cyOf(N-1),'#e8c768',22,1.5);
+      SFX.bell();vib(30);addScore(2000,N-1,c,'#e8c768');
+      bumpGoal('bell',null,1);got++;
+    }
+  }
+  if(got){
+    toast('猫铃送达 · <b>叮铃</b>');
+    await dropAndFill();
+  }
+}
+
+/* ---- 玩家出手 ---- */
+async function trySwap(a,b){
+  if(GS.busy||GS.over)return;
+  const [ar,ac]=a,[br,bc]=b;
+  if(!swappable(ar,ac)||!swappable(br,bc)){SFX.fail();return}
+  if(P(ar,ac).bell&&P(br,bc).bell){SFX.fail();return}
+  GS.busy=true;selCell=null;dragTo=null;hintCell=null;GS.idle=0;
+  const A=B[ar][ac], C=B[br][bc];
+  /* 交换动画 */
+  A.vx=(ac-bc)*ENG.cs;A.vy=(ar-br)*ENG.cs;
+  C.vx=(bc-ac)*ENG.cs;C.vy=(br-ar)*ENG.cs;
+  swapPieces(a,b);
+  SFX.swap();
+  await sleep(REDUCED?20:150);
+  const combo=isComboPair(a,b)?comboBlast(a,b):null;
+  const ok=combo||scanRuns().length>0;
+  if(!ok){                                              /* 无效：弹回 */
+    const A2=B[br][bc], C2=B[ar][ac];
+    A2.vx=(bc-ac)*ENG.cs;A2.vy=(br-ar)*ENG.cs;
+    C2.vx=(ac-bc)*ENG.cs;C2.vy=(ar-br)*ENG.cs;
+    swapPieces(a,b);
+    SFX.fail();vib(12);
+    await sleep(REDUCED?20:160);
+    GS.busy=false;return;
+  }
+  if(!GS.rushOn)GS.moves--;
+  ENG.lastMove=[[ar,ac],[br,bc]];
+  updHUD();
+  let gained=0;
+  if(combo){
+    playBlastFX(combo.fx);
+    comboBanner(0,combo.name);
+    if(combo.name==='双珠合璧')grant('a5');
+    grant('a1');
+    /* 组合技把两颗触发石也一并清掉 */
+    const cells=combo.cells.slice();
+    if(!cells.some(([r,c])=>r===ar&&c===ac))cells.push([ar,ac]);
+    if(!cells.some(([r,c])=>r===br&&c===bc))cells.push([br,bc]);
+    const res=clearCells(cells,3);
+    const pts=Math.round(90*res.gems*1.8+1600);
+    gained+=pts;addScore(pts,br,bc,'#e8c768');
+    if(GS.boss)bossHurt(res.gems+30);
+    vib(45);
+    await sleep(REDUCED?30:280);
+    await dropAndFill();
+    gained+=await settleBoard(2);
+  }else{
+    gained+=await settleBoard(0);
+  }
+  ENG.lastMove=null;
+  if(GS.rushOn){                                        /* 矿灯将熄：连锁给灯油 */
+    const bonus=Math.min(4,GS.chainMax>=3?1.2:.5)+(gained>4000?1.4:0);
+    GS.rushT+=bonus*1000;
+    if(bonus>=1)toast('+'+bonus.toFixed(1)+'s');
+  }
+  /* 死局重组 */
+  if(!anyMove()){
+    await sleep(200);
+    shuffleBoard();toast('无路可走 · <b>矿脉重组</b>');SFX.made();
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(B[r][c]){B[r][c].sc=.4;B[r][c].vy=-6+rnd()*12}
+    await sleep(320);
+  }
+  if(GS.boss&&GS.hp>0&&!goalsMet())await bossAct();
+  GS.busy=false;
+  await checkEnd();
+}
+
+async function checkEnd(){
+  if(GS.over)return;
+  if(GS.rushOn)return;
+  if(goalsMet()){
+    GS.over=true;GS.busy=true;
+    if(GS.boss){await bossDown()}
+    await sleep(260);
+    await finale();
+    endLevel(true);
+    return;
+  }
+  if(GS.moves<=0){
+    GS.over=true;GS.busy=true;
+    await sleep(400);
+    endLevel(false);
+  }
+}
+async function bossDown(){
+  const bo=BOSSES[GS.boss];
+  bossSay(bo.ko);SFX.bossKO();shake();flash(true);
+  $('#boss-bar').classList.add('hit');
+  for(let i=0;i<3;i++){
+    fxBurst(CSS_W*(.3+rnd()*.4),CSS_W*(.3+rnd()*.4),'#d56060',24,2);
+    await sleep(180);
+  }
+  if(GS.boss==='ye'||GS.boss==='both')grant('a9');
+  if(GS.boss==='she'||GS.boss==='both')grant('a10');
+  await sleep(500);
+}
+/* 达标后剩余步数化作灵技全场引爆 —— 收尾的爽点 */
+async function finale(){
+  if(GS.moves<=0)return;
+  toast('余力化技 · <b>'+GS.moves+' 步</b>');
+  const kinds=['H','V','B'];
+  let n=Math.min(GS.moves,10);
+  for(let i=0;i<n;i++){
+    const spots=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].k==='n')spots.push([r,c]);
+    if(!spots.length)break;
+    const [r,c]=spots[Math.floor(rnd()*spots.length)];
+    B[r][c].k=kinds[Math.floor(rnd()*kinds.length)];B[r][c].sc=.3;
+    SFX.made();
+    await sleep(REDUCED?20:110);
+  }
+  GS.moves=0;updHUD();
+  await sleep(180);
+  let guard=0;
+  while(guard++<12){
+    const specials=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].k!=='n')specials.push([r,c]);
+    if(!specials.length)break;
+    const ex=expandBlast([specials[0]]);
+    playBlastFX(ex.fx);
+    const res=clearCells(ex.cells,4);
+    addScore(Math.round(120*res.gems+400),specials[0][0],specials[0][1],'#e8c768');
+    await sleep(REDUCED?30:200);
+    await dropAndFill();
+    await settleBoard(2);
+  }
+}
+/* ==================================================================
+   [ 灵器 · 每日矿灯 · 星辰宝箱 · 难度补偿 ]
+   —— 顶级三消作品验证过的四件套：给玩家「有牌可打」「输了还能救」
+      「每天有理由回来」「长期有攒头」。全部靠玩获得，没有任何付费口子。
+   ================================================================== */
+const TOOLS={
+  pick:{ic:'⛏',nm:'矿镐',hint:'点任意一格 —— 一镐下去，灵石、墨封、岩壳、石笼都算数'},
+  swap:{ic:'⇄',nm:'换位符',hint:'点两个相邻格 —— 不管连不连得成，强行换位'},
+  mix:{ic:'✦',nm:'重整令',hint:'整盘灵石重新排布，不扣步数'},
+};
+const TOOLKEYS=['pick','swap','mix'];
+function toolCount(t){return Math.max(0,(SAVE.tools&&SAVE.tools[t])||0)}
+function giveTool(t,n){SAVE.tools[t]=toolCount(t)+(n||1);persist();renderTools()}
+function giveRandomTool(n){
+  const got={};
+  for(let i=0;i<(n||1);i++){const t=TOOLKEYS[Math.floor(rnd()*3)];giveTool(t,1);got[t]=(got[t]||0)+1}
+  return Object.keys(got).map(t=>TOOLS[t].ic+' '+TOOLS[t].nm+'×'+got[t]).join('　');
+}
+function renderTools(){
+  for(const b of $$('.tool')){
+    const t=b.dataset.t, n=toolCount(t);
+    b.querySelector('.cnt').textContent=n;
+    b.disabled=n<=0||GS.over;
+    b.classList.toggle('armed',GS.tool===t);
+  }
+  const h=$('#tool-hint');
+  if(GS.tool){h.textContent=TOOLS[GS.tool].hint;h.classList.add('on')}
+  else {h.classList.remove('on');h.textContent=''}
+}
+function armTool(t){
+  if(GS.busy||GS.over)return;
+  if(GS.tool===t){GS.tool=null;GS.toolFirst=null;selCell=null;renderTools();return}
+  if(toolCount(t)<=0){toast('这件灵器用完了 · <b>通关或每日矿灯可再得</b>');return}
+  GS.tool=t;GS.toolFirst=null;selCell=null;hintCell=null;SFX.click();renderTools();
+}
+function spendTool(t){SAVE.tools[t]=toolCount(t)-1;GS.tool=null;GS.toolFirst=null;persist();renderTools()}
+async function useToolAt(r,c){
+  const t=GS.tool;
+  if(t==='mix'){
+    spendTool('mix');GS.busy=true;
+    shuffleBoard();SFX.made();toast('重整令 · <b>矿脉焕然一新</b>');
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(B[i][j]){B[i][j].sc=.4;B[i][j].vy=-8+rnd()*16}
+    await sleep(340);await settleBoard(0);GS.busy=false;await checkEnd();return;
+  }
+  if(t==='pick'){
+    const p=P(r,c);
+    if(p&&p.bell){toast('猫铃砸不得 · <b>把它送到底行</b>');return}
+    if(!p&&T[r][c].crate===0&&T[r][c].ink===0){SFX.fail();return}
+    spendTool('pick');GS.busy=true;
+    fxRing(cxOf(c),cyOf(r),'#e8c768',ENG.cs*2.4);SFX.bomb();shake();vib(22);
+    const ex=expandBlast([[r,c]]);
+    playBlastFX(ex.fx);
+    const res=clearCells(ex.cells,1);
+    addScore(Math.round(70*res.gems+120),r,c,'#e8c768');
+    if(GS.boss)bossHurt(res.gems);
+    await sleep(180);await dropAndFill();await settleBoard(1);
+    if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+    GS.busy=false;await checkEnd();return;
+  }
+  if(t==='swap'){
+    if(!GS.toolFirst){
+      if(!swappable(r,c)){SFX.fail();return}
+      GS.toolFirst=[r,c];selCell=[r,c];SFX.click();
+      $('#tool-hint').textContent='再点一个相邻格完成换位';
+      return;
+    }
+    const a=GS.toolFirst;
+    if(Math.abs(a[0]-r)+Math.abs(a[1]-c)!==1){toast('要选<b>相邻</b>的两格');return}
+    if(!swappable(r,c)){SFX.fail();return}
+    spendTool('swap');GS.busy=true;selCell=null;
+    const A=B[a[0]][a[1]], C=B[r][c];
+    A.vx=(a[1]-c)*ENG.cs;A.vy=(a[0]-r)*ENG.cs;
+    C.vx=(c-a[1])*ENG.cs;C.vy=(r-a[0])*ENG.cs;
+    swapPieces(a,[r,c]);SFX.swap();
+    await sleep(REDUCED?20:160);
+    const combo=isComboPair(a,[r,c])?comboBlast(a,[r,c]):null;
+    if(combo){
+      playBlastFX(combo.fx);comboBanner(0,combo.name);
+      const cells=combo.cells.slice();
+      if(!cells.some(([rr,cc])=>rr===a[0]&&cc===a[1]))cells.push(a);
+      if(!cells.some(([rr,cc])=>rr===r&&cc===c))cells.push([r,c]);
+      const res=clearCells(cells,3);
+      addScore(Math.round(90*res.gems*1.8+1600),r,c,'#e8c768');
+      if(GS.boss)bossHurt(res.gems+30);
+      await sleep(REDUCED?30:280);await dropAndFill();
+    }
+    ENG.lastMove=[a,[r,c]];
+    await settleBoard(combo?2:0);
+    ENG.lastMove=null;
+    if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+    GS.busy=false;await checkEnd();return;
+  }
+}
+/* ---- 同伴助战 ---- */
+function allyChargeFrom(colors){
+  const c=GS.compDef; if(!c||GS.over)return;
+  const n=colors[c.col]||0; if(!n)return;
+  const was=GS.charge>=c.need;
+  GS.charge=Math.min(c.need,GS.charge+n);
+  renderAlly();
+  if(!was&&GS.charge>=c.need){
+    SFX.made();vib(26);
+    toast('<b>'+c.name+'</b> 准备好了 —— 「'+c.ult+'」',2200);
+    fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*5);
+  }
+}
+function renderAlly(){
+  const c=GS.compDef, el=$('#ally');
+  if(!c){el.style.display='none';return}
+  el.style.display='flex';
+  const ready=GS.charge>=c.need&&!GS.over;
+  el.classList.toggle('ready',ready);
+  el.style.setProperty('--ally-base',GEMS[c.col].base);
+  el.style.setProperty('--ally-dark',GEMS[c.col].dk);
+  el.style.setProperty('--ally-glow',hexA(GEMS[c.col].base,.45));
+  $('#ally-badge').querySelector('b').textContent=c.g;
+  $('#ally-name').innerHTML=c.name+' · <em>'+c.title+'</em>';
+  $('#ally-track').querySelector('i').style.width=(GS.charge/c.need*100)+'%';
+  $('#ally-fire').textContent=ready?c.ult:(GS.charge+' / '+c.need);
+}
+async function fireUlt(){
+  const c=GS.compDef;
+  if(!c||GS.busy||GS.over||GS.charge<c.need)return;
+  GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;
+  GS.busy=true;renderAlly();renderTools();
+  SAVE.ach['ult_'+c.id]=1;grant('a13');
+  if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
+  persist();
+  comboBanner(0,c.ult);
+  flash();shake();vib(40);
+  fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*8);
+  toast('<b>'+c.name+'</b> · 「'+c.ult+'」',2000);
+  await sleep(REDUCED?30:340);
+  if(c.id==='wolf'){                                          // 执灯：全盘特殊灵石同时引爆
+    const sp=[];
+    for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k!=='n')sp.push([r,c2]);
+    if(!sp.length){                                           // 没有特殊灵石时先送两颗，免得白放
+      const spots=[];for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2))spots.push([r,c2]);
+      for(let i=0;i<2&&spots.length;i++){const [r,c2]=spots.splice(Math.floor(rnd()*spots.length),1)[0];
+        B[r][c2].k=i?'V':'H';B[r][c2].sc=.3;sp.push([r,c2])}
+      SFX.made();await sleep(200);
+    }
+    const ex=expandBlast(sp);
+    playBlastFX(ex.fx);
+    const res=clearCells(ex.cells,4);
+    addScore(Math.round(110*res.gems+900),3,3,'#e8c768');
+    if(GS.boss)bossHurt(res.gems+18);
+  }else if(c.id==='lin'){                                     // 焚脉：三颗化爆裂
+    const spots=[];
+    for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k==='n')spots.push([r,c2]);
+    const made=[];
+    for(let i=0;i<3&&spots.length;i++){
+      const [r,c2]=spots.splice(Math.floor(rnd()*spots.length),1)[0];
+      B[r][c2].k='B';B[r][c2].sc=.25;made.push([r,c2]);
+      fxRing(cxOf(c2),cyOf(r),GEMS[1].base,ENG.cs*2);SFX.made();
+      await sleep(REDUCED?20:150);
+    }
+    await sleep(160);
+    if(made.length){
+      const ex=expandBlast(made);
+      playBlastFX(ex.fx);
+      const res=clearCells(ex.cells,4);
+      addScore(Math.round(110*res.gems+700),made[0][0],made[0][1],'#e8c768');
+      if(GS.boss)bossHurt(res.gems+14);
+    }
+  }else if(c.id==='hai'){                                     // 涤脉：一行一列
+    const r=Math.floor(rnd()*N), c2=Math.floor(rnd()*N);
+    fxBeam(r,c2,'h');fxBeam(r,c2,'v');SFX.rocket();SFX.orb();
+    const cells=[];
+    for(let i=0;i<N;i++){cells.push([r,i]);cells.push([i,c2])}
+    await sleep(REDUCED?20:200);
+    const res=clearCells(cells,4);
+    addScore(Math.round(110*res.gems+700),r,c2,'#e8c768');
+    if(GS.boss)bossHurt(res.gems+14);
+  }else if(c.id==='he'){                                      // 春生：加步 / 加时
+    if(GS.rushOn){GS.rushT+=8000;toast('<b>禾</b> 添了灯油 · +8 秒',2000)}
+    else {GS.moves+=3;updHUD();floatNum(2,4,'+3 步','#6aa86a')}
+    SFX.win();
+  }else if(c.id==='mo'){                                      // 引渡：凭空一颗万象
+    const spots=[];
+    for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k==='n')spots.push([r,c2]);
+    if(spots.length){
+      const [r,c2]=spots[Math.floor(rnd()*spots.length)];
+      B[r][c2].k='O';B[r][c2].sc=.2;
+      fxRing(cxOf(c2),cyOf(r),'#ffffff',ENG.cs*4);SFX.orb();SFX.made();
+      floatNum(r,c2,'万象','#ffffff');
+      grant('a4');
+    }
+  }else if(c.id==='zi'){                                      // 破封：机关各褪一层
+    let n=0;
+    for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++){
+      if(T[r][c2].ink>0){T[r][c2].ink--;bumpGoal('ink',null,1);n++;fxBurst(cxOf(c2),cyOf(r),'#9d72d6',6,.9)}
+      if(T[r][c2].crate>0){T[r][c2].crate--;bumpGoal('crate',null,1);n++;fxBurst(cxOf(c2),cyOf(r),'#7a705c',6,.9)}
+      const p=B[r][c2];
+      if(p&&p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);n++;fxBurst(cxOf(c2),cyOf(r),'#c9b78a',6,.9)}
+    }
+    SFX.crate();SFX.ink();SFX.crush();
+    addScore(n*160,3,3,'#c199e6');
+    if(!n)toast('这一关没有机关 —— <b>梓璇替你把灰扫了</b>',2000);
+  }
+  await sleep(REDUCED?30:240);
+  await dropAndFill();
+  await settleBoard(2);
+  if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+  renderAlly();
+  GS.busy=false;
+  await checkEnd();
+}
+function renderAllyPick(){
+  const host=$('#ally-pick');host.innerHTML='';
+  COMPANIONS.forEach(c=>{
+    const ul=compUnlocked(c);
+    const d=document.createElement('div');
+    d.className='ally-opt'+(ul?'':' lock')+(SAVE.comp===c.id?' sel':'');
+    d.dataset.u=c.unlock;
+    d.style.setProperty('--ally-base',GEMS[c.col].base);
+    d.style.setProperty('--ally-dark',GEMS[c.col].dk);
+    d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
+    d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'+c.name+'</div>';
+    if(ul)d.addEventListener('click',()=>{SAVE.comp=c.id;persist();SFX.click();renderAllyPick()});
+    host.appendChild(d);
+  });
+  const c=compById(SAVE.comp);
+  $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>　「'+c.ult+'」<br>'+c.desc
+    +'<br><span style="color:var(--ink3);font-size:11.5px">消除'+GEMS[c.col].name+'充能 · 满 '+c.need+' 颗发动</span>';
+}
+
+/* ---- 每日矿灯 ---- */
+const dayNum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000);
+function dailyState(){
+  const d=dayNum(), last=SAVE.daily.day||0;
+  return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0};
+}
+function renderDaily(){
+  const st=dailyState(), card=$('#daily-card');
+  if(!st.can){card.classList.remove('on');return}
+  const nextStreak=st.gap===1?st.streak+1:1;
+  card.classList.add('on');
+  $('#daily-title').textContent='矿灯已续 · 连续 '+nextStreak+' 天';
+  $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+(200+nextStreak*100)+'</b> ＋ 灵器 '+(nextStreak%3===0?2:1)+' 件';
+  const dots=$('#daily-dots');dots.innerHTML='';
+  for(let i=0;i<7;i++){const d=document.createElement('i');if(i<((nextStreak-1)%7)+1)d.className='lit';dots.appendChild(d)}
+}
+function claimDaily(){
+  const st=dailyState(); if(!st.can)return;
+  const nextStreak=st.gap===1?st.streak+1:1;
+  SAVE.daily={day:dayNum(),streak:nextStreak};
+  const pw=200+nextStreak*100;
+  SAVE.power=(SAVE.power||0)+pw;
+  const got=giveRandomTool(nextStreak%3===0?2:1);
+  persist();
+  SFX.win();fxBurstDom(1);
+  toast('今日矿灯 · 连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got,3200);
+  renderDaily();renderMenu();
+}
+/* ---- 星辰宝箱 ---- */
+const CHEST_COST=15;
+function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
+function renderChest(){
+  const ts=totalStars(), claimed=SAVE.chest||0;
+  const inCur=ts-claimed*CHEST_COST;
+  const can=inCur>=CHEST_COST;
+  $('#sm-cur').textContent=Math.min(inCur,CHEST_COST);
+  $('#sm-need').textContent=CHEST_COST;
+  $('#sm-fill').style.width=clamp(inCur/CHEST_COST*100,0,100)+'%';
+  $('#chest-btn').classList.toggle('on',can);
+}
+function openChest(){
+  const ts=totalStars(), claimed=SAVE.chest||0;
+  if(ts-claimed*CHEST_COST<CHEST_COST)return;
+  SAVE.chest=claimed+1;
+  SAVE.power=(SAVE.power||0)+800;
+  const got=giveRandomTool(3);
+  persist();
+  SFX.win();SFX.boardClear();fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
+  toast('星辰宝箱 · 第 <b>'+SAVE.chest+'</b> 箱<br>灵力 +800　'+got,3400);
+  renderChest();
+}
+/* ---- 难度补偿：连败会悄悄多给两步（单机、无内购，纯为不劝退） ---- */
+function mercyMoves(n){
+  const f=SAVE.fails[n]||0;
+  return f>=5?4:f>=3?2:0;
+}
+
+/* ==================================================================
+   [ 关卡启动 / 结算 ]
+   ================================================================== */
+function starsOf(L,score){return score>=L.s3?3:score>=L.s2?2:score>=L.s1?1:1}
+function grant(id){
+  if(SAVE.ach[id])return;
+  SAVE.ach[id]=1;persist();
+  const a=ACHS.find(x=>x.id===id);if(!a)return;
+  toast('徽记入册 · <b>'+a.ic+' '+a.nm+'</b>',2600);
+  SFX.star(1);
+}
+function openLevel(n,mode){
+  GS.mode=mode||'adv';
+  const L=levelDef(n);GS.L=L;
+  GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  const mercy=mercyMoves(n);
+  GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
+  GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
+  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  buildBoard(L);
+  show('game');
+  fitCanvas();
+  $('#rush-bar').classList.remove('on');
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">★</s><s style="left:'+(L.s2/L.s3*100)+'%">★</s><s style="left:97%">★</s>';
+  renderGoals($('#goal-row'),30);
+  $('#goal-lbl').textContent=L.boss?'讨伐':'目标';
+  updHUD();
+  const bb=$('#boss-bar');
+  if(L.boss){
+    const bo=BOSSES[L.boss];
+    bb.classList.add('on');
+    $('#boss-face').innerHTML=bossFaceSVG(L.boss);
+    $('#boss-name').textContent=bo.name;
+    $('#boss-hpbar').querySelector('i').style.width='100%';
+    $('#boss-hpbar').classList.remove('low');
+    $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;
+  }else bb.classList.remove('on');
+  $('#quip-line').innerHTML='<b>狼先生：</b>'+pick2(Q_INTRO);
+  /* 开场卡 */
+  $('#intro-kick').textContent=L.era+' · '+L.chName;
+  $('#intro-title').innerHTML=L.endless?'深度 <em>'+L.depth+'</em>':'第 <em>'+n+'</em> 关';
+  $('#intro-sub').textContent=L.boss?('讨伐战 · 步数 '+L.moves):('步数 '+L.moves);
+  renderGoalsTo($('#intro-goals'),38);
+  const notes=[];
+  const seen={};
+  if(L.ink.length||L.ink2.length)seen.ink=1;
+  if(L.crates.length||L.crates2.length)seen.crate=1;
+  if(L.cages.length)seen.cage=1;
+  if(L.snakes.length)seen.snake=1;
+  if(L.bells)seen.bell=1;
+  if(L.boss)seen.boss=1;
+  for(const k in seen){const o=OBST_INFO[k];if(o)notes.push('<b>'+o.nm+'</b>　'+o.tip)}
+  $('#intro-notes').innerHTML=notes.join('<br>');
+  $('#intro-quip').textContent=mercy?('这一关不好啃 —— 矿灯替你多撑 '+mercy+' 步。'):pick2(Q_INTRO);
+  renderAllyPick();renderTools();renderAlly();
+  if(L.boss){
+    const bo=BOSSES[L.boss];
+    $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);
+    $('#boss-intro-name').textContent=bo.short;
+    $('#boss-intro-title').textContent=bo.title;
+    $('#boss-intro-line').textContent=bo.intro;
+    ovl('boss');
+  }else ovl('intro');
+}
+function renderGoalsTo(host,size){
+  host.innerHTML='';
+  GS.goals.forEach(g=>{
+    const d=document.createElement('div');d.className='goal';
+    d.appendChild(goalIcon(g,size));
+    const n=document.createElement('div');n.className='cnt';n.textContent=goalText(g);
+    d.appendChild(n);host.appendChild(d);
+  });
+}
+function beginPlay(){
+  GS.compDef=compById(SAVE.comp);GS.charge=0;renderAlly();
+  ovl(null);GS.busy=false;GS.idle=PLAT.now();
+  if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
+    showTut('把相同的灵石 <b>三个连成一线</b> —— 点两下，或直接拖动',6000)}
+}
+function startRush(){
+  GS.mode='rush';
+  const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
+  L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
+  GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();
+  GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
+  GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
+  buildBoard(L);
+  show('game');fitCanvas();
+  $('#boss-bar').classList.remove('on');
+  $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
+  $('#rush-best').textContent='最佳 '+(SAVE.rushBest?SAVE.rushBest.toLocaleString('en-US'):'—');
+  $('#score-stars').innerHTML='<s style="left:25%">★</s><s style="left:56%">★</s><s style="left:97%">★</s>';
+  $('#goal-row').innerHTML='<div style="font-size:12px;letter-spacing:.16em;color:var(--ink2)">连锁越长 · 时间越多</div>';
+  $('#goal-lbl').textContent='灯油';
+  $('#quip-line').innerHTML='<b>狼先生：</b>九十秒，别客气。';
+  updHUD();GS.busy=false;GS.idle=PLAT.now();
+  showTut('限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
+}
+function endRush(){
+  GS.over=true;GS.busy=true;GS.rushOn=false;
+  const best=GS.score>SAVE.rushBest;
+  if(best){SAVE.rushBest=GS.score;persist()}
+  if(GS.score>=100000)grant('a8');
+  SFX.win();
+  $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
+  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
+  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b><br>历史最佳 <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>';
+  const stars=$('#end-stars').children;
+  const lv=GS.score>=80000?3:GS.score>=45000?2:GS.score>=20000?1:0;
+  for(let i=0;i<3;i++){stars[i].classList.remove('lit');}
+  setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
+  $('#end-quip').textContent=pick2(Q_RUSH_END);
+  $('#end-next').textContent='再点一盏';
+  $('#end-next').dataset.act='rush';
+  $('#end-retry').style.display='none';
+  ovl('end');
+}
+function endLevel(win){
+  const L=GS.L, n=L.n;
+  if(GS.score>=100000)grant('a8');
+  $('#end-continue').style.display='none';
+  let toolGot='';
+  if(win){
+    const st=starsOf(L,GS.score);
+    if(!L.endless){
+      SAVE.stars[n]=Math.max(SAVE.stars[n]||0,st);
+      SAVE.best[n]=Math.max(SAVE.best[n]||0,GS.score);
+      if(n>=SAVE.lv)SAVE.lv=Math.min(999,n+1);
+      if(SAVE.lv>64&&Object.keys(SAVE.stars).filter(k=>+k<=64).length>=64)grant('a11');
+    }else{
+      SAVE.best['e'+L.depth]=Math.max(SAVE.best['e'+L.depth]||0,GS.score);
+      SAVE.lv=Math.max(SAVE.lv,n+1);
+    }
+    delete SAVE.fails[n];
+    SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
+    toolGot=giveRandomTool(st>=3?2:1);
+    persist();
+    SFX.win();
+    $('#end-kick').textContent=L.era+' · '+L.chName;
+    $('#end-title').innerHTML='脉 · <em>通</em>';
+    const stars=$('#end-stars').children;
+    for(let i=0;i<3;i++)stars[i].classList.remove('lit');
+    setTimeout(()=>{for(let i=0;i<st;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i);
+      fxBurstDom(i)},i*300)},260);
+    $('#end-quip').textContent=pick2(Q_WIN);
+    $('#end-next').textContent=L.endless?'再深一层 →':'下一关 →';
+    $('#end-next').dataset.act='next';
+    $('#end-retry').style.display='';
+  }else{
+    SFX.lose();
+    SAVE.fails[n]=(SAVE.fails[n]||0)+1;persist();
+    $('#end-kick').textContent=L.era+' · '+L.chName;
+    $('#end-title').innerHTML='矿灯 · <em>暗</em>';
+    for(const s of $('#end-stars').children)s.classList.remove('lit');
+    $('#end-quip').textContent=pick2(Q_LOSE);
+    $('#end-next').textContent='再挖一次';
+    $('#end-next').dataset.act='retry';
+    $('#end-retry').style.display='none';
+    /* 续挖：差一口气时最关键的一颗糖 */
+    const cost=300*(GS.cont+1);
+    if(GS.cont<2){
+      const cb=$('#end-continue');
+      cb.style.display='';
+      cb.disabled=(SAVE.power||0)<cost;
+      $('#cont-cost').textContent=(SAVE.power||0)>=cost?('灵力 '+cost+'　余 '+(SAVE.power||0)):('灵力不足 · 需 '+cost);
+      cb.dataset.cost=cost;
+    }
+  }
+  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  const left=GS.goals.filter(g=>g.got<g.need).length;
+  $('#end-detail').innerHTML=win
+    ? '最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>　灵器 <b>'+toolGot+'</b>'
+    : '还差 <b>'+left+'</b> 项目标　最长连锁 <b>'+GS.chainMax+'</b>';
+  renderTools();
+  ovl('end');
+}
+function fxBurstDom(i){
+  const card=$('#ovl-end .ovl-card');if(!card)return;
+  const r=card.getBoundingClientRect();
+  const x=r.left+r.width*(.3+i*.2), y=r.top+r.height*.32;
+  for(let k=0;k<18;k++){
+    const p=document.createElement('div');
+    const cols=['#e8c768','#c9a64a','#fff8e0'];
+    p.style.cssText='position:fixed;left:'+x+'px;top:'+y+'px;width:6px;height:6px;pointer-events:none;z-index:95;background:'+cols[k%3]+';border-radius:'+(k%2?'50%':'0');
+    document.body.appendChild(p);
+    const a=rnd()*Math.PI*2, v=2+rnd()*5;
+    let vx=Math.cos(a)*v, vy=Math.sin(a)*v-3, px=0, py=0, life=54;
+    (function tick(){vy+=.2;px+=vx;py+=vy;life--;
+      p.style.transform='translate('+px+'px,'+py+'px) rotate('+(life*9)+'deg)';
+      p.style.opacity=life/54;
+      life>0?requestAnimationFrame(tick):p.remove()})();
+  }
+}
+
+/* ==================================================================
+   [ 界面 · SCREENS ]
+   ================================================================== */
+function show(id){
+  for(const s of $$('.scr'))s.classList.toggle('on',s.id==='scr-'+id);
+  $('#chip-home').classList.toggle('on',id!=='menu');
+  $('#corner-ctl').classList.toggle('on',id==='menu'||id==='map');
+  if(id==='menu'){renderMenu();renderDaily()}
+  if(id==='map'){renderMap();renderChest()}
+  if(id==='game'){renderTools();renderAlly()}
+}
+function ovl(id){
+  for(const o of $$('.ovl'))o.classList.toggle('on',o.id==='ovl-'+id);
+}
+function renderMenu(){
+  const n=Math.min(SAVE.lv,65);
+  const L=n>64?null:levelDef(n);
+  $('#adv-sub').textContent=n>64?('无尽矿脉 · 深度 '+(SAVE.lv-64)):('第 '+n+' 关 · '+L.chName);
+  $('#rush-sub').textContent='最佳 '+(SAVE.rushBest?SAVE.rushBest.toLocaleString('en-US'):'—');
+  const totStars=totalStars();
+  const got=ACHS.filter(a=>SAVE.ach[a.id]).length;
+  const tools=TOOLKEYS.reduce((a,t)=>a+toolCount(t),0);
+  $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
+    +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
+  $('#cat').classList.toggle('found',!!SAVE.cat);
+}
+let mapCh=1;
+function renderMap(){
+  const maxCh=8;
+  mapCh=clamp(mapCh,1,maxCh);
+  const C=CHAPTERS[mapCh-1];
+  $('#map-chname').textContent=C.name;
+  $('#map-era').textContent=C.era;
+  $('#map-epi').textContent=C.epi;
+  $('#map-chip').textContent=mapCh+' / '+maxCh;
+  $('#map-prev').disabled=mapCh<=1;
+  $('#map-next').disabled=mapCh>=maxCh;
+  const grid=$('#map-grid');grid.innerHTML='';
+  for(let i=1;i<=8;i++){
+    const n=(mapCh-1)*8+i;
+    const unlocked=n<=SAVE.lv;
+    const st=SAVE.stars[n]||0;
+    const d=document.createElement('div');
+    d.className='lv'+(unlocked?'':' locked')+(n===SAVE.lv?' cur':'')+(st?' done':'')+(i===8?' boss':'');
+    d.style.animationDelay=(i*.045)+'s';
+    d.innerHTML='<div class="n">'+n+'</div><div class="st">'+(st?'★'.repeat(st):(unlocked?'':'✕'))+'</div>'+(i===8?'<div class="bosscrown">✦</div>':'');
+    if(unlocked)d.addEventListener('click',()=>{SFX.click();openLevel(n)});
+    grid.appendChild(d);
+  }
+  const deep=SAVE.lv>64;
+  $('#map-endless').innerHTML=deep
+    ? '<button class="btn ghost" id="go-endless">⛏ 无尽矿脉 · 深度 '+(SAVE.lv-64)+'</button>'
+    : '通关 64 关后解锁「无尽矿脉」';
+  const ge=$('#go-endless');
+  if(ge)ge.addEventListener('click',()=>{SFX.click();openLevel(SAVE.lv)});
+}
+function renderAch(){
+  const g=$('#ach-grid');g.innerHTML='';
+  ACHS.forEach((a,i)=>{
+    const d=document.createElement('div');
+    d.className='ach'+(SAVE.ach[a.id]?' got':'');
+    d.style.animationDelay=(i*.03)+'s';
+    d.title=a.tip;
+    d.innerHTML='<div class="ic">'+a.ic+'</div><div class="nm">'+(SAVE.ach[a.id]?a.nm:'？？？')+'</div>';
+    g.appendChild(d);
+  });
+}
+const HOW_HTML=`
+<b>怎么玩</b>　点一颗灵石再点相邻的一颗，或者直接拖动 —— 只要能连成三个同色就成立。<br><br>
+<b>炼成灵石</b><br>
+　四连成一线 → <b>疾风灵石</b>（横扫整行 / 整列）<br>
+　L 形或 T 形 → <b>爆裂灵石</b>（炸开周围一圈）<br>
+　五连成一线 → <b>万象灵珠</b>（与任意灵石交换，吞掉全场同色）<br><br>
+<b>组合技</b>（两颗特殊灵石直接交换）<br>
+　疾风 × 疾风 → 十字贯通　　疾风 × 爆裂 → 巨风碾压<br>
+　爆裂 × 爆裂 → 双星巨爆　　万象 × 疾风 → 万象疾风<br>
+　万象 × 爆裂 → 万象天崩　　万象 × 万象 → <b>清空全场</b><br><br>
+<b>矿脉机关</b><br>
+　<b>墨封</b> 在墨渍上消除即揭一层，深墨要两层。<br>
+　<b>猫铃</b> 不能消除，只能交换——把它一路送到最底行。<br>
+　<b>岩壳</b> 在旁边消除或用灵技轰它，就能敲碎。<br>
+　<b>石笼</b> 被锁住的灵石不能动，连进三连即可破笼。<br><br>
+<b>讨伐战</b>　每消一颗都在削对方的气势，连锁与灵技伤害更高；对方每隔几步会出手捣乱。<br><br>
+<b>同伴助战</b>　出发前挑一位同行。消除<b>他对应颜色</b>的灵石就是在给他充能，满了点头像放大招。<br>
+　狼先生「执灯」引爆全盘特殊灵石 · 林「焚脉」三颗化爆裂 · 海「涤脉」洗净一行一列<br>
+　禾「春生」多给三步 · 墨「引渡」凭空一颗万象 · 梓璇「破封」全场机关各褪一层<br>
+　<b>带谁出门要看关卡</b>：机关多带梓璇，猫铃卡住带海，差一口气带禾。<br><br>
+<b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
+<b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆 —— 别急着刚好走完。<br><br>
+<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。
+`;
+
+/* ==================================================================
+   [ 输入 · INPUT ]
+   ================================================================== */
+let ptr={on:false,sr:0,sc:0,x0:0,y0:0};
+function cellFromEvent(e){
+  const r=cv.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width*CSS_W, y=(e.clientY-r.top)/r.height*CSS_W;
+  return [Math.floor(y/ENG.cs),Math.floor(x/ENG.cs),x,y];
+}
+cv.addEventListener('pointerdown',e=>{
+  if(GS.busy||GS.over)return;
+  AU.ensure();
+  const [r,c,x,y]=cellFromEvent(e);
+  if(!inB(r,c))return;
+  GS.idle=PLAT.now();hintCell=null;
+  if(GS.tool){useToolAt(r,c);return}                          // 灵器模式：吃掉本次点击
+  cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);
+  ptr={on:true,sr:r,sc:c,x0:x,y0:y};
+  if(selCell&&selCell[0]===r&&selCell[1]===c){selCell=null;return}
+  if(selCell&&(Math.abs(selCell[0]-r)+Math.abs(selCell[1]-c))===1){
+    trySwap(selCell,[r,c]);ptr.on=false;return;
+  }
+  if(swappable(r,c)){selCell=[r,c];SFX.click()}
+  else {selCell=null;if(T[r][c].crate>0||has(r,c))SFX.fail()}
+});
+cv.addEventListener('pointermove',e=>{
+  if(!ptr.on||GS.busy)return;
+  const [,,x,y]=cellFromEvent(e);
+  const dx=x-ptr.x0, dy=y-ptr.y0, th=ENG.cs*.34;
+  if(Math.abs(dx)<th&&Math.abs(dy)<th){dragTo=null;return}
+  let nr=ptr.sr,nc=ptr.sc;
+  if(Math.abs(dx)>Math.abs(dy))nc+=dx>0?1:-1;else nr+=dy>0?1:-1;
+  if(!inB(nr,nc)){dragTo=null;return}
+  dragTo=[nr,nc];
+  ptr.on=false;
+  trySwap([ptr.sr,ptr.sc],[nr,nc]);
+});
+cv.addEventListener('pointerup',()=>{ptr.on=false;dragTo=null});
+cv.addEventListener('pointercancel',()=>{ptr.on=false;dragTo=null});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ==================================================================
+   [ 主循环 · LOOP ]
+   ================================================================== */
+let lastT=0, menuT=0;
+function stepPieces(dt){
+  const k=1-Math.exp(-dt*.014);
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const p=B[r][c];if(!p)continue;
+    if(p.vx||p.vy){
+      p.vx+=(0-p.vx)*k;p.vy+=(0-p.vy)*k;
+      if(Math.abs(p.vx)<.35)p.vx=0;
+      if(Math.abs(p.vy)<.35)p.vy=0;
+    }
+    if(p.sc!==1){p.sc+=(1-p.sc)*(1-Math.exp(-dt*.016));if(Math.abs(1-p.sc)<.01)p.sc=1}
+    if(p.al!==1){p.al+=(1-p.al)*(1-Math.exp(-dt*.02));if(1-p.al<.01)p.al=1}
+  }
+  for(let i=DYING.length-1;i>=0;i--){
+    const d=DYING[i];d.life-=dt*.005;
+    if(d.life<=0)DYING.splice(i,1);
+  }
+}
+function drawDying(t){
+  for(const d of DYING){
+    const s=ENG.cs*(.4+d.life*.62), a=Math.max(0,d.life);
+    if(d.bell)continue;
+    cx.save();cx.globalAlpha=a;
+    drawGem(cx,d.x,d.y,s,d.g,d.k,{alpha:a,scale:1,rot:(1-d.life)*1.4,t});
+    cx.restore();
+  }
+}
+function loop(now){
+  PLAT.raf(loop);
+  const dt=Math.min(48,now-(lastT||now));lastT=now;
+  if($('#scr-game').classList.contains('on')){
+    stepPieces(dt);stepFX(dt);
+    if(GS.rushOn&&!GS.over){
+      GS.rushT-=dt;
+      const s=Math.max(0,GS.rushT/1000);
+      $('#rush-time').textContent=s.toFixed(1);
+      $('#rush-track').querySelector('i').style.width=clamp(GS.rushT/90000*100,0,100)+'%';
+      $('#rush-bar').classList.toggle('crit',s<=10);
+      if(s<=10&&Math.floor(s*2)!==GS.__tick){GS.__tick=Math.floor(s*2);if(s>0)SFX.tick()}
+      if(GS.rushT<=0)endRush();
+    }
+    /* 闲置久了给个提示 */
+    if(!GS.busy&&!GS.over&&GS.idle&&now-GS.idle>5200){
+      const mv=hintMove();
+      if(mv)hintCell=mv;
+      GS.idle=now-3000;
+    }
+    draw(now);drawDying(now);
+  }else if($('#scr-menu').classList.contains('on')){
+    drawMenuGems(now);
+  }
+}
+function drawMenuGems(t){
+  const c=$('#menu-gems');if(!c)return;
+  const W=Math.min(340,$('#scr-menu').clientWidth-40), H=64, d=Math.min(devicePixelRatio||1,2.5);
+  if(c.width!==Math.round(W*d)){c.width=Math.round(W*d);c.height=Math.round(H*d);c.style.width=W+'px';c.style.height=H+'px'}
+  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
+  const n=6, gap=W/n;
+  for(let i=0;i<n;i++){
+    const y=H/2+Math.sin(t*.0016+i*.8)*7;
+    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),i,i===5?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16});
+  }
+}
+
+/* ==================================================================
+   [ 事件接线 · WIRING ]
+   ================================================================== */
+$('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
+$('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
+$('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
+$('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
+$('#ach-close').addEventListener('click',()=>{SFX.click();ovl(null)});
+$('#how-close').addEventListener('click',()=>{SFX.click();ovl(null)});
+$('#map-back').addEventListener('click',()=>{SFX.click();show('menu')});
+$('#map-prev').addEventListener('click',()=>{SFX.click();mapCh--;renderMap()});
+$('#map-next').addEventListener('click',()=>{SFX.click();mapCh++;renderMap()});
+$('#intro-go').addEventListener('click',()=>{SFX.click();beginPlay()});
+$('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')});
+$('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
+$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.__wasRush=GS.rushOn;GS.rushOn=false;ovl('pause')});
+$('#pause-resume').addEventListener('click',()=>{SFX.click();GS.rushOn=GS.__wasRush;ovl(null);GS.idle=PLAT.now()});
+$('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.mode==='rush'?startRush():openLevel(GS.L.n)});
+$('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.mode==='rush'?show('menu'):show('map')});
+/* 地脉打通 → 先看编年史片段，再回图 */
+function loreFor(n){
+  if(!n||n>64||n%8!==0)return null;
+  return LORE[n/8-1]||null;
+}
+function maybeLore(after){
+  const lo=loreFor(GS.L&&GS.L.n);
+  if(!lo){after();return}
+  SAVE.lore=SAVE.lore||{};
+  SAVE.lore[lo.ch]=1;
+  if(Object.keys(SAVE.lore).length>=8)grant('a15');
+  persist();
+  $('#lore-kick').textContent='编年史片段 · 第 '+lo.ch+' 段';
+  $('#lore-title').innerHTML=CHAPTERS[lo.ch-1].name+' · <em>通</em>';
+  $('#lore-body').innerHTML=lo.body;
+  const lk=$('#lore-link');
+  lk.href=lo.u;
+  lk.querySelector('.lt').textContent=lo.t;
+  lk.querySelector('.ld').textContent=lo.d;
+  $('#lore-close').textContent=lo.ch>=8?'合上此卷':'继续下潜 →';
+  $('#lore-close').onclick=()=>{SFX.click();ovl(null);after()};
+  SFX.win();ovl('lore');
+}
+$('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'?show('menu'):show('map'))});
+$('#end-retry').addEventListener('click',()=>{SFX.click();ovl(null);openLevel(GS.L.n)});
+$('#end-next').addEventListener('click',e=>{
+  SFX.click();ovl(null);
+  const act=e.currentTarget.dataset.act;
+  if(act==='rush'){startRush();return}
+  if(act==='retry'){openLevel(GS.L.n);return}
+  const nx=Math.min(SAVE.lv,GS.L.n+1);
+  maybeLore(()=>openLevel(nx));
+});
+$('#end-continue').addEventListener('click',e=>{
+  const cost=+e.currentTarget.dataset.cost||300;
+  if((SAVE.power||0)<cost){toast('灵力不够 —— <b>先去别关攒攒</b>');return}
+  SAVE.power-=cost;GS.cont++;persist();
+  SFX.made();ovl(null);
+  GS.moves=5;GS.over=false;GS.busy=false;GS.idle=PLAT.now();
+  if(!anyMove())shuffleBoard();
+  updHUD();renderTools();renderAlly();
+  toast('矿灯又亮了 · <b>+5 步</b>',2200);
+  floatNum(2,4,'+5 步','#e8c768');
+});
+/* 同伴大招 */
+$('#ally-fire').addEventListener('click',()=>fireUlt());
+$('#ally').addEventListener('click',e=>{if(e.target.id!=='ally-fire')fireUlt()});
+/* 灵器 */
+for(const b of $$('.tool'))b.addEventListener('click',()=>armTool(b.dataset.t));
+$('#daily-claim').addEventListener('click',()=>{SFX.click();claimDaily()});
+$('#chest-btn').addEventListener('click',()=>{SFX.click();openChest()});
+$('#btn-sound').addEventListener('click',e=>{
+  SAVE.mute=!SAVE.mute;persist();
+  e.currentTarget.textContent=SAVE.mute?'🔇':'♪';
+  e.currentTarget.style.color=SAVE.mute?'var(--ink3)':'';
+  if(!SAVE.mute)SFX.click();
+});
+$('#wolf-badge').addEventListener('click',()=>{SFX.made();toast('狼先生：<b>矿灯我提着，你放心挖。</b>',2400)});
+$('#cat').addEventListener('click',()=>{
+  SFX.meow();
+  if(!SAVE.cat){SAVE.cat=1;persist();grant('a12');renderMenu()}
+  else toast('小黑猫：<b>……喵。</b>',1500);
+});
+(function(){var TLS='myskme-theme',order=['auto','light','dark'],nm={auto:'跟随系统',light:'浅色',dark:'深色'},ic={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+ function pref(){try{return localStorage.getItem(TLS)||'auto'}catch(e){return 'auto'}}
+ function res(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p}
+ function ap(p){var e=document.documentElement;e.setAttribute('data-theme',res(p));e.setAttribute('data-themepref',p);var b=$('#themeBtn');if(b){b.textContent=ic[p];b.title='主题：'+nm[p]}}
+ var b=$('#themeBtn');if(b)b.addEventListener('click',function(){SFX.click();var nx=order[(order.indexOf(pref())+1)%order.length];try{localStorage.setItem(TLS,nx)}catch(e){}ap(nx)});
+ if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(pref()==='auto')ap('auto')});ap(pref());})();
+addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCanvas()});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($$('.ovl.on').length)ovl(null);else if($('#scr-game').classList.contains('on'))$('#btn-pause').click()}
+});
+
+/* ==================================================================
+   [ 自检 · SELF TEST ] 供浏览器控制台核对引擎正确性
+   ================================================================== */
+window.__selftest=function(){
+  const out=[],ok=(n,c)=>out.push((c?'PASS ':'FAIL ')+n);
+  const save={B,T,ENG_c:ENG.colors,cs:ENG.cs};
+  ENG.cs=40;ENG.colors=5;
+  /* (r*2+c*3)%5：左右相差 3、上下相差 2，模 5 都不为 0 → 空盘保证零三连 */
+  const blank=()=>{T=[];B=[];for(let r=0;r<N;r++){const tr=[],br=[];for(let c=0;c<N;c++){tr.push({ink:0,crate:0});br.push(newPiece({g:(r*2+c*3)%5}))}T.push(tr);B.push(br)}};
+  const settle=()=>{let n=0;while(gravityPass()&&n++<40);return n};
+  blank();ok('测试用空盘自身无三连',scanRuns().length===0);
+  /* 1. 三连检测 */
+  blank();B[0][0].g=1;B[0][1].g=1;B[0][2].g=1;
+  ok('横向三连被识别',scanRuns().some(r=>r.dir==='h'&&r.len>=3));
+  blank();B[0][0].g=2;B[1][0].g=2;B[2][0].g=2;
+  ok('纵向三连被识别',scanRuns().some(r=>r.dir==='v'&&r.len>=3));
+  /* 2. 四连炼疾风 */
+  blank();for(let c=0;c<4;c++)B[3][c].g=1;B[3][4].g=0;B[2][0].g=0;B[2][1].g=2;B[2][2].g=0;B[2][3].g=2;
+  let gs=findGroups();
+  ok('横四炼成疾风·横',gs.length===1&&gs[0].make==='H');
+  blank();for(let r=0;r<4;r++)B[r][3].g=1;B[4][3].g=0;
+  gs=findGroups();ok('纵四炼成疾风·纵',gs.length===1&&gs[0].make==='V');
+  /* 3. 五连炼万象 */
+  blank();for(let c=0;c<5;c++)B[4][c].g=3;B[4][5].g=0;B[3][0].g=0;B[3][1].g=1;B[3][2].g=0;B[3][3].g=1;B[3][4].g=0;
+  gs=findGroups();ok('五连炼成万象',gs.length===1&&gs[0].make==='O');
+  /* 4. L 形炼爆裂 */
+  blank();
+  for(let c=0;c<3;c++)B[2][c].g=4;
+  for(let r=2;r<5;r++)B[r][0].g=4;
+  B[2][3].g=0;B[5][0].g=0;B[3][1].g=0;B[3][2].g=1;B[4][1].g=1;B[4][2].g=0;B[1][0].g=1;B[1][1].g=0;B[1][2].g=1;
+  gs=findGroups();
+  ok('L 形炼成爆裂',gs.length===1&&gs[0].make==='B'&&gs[0].at[0]===2&&gs[0].at[1]===0);
+  /* 5. 疾风爆发覆盖整行 */
+  blank();B[3][3].k='H';B[3][3].g=1;
+  let ex=expandBlast([[3,3]]);
+  ok('疾风·横清整行',ex.cells.filter(([r])=>r===3).length===N);
+  blank();B[3][3].k='V';ex=expandBlast([[3,3]]);
+  ok('疾风·纵清整列',ex.cells.filter(([,c])=>c===3).length===N);
+  blank();B[3][3].k='B';ex=expandBlast([[3,3]]);
+  ok('爆裂清 3×3',ex.cells.length===9);
+  /* 6. 特殊石连锁引爆 */
+  blank();B[3][3].k='H';B[3][3].g=1;B[3][5].k='V';B[3][5].g=2;
+  ex=expandBlast([[3,3]]);
+  ok('疾风引爆疾风（连锁）',ex.cells.filter(([,c])=>c===5).length===N);
+  /* 7. 组合技 */
+  blank();B[3][3].k='O';B[3][4].k='O';
+  let cb=comboBlast([3,3],[3,4]);
+  ok('双万象清空全场',cb&&cb.cells.length===N*N);
+  blank();B[3][3].k='H';B[3][4].k='V';
+  cb=comboBlast([3,3],[3,4]);
+  ok('疾风×疾风=十字贯通',cb&&cb.name==='十字贯通');
+  blank();B[3][3].k='B';B[3][4].k='B';
+  cb=comboBlast([3,3],[3,4]);
+  ok('爆裂×爆裂=双星巨爆',cb&&cb.name==='双星巨爆'&&cb.cells.length>=25);
+  blank();B[3][3].k='O';B[3][4].g=2;
+  const cnt2=(()=>{let n=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(B[r][c].g===2)n++;return n})();
+  cb=comboBlast([3,3],[3,4]);
+  ok('万象吞同色',cb&&cb.name==='万象吞色'&&cb.cells.length>=cnt2);
+  /* 8. 猫铃免疫爆发 */
+  blank();B[3][3].k='B';B[3][4]=newPiece({g:-1,bell:true});
+  ex=expandBlast([[3,3]]);
+  ok('猫铃免疫爆发',!ex.cells.some(([r,c])=>r===3&&c===4));
+  /* 9. 重力与补落（一次 gravityPass 只下落一格，逐帧动画用；settle 反复调用至稳定） */
+  blank();B[7][2]=null;B[6][2]=null;const falling=B[5][2];
+  settle();
+  ok('重力把灵石落到底',B[7][2]===falling&&B[5][2]!==falling);
+  blank();for(let r=0;r<N;r++)B[r][4]=null;
+  settle();spawnTop();
+  ok('顶部补落新灵石',!!B[0][4]);
+  /* 10. 岩壳阻挡 + 斜滑绕行 */
+  blank();T[5][3].crate=1;B[5][3]=null;
+  const stuck=B[4][3];settle();
+  ok('岩壳挡住直落（无处可绕时原地不动）',B[5][3]===null&&B[4][3]===stuck);
+  blank();T[5][3].crate=1;B[5][3]=null;
+  for(let r=0;r<N;r++)B[r][2]=null;                           // 整列腾空，斜滑才不会被同列落石抢占
+  const slider=B[4][3];settle();
+  let sat=null;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(B[r][c]===slider)sat=[r,c];
+  ok('灵石绕开岩壳斜滑下落',!!sat&&sat[1]===2&&sat[0]>4);
+  /* 11. 补漏兜底 */
+  blank();B[4][4]=null;T[4][4].crate=0;patchHoles();
+  ok('空洞被兜底填补',!!B[4][4]);
+  /* 12. 墨封不随灵石移动 */
+  blank();T[7][1].ink=2;B[7][1]=null;B[6][1].g=3;
+  gravityPass();
+  ok('墨封留在格子上（不随石头走）',T[7][1].ink===2&&T[6][1].ink===0);
+  /* 13. 石笼不可交换 */
+  blank();B[2][2].cage=1;
+  ok('石笼锁住不可交换',!swappable(2,2));
+  /* 14. 无效交换会被拒 */
+  blank();
+  B[0][0].g=0;B[0][1].g=1;B[0][2].g=2;B[0][3].g=3;
+  B[1][0].g=1;B[1][1].g=0;B[1][2].g=3;B[1][3].g=2;
+  B[2][0].g=2;B[2][1].g=3;B[2][2].g=0;B[2][3].g=1;
+  ok('不成三连的交换被判无效',!wouldMatch([0,0],[0,1]));
+  /* 15. 死局判定 + 重组 */
+  blank();
+  const pat=[[0,1,2,0,1,2,0,1],[2,0,1,2,0,1,2,0],[1,2,0,1,2,0,1,2]];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)B[r][c].g=pat[r%3][c];
+  const had=anyMove();
+  shuffleBoard();
+  ok('重组后必有可行走法',anyMove());
+  /* 16. 建盘保证：无初始三连 + 有解 */
+  let allOk=true;
+  for(const lv of [1,9,17,25,33,41,49,57,8,16,64,70,88]){
+    const L=levelDef(lv);buildBoard(L);
+    if(scanRuns().length!==0||!anyMove())allOk=false;
+  }
+  ok('16 个代表关建盘均无初始三连且有解',allOk);
+  /* 17. 关卡目标数量与格子一致 */
+  let goalOk=true;
+  for(let i=1;i<=64;i++){
+    const L=levelDef(i);
+    if(!L.goals.length)goalOk=false;
+    for(const g of L.goals){
+      if(g.type==='ink'&&g.need!==L.ink.length+L.ink2.length)goalOk=false;
+      if(g.type==='crate'&&g.need!==L.crates.length+L.crates2.length)goalOk=false;
+      if(g.type==='cage'&&g.need!==L.cages.length+L.snakes.length)goalOk=false;
+      if(g.need<=0)goalOk=false;
+    }
+  }
+  ok('64 关目标数量与实际机关数一致且非零',goalOk);
+  /* 18. 猫铃关：铃铛数与目标一致、且不被压在底行岩壳下 */
+  let bellOk=true;
+  for(let i=1;i<=64;i++){
+    const L=levelDef(i);if(!L.bells)continue;
+    const g=L.goals.find(x=>x.type==='bell');
+    if(!g||g.need!==L.bells)bellOk=false;
+    if(L.crates.some(([r])=>r===7))bellOk=false;
+  }
+  ok('猫铃关目标数正确且底行无岩壳',bellOk);
+  /* 19. 星级门槛递增 */
+  let starOk=true;
+  for(let i=1;i<=64;i++){const L=levelDef(i);if(!(L.s1<L.s2&&L.s2<L.s3))starOk=false}
+  ok('64 关三星门槛严格递增',starOk);
+  /* 20. 关卡确定性（同一关两次生成一致） */
+  const a1=JSON.stringify(levelDef(37)),a2=JSON.stringify(levelDef(37));
+  ok('关卡定义确定可复现',a1===a2);
+  B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
+  const fails=out.filter(s=>s.startsWith('FAIL'));
+  console.log(out.join('\n'));
+  console.log(fails.length?('❌ '+fails.length+' 项未通过'):('✅ 全部 '+out.length+' 项通过'));
+  return {total:out.length,failed:fails.length,lines:out};
+};
+
+/* ==================================================================
+   [ 启动 · BOOT ]
+   ================================================================== */
+$('#btn-sound').textContent=SAVE.mute?'🔇':'♪';
+buildBoard(levelDef(1));
+fitCanvas();
+show('menu');
+PLAT.raf(loop);
+
+</script>
+</body>
+</html>
