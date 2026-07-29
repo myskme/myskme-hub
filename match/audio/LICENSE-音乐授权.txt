@@ -1,0 +1,7 @@
+MYSKME 高保真音乐包 · 授权凭证 (Pixabay Content License · 可商用 · 免署名)
+来源: Pixabay (https://pixabay.com) · License: Pixabay Content License
+可商用、可用于游戏/印刷卡牌, 无需署名。下载日期 2026-06-22。
+- bgm_title.mp3  = "Epic Fantasy Adventure" by PaulYudin     · pixabay.com/music/156890
+- bgm_town.mp3   = "Fantasy Medieval Ambient" by DeusLower    · pixabay.com/music/237371
+- bgm_run.mp3    = "Epic Heroic Cinematic Action" by Alex_Kizenkov · pixabay.com/music/142162
+- bgm_boss.mp3   = "...Epic War Battle" by SoundGalleryByDmitryTaras · pixabay.com/music/119770
