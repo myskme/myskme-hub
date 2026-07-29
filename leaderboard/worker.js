@@ -343,6 +343,7 @@ async function handleAdmin(req, env, origin) {
    老师可删」的课堂级防线，与词灵榜同级，不是银行级。
    ══════════════════════════════════════════════════════════════ */
 const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30 };
+let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
   [15000, "深堑行者"], [26000, "灵石匠"], [42000, "矿脉宗师"], [65000, "☠执灯人·封号矿主"],
@@ -395,8 +396,8 @@ async function gfSubmit(req, env, origin) {
     return json({ ok: false, err: "太频繁，请稍后再上榜" }, 429, origin);
   const sea = await getSeason(env);
   if (!prev) {
-    const cnt = await env.DB.prepare("SELECT COUNT(*) AS c FROM gemfall WHERE season=?").bind(sea).first();
-    if (cnt && cnt.c >= SEASON_ROW_CAP) return json({ ok: false, err: "本赛季榜单已满，请联系老师" }, 429, origin);
+    const cnt = await env.DB.prepare("SELECT COUNT(*) AS c FROM gemfall").first();
+    if (cnt && cnt.c >= SEASON_ROW_CAP) return json({ ok: false, err: "榜单已满，请联系老师" }, 429, origin);
   }
   let alias = String(body.alias || "").trim().slice(0, 12);
   if (!ALIAS_RE.test(alias)) return json({ ok: false, err: "化名需 2-12 位中英文/数字" }, 400, origin);
@@ -426,11 +427,11 @@ async function gfSubmit(req, env, origin) {
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
        class_tag=CASE WHEN excluded.class_tag!='' THEN excluded.class_tag ELSE gemfall.class_tag END,
-       power=MAX(gemfall.power,excluded.power),
-       best_score=MAX(gemfall.best_score,excluded.best_score),
-       best_rush=MAX(gemfall.best_rush,excluded.best_rush),
-       lv=MAX(gemfall.lv,excluded.lv), stars=MAX(gemfall.stars,excluded.stars),
-       chain=MAX(gemfall.chain,excluded.chain),
+       power=MAX(COALESCE(gemfall.power,0),excluded.power),
+       best_score=MAX(COALESCE(gemfall.best_score,0),excluded.best_score),
+       best_rush=MAX(COALESCE(gemfall.best_rush,0),excluded.best_rush),
+       lv=MAX(COALESCE(gemfall.lv,0),excluded.lv), stars=MAX(COALESCE(gemfall.stars,0),excluded.stars),
+       chain=MAX(COALESCE(gemfall.chain,0),excluded.chain),
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
@@ -438,8 +439,8 @@ async function gfSubmit(req, env, origin) {
   const mine = await env.DB.prepare("SELECT power FROM gemfall WHERE id=?").bind(id).first();
   const myPower = (mine && mine.power) || power;
   const ahead = await env.DB.prepare(
-    "SELECT COUNT(*) AS c FROM gemfall WHERE season=? AND hidden=0 AND power>?"
-  ).bind(sea, myPower).first();
+    "SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND power>?"
+  ).bind(myPower).first();
   return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
     rankName: gfRankFor(myPower), badges: gfBadges(s), classJoined, season: sea }, 200, origin);
 }
@@ -450,25 +451,35 @@ async function gfBoard(req, env, origin, url) {
   const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
   let rows;
   const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges";
+  /* 不按 season 过滤：gemfall 没有 base_power 基线，赛季语义对它本来就不成立；
+     而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
+     这里按 season 过滤就会把整个矿脉榜读成空。矿脉榜记的是累计进度（关卡、星数），
+     本来就该是长期榜，要清空走 /gf/admin 的 reset。 */
   if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
-    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
     const c = await sha256("class|" + pw + "|" + env.LB_SALT);
     rows = await env.DB.prepare(
-      `SELECT ${cols} FROM gemfall WHERE season=? AND class_tag=? AND hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
-    ).bind(sea, c, limit).all();
+      `SELECT ${cols} FROM gemfall WHERE class_tag=? AND hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
+    ).bind(c, limit).all();
   } else {
     rows = await env.DB.prepare(
-      `SELECT ${cols} FROM gemfall WHERE season=? AND hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
-    ).bind(sea, limit).all();
+      `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
+    ).bind(limit).all();
   }
   return json({ ok: true, season: sea, scope, count: (rows.results || []).length, rows: gfMap(rows.results) }, 200, origin);
 }
 async function gfAdmin(req, env, origin) {
   let body;
   try { body = await req.json(); } catch (e) { return json({ ok: false, err: "bad json" }, 400, origin); }
+  /* 与 /admin 同级的爆破防护：口令是无盐单轮 sha256，没有限速就能硬撞 */
+  if (_gfLockUntil && Date.now() < _gfLockUntil) return json({ ok: false, err: "尝试过多，请稍后" }, 429, origin);
   const pwh = await sha256(String(body.pw || ""));
-  if (!env.LB_ADMIN_HASH || pwh !== env.LB_ADMIN_HASH) return json({ ok: false, err: "口令不对" }, 403, origin);
+  if (!env.LB_ADMIN_HASH || pwh !== env.LB_ADMIN_HASH) {
+    if (++_gfFails >= 8) { _gfLockUntil = Date.now() + 60000; _gfFails = 0; }
+    return json({ ok: false, err: "口令不对" }, 403, origin);
+  }
+  _gfFails = 0;
   await gfEnsure(env);
   const act = String(body.act || body.action || "list");   // 控制台历史上传的是 action，两种都收
   if (act === "list") {
@@ -486,6 +497,8 @@ async function gfAdmin(req, env, origin) {
     return json({ ok: true }, 200, origin);
   }
   if (act === "reset") {
+    /* 与 /admin 一致：清空整张表必须带确认串，避免误点 */
+    if (String(body.confirm || "") !== "RESET") return json({ ok: false, err: "需要 confirm:RESET" }, 400, origin);
     await env.DB.prepare("DELETE FROM gemfall").run();
     return json({ ok: true }, 200, origin);
   }

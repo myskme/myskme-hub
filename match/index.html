@@ -12,7 +12,7 @@
 <style>
 :root{
   --bg:#0a0a0c;--bg2:#111114;--panel:#16161a;--panel2:#1c1c22;--edge:#26262e;
-  --ink:#f0e6d2;--ink2:#a8a090;--ink3:#6a6458;
+  --ink:#f0e6d2;--ink2:#a8a090;--ink3:#8a8478;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
   --gold:#c9a64a;--gold2:#e8c768;--gold-hi:#e8c768;--gold-line:#7a6320;
   --red:#d56060;--green:#6aa86a;--blue:#6ba0dd;--purple:#c199e6;
   --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.10);
@@ -23,7 +23,7 @@
 }
 :root[data-theme="light"]{
   --bg:#ece2cc;--bg2:#e6dabf;--panel:#f8f2e4;--panel2:#efe6cf;--edge:#e2d5b4;
-  --ink:#2a2218;--ink2:#574b37;--ink3:#7a6e52;
+  --ink:#2a2218;--ink2:#574b37;--ink3:#6b6047;   /* 同上，浅色主题下也要过 AA */
   --gold:#6f5410;--gold2:#5f470e;--gold-hi:#8a6d1e;--gold-line:#b89a52;
   --red:#9a271d;--green:#2f6a3e;--blue:#33548c;--purple:#6a3d8c;
   --line:rgba(120,90,20,.30);--line2:rgba(120,90,20,.13);
@@ -323,6 +323,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #pt-bar.on{display:flex}
 #pt-bar .dot{width:30px;height:30px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:15px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
+/* 选手色随主题走，不烤死在内联样式里 */
+[style*="--pc-base"]{--pc:var(--pc-base)}
+:root[data-theme="light"] [style*="--pc-base"]{--pc:var(--pc-dark)}
 #pt-bar .mid{flex:1;min-width:0}
 #pt-bar .nm{font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pt-bar .sub{font-size:11px;color:var(--ink3);letter-spacing:.12em;margin-top:1px}
@@ -813,7 +816,7 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
-  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbSig:''};
+  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:''};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -1490,6 +1493,9 @@ function patchHoles(){                                          // 兜底：绝�
 
 /* ---- 建盘：无初始三连、且保证有解 ---- */
 function buildBoard(L,seed){
+  /* 特效数组只在游戏屏可见时才衰减，中途退出会把它们冻住。
+     不清的话下一局开头会闪出上一局的碎片与光束，聚会赛里更像是给下一位剧透。 */
+  DYING.length=0;FX.parts.length=0;FX.beams.length=0;FX.rings.length=0;FX.marks.length=0;
   /* 传了 seed 就用确定性随机源建盘 —— 聚会赛靠它保证同一轮所有人盘面一致 */
   ENG.rng=seed!=null?rngOf(seed):null;
   ENG.colors=L.colors;
@@ -2371,7 +2377,12 @@ async function useToolAt(r,c){
       return;
     }
     const a=GS.toolFirst;
-    if(Math.abs(a[0]-r)+Math.abs(a[1]-c)!==1){toast('要选<b>相邻</b>的两格');return}
+    if(Math.abs(a[0]-r)+Math.abs(a[1]-c)!==1){
+      /* 点了不相邻的格子：能选就改选它当新起点，不能选就整个撤销 —— 别把玩家钉死在第一格上 */
+      if(swappable(r,c)){GS.toolFirst=[r,c];selCell=[r,c];SFX.click();return}
+      GS.toolFirst=null;selCell=null;SFX.fail();
+      $('#tool-hint').textContent=TOOLS.swap.hint;return;
+    }
     if(!swappable(r,c)){SFX.fail();return}
     spendTool('swap');GS.busy=true;selCell=null;
     const A=B[a[0]][a[1]], C=B[r][c];
@@ -2473,8 +2484,10 @@ async function fireUlt(){
   }else if(c.id==='qi'){                                      // 破浪：一行一列
     const r=Math.floor(rnd()*N), c2=Math.floor(rnd()*N);
     fxBeam(r,c2,'h');fxBeam(r,c2,'v');SFX.rocket();SFX.orb();
-    const cells=[];
-    for(let i=0;i<N;i++){cells.push([r,i]);cells.push([i,c2])}
+    /* 行与列会在 (r,c2) 交叉，重复入列会让该格墨封被扣两层、石笼目标多记一次 */
+    const set=new Set();
+    for(let i=0;i<N;i++){set.add(KEY(r,i));set.add(KEY(i,c2))}
+    const cells=[...set].map(UNKEY);
     await sleep(REDUCED?20:200);
     const res=clearCells(cells,4);
     addScore(Math.round(110*res.gems+700),r,c2,'#e8c768');
@@ -2536,7 +2549,11 @@ function renderAllyPick(){
 /* ---- 每日矿灯 ---- */
 const dayNum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000);
 function dailyState(){
-  const d=dayNum(), last=SAVE.daily.day||0;
+  const d=dayNum();
+  let last=SAVE.daily.day||0;
+  /* 机器时钟曾经跑到未来（RTC 没电等）→ last 是个巨大值，校回来后就再也领不到了。
+     当成存档损坏重置，而不是把玩家永久锁在门外。 */
+  if(last>d){last=0;SAVE.daily={day:0,streak:0};persist()}
   return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0};
 }
 function renderDaily(){
@@ -2609,6 +2626,7 @@ function openLevel(n,mode){
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
+  GS.party=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   buildBoard(L);
@@ -2678,7 +2696,7 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();GS.paused=false;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
@@ -2804,11 +2822,13 @@ const PT_MOVES=14;                                             // 每人每轮�
 const PARTY={on:false,players:[],n:3,rounds:3,mode:'ffa',round:0,cur:0,seed:''};
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
 function ptColor(i){return GEMS[i%6]}
+/* 两个变量都写上，让 CSS 按当前主题挑 —— 直接烤死 --pc 的话，
+   「跟随系统」在傍晚自动转深色时，为浅色底选的暗色会留在深色背景上，几乎看不见 */
 function ptStyle(el,i){
   const g=ptColor(i);
-  el.style.setProperty('--pc',g.base);
+  el.style.setProperty('--pc-base',g.base);
+  el.style.setProperty('--pc-dark',g.dk);
   el.style.setProperty('--pg',hexA(g.base,.24));
-  if(document.documentElement.getAttribute('data-theme')==='light')el.style.setProperty('--pc',g.dk);
 }
 function ptMult(round){return round+1}                          // 第 1 轮 ×1，第 2 轮 ×2 …
 function renderPartySetup(){
@@ -2951,10 +2971,10 @@ function ptFinish(){
     S.textContent=ranked[0].name+' · '+ranked[0].total.toLocaleString('en-US');
   }
   P.innerHTML=ranked.map((p,i)=>{
-    const g=ptColor(p.idx), lite=document.documentElement.getAttribute('data-theme')==='light';
+    const g=ptColor(p.idx);
     return '<div class="pd-row'+(i===0&&PARTY.mode!=='relay'?' w1':'')+'">'
       +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
-      +'<div class="dot" style="--pc:'+(lite?g.dk:g.base)+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
+      +'<div class="dot" style="--pc-base:'+g.base+';--pc-dark:'+g.dk+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
       +'<div class="nm">'+esc(p.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(p.team?'蓝队':'红队')+'</span>':'')+'</div>'
       +'<div class="sc">'+p.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
@@ -3026,10 +3046,13 @@ const LB={
     if(!this.registered())return;
     const s=this.stats();
     const sig=[s.score,s.rush,s.lv,s.stars,s.chain].join('|');
-    if(sig===SAVE.lbSig)return;
-    if(SAVE.lbAt&&Date.now()-SAVE.lbAt<20000)return;           // 服务端 15 秒冷却，客户端留余量
-    SAVE.lbSig=sig;persist();
-    await this.submit(true);
+    if(sig===SAVE.lbSig)return;                                // 这份成绩已经成功上传过
+    if(SAVE.lbTry&&Date.now()-SAVE.lbTry<20000)return;         // 服务端 15 秒冷却，客户端留余量
+    SAVE.lbTry=Date.now();persist();
+    const d=await this.submit(true);
+    /* 只有真的传上去了才记 sig。以前失败也记，导致断网那一次之后
+       同一份成绩再也不会重发，「联网后自动补交」变成空话。 */
+    if(d&&d.ok){SAVE.lbSig=sig;persist()}
   },
 };
 function lbRowHTML(r,mine){
@@ -3229,21 +3252,22 @@ const HOW_HTML=`
 /* ==================================================================
    [ 输入 · INPUT ]
    ================================================================== */
-let ptr={on:false,sr:0,sc:0,x0:0,y0:0};
+let ptr={on:false,id:null,sr:0,sc:0,x0:0,y0:0};
 function cellFromEvent(e){
   const r=cv.getBoundingClientRect();
   const x=(e.clientX-r.left)/r.width*CSS_W, y=(e.clientY-r.top)/r.height*CSS_W;
   return [Math.floor(y/ENG.cs),Math.floor(x/ENG.cs),x,y];
 }
 cv.addEventListener('pointerdown',e=>{
-  if(GS.busy||GS.over)return;
+  if(GS.busy||GS.over||GS.paused)return;
   AU.ensure();
   const [r,c,x,y]=cellFromEvent(e);
   if(!inB(r,c))return;
   GS.idle=PLAT.now();hintCell=null;
   if(GS.tool){useToolAt(r,c);return}                          // 灵器模式：吃掉本次点击
+  if(ptr.on&&e.pointerId!==ptr.id)return;                      // 已有手指在拖，忽略第二根
   cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);
-  ptr={on:true,sr:r,sc:c,x0:x,y0:y};
+  ptr={on:true,id:e.pointerId,sr:r,sc:c,x0:x,y0:y};
   if(selCell&&selCell[0]===r&&selCell[1]===c){selCell=null;return}
   if(selCell&&(Math.abs(selCell[0]-r)+Math.abs(selCell[1]-c))===1){
     trySwap(selCell,[r,c]);ptr.on=false;return;
@@ -3252,7 +3276,7 @@ cv.addEventListener('pointerdown',e=>{
   else {selCell=null;if(T[r][c].crate>0||has(r,c))SFX.fail()}
 });
 cv.addEventListener('pointermove',e=>{
-  if(!ptr.on||GS.busy)return;
+  if(!ptr.on||GS.busy||e.pointerId!==ptr.id)return;
   const [,,x,y]=cellFromEvent(e);
   const dx=x-ptr.x0, dy=y-ptr.y0, th=ENG.cs*.34;
   if(Math.abs(dx)<th&&Math.abs(dy)<th){dragTo=null;return}
@@ -3260,11 +3284,11 @@ cv.addEventListener('pointermove',e=>{
   if(Math.abs(dx)>Math.abs(dy))nc+=dx>0?1:-1;else nr+=dy>0?1:-1;
   if(!inB(nr,nc)){dragTo=null;return}
   dragTo=[nr,nc];
-  ptr.on=false;
+  ptr.on=false;ptr.id=null;
   trySwap([ptr.sr,ptr.sc],[nr,nc]);
 });
-cv.addEventListener('pointerup',()=>{ptr.on=false;dragTo=null});
-cv.addEventListener('pointercancel',()=>{ptr.on=false;dragTo=null});
+cv.addEventListener('pointerup',e=>{if(e.pointerId!==ptr.id)return;ptr.on=false;ptr.id=null;dragTo=null});
+cv.addEventListener('pointercancel',e=>{if(e.pointerId!==ptr.id)return;ptr.on=false;ptr.id=null;dragTo=null});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 
 /* ==================================================================
@@ -3340,7 +3364,8 @@ function drawMenuGems(t){
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
-$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';renderLB()});
+$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.autoSubmit();renderLB()});
+addEventListener('online',()=>{LB.autoSubmit()});                // 回到网络就把欠着的成绩补上
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
@@ -3365,10 +3390,13 @@ $('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')
 $('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
 /* 暂停只冻结计时，绝不动 GS.rushOn ——
    动了它会让暂停期间悬空的回合走进 checkEnd 的通关分支，把限时赛判成「第 3 关通关」写进存档 */
-$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.paused=true;ovl('pause')});
+$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.paused=true;
+  /* 聚会赛不给「重开」：同一轮是同一颗种子，能重开就等于可以无限重刷到满意为止，
+     「同盘面比手艺」的前提就没了 */
+  $('#pause-retry').style.display=GS.party?'none':'';
+  ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
-  if(GS.party){ptStartTurn();return}                          // 聚会赛：重开当前这一手，别去开「第 0 关」
   GS.mode==='rush'?startRush():openLevel(GS.L.n)});
 $('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.paused=false;
   if(GS.party){PARTY.on=false;GS.party=false;$('#toolbar').style.display='';$('#pt-bar').classList.remove('on');show('menu');return}
@@ -3443,8 +3471,18 @@ $('#cat').addEventListener('click',()=>{
  var b=$('#themeBtn');if(b)b.addEventListener('click',function(){SFX.click();var nx=order[(order.indexOf(pref())+1)%order.length];try{localStorage.setItem(TLS,nx)}catch(e){}ap(nx)});
  if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(pref()==='auto')ap('auto')});ap(pref());})();
 addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCanvas()});
+/* Esc 一律走该弹层自己的按钮，让它跑完自己的收尾逻辑。
+   以前直接 ovl(null) 无差别关闭：交接屏/结算页被关掉后 GS.over 与 GS.busy 还是 true，
+   暂停键因 GS.over 失效、屏内没有别的可点控件，整局报废只能刷新；
+   暂停层被关掉则 GS.paused 不复位，限时赛倒计时永久冻结可以无限刷分。 */
+const ESC_ACT={'ovl-pause':'#pause-resume','ovl-hand':'#hand-quit','ovl-end':'#end-menu',
+  'ovl-pt-end':'#pte-menu','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
+  'ovl-ach':'#ach-close','ovl-how':'#how-close','ovl-lb':'#lb-close'};
 addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if($$('.ovl.on').length)ovl(null);else if($('#scr-game').classList.contains('on'))$('#btn-pause').click()}
+  if(e.key!=='Escape')return;
+  const cur=[...$$('.ovl.on')].pop();
+  if(cur){const b=$(ESC_ACT[cur.id]);if(b)b.click();return}
+  if($('#scr-game').classList.contains('on'))$('#btn-pause').click();
 });
 
 /* ==================================================================
