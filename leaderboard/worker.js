@@ -362,7 +362,9 @@ function gfBadges(s) {
   add(s.chain >= 7, "g9"); add(s.chain >= 12, "g10");
   return b;
 }
+let _gfReady = false;
 async function gfEnsure(env) {
+  if (_gfReady) return;                 // isolate 重启最多多跑一次，无害；读路径不该每次都写 DDL
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gemfall (
        id TEXT PRIMARY KEY, alias TEXT NOT NULL, faction TEXT DEFAULT '', class_tag TEXT DEFAULT '',
@@ -373,6 +375,7 @@ async function gfEnsure(env) {
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
+  _gfReady = true;
 }
 function gfMap(rows) {
   return (rows || []).map((r, i) => ({
@@ -436,13 +439,27 @@ async function gfSubmit(req, env, origin) {
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
          rname, badges, sea, seen, now).run();
-  const mine = await env.DB.prepare("SELECT power FROM gemfall WHERE id=?").bind(id).first();
-  const myPower = (mine && mine.power) || power;
+  /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
+     两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
+     而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
+  const row = await env.DB.prepare(
+    "SELECT best_score,best_rush,lv,stars,chain FROM gemfall WHERE id=?"
+  ).bind(id).first();
+  const merged = row ? {
+    score: row.best_score || 0, rush: row.best_rush || 0,
+    lv: row.lv || 0, stars: row.stars || 0, chain: row.chain || 0,
+  } : s;
+  const myPower = gfPower(merged);
+  const myRank = gfRankFor(myPower);
+  const myBadges = gfBadges(merged);
+  await env.DB.prepare("UPDATE gemfall SET power=?, rank_name=?, badges=? WHERE id=?")
+    .bind(myPower, myRank, myBadges.join(","), id).run();
   const ahead = await env.DB.prepare(
     "SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND power>?"
   ).bind(myPower).first();
   return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
-    rankName: gfRankFor(myPower), badges: gfBadges(s), classJoined, season: sea }, 200, origin);
+    rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
+    classJoined, season: sea }, 200, origin);
 }
 async function gfBoard(req, env, origin, url) {
   await gfEnsure(env);

@@ -941,11 +941,11 @@ const comboWord=c=>COMBO_WORDS[clamp(c,2,7)];
 /* ---------- 机关图解 ---------- */
 const OBST_INFO={
   ink:  {ic:'ink',  nm:'墨封',  tip:'在墨渍上消除灵石，就能揭掉一层墨。深墨要揭两层。'},
-  bell: {ic:'bell', nm:'猫铃',  tip:'铃铛不能消除，但可以交换——把它一路送到矿底最后一行。'},
+  bell: {ic:'bell', nm:'猫铃',  tip:'铃铛不能消除，但可以交换——把它一路送到矿底最后一行。<b>竖向疾风能让整列直接落底。</b>'},
   crate:{ic:'crate',nm:'岩壳',  tip:'在岩壳旁边消除、或用灵技轰它，就能敲碎。厚壳要敲两下。'},
   cage: {ic:'cage', nm:'石笼',  tip:'被锁住的灵石不能移动，但把它连进三连或用灵技命中，即可破笼。'},
   seal: {ic:'seal', nm:'红判',  tip:'叶王的朱批封印，当岩壳敲碎即可。'},
-  snake:{ic:'cage', nm:'蛇缠',  tip:'蛇女的缠丝，同石笼——连消或灵技可解。'},
+  snake:{ic:'cage', nm:'蛇缠',  tip:'缠丝夫人的丝，同石笼——连消或灵技可解。'},
   boss: {ic:'boss', nm:'讨伐',  tip:'每一次消除都在削减对方的气势，灵技与连锁伤害更高。'},
 };
 
@@ -1068,7 +1068,9 @@ function levelDef(n){
     if(L.ink.length&&!L.goals.some(g=>g.type==='ink'))L.goals.push({type:'ink',need:0});
   }else{
     /* 常规关：按地脉主题 */
-    const M=[0,24,23,23,22,22,21,20,20][ch]||21; L.moves=M;
+    /* 步数曲线：第三章（猫铃）单独加厚；第四章之后整体 +2 —— 后期机关密度翻了几倍，
+       原来的 22/22/21/20/20 配上 20+ 个机关，对普通玩家过于紧。 */
+    const M=[0,24,23,25,24,24,23,22,22][ch]||22; L.moves=M;
     if(ch>=6&&(pos===6||pos===7))L.colors=6;
     if(ch===7&&pos>=5)L.colors=6;
     switch(ch){
@@ -1089,7 +1091,7 @@ function levelDef(n){
         if(pos>=3)collectGoal(1,22);
         break}
       case 3:
-        L.bells=[2,2,3,3,3,4,4][pos-1];
+        L.bells=[1,1,2,2,2,3,3][pos-1];       // 原 [2,2,3,3,3,4,4]，整章通关率个位数，两轮下调
         L.goals.push({type:'bell',need:L.bells});
         if(pos>=3)collectGoal(1,20);
         if(pos>=6){L.ink=PAT.rowsBottom(2);L.goals.push({type:'ink',need:0})}
@@ -1142,6 +1144,30 @@ function levelDef(n){
   if(L.bells>0){                                                    // 猫铃只能放进无岩壳的列
     let free=0;for(let c=0;c<N;c++)if(!crateSet.has(c))free++;
     L.bells=Math.min(L.bells,Math.max(1,free*2));
+  }
+  /* 6 色关的收集目标按频率折算：颜色从 5 种变 6 种，目标色出现频率降 1/6，
+     need 不跟着降就是乘性惩罚，实测这些关通关率明显低一档 */
+  if(L.colors>5){
+    for(const g of L.goals)if(g.type==='collect')g.need=Math.max(8,Math.round(g.need*5/L.colors));
+  }
+  /* 铃会占掉 L.bells 个格子；这些格子若原本要放笼，笼就布不上了。
+     在回填 need 之前先把最坏情况从笼列表里扣掉，保证 need 永远布得满。 */
+  if(L.bells>0&&(L.cages||[]).length){
+    const cut=Math.min(L.bells,L.cages.length-1);
+    if(cut>0)L.cages=L.cages.slice(0,L.cages.length-cut);
+  }
+  /* 送铃是全场最贵的目标（要把整列下方清空），一关里和别的目标并存时封顶 2 个。
+     实测后期关反复出现「机关与收集全做完、偏偏铃差一两个」。 */
+  if(L.bells>0&&L.goals.some(g=>['ink','crate','cage','collect'].includes(g.type))){
+    L.bells=Math.min(L.bells,2);
+    const gb=L.goals.find(g=>g.type==='bell'); if(gb)gb.need=L.bells;
+  }
+  /* 复合关再折一次：同一关里每多一个机关目标，收集目标就少要一成半。
+     实测后期关「机关全做完、偏偏收集差一截」，说明二十来步里做不了两件满额的事。 */
+  const obGoals=L.goals.filter(g=>['ink','crate','cage','bell'].includes(g.type)).length;
+  if(obGoals>0){
+    const k=Math.max(0.6,1-0.15*obGoals);
+    for(const g of L.goals)if(g.type==='collect')g.need=Math.max(8,Math.round(g.need*k));
   }
   /* 目标数量回填 */
   for(const g of L.goals){
@@ -1579,6 +1605,7 @@ function patchHoles(){                                          // 兜底：绝�
 
 /* ---- 建盘：无初始三连、且保证有解 ---- */
 function buildBoard(L,seed){
+  const keepRng=(seed==null&&GS.party)?ENG.rng:null;         // 聚会赛中途重铺不能冲掉本手的随机流
   /* 特效数组只在游戏屏可见时才衰减，中途退出会把它们冻住。
      不清的话下一局开头会闪出上一局的碎片与光束，聚会赛里更像是给下一位剧透。 */
   DYING.length=0;FX.parts.length=0;FX.beams.length=0;FX.rings.length=0;FX.marks.length=0;
@@ -1598,9 +1625,10 @@ function buildBoard(L,seed){
         (c>=2&&gemAt(r,c-1)===g&&gemAt(r,c-2)===g)||(r>=2&&gemAt(r-1,c)===g&&gemAt(r-2,c)===g)));
       B[r][c]=newPiece({g});
     }
-    for(const [r,c] of L.cages||[])if(inB(r,c)&&B[r][c])B[r][c].cage=1;
-    for(const [r,c] of L.snakes||[])if(inB(r,c)&&B[r][c]){B[r][c].cage=1;B[r][c].snake=true}
-    /* 放猫铃：顶部分散列 */
+    /* ⚠ 先放猫铃、再放石笼。反过来的话铃会把已经设好 cage 的格子整个覆盖掉，
+       笼没了但 need 已经算进去 —— 那一关就永远差几个笼。
+       （铃的出生行从第 0 行下移到第 3 行之后，正好和石笼的散布区重叠，自检立刻抓到了。） */
+    const bellAt=new Set();
     if(L.bells>0){
       const R=ENG.rng||rnd;
       /* 铃要从顶一路落到底，整列都不能有岩壳 —— 只查第 0 行的话，
@@ -1608,15 +1636,40 @@ function buildBoard(L,seed){
       const cols=[];
       for(let c=0;c<N;c++){let ok=true;for(let r=0;r<N;r++)if(T[r][c].crate>0){ok=false;break}if(ok)cols.push(c)}
       for(let i=cols.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
+      /* 铃从第 2 行起生成，不再从最顶上掉。
+         从第 0 行到第 7 行要清掉整整 7 格，而铃越低「有效目标区」越小，
+         最后两格慢得离谱 —— 实测整章通关率只有个位数。下沉距离砍到 5 格后回到合理区间。 */
+      const startRow=3;                    // 只需落 4 格；从顶端掉 7 格实测整章通关率个位数
       for(let i=0;i<L.bells&&cols.length;i++){
-        const c=cols[i%cols.length], r=Math.floor(i/cols.length);
-        if(inB(r,c)&&T[r][c].crate===0)B[r][c]=newPiece({g:-1,bell:true});
+        const c=cols[i%cols.length], r=startRow+Math.floor(i/cols.length);
+        if(inB(r,c)&&T[r][c].crate===0){B[r][c]=newPiece({g:-1,bell:true});bellAt.add(r*N+c)}
       }
     }
-    if(scanRuns().length===0&&anyMove()){ENG.rng=null;return true}
+    for(const [r,c] of L.cages||[])if(inB(r,c)&&B[r][c]&&!bellAt.has(r*N+c))B[r][c].cage=1;
+    for(const [r,c] of L.snakes||[])if(inB(r,c)&&B[r][c]&&!bellAt.has(r*N+c)){B[r][c].cage=1;B[r][c].snake=true}
+    if(scanRuns().length===0&&anyMove()){ENG.rng=keepRng;reconcileGoals(L);return true}
   }
-  ENG.rng=null;
+  ENG.rng=keepRng;
+  reconcileGoals(L);
   return true;
+}
+/* 建盘之后按**盘面上真正布上的数量**校准机关目标。
+   以前是在 levelDef 里靠预测（哪些格子会被占、哪些会被丢弃），
+   而铃、笼、岩壳三者的落点会互相挤占，预测总有漏网 ——
+   第 3 关（收集色）、第 51 关（石笼）、第 42 关（铃挤掉笼）都是这么来的，
+   每次都要等玩家卡死才发现。改成事后对账，这一类 bug 就永久绝根了。 */
+function reconcileGoals(L){
+  let ink=0,crate=0,cage=0,bell=0;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    ink+=T[r][c].ink; crate+=T[r][c].crate;
+    const p=B[r][c]; if(!p)continue;
+    if(p.cage>0)cage++; if(p.bell)bell++;
+  }
+  const real={ink,crate,cage,bell};
+  for(const g of L.goals){
+    const got=real[g.type];
+    if(got!==undefined)g.need=Math.max(1,got);
+  }
 }
 function shuffleBoard(){
   const slots=[],pool=[];
@@ -2724,7 +2777,7 @@ function openChest(){
 /* ---- 难度补偿：连败会悄悄多给两步（单机、无内购，纯为不劝退） ---- */
 function mercyMoves(n){
   const f=SAVE.fails[n]||0;
-  return f>=5?4:f>=3?2:0;
+  return f>=4?4:f>=2?2:0;                      // 连输两次就给 —— 等到第三次，很多人已经放弃了
 }
 
 /* ==================================================================
@@ -2741,6 +2794,7 @@ function grant(id){
 function openLevel(n,mode){
   GS.mode=mode||'adv';
   const L=levelDef(n);GS.L=L;
+  buildBoard(L);                                    // 先建盘 —— reconcileGoals 会按实际布上的数量校准 need
   GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   const mercy=mercyMoves(n);
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
@@ -2749,7 +2803,6 @@ function openLevel(n,mode){
   GS.party=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
-  buildBoard(L);
   show('game');
   fitCanvas();
   $('#rush-bar').classList.remove('on');
@@ -2821,7 +2874,6 @@ function startRush(){
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
-  buildBoard(L);
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
@@ -2871,7 +2923,7 @@ function endLevel(win){
       SAVE.best['e'+L.depth]=Math.max(SAVE.best['e'+L.depth]||0,GS.score);
       SAVE.lv=Math.max(SAVE.lv,n+1);
     }
-    delete SAVE.fails[n];
+    SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
     setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
@@ -2898,7 +2950,7 @@ function endLevel(win){
     $('#end-next').dataset.act='retry';
     $('#end-retry').style.display='none';
     /* 续挖：差一口气时最关键的一颗糖 */
-    const cost=300*(GS.cont+1);
+    const cost=200*(GS.cont+1);                // 原 300 起 ≈ 一整关的收益，与「输了还能救」的本意不符
     if(GS.cont<2){
       const cb=$('#end-continue');
       cb.style.display='';
@@ -3086,8 +3138,11 @@ function ptStartTurn(){
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
-  /* 同一轮 = 同一颗种子 = 同一个初始盘面，公平可比 */
+  /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手** ——
+     只种初盘的话，第一次消除之后的补位就各走各的 Math.random()，
+     两个人下同样的步子结果照样分岔，「比手艺不比运气」就站不住。 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
+  ENG.rng=rngOf(PARTY.seed+'|play'+PARTY.round);              // 补位/重排也吃同一条随机流
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   if(PARTY.pace==='timed'){                                    // 快赛：复用限时条做倒计时
@@ -3116,6 +3171,7 @@ function ptStartTurn(){
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
 }
 function ptTurnEnd(){
+  ENG.rng=null;                                              // 交棒后把随机流还给全局
   GS.epoch=(GS.epoch||0)+1;                                  // 让上一位没跑完的连锁自己退出，别串进下一位的回合
   GS.rushOn=false;$('#rush-bar').classList.remove('on');
   const p=PARTY.players[PARTY.cur];
@@ -3491,7 +3547,7 @@ const HOW_HTML=`
 　万象 × 爆裂 → 万象天崩　　万象 × 万象 → <b>清空全场</b><br><br>
 <b>矿脉机关</b><br>
 　<b>墨封</b> 在墨渍上消除即揭一层，深墨要两层。<br>
-　<b>猫铃</b> 不能消除，只能交换——把它一路送到最底行。<br>
+　<b>猫铃</b> 不能消除，只能交换——把它一路送到最底行。<b>诀窍：在铃那一列炼一颗竖向疾风，一炸到底。</b><br>
 　<b>岩壳</b> 在旁边消除或用灵技轰它，就能敲碎。<br>
 　<b>石笼</b> 被锁住的灵石不能动，连进三连即可破笼。<br><br>
 <b>讨伐战</b>　每消一颗都在削对方的气势，连锁与灵技伤害更高；对方每隔几步会出手捣乱。<br><br>
@@ -3715,7 +3771,7 @@ $('#end-next').addEventListener('click',e=>{
   maybeLore(()=>openLevel(nx));
 });
 $('#end-continue').addEventListener('click',e=>{
-  const cost=+e.currentTarget.dataset.cost||300;
+  const cost=+e.currentTarget.dataset.cost||200;
   if((SAVE.power||0)<cost){toast('灵力不够 —— <b>先去别关攒攒</b>');return}
   SAVE.power-=cost;GS.cont++;persist();
   SFX.made();ovl(null);
