@@ -7,7 +7,7 @@
 <title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
-<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局 —— 一上手就停不下来。">
+<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <style>
 :root{
@@ -71,7 +71,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .hr::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:8px;color:var(--gold);opacity:.8}
 
 /* ============ 主菜单 ============ */
-/* safe center：内容没超高时垂直居中，超高时退回顶部对齐 ——
+/* safe center：内容没超高时垂直居中，超高时退回顶部对齐——
    纯 center 在溢出时会把顶部裁掉而且**滚不上去**，标题就是这么消失的 */
 #scr-menu{justify-content:safe center;gap:6px;text-align:center}
 @supports not (justify-content:safe center){
@@ -85,7 +85,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 @keyframes titleIn{0%{opacity:0;letter-spacing:.4em;transform:translateY(18px);filter:blur(6px)}100%{opacity:1;letter-spacing:.18em;transform:translateY(0);filter:blur(0)}}
 .subtitle{color:var(--ink2);font-size:14px;letter-spacing:.2em;margin:2px 0 0}
 #menu-gems{height:56px;margin:6px 0 2px}
-/* 有立绘时放大成真正的主视觉 —— 512px 的立绘塞进 92px 徽章太可惜，
+/* 有立绘时放大成真正的主视觉——512px 的立绘塞进 92px 徽章太可惜，
    而这是玩家打开游戏第一眼看到的东西。没有立绘时仍是原来的字形徽章尺寸。 */
 .wolf-badge{width:92px;height:92px;margin:4px auto 0;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;
   transition:width .5s cubic-bezier(.16,1,.3,1),height .5s cubic-bezier(.16,1,.3,1);
@@ -118,7 +118,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
 .menu-foot a:hover{color:var(--gold)}
 /* 小黑猫 */
-/* 小黑猫是彩蛋，藏在角落即可 —— 但不能压住页脚的「作品总目」链接 */
+/* 小黑猫是彩蛋，藏在角落即可——但不能压住页脚的「作品总目」链接 */
 #cat{position:relative;display:block;width:52px;height:45px;margin:10px 4px 0 auto;
   cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
@@ -477,7 +477,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 .obst-notes{margin:10px auto 0;text-align:left;max-width:300px;font-size:12.5px;color:var(--ink2);line-height:1.8}
 .obst-notes b{color:var(--gold2);font-weight:500}
 .quip{margin:14px auto 4px;font-size:13.5px;color:var(--ink2);max-width:300px;line-height:1.8}
-.quip::before{content:'「'}.quip::after{content:'」—— 狼先生'}
+.quip::before{content:'「'}.quip::after{content:'」——狼先生'}
 .quip.boss::after{content:'」'}
 .ovl-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
 .stars-row{display:flex;justify-content:center;gap:16px;margin:14px 0 4px;height:52px}
@@ -841,7 +841,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <script>
 'use strict';
 /* ============================================================
-   灵石远征 · GEMFALL —— MYSKME × 英语王老师
+   灵石远征 · GEMFALL——MYSKME × 英语王老师
    单文件 · 离线可玩 · 黑金编年史
    ============================================================ */
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
@@ -889,10 +889,10 @@ const CHAPTERS=[
   {name:'墨渊支脉',era:'第二地脉',epi:'叶王的墨汁渗进石缝，把灵石封在了下面。'},
   {name:'猫铃矿道',era:'第三地脉',epi:'小黑猫的铃铛滚落深处——送它们回到矿底。'},
   {name:'岩壳深堑',era:'第四地脉',epi:'老矿道塌了一半，岩壳要一层层敲开。'},
-  {name:'蛇窟缠层',era:'第五地脉',epi:'那位换了个称呼又来了 —— 这回不用红笔，用丝。'},
+  {name:'蛇窟缠层',era:'第五地脉',epi:'那位换了个称呼又来了——这回不用红笔，用丝。'},
   {name:'双生裂谷',era:'第六地脉',epi:'墨与岩互相掩护，这里开始考真功夫。'},
   {name:'风暴矿心',era:'第七地脉',epi:'矿脉的心跳越来越快，稳住你的手。'},
-  {name:'王座熔窟',era:'第八地脉',epi:'王座只有一张 —— 前面两次，坐的都是同一位。'},
+  {name:'王座熔窟',era:'第八地脉',epi:'王座只有一张——前面两次，坐的都是同一位。'},
 ];
 const BOSSES={
   ye:{key:'ye',short:'叶王',name:'叶王 · 红笔判官',title:'红笔判官',act:'seal',every:3,
@@ -908,7 +908,7 @@ const BOSSES={
   /* 叶王与蛇女是同一人的两个称谓（王老师 2026-07-29 定）。
      前两场分别以「红笔判官」和「缠丝夫人」出现，终章揭晓本是一人、两相同现。 */
   both:{key:'both',short:'真形',name:'叶王 · 真形',title:'朱笔与缠丝，本是一人',act:'both',every:2,
-    intro:'红笔与丝线一起抬起来。「你早该看出来了 —— 从头到尾，只有我一个。」',
+    intro:'红笔与丝线一起抬起来。「你早该看出来了——从头到尾，只有我一个。」',
     hurt:['「放肆！」','「嘶——疼的呢。」','「两只手都还在。」'],
     doing:['「判！」','「缠住。」','「这次两样一起来。」'],
     ko:'「原来……两只手，也拦不住一个人往下走。」'},
@@ -961,7 +961,7 @@ const OBST_INFO={
   bell: {ic:'bell', nm:'猫铃',  tip:'铃铛不能消除，但可以交换——把它一路送到矿底最后一行。<b>竖向疾风能让整列直接落底。</b>'},
   crate:{ic:'crate',nm:'岩壳',  tip:'在岩壳旁边消除、或用灵技轰它，就能敲碎。厚壳要敲两下。'},
   cage: {ic:'cage', nm:'石笼',  tip:'被锁住的灵石不能移动，但把它连进三连或用灵技命中，即可破笼。'},
-  seal: {ic:'seal', nm:'红判',  tip:'叶王的朱批封印，当岩壳敲碎即可。'},
+  seal: {ic:'seal', nm:'红判',  tip:'叶王的朱批封印，当作岩壳敲碎即可。'},
   snake:{ic:'cage', nm:'蛇缠',  tip:'缠丝夫人的丝，同石笼——连消或灵技可解。'},
   boss: {ic:'boss', nm:'讨伐',  tip:'每一次消除都在削减对方的气势，灵技与连锁伤害更高。'},
 };
@@ -978,7 +978,7 @@ const COMPANIONS=[
   {id:'jun', g:'钧',name:'钧',    title:'开山者', beast:'老虎',  col:1,need:38,ult:'虎啸',unlock:4,
    desc:'一声吼，把三颗灵石就地震成<b>爆裂灵石</b>。清岩壳、破石笼的快刀。'},
   {id:'qi',  g:'麒',name:'麒',    title:'巡渊者', beast:'鲨鱼',  col:2,need:38,ult:'破浪',unlock:10,
-   desc:'一道横穿，洗净<b>一行一列</b>。猫铃卡住时最好用 —— 底下一空，铃自己就下去了。'},
+   desc:'一道横穿，洗净<b>一行一列</b>。猫铃卡住时最好用——底下一空，铃自己就下去了。'},
   {id:'xi',  g:'晰',name:'晰',    title:'探路者', beast:'兔子',  col:3,need:34,ult:'疾足',unlock:16,
    desc:'再给你 <b>3 步</b>（限时局则加 <b>8 秒</b>）。差一口气时的救命稻草。'},
   {id:'xiao',g:'晓',name:'晓',    title:'摘星者', beast:'飞鼠',  col:4,need:46,ult:'掠星',unlock:24,
@@ -992,20 +992,20 @@ const compUnlocked=c=>SAVE.lv>=c.unlock;
 /* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
 const LORE=[
   {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
-   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案 —— 一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
+   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案——一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页被朱笔圈过的旧纸。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，圈完还得说清楚。」',
-   t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评 —— 被红笔改过、又被夸过的那些。',u:'../wall/'},
+   t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评——被红笔改过、又被夸过的那些。',u:'../wall/'},
   {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
    t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
   {ch:4,body:'敲开最后一层岩壳，里面是一把锈住的短剑。<br>「笼中剑，」狼先生认出来了，「有人在这儿等过很久。」',
    t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备。',u:'https://myskme.github.io/myskme-expedition-web/'},
-  {ch:5,body:'缠丝断在你手里，散成一地细字。凑近看，每一根都是一个被记错的单词。<br>「还是她，」狼先生认出那手笔迹，「换了个名字，换了样工具 —— 收集的还是同一批东西。」',
-   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来 —— 兑换码即卷号，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
+  {ch:5,body:'缠丝断在你手里，散成一地细字。凑近看，每一根都是一个被记错的单词。<br>「还是她，」狼先生认出那手笔迹，「换了个名字，换了样工具——收集的还是同一批东西。」',
+   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来——兑换码即卷号，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
   {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
    t:'自鸣棋',d:'肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 · 35 位正典角色，扫码即玩。',u:'https://myskme.github.io/myskme-zimingqi/'},
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
    t:'记分编年史',d:'记分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
-  {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处 —— 从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
+  {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处——从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>——灵石远征 · 卷一 · 终',
    t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'../'},
 ];
 
@@ -1019,8 +1019,8 @@ const ACHS=[
   {id:'a6', ic:'⚡', nm:'五重连锁', tip:'一次交换引发 5 连锁'},
   {id:'a7', ic:'🌋', nm:'灵脉共鸣', tip:'一次交换引发 7 连锁'},
   {id:'a8', ic:'🏆', nm:'十万灵力', tip:'单关得分突破 100,000'},
-  {id:'a9', ic:'📕', nm:'合上朱笔', tip:'首次击退叶王'},
-  {id:'a10',ic:'🐍', nm:'请蛇出窟', tip:'首次击退缠丝夫人（她的另一个名字）'},
+  {id:'a9', ic:'📕', nm:'合上朱笔', tip:'首次击退红笔判官'},
+  {id:'a10',ic:'🐍', nm:'请蛇出窟', tip:'首次击退缠丝夫人——叶王的另一个名号'},
   {id:'a11',ic:'👑', nm:'谷地全通', tip:'通关全部 64 关'},
   {id:'a12',ic:'🐈‍⬛',nm:'猫铃司铃', tip:'在大厅找到小黑猫'},
   {id:'a13',ic:'🕯', nm:'执灯之人', tip:'首次放出同伴大招'},
@@ -1054,7 +1054,7 @@ function levelDef(n){
   const L={n,ch,pos,endless,depth,colors:5,moves:23,goals:[],ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss:null,s1:0,s2:0,s3:0,
     chName:endless?'无尽矿脉':CHAPTERS[ch-1].name,era:endless?('深度 '+depth):CHAPTERS[ch-1].era,epi:endless?'没有尽头，只有更深。矿灯管够。':CHAPTERS[ch-1].epi};
   /* ⚠ 只能从本关真有的颜色里抽（L.colors 到这里已经定稿）。
-     以前固定从 6 色里抽，而多数关只有 5 色 —— 一旦抽中 5 号色，
+     以前固定从 6 色里抽，而多数关只有 5 色——一旦抽中 5 号色，
      那种灵石根本不会出现在盘上，该关永远打不通。
      第 3 关就中过，等于整条 64 关主线卡死在第三关。 */
   const pickColors=k=>{
@@ -1085,7 +1085,7 @@ function levelDef(n){
     if(L.ink.length&&!L.goals.some(g=>g.type==='ink'))L.goals.push({type:'ink',need:0});
   }else{
     /* 常规关：按地脉主题 */
-    /* 步数曲线：第三章（猫铃）单独加厚；第四章之后整体 +2 —— 后期机关密度翻了几倍，
+    /* 步数曲线：第三章（猫铃）单独加厚；第四章之后整体 +2——后期机关密度翻了几倍，
        原来的 22/22/21/20/20 配上 20+ 个机关，对普通玩家过于紧。 */
     const M=[0,24,23,25,24,24,23,22,22][ch]||22; L.moves=M;
     if(ch>=6&&(pos===6||pos===7))L.colors=6;
@@ -1152,7 +1152,7 @@ function levelDef(n){
   if(L.bells>0){L.crates=L.crates.filter(([r])=>r<7);L.crates2=(L.crates2||[]).filter(([r])=>r<7);
     L.cages=L.cages.filter(([r])=>r<7);L.snakes=L.snakes.filter(([r])=>r<7)}
   /* ⚠ 机关对账（必须在回填 need 之前）：
-     石笼若落在岩壳格上，buildBoard 会静默丢弃它，而 need 是按列表长度回填的 ——
+     石笼若落在岩壳格上，buildBoard 会静默丢弃它，而 need 是按列表长度回填的——
      那一关就永远差几个笼、不可能通关。第 51 关曾因此把 52 关往后整条线全锁死。 */
   const crateSet=new Set((L.crates||[]).map(([r,c])=>r*N+c));   // 只用薄壳；厚壳靠它验子集，不能自己也进集合
   L.cages=(L.cages||[]).filter(([r,c])=>!crateSet.has(r*N+c));
@@ -1306,7 +1306,7 @@ function art(key){
 /* DOM 版：图加载成功才盖住底下的字形徽章，失败就当无事发生。
    ⚠ background-size / position 必须内联写：#ally-badge 这类 ID 选择器里的
    background 简写会把类规则里的 cover 重置掉（ID 特异性更高），
-   结果 512px 立绘在 44px 框里按原尺寸从左上角显示 —— 只看得到一块空白。 */
+   结果 512px 立绘在 44px 框里按原尺寸从左上角显示——只看得到一块空白。 */
 function applyArt(el,key){
   if(!el)return;
   const src=ART[key];
@@ -1336,7 +1336,7 @@ function drawArt(ctx,key,x,y,size){
 
 /* ==================================================================
    [ 纯逻辑引擎 · PORTABLE CORE ]
-   零 DOM、零 Canvas、零平台 API —— 可整段拷进任何 JS 运行时。
+   零 DOM、零 Canvas、零平台 API——可整段拷进任何 JS 运行时。
    双层网格（关键：墨封/岩壳属于「格子」，灵石属于「棋子」，重力只搬棋子）
      T[r][c] = {ink:0..2, crate:0..2}          格子（静止）
      B[r][c] = 棋子对象 | null                  棋子（会坠落）
@@ -1361,7 +1361,7 @@ function randColor(rng){return Math.floor((rng||ENG.rng||rnd)()*ENG.colors)}
 
 /* ---- 找出所有三连及以上（返回若干「组」） ----
    matchable 排除万象灵珠：它在渲染上是无色虹彩球、引爆时吞的也是全场最多的那色，
-   唯独配对判定里还带着炼成时的原色 —— 那会让玩家攒出来的万象被随机连锁无预警吞掉。
+   唯独配对判定里还带着炼成时的原色——那会让玩家攒出来的万象被随机连锁无预警吞掉。
    注意只能在这里排除，不能改 isGem 本身：expandBlast 靠 isGem 做连锁引爆，
    排掉 O 会让万象再也不被连爆。 */
 function matchable(r,c){return isGem(r,c)&&B[r][c].k!=='O'}
@@ -1398,7 +1398,7 @@ function findGroups(){
   }
   /* 合并被后来的 run 串起来的组 */
   /* 反复合并到不再相交为止。只扫一趟的话：g 吸收别的组之后才与 h 相连，
-     轮到 h 时会反过来吞掉 g 并标记 g.dead —— 但 g 早已进了 merged，
+     轮到 h 时会反过来吞掉 g 并标记 g.dead——但 g 早已进了 merged，
      于是返回两个互相重叠的组，一步棋会多炼一颗特殊石、分数与 specials 双计。 */
   const merged=[];
   let again=true, guard=0;
@@ -1535,7 +1535,7 @@ function isComboPair(a,b){
 
 /* ---- 交换是否会产生消除 ---- */
 function swapPieces(a,b){const t=B[a[0]][a[1]];B[a[0]][a[1]]=B[b[0]][b[1]];B[b[0]][b[1]]=t}
-/* 只检查穿过 a、b 的那两行两列 —— 用全局 scanRuns 的话，
+/* 只检查穿过 a、b 的那两行两列——用全局 scanRuns 的话，
    盘上只要还残留任何三连它就恒真，于是 anyMove() 也恒真，
    shuffleBoard 失败时那道「重铺一盘」的兜底永远触发不了。 */
 function runThrough(r,c){
@@ -1626,7 +1626,7 @@ function buildBoard(L,seed){
   /* 特效数组只在游戏屏可见时才衰减，中途退出会把它们冻住。
      不清的话下一局开头会闪出上一局的碎片与光束，聚会赛里更像是给下一位剧透。 */
   DYING.length=0;FX.parts.length=0;FX.beams.length=0;FX.rings.length=0;FX.marks.length=0;
-  /* 传了 seed 就用确定性随机源建盘 —— 聚会赛靠它保证同一轮所有人盘面一致 */
+  /* 传了 seed 就用确定性随机源建盘——聚会赛靠它保证同一轮所有人盘面一致 */
   ENG.rng=seed!=null?rngOf(seed):null;
   ENG.colors=L.colors;
   T=[];for(let r=0;r<N;r++){const row=[];for(let c=0;c<N;c++)row.push({ink:0,crate:0});T.push(row)}
@@ -1643,19 +1643,19 @@ function buildBoard(L,seed){
       B[r][c]=newPiece({g});
     }
     /* ⚠ 先放猫铃、再放石笼。反过来的话铃会把已经设好 cage 的格子整个覆盖掉，
-       笼没了但 need 已经算进去 —— 那一关就永远差几个笼。
+       笼没了但 need 已经算进去——那一关就永远差几个笼。
        （铃的出生行从第 0 行下移到第 3 行之后，正好和石笼的散布区重叠，自检立刻抓到了。） */
     const bellAt=new Set();
     if(L.bells>0){
       const R=ENG.rng||rnd;
-      /* 铃要从顶一路落到底，整列都不能有岩壳 —— 只查第 0 行的话，
+      /* 铃要从顶一路落到底，整列都不能有岩壳——只查第 0 行的话，
          铃会卡在中间那层岩壳上，能不能绕出去全看斜滑的运气 */
       const cols=[];
       for(let c=0;c<N;c++){let ok=true;for(let r=0;r<N;r++)if(T[r][c].crate>0){ok=false;break}if(ok)cols.push(c)}
       for(let i=cols.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
       /* 铃从第 2 行起生成，不再从最顶上掉。
          从第 0 行到第 7 行要清掉整整 7 格，而铃越低「有效目标区」越小，
-         最后两格慢得离谱 —— 实测整章通关率只有个位数。下沉距离砍到 5 格后回到合理区间。 */
+         最后两格慢得离谱——实测整章通关率只有个位数。下沉距离砍到 5 格后回到合理区间。 */
       const startRow=3;                    // 只需落 4 格；从顶端掉 7 格实测整章通关率个位数
       for(let i=0;i<L.bells&&cols.length;i++){
         const c=cols[i%cols.length], r=startRow+Math.floor(i/cols.length);
@@ -1672,7 +1672,7 @@ function buildBoard(L,seed){
 }
 /* 建盘之后按**盘面上真正布上的数量**校准机关目标。
    以前是在 levelDef 里靠预测（哪些格子会被占、哪些会被丢弃），
-   而铃、笼、岩壳三者的落点会互相挤占，预测总有漏网 ——
+   而铃、笼、岩壳三者的落点会互相挤占，预测总有漏网——
    第 3 关（收集色）、第 51 关（石笼）、第 42 关（铃挤掉笼）都是这么来的，
    每次都要等玩家卡死才发现。改成事后对账，这一类 bug 就永久绝根了。 */
 function reconcileGoals(L){
@@ -1705,7 +1705,7 @@ function shuffleBoard(){
   return anyMove();
 }
 /* ==================================================================
-   [ 渲染层 · RENDERER ] Canvas 2D —— 小游戏平台可直接复用（API 同名）
+   [ 渲染层 · RENDERER ] Canvas 2D——小游戏平台可直接复用（API 同名）
    ================================================================== */
 const cv=PLAT.canvas(), cx=cv.getContext('2d');
 let CSS_W=0, DPR=1;
@@ -1821,7 +1821,7 @@ function hexA(h,a){
   return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
 }
 /* ---- 机关绘制 ---- */
-/* 墨封铺满整格 —— 灵石会盖住格子中央，画成小墨点等于看不见 */
+/* 墨封铺满整格——灵石会盖住格子中央，画成小墨点等于看不见 */
 function drawInk(ctx,x,y,s,layers,t){
   if(drawArt(ctx,layers>1?'ob_ink2':'ob_ink',x,y,s))return;
   ctx.save();
@@ -1936,7 +1936,7 @@ function fxBeam(r,c,dir,color){FX.beams.push({r,c,dir,life:1,c2:color||'#e8c768'
 function fxRing(x,y,color,max){FX.rings.push({x,y,life:1,c:color||'#e8c768',max:max||ENG.cs*3})}
 function fxMark(r,c,kind){FX.marks.push({r,c,kind,life:1})}
 function stepFX(dt){
-  /* f = 相对 60fps 的帧当量。不归一化的话特效时长会跟屏幕刷新率反比 ——
+  /* f = 相对 60fps 的帧当量。不归一化的话特效时长会跟屏幕刷新率反比——
      120Hz 手机上光束只闪一半时间、粒子只炸开一半半径，还会和按真实时间
      推进的棋子动画脱拍。dt 已在 loop 里钳到 48ms 上限。 */
   const f=dt/16.667;
@@ -2113,7 +2113,7 @@ function bumpGoal(type,col,n){
   });
   return hit;
 }
-/* 空数组不算达成 —— 限时赛把 goals 设成空，一旦有路径绕过 rushOn 守卫就会误判通关 */
+/* 空数组不算达成——限时赛把 goals 设成空，一旦有路径绕过 rushOn 守卫就会误判通关 */
 function goalsMet(){return GS.goals.length>0&&GS.goals.every(g=>g.got>=g.need)}
 function updHUD(){
   const mv=$('#hud-moves');
@@ -2273,7 +2273,7 @@ async function settleBoard(firstChain){
     for(const m of makes){
       const [r,c]=m.at;
       /* 炼成位若正压着一颗笼中石，这颗石头会被新特殊石顶掉。
-         必须在覆盖前把破笼记上账 —— 漏记会让石笼目标永远差一个，整关不可能通关。 */
+         必须在覆盖前把破笼记上账——漏记会让石笼目标永远差一个，整关不可能通关。 */
       const old=B[r][c];
       if(old&&old.cage>0){
         bumpGoal('cage',null,1);SFX.crate();
@@ -2283,9 +2283,9 @@ async function settleBoard(firstChain){
       fxRing(cxOf(c),cyOf(r),m.k==='O'?'#ffffff':GEMS[m.g].base,ENG.cs*2.2);
       SFX.made();GS.specials++;
       addScore(m.k==='O'?900:m.k==='B'?520:320,r,c,'#e8c768');
-      if(m.k==='H'||m.k==='V'){grant('a2');tutOnce('sp1','四连炼成 <b>疾风灵石</b> —— 点它可横扫整行/整列')}
-      if(m.k==='B'){grant('a3');tutOnce('sp2','L 形炼成 <b>爆裂灵石</b> —— 炸开周围一圈')}
-      if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b> —— 与任意灵石交换，吞掉全场同色')}
+      if(m.k==='H'||m.k==='V'){grant('a2');tutOnce('sp1','四连炼成 <b>疾风灵石</b>——点它可横扫整行/整列')}
+      if(m.k==='B'){grant('a3');tutOnce('sp2','L 形炼成 <b>爆裂灵石</b>——炸开周围一圈')}
+      if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b>——与任意灵石交换，吞掉全场同色')}
     }
     grant('a1');
     GS.lastChain=chain;
@@ -2314,7 +2314,7 @@ async function dropAndFill(){
     let moved=gravityPass();
     const spawned=spawnTop();
     if(!moved&&!spawned)break;
-    /* 落得越久越快 —— 真实重力就是加速的，顺带把大清场的等待时间砍掉一半 */
+    /* 落得越久越快——真实重力就是加速的，顺带把大清场的等待时间砍掉一半 */
     await sleep(REDUCED?10:Math.max(24,60-guard*5));
   }
   const patched=patchHoles();
@@ -2342,7 +2342,7 @@ async function checkBells(){
 
 /* ---- 玩家出手 ----
    ⚠ 世代号 GS.epoch：开新关 / 重开 / 聚会赛交棒 都会 ++。
-   这条结算链每次 await 之后都核对一次，过期就自己退出 ——
+   这条结算链每次 await 之后都核对一次，过期就自己退出——
    否则上一局没跑完的连锁会继续在**新盘面**上清格子、加分、
    甚至给新玩家白送时间（快赛到点强制交棒时几乎必然发生）。 */
 async function trySwap(a,b){
@@ -2403,7 +2403,7 @@ async function trySwap(a,b){
   ENG.lastMove=null;
   /* 矿灯将熄：这一手打得好才回灯油。
      ⚠ 以前用的是 GS.chainMax（整局历史最大连锁），意味着只要全局打出过一次 3 连锁，
-     此后每一步都无条件 +1.2 秒 —— 90 秒的局能拖成好几分钟，榜单彻底失真。
+     此后每一步都无条件 +1.2 秒——90 秒的局能拖成好几分钟，榜单彻底失真。
      ⚠ 聚会赛快赛不回时间：每人固定秒数是「全场时长可预估」和灯油配额的前提。 */
   if(GS.rushOn&&!GS.party){
     const ch=GS.lastChain||0;
@@ -2465,7 +2465,7 @@ async function bossDown(){
   if(GS.boss==='she'||GS.boss==='both')grant('a10');
   await sleep(500);
 }
-/* 达标后剩余步数化作灵技全场引爆 —— 收尾的爽点 */
+/* 达标后剩余步数化作灵技全场引爆——收尾的爽点 */
 async function finale(){
   if(GS.moves<=0)return;
   toast('余力化技 · <b>'+GS.moves+' 步</b>');
@@ -2498,12 +2498,12 @@ async function finale(){
 }
 /* ==================================================================
    [ 灵器 · 每日矿灯 · 星辰宝箱 · 难度补偿 ]
-   —— 顶级三消作品验证过的四件套：给玩家「有牌可打」「输了还能救」
+——顶级三消作品验证过的四件套：给玩家「有牌可打」「输了还能救」
       「每天有理由回来」「长期有攒头」。全部靠玩获得，没有任何付费口子。
    ================================================================== */
 const TOOLS={
-  pick:{ic:'⛏',nm:'矿镐',hint:'点任意一格 —— 一镐下去，灵石、墨封、岩壳、石笼都算数'},
-  swap:{ic:'⇄',nm:'换位符',hint:'点两个相邻格 —— 不管连不连得成，强行换位'},
+  pick:{ic:'⛏',nm:'矿镐',hint:'点任意一格——一镐下去，灵石、墨封、岩壳、石笼都算数'},
+  swap:{ic:'⇄',nm:'换位符',hint:'点两个相邻格——不管连不连得成，强行换位'},
   mix:{ic:'✦',nm:'重整令',hint:'整盘灵石重新排布，不扣步数'},
 };
 const TOOLKEYS=['pick','swap','mix'];
@@ -2568,7 +2568,7 @@ async function useToolAt(r,c){
       $('#tool-hint').textContent=TOOLS.swap.hint;return;
     }
     if(Math.abs(a[0]-r)+Math.abs(a[1]-c)!==1){
-      /* 点了不相邻的格子：能选就改选它当新起点，不能选就整个撤销 —— 别把玩家钉死在第一格上 */
+      /* 点了不相邻的格子：能选就改选它当新起点，不能选就整个撤销——别把玩家钉死在第一格上 */
       if(swappable(r,c)){GS.toolFirst=[r,c];selCell=[r,c];SFX.click();return}
       GS.toolFirst=null;selCell=null;SFX.fail();
       $('#tool-hint').textContent=TOOLS.swap.hint;return;
@@ -2607,7 +2607,7 @@ function allyChargeFrom(colors){
   renderAlly();
   if(!was&&GS.charge>=c.need){
     SFX.made();vib(26);
-    toast('<b>'+c.name+'</b> 准备好了 —— 「'+c.ult+'」',2200);
+    toast('<b>'+c.name+'</b> 准备好了——「'+c.ult+'」',2200);
     fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*5);
   }
 }
@@ -2706,7 +2706,7 @@ async function fireUlt(){
     }
     SFX.crate();SFX.ink();SFX.crush();
     addScore(n*160,3,3,'#c199e6');
-    if(!n)toast('这一关没有机关 —— <b>梓替你把灰扫了</b>',2000);
+    if(!n)toast('这一关没有机关——<b>梓替你把灰扫了</b>',2000);
   }
   await sleep(REDUCED?30:240);
   await dropAndFill();
@@ -2794,7 +2794,7 @@ function openChest(){
 /* ---- 难度补偿：连败会悄悄多给两步（单机、无内购，纯为不劝退） ---- */
 function mercyMoves(n){
   const f=SAVE.fails[n]||0;
-  return f>=4?4:f>=2?2:0;                      // 连输两次就给 —— 等到第三次，很多人已经放弃了
+  return f>=4?4:f>=2?2:0;                      // 连输两次就给——等到第三次，很多人已经放弃了
 }
 
 /* ==================================================================
@@ -2811,7 +2811,7 @@ function grant(id){
 function openLevel(n,mode){
   GS.mode=mode||'adv';
   const L=levelDef(n);GS.L=L;
-  buildBoard(L);                                    // 先建盘 —— reconcileGoals 会按实际布上的数量校准 need
+  buildBoard(L);                                    // 先建盘——reconcileGoals 会按实际布上的数量校准 need
   GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   const mercy=mercyMoves(n);
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
@@ -2854,7 +2854,7 @@ function openLevel(n,mode){
   if(L.boss)seen.boss=1;
   for(const k in seen){const o=OBST_INFO[k];if(o)notes.push('<b>'+o.nm+'</b>　'+o.tip)}
   $('#intro-notes').innerHTML=notes.join('<br>');
-  $('#intro-quip').textContent=mercy?('这一关不好啃 —— 矿灯替你多撑 '+mercy+' 步。'):pick2(Q_INTRO);
+  $('#intro-quip').textContent=mercy?('这一关不好啃——矿灯替你多撑 '+mercy+' 步。'):pick2(Q_INTRO);
   renderAllyPick();renderTools();renderAlly();
   if(L.boss){
     const bo=BOSSES[L.boss];
@@ -2879,7 +2879,7 @@ function beginPlay(){
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
-    showTut('把相同的灵石 <b>三个连成一线</b> —— 点两下，或直接拖动',6000)}
+    showTut('把相同的灵石 <b>三个连成一线</b>——点两下，或直接拖动',6000)}
 }
 function startRush(){
   GS.mode='rush';
@@ -3026,7 +3026,7 @@ function ptEstimate(){
 }
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
 function ptColor(i){return GEMS[i%6]}
-/* 两个变量都写上，让 CSS 按当前主题挑 —— 直接烤死 --pc 的话，
+/* 两个变量都写上，让 CSS 按当前主题挑——直接烤死 --pc 的话，
    「跟随系统」在傍晚自动转深色时，为浅色底选的暗色会留在深色背景上，几乎看不见 */
 function ptStyle(el,i){
   const g=ptColor(i);
@@ -3083,7 +3083,7 @@ function renderPartySetup(){
       const oil=document.createElement('button');
       oil.className='tm oil'+((p.oil||1)>1?' hi':'');
       oil.innerHTML='🪔 ×'+(p.oil||1)+'<i>'+ptSecsFor(p)+'秒</i>';
-      oil.title='灯油配额 —— 点一下换';
+      oil.title='灯油配额——点一下换';
       oil.addEventListener('click',()=>{
         const k=PT_OIL.indexOf(p.oil||1);
         p.oil=PT_OIL[(k+1)%PT_OIL.length];SFX.click();renderPartySetup();
@@ -3103,7 +3103,7 @@ function renderPartySetup(){
           +'点名字右边的 <b>🪔 灯油</b> 可以单独给谁多一份时间（×2 就是双倍时长）。'
         : '每人每轮 <b>'+PT_MOVES+'</b> 步，走完自动交棒。')
     +'同一轮大家拿到<b>一模一样的盘面</b>。'
-    +'<br>轮次倍率 <b>'+mult.join(' · ')+'</b> —— 越往后越关键，前面落后也翻得回来。'
+    +'<br>轮次倍率 <b>'+mult.join(' · ')+'</b>——越往后越关键，前面落后也翻得回来。'
     +'<br><span style="color:var(--gold2)">预计全场约 <b>'+est+' 分钟</b></span>'
     +'（'+PARTY.n+' 人 × '+PARTY.rounds+' 轮 = '+(PARTY.n*PARTY.rounds)+' 手）';
 }
@@ -3155,7 +3155,7 @@ function ptStartTurn(){
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
-  /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手** ——
+  /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手**——
      只种初盘的话，第一次消除之后的补位就各走各的 Math.random()，
      两个人下同样的步子结果照样分岔，「比手艺不比运气」就站不住。 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
@@ -3239,7 +3239,7 @@ function ptFinish(){
    后端复用 MYSKME 现有的 Cloudflare Worker + D1，走独立的 /gf/* 路由与
    独立的 gemfall 表，和词灵榜互不影响。
    隐私：只上传化名与几个数字；设备键在服务端加盐哈希，原始 UUID 不出本机。
-   离线 / 后端未部署 / 断网 时全部静默降级 —— 游戏本体永远照常能玩。
+   离线 / 后端未部署 / 断网 时全部静默降级——游戏本体永远照常能玩。
    ================================================================== */
 const LB={
   api:'https://myskme-leaderboard.wzc1020.workers.dev',
@@ -3259,8 +3259,8 @@ const LB={
     let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
     return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0};
   },
-  /* 带上 HTTP 状态码返回 —— 否则只能拿中文文案去正则猜 429，
-     后端哪天改了措辞就失灵。读 8 秒、写 15 秒（课堂 Wi-Fi 慢，写要给够时间）。 */
+  /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
+     后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
   async fetchJSON(url,opt,ms){
     const ctl=new AbortController();
     const to=setTimeout(()=>ctl.abort(),ms||8000);
@@ -3299,10 +3299,10 @@ const LB={
      成绩全是单调递增的最大值（最佳分/关卡/星数/连锁只增不减），
      所以「待上传」永远只需要记一个最新快照，不必排队列。
      设计要点：
-       · 串行 —— 同一时刻只允许一个提交在飞，杜绝快速连点或自动/手动撞车
-       · 退避 —— 连续失败按 20s→40s→80s… 递增，封顶 5 分钟，不打扰也不放弃
-       · 多入口唤醒 —— 开局、通关、联网恢复、切回前台、打开榜单、退避定时器
-       · 429 不算错 —— 那是服务端 15 秒冷却，等一会儿再来就行
+       · 串行——同一时刻只允许一个提交在飞，杜绝快速连点或自动/手动撞车
+       · 退避——连续失败按 20s→40s→80s… 递增，封顶 5 分钟，不打扰也不放弃
+       · 多入口唤醒——开局、通关、联网恢复、切回前台、打开榜单、退避定时器
+       · 429 不算错——那是服务端 15 秒冷却，等一会儿再来就行
      只要还没成功，pending() 就一直为真，玩家在大厅能看到「待上传」。 */
   sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
@@ -3353,7 +3353,7 @@ const LB={
   },
   autoSubmit(){return this.flush('auto')},
   /* 页面即将被回收时的最后一发。普通 fetch 在卸载时不可靠，用 sendBeacon；
-     必须发 text/plain —— application/json 会触发预检，而信标发不了预检。
+     必须发 text/plain——application/json 会触发预检，而信标发不了预检。
      后端 req.json() 不校验 Content-Type，照样能解析。 */
   beacon(){
     if(!this.registered()||this.stop||!this.pending())return false;
@@ -3404,7 +3404,7 @@ async function renderLB(){
     $('#lb-alias').value=SAVE.lbAlias||'';
     $('#lb-faction').value=SAVE.lbFaction||'';
     $('#lb-pw').value=SAVE.lbPw||'';
-    msg.innerHTML='起个化名就能上榜 —— <b>不要用真名</b>。';
+    msg.innerHTML='起个化名就能上榜——<b>不要用真名</b>。';
     $('#lb-submit').textContent='起名上榜';$('#lb-edit').style.display='none';
     return;
   }
@@ -3416,13 +3416,13 @@ async function renderLB(){
     msg.innerHTML='还没填小队口令。点「改化名」补上，就能看小队榜。';return;
   }
   if(!d.ok){
-    msg.innerHTML=(d.offline?'连不上矿脉榜 —— <b>不影响你继续挖</b>，联网后再来看。'
+    msg.innerHTML=(d.offline?'连不上矿脉榜——<b>不影响你继续挖</b>，联网后再来看。'
       :esc(d.err||'榜单暂时读不到'))+'<br><span style="font-size:11.5px">（榜单是加分项，离线一样能玩）</span>';
     return;
   }
   const rows=d.rows||[];
   if(!rows.length){
-    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜 —— <b>你可以是第一个</b>。':'榜上还空着 —— <b>你可以是第一个</b>。';
+    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。':'榜上还空着——<b>你可以是第一个</b>。';
     return;
   }
   msg.textContent='';
@@ -3460,22 +3460,22 @@ async function lbSave(){
     const a=$('#lb-alias').value.trim();
     if(a.length<2||a.length>12){toast('化名要 <b>2–12 位</b>');return}
     if(!/^[一-龥A-Za-z0-9·\-_ ]{2,12}$/.test(a)){toast('化名只能用中英文、数字和 ·-_');return}
-    if(lbBlocked(a)){toast('这个化名是保留词 —— <b>换一个</b>');return}
+    if(lbBlocked(a)){toast('这个化名是保留词——<b>换一个</b>');return}
     const f=$('#lb-faction').value.trim().slice(0,8);
-    if(f&&lbBlocked(f)){toast('门派名是保留词 —— <b>换一个</b>');return}
+    if(f&&lbBlocked(f)){toast('门派名是保留词——<b>换一个</b>');return}
     SAVE.lbAlias=a;
     SAVE.lbFaction=$('#lb-faction').value.trim().slice(0,8);
     SAVE.lbPw=$('#lb-pw').value.trim().slice(0,24);
     SAVE.lbSig='';persist();
   }
   $('#lb-msg').textContent='上传中…';
-  /* 走同一个 flush，才能共用串行锁、退避和 sig 记账 ——
+  /* 走同一个 flush，才能共用串行锁、退避和 sig 记账——
      以前手动路径绕开了它，成功后不写 lbSig，
      导致新玩家第一次起名上榜之后大厅永远显示「待上传」。 */
   LB.stop=false;                                              // 改了化名就再给一次机会
   const d=await LB.flush('manual',true);
   if(d&&d.ok)await renderLB();
-  else if(d&&d.offline)$('#lb-msg').innerHTML='连不上矿脉榜 —— 化名已存在本机，<b>联网后会自动补上</b>。';
+  else if(d&&d.offline)$('#lb-msg').innerHTML='连不上矿脉榜——化名已存在本机，<b>联网后会自动补上</b>。';
   else if(d&&d.err==='排队中')$('#lb-msg').textContent='正在上传，稍等一下…';
   else await renderLB();
 }
@@ -3553,7 +3553,7 @@ function renderAch(){
   });
 }
 const HOW_HTML=`
-<b>怎么玩</b>　点一颗灵石再点相邻的一颗，或者直接拖动 —— 只要能连成三个同色就成立。<br><br>
+<b>怎么玩</b>　点一颗灵石再点相邻的一颗，或者直接拖动——只要能连成三个同色就成立。<br><br>
 <b>炼成灵石</b><br>
 　四连成一线 → <b>疾风灵石</b>（横扫整行 / 整列）<br>
 　L 形或 T 形 → <b>爆裂灵石</b>（炸开周围一圈）<br>
@@ -3573,11 +3573,11 @@ const HOW_HTML=`
 　晰「疾足」多给三步 · 晓「掠星」凭空一颗万象 · 梓「破封」全场机关各褪一层<br>
 　<b>带谁出门要看关卡</b>：机关多带梓，猫铃卡住带麒，差一口气带晰。<br><br>
 <b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
-<b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆 —— 别急着刚好走完。<br><br>
+<b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆——别急着刚好走完。<br><br>
 <b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。<br><br>
 <b>聚会赛</b>　一台机器 2–6 人轮流玩，打 3–5 轮。<b>同一轮里所有人拿到一模一样的盘面</b>，比的是手艺不是运气；
 轮次倍率 ×1 ×2 ×3 越往后越重，前面落后也翻得回来。可选各打各的、两队对抗、或合力凑一个总分。<br>
-计时有两种：<b>步数制</b>每人 14 步走完交棒；<b>快赛</b>每人固定秒数，时间一到自动交棒、步数不限 ——
+计时有两种：<b>步数制</b>每人 14 步走完交棒；<b>快赛</b>每人固定秒数，时间一到自动交棒、步数不限——
 人多的时候用快赛，全场时长可控，设置页会先告诉你预计要打多久。<br>
 快赛还能给单个人多配<b>灯油</b>：×2 就是双倍时长。谁该多拿一份由你在场下定，游戏只负责照配额发。<br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
@@ -3669,7 +3669,7 @@ function loop(now){
       $('#rush-track').querySelector('i').style.width=clamp(GS.rushT/(GS.rushMax||90000)*100,0,100)+'%';
       $('#rush-bar').classList.toggle('crit',s<=10);
       if(s<=10&&Math.floor(s*2)!==GS.__tick){GS.__tick=Math.floor(s*2);if(s>0)SFX.tick()}
-      /* 结算链还在跑就先别收 —— 否则玩家最后一手打出的连锁分数会被静默丢弃，
+      /* 结算链还在跑就先别收——否则玩家最后一手打出的连锁分数会被静默丢弃，
          上传到榜单的也是截断值。等 busy 落下来再定分。 */
       if(GS.rushT<=0&&!GS.busy){
         if(GS.party){GS.rushOn=false;GS.over=true;GS.busy=true;ptTurnEnd()}   // 快赛：时间到就交棒
@@ -3738,7 +3738,7 @@ $('#map-next').addEventListener('click',()=>{SFX.click();mapCh++;renderMap()});
 $('#intro-go').addEventListener('click',()=>{SFX.click();beginPlay()});
 $('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')});
 $('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
-/* 暂停只冻结计时，绝不动 GS.rushOn ——
+/* 暂停只冻结计时，绝不动 GS.rushOn——
    动了它会让暂停期间悬空的回合走进 checkEnd 的通关分支，把限时赛判成「第 3 关通关」写进存档 */
 $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
   if(GS.busy){toast('等这一手落定再暂停');return}            // 结算中暂停＝冻结时钟刷分，且重开会让旧链串到新盘面
@@ -3789,7 +3789,7 @@ $('#end-next').addEventListener('click',e=>{
 });
 $('#end-continue').addEventListener('click',e=>{
   const cost=+e.currentTarget.dataset.cost||200;
-  if((SAVE.power||0)<cost){toast('灵力不够 —— <b>先去别关攒攒</b>');return}
+  if((SAVE.power||0)<cost){toast('灵力不够——<b>先去别关攒攒</b>');return}
   SAVE.power-=cost;GS.cont++;persist();
   SFX.made();ovl(null);
   GS.moves=5;GS.over=false;GS.busy=false;GS.idle=PLAT.now();
@@ -3948,7 +3948,7 @@ window.__selftest=function(){
   }
   ok('16 个代表关建盘均无初始三连且有解',allOk);
   /* 17. 目标数必须等于「真正布上盘面的机关数」。
-         旧版是拿 need 去比它自己的来源，恒真、抓不到任何东西 ——
+         旧版是拿 need 去比它自己的来源，恒真、抓不到任何东西——
          第 51 关石笼落在岩壳上被静默丢弃、整关不可能通关，就是它漏掉的。 */
   const countBoard=()=>{let ink=0,crate=0,cage=0,bell=0;
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){
@@ -3970,7 +3970,7 @@ window.__selftest=function(){
   }
   ok('64 关每个目标都能在盘面上真正达成'+(badLv.length?'('+badLv.slice(0,4).join('; ')+')':''),goalOk);
   /* 17a. 收集目标要的颜色必须真的会出现在盘上。
-         曾经 pickColors 固定从 6 色里抽而多数关只有 5 色 ——
+         曾经 pickColors 固定从 6 色里抽而多数关只有 5 色——
          第 3 关要 5 号色、盘上一颗都没有，整条主线卡死在第三关。
          上面第 17 项的 countBoard 不含 collect，抓不到这类，所以单列一条。 */
   let colOk=true, badCol=[];
