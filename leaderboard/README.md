@@ -49,3 +49,58 @@ MYSKME 题库书架的联网世界榜/班级榜/名人堂。免费、低维护�
 默认匿名化名，绝不收真名/学校/精确时间；班级以加盐口令哈希命名空间；admin list 只回 is_class 布尔不泄露班级哈希；按赛季可封榜或一键清空。
 
 MYSKME 题库工坊 / MYSKME × 英语王老师
+
+---
+
+## 灵石远征 · 矿脉榜（GEMFALL）—— 2026-07-29 新增
+
+消消乐《灵石远征》的排行榜。**与词灵榜完全隔离**：独立表 `gemfall`、独立路由 `/gf/*`，
+上面那套词灵榜的表、公式、路由一行没动。
+
+### 为什么不复用 /submit
+
+词灵榜的 `/submit` 会**服务端重算灵力**（按题库目录压上限），那套公式绑死在答题数据上。
+消消乐的分数没法这样重算，所以走另一条防线：**硬上限 + 15 秒限频 + 每赛季行数上限 + 老师可删**，
+与词灵榜同为**课堂级**防作弊，不是银行级。伪造的分数进不来（会被钳到上限），
+不可能的数值存不进去（星数不会超过已通关卡数的三倍），老师随时能删。
+
+### 路由
+
+| 路由 | 方法 | 说明 |
+|---|---|---|
+| `/gf/board?scope=world\|class&pw=&limit=` | GET | 读榜。class 需班级口令（服务端加盐哈希） |
+| `/gf/submit` | POST | 上榜。body: `{deviceUUID, alias, faction, pw, stats:{score,rush,lv,stars,chain}}` |
+| `/gf/admin` | POST | 老师：list / hide / show / delete / reset（pw 用管理员口令，与 `/admin` 同一个 `LB_ADMIN_HASH`） |
+
+### 矿力公式
+
+```
+矿力 = 星数×120 + 已通关卡数×80 + 单关最佳÷50 + 矿灯最佳÷40 + 最长连锁×60
+```
+
+星与关卡为主（走得多远），分数为辅（打得多好）。段位见 `GF_RANKS`。
+
+### 表结构
+
+`gemfall` 表由 `gfEnsure()` 在每次请求时 `CREATE TABLE IF NOT EXISTS` 自动建，
+**不需要单独跑 migration**。字段见 worker.js。
+
+### 部署
+
+和以前一样：把 Cloudflare token 放到 `/tmp/cf_tok`，然后
+
+```bash
+python3 leaderboard/deploy.py
+```
+
+token 需要 `Workers Scripts:Edit` + `D1:Edit`，账号 `020412…`。**用完记得吊销。**
+
+部署后冒烟：
+
+```bash
+curl -s https://myskme-leaderboard.wzc1020.workers.dev/ | head -c 200          # 应含 v:4 与 games
+curl -s 'https://myskme-leaderboard.wzc1020.workers.dev/gf/board?scope=world'  # 应返回 ok:true 空榜
+```
+
+**部署前**：游戏里的矿脉榜会显示「连不上矿脉榜 —— 不影响你继续挖」，
+本体功能完全不受影响，化名也已存在本机、联网后自动补交。

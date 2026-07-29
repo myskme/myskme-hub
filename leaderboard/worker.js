@@ -336,6 +336,162 @@ async function handleAdmin(req, env, origin) {
   return json({ ok: false, err: "unknown action" }, 400, origin);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   灵石远征 · 矿脉榜（GEMFALL）—— 独立表 gemfall，独立路由 /gf/*
+   与词灵榜完全隔离：不共用表、不共用公式、不改上面任何一行。
+   消消乐的分数没法像答题那样服务端重算，所以走「硬上限 + 限频 +
+   老师可删」的课堂级防线，与词灵榜同级，不是银行级。
+   ══════════════════════════════════════════════════════════════ */
+const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30 };
+const GF_RANKS = [
+  [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
+  [15000, "深堑行者"], [26000, "灵石匠"], [42000, "矿脉宗师"], [65000, "☠执灯人·封号矿主"],
+];
+function gfRankFor(p) { let n = GF_RANKS[0][1]; for (const [t, name] of GF_RANKS) if (p >= t) n = name; return n; }
+// 矿力：星与关卡为主（体现走得多远），分数为辅（体现打得多好）
+function gfPower(s) {
+  return s.stars * 120 + s.lv * 80 + Math.floor(s.score / 50)
+       + Math.floor(s.rush / 40) + s.chain * 60;
+}
+function gfBadges(s) {
+  const b = [], add = (c, id) => { if (c) b.push(id); };
+  add(s.lv >= 8, "g1"); add(s.lv >= 32, "g2"); add(s.lv >= 64, "g3"); add(s.lv > 64, "g4");
+  add(s.stars >= 96, "g5"); add(s.stars >= 192, "g6");
+  add(s.score >= 100000, "g7"); add(s.rush >= 50000, "g8");
+  add(s.chain >= 7, "g9"); add(s.chain >= 12, "g10");
+  return b;
+}
+async function gfEnsure(env) {
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gemfall (
+       id TEXT PRIMARY KEY, alias TEXT NOT NULL, faction TEXT DEFAULT '', class_tag TEXT DEFAULT '',
+       power INTEGER DEFAULT 0, best_score INTEGER DEFAULT 0, best_rush INTEGER DEFAULT 0,
+       lv INTEGER DEFAULT 0, stars INTEGER DEFAULT 0, chain INTEGER DEFAULT 0,
+       rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
+       first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
+  ).run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
+}
+function gfMap(rows) {
+  return (rows || []).map((r, i) => ({
+    rank: i + 1, alias: r.alias, faction: r.faction || "", power: r.power || 0,
+    lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
+    chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
+    tag: String(r.id || "").slice(-2),
+  }));
+}
+async function gfSubmit(req, env, origin) {
+  if ((env.LB_KILL || "0") === "1") return json({ ok: false, err: "榜单维护中" }, 503, origin);
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false, err: "bad json" }, 400, origin); }
+  const dev = String(body.deviceUUID || "");
+  if (dev.length < 8) return json({ ok: false, err: "no device" }, 400, origin);
+  await gfEnsure(env);
+  const id = await sha256(dev + "|" + env.LB_SALT);
+  const now = Date.now();
+  const prev = await env.DB.prepare("SELECT last_write, first_seen FROM gemfall WHERE id=?").bind(id).first();
+  if (prev && prev.last_write && now - prev.last_write < 15000)
+    return json({ ok: false, err: "太频繁，请稍后再上榜" }, 429, origin);
+  const sea = await getSeason(env);
+  if (!prev) {
+    const cnt = await env.DB.prepare("SELECT COUNT(*) AS c FROM gemfall WHERE season=?").bind(sea).first();
+    if (cnt && cnt.c >= SEASON_ROW_CAP) return json({ ok: false, err: "本赛季榜单已满，请联系老师" }, 429, origin);
+  }
+  let alias = String(body.alias || "").trim().slice(0, 12);
+  if (!ALIAS_RE.test(alias)) return json({ ok: false, err: "化名需 2-12 位中英文/数字" }, 400, origin);
+  if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
+  let faction = String(body.faction || "").trim().slice(0, 8);
+  if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
+  let classTag = "", classJoined = false;
+  if (body.pw && String(body.pw).trim()) {
+    classTag = await sha256("class|" + String(body.pw).trim() + "|" + env.LB_SALT);
+    classJoined = true;
+  }
+  // 硬上限：不可能的数值直接压回，伪造分数进不来
+  const st = body.stats || {};
+  const s = {
+    score: clampInt(st.score, 0, GF_CAP.score), rush: clampInt(st.rush, 0, GF_CAP.rush),
+    lv: clampInt(st.lv, 0, GF_CAP.lv), stars: clampInt(st.stars, 0, GF_CAP.stars),
+    chain: clampInt(st.chain, 0, GF_CAP.chain),
+  };
+  // 星数不可能超过已通关卡数的三倍
+  s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
+  const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
+  const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
+  await env.DB.prepare(
+    `INSERT INTO gemfall (id,alias,faction,class_tag,power,best_score,best_rush,lv,stars,chain,
+       rank_name,badges,season,first_seen,last_write,hidden)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+     ON CONFLICT(id) DO UPDATE SET
+       alias=excluded.alias, faction=excluded.faction,
+       class_tag=CASE WHEN excluded.class_tag!='' THEN excluded.class_tag ELSE gemfall.class_tag END,
+       power=MAX(gemfall.power,excluded.power),
+       best_score=MAX(gemfall.best_score,excluded.best_score),
+       best_rush=MAX(gemfall.best_rush,excluded.best_rush),
+       lv=MAX(gemfall.lv,excluded.lv), stars=MAX(gemfall.stars,excluded.stars),
+       chain=MAX(gemfall.chain,excluded.chain),
+       rank_name=excluded.rank_name, badges=excluded.badges,
+       season=excluded.season, last_write=excluded.last_write`
+  ).bind(id, alias, faction, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
+         rname, badges, sea, seen, now).run();
+  const mine = await env.DB.prepare("SELECT power FROM gemfall WHERE id=?").bind(id).first();
+  const myPower = (mine && mine.power) || power;
+  const ahead = await env.DB.prepare(
+    "SELECT COUNT(*) AS c FROM gemfall WHERE season=? AND hidden=0 AND power>?"
+  ).bind(sea, myPower).first();
+  return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
+    rankName: gfRankFor(myPower), badges: gfBadges(s), classJoined, season: sea }, 200, origin);
+}
+async function gfBoard(req, env, origin, url) {
+  await gfEnsure(env);
+  const sea = url.searchParams.get("season") || await getSeason(env);
+  const scope = url.searchParams.get("scope") || "world";
+  const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
+  let rows;
+  const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges";
+  if (scope === "class") {
+    const pw = (url.searchParams.get("pw") || "").trim();
+    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    const c = await sha256("class|" + pw + "|" + env.LB_SALT);
+    rows = await env.DB.prepare(
+      `SELECT ${cols} FROM gemfall WHERE season=? AND class_tag=? AND hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
+    ).bind(sea, c, limit).all();
+  } else {
+    rows = await env.DB.prepare(
+      `SELECT ${cols} FROM gemfall WHERE season=? AND hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
+    ).bind(sea, limit).all();
+  }
+  return json({ ok: true, season: sea, scope, count: (rows.results || []).length, rows: gfMap(rows.results) }, 200, origin);
+}
+async function gfAdmin(req, env, origin) {
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false, err: "bad json" }, 400, origin); }
+  const pwh = await sha256(String(body.pw || ""));
+  if (!env.LB_ADMIN_HASH || pwh !== env.LB_ADMIN_HASH) return json({ ok: false, err: "口令不对" }, 403, origin);
+  await gfEnsure(env);
+  const act = String(body.act || body.action || "list");   // 控制台历史上传的是 action，两种都收
+  if (act === "list") {
+    const rows = await env.DB.prepare(
+      "SELECT id,alias,faction,class_tag,power,lv,stars,hidden FROM gemfall ORDER BY power DESC LIMIT 300"
+    ).all();
+    return json({ ok: true, rows: (rows.results || []).map(r => ({ ...r, is_class: !!r.class_tag, class_tag: undefined })) }, 200, origin);
+  }
+  if (act === "hide" || act === "show") {
+    await env.DB.prepare("UPDATE gemfall SET hidden=? WHERE id=?").bind(act === "hide" ? 1 : 0, String(body.id || "")).run();
+    return json({ ok: true }, 200, origin);
+  }
+  if (act === "delete") {
+    await env.DB.prepare("DELETE FROM gemfall WHERE id=?").bind(String(body.id || "")).run();
+    return json({ ok: true }, 200, origin);
+  }
+  if (act === "reset") {
+    await env.DB.prepare("DELETE FROM gemfall").run();
+    return json({ ok: true }, 200, origin);
+  }
+  return json({ ok: false, err: "unknown act" }, 400, origin);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -348,7 +504,10 @@ export default {
       if (p === "/factions" && request.method === "GET") return await handleFactions(request, env, origin, url);
       if (p === "/submit" && request.method === "POST") return await handleSubmit(request, env, origin);
       if (p === "/admin" && request.method === "POST") return await handleAdmin(request, env, origin);
-      if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 3, season: await getSeason(env) }, 200, origin);
+      if (p === "/gf/board" && request.method === "GET") return await gfBoard(request, env, origin, url);
+      if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
+      if (p === "/gf/admin" && request.method === "POST") return await gfAdmin(request, env, origin);
+      if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 4, games: ["wordduel", "gemfall"], season: await getSeason(env) }, 200, origin);
       return json({ ok: false, err: "not found" }, 404, origin);
     } catch (e) {
       console.error("LB worker error:", e && e.stack || e);

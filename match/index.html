@@ -100,7 +100,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-foot a:hover{color:var(--gold)}
 /* 小黑猫 */
 /* 小黑猫是彩蛋，藏在角落即可 —— 但不能压住页脚的「作品总目」链接 */
-#cat{position:fixed;right:16px;bottom:calc(56px + env(safe-area-inset-bottom));width:54px;height:47px;
+#cat{position:relative;display:block;width:52px;height:45px;margin:10px 4px 0 auto;
   cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
 #cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
@@ -275,6 +275,98 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .ally-opt.lock::after{content:'第 'attr(data-u)' 关';position:absolute;bottom:-15px;left:0;right:0;font-size:9px;color:var(--ink3);letter-spacing:.04em}
 #ally-desc{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;margin-top:20px;min-height:34px;line-height:1.7}
 #ally-desc b{color:var(--gold2);font-weight:500}
+/* 聚会赛 */
+/* 底部留出左下角「作品总目」浮标的高度，别压住最后一个输入框 */
+#scr-party{gap:6px;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+.pt-head{text-align:center;margin-top:6px}
+.pt-head h2{font-size:25px;font-weight:300;letter-spacing:.26em;margin:2px 0}
+.pt-head h2 em{font-style:normal;color:var(--gold)}
+.pt-sec{width:min(420px,94vw);margin-top:14px}
+.pt-lbl{font-size:11px;letter-spacing:.34em;color:var(--ink3);margin-bottom:7px;text-align:center}
+.pt-chips{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.pt-chip{font-family:var(--serif);font-size:14px;letter-spacing:.1em;padding:9px 15px;cursor:pointer;
+  border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);transition:all .2s}
+.pt-chip:hover{border-color:var(--gold);color:var(--ink)}
+.pt-chip.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 13%,var(--bg2));box-shadow:var(--glow-soft)}
+.pt-chip .d{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--ink3);margin-top:2px}
+.pt-chip.on .d{color:color-mix(in srgb,var(--gold) 60%,var(--ink3))}
+#pt-names{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.pt-name{display:flex;align-items:center;gap:9px}
+.pt-dot{width:30px;height:30px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:var(--pc);background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
+.pt-name input{flex:1;min-width:0;font-family:var(--serif);font-size:15px;padding:8px 11px;color:var(--ink);
+  background:var(--bg2);border:1px solid var(--line);outline:none;transition:border-color .2s}
+.pt-name input:focus{border-color:var(--gold)}
+.pt-name .tm{flex:none;font-family:var(--serif);font-size:12px;letter-spacing:.1em;padding:7px 10px;cursor:pointer;
+  border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);transition:all .2s;min-width:56px}
+.pt-name .tm.a{border-color:var(--red);color:var(--red)}
+.pt-name .tm.b{border-color:var(--blue);color:var(--blue)}
+#pt-hint{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;text-align:center;margin-top:12px;line-height:1.8;
+  width:min(420px,94vw)}
+#pt-hint b{color:var(--gold2);font-weight:500}
+/* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了 */
+#ovl-hand{background:var(--bg)}
+:root[data-theme="dark"] #ovl-hand{background:#07070a}
+#ovl-hand .ovl-card{text-align:center}
+#hand-dot{width:88px;height:88px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:40px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg,rgba(201,166,74,.16)),transparent 72%);
+  position:relative;animation:curPulse 2.2s ease-in-out infinite}
+#hand-dot::before{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 22s linear infinite}
+#hand-who{font-size:27px;font-weight:300;letter-spacing:.2em;margin-top:8px;color:var(--ink)}
+#hand-meta{font-size:12.5px;color:var(--ink3);letter-spacing:.16em;margin-top:4px}
+#hand-mult{font-size:15px;color:var(--gold2);letter-spacing:.14em;margin-top:8px}
+#hand-scores{margin-top:14px;font-size:12.5px;color:var(--ink2);line-height:2;letter-spacing:.04em}
+#hand-scores b{color:var(--gold2);font-weight:500}
+/* 聚会赛 HUD 条 */
+#pt-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;
+  border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 11px}
+#pt-bar.on{display:flex}
+#pt-bar .dot{width:30px;height:30px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
+#pt-bar .mid{flex:1;min-width:0}
+#pt-bar .nm{font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pt-bar .sub{font-size:11px;color:var(--ink3);letter-spacing:.12em;margin-top:1px}
+#pt-bar .mu{flex:none;font-size:17px;color:var(--gold2);letter-spacing:.02em}
+/* 名次台 */
+#pt-podium{margin:16px 0 4px;text-align:left}
+.pd-row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line2)}
+.pd-row:last-child{border-bottom:0}
+.pd-row .rk{width:28px;flex:none;text-align:center;font-size:15px;color:var(--ink3)}
+.pd-row.w1 .rk{color:var(--gold2);font-size:19px}
+.pd-row .dot{width:28px;height:28px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--pc);background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
+.pd-row .nm{flex:1;min-width:0;font-size:15px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-row .sc{flex:none;font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
+.pd-row.w1{background:color-mix(in srgb,var(--gold) 10%,transparent)}
+#pt-rounds{margin-top:10px;font-size:11.5px;color:var(--ink3);line-height:1.9;letter-spacing:.03em}
+/* 矿脉榜 */
+#ovl-lb .ovl-card{width:min(440px,94vw)}
+.lb-tabs{display:flex;gap:8px;margin:14px 0 10px}
+.lb-tabs button{flex:1;font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;padding:8px 4px;
+  border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
+.lb-tabs button.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
+#lb-list{max-height:46dvh;overflow-y:auto;text-align:left}
+.lb-row{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px solid var(--line2)}
+.lb-row:last-child{border-bottom:0}
+.lb-row .rk{width:26px;flex:none;text-align:center;font-size:14px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.lb-row.top1 .rk,.lb-row.top2 .rk,.lb-row.top3 .rk{color:var(--gold2);font-size:16px}
+.lb-row.me{background:color-mix(in srgb,var(--gold) 10%,transparent);border-left:2px solid var(--gold)}
+.lb-row .who{flex:1;min-width:0}
+.lb-row .nm{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-row .sub{font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-row .pw{flex:none;text-align:right}
+.lb-row .pv{font-size:15px;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.2}
+.lb-row .pl{font-size:10px;color:var(--ink3);letter-spacing:.16em}
+#lb-mine{margin-top:10px;font-size:12.5px;color:var(--ink2);letter-spacing:.06em;line-height:1.9}
+#lb-mine b{color:var(--gold2);font-weight:500}
+#lb-msg{font-size:13px;color:var(--ink3);padding:22px 6px;line-height:1.9}
+.lb-form{text-align:left;margin-top:12px}
+.lb-form label{display:block;font-size:11.5px;letter-spacing:.2em;color:var(--ink3);margin:9px 0 3px}
+.lb-form input{width:100%;font-family:var(--serif);font-size:15px;padding:9px 11px;color:var(--ink);
+  background:var(--bg2);border:1px solid var(--line);outline:none;transition:border-color .2s}
+.lb-form input:focus{border-color:var(--gold)}
+.lb-form .tip{font-size:11.5px;color:var(--ink3);margin-top:5px;line-height:1.7}
 /* 编年史片段（地脉通关联动卡） */
 #ovl-lore .ovl-card{max-width:420px}
 #lore-body{font-size:14px;color:var(--ink);line-height:2;letter-spacing:.04em;text-align:left;margin:14px 0 4px}
@@ -428,6 +520,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="menu-btns">
       <button class="btn primary big ornate" id="btn-adventure">⚒ 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
       <button class="btn ornate" id="btn-rush">🕯 矿灯将熄 · 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
+      <button class="btn ornate" id="btn-party">🎲 聚会赛<span class="sub">一台机器轮流玩 · 2–6 人</span></button>
+      <button class="btn ornate" id="btn-lb">🏆 矿脉榜<span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
       <div class="menu-sub">
         <button class="btn ghost" id="btn-ach">🏅 成就</button>
         <button class="btn ghost" id="btn-how">卷轴 · 玩法</button>
@@ -479,8 +573,47 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="ovl-btns"><button class="btn ghost" id="map-back">← 回大厅</button></div>
   </section>
 
+  <!-- 聚会赛 · 设置 -->
+  <section id="scr-party" class="scr">
+    <div class="pt-head">
+      <div class="kicker">PARTY · PASS &amp; PLAY</div>
+      <h2>聚会 · <em>赛</em></h2>
+      <div class="map-era">一台机器轮流玩 · 2–6 人</div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">几个人</div>
+      <div class="pt-chips" id="pt-count"></div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">打几轮</div>
+      <div class="pt-chips" id="pt-rounds-pick"></div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">怎么算</div>
+      <div class="pt-chips" id="pt-mode">
+        <div class="pt-chip on" data-m="ffa">各打各的<span class="d">总分最高者胜</span></div>
+        <div class="pt-chip" data-m="team">两队对抗<span class="d">红队 vs 蓝队</span></div>
+        <div class="pt-chip" data-m="relay">合力接龙<span class="d">大家凑一个总分</span></div>
+      </div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">名字（可改）</div>
+      <div id="pt-names"></div>
+    </div>
+    <div id="pt-hint"></div>
+    <div class="ovl-btns" style="margin-bottom:20px">
+      <button class="btn ghost" id="pt-back">← 回大厅</button>
+      <button class="btn primary big" id="pt-go">开 局</button>
+    </div>
+  </section>
+
   <!-- 游戏 -->
   <section id="scr-game" class="scr">
+    <div id="pt-bar">
+      <div class="dot" id="ptb-dot">一</div>
+      <div class="mid"><div class="nm" id="ptb-name">选手一</div><div class="sub" id="ptb-sub">第 1 轮 / 共 3 轮</div></div>
+      <div class="mu" id="ptb-mult">×1</div>
+    </div>
     <div id="rush-bar"><div id="rush-top"><span>矿灯将熄 · LAMPLIGHT</span><span id="rush-time">90.0</span><span id="rush-best">最佳 —</span></div><div id="rush-track"><i></i></div></div>
     <div id="boss-bar">
       <div id="boss-face"></div>
@@ -586,6 +719,61 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="ovl-btns"><button class="btn ghost" id="ach-close">合上</button></div>
 </div></div>
 
+<!-- 聚会赛 · 交接 -->
+<div class="ovl" id="ovl-hand"><div class="ovl-card">
+  <div class="ovl-kick" id="hand-kick">把机器递给下一位</div>
+  <div id="hand-dot">一</div>
+  <div id="hand-who">选手一</div>
+  <div id="hand-meta">第 1 轮 / 共 3 轮</div>
+  <div id="hand-mult">本轮得分 ×1</div>
+  <div id="hand-scores"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="hand-quit">结束本局</button>
+    <button class="btn primary big" id="hand-go">我准备好了</button>
+  </div>
+</div></div>
+
+<!-- 聚会赛 · 战果 -->
+<div class="ovl" id="ovl-pt-end"><div class="ovl-card">
+  <div class="ovl-kick">PARTY RESULT</div>
+  <div class="ovl-title" id="pte-title">冠 · <em>军</em></div>
+  <div class="ovl-sub" id="pte-sub"></div>
+  <div id="pt-podium"></div>
+  <div id="pt-rounds"></div>
+  <div class="quip" id="pte-quip"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="pte-menu">回大厅</button>
+    <button class="btn primary" id="pte-again">再来一局</button>
+  </div>
+</div></div>
+
+<!-- 矿脉榜 -->
+<div class="ovl" id="ovl-lb"><div class="ovl-card">
+  <div class="ovl-kick">GEMFALL LEADERBOARD</div>
+  <div class="ovl-title">矿脉 · <em>榜</em></div>
+  <div class="lb-tabs">
+    <button data-scope="world" class="on">世界榜</button>
+    <button data-scope="class">小队榜</button>
+  </div>
+  <div id="lb-msg">正在连接矿脉…</div>
+  <div id="lb-list"></div>
+  <div id="lb-mine"></div>
+  <div class="lb-form" id="lb-form" hidden>
+    <label>化名（2–12 位中英文/数字，别用真名）</label>
+    <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：持镐的阿狼">
+    <label>门派（可留空）</label>
+    <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
+    <label>小队口令（可留空，填了才进小队榜）</label>
+    <input id="lb-pw" maxlength="24" autocapitalize="none" autocorrect="off" placeholder="同一句口令 = 同一个小队">
+    <div class="tip">榜上只出现化名，不收集任何真实身份信息。设备换了或清了缓存，成绩要重新上榜。</div>
+  </div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="lb-close">合上</button>
+    <button class="btn" id="lb-edit">改化名</button>
+    <button class="btn primary" id="lb-submit">上 榜</button>
+  </div>
+</div></div>
+
 <!-- 编年史片段 · 地脉通关联动 -->
 <div class="ovl" id="ovl-lore"><div class="ovl-card">
   <div class="ovl-kick" id="lore-kick">编年史片段 · CHRONICLE</div>
@@ -624,7 +812,8 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- 存档 ---------- */
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
-  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{}};
+  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
+  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbSig:''};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -738,18 +927,22 @@ const OBST_INFO={
 
 /* ---------- 同伴助战：六位学院谷地的熟人，各自应一色灵石 ----------
    充能 = 消除对应色灵石；满了放大招。带谁出门，取决于这一关卡在哪 */
+/* 名录与兽形以王老师 2026-07-29 的勘误为准：
+   琳（原「林」）将在世界观中逐步下线，本作不采用；禾 / 墨 无正式档案，撤下；
+   海与梓同为鹿，重复，保留梓（梅花鹿）。
+   title 是本作矿脉题材下的角色定位（由各自大招推出），不主张世界观正典。 */
 const COMPANIONS=[
-  {id:'wolf',g:'狼',name:'狼先生',title:'执灯人',   col:0,need:42,ult:'执灯',unlock:1,
+  {id:'wolf',g:'狼',name:'狼先生',title:'执灯人', beast:'狼',    col:0,need:42,ult:'执灯',unlock:1,
    desc:'全盘已炼成的灵石<b>同时引爆</b>。攒一手特殊灵石再放，场面最好看。'},
-  {id:'lin', g:'林',name:'林',    title:'噬词者',   col:1,need:38,ult:'焚脉',unlock:4,
-   desc:'把三颗灵石就地炼成<b>爆裂灵石</b>。清岩壳、破石笼的快刀。'},
-  {id:'hai', g:'海',name:'海',    title:'鹿女',     col:2,need:38,ult:'涤脉',unlock:10,
-   desc:'洗净<b>一行一列</b>。猫铃卡住时最好用 —— 底下一空，铃自己就下去了。'},
-  {id:'he',  g:'禾',name:'禾',    title:'习字者',   col:3,need:34,ult:'春生',unlock:16,
+  {id:'jun', g:'钧',name:'钧',    title:'开山者', beast:'老虎',  col:1,need:38,ult:'虎啸',unlock:4,
+   desc:'一声吼，把三颗灵石就地震成<b>爆裂灵石</b>。清岩壳、破石笼的快刀。'},
+  {id:'qi',  g:'麒',name:'麒',    title:'巡渊者', beast:'鲨鱼',  col:2,need:38,ult:'破浪',unlock:10,
+   desc:'一道横穿，洗净<b>一行一列</b>。猫铃卡住时最好用 —— 底下一空，铃自己就下去了。'},
+  {id:'xi',  g:'晰',name:'晰',    title:'探路者', beast:'兔子',  col:3,need:34,ult:'疾足',unlock:16,
    desc:'再给你 <b>3 步</b>（限时局则加 <b>8 秒</b>）。差一口气时的救命稻草。'},
-  {id:'mo',  g:'墨',name:'墨',    title:'驭灵师',   col:4,need:46,ult:'引渡',unlock:24,
-   desc:'凭空引出一颗<b>万象灵珠</b>。想凑组合技，就靠她。'},
-  {id:'zi',  g:'梓',name:'梓璇',  title:'初代大弟子',col:5,need:40,ult:'破封',unlock:32,
+  {id:'xiao',g:'晓',name:'晓',    title:'摘星者', beast:'飞鼠',  col:4,need:46,ult:'掠星',unlock:24,
+   desc:'滑翔而过，摘下一颗<b>万象灵珠</b>。想凑组合技，就靠他。'},
+  {id:'zi',  g:'梓',name:'梓',    title:'解封者', beast:'梅花鹿',col:5,need:40,ult:'破封',unlock:32,
    desc:'全场<b>墨封 / 岩壳 / 石笼各褪一层</b>。机关关的万能解。'},
 ];
 const compById=id=>COMPANIONS.find(c=>c.id===id)||COMPANIONS[0];
@@ -759,7 +952,7 @@ const compUnlocked=c=>SAVE.lv>=c.unlock;
 const LORE=[
   {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
    t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案 —— 一切远征的源头。',u:'https://myskme-volvme-ii.netlify.app'},
-  {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页批改过的作业。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，批完还得讲。」',
+  {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页被朱笔圈过的旧纸。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，圈完还得说清楚。」',
    t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评 —— 被红笔改过、又被夸过的那些。',u:'../wall/'},
   {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
    t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
@@ -993,9 +1186,9 @@ const PLAT={
 const ART={
   hero:'art/hero.webp',                                        // 大厅主视觉（狼先生）
   cat:'art/cat.webp',                                          // 大厅小黑猫彩蛋
-  ally_wolf:'art/ally-wolf.webp', ally_lin:'art/ally-lin.webp',
-  ally_hai:'art/ally-hai.webp',   ally_he:'art/ally-he.webp',
-  ally_mo:'art/ally-mo.webp',     ally_zi:'art/ally-zi.webp',
+  ally_wolf:'art/ally-wolf.webp', ally_jun:'art/ally-jun.webp',
+  ally_qi:'art/ally-qi.webp',     ally_xi:'art/ally-xi.webp',
+  ally_xiao:'art/ally-xiao.webp', ally_zi:'art/ally-zi.webp',
   boss_ye:'art/boss-ye.webp', boss_she:'art/boss-she.webp', boss_both:'art/boss-both.webp',
   gem_0:'art/gem-0.webp', gem_1:'art/gem-1.webp', gem_2:'art/gem-2.webp',
   gem_3:'art/gem-3.webp', gem_4:'art/gem-4.webp', gem_5:'art/gem-5.webp',
@@ -1061,7 +1254,7 @@ const gemAt=(r,c)=>isGem(r,c)?B[r][c].g:-1;
 const swappable=(r,c)=>inB(r,c)&&canHold(r,c)&&has(r,c)&&B[r][c].cage===0;
 
 function newPiece(o){return Object.assign({g:0,k:'n',bell:false,cage:0,snake:false,id:idSeq++,vx:0,vy:0,sc:1,al:1,spin:0,glow:0,born:0},o||{})}
-function randColor(rng){return Math.floor((rng||rnd)()*ENG.colors)}
+function randColor(rng){return Math.floor((rng||ENG.rng||rnd)()*ENG.colors)}
 
 /* ---- 找出所有三连及以上（返回若干「组」） ---- */
 function scanRuns(){
@@ -1294,7 +1487,9 @@ function patchHoles(){                                          // 兜底：绝�
 }
 
 /* ---- 建盘：无初始三连、且保证有解 ---- */
-function buildBoard(L){
+function buildBoard(L,seed){
+  /* 传了 seed 就用确定性随机源建盘 —— 聚会赛靠它保证同一轮所有人盘面一致 */
+  ENG.rng=seed!=null?rngOf(seed):null;
   ENG.colors=L.colors;
   T=[];for(let r=0;r<N;r++){const row=[];for(let c=0;c<N;c++)row.push({ink:0,crate:0});T.push(row)}
   const markT=(list,prop,val)=>{for(const [r,c] of list||[])if(inB(r,c))T[r][c][prop]=val};
@@ -1313,15 +1508,17 @@ function buildBoard(L){
     for(const [r,c] of L.snakes||[])if(inB(r,c)&&B[r][c]){B[r][c].cage=1;B[r][c].snake=true}
     /* 放猫铃：顶部分散列 */
     if(L.bells>0){
+      const R=ENG.rng||rnd;
       const cols=[];for(let c=0;c<N;c++)if(T[0][c].crate===0)cols.push(c);
-      for(let i=cols.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
+      for(let i=cols.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
       for(let i=0;i<L.bells&&cols.length;i++){
         const c=cols[i%cols.length], r=Math.floor(i/cols.length);
         if(inB(r,c)&&T[r][c].crate===0)B[r][c]=newPiece({g:-1,bell:true});
       }
     }
-    if(scanRuns().length===0&&anyMove())return true;
+    if(scanRuns().length===0&&anyMove()){ENG.rng=null;return true}
   }
+  ENG.rng=null;
   return true;
 }
 function shuffleBoard(){
@@ -1876,6 +2073,7 @@ async function settleBoard(firstChain){
     const groups=findGroups();
     if(!groups.length)break;
     chain++;GS.chainMax=Math.max(GS.chainMax,chain);
+    if(chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}
     /* 先记下要炼成的特殊灵石 */
     const makes=[];
     const all=new Set();
@@ -1908,7 +2106,7 @@ async function settleBoard(firstChain){
       if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b> —— 与任意灵石交换，吞掉全场同色')}
     }
     grant('a1');
-    await sleep(REDUCED?30:200);
+    await sleep(REDUCED?25:150);
     await dropAndFill();
   }
   if(chain>=5)grant('a6');
@@ -1933,7 +2131,8 @@ async function dropAndFill(){
     let moved=gravityPass();
     const spawned=spawnTop();
     if(!moved&&!spawned)break;
-    await sleep(REDUCED?12:62);
+    /* 落得越久越快 —— 真实重力就是加速的，顺带把大清场的等待时间砍掉一半 */
+    await sleep(REDUCED?10:Math.max(24,60-guard*5));
   }
   const patched=patchHoles();
   if(patched)await sleep(80);
@@ -2028,6 +2227,10 @@ async function trySwap(a,b){
 async function checkEnd(){
   if(GS.over)return;
   if(GS.rushOn)return;
+  if(GS.party){                                               // 聚会赛：步数走完就交棒，不走通关结算
+    if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(500);ptTurnEnd()}
+    return;
+  }
   if(goalsMet()){
     GS.over=true;GS.busy=true;
     if(GS.boss){await bossDown()}
@@ -2233,7 +2436,7 @@ async function fireUlt(){
     const res=clearCells(ex.cells,4);
     addScore(Math.round(110*res.gems+900),3,3,'#e8c768');
     if(GS.boss)bossHurt(res.gems+18);
-  }else if(c.id==='lin'){                                     // 焚脉：三颗化爆裂
+  }else if(c.id==='jun'){                                     // 虎啸：三颗震成爆裂
     const spots=[];
     for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k==='n')spots.push([r,c2]);
     const made=[];
@@ -2251,7 +2454,7 @@ async function fireUlt(){
       addScore(Math.round(110*res.gems+700),made[0][0],made[0][1],'#e8c768');
       if(GS.boss)bossHurt(res.gems+14);
     }
-  }else if(c.id==='hai'){                                     // 涤脉：一行一列
+  }else if(c.id==='qi'){                                      // 破浪：一行一列
     const r=Math.floor(rnd()*N), c2=Math.floor(rnd()*N);
     fxBeam(r,c2,'h');fxBeam(r,c2,'v');SFX.rocket();SFX.orb();
     const cells=[];
@@ -2260,11 +2463,11 @@ async function fireUlt(){
     const res=clearCells(cells,4);
     addScore(Math.round(110*res.gems+700),r,c2,'#e8c768');
     if(GS.boss)bossHurt(res.gems+14);
-  }else if(c.id==='he'){                                      // 春生：加步 / 加时
-    if(GS.rushOn){GS.rushT+=8000;toast('<b>禾</b> 添了灯油 · +8 秒',2000)}
+  }else if(c.id==='xi'){                                      // 疾足：加步 / 加时
+    if(GS.rushOn){GS.rushT+=8000;toast('<b>晰</b> 添了灯油 · +8 秒',2000)}
     else {GS.moves+=3;updHUD();floatNum(2,4,'+3 步','#6aa86a')}
     SFX.win();
-  }else if(c.id==='mo'){                                      // 引渡：凭空一颗万象
+  }else if(c.id==='xiao'){                                    // 掠星：凭空一颗万象
     const spots=[];
     for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k==='n')spots.push([r,c2]);
     if(spots.length){
@@ -2274,7 +2477,7 @@ async function fireUlt(){
       floatNum(r,c2,'万象','#ffffff');
       grant('a4');
     }
-  }else if(c.id==='zi'){                                      // 破封：机关各褪一层
+  }else if(c.id==='zi'){                                      // 破封：机关各褪一层（梓）
     let n=0;
     for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++){
       if(T[r][c2].ink>0){T[r][c2].ink--;bumpGoal('ink',null,1);n++;fxBurst(cxOf(c2),cyOf(r),'#9d72d6',6,.9)}
@@ -2284,7 +2487,7 @@ async function fireUlt(){
     }
     SFX.crate();SFX.ink();SFX.crush();
     addScore(n*160,3,3,'#c199e6');
-    if(!n)toast('这一关没有机关 —— <b>梓璇替你把灰扫了</b>',2000);
+    if(!n)toast('这一关没有机关 —— <b>梓替你把灰扫了</b>',2000);
   }
   await sleep(REDUCED?30:240);
   await dropAndFill();
@@ -2479,6 +2682,7 @@ function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
   const best=GS.score>SAVE.rushBest;
   if(best){SAVE.rushBest=GS.score;persist()}
+  setTimeout(()=>LB.autoSubmit(),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
   $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
@@ -2513,6 +2717,7 @@ function endLevel(win){
     }
     delete SAVE.fails[n];
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
+    setTimeout(()=>LB.autoSubmit(),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
     SFX.win();
@@ -2573,6 +2778,335 @@ function fxBurstDom(i){
 }
 
 /* ==================================================================
+   [ 聚会赛 · PARTY（一台机器轮流玩） ]
+   同一轮里所有人拿到**完全相同的初始棋盘**（同种子），比的是手艺不是运气。
+   轮次倍率 ×1 / ×2 / ×3… 越往后越重，前面落后也翻得回来。
+   全程不带任何课业相关字眼，纯聚会玩法。
+   ================================================================== */
+const PT_GLYPH=['一','二','三','四','五','六'];
+const PT_MOVES=14;                                             // 每人每轮的步数，一局约 1–2 分钟
+const PARTY={on:false,players:[],n:3,rounds:3,mode:'ffa',round:0,cur:0,seed:''};
+function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
+function ptColor(i){return GEMS[i%6]}
+function ptStyle(el,i){
+  const g=ptColor(i);
+  el.style.setProperty('--pc',g.base);
+  el.style.setProperty('--pg',hexA(g.base,.24));
+  if(document.documentElement.getAttribute('data-theme')==='light')el.style.setProperty('--pc',g.dk);
+}
+function ptMult(round){return round+1}                          // 第 1 轮 ×1，第 2 轮 ×2 …
+function renderPartySetup(){
+  const cnt=$('#pt-count');cnt.innerHTML='';
+  for(let n=2;n<=6;n++){
+    const d=document.createElement('div');
+    d.className='pt-chip'+(PARTY.n===n?' on':'');d.textContent=n+' 人';
+    d.addEventListener('click',()=>{PARTY.n=n;renderPartySetup()});
+    cnt.appendChild(d);
+  }
+  const rp=$('#pt-rounds-pick');rp.innerHTML='';
+  for(let r=3;r<=5;r++){
+    const d=document.createElement('div');
+    d.className='pt-chip'+(PARTY.rounds===r?' on':'');
+    d.innerHTML=r+' 轮<span class="d">倍率 ×1…×'+r+'</span>';
+    d.addEventListener('click',()=>{PARTY.rounds=r;renderPartySetup()});
+    rp.appendChild(d);
+  }
+  for(const c of $$('#pt-mode .pt-chip'))c.classList.toggle('on',c.dataset.m===PARTY.mode);
+  /* 名字与队伍 */
+  while(PARTY.players.length<6)PARTY.players.push({name:'',team:PARTY.players.length%2});
+  const host=$('#pt-names');host.innerHTML='';
+  for(let i=0;i<PARTY.n;i++){
+    const p=PARTY.players[i];
+    const row=document.createElement('div');row.className='pt-name';
+    const dot=document.createElement('div');dot.className='pt-dot';dot.textContent=PT_GLYPH[i];ptStyle(dot,i);
+    const inp=document.createElement('input');
+    inp.maxLength=8;inp.placeholder=ptDefaultName(i);inp.value=p.name||'';
+    inp.setAttribute('autocapitalize','none');inp.setAttribute('autocorrect','off');
+    inp.addEventListener('input',()=>{p.name=inp.value.slice(0,8)});
+    row.appendChild(dot);row.appendChild(inp);
+    if(PARTY.mode==='team'){
+      const tm=document.createElement('button');
+      tm.className='tm '+(p.team?'b':'a');tm.textContent=p.team?'蓝队':'红队';
+      tm.addEventListener('click',()=>{p.team=p.team?0:1;SFX.click();renderPartySetup()});
+      row.appendChild(tm);
+    }
+    host.appendChild(row);
+  }
+  const mult=[];for(let r=0;r<PARTY.rounds;r++)mult.push('×'+ptMult(r));
+  $('#pt-hint').innerHTML=
+    (PARTY.mode==='ffa'?'各打各的，<b>总分最高的人赢</b>。':
+     PARTY.mode==='team'?'两队各自把分数加起来，<b>总分高的队赢</b>。':
+     '所有人的分数<b>加在一起</b>，一起冲一个总分。')
+    +'<br>每人每轮 <b>'+PT_MOVES+'</b> 步，同一轮大家拿到<b>一模一样的盘面</b>。'
+    +'<br>轮次倍率 <b>'+mult.join(' · ')+'</b> —— 越往后越关键，前面落后也翻得回来。';
+}
+function startParty(){
+  PARTY.on=true;PARTY.round=0;PARTY.cur=0;
+  PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
+    name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),
+    team:p.team||0, scores:[], total:0, idx:i,
+  }));
+  ptHandoff();
+}
+function ptHandoff(){
+  const p=PARTY.players[PARTY.cur];
+  const dot=$('#hand-dot');dot.textContent=PT_GLYPH[p.idx];ptStyle(dot,p.idx);
+  $('#hand-kick').textContent=(PARTY.round===0&&PARTY.cur===0)?'第一位，开始':'把机器递给下一位';
+  $('#hand-who').textContent=p.name+(PARTY.mode==='team'?(p.team?' · 蓝队':' · 红队'):'');
+  $('#hand-meta').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
+  $('#hand-mult').textContent='本轮得分 ×'+ptMult(PARTY.round);
+  $('#hand-scores').innerHTML=ptScoreLines();
+  show('game');ovl('hand');
+}
+function ptScoreLines(){
+  if(!PARTY.players.some(p=>p.total>0))return '';
+  if(PARTY.mode==='relay'){
+    const tot=PARTY.players.reduce((a,p)=>a+p.total,0);
+    return '目前合计 <b>'+tot.toLocaleString('en-US')+'</b>';
+  }
+  if(PARTY.mode==='team'){
+    const a=PARTY.players.filter(p=>!p.team).reduce((x,p)=>x+p.total,0);
+    const b=PARTY.players.filter(p=>p.team).reduce((x,p)=>x+p.total,0);
+    return '红队 <b>'+a.toLocaleString('en-US')+'</b> ｜ 蓝队 <b>'+b.toLocaleString('en-US')+'</b>';
+  }
+  return PARTY.players.slice().sort((x,y)=>y.total-x.total).slice(0,3)
+    .map((p,i)=>(i+1)+'. '+esc(p.name)+' <b>'+p.total.toLocaleString('en-US')+'</b>').join('　');
+}
+function ptStartTurn(){
+  const p=PARTY.players[PARTY.cur];
+  const L=levelDef(3);
+  L.n=0;L.endless=false;L.boss=null;L.bells=0;
+  L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
+  L.colors=5;L.moves=PT_MOVES;
+  L.goals=[{type:'score',need:999999999,got:0}];
+  L.chName='聚会赛';L.era='第 '+(PARTY.round+1)+' 轮';
+  L.s1=6000;L.s2=14000;L.s3=26000;
+  GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  GS.moves=PT_MOVES;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;
+  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  /* 同一轮 = 同一颗种子 = 同一个初始盘面，公平可比 */
+  buildBoard(L,PARTY.seed+'|r'+PARTY.round);
+  show('game');fitCanvas();
+  $('#boss-bar').classList.remove('on');
+  $('#rush-bar').classList.remove('on');
+  $('#toolbar').style.display='none';                          // 聚会赛不用灵器，人人同起点
+  $('#tool-hint').classList.remove('on');
+  const bar=$('#pt-bar');bar.classList.add('on');
+  const dot=$('#ptb-dot');dot.textContent=PT_GLYPH[p.idx];ptStyle(dot,p.idx);ptStyle(bar,p.idx);
+  $('#ptb-name').textContent=p.name+(PARTY.mode==='team'?(p.team?' · 蓝队':' · 红队'):'');
+  $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
+  $('#ptb-mult').textContent='×'+ptMult(PARTY.round);
+  $('#score-stars').innerHTML='<s style="left:23%">★</s><s style="left:54%">★</s><s style="left:97%">★</s>';
+  renderGoals($('#goal-row'),30);
+  $('#goal-lbl').textContent='本轮得分';
+  $('#quip-line').innerHTML='<b>狼先生：</b>'+pick2(Q_INTRO);
+  updHUD();renderAlly();
+  ovl(null);GS.busy=false;GS.idle=PLAT.now();
+}
+function ptTurnEnd(){
+  const p=PARTY.players[PARTY.cur];
+  const gained=GS.score*ptMult(PARTY.round);
+  p.scores.push(gained);p.total+=gained;
+  SFX.win();
+  PARTY.cur++;
+  if(PARTY.cur>=PARTY.players.length){PARTY.cur=0;PARTY.round++}
+  if(PARTY.round>=PARTY.rounds){ptFinish();return}
+  ptHandoff();
+}
+function ptFinish(){
+  PARTY.on=false;GS.party=false;
+  $('#toolbar').style.display='';
+  $('#pt-bar').classList.remove('on');
+  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  const T=$('#pte-title'), S=$('#pte-sub'), P=$('#pt-podium');
+  if(PARTY.mode==='relay'){
+    const tot=PARTY.players.reduce((a,p)=>a+p.total,0);
+    T.innerHTML='合力 · <em>达成</em>';
+    S.textContent=PARTY.players.length+' 人 · '+PARTY.rounds+' 轮 · 合计 '+tot.toLocaleString('en-US');
+  }else if(PARTY.mode==='team'){
+    const a=PARTY.players.filter(p=>!p.team).reduce((x,p)=>x+p.total,0);
+    const b=PARTY.players.filter(p=>p.team).reduce((x,p)=>x+p.total,0);
+    T.innerHTML=a===b?'握手 · <em>言和</em>':(a>b?'红队 · <em>胜</em>':'蓝队 · <em>胜</em>');
+    S.textContent='红队 '+a.toLocaleString('en-US')+' ｜ 蓝队 '+b.toLocaleString('en-US');
+  }else{
+    T.innerHTML='冠 · <em>军</em>';
+    S.textContent=ranked[0].name+' · '+ranked[0].total.toLocaleString('en-US');
+  }
+  P.innerHTML=ranked.map((p,i)=>{
+    const g=ptColor(p.idx), lite=document.documentElement.getAttribute('data-theme')==='light';
+    return '<div class="pd-row'+(i===0&&PARTY.mode!=='relay'?' w1':'')+'">'
+      +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
+      +'<div class="dot" style="--pc:'+(lite?g.dk:g.base)+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
+      +'<div class="nm">'+esc(p.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(p.team?'蓝队':'红队')+'</span>':'')+'</div>'
+      +'<div class="sc">'+p.total.toLocaleString('en-US')+'</div></div>';
+  }).join('');
+  $('#pt-rounds').innerHTML=ranked.map(p=>
+    esc(p.name)+'：'+p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')).join(' · ')).join('<br>');
+  $('#pte-quip').textContent=pick2(Q_WIN);
+  fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
+  ovl('pt-end');
+}
+
+/* ==================================================================
+   [ 矿脉榜 · NETWORK LEADERBOARD ]
+   后端复用 MYSKME 现有的 Cloudflare Worker + D1，走独立的 /gf/* 路由与
+   独立的 gemfall 表，和词灵榜互不影响。
+   隐私：只上传化名与几个数字；设备键在服务端加盐哈希，原始 UUID 不出本机。
+   离线 / 后端未部署 / 断网 时全部静默降级 —— 游戏本体永远照常能玩。
+   ================================================================== */
+const LB={
+  api:'https://myskme-leaderboard.wzc1020.workers.dev',
+  scope:'world',
+  dev(){
+    if(!SAVE.lbDev){
+      SAVE.lbDev=(crypto.randomUUID?crypto.randomUUID():
+        'gf-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12));
+      persist();
+    }
+    return SAVE.lbDev;
+  },
+  registered(){return !!(SAVE.lbAlias&&SAVE.lbAlias.length>=2)},
+  stats(){
+    const stars=totalStars();
+    const lv=Math.max(0,(SAVE.lv||1)-1);                       // 已通关卡数
+    let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
+    return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0};
+  },
+  async fetchJSON(url,opt){
+    const ctl=new AbortController();
+    const to=setTimeout(()=>ctl.abort(),9000);                 // 网络不好时别让玩家干等
+    try{
+      const r=await fetch(url,Object.assign({signal:ctl.signal},opt||{}));
+      const d=await r.json().catch(()=>({ok:false,err:'返回格式不对'}));
+      return d;
+    }catch(e){
+      return {ok:false,err:e.name==='AbortError'?'连接超时':'连不上矿脉榜',offline:true};
+    }finally{clearTimeout(to)}
+  },
+  async submit(silent){
+    if(!this.registered())return {ok:false,err:'还没起化名'};
+    const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
+      pw:SAVE.lbPw||'',stats:this.stats()};
+    const d=await this.fetchJSON(this.api+'/gf/submit',
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(d.ok){
+      SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;SAVE.lbAt=Date.now();persist();
+      if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
+    }else if(!silent&&d.err&&!d.offline)toast(d.err);
+    return d;
+  },
+  async board(scope){
+    let u=this.api+'/gf/board?scope='+scope+'&limit=50';
+    if(scope==='class'){
+      if(!SAVE.lbPw)return {ok:false,err:'nopw'};
+      u+='&pw='+encodeURIComponent(SAVE.lbPw);
+    }
+    return await this.fetchJSON(u);
+  },
+  /* 通关 / 限时局结束后自动提交：只在成绩真的变好、且距上次≥20 秒时才发 */
+  async autoSubmit(){
+    if(!this.registered())return;
+    const s=this.stats();
+    const sig=[s.score,s.rush,s.lv,s.stars,s.chain].join('|');
+    if(sig===SAVE.lbSig)return;
+    if(SAVE.lbAt&&Date.now()-SAVE.lbAt<20000)return;           // 服务端 15 秒冷却，客户端留余量
+    SAVE.lbSig=sig;persist();
+    await this.submit(true);
+  },
+};
+function lbRowHTML(r,mine){
+  const medal=r.rank<=3?['①','②','③'][r.rank-1]:r.rank;
+  const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
+    r.lv?('第 '+r.lv+' 关'):'',r.stars?('★'+r.stars):''].filter(Boolean).join(' · ');
+  return '<div class="lb-row'+(r.rank<=3?' top'+r.rank:'')+(mine?' me':'')+'">'
+    +'<div class="rk">'+medal+'</div>'
+    +'<div class="who"><div class="nm">'+esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
+    +'<div class="sub">'+esc(sub)+'</div></div>'
+    +'<div class="pw"><div class="pv">'+(r.power||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
+    +'</div>';
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function renderLB(){
+  const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
+  const form=$('#lb-form');
+  for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
+  if(!LB.registered()){
+    form.hidden=false;list.innerHTML='';mine.innerHTML='';
+    /* 输入框与存档同步，避免显示上一次残留的值 */
+    $('#lb-alias').value=SAVE.lbAlias||'';
+    $('#lb-faction').value=SAVE.lbFaction||'';
+    $('#lb-pw').value=SAVE.lbPw||'';
+    msg.innerHTML='起个化名就能上榜 —— <b>不要用真名</b>。';
+    $('#lb-submit').textContent='起名上榜';$('#lb-edit').style.display='none';
+    return;
+  }
+  form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
+  msg.textContent='正在连接矿脉…';list.innerHTML='';mine.innerHTML='';
+  const d=await LB.board(LB.scope);
+  if(d.err==='nopw'){
+    msg.innerHTML='还没填小队口令。点「改化名」补上，就能看小队榜。';return;
+  }
+  if(!d.ok){
+    msg.innerHTML=(d.offline?'连不上矿脉榜 —— <b>不影响你继续挖</b>，联网后再来看。'
+      :esc(d.err||'榜单暂时读不到'))+'<br><span style="font-size:11.5px">（榜单是加分项，离线一样能玩）</span>';
+    return;
+  }
+  const rows=d.rows||[];
+  if(!rows.length){
+    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜 —— <b>你可以是第一个</b>。':'榜上还空着 —— <b>你可以是第一个</b>。';
+    return;
+  }
+  msg.textContent='';
+  let html='',found=false;
+  for(const r of rows){
+    const isMe=r.alias===SAVE.lbAlias;
+    if(isMe)found=true;
+    html+=lbRowHTML(r,isMe);
+  }
+  list.innerHTML=html;
+  const s=LB.stats();
+  mine.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
+    +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
+    +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
+      +(found?'':' · 未进前 50，继续挖')):'');
+}
+function lbOpenForm(){
+  $('#lb-form').hidden=false;
+  $('#lb-alias').value=SAVE.lbAlias||'';
+  $('#lb-faction').value=SAVE.lbFaction||'';
+  $('#lb-pw').value=SAVE.lbPw||'';
+  $('#lb-msg').innerHTML='改完点「上榜」保存。';
+  $('#lb-list').innerHTML='';$('#lb-mine').innerHTML='';
+  $('#lb-submit').textContent='保存并上榜';
+}
+/* 与服务端同一份保留词，客户端先挡一道，省一次白跑的往返 */
+const LB_BLOCK=['管理员','admin','老师','王老师','狼先生','mrwolf','myskme','客服','官方','系统'];
+const lbNorm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[\s·\-_]+/g,'');
+const lbBlocked=s=>{const n=lbNorm(s);return LB_BLOCK.some(w=>n.includes(lbNorm(w)))};
+async function lbSave(){
+  const form=$('#lb-form');
+  if(form.hidden&&!LB.registered())form.hidden=false;      // 没化名却没开表单：兜底打开，别静默失败
+  if(!form.hidden){
+    const a=$('#lb-alias').value.trim();
+    if(a.length<2||a.length>12){toast('化名要 <b>2–12 位</b>');return}
+    if(!/^[一-龥A-Za-z0-9·\-_ ]{2,12}$/.test(a)){toast('化名只能用中英文、数字和 ·-_');return}
+    if(lbBlocked(a)){toast('这个化名是保留词 —— <b>换一个</b>');return}
+    const f=$('#lb-faction').value.trim().slice(0,8);
+    if(f&&lbBlocked(f)){toast('门派名是保留词 —— <b>换一个</b>');return}
+    SAVE.lbAlias=a;
+    SAVE.lbFaction=$('#lb-faction').value.trim().slice(0,8);
+    SAVE.lbPw=$('#lb-pw').value.trim().slice(0,24);
+    SAVE.lbSig='';persist();
+  }
+  $('#lb-msg').textContent='上传中…';
+  const d=await LB.submit(false);
+  if(!d.ok&&d.offline)$('#lb-msg').innerHTML='连不上矿脉榜 —— 化名已存在本机，<b>联网后会自动补上</b>。';
+  else await renderLB();
+}
+
+/* ==================================================================
    [ 界面 · SCREENS ]
    ================================================================== */
 function show(id){
@@ -2582,6 +3116,7 @@ function show(id){
   if(id==='menu'){renderMenu();renderDaily()}
   if(id==='map'){renderMap();renderChest()}
   if(id==='game'){renderTools();renderAlly()}
+  if(id==='party')renderPartySetup();
 }
 function ovl(id){
   for(const o of $$('.ovl'))o.classList.toggle('on',o.id==='ovl-'+id);
@@ -2597,6 +3132,9 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   $('#cat').classList.toggle('found',!!SAVE.cat);
+  $('#lb-sub').textContent=SAVE.lbPower
+    ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||''))
+    : (LB.registered()?'查看世界榜与小队榜':'看看别人挖到哪了');
   applyArt($('#wolf-badge'),'hero');
   applyArt($('#cat'),'cat');
 }
@@ -2659,12 +3197,17 @@ const HOW_HTML=`
 　<b>石笼</b> 被锁住的灵石不能动，连进三连即可破笼。<br><br>
 <b>讨伐战</b>　每消一颗都在削对方的气势，连锁与灵技伤害更高；对方每隔几步会出手捣乱。<br><br>
 <b>同伴助战</b>　出发前挑一位同行。消除<b>他对应颜色</b>的灵石就是在给他充能，满了点头像放大招。<br>
-　狼先生「执灯」引爆全盘特殊灵石 · 林「焚脉」三颗化爆裂 · 海「涤脉」洗净一行一列<br>
-　禾「春生」多给三步 · 墨「引渡」凭空一颗万象 · 梓璇「破封」全场机关各褪一层<br>
-　<b>带谁出门要看关卡</b>：机关多带梓璇，猫铃卡住带海，差一口气带禾。<br><br>
+　狼先生「执灯」引爆全盘特殊灵石 · 钧「虎啸」三颗震成爆裂 · 麒「破浪」洗净一行一列<br>
+　晰「疾足」多给三步 · 晓「掠星」凭空一颗万象 · 梓「破封」全场机关各褪一层<br>
+　<b>带谁出门要看关卡</b>：机关多带梓，猫铃卡住带麒，差一口气带晰。<br><br>
 <b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
 <b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆 —— 别急着刚好走完。<br><br>
-<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。
+<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。<br><br>
+<b>聚会赛</b>　一台机器 2–6 人轮流玩，打 3–5 轮。<b>同一轮里所有人拿到一模一样的盘面</b>，比的是手艺不是运气；
+轮次倍率 ×1 ×2 ×3 越往后越重，前面落后也翻得回来。可选各打各的、两队对抗、或合力凑一个总分。<br><br>
+<b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
+榜上只出现化名，不收集任何真实身份信息；离线也照常能玩，联网后自动补交。
+填同一句<b>小队口令</b>的人会自动分到同一个小队榜里。
 `;
 
 /* ==================================================================
@@ -2781,6 +3324,20 @@ function drawMenuGems(t){
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
+$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';renderLB()});
+$('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
+$('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
+$('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
+for(const c of $$('#pt-mode .pt-chip'))c.addEventListener('click',()=>{SFX.click();PARTY.mode=c.dataset.m;renderPartySetup()});
+$('#hand-go').addEventListener('click',()=>{SFX.click();ptStartTurn()});
+$('#hand-quit').addEventListener('click',()=>{SFX.click();PARTY.on=false;GS.party=false;
+  $('#toolbar').style.display='';$('#pt-bar').classList.remove('on');ovl(null);show('menu')});
+$('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')});
+$('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
+$('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
+$('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+$('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
+for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
 $('#ach-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#how-close').addEventListener('click',()=>{SFX.click();ovl(null)});
@@ -2793,7 +3350,9 @@ $('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
 $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.__wasRush=GS.rushOn;GS.rushOn=false;ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.rushOn=GS.__wasRush;ovl(null);GS.idle=PLAT.now()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.mode==='rush'?startRush():openLevel(GS.L.n)});
-$('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.mode==='rush'?show('menu'):show('map')});
+$('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;
+  if(GS.party){PARTY.on=false;GS.party=false;$('#toolbar').style.display='';$('#pt-bar').classList.remove('on');show('menu');return}
+  GS.mode==='rush'?show('menu'):show('map')});
 /* 地脉打通 → 先看编年史片段，再回图 */
 function loreFor(n){
   if(!n||n>64||n%8!==0)return null;
