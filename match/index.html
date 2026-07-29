@@ -835,7 +835,7 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
-  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:''};
+  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:''};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -2168,7 +2168,7 @@ async function bossAct(){
     await sleep(90);
   }
   /* 万一封成死局，立刻重组 */
-  if(!anyMove()){shuffleBoard();toast('矿脉重组 · <b>手感还在</b>')}
+  if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('矿脉重组 · <b>手感还在</b>')}
 }
 
 /* ---- 核心回合 ---- */
@@ -2178,7 +2178,7 @@ async function settleBoard(firstChain){
     const groups=findGroups();
     if(!groups.length)break;
     chain++;GS.chainMax=Math.max(GS.chainMax,chain);
-    if(chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}
+    if(!GS.party&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 客人打的连锁不算机主的
     /* 先记下要炼成的特殊灵石 */
     const makes=[];
     const all=new Set();
@@ -2218,6 +2218,7 @@ async function settleBoard(firstChain){
       if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b> —— 与任意灵石交换，吞掉全场同色')}
     }
     grant('a1');
+    GS.lastChain=chain;
     await sleep(REDUCED?25:150);
     await dropAndFill();
   }
@@ -2269,13 +2270,19 @@ async function checkBells(){
   }
 }
 
-/* ---- 玩家出手 ---- */
+/* ---- 玩家出手 ----
+   ⚠ 世代号 GS.epoch：开新关 / 重开 / 聚会赛交棒 都会 ++。
+   这条结算链每次 await 之后都核对一次，过期就自己退出 ——
+   否则上一局没跑完的连锁会继续在**新盘面**上清格子、加分、
+   甚至给新玩家白送时间（快赛到点强制交棒时几乎必然发生）。 */
 async function trySwap(a,b){
   if(GS.busy||GS.over)return;
   const [ar,ac]=a,[br,bc]=b;
   if(!swappable(ar,ac)||!swappable(br,bc)){SFX.fail();return}
   if(P(ar,ac).bell&&P(br,bc).bell){SFX.fail();return}
-  GS.busy=true;selCell=null;dragTo=null;hintCell=null;GS.idle=0;
+  const ep=GS.epoch;
+  const stale=()=>ep!==GS.epoch;
+  GS.busy=true;selCell=null;dragTo=null;hintCell=null;
   const A=B[ar][ac], C=B[br][bc];
   /* 交换动画 */
   A.vx=(ac-bc)*ENG.cs;A.vy=(ar-br)*ENG.cs;
@@ -2283,6 +2290,7 @@ async function trySwap(a,b){
   swapPieces(a,b);
   SFX.swap();
   await sleep(REDUCED?20:150);
+  if(stale())return;
   const combo=isComboPair(a,b)?comboBlast(a,b):null;
   const ok=combo||scanRuns().length>0;
   if(!ok){                                              /* 无效：弹回 */
@@ -2292,7 +2300,8 @@ async function trySwap(a,b){
     swapPieces(a,b);
     SFX.fail();vib(12);
     await sleep(REDUCED?20:160);
-    GS.busy=false;return;
+    if(stale())return;
+    GS.busy=false;GS.idle=PLAT.now();return;
   }
   if(!GS.rushOn)GS.moves--;
   ENG.lastMove=[[ar,ac],[br,bc]];
@@ -2313,16 +2322,27 @@ async function trySwap(a,b){
     if(GS.boss)bossHurt(res.gems+30);
     vib(45);
     await sleep(REDUCED?30:280);
+    if(stale())return;
     await dropAndFill();
+    if(stale())return;
     gained+=await settleBoard(2);
   }else{
     gained+=await settleBoard(0);
   }
+  if(stale())return;
   ENG.lastMove=null;
-  if(GS.rushOn){                                        /* 矿灯将熄：连锁给灯油 */
-    const bonus=Math.min(4,GS.chainMax>=3?1.2:.5)+(gained>4000?1.4:0);
-    GS.rushT+=bonus*1000;
-    if(bonus>=1)toast('+'+bonus.toFixed(1)+'s');
+  /* 矿灯将熄：这一手打得好才回灯油。
+     ⚠ 以前用的是 GS.chainMax（整局历史最大连锁），意味着只要全局打出过一次 3 连锁，
+     此后每一步都无条件 +1.2 秒 —— 90 秒的局能拖成好几分钟，榜单彻底失真。
+     ⚠ 聚会赛快赛不回时间：每人固定秒数是「全场时长可预估」和灯油配额的前提。 */
+  if(GS.rushOn&&!GS.party){
+    const ch=GS.lastChain||0;
+    const bonus=(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
+    if(bonus>0&&GS.rushGiven<45000){                      // 单局返还封顶 45 秒
+      const add=Math.min(bonus*1000,45000-GS.rushGiven);
+      GS.rushT+=add;GS.rushGiven+=add;
+      toast('+'+(add/1000).toFixed(1)+'s');
+    }
   }
   /* 死局重组 */
   if(!anyMove()){
@@ -2336,7 +2356,9 @@ async function trySwap(a,b){
     await sleep(320);
   }
   if(GS.boss&&GS.hp>0&&!goalsMet())await bossAct();
-  GS.busy=false;
+  if(stale())return;
+  /* 已经结束了就别把 busy 放开（计时归零时 endRush 已经把 busy 置 true 定分了） */
+  if(!GS.over){GS.busy=false;GS.idle=PLAT.now()}
   await checkEnd();
 }
 
@@ -2348,7 +2370,7 @@ async function checkEnd(){
     return;
   }
   if(goalsMet()){
-    GS.over=true;GS.busy=true;
+    GS.over=true;GS.busy=true;GS.won=true;
     if(GS.boss){await bossDown()}
     await sleep(260);
     await finale();
@@ -2444,7 +2466,7 @@ async function useToolAt(r,c){
   const t=GS.tool;
   if(t==='mix'){
     spendTool('mix');GS.busy=true;
-    shuffleBoard();SFX.made();toast('重整令 · <b>矿脉焕然一新</b>');
+    if(!shuffleBoard())buildBoard(GS.L);SFX.made();toast('重整令 · <b>矿脉焕然一新</b>');
     for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(B[i][j]){B[i][j].sc=.4;B[i][j].vy=-8+rnd()*16}
     await sleep(340);await settleBoard(0);GS.busy=false;await checkEnd();return;
   }
@@ -2460,7 +2482,7 @@ async function useToolAt(r,c){
     addScore(Math.round(70*res.gems+120),r,c,'#e8c768');
     if(GS.boss)bossHurt(res.gems);
     await sleep(180);await dropAndFill();await settleBoard(1);
-    if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+    if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('无路可走 · <b>矿脉重组</b>')}
     GS.busy=false;await checkEnd();return;
   }
   if(t==='swap'){
@@ -2471,6 +2493,10 @@ async function useToolAt(r,c){
       return;
     }
     const a=GS.toolFirst;
+    if(a[0]===r&&a[1]===c){                                   // 点自己＝取消选择
+      GS.toolFirst=null;selCell=null;SFX.click();
+      $('#tool-hint').textContent=TOOLS.swap.hint;return;
+    }
     if(Math.abs(a[0]-r)+Math.abs(a[1]-c)!==1){
       /* 点了不相邻的格子：能选就改选它当新起点，不能选就整个撤销 —— 别把玩家钉死在第一格上 */
       if(swappable(r,c)){GS.toolFirst=[r,c];selCell=[r,c];SFX.click();return}
@@ -2498,7 +2524,7 @@ async function useToolAt(r,c){
     ENG.lastMove=[a,[r,c]];
     await settleBoard(combo?2:0);
     ENG.lastMove=null;
-    if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+    if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('无路可走 · <b>矿脉重组</b>')}
     GS.busy=false;await checkEnd();return;
   }
 }
@@ -2615,7 +2641,7 @@ async function fireUlt(){
   await sleep(REDUCED?30:240);
   await dropAndFill();
   await settleBoard(2);
-  if(!anyMove()){shuffleBoard();toast('无路可走 · <b>矿脉重组</b>')}
+  if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('无路可走 · <b>矿脉重组</b>')}
   renderAlly();
   GS.busy=false;
   await checkEnd();
@@ -2720,7 +2746,7 @@ function openLevel(n,mode){
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
-  GS.party=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
+  GS.party=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   buildBoard(L);
@@ -2791,6 +2817,7 @@ function startRush(){
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
   GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
+  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
@@ -3057,6 +3084,7 @@ function ptStartTurn(){
   GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
+  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   /* 同一轮 = 同一颗种子 = 同一个初始盘面，公平可比 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
@@ -3088,6 +3116,7 @@ function ptStartTurn(){
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
 }
 function ptTurnEnd(){
+  GS.epoch=(GS.epoch||0)+1;                                  // 让上一位没跑完的连锁自己退出，别串进下一位的回合
   GS.rushOn=false;$('#rush-bar').classList.remove('on');
   const p=PARTY.players[PARTY.cur];
   const gained=GS.score*ptMult(PARTY.round);
@@ -3157,15 +3186,18 @@ const LB={
     let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
     return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0};
   },
-  async fetchJSON(url,opt){
+  /* 带上 HTTP 状态码返回 —— 否则只能拿中文文案去正则猜 429，
+     后端哪天改了措辞就失灵。读 8 秒、写 15 秒（课堂 Wi-Fi 慢，写要给够时间）。 */
+  async fetchJSON(url,opt,ms){
     const ctl=new AbortController();
-    const to=setTimeout(()=>ctl.abort(),9000);                 // 网络不好时别让玩家干等
+    const to=setTimeout(()=>ctl.abort(),ms||8000);
     try{
       const r=await fetch(url,Object.assign({signal:ctl.signal},opt||{}));
       const d=await r.json().catch(()=>({ok:false,err:'返回格式不对'}));
+      d.status=r.status;
       return d;
     }catch(e){
-      return {ok:false,err:e.name==='AbortError'?'连接超时':'连不上矿脉榜',offline:true};
+      return {ok:false,err:e.name==='AbortError'?'连接超时':'连不上矿脉榜',offline:true,status:0};
     }finally{clearTimeout(to)}
   },
   async submit(silent){
@@ -3173,9 +3205,11 @@ const LB={
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
       pw:SAVE.lbPw||'',stats:this.stats()};
     const d=await this.fetchJSON(this.api+'/gf/submit',
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},15000);
     if(d.ok){
-      SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;SAVE.lbAt=Date.now();persist();
+      SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
+      if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
+      SAVE.lbAt=Date.now();persist();
       if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
@@ -3199,26 +3233,40 @@ const LB={
      只要还没成功，pending() 就一直为真，玩家在大厅能看到「待上传」。 */
   sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
-  busy:false, timer:0, wait:0,
+  busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
   plan(ms){
     clearTimeout(this.timer);
     this.wait=Math.min(Math.max(ms||0,this.wait?this.wait*2:20000),300000);
-    this.timer=setTimeout(()=>{this.timer=0;this.flush('retry')},this.wait);
+    /* 加抖动：一个班几十台机器同时断网重连，online 事件几乎同时触发，
+       没有抖动的话会形成周期性同步冲击 */
+    const jitter=Math.round(this.wait*(0.8+Math.random()*0.4));
+    this.timer=setTimeout(()=>{this.timer=0;this.flush('retry')},jitter);
   },
-  async flush(why){
-    if(this.busy||!this.registered())return;
+  /* 唯一的上传出口。loud=true 时会 toast（手动上榜用），
+     手动路径也走这里，才能共用串行锁、退避与 sig 记账。 */
+  async flush(why,loud){
+    if(!this.registered()||this.stop)return {ok:false,err:'未起名'};
+    if(this.busy){this.again=true;return {ok:false,err:'排队中'}}   // 重入排队，不丢掉
     const sig=this.sig();
-    if(sig===SAVE.lbSig){this.wait=0;return}                   // 已同步，没什么可传的
+    if(sig===SAVE.lbSig&&!loud){this.wait=0;return {ok:true,skipped:true}}
     this.busy=true;
+    let d=null;
     try{
-      const d=await this.submit(true);
+      d=await this.submit(!loud);
       if(d&&d.ok){
         SAVE.lbSig=sig;SAVE.lbErr='';this.wait=0;
         clearTimeout(this.timer);this.timer=0;persist();
+        /* 在飞期间成绩又变好了 → 立刻排一次近的重试，别等下个唤醒点 */
+        if(this.sig()!==sig)this.plan(1500);
       }else if(d&&d.offline){
-        SAVE.lbErr='';this.plan();                             // 断网：安静重试，不打扰
-      }else if(d&&/频繁|429/.test(String(d.err||''))){
-        SAVE.lbErr='';this.plan(25000);                        // 服务端冷却，等过了再来
+        SAVE.lbErr='';this.plan();
+      }else if(d&&(d.status===429||/频繁/.test(String(d.err||'')))){
+        SAVE.lbErr='';this.plan(25000);                        // 服务端 15 秒冷却
+      }else if(d&&d.status>=400&&d.status<500){
+        /* 永久性拒绝（化名违规、格式不对）：重试一万次也不会成功，
+           停下来并把原因显示给玩家，让他去改化名 */
+        SAVE.lbErr=(d&&d.err)||'上传被拒绝';this.stop=true;
+        clearTimeout(this.timer);this.timer=0;persist();
       }else{
         SAVE.lbErr=(d&&d.err)||'上传没成功';this.plan();
       }
@@ -3226,16 +3274,32 @@ const LB={
     finally{
       this.busy=false;
       if($('#scr-menu').classList.contains('on'))lbMenuStatus();
+      if(this.again){this.again=false;setTimeout(()=>this.flush('again'),300)}
     }
+    return d||{ok:false};
   },
   autoSubmit(){return this.flush('auto')},
+  /* 页面即将被回收时的最后一发。普通 fetch 在卸载时不可靠，用 sendBeacon；
+     必须发 text/plain —— application/json 会触发预检，而信标发不了预检。
+     后端 req.json() 不校验 Content-Type，照样能解析。 */
+  beacon(){
+    if(!this.registered()||this.stop||!this.pending())return false;
+    if(!navigator.sendBeacon)return false;
+    try{
+      const body=JSON.stringify({deviceUUID:this.dev(),alias:SAVE.lbAlias,
+        faction:SAVE.lbFaction||'',pw:SAVE.lbPw||'',stats:this.stats()});
+      return navigator.sendBeacon(this.api+'/gf/submit',new Blob([body],{type:'text/plain'}));
+    }catch(e){return false}
+  },
 };
 /* 大厅上的同步状态：有没传上去的成绩就说一声，传完了也让人安心 */
 function lbMenuStatus(){
   const el=$('#lb-sub');if(!el)return;
   if(!LB.registered()){el.textContent='看看别人挖到哪了';el.classList.remove('warn');return}
   if(LB.pending()){
-    el.innerHTML=LB.busy?'正在上传成绩…':'有新成绩待上传 · <b>联网后自动补交</b>';
+    el.innerHTML=LB.busy?'正在上传成绩…'
+      :(SAVE.lbErr?('上榜被拒 · <b>'+esc(SAVE.lbErr)+'</b> · 点进去改化名')
+                  :'有新成绩待上传 · <b>联网后自动补交</b>');
     el.classList.add('warn');return;
   }
   el.classList.remove('warn');
@@ -3244,18 +3308,20 @@ function lbMenuStatus(){
     : '查看世界榜与小队榜';
 }
 function lbRowHTML(r,mine){
-  const medal=r.rank<=3?['①','②','③'][r.rank-1]:r.rank;
+  const rank=Number(r.rank)||0;
+  const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
     r.lv?('第 '+r.lv+' 关'):'',r.stars?('★'+r.stars):''].filter(Boolean).join(' · ');
-  return '<div class="lb-row'+(r.rank<=3?' top'+r.rank:'')+(mine?' me':'')+'">'
+  return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'+esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
     +'<div class="sub">'+esc(sub)+'</div></div>'
-    +'<div class="pw"><div class="pv">'+(r.power||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
+    +'<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
     +'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function renderLB(){
+  const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
   const form=$('#lb-form');
   for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
@@ -3272,6 +3338,7 @@ async function renderLB(){
   form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
   msg.textContent='正在连接矿脉…';list.innerHTML='';mine.innerHTML='';
   const d=await LB.board(LB.scope);
+  if(tok!==LB._tok)return;                                    // 期间又切了标签，这次结果作废
   if(d.err==='nopw'){
     msg.innerHTML='还没填小队口令。点「改化名」补上，就能看小队榜。';return;
   }
@@ -3288,7 +3355,8 @@ async function renderLB(){
   msg.textContent='';
   let html='',found=false;
   for(const r of rows){
-    const isMe=r.alias===SAVE.lbAlias;
+    /* 同名很常见，光比化名会把两个人都标成「你」。后端给了 tag（设备键末两位），有就一起比 */
+    const isMe=r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag);
     if(isMe)found=true;
     html+=lbRowHTML(r,isMe);
   }
@@ -3328,8 +3396,14 @@ async function lbSave(){
     SAVE.lbSig='';persist();
   }
   $('#lb-msg').textContent='上传中…';
-  const d=await LB.submit(false);
-  if(!d.ok&&d.offline)$('#lb-msg').innerHTML='连不上矿脉榜 —— 化名已存在本机，<b>联网后会自动补上</b>。';
+  /* 走同一个 flush，才能共用串行锁、退避和 sig 记账 ——
+     以前手动路径绕开了它，成功后不写 lbSig，
+     导致新玩家第一次起名上榜之后大厅永远显示「待上传」。 */
+  LB.stop=false;                                              // 改了化名就再给一次机会
+  const d=await LB.flush('manual',true);
+  if(d&&d.ok)await renderLB();
+  else if(d&&d.offline)$('#lb-msg').innerHTML='连不上矿脉榜 —— 化名已存在本机，<b>联网后会自动补上</b>。';
+  else if(d&&d.err==='排队中')$('#lb-msg').textContent='正在上传，稍等一下…';
   else await renderLB();
 }
 
@@ -3522,7 +3596,9 @@ function loop(now){
       $('#rush-track').querySelector('i').style.width=clamp(GS.rushT/(GS.rushMax||90000)*100,0,100)+'%';
       $('#rush-bar').classList.toggle('crit',s<=10);
       if(s<=10&&Math.floor(s*2)!==GS.__tick){GS.__tick=Math.floor(s*2);if(s>0)SFX.tick()}
-      if(GS.rushT<=0){
+      /* 结算链还在跑就先别收 —— 否则玩家最后一手打出的连锁分数会被静默丢弃，
+         上传到榜单的也是截断值。等 busy 落下来再定分。 */
+      if(GS.rushT<=0&&!GS.busy){
         if(GS.party){GS.rushOn=false;GS.over=true;GS.busy=true;ptTurnEnd()}   // 快赛：时间到就交棒
         else endRush();
       }
@@ -3560,9 +3636,13 @@ $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
 $('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.flush('open');renderLB()});
-/* 唤醒时机：联网恢复 / 切回前台 / 页面即将关闭前再试一次 */
-addEventListener('online',()=>{LB.wait=0;LB.flush('online')});
-addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){LB.wait=0;LB.flush('visible')}});
+/* 唤醒时机：联网恢复 / 切回前台 / 页面即将被回收前用信标补一次 */
+addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
+addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('visible')}
+  else LB.beacon();                                            // 切走就可能被系统回收，先发一发
+});
+addEventListener('pagehide',()=>LB.beacon());
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
@@ -3587,7 +3667,9 @@ $('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')
 $('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
 /* 暂停只冻结计时，绝不动 GS.rushOn ——
    动了它会让暂停期间悬空的回合走进 checkEnd 的通关分支，把限时赛判成「第 3 关通关」写进存档 */
-$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.paused=true;
+$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
+  if(GS.busy){toast('等这一手落定再暂停');return}            // 结算中暂停＝冻结时钟刷分，且重开会让旧链串到新盘面
+  SFX.click();GS.paused=true;
   /* 聚会赛不给「重开」：同一轮是同一颗种子，能重开就等于可以无限重刷到满意为止，
      「同盘面比手艺」的前提就没了 */
   $('#pause-retry').style.display=GS.party?'none':'';
@@ -3604,6 +3686,7 @@ function loreFor(n){
   return LORE[n/8-1]||null;
 }
 function maybeLore(after){
+  if(!GS.won){after&&after();return}                          // 输了不解锁编年史，也不发徽记
   const lo=loreFor(GS.L&&GS.L.n);
   if(!lo){after();return}
   SAVE.lore=SAVE.lore||{};
@@ -3637,7 +3720,7 @@ $('#end-continue').addEventListener('click',e=>{
   SAVE.power-=cost;GS.cont++;persist();
   SFX.made();ovl(null);
   GS.moves=5;GS.over=false;GS.busy=false;GS.idle=PLAT.now();
-  if(!anyMove())shuffleBoard();
+  if(!anyMove())if(!shuffleBoard())buildBoard(GS.L);
   updHUD();renderTools();renderAlly();
   toast('矿灯又亮了 · <b>+5 步</b>',2200);
   floatNum(2,4,'+5 步','#e8c768');
