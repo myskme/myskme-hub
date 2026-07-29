@@ -90,6 +90,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-btns{display:flex;flex-direction:column;gap:12px;margin-top:16px;width:min(320px,86vw)}
 .menu-btns .btn{width:100%}
 .btn .sub{display:block;font-size:11px;letter-spacing:.24em;color:var(--ink3);margin-top:3px}
+.btn .sub.warn{color:var(--gold2)}                 /* 有成绩没传上去时描金提醒 */
+.btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
 .menu-sub{display:flex;gap:10px;justify-content:center;margin-top:2px}
 .menu-sub .btn{flex:1}
@@ -833,7 +835,7 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
-  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:''};
+  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:''};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -2773,7 +2775,7 @@ function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
   const best=GS.score>SAVE.rushBest;
   if(best){SAVE.rushBest=GS.score;persist()}
-  setTimeout(()=>LB.autoSubmit(),600);
+  setTimeout(()=>LB.flush('clear'),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
   $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
@@ -2809,7 +2811,7 @@ function endLevel(win){
     }
     delete SAVE.fails[n];
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
-    setTimeout(()=>LB.autoSubmit(),600);
+    setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
     SFX.win();
@@ -3151,20 +3153,61 @@ const LB={
     }
     return await this.fetchJSON(u);
   },
-  /* 通关 / 限时局结束后自动提交：只在成绩真的变好、且距上次≥20 秒时才发 */
-  async autoSubmit(){
-    if(!this.registered())return;
-    const s=this.stats();
-    const sig=[s.score,s.rush,s.lv,s.stars,s.chain].join('|');
-    if(sig===SAVE.lbSig)return;                                // 这份成绩已经成功上传过
-    if(SAVE.lbTry&&Date.now()-SAVE.lbTry<20000)return;         // 服务端 15 秒冷却，客户端留余量
-    SAVE.lbTry=Date.now();persist();
-    const d=await this.submit(true);
-    /* 只有真的传上去了才记 sig。以前失败也记，导致断网那一次之后
-       同一份成绩再也不会重发，「联网后自动补交」变成空话。 */
-    if(d&&d.ok){SAVE.lbSig=sig;persist()}
+  /* ────────── 上传管理器 ──────────
+     成绩全是单调递增的最大值（最佳分/关卡/星数/连锁只增不减），
+     所以「待上传」永远只需要记一个最新快照，不必排队列。
+     设计要点：
+       · 串行 —— 同一时刻只允许一个提交在飞，杜绝快速连点或自动/手动撞车
+       · 退避 —— 连续失败按 20s→40s→80s… 递增，封顶 5 分钟，不打扰也不放弃
+       · 多入口唤醒 —— 开局、通关、联网恢复、切回前台、打开榜单、退避定时器
+       · 429 不算错 —— 那是服务端 15 秒冷却，等一会儿再来就行
+     只要还没成功，pending() 就一直为真，玩家在大厅能看到「待上传」。 */
+  sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain].join('|')},
+  pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
+  busy:false, timer:0, wait:0,
+  plan(ms){
+    clearTimeout(this.timer);
+    this.wait=Math.min(Math.max(ms||0,this.wait?this.wait*2:20000),300000);
+    this.timer=setTimeout(()=>{this.timer=0;this.flush('retry')},this.wait);
   },
+  async flush(why){
+    if(this.busy||!this.registered())return;
+    const sig=this.sig();
+    if(sig===SAVE.lbSig){this.wait=0;return}                   // 已同步，没什么可传的
+    this.busy=true;
+    try{
+      const d=await this.submit(true);
+      if(d&&d.ok){
+        SAVE.lbSig=sig;SAVE.lbErr='';this.wait=0;
+        clearTimeout(this.timer);this.timer=0;persist();
+      }else if(d&&d.offline){
+        SAVE.lbErr='';this.plan();                             // 断网：安静重试，不打扰
+      }else if(d&&/频繁|429/.test(String(d.err||''))){
+        SAVE.lbErr='';this.plan(25000);                        // 服务端冷却，等过了再来
+      }else{
+        SAVE.lbErr=(d&&d.err)||'上传没成功';this.plan();
+      }
+    }catch(e){ this.plan() }
+    finally{
+      this.busy=false;
+      if($('#scr-menu').classList.contains('on'))lbMenuStatus();
+    }
+  },
+  autoSubmit(){return this.flush('auto')},
 };
+/* 大厅上的同步状态：有没传上去的成绩就说一声，传完了也让人安心 */
+function lbMenuStatus(){
+  const el=$('#lb-sub');if(!el)return;
+  if(!LB.registered()){el.textContent='看看别人挖到哪了';el.classList.remove('warn');return}
+  if(LB.pending()){
+    el.innerHTML=LB.busy?'正在上传成绩…':'有新成绩待上传 · <b>联网后自动补交</b>';
+    el.classList.add('warn');return;
+  }
+  el.classList.remove('warn');
+  el.textContent=SAVE.lbPower
+    ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
+    : '查看世界榜与小队榜';
+}
 function lbRowHTML(r,mine){
   const medal=r.rank<=3?['①','②','③'][r.rank-1]:r.rank;
   const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
@@ -3281,9 +3324,7 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   $('#cat').classList.toggle('found',!!SAVE.cat);
-  $('#lb-sub').textContent=SAVE.lbPower
-    ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||''))
-    : (LB.registered()?'查看世界榜与小队榜':'看看别人挖到哪了');
+  lbMenuStatus();
   applyArt($('#wolf-badge'),'hero');
   applyArt($('#cat'),'cat');
 }
@@ -3483,8 +3524,10 @@ function drawMenuGems(t){
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
-$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.autoSubmit();renderLB()});
-addEventListener('online',()=>{LB.autoSubmit()});                // 回到网络就把欠着的成绩补上
+$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.flush('open');renderLB()});
+/* 唤醒时机：联网恢复 / 切回前台 / 页面即将关闭前再试一次 */
+addEventListener('online',()=>{LB.wait=0;LB.flush('online')});
+addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){LB.wait=0;LB.flush('visible')}});
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
@@ -3789,6 +3832,8 @@ buildBoard(levelDef(1));
 fitCanvas();
 show('menu');
 PLAT.raf(loop);
+/* 开局补交上次没传成功的成绩（延后一点，别和首屏抢带宽） */
+setTimeout(()=>LB.flush('boot'),1800);
 
 </script>
 </body>
