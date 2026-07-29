@@ -1311,8 +1311,10 @@ function findGroups(){
     /* 炼成位置：优先玩家刚动过的那颗，其次交点，最后取中点 */
     g.at=null;
     const list=[...g.cells].map(k=>[Math.floor(k/N),k%N]);
+    const free=([r,c])=>{const p=P(r,c);return !p||p.cage===0};   // 优先不压笼中石
     if(ENG.lastMove){
-      const hit=list.find(([r,c])=>ENG.lastMove.some(p=>p[0]===r&&p[1]===c));
+      const hit=list.find(([r,c])=>ENG.lastMove.some(p=>p[0]===r&&p[1]===c)&&free([r,c]))
+             || list.find(([r,c])=>ENG.lastMove.some(p=>p[0]===r&&p[1]===c));
       if(hit)g.at=hit;
     }
     if(!g.at&&hs.length&&vs.length){
@@ -1574,8 +1576,11 @@ function gemPath(ctx,x,y,R,shape,rot){
 function drawGem(ctx,x,y,size,gi,kind,o){
   o=o||{};
   const G=GEMS[gi]||GEMS[0], R=size*.42, rot=o.rot||0, t=o.t||0;
+  /* A = 本次绘制的整体透明度基准；下面每一层都乘它，否则淡出时
+     本体化掉了、高光与标记还是满不透明，最后整块突然消失 */
+  const A=(o.alpha!=null?o.alpha:1);
   ctx.save();
-  if(o.alpha!=null)ctx.globalAlpha=o.alpha;
+  ctx.globalAlpha=A;
   if(o.scale&&o.scale!==1){ctx.translate(x,y);ctx.scale(o.scale,o.scale);ctx.translate(-x,-y)}
   /* 底光（军规四·氛围层） */
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,R*1.9);
@@ -1611,14 +1616,14 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   ctx.stroke();
   /* 内刻面 */
   ctx.save();ctx.clip();
-  ctx.globalAlpha=.55;ctx.fillStyle=G.hi;
+  ctx.globalAlpha=A*.55;ctx.fillStyle=G.hi;
   ctx.beginPath();ctx.moveTo(x-R,y-R*.9);ctx.lineTo(x+R*.25,y-R*1.1);ctx.lineTo(x-R*.55,y+R*.2);ctx.closePath();ctx.fill();
-  ctx.globalAlpha=.28;ctx.fillStyle='#000';
+  ctx.globalAlpha=A*.28;ctx.fillStyle='#000';
   ctx.beginPath();ctx.moveTo(x+R,y+R*.95);ctx.lineTo(x-R*.2,y+R*1.1);ctx.lineTo(x+R*.6,y-R*.1);ctx.closePath();ctx.fill();
   ctx.restore();
-  ctx.globalAlpha=.9;ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.globalAlpha=A*.9;ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.beginPath();ctx.ellipse(x-R*.34,y-R*.4,R*.24,R*.15,-.7,0,Math.PI*2);ctx.fill();
-  ctx.globalAlpha=1;
+  ctx.globalAlpha=A;
   if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
   ctx.restore();
 }
@@ -1766,11 +1771,15 @@ function fxBeam(r,c,dir,color){FX.beams.push({r,c,dir,life:1,c2:color||'#e8c768'
 function fxRing(x,y,color,max){FX.rings.push({x,y,life:1,c:color||'#e8c768',max:max||ENG.cs*3})}
 function fxMark(r,c,kind){FX.marks.push({r,c,kind,life:1})}
 function stepFX(dt){
+  /* f = 相对 60fps 的帧当量。不归一化的话特效时长会跟屏幕刷新率反比 ——
+     120Hz 手机上光束只闪一半时间、粒子只炸开一半半径，还会和按真实时间
+     推进的棋子动画脱拍。dt 已在 loop 里钳到 48ms 上限。 */
+  const f=dt/16.667;
   for(let i=FX.parts.length-1;i>=0;i--){const p=FX.parts[i];
-    p.vy+=.19;p.x+=p.vx;p.y+=p.vy;p.life-=p.dec;p.rot+=.16;if(p.life<=0)FX.parts.splice(i,1)}
-  for(let i=FX.beams.length-1;i>=0;i--){FX.beams[i].life-=.055;if(FX.beams[i].life<=0)FX.beams.splice(i,1)}
-  for(let i=FX.rings.length-1;i>=0;i--){FX.rings[i].life-=.045;if(FX.rings[i].life<=0)FX.rings.splice(i,1)}
-  for(let i=FX.marks.length-1;i>=0;i--){FX.marks[i].life-=.05;if(FX.marks[i].life<=0)FX.marks.splice(i,1)}
+    p.vy+=.19*f;p.x+=p.vx*f;p.y+=p.vy*f;p.life-=p.dec*f;p.rot+=.16*f;if(p.life<=0)FX.parts.splice(i,1)}
+  for(let i=FX.beams.length-1;i>=0;i--){FX.beams[i].life-=.055*f;if(FX.beams[i].life<=0)FX.beams.splice(i,1)}
+  for(let i=FX.rings.length-1;i>=0;i--){FX.rings[i].life-=.045*f;if(FX.rings[i].life<=0)FX.rings.splice(i,1)}
+  for(let i=FX.marks.length-1;i>=0;i--){FX.marks[i].life-=.05*f;if(FX.marks[i].life<=0)FX.marks.splice(i,1)}
 }
 function drawFX(t){
   const s=ENG.cs;
@@ -2097,6 +2106,13 @@ async function settleBoard(firstChain){
     /* 炼成特殊灵石 */
     for(const m of makes){
       const [r,c]=m.at;
+      /* 炼成位若正压着一颗笼中石，这颗石头会被新特殊石顶掉。
+         必须在覆盖前把破笼记上账 —— 漏记会让石笼目标永远差一个，整关不可能通关。 */
+      const old=B[r][c];
+      if(old&&old.cage>0){
+        bumpGoal('cage',null,1);SFX.crate();
+        fxBurst(cxOf(c),cyOf(r),'#c9b78a',8,.9);
+      }
       B[r][c]=newPiece({g:m.g,k:m.k});B[r][c].sc=.2;
       fxRing(cxOf(c),cyOf(r),m.k==='O'?'#ffffff':GEMS[m.g].base,ENG.cs*2.2);
       SFX.made();GS.specials++;
@@ -2412,7 +2428,7 @@ function renderAlly(){
 async function fireUlt(){
   const c=GS.compDef;
   if(!c||GS.busy||GS.over||GS.charge<c.need)return;
-  GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;
+  GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;hintCell=null;
   GS.busy=true;renderAlly();renderTools();
   SAVE.ach['ult_'+c.id]=1;grant('a13');
   if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
@@ -2592,7 +2608,7 @@ function openLevel(n,mode){
   const mercy=mercyMoves(n);
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
-  GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   buildBoard(L);
@@ -2653,7 +2669,7 @@ function renderGoalsTo(host,size){
 }
 function beginPlay(){
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderAlly();
-  ovl(null);GS.busy=false;GS.idle=PLAT.now();
+  ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
     showTut('把相同的灵石 <b>三个连成一线</b> —— 点两下，或直接拖动',6000)}
 }
@@ -2662,7 +2678,7 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();GS.paused=false;
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
@@ -2884,7 +2900,7 @@ function ptStartTurn(){
   L.s1=6000;L.s2=14000;L.s3=26000;
   GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=PT_MOVES;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   /* 同一轮 = 同一颗种子 = 同一个初始盘面，公平可比 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
@@ -2903,7 +2919,7 @@ function ptStartTurn(){
   $('#goal-lbl').textContent='本轮得分';
   $('#quip-line').innerHTML='<b>狼先生：</b>'+pick2(Q_INTRO);
   updHUD();renderAlly();
-  ovl(null);GS.busy=false;GS.idle=PLAT.now();
+  ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
 }
 function ptTurnEnd(){
   const p=PARTY.players[PARTY.cur];
@@ -3286,7 +3302,7 @@ function loop(now){
   const dt=Math.min(48,now-(lastT||now));lastT=now;
   if($('#scr-game').classList.contains('on')){
     stepPieces(dt);stepFX(dt);
-    if(GS.rushOn&&!GS.over){
+    if(GS.rushOn&&!GS.over&&!GS.paused){
       GS.rushT-=dt;
       const s=Math.max(0,GS.rushT/1000);
       $('#rush-time').textContent=s.toFixed(1);
@@ -3347,10 +3363,14 @@ $('#map-next').addEventListener('click',()=>{SFX.click();mapCh++;renderMap()});
 $('#intro-go').addEventListener('click',()=>{SFX.click();beginPlay()});
 $('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')});
 $('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
-$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.__wasRush=GS.rushOn;GS.rushOn=false;ovl('pause')});
-$('#pause-resume').addEventListener('click',()=>{SFX.click();GS.rushOn=GS.__wasRush;ovl(null);GS.idle=PLAT.now()});
-$('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.mode==='rush'?startRush():openLevel(GS.L.n)});
-$('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;
+/* 暂停只冻结计时，绝不动 GS.rushOn ——
+   动了它会让暂停期间悬空的回合走进 checkEnd 的通关分支，把限时赛判成「第 3 关通关」写进存档 */
+$('#btn-pause').addEventListener('click',()=>{if(GS.over)return;SFX.click();GS.paused=true;ovl('pause')});
+$('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
+$('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
+  if(GS.party){ptStartTurn();return}                          // 聚会赛：重开当前这一手，别去开「第 0 关」
+  GS.mode==='rush'?startRush():openLevel(GS.L.n)});
+$('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.paused=false;
   if(GS.party){PARTY.on=false;GS.party=false;$('#toolbar').style.display='';$('#pt-bar').classList.remove('on');show('menu');return}
   GS.mode==='rush'?show('menu'):show('map')});
 /* 地脉打通 → 先看编年史片段，再回图 */
