@@ -100,6 +100,39 @@
       "count": 7
     },
     {
+      "code": "S1E6",
+      "name": "S1E6 六一盲盒寻宝",
+      "desc": "六一限定 · 陷阱猎人版 · 易错陷阱 20 题（词汇 5 + 地标语法 12 + 综合 3）· 纯初二及以上",
+      "date": "2026-05-31",
+      "cat": "剧集专项",
+      "pack": "MYSKME 第一季",
+      "level": "进阶",
+      "tier": "free",
+      "count": 20
+    },
+    {
+      "code": "S1E7",
+      "name": "S1E7 镜屋猎杀",
+      "desc": "陷阱猎人版 · 选项级心理战 24 题（词汇 6 + 语法 14 + 综合 4）",
+      "date": "2026-06-10",
+      "cat": "剧集专项",
+      "pack": "MYSKME 第一季",
+      "level": "进阶",
+      "tier": "free",
+      "count": 24
+    },
+    {
+      "code": "S1E8",
+      "name": "S1E8 心甘情愿的笼",
+      "desc": "陷阱猎人版 · 素笼特辑 · 题干小词与答题心态 24 题（词汇 6 + 语法 14 + 综合 4）",
+      "date": "2026-06-20",
+      "cat": "剧集专项",
+      "pack": "MYSKME 第一季",
+      "level": "进阶",
+      "tier": "free",
+      "count": 24
+    },
+    {
       "code": "S2E1",
       "name": "S2E1 复工协议",
       "desc": "第二季开篇·物品大罢工。与同名试卷配套：罢工/劳工主题词汇 + 初三+高阶语法陷阱（非谓语·倒装·情态完成式·虚拟·从句·错综条件）。",
@@ -131,6 +164,116 @@
       "level": "进阶",
       "tier": "free",
       "count": 24
+    },
+    {
+      "code": "S2E4",
+      "name": "S2E4 无间道之夏",
+      "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态情态/从句非谓语/词汇辨析）。低生词、高选项迷惑；世界观：期末结束、闻浩无间道败走、初代弟子将归来。暗号 RETURN。",
+      "date": "",
+      "cat": "",
+      "pack": "",
+      "level": "",
+      "tier": "free",
+      "count": 15
+    },
+    {
+      "code": "S2E5",
+      "name": "S2E5 归途",
+      "desc": "中考方向·陷阱猎人版配套题库 · 15 道单选（时态语态/从句非谓语连词/词汇辨析）。低生词、高选项迷惑；世界观：初代双璧梓与增归来，七年空课桌有了主人，黑域噤声。暗号 HOMEROOM。",
+      "date": "",
+      "cat": "",
+      "pack": "",
+      "level": "",
+      "tier": "free",
+      "count": 15
+    },
+    {
+      "code": "SP1",
+      "name": "SP1 叶王的红笔",
+      "desc": "2026 暑假特辑·独立系列 · 中考方向·陷阱猎人版 · 16 道自包含单选（形容词顺序/副词/时间介词/时态语态情态/非谓语/从句/反义疑问/反选题）。初中语法全专项只考命门。看图题与红笔翻案在纸卷上。",
+      "date": "2026-07-16",
+      "cat": "特辑机关卷",
+      "pack": "2026 暑假特辑",
+      "level": "炼狱",
+      "tier": "free",
+      "count": 16
+    },
+    {
+      "code": "SP1M",
+      "name": "SP1M 小蛇的红笔·学徒篇",
+      "desc": "2026 暑假特辑·学徒篇 · 中级档（与 SP1 高级配对） · 14 道自包含单选（形容词位置/频度副词/then-than/三单/复数/冠词读音/some-any/was-were/can/祈使/宾格/反选）。初一初二基础命门。看图题、接龙、红笔翻案在纸卷上。",
+      "date": "2026-07-18",
+      "cat": "特辑机关卷",
+      "pack": "2026 暑假特辑",
+      "level": "进阶",
+      "tier": "free",
+      "count": 14
+    },
+    {
+      "code": "SP2",
+      "name": "SP2 十一封未烧的信·诺（人物传VOL.1）",
+      "desc": "2026 暑假特辑·人物传 VOL.1 高级档（传主：诺） · 15 道自包含单选（宾从语序/感叹/since/情态推测/as…as/被动/完成被动/whose/分词/倒装/过去完成/反义疑问/图证反选）。传记阅读与菀的答卷在纸卷上。",
+      "date": "2026-07-21",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "炼狱",
+      "tier": "free",
+      "count": 15
+    },
+    {
+      "code": "SP2M",
+      "name": "SP2M 十一封未烧的信·诺（人物传VOL.1·中级）",
+      "desc": "人物传 VOL.1 中级档（传主：诺·学徒版） · 13 道自包含单选（三单否定/现在完成入门/hers/often 位置/any/How 感叹/there be/进行否定/Whose/eleventh/wrote/want to/图证反选）。",
+      "date": "2026-07-21",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "进阶",
+      "tier": "free",
+      "count": 13
+    },
+    {
+      "code": "SP3",
+      "name": "SP3 第一个囚徒·叶王（人物传VOL.2）",
+      "desc": "2026 暑假特辑·人物传 VOL.2 高级档（传主：叶王） · 15 道自包含单选（反义疑问 never/where 定从/would rather/stop doing/find it/used to/each of/两门比较级/双冠词读音/stop from doing/交际拒绝/neither 倒装/过去进行/It takes/图证反选）。传记阅读与航的答卷在纸卷上。",
+      "date": "2026-07-25",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "炼狱",
+      "tier": "free",
+      "count": 15
+    },
+    {
+      "code": "SP3M",
+      "name": "SP3M 第一个囚徒·叶王（人物传VOL.2·中级）",
+      "desc": "人物传 VOL.2 中级档（传主：叶王·学徒版） · 13 道自包含单选（所有格 Hang's/used to be/比较级 -er/an old/May I/反义疑问前肯后否/there are/三单 watches/宾格 them/was/Don't 祈使/enjoy doing/图证反选）。",
+      "date": "2026-07-25",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "进阶",
+      "tier": "free",
+      "count": 13
+    },
+    {
+      "code": "SP4",
+      "name": "SP4 画像与弓·克与宸（人物传VOL.3）",
+      "desc": "2026 暑假特辑·人物传 VOL.3 高级档（双传主：克与宸） · 15 道自包含单选（while 对比/one…the other/Neither of/prefer to/so that/主将从现/both/opposite/must be 推测/never+完成/过去被动/All three/whether+不定式/seem to/图证反选）。双传记阅读与姐弟互批在纸卷上。",
+      "date": "2026-07-27",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "炼狱",
+      "tier": "free",
+      "count": 15
+    },
+    {
+      "code": "SP4M",
+      "name": "SP4M 画像与弓·克与宸（人物传VOL.3·中级）",
+      "desc": "人物传 VOL.3 中级档（双传主：克与宸·学徒版） · 13 道自包含单选（both…and/one…the other/规则过去 -ed/There was/mustn't/hope to do/children/Look!+进行/by himself/didn't/最高级/How often/图证反选）。",
+      "date": "2026-07-27",
+      "cat": "人物传连载",
+      "pack": "2026 暑假特辑",
+      "level": "进阶",
+      "tier": "free",
+      "count": 13
     },
     {
       "code": "TENSE1",

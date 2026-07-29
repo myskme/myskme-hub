@@ -1,0 +1,205 @@
+{
+  "name": "SP1 叶王的红笔",
+  "code": "SP1",
+  "desc": "2026 暑假特辑·独立系列 · 中考方向·陷阱猎人版 · 16 道自包含单选（形容词顺序/副词/时间介词/时态语态情态/非谓语/从句/反义疑问/反选题）。初中语法全专项只考命门。看图题与红笔翻案在纸卷上。",
+  "tier": "free",
+  "level": "炼狱",
+  "cat": "特辑机关卷",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "8. Ye Wang keeps ___ box of red pens on her desk.",
+        "ops": [
+          "a wooden small old",
+          "an old small wooden",
+          "a small old wooden",
+          "a small wooden old"
+        ],
+        "ans": 2,
+        "why": "size-age-material → a small old wooden box。",
+        "lv": 2
+      },
+      {
+        "q": "9. The snake moved so quietly that we ___ noticed it at all.",
+        "ops": [
+          "hard",
+          "hardly",
+          "hardly ever",
+          "not"
+        ],
+        "ans": 1,
+        "why": "hardly=几乎不，修饰动词 noticed。",
+        "lv": 2
+      },
+      {
+        "q": "10. ___ the end of this summer, she will have graded a thousand papers.",
+        "ops": [
+          "By",
+          "At",
+          "Until",
+          "In"
+        ],
+        "ans": 0,
+        "why": "by the end of…=到…为止，与将来完成 will have done 搭配。",
+        "lv": 2
+      },
+      {
+        "q": "11. Check your answers ___ you hand in the paper — it is too late afterwards.",
+        "ops": [
+          "after",
+          "since",
+          "until",
+          "before"
+        ],
+        "ans": 3,
+        "why": "后半句‘之后就晚了’锁定交卷之前 → before。",
+        "lv": 2
+      },
+      {
+        "q": "12. First she read the paper, and ___ she picked up the red pen.",
+        "ops": [
+          "then",
+          "than",
+          "after",
+          "before"
+        ],
+        "ans": 0,
+        "why": "First…, and then…=先…然后…。",
+        "lv": 1
+      },
+      {
+        "q": "13. She drank two ___ while grading the papers.",
+        "ops": [
+          "cup of teas",
+          "cups of teas",
+          "cups of tea",
+          "cup of tea"
+        ],
+        "ans": 2,
+        "why": "two cups of tea，容器复数、tea 不可数不变。",
+        "lv": 2
+      },
+      {
+        "q": "14. If it ___ tomorrow, the summer party will be moved indoors.",
+        "ops": [
+          "rains",
+          "will rain",
+          "rained",
+          "is raining"
+        ],
+        "ans": 0,
+        "why": "主将从现 → 从句用 rains。",
+        "lv": 2
+      },
+      {
+        "q": "15. A strange thing ___ in the grading room last night.",
+        "ops": [
+          "was happened",
+          "has been happened",
+          "happened",
+          "were happened"
+        ],
+        "ans": 2,
+        "why": "happen 不及物，主动一般过去 → happened。",
+        "lv": 2
+      },
+      {
+        "q": "16. The light in her room is still on. She ___ still be grading.",
+        "ops": [
+          "must",
+          "can",
+          "need",
+          "shall"
+        ],
+        "ans": 0,
+        "why": "肯定推测 → must be(一定在…)。",
+        "lv": 1
+      },
+      {
+        "q": "17. She made the students ___ their answers twice before handing in.",
+        "ops": [
+          "to check",
+          "check",
+          "checking",
+          "checked"
+        ],
+        "ans": 1,
+        "why": "make sb do —— 使役动词后省去 to。",
+        "lv": 2
+      },
+      {
+        "q": "18. This is the room ___ she grades every paper.",
+        "ops": [
+          "which",
+          "that",
+          "where",
+          "what"
+        ],
+        "ans": 2,
+        "why": "先行词 room 表地点，从句不缺成分 → 关系副词 where。",
+        "lv": 2
+      },
+      {
+        "q": "19. She has never crossed out a right answer, ___?",
+        "ops": [
+          "has she",
+          "hasn't she",
+          "does she",
+          "didn't she"
+        ],
+        "ans": 0,
+        "why": "never 是否定词 → 反义疑问用肯定 has she。",
+        "lv": 2
+      },
+      {
+        "q": "20. 下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "There are many papers on the desk.",
+          "Neither of the pens works.",
+          "The news are very exciting.",
+          "Each of us has a red pen."
+        ],
+        "ans": 2,
+        "why": "news 不可数、作单数 → The news is very exciting。",
+        "lv": 2
+      },
+      {
+        "q": "21. 下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "This paper is the more difficult of the two.",
+          "She is taller than any girl in her class.",
+          "He runs faster than anyone else.",
+          "It is the most useful book I have ever read."
+        ],
+        "ans": 1,
+        "why": "她自己也在班里，不能和自己比 → than any other girl。",
+        "lv": 2
+      },
+      {
+        "q": "22. She was ___ tired that she fell asleep on the desk.",
+        "ops": [
+          "such",
+          "so",
+          "very",
+          "too"
+        ],
+        "ans": 1,
+        "why": "so + 形容词(tired) + that 从句。",
+        "lv": 2
+      },
+      {
+        "q": "23. ___ she is strict, she is never unfair to anyone.",
+        "ops": [
+          "But",
+          "Because",
+          "So",
+          "Though"
+        ],
+        "ans": 3,
+        "why": "Though 引导让步状语从句。",
+        "lv": 1
+      }
+    ]
+  }
+}

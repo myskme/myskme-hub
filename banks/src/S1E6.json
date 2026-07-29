@@ -1,0 +1,254 @@
+{
+  "name": "S1E6 六一盲盒寻宝",
+  "code": "S1E6",
+  "desc": "六一限定 · 陷阱猎人版 · 易错陷阱 20 题（词汇 5 + 地标语法 12 + 综合 3）· 纯初二及以上",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第一季",
+  "date": "2026-05-31",
+  "mods": {
+    "m5": [
+      {
+        "q": "Blind boxes are so ___ that I just can't stop opening them.",
+        "ops": [
+          "interesting",
+          "interested",
+          "interest",
+          "interestingly"
+        ],
+        "ans": 0,
+        "why": "描述事物“令人……”用 -ing 形容词→interesting；interested 描述人“感到……”，主语是 boxes（物）不能用；interest 是名词/动词，interestingly 是副词不能作表语。",
+        "lv": 1
+      },
+      {
+        "q": "It was ___ a rare card that the whole class wanted it.",
+        "ops": [
+          "so",
+          "such",
+          "very",
+          "too"
+        ],
+        "ans": 1,
+        "why": "后接 a＋形＋名（a rare card）用 such；so 后只跟形容词（so rare a card 才行）；very 不引导 that 从句，too 表“太…以致不能”。",
+        "lv": 2
+      },
+      {
+        "q": "I've ___ over 500 yuan on these toys this year alone.",
+        "ops": [
+          "spent",
+          "cost",
+          "paid",
+          "taken"
+        ],
+        "ans": 0,
+        "why": "人作主语花钱用 spend...on→spent；cost 主语是物，pay 要 pay for sth，take 用于 it takes sb time to do。",
+        "lv": 1
+      },
+      {
+        "q": "Sadly, ___ collectors can ever afford the diamond edition — almost none.",
+        "ops": [
+          "few",
+          "a few",
+          "little",
+          "a little"
+        ],
+        "ans": 0,
+        "why": "collectors 可数复数＋句末 almost none 提示否定→few（几乎没有）；a few 是肯定“有一些”，little/a little 修饰不可数。",
+        "lv": 2
+      },
+      {
+        "q": "The resale price has ___ sharply since the toy sold out.",
+        "ops": [
+          "risen",
+          "raised",
+          "rose",
+          "aroused"
+        ],
+        "ans": 0,
+        "why": "价格“上涨”是自动行为，rise 不及物（rise-rose-risen），现在完成 has risen；raised 是及物“提高某物”需宾语，rose 不能跟 has，aroused 词义错。",
+        "lv": 2
+      },
+      {
+        "q": "More than half of China's diamonds ___ from this very city.",
+        "ops": [
+          "comes",
+          "come",
+          "is coming",
+          "has come"
+        ],
+        "ans": 1,
+        "why": "half of＋名词谓语随 of 后名词：diamonds 复数→come；被 half 迷惑用单数 comes 是最大坑。",
+        "lv": 2
+      },
+      {
+        "q": "In fact, diamonds ___ here since the 1950s.",
+        "ops": [
+          "have found",
+          "have been found",
+          "found",
+          "are finding"
+        ],
+        "ans": 1,
+        "why": "钻石是“被发现”的＋since the 1950s→现在完成被动 have been found；have found 漏了被动（钻石不会自己找）。",
+        "lv": 3
+      },
+      {
+        "q": "The book town, ___ opened in 2019, draws crowds of children.",
+        "ops": [
+          "which",
+          "that",
+          "it",
+          "what"
+        ],
+        "ans": 0,
+        "why": "逗号隔开的非限定性定语从句关系词用 which；that 绝不用于非限定，it 缺连词，what 不引导定语从句。",
+        "lv": 2
+      },
+      {
+        "q": "Children here ___ ever since the library first opened.",
+        "ops": [
+          "have read",
+          "have been reading",
+          "are reading",
+          "read"
+        ],
+        "ans": 1,
+        "why": "ever since...opened 强调动作持续到现在→现在完成进行 have been reading；have read 强调结果，此处强调持续过程。",
+        "lv": 3
+      },
+      {
+        "q": "— Where's Tom? — He ___ to the island; he'll be back next week.",
+        "ops": [
+          "has been",
+          "has gone",
+          "went",
+          "goes"
+        ],
+        "ans": 1,
+        "why": "人现在不在、下周才回→has gone to（去了没回）；has been＝去过已回来，与 he'll be back 矛盾，是最大坑。",
+        "lv": 2
+      },
+      {
+        "q": "This famous beach is really worth ___ in summer.",
+        "ops": [
+          "visiting",
+          "to visit",
+          "visited",
+          "visit"
+        ],
+        "ans": 0,
+        "why": "固定结构 be worth＋doing（值得做）→visiting；worth 后不接不定式 to visit。",
+        "lv": 1
+      },
+      {
+        "q": "The old town ___ more than 1,000 years ago.",
+        "ops": [
+          "was built",
+          "has been built",
+          "is built",
+          "built"
+        ],
+        "ans": 0,
+        "why": "ago 锁过去＋古城“被建造”→一般过去被动 was built；has been built 完成时不与 ago 连用是坑，built 漏被动。",
+        "lv": 2
+      },
+      {
+        "q": "The ancient tower here ___ for centuries, strong as ever.",
+        "ops": [
+          "has stood",
+          "has been stood",
+          "was stood",
+          "stood"
+        ],
+        "ans": 0,
+        "why": "stand（矗立）是不及物动词没有被动＋strong as ever 提示至今→has stood；has been stood 看似高级被动实则不及物不能被动，是全卷最大陷阱。",
+        "lv": 3
+      },
+      {
+        "q": "They say a 40-stop metro ___ here — impossible for such a small city!",
+        "ops": [
+          "can build",
+          "can be built",
+          "will building",
+          "builds"
+        ],
+        "ans": 1,
+        "why": "地铁是“被建”＋情态动词 can→情态被动 can be built；can build 是主动（地铁不会自己建）。",
+        "lv": 3
+      },
+      {
+        "q": "This little city doesn't have a subway, ___?",
+        "ops": [
+          "does it",
+          "doesn't it",
+          "is it",
+          "has it"
+        ],
+        "ans": 0,
+        "why": "陈述句否定（doesn't have）→反义疑问用肯定 does it（前否后肯）；doesn't it 重复否定，is it/has it 助动词不对应。",
+        "lv": 2
+      },
+      {
+        "q": "If this aquarium ___ real, the whole country ___ about it by now.",
+        "ops": [
+          "were; would know",
+          "is; will know",
+          "was; knows",
+          "were; knew"
+        ],
+        "ans": 0,
+        "why": "馆是假的，与现在事实相反的虚拟语气：if 从句 were，主句 would＋原形；is;will know 是真实条件句，was 虚拟须用 were，were;knew 主句缺 would。",
+        "lv": 3
+      },
+      {
+        "q": "Honestly, nobody knows ___.",
+        "ops": [
+          "where is it",
+          "where it is",
+          "where was it",
+          "it is where"
+        ],
+        "ans": 1,
+        "why": "knows 后宾语从句用陈述语序 where it is；where is it 保留疑问语序是最常见错误。",
+        "lv": 2
+      },
+      {
+        "q": "Your chance of pulling the secret one is just one ___ 144.",
+        "ops": [
+          "in",
+          "of",
+          "to",
+          "by"
+        ],
+        "ans": 0,
+        "why": "“N 分之一的概率”固定 one in N（one in 144）；to 用于比分（2 to 1），of/by 搭配错。",
+        "lv": 1
+      },
+      {
+        "q": "A diamond box costs about three times ___ a normal one.",
+        "ops": [
+          "as much as",
+          "as many as",
+          "more as",
+          "so much as"
+        ],
+        "ans": 0,
+        "why": "倍数表达 times＋as...as，cost 钱（不可数概念）用 as much as；as many as 用于可数，more as 应为 more than。",
+        "lv": 2
+      },
+      {
+        "q": "It was not ___ I opened the very last box ___ I finally got the diamond edition.",
+        "ops": [
+          "until; that",
+          "until; when",
+          "when; that",
+          "till; then"
+        ],
+        "ans": 0,
+        "why": "It was not until...that... 是强调“直到……才……”的固定框架，第二空只能用 that；when/then 都破坏强调句结构。",
+        "lv": 3
+      }
+    ]
+  }
+}

@@ -8,77 +8,88 @@ HERE = os.path.dirname(os.path.abspath(__file__))  # 脚本所在目录（仓库
 OUT = os.path.join(HERE, "index.html")
 LIB = open(os.path.join(HERE, "qrcode-generator.js"), encoding="utf-8").read()
 
+# ---------- 已收起的作品（2026-07-11 王老师指示：大乱斗 / 三国不常用、仅自己用，从主页收起）----------
+# 数据完整保留于此，需要恢复就把对应 item 加回下面 sections 的 items 数组即可：
+#   卷一 · {"key": "brawl", "glyph": "斗", "cat": "game", "rarity": "SR", "cover": "assets/cover-brawl.webp", "tag": "积分对战 · 塔防", "title": "MYSKME 大乱斗", "en": "MYSKME BRAWL", "desc": "课堂积分对战 + 黑域塔防 · 六系角色养成 · 可分享炫耀战报卡。", "url": "https://myskme.github.io/myskme-brawl/"}
+#   卷二 · {"key": "threek", "glyph": "国", "cat": "tool", "rarity": "R", "cover": "assets/cover-threek.webp", "tag": "课堂游戏", "title": "三国军师争霸", "en": "THREE KINGDOMS", "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。", "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"}
 # ---------- 默认内容（管理员模式编辑后存 localStorage / 导出可覆盖此处） ----------
 DEFAULT_DATA = {
     "kicker": "THE MYSKME CHRONICLES · 王老师 MR. WANG",
     "titlePre": "MYSKME",
     "titleEm": "编年史",
     "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
-    "hint": "往下翻阅两卷 —— 每一件都可扫码即玩、离线可用、投屏可讲。",
+    "hint": "往下是 娱乐 与 学习 两区 —— 每一件都免下载免安装，扫码即玩，手机直接开。",
     "hubUrl": "https://myskme.github.io/myskme-hub/",
     "sections": [
-        {"label": "卷一 · 远征录", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 白昼推开冒险之门",
+        {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
+            {"key": "star-dungeon", "glyph": "牢", "cat": "game", "rarity": "UR", "cover": "assets/cover-star-dungeon.jpg",
+             "tag": "课堂肉鸽 · 策略地牢", "title": "星徒地牢", "en": "STAR DUNGEON",
+             "desc": "3–4 人最佳的课堂像素战术地牢 · 5–6 题集中判分，再由全队布局行动 · 机关、计谋、二周目与云端排行，手机可装到主屏。",
+             "url": "https://myskme.github.io/myskme-star-dungeon/", "featured": True},
             {"key": "expedition", "glyph": "征", "cat": "game", "rarity": "UR", "cover": "assets/cover-expedition.webp",
              "tag": "动作肉鸽 · RPG", "title": "远征录 · 笼中剑", "en": "EXPEDITION · CAGED BLADE",
-             "desc": "学院谷地动作肉鸽 · 技能连招 · 探索成长 · 金叶与水晶经济 —— 狼先生宇宙的旗舰远征。",
-             "url": "https://myskme-expedition.netlify.app", "featured": True},
+             "desc": "学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备 —— 狼先生宇宙的旗舰。",
+             "url": "https://myskme.github.io/myskme-expedition-web/", "featured": True},
             {"key": "starling", "glyph": "灵", "cat": "game", "rarity": "SSR", "cover": "assets/cover-starling.webp",
              "tag": "电子宠物 · 养成", "title": "星灵远征", "en": "STARLING",
              "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回一封封寓言信。",
              "url": "https://myskme.github.io/myskme-starling/"},
             {"key": "gemfall", "glyph": "消", "cat": "game", "rarity": "SSR", "cover": "",
              "tag": "消消乐 · 三消远征", "title": "灵石远征", "en": "GEMFALL",
-             "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，单文件离线。",
+             "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
              "url": "https://myskme.github.io/myskme-hub/match/"},
-            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SR", "cover": "assets/cover-zimingqi.webp",
+            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 多人对战 + 单人十关试炼（叶王终战 / 每日同题） · 单文件离线，扫码 / 投屏即用。",
-             "url": "https://myskme.github.io/myskme-zimingqi/"},
-            {"key": "brawl", "glyph": "斗", "cat": "game", "rarity": "SR", "cover": "assets/cover-brawl.webp",
-             "tag": "积分对战 · 塔防", "title": "MYSKME 大乱斗", "en": "MYSKME BRAWL",
-             "desc": "课堂积分对战 + 黑域塔防 · 六系角色养成 · 可分享炫耀战报卡。",
-             "url": "https://myskme.github.io/myskme-brawl/"},
-            {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/cover-volvme.webp",
+             "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 35 位正典角色，扫码即玩。",
+             "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
+            {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
+             "coverLegacy": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
-             "desc": "狼先生与他的学生们 · 正典叙事与设定档案第二卷 —— 一切远征的源头。",
-             "url": "https://myskme-volvme-ii.netlify.app"},
+             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。",
+             "url": "https://myskme.github.io/myskme-chronicle/",
+             "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月",
+             "url3": "https://myskme.github.io/myskme-chronicle/locations.html", "url3label": "正典地点",
+             "url4": "https://myskme.github.io/myskme-chronicle/relics.html", "url4label": "正典信物",
+             "url5": "https://myskme.github.io/myskme-chronicle/moments.html", "url5label": "正典名场面",
+             "url6": "https://myskme.github.io/myskme-chronicle/characters.html", "url6label": "正典角色"},
         ]},
-        {"label": "卷二 · 学堂器物志", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 夜里以茶与尺执教",
-         "epigraph": "把中考四板块，做成可玩、可讲、可投屏的器物。", "icon": "book", "items": [
+        {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
+         "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
             {"key": "quiz", "glyph": "题", "cat": "tool", "rarity": "UR", "cover": "assets/cover-quiz.webp",
-             "tag": "题库训练 · 内含 2 套", "title": "题库训练场", "en": "QUIZ TRAINER",
-             "desc": "题库训练总入口 · 内含「词灵对决」单词训练 与「无名之原」答题闯关。做过的卷就是粮。",
-             "url": "https://myskme-games.netlify.app/", "featured": True},
-            {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "",
-             "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
-             "desc": "中考题库总目 · 兑换码即卷号 · 点开即玩「词灵对决」，含时态 / 完形 / 阅读 / 语法陷阱专项。",
-             "url": "https://myskme.github.io/myskme-hub/banks/"},
-            {"key": "listen", "glyph": "听", "cat": "tool", "rarity": "R", "cover": "",
+             "tag": "题库训练 · 两种玩法", "title": "题库训练场", "en": "QUIZ TRAINER",
+             "desc": "『词灵对决』自己刷：输兑换码，做过的卷变游戏；『无名之原』课堂肉鸽跟老师一起玩。",
+             "url": "https://myskme.github.io/myskme-quiz/", "featured": True},
+            {"key": "listen", "glyph": "听", "cat": "tool", "rarity": "R", "cover": "assets/cover-listen.webp",
              "tag": "中考 · 听力", "title": "听力训练场", "en": "LISTENING",
              "desc": "中考听力精练 · 多语音朗读 · 逐句跟读 · 浏览器直接播放，免下载。",
              "url": "https://myskme.github.io/myskme-hub/listen/"},
-            {"key": "write", "glyph": "写", "cat": "tool", "rarity": "R", "cover": "",
+            {"key": "write", "glyph": "写", "cat": "tool", "rarity": "R", "cover": "assets/cover-write.webp",
              "tag": "中考 · 写作", "title": "作文训练场", "en": "WRITING",
              "desc": "中考写作分步训练 · 范文 · 句式脚手架 · 自评清单。",
              "url": "https://myskme.github.io/myskme-hub/write/"},
-            {"key": "daily", "glyph": "日", "cat": "tool", "rarity": "R", "cover": "",
+            {"key": "daily", "glyph": "日", "cat": "tool", "rarity": "R", "cover": "assets/cover-daily.webp",
              "tag": "每日打卡", "title": "每日一题", "en": "DAILY QUIZ",
              "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
              "url": "https://myskme.github.io/myskme-hub/daily/"},
-            {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/cover-wall.webp",
+            {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
+             "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
+             "desc": "词灵对决的书架 · 全部题库亮在架上点开即玩 · 时态 / 完形 / 阅读 / 陷阱专项 + 剧集卷。",
+             "url": "https://myskme.github.io/myskme-hub/banks/"},
+            {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-wall-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
+             "coverLegacy": "assets/cover-wall.webp",
              "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
              "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
              "url": "https://myskme.github.io/myskme-hub/wall/"},
-            {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/cover-scoreboard.webp",
+            {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-scoreboard-1280.webp",
+             "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
+             "coverLegacy": "assets/cover-scoreboard.webp",
              "tag": "课堂 · 积分榜", "title": "记分编年史", "en": "SCOREBOARD",
-             "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线 PWA。",
+             "desc": "英语课堂积分 · 排行榜 · 团队赛 · 赛季管理 —— 老师投屏上课用，免安装、断网也能记。",
              "url": "https://myskme.github.io/myskme-scoreboard/"},
-            {"key": "threek", "glyph": "国", "cat": "tool", "rarity": "R", "cover": "assets/cover-threek.webp",
-             "tag": "课堂游戏", "title": "三国军师争霸", "en": "THREE KINGDOMS",
-             "desc": "三国主题课堂积分器 · 军师争霸 / 合作模式 · 锦囊谋略 · 投屏即用。",
-             "url": "https://myskme.github.io/three-kingdoms-classroom-scoreboard/"},
-            {"key": "print", "glyph": "印", "cat": "tool", "rarity": "N", "cover": "",
+            {"key": "print", "glyph": "印", "cat": "tool", "rarity": "N", "cover": "assets/cover-print.webp",
              "tag": "打印 / PDF", "title": "打印中心", "en": "PRINT CENTER",
              "desc": "从题库一键生成 选择卷 / 答案版 / 词表 / 默写版，A4 存 PDF。答案版需口令。",
              "url": "https://myskme.github.io/myskme-hub/print/"},
@@ -93,7 +104,9 @@ _sp = os.path.join(HERE, "shots.json")
 # 旧的自动截图（作文墙/记分/三国等）与新封面/字形徽风格不统一，故停用，改由 cover 字段统一。
 SHOTS = {}  # 停用截图自动注入
 
-PASSWORD = "mrwolf4358"
+# 管理口令以 sha256 存储，明文不入源码（与 maker/almanac/forge/console 同范式）。
+# 值 = sha256(管理口令)。改口令：printf '%s' '新口令' | shasum -a 256，把输出填这里。
+PASSWORD_HASH = "4f25090d6fd1faaafc8e801097c637011e95ce24832554056a258726f15e6585"
 
 CSS = r"""
 :root{
@@ -113,6 +126,7 @@ CSS = r"""
   --card-hover-shadow:0 18px 50px rgba(0,0,0,.5),inset 0 0 40px rgba(201,166,74,.05);
   --plate-shadow:0 4px 16px rgba(0,0,0,.4);
   --bar-bg:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));
+  --nav-bg:linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8));
 }
 /* ---- 浅色（羊皮纸）主题：data-theme 由脚本按 跟随系统/浅/深 解析后写入 ---- */
 :root[data-theme="light"]{
@@ -131,9 +145,14 @@ CSS = r"""
   --card-hover-shadow:0 14px 36px rgba(120,90,30,.20),inset 0 0 40px rgba(201,166,74,.06);
   --plate-shadow:0 4px 14px rgba(120,90,30,.25);
   --bar-bg:linear-gradient(180deg,#f2e8d2,rgba(242,232,210,.97));
+  --nav-bg:linear-gradient(180deg,rgba(236,226,204,.96),rgba(236,226,204,.86));
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;}
+.icon{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.18em;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);
   line-height:1.7;overflow-x:hidden;
   background-image:var(--page-grad);
@@ -149,7 +168,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 
 /* ---------- 卷目录 · sticky 顶栏 ---------- */
 .volnav{position:sticky;top:0;z-index:35;
-  background:linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8));
+  background:var(--nav-bg,linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8))); /* 浅色主题下原硬编码深底会压出不可读白字 */
   -webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);
   border-bottom:1px solid var(--line);}
 .volnav-inner{max-width:1220px;margin:0 auto;width:100%;
@@ -158,8 +177,9 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .volnav-brand{font-family:var(--serif);font-size:14px;letter-spacing:.24em;color:var(--gold2);
   white-space:nowrap;margin-right:14px;padding-right:14px;border-right:1px solid var(--line2);flex:0 0 auto;}
 .volnav-brand b{font-weight:400;}
+a.volnav-brand{text-decoration:none;}a.volnav-brand:hover{color:var(--gold);}
 .vlink{font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;color:var(--ink3);text-decoration:none;
-  white-space:nowrap;padding:6px 13px;border-radius:2px;position:relative;transition:color .3s;flex:0 0 auto;}
+  white-space:nowrap;padding:11px 13px;border-radius:2px;position:relative;transition:color .3s;flex:0 0 auto;}
 .vlink:hover{color:var(--ink);}
 .vlink.on{color:var(--gold2);}
 .vlink.on::after{content:'';position:absolute;left:13px;right:13px;bottom:1px;height:1px;background:var(--gold);box-shadow:var(--glow-gold);}
@@ -169,7 +189,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 
 /* ---------- 英雄区 · 编年史卷首 ---------- */
 .hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(20px,4vw,56px);
-  align-items:center;min-height:clamp(360px,62vh,560px);padding:clamp(40px,7vw,72px) 0 clamp(28px,5vw,44px);}
+  align-items:center;min-height:clamp(300px,46vh,430px);padding:clamp(26px,4vw,48px) 0 clamp(18px,3vw,28px);}
 .hero-art{position:relative;align-self:stretch;display:flex;align-items:flex-end;justify-content:center;min-height:280px;}
 .hero-figure{position:relative;width:100%;max-width:420px;aspect-ratio:1/1.12;}
 .hero-figure img{width:100%;height:100%;object-fit:contain;object-position:bottom center;
@@ -187,6 +207,12 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .hero-figure.nofig{display:flex;align-items:center;justify-content:center;aspect-ratio:auto;min-height:280px;}
 .hero-figure.nofig .hero-crestbig{display:flex;}
 .hero-figure.nofig .hero-halo{display:none;}
+@media (max-width:560px){ /* 小屏 hero 瘦身:原首屏≈550px 只见英雄区,一张作品卡都看不到;选择器加 .hero 前缀提特异性,防被后面 820 断点同名规则按源顺序覆盖 */
+  .hero .hero-figure img{max-width:150px;}
+  .hero .motto{font-size:13px;}
+  .hero .epilogue{font-size:12px;}
+  .hero .meta-row .stat b{font-size:20px;}
+}
 @media (max-width:820px){
   .hero{grid-template-columns:1fr;text-align:center;min-height:auto;gap:6px;padding:32px 0 22px;}
   .hero-art{order:-1;min-height:180px;align-items:center;}
@@ -202,7 +228,9 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
   opacity:0;animation:fade 1s .1s both;}
 .kicker .crest{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--gold3);border-radius:50%;
   display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold2);letter-spacing:0;text-transform:none;box-shadow:inset 0 0 14px rgba(201,166,74,.2);}
-.title-hero{font-size:clamp(44px,8.5vw,104px);font-weight:700;letter-spacing:.02em;line-height:1.02;margin:.2em 0 .16em;
+/* 下限 44px 会让「MYSKME 编年史」在窄屏折成「MYSKME 编 / 年史」——把词劈开了。
+   降到 32px 后 375px 宽的手机上仍能整词成行；上限与增长率不变,大屏观感照旧。 */
+.title-hero{font-size:clamp(32px,8.5vw,104px);font-weight:700;letter-spacing:.02em;line-height:1.02;margin:.2em 0 .16em;
   font-family:var(--serif);animation:titleIn 1.4s cubic-bezier(.16,1,.3,1) both;}
 .title-hero span{display:inline-block;}
 .title-hero em{font-style:normal;font-weight:700;
@@ -219,7 +247,7 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 .stat span{font-size:11px;letter-spacing:.2em;color:var(--ink3);}
 .usehint{margin-top:26px;color:var(--ink3);font-size:12.5px;letter-spacing:.06em;line-height:1.8;max-width:40em;opacity:0;animation:fade 1.1s 1s both;}
 /* hero 底部星图分隔，暗示往下是同一世界的篇章 */
-.starmap{position:relative;z-index:2;height:60px;margin:0 auto clamp(30px,5vw,48px);opacity:.5;
+.starmap{position:relative;z-index:2;height:42px;margin:0 auto clamp(14px,2.5vw,26px);opacity:.5;
   -webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
 .starmap svg{width:100%;height:100%;display:block;}
 
@@ -243,10 +271,9 @@ html{scroll-behavior:smooth;scroll-padding-top:76px;}
 section[data-collapsed="1"] .grid{display:none!important;}
 .fs-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .fs-actions .btn{font-size:12.5px;padding:7px 14px;}
-section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
-.grid{display:grid;gap:clamp(16px,2.2vw,22px);grid-template-columns:repeat(auto-fill,minmax(288px,1fr));grid-auto-rows:1fr;}
-.card.featured{grid-column:span 2;}
-@media (max-width:960px){.card.featured{grid-column:span 1;}}
+section{margin-top:clamp(30px,5vw,54px);scroll-margin-top:76px;}
+.grid{display:grid;gap:clamp(13px,1.7vw,18px);grid-template-columns:repeat(auto-fill,minmax(248px,1fr));grid-auto-rows:1fr;}
+.card.featured{grid-column:span 1;}
 
 .ornate{position:relative;}
 .ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;
@@ -255,24 +282,31 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .ornate::after{bottom:-1px;right:-1px;border-left:0;border-top:0;}
 .ornate:hover::before,.ornate:hover::after{width:26px;height:26px;opacity:1;}
 
-.card{background:var(--card-bg);border:1px solid var(--line);
+.card{background:var(--card-bg);border:1px solid var(--line);isolation:isolate;
   padding:20px 20px 18px;display:flex;flex-direction:column;gap:14px;position:relative;
   transition:transform .45s cubic-bezier(.16,1,.3,1),border-color .35s,box-shadow .45s,background .35s;
   opacity:0;transform:translateY(24px);}
 .card.in{opacity:1;transform:translateY(0);transition-delay:calc(var(--i) * 60ms);}
 .card:hover{transform:translateY(-6px);border-color:var(--gold);box-shadow:var(--card-hover-shadow);}
-.card.featured{grid-column:span 2;border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 34px rgba(201,166,74,.07);}
-.card.featured .thumb{aspect-ratio:16/8.4;}
-.card.featured .card-body h3{font-size:24px;}
+.card.featured{border-color:var(--gold3);background:var(--feat-bg);box-shadow:inset 0 0 34px rgba(201,166,74,.07);}
+@media (min-width:1101px){
+  .card.finale{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+    grid-template-areas:"thumb thumb" "body foot";align-items:stretch;column-gap:22px;}
+  .card.finale .thumb{grid-area:thumb;aspect-ratio:16/5;min-width:0;width:calc(100% + 40px);max-width:calc(100% + 40px);}
+  .card.finale .card-body{grid-area:body;padding-right:20px;border-right:1px solid var(--line2);}
+  .card.finale .card-foot{grid-area:foot;padding-top:0;border-top:0;align-self:stretch;}
+  .card.finale .card-admin{grid-column:1/-1;}
+}
 /* 稀有度左描边点缀（同游戏卡稀有度色码，学生一眼对得上） */
 .card.rar-UR{--rc:#ffb13c}.card.rar-SSR{--rc:#c77dff}.card.rar-SR{--rc:#5aa9ff}.card.rar-R{--rc:#9fb0c0}.card.rar-N{--rc:#c2925a}
 .card[class*="rar-"]{border-left:2px solid color-mix(in srgb,var(--rc,var(--gold)) 55%,var(--line));}
 .card[class*="rar-"]:hover{border-left-color:var(--rc,var(--gold));}
 /* 封面左上角：分类徽（游戏=剑 / 世界=史 / 工具=书） */
-.cat-icon{position:absolute;top:9px;left:9px;z-index:4;width:30px;height:30px;border:1px solid var(--line);
+.cat-icon{position:absolute;top:9px;left:9px;z-index:4;height:30px;border:1px solid rgba(232,199,104,.28);
   background:rgba(10,9,12,.66);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);color:var(--gold2);
-  display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s;}
+  display:flex;align-items:center;justify-content:center;gap:6px;padding:0 9px;transition:border-color .3s,color .3s,background .3s;}
 .cat-icon svg{width:16px;height:16px;display:block;}
+.cat-icon small{font-size:9px;line-height:1;letter-spacing:.12em;color:inherit;white-space:nowrap;}
 .card:hover .cat-icon{border-color:var(--gold);color:var(--gold);}
 /* 封面右上角：稀有度角标 */
 .rarity-badge{position:absolute;top:9px;right:9px;z-index:4;font-size:10px;font-weight:700;letter-spacing:.14em;
@@ -280,21 +314,21 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .card.rar-N .rarity-badge{color:var(--ink);background:transparent;border:1px solid var(--rc);box-shadow:none;}
 
 /* 预览截图（hero）：满宽出血到卡片边缘，缺图回退字形 */
-.thumb{margin:-24px -24px 0;position:relative;display:block;aspect-ratio:16/10;overflow:hidden;
+.thumb{margin:-20px -20px 0;position:relative;display:block;aspect-ratio:16/7;overflow:hidden;
   background:var(--bg4);border-bottom:1px solid var(--line);text-decoration:none;cursor:pointer;}
 .thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;
   filter:saturate(1.05);transition:transform .55s cubic-bezier(.16,1,.3,1),filter .4s;}
+.thumb::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(3,4,8,.03) 45%,rgba(3,4,8,.48) 100%);}
 .card:hover .thumb img{transform:scale(1.05);filter:saturate(1.1) brightness(1.05);}
 .thumb::after{content:'↗ 打开';position:absolute;bottom:10px;right:10px;font-size:11px;letter-spacing:.1em;
   color:var(--gold2);background:rgba(10,10,12,.66);border:1px solid var(--line);padding:3px 9px;
-  opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none;}
+  opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none;z-index:3;}
 .card:hover .thumb::after{opacity:1;transform:translateY(0);}
 .thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(201,166,74,.14),transparent 70%);}
 .thumb-fallback span{font-size:62px;font-weight:300;color:var(--gold);text-shadow:0 0 24px rgba(201,166,74,.35);transition:transform .5s cubic-bezier(.16,1,.3,1);}
 .card:hover .thumb-fallback span{transform:scale(1.08);}
-.card-body{display:flex;flex-direction:column;gap:7px;flex:1;}
-.ribbon{position:absolute;top:14px;right:-30px;transform:rotate(45deg);background:var(--gold);
-  color:var(--bg);font-size:11px;font-weight:700;letter-spacing:.22em;padding:3px 34px;z-index:4;box-shadow:0 2px 10px rgba(0,0,0,.4);}
+.card-body{display:flex;flex-direction:column;gap:9px;flex:1;}
 
 .card-head{display:flex;gap:15px;align-items:center;}
 .badge{flex:0 0 64px;width:64px;height:64px;border:1px solid var(--line);position:relative;
@@ -304,8 +338,19 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .card:hover .badge::before{opacity:.85;transform:rotate(45deg) scale(1.08);}
 .card:hover .badge-glyph{transform:scale(1.12);text-shadow:0 0 34px rgba(201,166,74,.65);}
 
-.card-titles{min-width:0;flex:1;}
+.card-heading{display:flex;align-items:center;gap:12px;min-width:0;}
+.work-mark{flex:0 0 48px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;position:relative;
+  color:var(--gold2);border:1px solid var(--line);background:radial-gradient(circle at 50% 42%,rgba(201,166,74,.16),rgba(201,166,74,.025) 70%);
+  box-shadow:inset 0 0 18px rgba(201,166,74,.04);transition:color .3s,border-color .3s,transform .45s cubic-bezier(.16,1,.3,1),box-shadow .3s;}
+.work-mark::after{content:'';position:absolute;inset:9px;border:1px solid var(--line2);transform:rotate(45deg);transition:transform .6s cubic-bezier(.16,1,.3,1),border-color .3s;}
+.work-mark svg{width:24px;height:24px;position:relative;z-index:1;}
+.card:hover .work-mark{color:var(--gold);border-color:var(--gold3);transform:translateY(-2px);box-shadow:inset 0 0 24px rgba(201,166,74,.11),var(--glow-gold);}
+.card:hover .work-mark::after{border-color:var(--gold3);transform:rotate(135deg);}
+.card-titles{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px;}
 .tag{align-self:flex-start;font-size:11px;letter-spacing:.2em;color:var(--gold);border:1px solid var(--line);padding:2px 9px;}
+.feat-tag{color:#141008;background:var(--gold);border-color:var(--gold);font-weight:700;}
+.card-titles{flex-direction:row !important;flex-wrap:wrap;align-items:center;column-gap:8px;}
+.card-titles h3,.card-titles .en{flex-basis:100%;}
 .card-body h3{margin:0;font-size:21px;font-weight:500;letter-spacing:.06em;line-height:1.35;}
 .card-body h3 a{color:var(--ink);text-decoration:none;transition:color .3s,text-shadow .3s;}
 .card:hover .card-body h3 a{color:var(--gold2);text-shadow:0 0 18px rgba(201,166,74,.4);}
@@ -313,24 +358,32 @@ section{margin-top:clamp(48px,8vw,86px);scroll-margin-top:76px;}
 .card-desc{margin:0;color:var(--ink2);font-size:14.5px;line-height:1.7;flex:1;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-.card-foot{display:flex;gap:18px;align-items:center;padding-top:16px;border-top:1px solid var(--line2);}
-.qr-plate{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;
+.card-foot{display:flex;flex-direction:column;gap:11px;padding-top:13px;border-top:1px solid var(--line2);}
+.qr-plate{display:none;flex-direction:column;align-items:center;gap:6px;padding:8px;align-self:center;
   background:#f3e9cf;border:1px solid var(--gold3);box-shadow:var(--plate-shadow);
   transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s;}
+.qr-plate.show{display:flex;animation:fade .35s both;}
 .qr-plate:hover{transform:scale(1.05);box-shadow:0 6px 22px rgba(0,0,0,.55),var(--glow-gold);}
-.qr-box{width:108px;height:108px;}
-.qr{width:108px;height:108px;display:block;}
-.qr-hint{font-size:10px;letter-spacing:.22em;color:#7a6320;font-weight:700;}
+.qr-box{width:86px;height:86px;}
+.qr{width:86px;height:86px;display:block;}
+.qr-hint{font-size:10px;letter-spacing:.18em;color:#7a6320;font-weight:700;display:flex;align-items:center;gap:4px;}
+.qr-hint .icon{width:12px;height:12px;stroke-width:1.9;}
 .card-actions{flex:1;min-width:0;display:flex;flex-direction:column;gap:11px;}
-.url{font-size:12px;color:var(--ink3);word-break:break-all;letter-spacing:.02em;font-family:ui-monospace,Menlo,monospace;}
+.url{display:none;}
+body.admin .url{display:block;font-size:12px;color:var(--ink3);word-break:break-all;letter-spacing:.02em;font-family:ui-monospace,Menlo,monospace;}
 .btn-row{display:flex;gap:9px;flex-wrap:wrap;}
-.btn{font-family:var(--serif);font-size:13px;letter-spacing:.1em;padding:8px 16px;cursor:pointer;
+.btn{font-family:var(--serif);font-size:13px;letter-spacing:.1em;padding:8px 14px;min-height:42px;cursor:pointer;
   border:1px solid var(--line);background:transparent;color:var(--ink);text-decoration:none;
-  transition:transform .2s,border-color .3s,background .3s,color .3s,box-shadow .3s;}
+  transition:transform .2s,border-color .3s,background .3s,color .3s,box-shadow .3s;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;}
 .btn:hover{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-gold);}
 .btn:active{transform:scale(.96);}
 .btn-go{background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border-color:var(--gold3);}
 .btn-go:hover{background:linear-gradient(180deg,rgba(201,166,74,.3),rgba(201,166,74,.12));}
+.btn-go2{border-color:var(--gold3);color:var(--gold2);}
+.btn-go2:hover{background:rgba(201,166,74,.10);}
+a:focus-visible,button:focus-visible,input:focus-visible,[contenteditable="true"]:focus-visible{
+  outline:2px solid var(--gold2);outline-offset:3px;box-shadow:0 0 0 5px rgba(201,166,74,.14);}
 
 /* ---------- 管理员模式 ---------- */
 .card-admin{display:none;gap:6px;flex-wrap:wrap;margin-top:6px;padding-top:12px;border-top:1px dashed var(--line2);}
@@ -347,9 +400,10 @@ body.admin .add-work:hover{border-color:var(--gold);color:var(--gold2);box-shado
 [contenteditable="true"]:focus{outline:1px solid var(--gold);background:rgba(201,166,74,.07);}
 body.admin .title-link{cursor:text;}
 
-.admin-fab{position:fixed;left:16px;bottom:16px;z-index:40;width:40px;height:40px;border:1px solid var(--line);
+.admin-fab{position:fixed;left:16px;bottom:16px;z-index:40;width:44px;height:44px;border:1px solid var(--line);
   background:var(--bg3);color:var(--ink3);cursor:pointer;font-size:16px;opacity:.45;
   transition:all .3s;display:flex;align-items:center;justify-content:center;}
+.admin-fab .icon{width:19px;height:19px;}
 .admin-fab:hover{opacity:1;border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-gold);}
 body.admin .admin-fab{display:none;}
 
@@ -405,14 +459,18 @@ footer b{color:var(--ink2);font-weight:400;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 
 @media (max-width:760px){
+  .card-desc{-webkit-line-clamp:3;} /* 2行会把最长几张主推卡的后半句卖点截掉 */
   .grid{grid-template-columns:1fr;}
   .card-foot{flex-direction:column;align-items:stretch;}
   .qr-plate{align-self:center;}
   .card-actions{align-items:center;text-align:center;}
   .url{text-align:center;}
-  .ribbon{font-size:10px;padding:3px 30px;}
   .admin-bar .ab-title{width:100%;margin-bottom:4px;}
+  .ctrl{right:10px;bottom:10px;gap:6px;flex-direction:column;}
   .toast{bottom:78px;max-width:82vw;}
+}
+@media (min-width:761px) and (max-width:1100px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;transition-duration:.01ms!important;}
@@ -421,9 +479,10 @@ footer b{color:var(--ink2);font-weight:400;}
 
 /* ---------- 右下角控制台：主题切换 / 打印 / 分享 ---------- */
 .ctrl{position:fixed;right:16px;bottom:16px;z-index:42;display:flex;gap:10px;}
-.ctrl-btn{width:40px;height:40px;border:1px solid var(--line);background:var(--bg3);color:var(--ink2);
+.ctrl-btn{width:44px;height:44px;border:1px solid var(--line);background:var(--bg3);color:var(--ink2);
   cursor:pointer;font-size:16px;opacity:.6;transition:all .3s;display:flex;align-items:center;justify-content:center;
   font-family:var(--serif);}
+.ctrl-btn .icon{width:19px;height:19px;}
 .ctrl-btn:hover{opacity:1;border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-gold);transform:translateY(-2px);}
 .ctrl-btn:active{transform:scale(.95);}
 
@@ -441,8 +500,8 @@ footer b{color:var(--ink2);font-weight:400;}
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   body::before,body::after{display:none!important;}
   /* 一页汇总：隐藏图片/简介/按钮等，只留 标题 + 二维码 + 链接，紧凑排成一页 */
-  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb,
-  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.ribbon,.foot-share,
+  .admin-bar,.admin-fab,.ctrl,.toast,.pw-mask,.card-admin,.add-work,.btn-row,.thumb,.work-mark,
+  .tag,.en,.card-desc,.qr-hint,.kicker,.meta-row,.usehint,.foot-share,
   .volnav,.hero-art,.starmap,.chap-era,.chap-epi,.cat-icon,.rarity-badge,.rule-caret{display:none!important;}
   .hero{display:block!important;min-height:0!important;padding:0!important;}
   .rule{margin-bottom:2mm!important;}
@@ -480,16 +539,54 @@ footer b{color:var(--ink2);font-weight:400;}
 """
 
 APP_JS = r"""
-var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
+var LS='myskme-hub-data', SS='myskme-admin', PW_HASH='%%PWHASH%%';
+function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0');}).join('');}).catch(function(){return '';});}
 (function(){
   var content=document.getElementById('content');
   var header=document.querySelector('header');
   var toastEl=document.getElementById('toast');
   var REDUCE=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 旧管理员存档只保存当时的数据。按稳定 key 回填后来新增的视觉资源，
+  // 保留用户改过的文案、网址、排序与自建作品，不要求清空 localStorage。
+  var DEFAULT_ITEM_BY_KEY={};
+  (DEFAULT_DATA.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){if(it.key)DEFAULT_ITEM_BY_KEY[it.key]=it;});});
   var DATA=load(); var saveTimer, toastTimer;
 
   function clone(o){return JSON.parse(JSON.stringify(o));}
-  function load(){try{var s=localStorage.getItem(LS);if(s)return JSON.parse(s);}catch(e){}return clone(DEFAULT_DATA);}
+  function mergeVisualDefaults(data){
+    var present={};
+    (data.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){
+      if(it.key)present[it.key]=true;
+      var d=it.key&&DEFAULT_ITEM_BY_KEY[it.key]; if(!d)return;
+      if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
+      if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
+      if(!it.icon&&d.icon)it.icon=d.icon;
+      // 次链接也要回填：0718 给「世界编年史」加的「剧情图册·无月」原本只有清空过
+      // localStorage 的人看得见——老访客(尤其是王老师自己这台)存档里没有 url2,
+      // 永远刷不出来。只补缺失的,不覆盖用户改过的。
+      if(!it.url2&&d.url2)it.url2=d.url2;
+      if(!it.url2label&&d.url2label)it.url2label=d.url2label;
+      // 0723 又给「世界编年史」加了第三链接「正典地点」——老访客同理要回填,否则永远刷不出来
+      if(!it.url3&&d.url3)it.url3=d.url3;
+      if(!it.url3label&&d.url3label)it.url3label=d.url3label;
+      if(!it.url4&&d.url4)it.url4=d.url4;
+      if(!it.url4label&&d.url4label)it.url4label=d.url4label;
+      if(!it.url5&&d.url5)it.url5=d.url5;
+      if(!it.url5label&&d.url5label)it.url5label=d.url5label;
+      if(!it.url6&&d.url6)it.url6=d.url6;
+      if(!it.url6label&&d.url6label)it.url6label=d.url6label;
+    });});
+    // 0726 新增「星徒地牢」。老访客的管理员存档里没有这张卡；
+    // 只在完全缺失时补到娱乐卷首，不覆盖文案、不改变其他自定义作品。
+    var entertainment=data.sections&&data.sections[0];
+    var starDungeon=DEFAULT_ITEM_BY_KEY['star-dungeon'];
+    if(entertainment&&starDungeon&&!present['star-dungeon']){
+      entertainment.items=entertainment.items||[];
+      entertainment.items.unshift(clone(starDungeon));
+    }
+    return data;
+  }
+  function load(){try{var s=localStorage.getItem(LS);if(s)return mergeVisualDefaults(JSON.parse(s));}catch(e){}return mergeVisualDefaults(clone(DEFAULT_DATA));}
   function save(){try{localStorage.setItem(LS,JSON.stringify(DATA));}catch(e){}}
   function dsave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,400);}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -507,30 +604,73 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     game:'<path d="M12 2l3 3v9l-3 3-3-3V5z"/><path d="M9 17h6M12 17v4"/>',
     lore:'<path d="M5 4h11v13a3 3 0 003 3H8a3 3 0 01-3-3V4z"/><path d="M16 4a3 3 0 013 3a1 1 0 01-1 1h-2"/>',
     tool:'<path d="M4 4h7v15H6a2 2 0 01-2-2V4zM20 4h-7v15h5a2 2 0 002-2V4z"/>'};
+  var ITEM_PATH={
+    'star-dungeon':'<path d="M5 20V7l7-4 7 4v13"/><path d="M8 20v-7h8v7M9 8h6M12 10v3"/><path d="M4 20h16"/>',
+    expedition:'<path d="M14.5 3.5l6 6L11 19l-4 1 1-4z"/><path d="M13 5l6 6M9 15l-4-4M5 19l-2 2"/>',
+    starling:'<path d="M12 3c-3.8 3.7-6 8-6 12a6 6 0 0012 0c0-4-2.2-8.3-6-12z"/><path d="M12 8l1.2 2.4 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4z"/>',
+    zimingqi:'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 9h16M4 15h16M9 4v16M15 4v16"/><circle cx="12" cy="12" r="2.2"/>',
+    brawl:'<path d="M5 4l15 15M19 4L4 19"/><path d="M7 16l-3 3 1 1 3-3M16 7l3-3 1 1-3 3"/><path d="M12 7l2-3 2 3M7 12l-3 2 3 2"/>',
+    volvme:'<path d="M6 4h11v14H7a3 3 0 01-3-3V6a2 2 0 012-2z"/><path d="M8 8h6M8 12h4"/><path d="M17 4a3 3 0 013 3v11h-3"/>',
+    quiz:'<path d="M12 3l5 5-5 13L7 8z"/><path d="M7 8h10M9 13h6"/><circle cx="4" cy="7" r="1"/><circle cx="20" cy="15" r="1"/>',
+    banks:'<path d="M4 5h16v14H4zM8 5v14M13 5v14M4 10h16"/><path d="M16 7h2M16 13h2M6 7v1M10 12v4"/>',
+    listen:'<path d="M4 14v-2a8 8 0 0116 0v2"/><path d="M4 14a2 2 0 012-2h1v7H6a2 2 0 01-2-2zM20 14a2 2 0 00-2-2h-1v7h1a2 2 0 002-2z"/><path d="M9 15l1.3-2 1.5 4 1.4-5 1.8 3"/>',
+    write:'<path d="M19 3c-5 .7-9.2 4.6-10.5 10.2L6 18l4.8-2.4C16.4 14 19.8 8.3 19 3z"/><path d="M5 20l8-8M10 16h7v4H8"/>',
+    daily:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/><path d="M12 12l.9 1.8 2.1.3-1.5 1.5.4 2.1-1.9-1-1.9 1 .4-2.1L9 14.1l2.1-.3z"/>',
+    wall:'<rect x="4" y="4" width="16" height="13" rx="1"/><path d="M8 8h8M8 11h6"/><path d="M9 17l-1 4 4-2 4 2-1-4"/><circle cx="12" cy="16" r="2.5"/>',
+    scoreboard:'<path d="M5 4h14v16H5z"/><path d="M8 8h5M8 12h8M8 16h6"/><path d="M16 5l.8 1.6 1.7.3-1.2 1.2.3 1.8-1.6-.9-1.6.9.3-1.8-1.2-1.2 1.7-.3z"/>',
+    threek:'<path d="M4 18c3-8 7-13 16-14-1 8-6 12-14 15z"/><path d="M6 17l12-11M9 15l-1-6M12 12l1-6M15 9l3 1"/><path d="M4 21l3-3"/>',
+    print:'<path d="M7 8V3h10v5M7 17H5a2 2 0 01-2-2v-4a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><path d="M7 14h10v7H7z"/><circle cx="17.5" cy="11.5" r=".7"/>'};
+  var UI_PATH={
+    external:'<path d="M14 5h5v5M10 14l9-9"/><path d="M19 13v6H5V5h6"/>',
+    copy:'<rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2h3"/>',
+    scan:'<path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/><path d="M9 9h6v6H9z"/>',
+    print:'<path d="M7 8V3h10v5M7 17H5a2 2 0 01-2-2v-4a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><path d="M7 14h10v7H7z"/>',
+    share:'<circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="M8 11l8-5M8 13l8 5"/>',
+    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    moon:'<path d="M20 15.5A8.5 8.5 0 118.5 4 7 7 0 0020 15.5z"/>',
+    auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z"/>',
+    edit:'<path d="M4 20l4.5-1 10-10a2.1 2.1 0 00-3-3l-10 10z"/><path d="M14.5 7.5l3 3M4 20h6"/>',
+    links:'<path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"/>',
+    poster:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M7 16l3-3 2 2 3-4 2 3M8 7h5"/>'};
   var CAT_NAME={game:'游戏',lore:'世界观',tool:'学习工具'};
+  function iconSVG(path,extra){return '<svg class="icon'+(extra?' '+extra:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';}
+  function uiIcon(name){return iconSVG(UI_PATH[name]||UI_PATH.external);}
   function catIcon(cat){var d=CAT_PATH[cat]||CAT_PATH.tool;
-    return '<span class="cat-icon" title="'+(CAT_NAME[cat]||'作品')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
+    return '<span class="cat-icon" title="'+(CAT_NAME[cat]||'作品')+'" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg><small>'+esc(CAT_NAME[cat]||'作品')+'</small></span>';}
+  function workMark(it){var d=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
+    return '<span class="work-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
   function cardHTML(it,si,ii){
     var cover=it.cover||'';
+    var coverSmall=it.coverSmall||'';
     var fb='<div class="thumb-fallback"'+(cover?' style="display:none"':'')+'><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
-    var img=cover?'<img class="cover-img" loading="lazy" alt="" src="'+esc(cover)+'" onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
+    var srcset=coverSmall?' srcset="'+esc(coverSmall)+' 640w, '+esc(cover)+' 1280w" sizes="(max-width:720px) 94vw, 600px"':'';
+    var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'"'+srcset+' onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
-    var badges=catIcon(it.cat)+'<span class="rarity-badge">'+rar+'</span>';
-    var thumb='<a class="thumb" href="'+esc(it.url)+'" target="_blank" rel="noopener">'+badges+img+fb+'</a>';
-    return '<article class="card ornate rar-'+rar+(it.featured?' featured':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
+    var ext=(it.url||'').indexOf('myskme.github.io/myskme-hub/')<0; // hub 自家子页当前标签打开,保住返回键;外站才开新标签
+    var tgt=ext?' target="_blank" rel="noopener"':'';
+    var badges=catIcon(it.cat)+'<span class="rarity-badge">'+rar+'</span>'; // 稀有度角标接线——CSS 早就写好(rar-* 左描边+角标),markup 一直没输出
+    var thumb='<a class="thumb" href="'+esc(it.url)+'"'+tgt+' aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
+    return '<article class="card ornate rar-'+rar+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
       +thumb
-      +'<div class="card-body"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'
-        +'<h3><a class="title-link" href="'+esc(it.url)+'" target="_blank" rel="noopener" data-bind="title">'+esc(it.title)+'</a></h3>'
-        +'<span class="en" data-bind="en">'+esc(it.en)+'</span>'
+      +'<div class="card-body"><div class="card-heading">'+workMark(it)+'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'+(it.featured?'<span class="tag feat-tag">★ 主推</span>':'')
+        +'<h3><a class="title-link" href="'+esc(it.url)+'"'+tgt+' data-bind="title">'+esc(it.title)+'</a></h3>'
+        +'<span class="en" data-bind="en">'+esc(it.en)+'</span></div></div>'
         +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
-      +'<div class="card-foot"><div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">扫码即玩</span></div>'
-        +'<div class="card-actions"><span class="url" data-bind="url">'+esc(it.url)+'</span>'
-        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'" target="_blank" rel="noopener">访问 ↗</a>'
-        +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">复制链接</button></div></div></div>'
+      +'<div class="card-foot">'
+        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'"'+tgt+'>'+uiIcon('external')+'<span>访问</span></a>'
+        +(it.url2?'<a class="btn btn-go2" href="'+esc(it.url2)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url2label||'更多')+'</span></a>':'')
+        +(it.url3?'<a class="btn btn-go2" href="'+esc(it.url3)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url3label||'更多')+'</span></a>':'')
+        +(it.url4?'<a class="btn btn-go2" href="'+esc(it.url4)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url4label||'更多')+'</span></a>':'')
+        +(it.url5?'<a class="btn btn-go2" href="'+esc(it.url5)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url5label||'更多')+'</span></a>':'')
+        +(it.url6?'<a class="btn btn-go2" href="'+esc(it.url6)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url6label||'更多')+'</span></a>':'')
+        +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
+        +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
+        +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
+        +'<div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">'+uiIcon('scan')+'扫码即玩 · 投屏给学生扫</span></div></div>'
       +'<div class="card-admin">'
         +'<button data-op="up" title="上移">↑ 上移</button><button data-op="down" title="下移">↓ 下移</button>'
         +'<button data-op="move" title="移到另一区">⇄ 换区</button>'
-        +'<button data-op="feat" title="HUB 角标开关">★ 角标</button>'
+        +'<button data-op="feat" title="主推开关(金色边框+★主推章)">★ 主推</button>'
         +'<button data-op="del" class="danger" title="删除此作品">删除</button>'
       +'</div></article>';
   }
@@ -547,7 +687,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   }
   function buildNav(){
     var nav=document.getElementById('volnav-inner'); if(!nav)return;
-    var h='<span class="volnav-brand">✦ <b>MYSKME 编年史</b></span>';
+    var h='<a class="volnav-brand" href="#top" title="回到顶部">✦ <b>MYSKME 总目</b></a>'; // 品牌可点=回顶;自称统一「总目」,让「编年史」独属世界编年史
     DATA.sections.forEach(function(sec,si){
       var anc=sec.anchor||('vol-'+(si+1));
       h+='<a class="vlink" href="#'+anc+'" data-nav="'+anc+'">'+(sec.vol?'<span class="vl-num">'+esc(sec.vol)+'</span>':'')+esc((sec.label||'').replace(/^卷[一二三四五六七八九十]+\s*·\s*/,''))+'</a>';
@@ -689,8 +829,10 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   function openPw(){mask.classList.add('show');pwBox.classList.remove('err');pwInput.value='';setTimeout(function(){pwInput.focus();},60);}
   function closePw(){mask.classList.remove('show');}
   function tryPw(){
-    if(pwInput.value===PW){closePw();setAdmin(true);toast('已进入管理员模式');}
-    else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    sha256hex((pwInput.value||'').trim()).then(function(h){
+      if(h===PW_HASH){closePw();setAdmin(true);toast('已进入管理员模式');}
+      else{pwBox.classList.remove('err');void pwBox.offsetWidth;pwBox.classList.add('err');pwInput.select();}
+    });
   }
   function setAdmin(on){
     document.body.classList.toggle('admin',on);
@@ -780,7 +922,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var tx=hx+hq+44;ctx.textAlign='left';
     ctx.fillStyle='#8a6d1e';ctx.font='600 33px "Songti SC",serif';ctx.fillText('扫码打开 · 作品总目',tx,hy+46);
     ctx.fillStyle='#5a4f38';ctx.font='400 22px ui-monospace,Menlo,monospace';ctx.fillText((DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,''),tx,hy+88);
-    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('远征与学堂 · 中考四板块 · 一站直达',tx,hy+132);
+    ctx.fillStyle='#6a5f47';ctx.font='400 23px "Songti SC",serif';ctx.fillText('娱乐与学习 · 中考修行 · 一站直达',tx,hy+132);
     ctx.textAlign='center';ctx.fillStyle='#8a6d1e';ctx.font='600 22px serif';ctx.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-作品总目-海报.png';
@@ -802,6 +944,7 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
     var op=e.target.closest('[data-op]'); if(op){doOp(op);return;}
     var add=e.target.closest('[data-addsec]'); if(add){addWork(+add.getAttribute('data-addsec'));return;}
     var cp=e.target.closest('.btn-copy'); if(cp){copyLink(cp);return;}
+    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card');var qp=qc&&qc.querySelector('.qr-plate');if(qp)qp.classList.toggle('show');return;}
     if(isAdmin()){var a=e.target.closest('a');if(a)e.preventDefault();}  // 编辑时不跳转
   });
 
@@ -825,13 +968,13 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
 
   // ---- 主题：跟随系统 / 浅色 / 深色 ----
   var TLS='myskme-theme', tOrder=['auto','light','dark'],
-      tName={auto:'跟随系统',light:'浅色',dark:'深色'}, tIcon={auto:'◐',light:'☀',dark:'☾'};
+      tName={auto:'跟随系统',light:'浅色',dark:'深色'}, tIcon={auto:'auto',light:'sun',dark:'moon'};
   var mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
   function getPref(){try{return localStorage.getItem(TLS)||'auto';}catch(e){return 'auto';}}
   function resolveTheme(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p;}
   function applyTheme(p){var e=document.documentElement;
     e.setAttribute('data-theme',resolveTheme(p));e.setAttribute('data-themepref',p);
-    var b=document.getElementById('themeBtn');if(b){b.textContent=tIcon[p];b.title='主题：'+tName[p]+'（点按切换）';}}
+    var b=document.getElementById('themeBtn');if(b){b.innerHTML=uiIcon(tIcon[p])+'<span class="sr-only">切换主题</span>';b.title='主题：'+tName[p]+'（点按切换）';}}
   function cycleTheme(){var nxt=tOrder[(tOrder.indexOf(getPref())+1)%tOrder.length];
     try{localStorage.setItem(TLS,nxt);}catch(e){}applyTheme(nxt);toast('主题：'+tName[nxt]);}
   if(mq){var mqh=function(){if(getPref()==='auto')applyTheme('auto');};
@@ -849,6 +992,11 @@ var LS='myskme-hub-data', SS='myskme-admin', PW='%%PW%%';
   var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',buildPoster);
 
   // ---- 启动 ----
+  var adminFab=document.getElementById('adminFab');if(adminFab)adminFab.innerHTML=uiIcon('edit')+'<span class="sr-only">管理员</span>';
+  var printCtl=document.getElementById('printBtn');if(printCtl)printCtl.innerHTML=uiIcon('print')+'<span class="sr-only">打印</span>';
+  var shareCtl=document.getElementById('shareBtn');if(shareCtl)shareCtl.innerHTML=uiIcon('share')+'<span class="sr-only">分享</span>';
+  if(cab)cab.innerHTML=uiIcon('links')+'<span>复制全部链接</span>';
+  if(pb)pb.innerHTML=uiIcon('poster')+'<span>导出竖版海报</span>';
   applyTheme(getPref());
   var sq=document.getElementById('shareQr'); if(sq)sq.innerHTML='<div class="qr-box">'+qrSVG(DATA.hubUrl||location.href)+'</div>';
   var su=document.getElementById('shareUrl'); if(su)su.textContent=(DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,'');
@@ -887,8 +1035,8 @@ def static_header(d):
         f'      <p class="epilogue" data-h="hint">{d["hint"]}</p>\n'
         '      <div class="meta-row">\n'
         '        <div class="stat"><b id="stat-total">0</b><span>部作品</span></div>\n'
-        '        <div class="stat"><b id="stat-a">0</b><span>卷一 · 远征</span></div>\n'
-        '        <div class="stat"><b id="stat-b">0</b><span>卷二 · 学堂</span></div>\n'
+        '        <div class="stat"><b id="stat-a">0</b><span>娱乐</span></div>\n'
+        '        <div class="stat"><b id="stat-b">0</b><span>学习</span></div>\n'
         '      </div>\n'
         '    </div>\n'
         '  </header>\n'
@@ -896,9 +1044,15 @@ def static_header(d):
     )
 
 data_json = json.dumps(DEFAULT_DATA, ensure_ascii=False, indent=2)
-app = APP_JS.replace("%%PW%%", PASSWORD)
+app = APP_JS.replace("%%PWHASH%%", PASSWORD_HASH)
 
 PAGE = """<!doctype html>
+<!--
+  本文件由 build_hub.py 自动生成，请勿手改。
+  手改会在下次运行生成器时被静默覆盖。
+  要改内容：先改 build_hub.py，再重新运行它生成本文件。
+  页面里的「导出 index.html」按钮同理，导出物只作备份，不要当作源文件回填仓库。
+-->
 <html lang="zh-CN" data-theme="dark" data-themepref="auto">
 <head>
 <meta charset="utf-8">
@@ -911,10 +1065,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="MYSKME · 王老师 作品总目，扫码即玩：记分编年史、三国军师争霸、大乱斗、远征录、星灵远征、世界编年史、题库训练场。">
+<meta name="description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的课堂英语作品 · 中考四板块（题库·词灵对决 / 听力 / 写作 / 每日一题）· 优秀作文墙 —— 扫码即玩。">
+<meta property="og:description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
 <meta property="og:url" content="https://myskme.github.io/myskme-hub/">
 <meta name="twitter:card" content="summary_large_image">
@@ -933,6 +1087,7 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
   <button id="abExit">退出</button>
 </div>
 
+<a id="top"></a>
 <nav class="volnav" id="volnav"><div class="volnav-inner" id="volnav-inner"></div></nav>
 
 <div class="wrap">
@@ -951,20 +1106,31 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       </div>
     </div>
     <div class="foot-links">
-      <a href="https://myskme.github.io/myskme-hub/banks/" target="_blank" rel="noopener">题库书架</a>
+      <a href="https://myskme.github.io/myskme-star-dungeon/" target="_blank" rel="noopener">星徒地牢</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/wall/" target="_blank" rel="noopener">优秀作文墙</a>
+      <a href="https://myskme.github.io/myskme-expedition-web/" target="_blank" rel="noopener">远征录</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/write/" target="_blank" rel="noopener">作文训练场</a>
+      <a href="https://myskme.github.io/myskme-starling/" target="_blank" rel="noopener">星灵远征</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/daily/" target="_blank" rel="noopener">每日一题</a>
+      <a href="https://myskme.github.io/myskme-zimingqi/" target="_blank" rel="noopener">自鸣棋</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/listen/" target="_blank" rel="noopener">听力训练场</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/print/" target="_blank" rel="noopener">打印中心</a>
+      <a href="https://myskme.github.io/myskme-chronicle/" target="_blank" rel="noopener">世界编年史</a>
     </div>
-    <div><b>MYSKME</b> — Make Yourself Special &amp; Kind</div>
-    <div>单文件离线作品总目 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
+    <div class="foot-links">
+      <a href="https://myskme.github.io/myskme-hub/banks/">题库书架</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/wall/">优秀作文墙</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/write/">作文训练场</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/daily/">每日一题</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/listen/">听力训练场</a>
+      <span>·</span>
+      <a href="https://myskme.github.io/myskme-hub/print/">打印中心</a>
+    </div>
+    <div><b>MYSKME</b> — Make Yourself Special &amp; Kind · Mr. Wang（王老师）</div>
+    <div>免下载免安装 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
   </footer>
 </div>
 
@@ -1010,4 +1176,4 @@ page = (PAGE
 
 with open(OUT, "w", encoding="utf-8") as f:
     f.write(page)
-print("WROTE", OUT, len(page), "bytes; password:", PASSWORD)
+print("WROTE", OUT, len(page), "bytes; 管理口令走 sha256 哈希门（明文不入源码/日志）")

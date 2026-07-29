@@ -1,0 +1,194 @@
+{
+  "name": "SP4 画像与弓·克与宸（人物传VOL.3）",
+  "code": "SP4",
+  "desc": "2026 暑假特辑·人物传 VOL.3 高级档（双传主：克与宸） · 15 道自包含单选（while 对比/one…the other/Neither of/prefer to/so that/主将从现/both/opposite/must be 推测/never+完成/过去被动/All three/whether+不定式/seem to/图证反选）。双传记阅读与姐弟互批在纸卷上。",
+  "date": "2026-07-27",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "level": "炼狱",
+  "tier": "free",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. ___ the sister loved quiet, the brother loved noise.",
+        "ops": [
+          "During",
+          "While",
+          "So",
+          "Or"
+        ],
+        "ans": 1,
+        "why": "正确：while 表两者对比。",
+        "lv": 2
+      },
+      {
+        "q": "7. They had two treasures: ___ was a covered portrait, and ___ was a wall of bows.",
+        "ops": [
+          "one; another",
+          "one; the other",
+          "the one; other",
+          "one; others"
+        ],
+        "ans": 1,
+        "why": "正确：两者固定搭配 one…the other。",
+        "lv": 2
+      },
+      {
+        "q": "8. ___ of the two ever crossed the line.",
+        "ops": [
+          "None",
+          "Both",
+          "Either",
+          "Neither"
+        ],
+        "ans": 3,
+        "why": "正确：两者都不 + 单数谓语。",
+        "lv": 2
+      },
+      {
+        "q": "9. She preferred painting ___ talking.",
+        "ops": [
+          "than",
+          "at",
+          "to",
+          "with"
+        ],
+        "ans": 2,
+        "why": "正确：prefer doing to doing。",
+        "lv": 2
+      },
+      {
+        "q": "10. She covered the portrait ___ nobody could see it.",
+        "ops": [
+          "because",
+          "unless",
+          "although",
+          "so that"
+        ],
+        "ans": 3,
+        "why": "正确：表目的 → so that。",
+        "lv": 2
+      },
+      {
+        "q": "11. If she ever ___ back, the room will be exactly as she left it.",
+        "ops": [
+          "will come",
+          "came",
+          "come",
+          "comes"
+        ],
+        "ans": 3,
+        "why": "正确：从句现在时 comes。",
+        "lv": 1
+      },
+      {
+        "q": "12. Both halves of the room ___ a carpet of their own.",
+        "ops": [
+          "has",
+          "have",
+          "is having",
+          "there are"
+        ],
+        "ans": 1,
+        "why": "正确：both → 复数 have。",
+        "lv": 1
+      },
+      {
+        "q": "13. The bow wall is ___ the covered portrait.",
+        "ops": [
+          "opposite",
+          "among",
+          "between",
+          "inside"
+        ],
+        "ans": 0,
+        "why": "正确：正对面 → opposite。",
+        "lv": 1
+      },
+      {
+        "q": "14. Look at the stripes — the big shadow in the window ___ a tiger.",
+        "ops": [
+          "can't be",
+          "mustn't be",
+          "needn't be",
+          "must be"
+        ],
+        "ans": 3,
+        "why": "正确：证据确凿 → must be。",
+        "lv": 2
+      },
+      {
+        "q": "15. He has ___ shot a single arrow — look at the clean target.",
+        "ops": [
+          "ever",
+          "already",
+          "yet",
+          "never"
+        ],
+        "ans": 3,
+        "why": "正确：从未 → never。",
+        "lv": 2
+      },
+      {
+        "q": "16. The room ___ into two halves by a line of tape years ago.",
+        "ops": [
+          "divided",
+          "was divided",
+          "is divided",
+          "has divided"
+        ],
+        "ans": 1,
+        "why": "正确：过去被动。",
+        "lv": 2
+      },
+      {
+        "q": "17. ___ three shadows passed the window at dusk.",
+        "ops": [
+          "Both",
+          "Every",
+          "All",
+          "Each"
+        ],
+        "ans": 2,
+        "why": "正确：三个 → All three。",
+        "lv": 1
+      },
+      {
+        "q": "18. She stood at the gate, not knowing ___ to look back or not.",
+        "ops": [
+          "whether",
+          "if",
+          "what",
+          "why"
+        ],
+        "ans": 0,
+        "why": "正确：whether to do or not。",
+        "lv": 2
+      },
+      {
+        "q": "19. The two treasures ___ to share one secret: both are kept, and never used.",
+        "ops": [
+          "seem",
+          "seems",
+          "seeming",
+          "are seem"
+        ],
+        "ans": 0,
+        "why": "正确：复数 → seem to share。",
+        "lv": 2
+      },
+      {
+        "q": "20. 对照旧屋再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "There are eight bows on the wall.",
+          "The tape line is still on the floor.",
+          "Both of the treasures belongs to the sister.",
+          "The empty chair is on the sister's side."
+        ],
+        "ans": 2,
+        "why": "正确（此句有错）：both → belong；且弓墙不属于姐姐。",
+        "lv": 2
+      }
+    ]
+  }
+}

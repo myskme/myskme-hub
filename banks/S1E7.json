@@ -1,0 +1,301 @@
+{
+  "name": "S1E7 镜屋猎杀",
+  "code": "S1E7",
+  "desc": "陷阱猎人版 · 选项级心理战 24 题（词汇 6 + 语法 14 + 综合 4）",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "剧集专项",
+  "pack": "MYSKME 第一季",
+  "mods": {
+    "m5": [
+      {
+        "q": "The library was so ___ that I could hear my own heartbeat.",
+        "ops": [
+          "quite",
+          "quit",
+          "quietly",
+          "quiet"
+        ],
+        "ans": 3,
+        "why": "so＋形容词＋that，空格作 was 的表语需形容词 quiet；quite＝相当（副词），quit＝退出（动词），quietly 是副词不能作表语。",
+        "lv": 2
+      },
+      {
+        "q": "Scientists are still studying how rising temperatures ___ ocean life.",
+        "ops": [
+          "affect",
+          "affecting",
+          "effects",
+          "effect"
+        ],
+        "ans": 0,
+        "why": "从句主语 temperatures（复数）需谓语原形 affect（v. 影响）；effect 是名词（效果），affecting 缺助动词不能单独作谓语。",
+        "lv": 2
+      },
+      {
+        "q": "It ___ me three hours to finish the puzzle, but it was worth it.",
+        "ops": [
+          "spent",
+          "cost",
+          "took",
+          "paid"
+        ],
+        "ans": 2,
+        "why": "It takes sb. 时间 to do sth. 固定句型；spend 的主语必须是人，cost 不接 to do 作真正主语，pay 接钱。",
+        "lv": 2
+      },
+      {
+        "q": "It was ___ a tricky question that even the teacher paused for a moment.",
+        "ops": [
+          "so",
+          "such",
+          "very",
+          "too"
+        ],
+        "ans": 1,
+        "why": "空后是 a＋形＋名，用 such（such a tricky question）；so 需 so tricky a question 语序；very/too 不引导 that 从句。",
+        "lv": 2
+      },
+      {
+        "q": "— Would you like some coffee? — Just ___, please. I can't sleep if I drink too much.",
+        "ops": [
+          "a few",
+          "few",
+          "little",
+          "a little"
+        ],
+        "ans": 3,
+        "why": "coffee 不可数且语境是肯定的“来一点”→ a little；a few/few 修饰可数复数；little 表否定“几乎没有”。",
+        "lv": 2
+      },
+      {
+        "q": "You may ___ the book for two weeks, but please don't write on it.",
+        "ops": [
+          "borrow",
+          "lend",
+          "return",
+          "keep"
+        ],
+        "ans": 3,
+        "why": "for＋时间段需延续性动词，keep（持有）可延续；borrow/lend/return 都是瞬间动词，不能接 for two weeks。",
+        "lv": 2
+      },
+      {
+        "q": "We ___ each other since we were in primary school, and we're still best friends.",
+        "ops": [
+          "know",
+          "have known",
+          "knew",
+          "had known"
+        ],
+        "ans": 1,
+        "why": "since＋still（延续到现在）→ 现在完成时 have known；had known 需要“过去的过去”参照点。",
+        "lv": 2
+      },
+      {
+        "q": "— I can't find Lucy anywhere. — Oh, she ___ to the headmaster's office. She'll be back in ten minutes.",
+        "ops": [
+          "has been",
+          "went",
+          "has gone",
+          "had gone"
+        ],
+        "ans": 2,
+        "why": "现在找不到她＋十分钟后回来＝此刻人不在场 → has gone（去了还没回）；has been＝去过且已回来，正好相反。",
+        "lv": 2
+      },
+      {
+        "q": "This bridge ___ over a hundred years ago, but it still carries traffic today.",
+        "ops": [
+          "was built",
+          "built",
+          "has been built",
+          "is built"
+        ],
+        "ans": 0,
+        "why": "ago 锁定过去时间点＋桥被建造 → 一般过去时被动 was built；完成时不与 ago 连用。",
+        "lv": 2
+      },
+      {
+        "q": "A terrible accident ___ at the crossroads last night; luckily no one was hurt.",
+        "ops": [
+          "was happened",
+          "happened",
+          "has happened",
+          "was happening"
+        ],
+        "ans": 1,
+        "why": "happen 是不及物动词，没有被动语态（假被动陷阱）；last night 锁一般过去。",
+        "lv": 2
+      },
+      {
+        "q": "The fireworks ___ at exactly 9 p.m. every National Day, and the whole city watches.",
+        "ops": [
+          "set off",
+          "are setting off",
+          "are set off",
+          "set off by"
+        ],
+        "ans": 2,
+        "why": "烟花被人燃放 → 短语动词被动 are set off（被动时介词 off 不能丢）；every National Day 锁一般现在。",
+        "lv": 2
+      },
+      {
+        "q": "Look! The old theatre ___ into a modern library right now.",
+        "ops": [
+          "is being turned",
+          "is turning",
+          "is turned",
+          "turns"
+        ],
+        "ans": 0,
+        "why": "right now → 进行体；剧院被改造 → 被动；进行＋被动＝is being done；is turning 形似却是主动进行。",
+        "lv": 2
+      },
+      {
+        "q": "The new student asked me ___.",
+        "ops": [
+          "where was the computer room",
+          "that where the computer room was",
+          "where the computer room was",
+          "where is the computer room located on this floor"
+        ],
+        "ans": 2,
+        "why": "宾语从句用陈述语序，主句 asked（过去）→ 从句呼应用 was；最长的 D 项语序和时态双错，纯属诱饵。",
+        "lv": 2
+      },
+      {
+        "q": "He failed the driving test again, ___ disappointed his whole family.",
+        "ops": [
+          "that",
+          "it",
+          "what",
+          "which"
+        ],
+        "ans": 3,
+        "why": "逗号后指代整个前句的非限定性定语从句只能用 which；that/what 不引导非限定从句，it 缺连词。",
+        "lv": 2
+      },
+      {
+        "q": "Don't worry. I'll call you as soon as the meeting ___.",
+        "ops": [
+          "will end",
+          "ends",
+          "ended",
+          "is ending"
+        ],
+        "ans": 1,
+        "why": "时间状语从句“主将从现”：主句 will call，从句用一般现在 ends；反射性填 will end 正是陷阱。",
+        "lv": 2
+      },
+      {
+        "q": "Your sister hardly ever watches TV, ___?",
+        "ops": [
+          "does she",
+          "doesn't she",
+          "is she",
+          "hasn't she"
+        ],
+        "ans": 0,
+        "why": "hardly 含否定义 → 前否后肯，附加问用肯定式；主句实义动词 watches → 用 does she。",
+        "lv": 2
+      },
+      {
+        "q": "Half of the apples on the table ___ already gone bad, so throw them away.",
+        "ops": [
+          "has",
+          "is",
+          "was",
+          "have"
+        ],
+        "ans": 3,
+        "why": "half of＋名词，谓语随 of 后名词（apples 复数）→ 复数；gone bad 需 have gone（现在完成）。",
+        "lv": 2
+      },
+      {
+        "q": "It was not until midnight ___ the firefighters finally put out the flames.",
+        "ops": [
+          "when",
+          "that",
+          "which",
+          "since then"
+        ],
+        "ans": 1,
+        "why": "It was not until... that... 是 not until 的强调句固定框架，只能用 that。",
+        "lv": 2
+      },
+      {
+        "q": "If I ___ you, I wouldn't trust that stranger so easily.",
+        "ops": [
+          "am",
+          "was",
+          "were",
+          "had been"
+        ],
+        "ans": 2,
+        "why": "主句 wouldn't → 与现在事实相反的虚拟语气，be 动词用 were（If I were you 固定）；was 是口语，考试以 were 为准。",
+        "lv": 2
+      },
+      {
+        "q": "The population of this town is now three times ___ it was twenty years ago.",
+        "ops": [
+          "as larger as",
+          "as large as",
+          "as large than",
+          "so large as"
+        ],
+        "ans": 1,
+        "why": "倍数表达：N times as＋原级＋as（three times as large as）；as...as 中间用原级不用比较级。",
+        "lv": 2
+      },
+      {
+        "q": "In this lucky draw, the chance of winning the grand prize is only one ___ ten thousand.",
+        "ops": [
+          "in",
+          "of",
+          "to",
+          "for"
+        ],
+        "ans": 0,
+        "why": "概率“N 分之一”用 one in N（one in ten thousand＝万分之一）；to 用于比分，of 接复数集合。",
+        "lv": 2
+      },
+      {
+        "q": "Not only the students but also the teacher ___ surprised by the announcement yesterday.",
+        "ops": [
+          "are",
+          "were",
+          "was",
+          "is"
+        ],
+        "ans": 2,
+        "why": "not only A but also B 谓语就近 B（the teacher 单数）＋yesterday 锁过去 → was；看到 students 反射用复数正是陷阱。",
+        "lv": 2
+      },
+      {
+        "q": "My eyes hurt. I ___ at the screen for three hours without a break.",
+        "ops": [
+          "stare",
+          "stared",
+          "have stared",
+          "have been staring"
+        ],
+        "ans": 3,
+        "why": "for three hours＋一直没停（眼睛疼是持续盯着的结果）→ 现在完成进行时强调持续过程；have stared 强调结果，不如 D 贴切。",
+        "lv": 2
+      },
+      {
+        "q": "___ is no use crying over spilt milk; what matters is what you do next.",
+        "ops": [
+          "That",
+          "This",
+          "There",
+          "It"
+        ],
+        "ans": 3,
+        "why": "It is no use doing sth. 固定句型，It 作形式主语；That/This 需有指代对象，There is no use 不成立。",
+        "lv": 2
+      }
+    ]
+  }
+}

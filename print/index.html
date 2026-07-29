@@ -109,7 +109,11 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function blanks(s){return esc(s).replace(/___+/g,'<span class="blank">　　　</span>')}
 var CAT=[],BANK=null,MODE='paper';
 var MODES=[['paper','选择题卷'],['key','选择题·答案版 🔒'],['vocab','词表'],['dictation','词表·默写版']];
-/* 答案+解析软门（密码 myskme2026，与作文墙口令同）——题目免费，答案/解析需密码 */
+/* 答案+解析软门——题目免费，答案/解析需密码。明文口令不入源码(同 wall/maker/almanac 范式)。
+   ⚠ 待办(2026-07-20)：当前 ANS_HASH 恰好 = sha256(作文墙班级口令)，而班级口令是印在
+   学生海报上分发的 → 全班都能解锁教师答案版。请换一个只有你知道的口令：
+       printf '%s' '新口令' | shasum -a 256
+   把结果填进下面的 ANS_HASH 即可（前端软门，防君子不防小人，但至少不该和班级口令同一把）。 */
 var ANS_HASH="6bc05fd48828cf625c1ee53fd231cb69ffc5fd736f940b496549d443ad56cea0";
 function ansOK(){try{return sessionStorage.getItem('myskme-ans')==='1'}catch(e){return false}}
 async function sha256(s){try{var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')}catch(e){return ''}}

@@ -9,7 +9,7 @@
 - [x] **① 冻结题库 JSON schema + 校验器**（`/schema`）——出卷端与网站端共用，出库前 `python3 schema/validate_tiku.py 卷号.json`。✅ 2026-06-24
 - [x] **学习核心入 git**：词灵对决 + 无名之原 已克隆进**私有仓库** `myskme/myskme-games`（+ 本地）。✅ 2026-06-24
 - [x] **② 词灵对决：连胜火苗 + 今日任务 + 7 日格子**。✅ 2026-06-24 — 主屏顶部 🔥连续N天·最佳M天 + 7日打卡点 + 今日任务（复用已有 streak 数据，已上线）。
-- [x] **③ 卷尾 QR 自带兑换码** `?code=XXXX`。✅ 2026-06-24 — `word-duel?code=卷号` 一扫即装当期题库（已上线）。待收尾：出卷 skill 的卷尾二维码模板改成 `…/word-duel?code=卷号`。
+- [x] **③ 卷尾 QR 自带兑换码** `?code=XXXX`。✅ 2026-06-24 — 一扫即装当期题库（已上线）。**2026-07-12 更新**：题库游戏搬 GitHub Pages，卷尾二维码/网址改 `myskme.github.io/myskme-quiz/word-duel.html?code=卷号`；参考模板已落地 `新英语/s2e5/render_s2e5.py`（每卷专属 QR，segno 生成 + BarcodeDetector 解码验证）。⚠ 出卷 skill `myskme-english-paper`（插件托管）的 SKILL.md/data.py 默认值仍写 netlify，需在维护该 skill 处更新，或每次出卷套用新址。
 - [x] **④ 语法陷阱 SRS deck**：八类陷阱喂给词灵对决同一引擎（同引擎换内容）。✅ 2026-06-24 → `banks/TRAP1.json`（32 题，过 3 评审答案唯一性审计）
 - [ ] **⑤ 家长周报卡**：一键导出“本周练 X 词 / 攻克 Y 错题 / 连续 Z 天”（复用海报 canvas）。
 - [ ] **⑥ 全站“MYSKME 世界”回链页脚**：六座孤岛变漏斗。

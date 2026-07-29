@@ -1,0 +1,169 @@
+{
+  "name": "SP4M 画像与弓·克与宸（人物传VOL.3·中级）",
+  "code": "SP4M",
+  "desc": "人物传 VOL.3 中级档（双传主：克与宸·学徒版） · 13 道自包含单选（both…and/one…the other/规则过去 -ed/There was/mustn't/hope to do/children/Look!+进行/by himself/didn't/最高级/How often/图证反选）。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "6. Both Ke and Chen ___ good at their own thing.",
+        "ops": [
+          "is",
+          "are",
+          "be",
+          "am"
+        ],
+        "ans": 1,
+        "why": "正确：both…and → 复数 are。",
+        "lv": 1
+      },
+      {
+        "q": "7. They have two treasures: one is a portrait, ___ is a bow collection.",
+        "ops": [
+          "other",
+          "another",
+          "others",
+          "the other"
+        ],
+        "ans": 3,
+        "why": "正确：两者 → one…the other。",
+        "lv": 2
+      },
+      {
+        "q": "8. When they were small, they often ___ together in this room.",
+        "ops": [
+          "played",
+          "play",
+          "plaies",
+          "playing"
+        ],
+        "ans": 0,
+        "why": "正确：过去 → played。",
+        "lv": 1
+      },
+      {
+        "q": "9. Long ago, there ___ only one room for the two children.",
+        "ops": [
+          "were",
+          "was",
+          "is",
+          "are"
+        ],
+        "ans": 1,
+        "why": "正确：过去 + 单数 → There was。",
+        "lv": 2
+      },
+      {
+        "q": "10. Chen knows the old rule: \"You ___ cross the line!\"",
+        "ops": [
+          "needn't",
+          "can",
+          "mustn't",
+          "may"
+        ],
+        "ans": 2,
+        "why": "正确：禁止 → mustn't。",
+        "lv": 1
+      },
+      {
+        "q": "11. He hopes ___ his sister again some day.",
+        "ops": [
+          "seeing",
+          "see",
+          "sees",
+          "to see"
+        ],
+        "ans": 3,
+        "why": "正确：hope to do。",
+        "lv": 2
+      },
+      {
+        "q": "14. The two ___ drew the line when they were young.",
+        "ops": [
+          "childs",
+          "childrens",
+          "children",
+          "child"
+        ],
+        "ans": 2,
+        "why": "正确：不规则复数 children。",
+        "lv": 2
+      },
+      {
+        "q": "15. Look! A spider ___ from the window frame.",
+        "ops": [
+          "hangs",
+          "is hanging",
+          "hanging",
+          "hang"
+        ],
+        "ans": 1,
+        "why": "正确：Look!+进行时。",
+        "lv": 2
+      },
+      {
+        "q": "16. He cleans the eight bows all by ___ .",
+        "ops": [
+          "him",
+          "his",
+          "he",
+          "himself"
+        ],
+        "ans": 3,
+        "why": "正确：by himself。",
+        "lv": 2
+      },
+      {
+        "q": "17. She ___ tell anyone her reason before she left.",
+        "ops": [
+          "didn't",
+          "doesn't",
+          "isn't",
+          "won't"
+        ],
+        "ans": 0,
+        "why": "正确：过去否定 → didn't tell。",
+        "lv": 2
+      },
+      {
+        "q": "18. Of the three shadows outside, the tiger is the ___ .",
+        "ops": [
+          "bigger",
+          "big",
+          "biggest",
+          "most big"
+        ],
+        "ans": 2,
+        "why": "正确：三者 → the biggest。",
+        "lv": 1
+      },
+      {
+        "q": "19. — ___ do the sister and the brother talk now? — Never.",
+        "ops": [
+          "How long",
+          "How many",
+          "How much",
+          "How often"
+        ],
+        "ans": 3,
+        "why": "正确：问频率 → How often。",
+        "lv": 2
+      },
+      {
+        "q": "20. 对照旧屋再读四句——只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "He hope to see her again.",
+          "There are five pots of paint on the floor.",
+          "The target is clean.",
+          "The tape line is still there."
+        ],
+        "ans": 0,
+        "why": "正确（此句有错）：he → hopes。",
+        "lv": 2
+      }
+    ]
+  }
+}

@@ -12,7 +12,7 @@
 | | |
 |---|---|
 | GitHub Pages | https://myskme.github.io/myskme-hub/ |
-| Netlify 副本 | https://myskme-hub.netlify.app |
+| ~~Netlify 副本~~ | 已随 Netlify 于 2026-07-12 退役，勿再引用 |
 
 六大作品的聚合门面：真实截图预览、明暗主题（默认跟随系统、可手动切）、**一页打印**、**竖版海报导出**（1080×1920，含全部二维码，发朋友圈/家长群）、**复制全部链接**、**课堂专用区可折叠**（家长视角默认收起）、页脚**分享二维码**、密码**管理员模式**可视化改内容并导出。
 
@@ -24,7 +24,7 @@
 
 | | |
 |---|---|
-| 线上 | https://myskme.github.io/myskme-hub/wall/ （班级口令 `myskme2026`） |
+| 线上 | https://myskme.github.io/myskme-hub/wall/ （班级口令见 wall 后台「设口令」，不在文档里留明文） |
 
 5 篇优秀手写作文真迹上墙：年级筛选、点击放大、金奖角标、王老师点评与亮点。
 **自助上传**：Pages CMS「作文墙」集合——网页传扫描件 + 写点评 + 发布，自动上线，无需碰代码。
@@ -58,12 +58,12 @@ flowchart LR
 
 数据契约：`schema/tiku.schema.json` + `schema/validate_tiku.py`；三层书架 `free / code / svip`。
 
-**公开题库书架页**：https://myskme.github.io/myskme-hub/banks/ —— 读 `index.json` 自动展示全部已发布题库（兑换码 · 题量 · 难度 · 门槛 + 「去刷题」直达 `word-duel?code=`）。CMS 一发布即自动上架，零维护。可印在卷子上或发家长群当总目录。
+**公开题库书架页**：https://myskme.github.io/myskme-hub/banks/ —— 读 `index.json` 自动展示全部已发布题库（兑换码 · 题量 · 难度 · 门槛 + 「去刷题」直达 `word-duel.html?code=`）。CMS 一发布即自动上架，零维护。可印在卷子上或发家长群当总目录。
 
 ## 四、词灵对决增强
 
 - **主屏连胜火苗**：🔥 连续 N 天 · 最佳 M 天 + 近 7 日打卡点 + 今日任务（"明天再来"的钩子）。
-- **卷尾二维码** `?code=卷号`：一扫即装当期题库（课上做卷 → 回家直接刷同款）。出卷 skill 卷尾码模板已同步更新。
+- **卷尾二维码** `?code=卷号`：一扫即装当期题库（课上做卷 → 回家直接刷同款）。2026-07-12 网址搬 GitHub Pages（`myskme.github.io/myskme-quiz/word-duel.html?code=卷号`），参考模板已落地 `render_s2e5.py`；出卷 skill（插件）默认值待在其维护处更新（不在本地可编辑路径）。
 - **题库书架改取枢纽**：网页发布的题库即时进游戏。
 - **家长周报卡**（做好待上线）：战绩页一键生成可分享周报图（本周练习 + 连续打卡 + 累计成果 + 王老师寄语），发家长群——补上闭环最后一环"家长看见"。
 

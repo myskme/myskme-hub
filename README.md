@@ -7,13 +7,14 @@
 ## 收录作品
 | 作品 | 地址 |
 |---|---|
+| 星徒地牢 | https://myskme.github.io/myskme-star-dungeon/ |
 | MYSKME 积分板 | https://myskme.github.io/myskme-scoreboard/ |
 | 三国军师争霸积分器 | https://myskme.github.io/three-kingdoms-classroom-scoreboard/ |
 | MYSKME 大乱斗 | https://myskme.github.io/myskme-brawl/ |
-| 远征录 · 笼中剑 | https://myskme-expedition.netlify.app |
+| 远征录 · 笼中剑 | https://myskme.github.io/myskme-expedition-web/ |
 | 星灵远征 · 电子宠物 | https://myskme.github.io/myskme-starling/ |
-| 世界编年史 II | https://myskme-volvme-ii.netlify.app |
-| MYSKME 题库训练场 | https://myskme-games.netlify.app/ |
+| 世界编年史 II | https://myskme.github.io/myskme-chronicle/ |
+| MYSKME 题库训练场 | https://myskme.github.io/myskme-quiz/ |
 | MYSKME自鸣棋 · 课堂肉鸽自走棋 | https://myskme.github.io/myskme-zimingqi/ |
 
 ## 学习工具（本仓库托管 · GitHub Pages · 免后端）
