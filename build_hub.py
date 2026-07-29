@@ -35,7 +35,7 @@ DEFAULT_DATA = {
              "tag": "电子宠物 · 养成", "title": "星灵远征", "en": "STARLING",
              "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回一封封寓言信。",
              "url": "https://myskme.github.io/myskme-starling/"},
-            {"key": "gemfall", "glyph": "消", "cat": "game", "rarity": "SSR", "cover": "",
+            {"key": "gemfall", "glyph": "消", "cat": "game", "rarity": "SSR", "cover": "assets/cover-gemfall.webp",
              "tag": "消消乐 · 三消远征", "title": "灵石远征", "en": "GEMFALL",
              "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
              "url": "https://myskme.github.io/myskme-hub/match/"},

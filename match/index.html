@@ -223,7 +223,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .has-art{background-size:cover;background-position:center top;background-repeat:no-repeat}
 #ally-badge.has-art b,.ally-opt.has-art .g,.wolf-badge.has-art b,.wolf-badge.has-art svg{opacity:0}
 #ally-badge.has-art::before,.wolf-badge.has-art::before{opacity:.75}
+/* 有立绘时：底部压一层渐变，名字才在深浅两种立绘上都读得清 */
 .ally-opt.has-art{background-color:var(--bg2)}
+.ally-opt.has-art::before{content:'';position:absolute;left:0;right:0;bottom:0;height:52%;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.82));pointer-events:none;z-index:1}
+.ally-opt.has-art .n{position:relative;z-index:2;color:#e8dcc4;text-shadow:0 1px 3px rgba(0,0,0,.95)}
+.ally-opt.has-art.sel .n{color:var(--gold2)}
+.ally-opt.lock.has-art{filter:grayscale(.85)}          /* 未解锁的立绘去色，一眼看出还没拿到 */
 #cat.has-art svg{opacity:0}
 #map-banner{width:min(340px,90vw);aspect-ratio:16/7;margin:2px auto 6px;display:none;
   border:1px solid var(--line);position:relative}
@@ -263,7 +269,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #ally.ready #ally-fire:active{transform:scale(.95)}
 /* 同伴选择（开场卡） */
 .ally-pick{display:flex;gap:5px;justify-content:center;margin:14px 0 2px}
-.ally-opt{flex:1;min-width:0;max-width:56px;padding:6px 1px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer;
+.ally-opt{flex:1;min-width:0;max-width:56px;min-height:62px;padding:6px 1px;border:1px solid var(--line2);background:var(--bg2);cursor:pointer;
+  display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s;position:relative}
 .ally-opt .g{font-size:20px;font-weight:300;color:var(--ink3);line-height:1.1;transition:all .25s}
 .ally-opt .n{font-size:10px;letter-spacing:0;color:var(--ink3);white-space:nowrap}
@@ -544,7 +551,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       把灵石三三对齐，沉睡的灵力就会醒来。<br>
       <a href="../">← 作品总目</a>　·　MYSKME × 英语王老师
     </div>
-    <div id="cat" title="……">
+    <div id="cat" title="……" data-fit="contain">
       <svg viewBox="0 0 64 56" fill="#0c0c0e" stroke="rgba(201,166,74,.35)" stroke-width="1">
         <path class="tail" d="M8 46 Q-2 40 4 30 Q6 26 10 28 Q6 36 14 42 Z"/>
         <path d="M18 20 L22 8 L30 16 Q36 14 42 16 L50 8 L54 20 Q60 30 56 42 Q54 50 36 50 Q18 50 16 42 Q12 30 18 20 Z"/>
@@ -561,7 +568,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <div class="map-era" id="map-era">第一地脉</div>
       <div class="map-epi" id="map-epi"></div>
     </div>
-    <div id="map-banner"></div>
+    <div id="map-banner" data-pos="center"></div>
     <div class="map-nav">
       <button class="btn ghost" id="map-prev">◀</button>
       <div class="chname" id="map-chip"></div>
@@ -1232,14 +1239,25 @@ function art(key){
   }
   return (e&&e.__ok)?e:null;
 }
-/* DOM 版：图加载成功才盖住底下的字形徽章，失败就当无事发生 */
+/* DOM 版：图加载成功才盖住底下的字形徽章，失败就当无事发生。
+   ⚠ background-size / position 必须内联写：#ally-badge 这类 ID 选择器里的
+   background 简写会把类规则里的 cover 重置掉（ID 特异性更高），
+   结果 512px 立绘在 44px 框里按原尺寸从左上角显示 —— 只看得到一块空白。 */
 function applyArt(el,key){
   if(!el)return;
   const src=ART[key];
   if(!src){el.classList.remove('has-art');return}
   if(_art[key]===null){el.classList.remove('has-art');return}
+  const fit=el.dataset.fit||'cover';                       // 猫是整只坐姿，用 contain 免得被裁
+  const pos=el.dataset.pos||(fit==='contain'?'center':'center 22%');  // 半身像偏上取脸
   const im=art(key);
-  const put=()=>{el.style.backgroundImage='url("'+src+'")';el.classList.add('has-art')};
+  const put=()=>{
+    el.style.backgroundImage='url("'+src+'")';
+    el.style.backgroundSize=fit;
+    el.style.backgroundPosition=pos;
+    el.style.backgroundRepeat='no-repeat';
+    el.classList.add('has-art');
+  };
   if(im){put();return}
   el.classList.remove('has-art');
   const probe=_art[key];
@@ -3382,10 +3400,13 @@ function drawMenuGems(t){
   const W=Math.min(340,$('#scr-menu').clientWidth-40), H=64, d=Math.min(devicePixelRatio||1,2.5);
   if(c.width!==Math.round(W*d)){c.width=Math.round(W*d);c.height=Math.round(H*d);c.style.width=W+'px';c.style.height=H+'px'}
   const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
-  const n=6, gap=W/n;
+  /* 六色全露 + 万象珠压轴。之前只画 6 个且把第 6 个当成万象珠，
+     结果星屑那一颗从来没在大厅出现过。 */
+  const n=7, gap=W/n;
   for(let i=0;i<n;i++){
     const y=H/2+Math.sin(t*.0016+i*.8)*7;
-    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),i,i===5?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16});
+    const orb=(i===6);
+    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),orb?0:i,orb?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16});
   }
 }
 
