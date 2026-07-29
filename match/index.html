@@ -954,17 +954,17 @@ const compUnlocked=c=>SAVE.lv>=c.unlock;
 /* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
 const LORE=[
   {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
-   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案 —— 一切远征的源头。',u:'https://myskme-volvme-ii.netlify.app'},
+   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案 —— 一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页被朱笔圈过的旧纸。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，圈完还得说清楚。」',
    t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评 —— 被红笔改过、又被夸过的那些。',u:'../wall/'},
   {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
    t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
   {ch:4,body:'敲开最后一层岩壳，里面是一把锈住的短剑。<br>「笼中剑，」狼先生认出来了，「有人在这儿等过很久。」',
-   t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 技能连招 · 探索成长 —— 旗舰远征。',u:'https://myskme-expedition.netlify.app'},
+   t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备。',u:'https://myskme.github.io/myskme-expedition-web/'},
   {ch:5,body:'蛇女的缠丝断在你手里，散成一地细字。<br>凑近看，每一根都是一个被记错的单词。「她收集这些，」狼先生皱眉，「收集了很久。」',
-   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来 —— 兑换码即卷号，扫码即玩。',u:'https://myskme-games.netlify.app/'},
+   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来 —— 兑换码即卷号，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
   {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
-   t:'自鸣棋',d:'课堂肉鸽自走棋 · 多人对战 + 单人十关试炼，扫码 / 投屏即用。',u:'https://myskme.github.io/myskme-zimingqi/'},
+   t:'自鸣棋',d:'肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 · 35 位正典角色，扫码即玩。',u:'https://myskme.github.io/myskme-zimingqi/'},
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
    t:'记分编年史',d:'英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
   {ch:8,body:'王座熔窟安静下来。叶王的红笔断在地上，蛇女的缠丝烧成了灰。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
@@ -1030,7 +1030,8 @@ function levelDef(n){
     if(depth%8===0){L.boss=depth%16===0?'she':'ye';L.bossHP=190+depth*4;L.moves=25;L.goals.push({type:'boss',need:L.bossHP})}
     else if(arch===1){L.ink=PAT.rowsBottom(3);L.ink2=depth>10?PAT.rowsBottom(1):[];L.goals.push({type:'ink',need:0});collectGoal(1,28)}
     else if(arch===2){L.bells=3+(depth>8?1:0);L.goals.push({type:'bell',need:L.bells});collectGoal(1,24)}
-    else if(arch===3){L.crates=PAT.pillars();L.crates2=depth>10?PAT.center():[];L.goals.push({type:'crate',need:0})}
+    else if(arch===3){L.crates=PAT.pillars().concat(depth>10?PAT.center():[]);
+      L.crates2=depth>10?PAT.center():[];L.goals.push({type:'crate',need:0})}
     else if(arch===4){L.cages=PAT.scatter(rng,8+Math.min(4,depth>>2),2,5);L.goals.push({type:'cage',need:0});collectGoal(1,26)}
     else if(arch===5){L.ink=PAT.checkerMid();L.crates=PAT.corners(2);L.goals.push({type:'ink',need:0},{type:'crate',need:0})}
     else {collectGoal(2,34);L.ink=PAT.diamond()}
@@ -1085,7 +1086,10 @@ function levelDef(n){
         const mix=pos%3;
         if(mix===1){L.ink=PAT.checkerMid();L.ink2=L.ink.filter((_,i)=>i%2===0);L.crates=PAT.corners(2);L.crates2=L.crates.filter((_,i)=>i%2===0);L.goals.push({type:'ink',need:0},{type:'crate',need:0})}
         else if(mix===2){L.bells=4;L.ink=PAT.rowsBottom(2);L.goals.push({type:'bell',need:4},{type:'ink',need:0})}
-        else {L.cages=PAT.scatter(rng,8,2,5);L.crates=PAT.pillars().slice(0,6);L.goals.push({type:'cage',need:0},{type:'crate',need:0});collectGoal(1,26)}
+        else {L.crates=PAT.pillars().slice(0,6);
+          const cs=new Set(L.crates.map(([r,c])=>r*N+c));
+          L.cages=PAT.scatter(rng,16,2,5).filter(([r,c])=>!cs.has(r*N+c)).slice(0,8);  // 多撒再筛，保住设计难度
+          L.goals.push({type:'cage',need:0},{type:'crate',need:0});collectGoal(1,26)}
         break}
       case 8:{
         const mix=pos%3;
@@ -1097,6 +1101,17 @@ function levelDef(n){
   }
   /* 铃铛关不许在最底行铺岩壳（可破也别恶心人） */
   if(L.bells>0){L.crates=L.crates.filter(([r])=>r<7);L.cages=L.cages.filter(([r])=>r<7);L.snakes=L.snakes.filter(([r])=>r<7)}
+  /* ⚠ 机关对账（必须在回填 need 之前）：
+     石笼若落在岩壳格上，buildBoard 会静默丢弃它，而 need 是按列表长度回填的 ——
+     那一关就永远差几个笼、不可能通关。第 51 关曾因此把 52 关往后整条线全锁死。 */
+  const crateSet=new Set([...(L.crates||[]),...(L.crates2||[])].map(([r,c])=>r*N+c));
+  L.cages=(L.cages||[]).filter(([r,c])=>!crateSet.has(r*N+c));
+  L.snakes=(L.snakes||[]).filter(([r,c])=>!crateSet.has(r*N+c));
+  L.crates2=(L.crates2||[]).filter(([r,c])=>crateSet.has(r*N+c));   // 厚壳必须是薄壳的子集
+  if(L.bells>0){                                                    // 猫铃只能放进无岩壳的列
+    let free=0;for(let c=0;c<N;c++)if(!crateSet.has(c))free++;
+    L.bells=Math.min(L.bells,Math.max(1,free*2));
+  }
   /* 目标数量回填 */
   for(const g of L.goals){
     if(g.type==='ink')g.need=L.ink.length+L.ink2.length;
@@ -1292,16 +1307,23 @@ function findGroups(){
     for(const [r,c] of cs){g.cells.add(key(r,c));owner.set(key(r,c),g)}
   }
   /* 合并被后来的 run 串起来的组 */
+  /* 反复合并到不再相交为止。只扫一趟的话：g 吸收别的组之后才与 h 相连，
+     轮到 h 时会反过来吞掉 g 并标记 g.dead —— 但 g 早已进了 merged，
+     于是返回两个互相重叠的组，一步棋会多炼一颗特殊石、分数与 specials 双计。 */
   const merged=[];
-  for(const g of groups){
-    if(g.dead)continue;
-    for(const h of groups){
-      if(h===g||h.dead)continue;
-      let touch=false; for(const k of h.cells)if(g.cells.has(k)){touch=true;break}
-      if(touch){for(const k of h.cells)g.cells.add(k);g.runs.push(...h.runs);h.dead=true}
+  let again=true, guard=0;
+  while(again&&guard++<64){
+    again=false;
+    for(const g of groups){
+      if(g.dead)continue;
+      for(const h of groups){
+        if(h===g||h.dead)continue;
+        let touch=false; for(const k of h.cells)if(g.cells.has(k)){touch=true;break}
+        if(touch){for(const k of h.cells)g.cells.add(k);g.runs.push(...h.runs);h.dead=true;again=true}
+      }
     }
-    merged.push(g);
   }
+  for(const g of groups)if(!g.dead)merged.push(g);
   for(const g of merged){
     const hs=g.runs.filter(x=>x.dir==='h'), vs=g.runs.filter(x=>x.dir==='v');
     const maxH=hs.reduce((m,x)=>Math.max(m,x.len),0), maxV=vs.reduce((m,x)=>Math.max(m,x.len),0);
@@ -1954,7 +1976,8 @@ function bumpGoal(type,col,n){
   });
   return hit;
 }
-function goalsMet(){return GS.goals.every(g=>g.got>=g.need)}
+/* 空数组不算达成 —— 限时赛把 goals 设成空，一旦有路径绕过 rushOn 守卫就会误判通关 */
+function goalsMet(){return GS.goals.length>0&&GS.goals.every(g=>g.got>=g.need)}
 function updHUD(){
   const mv=$('#hud-moves');
   if(GS.rushOn){mv.querySelector('.num').textContent=GS.chainMax||'—';mv.querySelector('.lbl').textContent='最长连锁'}
@@ -2237,7 +2260,11 @@ async function trySwap(a,b){
   /* 死局重组 */
   if(!anyMove()){
     await sleep(200);
-    shuffleBoard();toast('无路可走 · <b>矿脉重组</b>');SFX.made();
+    /* 极端盘面（几乎全是笼中石）重排会失败，那样玩家卡在无解盘上、步数不再减少、
+       关卡永远不结束。重排不成就直接重铺一盘。 */
+    if(!shuffleBoard()){buildBoard(GS.L);toast('矿脉塌了 · <b>重新开凿</b>')}
+    else toast('无路可走 · <b>矿脉重组</b>');
+    SFX.made();
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(B[r][c]){B[r][c].sc=.4;B[r][c].vy=-6+rnd()*12}
     await sleep(320);
   }
@@ -2731,6 +2758,7 @@ function endRush(){
   $('#end-next').textContent='再点一盏';
   $('#end-next').dataset.act='rush';
   $('#end-retry').style.display='none';
+  $('#end-continue').style.display='none';   // 不复位会把冒险关的续挖状态漏进限时赛结算屏
   ovl('end');
 }
 function endLevel(win){
@@ -3594,19 +3622,51 @@ window.__selftest=function(){
     if(scanRuns().length!==0||!anyMove())allOk=false;
   }
   ok('16 个代表关建盘均无初始三连且有解',allOk);
-  /* 17. 关卡目标数量与格子一致 */
-  let goalOk=true;
+  /* 17. 目标数必须等于「真正布上盘面的机关数」。
+         旧版是拿 need 去比它自己的来源，恒真、抓不到任何东西 ——
+         第 51 关石笼落在岩壳上被静默丢弃、整关不可能通关，就是它漏掉的。 */
+  const countBoard=()=>{let ink=0,crate=0,cage=0,bell=0;
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      ink+=T[r][c].ink;crate+=T[r][c].crate;
+      const p=B[r][c];if(!p)continue;
+      if(p.cage>0)cage++;if(p.bell)bell++;
+    }return {ink,crate,cage,bell}};
+  let goalOk=true, badLv=[];
   for(let i=1;i<=64;i++){
     const L=levelDef(i);
-    if(!L.goals.length)goalOk=false;
+    if(!L.goals.length){goalOk=false;badLv.push(i+':no-goal');continue}
+    buildBoard(L);
+    const n=countBoard();
     for(const g of L.goals){
-      if(g.type==='ink'&&g.need!==L.ink.length+L.ink2.length)goalOk=false;
-      if(g.type==='crate'&&g.need!==L.crates.length+L.crates2.length)goalOk=false;
-      if(g.type==='cage'&&g.need!==L.cages.length+L.snakes.length)goalOk=false;
-      if(g.need<=0)goalOk=false;
+      if(g.need<=0){goalOk=false;badLv.push(i+':'+g.type+'=0');continue}
+      const got=n[g.type];
+      if(got!==undefined&&got<g.need){goalOk=false;badLv.push(i+':'+g.type+' need'+g.need+' got'+got)}
     }
   }
-  ok('64 关目标数量与实际机关数一致且非零',goalOk);
+  ok('64 关每个目标都能在盘面上真正达成'+(badLv.length?'('+badLv.slice(0,4).join('; ')+')':''),goalOk);
+  /* 17b. 无尽层同样对账 */
+  let endOk=true, badE=[];
+  for(let i=65;i<=100;i++){
+    const L=levelDef(i);buildBoard(L);
+    const n=countBoard();
+    for(const g of L.goals){
+      const got=n[g.type];
+      if(got!==undefined&&got!==g.need){endOk=false;badE.push(i+':'+g.type+' need'+g.need+' got'+got)}
+    }
+  }
+  ok('无尽层目标数与盘面完全吻合'+(badE.length?'('+badE.slice(0,3).join('; ')+')':''),endOk);
+  /* 17c. 分叉盘面不该返回互相重叠的组 */
+  blank();
+  for(let c=0;c<3;c++)B[0][c].g=0;
+  for(let c=3;c<6;c++)B[2][c].g=0;
+  for(let c=0;c<5;c++)B[4][c].g=0;
+  for(let r=0;r<5;r++)B[r][0].g=0;
+  for(let r=1;r<5;r++)B[r][4].g=0;
+  const gs2=findGroups();
+  let ov=false;
+  for(let i=0;i<gs2.length;i++)for(let j=i+1;j<gs2.length;j++)
+    for(const k of gs2[j].cells)if(gs2[i].cells.has(k)){ov=true;break}
+  ok('分叉盘面合并成单组、无重叠 (组数='+gs2.length+')',gs2.length===1&&!ov);
   /* 18. 猫铃关：铃铛数与目标一致、且不被压在底行岩壳下 */
   let bellOk=true;
   for(let i=1;i<=64;i++){
