@@ -1,7 +1,14 @@
-MYSKME 高保真音乐包 · 授权凭证 (Pixabay Content License · 可商用 · 免署名)
-来源: Pixabay (https://pixabay.com) · License: Pixabay Content License
-可商用、可用于游戏/印刷卡牌, 无需署名。下载日期 2026-06-22。
-- bgm_title.mp3  = "Epic Fantasy Adventure" by PaulYudin     · pixabay.com/music/156890
-- bgm_town.mp3   = "Fantasy Medieval Ambient" by DeusLower    · pixabay.com/music/237371
-- bgm_run.mp3    = "Epic Heroic Cinematic Action" by Alex_Kizenkov · pixabay.com/music/142162
-- bgm_boss.mp3   = "...Epic War Battle" by SoundGalleryByDmitryTaras · pixabay.com/music/119770
+灵石远征 · BGM 授权凭证
+
+来源: incompetech.com (Kevin MacLeod) · License: CC BY 4.0 · 可商用
+署名要求已由本文件满足（行业惯例：随发行物附署名文件）。下载日期 2026-07-30。
+
+- bgm_title.m4a = "Carefree" Kevin MacLeod (incompetech.com)
+    Licensed under Creative Commons: By Attribution 4.0
+    https://creativecommons.org/licenses/by/4.0/
+- bgm_run.m4a   = "Monkeys Spinning Monkeys" Kevin MacLeod (incompetech.com)
+    Licensed under Creative Commons: By Attribution 4.0
+- bgm_boss.m4a  = "Sneaky Snitch" Kevin MacLeod (incompetech.com)
+    Licensed under Creative Commons: By Attribution 4.0
+
+（此前的 Pixabay 史诗音乐包已于 2026-07-30 撤换——曲风不符合休闲益智类型。）
