@@ -71,15 +71,32 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .hr::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:8px;color:var(--gold);opacity:.8}
 
 /* ============ 主菜单 ============ */
-#scr-menu{justify-content:center;gap:6px;text-align:center}
+/* safe center：内容没超高时垂直居中，超高时退回顶部对齐 ——
+   纯 center 在溢出时会把顶部裁掉而且**滚不上去**，标题就是这么消失的 */
+#scr-menu{justify-content:safe center;gap:6px;text-align:center}
+@supports not (justify-content:safe center){
+  #scr-menu{justify-content:flex-start}
+  #scr-menu::before{content:'';margin-top:auto}
+  #scr-menu::after{content:'';margin-bottom:auto}
+}
 .title-hero{font-size:clamp(40px,9vw,76px);font-weight:300;letter-spacing:.18em;margin:6px 0 0;line-height:1.25;
   animation:titleIn 1.3s cubic-bezier(.16,1,.3,1) both}
 .title-hero em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
 @keyframes titleIn{0%{opacity:0;letter-spacing:.4em;transform:translateY(18px);filter:blur(6px)}100%{opacity:1;letter-spacing:.18em;transform:translateY(0);filter:blur(0)}}
 .subtitle{color:var(--ink2);font-size:14px;letter-spacing:.2em;margin:2px 0 0}
-#menu-gems{height:64px;margin:8px 0 2px}
+#menu-gems{height:56px;margin:6px 0 2px}
+/* 有立绘时放大成真正的主视觉 —— 512px 的立绘塞进 92px 徽章太可惜，
+   而这是玩家打开游戏第一眼看到的东西。没有立绘时仍是原来的字形徽章尺寸。 */
 .wolf-badge{width:92px;height:92px;margin:4px auto 0;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;
+  transition:width .5s cubic-bezier(.16,1,.3,1),height .5s cubic-bezier(.16,1,.3,1);
   background:radial-gradient(ellipse at center,color-mix(in srgb,var(--gold) 14%,transparent),transparent 70%)}
+.wolf-badge.has-art{flex:none;width:min(160px,42vw);height:min(180px,48vw);border-color:var(--gold-line)}
+.wolf-badge.has-art::before{inset:8px}
+.wolf-badge.has-art::after{inset:-9px}
+/* 底部渐隐，让立绘和背景融进去，不至于是一块硬边的方图 */
+.wolf-badge.has-art{-webkit-mask-image:linear-gradient(180deg,#000 66%,transparent);
+  mask-image:linear-gradient(180deg,#000 66%,transparent)}
+@media (max-height:740px){.wolf-badge.has-art{width:min(120px,34vw);height:min(134px,38vw)}}
 .wolf-badge::before{content:'';position:absolute;inset:6px;border:1px solid var(--gold-line);opacity:.45;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s}
 .wolf-badge::after{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 24s linear infinite}
 .wolf-badge svg{position:absolute;width:70%;height:70%;opacity:.16}
@@ -472,7 +489,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 #end-detail b{color:var(--ink2);font-weight:500}
 /* Boss 登场 */
 #ovl-boss .ovl-card{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
-#boss-intro-face{width:120px;height:120px;margin:8px auto}
+#boss-intro-face{width:min(168px,44vw);height:min(168px,44vw);margin:8px auto}
 #boss-intro-face svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(168,48,48,.4))}
 #boss-intro-name{font-size:30px;font-weight:300;letter-spacing:.3em;color:var(--red);white-space:pre-line;line-height:1.35;
   animation:titleIn 1s cubic-bezier(.16,1,.3,1) both}
@@ -3470,7 +3487,7 @@ function show(id){
   for(const s of $$('.scr'))s.classList.toggle('on',s.id==='scr-'+id);
   $('#chip-home').classList.toggle('on',id!=='menu');
   $('#corner-ctl').classList.toggle('on',id==='menu'||id==='map');
-  if(id==='menu'){renderMenu();renderDaily()}
+  if(id==='menu'){renderMenu();renderDaily();const m=$('#scr-menu');if(m)m.scrollTop=0}
   if(id==='map'){renderMap();renderChest()}
   if(id==='game'){renderTools();renderAlly()}
   if(id==='party')renderPartySetup();
@@ -3490,7 +3507,7 @@ function renderMenu(){
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
-  applyArt($('#wolf-badge'),'hero');
+  $('#wolf-badge').dataset.pos='center 18%';applyArt($('#wolf-badge'),'hero');
   applyArt($('#cat'),'cat');
 }
 let mapCh=1;
