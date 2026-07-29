@@ -219,6 +219,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #rush-track i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold))}
 #rush-bar.crit #rush-track i{background:linear-gradient(90deg,#7a1f1f,var(--red))}
 #rush-bar.crit #rush-time{color:var(--red);animation:lowPulse 1s infinite}
+/* 插画到位后盖住字形徽章；缺图时这条规则不生效，一切照旧 */
+.has-art{background-size:cover;background-position:center top;background-repeat:no-repeat}
+#ally-badge.has-art b,.ally-opt.has-art .g,.wolf-badge.has-art b,.wolf-badge.has-art svg{opacity:0}
+#ally-badge.has-art::before,.wolf-badge.has-art::before{opacity:.75}
+.ally-opt.has-art{background-color:var(--bg2)}
+#cat.has-art svg{opacity:0}
+#map-banner{width:min(340px,90vw);aspect-ratio:16/7;margin:2px auto 6px;display:none;
+  border:1px solid var(--line);position:relative}
+#map-banner.has-art{display:block}
+#map-banner::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 55%,color-mix(in srgb,var(--bg) 82%,transparent))}
+#boss-face.has-art,#boss-intro-face.has-art{border:1px solid color-mix(in srgb,var(--red) 40%,var(--line))}
+#boss-face.has-art svg,#boss-intro-face.has-art svg{opacity:0}
 /* 同伴 · 助战 */
 #ally{width:min(520px,100%);display:flex;align-items:center;gap:10px;margin-top:8px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:7px 10px;
@@ -450,6 +463,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <div class="map-era" id="map-era">第一地脉</div>
       <div class="map-epi" id="map-epi"></div>
     </div>
+    <div id="map-banner"></div>
     <div class="map-nav">
       <button class="btn ghost" id="map-prev">◀</button>
       <div class="chname" id="map-chip"></div>
@@ -971,6 +985,60 @@ const PLAT={
 };
 
 /* ==================================================================
+   [ 美术资源映射表 · ART MAP ]
+   插画补上后放进 match/art/ 即可自动生效，本文件一行都不用改。
+   文件不存在时静默回落到程序化绘制（字形徽章 / Canvas 灵石），
+   所以缺图不会报错、也不会留空白。规格见同目录《美术交接单.md》。
+   ================================================================== */
+const ART={
+  hero:'art/hero.webp',                                        // 大厅主视觉（狼先生）
+  cat:'art/cat.webp',                                          // 大厅小黑猫彩蛋
+  ally_wolf:'art/ally-wolf.webp', ally_lin:'art/ally-lin.webp',
+  ally_hai:'art/ally-hai.webp',   ally_he:'art/ally-he.webp',
+  ally_mo:'art/ally-mo.webp',     ally_zi:'art/ally-zi.webp',
+  boss_ye:'art/boss-ye.webp', boss_she:'art/boss-she.webp', boss_both:'art/boss-both.webp',
+  gem_0:'art/gem-0.webp', gem_1:'art/gem-1.webp', gem_2:'art/gem-2.webp',
+  gem_3:'art/gem-3.webp', gem_4:'art/gem-4.webp', gem_5:'art/gem-5.webp',
+  gem_orb:'art/gem-orb.webp',
+  ob_ink:'art/ob-ink.webp', ob_ink2:'art/ob-ink2.webp',
+  ob_crate:'art/ob-crate.webp', ob_crate2:'art/ob-crate2.webp',
+  ob_cage:'art/ob-cage.webp', ob_bell:'art/ob-bell.webp',
+  ch_1:'art/chapter-1.webp', ch_2:'art/chapter-2.webp', ch_3:'art/chapter-3.webp', ch_4:'art/chapter-4.webp',
+  ch_5:'art/chapter-5.webp', ch_6:'art/chapter-6.webp', ch_7:'art/chapter-7.webp', ch_8:'art/chapter-8.webp',
+};
+const _art={};                                                 // key -> Image | null(确认没有)
+function art(key){
+  const src=ART[key]; if(!src)return null;
+  let e=_art[key];
+  if(e===undefined){
+    e=new Image();
+    e.onload=()=>{e.__ok=true};
+    e.onerror=()=>{_art[key]=null};
+    e.src=src; _art[key]=e;
+  }
+  return (e&&e.__ok)?e:null;
+}
+/* DOM 版：图加载成功才盖住底下的字形徽章，失败就当无事发生 */
+function applyArt(el,key){
+  if(!el)return;
+  const src=ART[key];
+  if(!src){el.classList.remove('has-art');return}
+  if(_art[key]===null){el.classList.remove('has-art');return}
+  const im=art(key);
+  const put=()=>{el.style.backgroundImage='url("'+src+'")';el.classList.add('has-art')};
+  if(im){put();return}
+  el.classList.remove('has-art');
+  const probe=_art[key];
+  if(probe&&!probe.__wired){probe.__wired=true;probe.addEventListener('load',()=>{if(el.isConnected)put()})}
+}
+/* 画布版：有图就贴图，没图返回 false 让调用方走程序化绘制 */
+function drawArt(ctx,key,x,y,size){
+  const im=art(key); if(!im)return false;
+  ctx.drawImage(im,x-size/2,y-size/2,size,size);
+  return true;
+}
+
+/* ==================================================================
    [ 纯逻辑引擎 · PORTABLE CORE ]
    零 DOM、零 Canvas、零平台 API —— 可整段拷进任何 JS 运行时。
    双层网格（关键：墨封/岩壳属于「格子」，灵石属于「棋子」，重力只搬棋子）
@@ -1316,6 +1384,12 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,R*1.9);
   amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));amb.addColorStop(1,hexA(G.base,0));
   ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,R*1.9,0,Math.PI*2);ctx.fill();
+  /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
+  if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){ctx.restore();return}
+  if(kind!=='O'&&drawArt(ctx,'gem_'+gi,x,y,size*1.02)){
+    if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
+    ctx.restore();return;
+  }
   if(kind==='O'){                                              // 万象：虹彩球
     const g=ctx.createRadialGradient(x-R*.3,y-R*.35,R*.1,x,y,R*1.05);
     g.addColorStop(0,'#ffffff');
@@ -1348,10 +1422,15 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   ctx.globalAlpha=.9;ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.beginPath();ctx.ellipse(x-R*.34,y-R*.4,R*.24,R*.15,-.7,0,Math.PI*2);ctx.fill();
   ctx.globalAlpha=1;
-  /* 特殊标记 */
+  if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
+  ctx.restore();
+}
+/* 疾风/爆裂的标记单独一支，程序化灵石与插画灵石共用 */
+function drawGemMark(ctx,x,y,size,R,kind,t){
   if(kind==='H'||kind==='V'){
     ctx.save();ctx.translate(x,y);if(kind==='V')ctx.rotate(Math.PI/2);
     ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.4,size*.05);ctx.lineCap='round';
+    ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=size*.08;
     for(const s of [-1,1]){
       ctx.beginPath();ctx.moveTo(s*R*.28,0);ctx.lineTo(s*R*.86,0);ctx.stroke();
       ctx.beginPath();ctx.moveTo(s*R*.58,-R*.26);ctx.lineTo(s*R*.88,0);ctx.lineTo(s*R*.58,R*.26);ctx.stroke();
@@ -1360,6 +1439,7 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   }else if(kind==='B'){
     ctx.save();ctx.translate(x,y);ctx.rotate(t*.0011);
     ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.3,size*.045);
+    ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=size*.08;
     ctx.beginPath();ctx.arc(0,0,R*.5,0,Math.PI*2);ctx.stroke();
     ctx.setLineDash([R*.22,R*.2]);ctx.globalAlpha=.85;
     ctx.beginPath();ctx.arc(0,0,R*.8,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
@@ -1368,7 +1448,6 @@ function drawGem(ctx,x,y,size,gi,kind,o){
     ctx.fillStyle='rgba(255,255,255,'+(.55+p*.4)+')';
     ctx.beginPath();ctx.arc(x,y,R*.22,0,Math.PI*2);ctx.fill();
   }
-  ctx.restore();
 }
 function hexA(h,a){
   const n=parseInt(h.slice(1),16);
@@ -1377,6 +1456,7 @@ function hexA(h,a){
 /* ---- 机关绘制 ---- */
 /* 墨封铺满整格 —— 灵石会盖住格子中央，画成小墨点等于看不见 */
 function drawInk(ctx,x,y,s,layers,t){
+  if(drawArt(ctx,layers>1?'ob_ink2':'ob_ink',x,y,s))return;
   ctx.save();
   const h=s/2, x0=x-h, y0=y-h;
   const deep=layers>1;
@@ -1403,6 +1483,7 @@ function drawInk(ctx,x,y,s,layers,t){
   ctx.restore();
 }
 function drawCrate(ctx,x,y,s,layers){
+  if(drawArt(ctx,layers>1?'ob_crate2':'ob_crate',x,y,s))return;
   const R=s*.44;
   ctx.save();
   const g=ctx.createLinearGradient(x-R,y-R,x+R,y+R);
@@ -1419,6 +1500,7 @@ function drawCrate(ctx,x,y,s,layers){
   ctx.restore();
 }
 function drawCage(ctx,x,y,s,snake,t){
+  if(!snake&&drawArt(ctx,'ob_cage',x,y,s))return;
   const R=s*.46;
   ctx.save();
   ctx.strokeStyle=snake?'rgba(120,200,140,.9)':'rgba(196,186,160,.85)';
@@ -1438,6 +1520,7 @@ function drawCage(ctx,x,y,s,snake,t){
   ctx.restore();
 }
 function drawBell(ctx,x,y,s,t){
+  if(drawArt(ctx,'ob_bell',x,y,s*1.05))return;
   const R=s*.36;
   ctx.save();
   const sw=Math.sin(t*.0032)*.16;
@@ -2118,6 +2201,7 @@ function renderAlly(){
   el.style.setProperty('--ally-dark',GEMS[c.col].dk);
   el.style.setProperty('--ally-glow',hexA(GEMS[c.col].base,.45));
   $('#ally-badge').querySelector('b').textContent=c.g;
+  applyArt($('#ally-badge'),'ally_'+c.id);
   $('#ally-name').innerHTML=c.name+' · <em>'+c.title+'</em>';
   $('#ally-track').querySelector('i').style.width=(GS.charge/c.need*100)+'%';
   $('#ally-fire').textContent=ready?c.ult:(GS.charge+' / '+c.need);
@@ -2221,6 +2305,7 @@ function renderAllyPick(){
     d.style.setProperty('--ally-dark',GEMS[c.col].dk);
     d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
     d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'+c.name+'</div>';
+    if(ul)applyArt(d,'ally_'+c.id);
     if(ul)d.addEventListener('click',()=>{SAVE.comp=c.id;persist();SFX.click();renderAllyPick()});
     host.appendChild(d);
   });
@@ -2320,6 +2405,7 @@ function openLevel(n,mode){
     const bo=BOSSES[L.boss];
     bb.classList.add('on');
     $('#boss-face').innerHTML=bossFaceSVG(L.boss);
+    applyArt($('#boss-face'),'boss_'+L.boss);
     $('#boss-name').textContent=bo.name;
     $('#boss-hpbar').querySelector('i').style.width='100%';
     $('#boss-hpbar').classList.remove('low');
@@ -2346,6 +2432,7 @@ function openLevel(n,mode){
   if(L.boss){
     const bo=BOSSES[L.boss];
     $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);
+    applyArt($('#boss-intro-face'),'boss_'+L.boss);
     $('#boss-intro-name').textContent=bo.short;
     $('#boss-intro-title').textContent=bo.title;
     $('#boss-intro-line').textContent=bo.intro;
@@ -2510,6 +2597,8 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   $('#cat').classList.toggle('found',!!SAVE.cat);
+  applyArt($('#wolf-badge'),'hero');
+  applyArt($('#cat'),'cat');
 }
 let mapCh=1;
 function renderMap(){
@@ -2520,6 +2609,7 @@ function renderMap(){
   $('#map-era').textContent=C.era;
   $('#map-epi').textContent=C.epi;
   $('#map-chip').textContent=mapCh+' / '+maxCh;
+  applyArt($('#map-banner'),'ch_'+mapCh);
   $('#map-prev').disabled=mapCh<=1;
   $('#map-next').disabled=mapCh>=maxCh;
   const grid=$('#map-grid');grid.innerHTML='';
