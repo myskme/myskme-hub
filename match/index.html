@@ -308,6 +308,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);transition:all .2s;min-width:56px}
 .pt-name .tm.a{border-color:var(--red);color:var(--red)}
 .pt-name .tm.b{border-color:var(--blue);color:var(--blue)}
+/* 灯油配额：给谁多一份，谁这一手的矿灯就亮得久一点 */
+.pt-name .tm.oil{min-width:62px;line-height:1.15;padding:5px 8px}
+.pt-name .tm.oil i{display:block;font-style:normal;font-size:9.5px;letter-spacing:.02em;color:var(--ink3);margin-top:1px}
+.pt-name .tm.oil.hi{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
+.pt-name .tm.oil.hi i{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
 #pt-hint{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;text-align:center;margin-top:12px;line-height:1.8;
   width:min(420px,94vw)}
 #pt-hint b{color:var(--gold2);font-weight:500}
@@ -598,6 +603,10 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="pt-sec">
       <div class="pt-lbl">打几轮</div>
       <div class="pt-chips" id="pt-rounds-pick"></div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">怎么比</div>
+      <div class="pt-chips" id="pt-pace"></div>
     </div>
     <div class="pt-sec">
       <div class="pt-lbl">怎么算</div>
@@ -976,7 +985,7 @@ const LORE=[
   {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
    t:'自鸣棋',d:'肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 · 35 位正典角色，扫码即玩。',u:'https://myskme.github.io/myskme-zimingqi/'},
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
-   t:'记分编年史',d:'英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
+   t:'记分编年史',d:'记分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
   {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处 —— 从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
    t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'../'},
 ];
@@ -2744,7 +2753,7 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
@@ -2867,8 +2876,21 @@ function fxBurstDom(i){
    全程不带任何课业相关字眼，纯聚会玩法。
    ================================================================== */
 const PT_GLYPH=['一','二','三','四','五','六'];
-const PT_MOVES=14;                                             // 每人每轮的步数，一局约 1–2 分钟
-const PARTY={on:false,players:[],n:3,rounds:3,mode:'ffa',round:0,cur:0,seed:''};
+const PT_MOVES=14;                                             // 步数制：每人每轮的步数
+const PT_SECS=[45,60,90];                                      // 快赛可选的每手基准秒数
+const PT_OIL=[1,2,3];                                          // 灯油配额：谁多给一份，灯就亮得久一点
+/* 这一手实际多少秒 = 基准秒数 × 该选手的灯油。线下怎么定由你，游戏只管照配额发。 */
+function ptSecsFor(p){return Math.round(PARTY.secs*((p&&p.oil)||1))}
+/* pace:'moves' 步数制 | 'timed' 快赛（每手固定秒数，总时长可预估） */
+const PARTY={on:false,players:[],n:3,rounds:3,mode:'ffa',pace:'moves',secs:60,round:0,cur:0,seed:''};
+/* 预计总时长：每手时间 + 交接停顿，用于设置页提前告知，免得一局拖太久 */
+function ptEstimate(){
+  const hand=8;                                                // 每次交接的停顿
+  if(PARTY.pace!=='timed')return Math.round(PARTY.n*PARTY.rounds*(75+hand)/60);
+  let per=0;
+  for(let i=0;i<PARTY.n;i++)per+=ptSecsFor(PARTY.players[i])+hand;
+  return Math.max(1,Math.round(per*PARTY.rounds/60));
+}
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
 function ptColor(i){return GEMS[i%6]}
 /* 两个变量都写上，让 CSS 按当前主题挑 —— 直接烤死 --pc 的话，
@@ -2896,6 +2918,15 @@ function renderPartySetup(){
     d.addEventListener('click',()=>{PARTY.rounds=r;renderPartySetup()});
     rp.appendChild(d);
   }
+  /* 计时方式：步数制 or 快赛（按秒） */
+  const pc=$('#pt-pace');pc.innerHTML='';
+  const mk=(on,html,fn)=>{const d=document.createElement('div');
+    d.className='pt-chip'+(on?' on':'');d.innerHTML=html;
+    d.addEventListener('click',()=>{SFX.click();fn();renderPartySetup()});pc.appendChild(d)};
+  mk(PARTY.pace==='moves','步数制<span class="d">每人 '+PT_MOVES+' 步</span>',()=>{PARTY.pace='moves'});
+  for(const sec of PT_SECS)
+    mk(PARTY.pace==='timed'&&PARTY.secs===sec,sec+' 秒<span class="d">快赛</span>',
+       ()=>{PARTY.pace='timed';PARTY.secs=sec});
   for(const c of $$('#pt-mode .pt-chip'))c.classList.toggle('on',c.dataset.m===PARTY.mode);
   /* 名字与队伍 */
   while(PARTY.players.length<6)PARTY.players.push({name:'',team:PARTY.players.length%2});
@@ -2915,22 +2946,40 @@ function renderPartySetup(){
       tm.addEventListener('click',()=>{p.team=p.team?0:1;SFX.click();renderPartySetup()});
       row.appendChild(tm);
     }
+    if(PARTY.pace==='timed'){
+      const oil=document.createElement('button');
+      oil.className='tm oil'+((p.oil||1)>1?' hi':'');
+      oil.innerHTML='🪔 ×'+(p.oil||1)+'<i>'+ptSecsFor(p)+'秒</i>';
+      oil.title='灯油配额 —— 点一下换';
+      oil.addEventListener('click',()=>{
+        const k=PT_OIL.indexOf(p.oil||1);
+        p.oil=PT_OIL[(k+1)%PT_OIL.length];SFX.click();renderPartySetup();
+      });
+      row.appendChild(oil);
+    }
     host.appendChild(row);
   }
   const mult=[];for(let r=0;r<PARTY.rounds;r++)mult.push('×'+ptMult(r));
+  const est=ptEstimate();
   $('#pt-hint').innerHTML=
     (PARTY.mode==='ffa'?'各打各的，<b>总分最高的人赢</b>。':
      PARTY.mode==='team'?'两队各自把分数加起来，<b>总分高的队赢</b>。':
      '所有人的分数<b>加在一起</b>，一起冲一个总分。')
-    +'<br>每人每轮 <b>'+PT_MOVES+'</b> 步，同一轮大家拿到<b>一模一样的盘面</b>。'
-    +'<br>轮次倍率 <b>'+mult.join(' · ')+'</b> —— 越往后越关键，前面落后也翻得回来。';
+    +'<br>'+(PARTY.pace==='timed'
+        ? '基准 <b>'+PARTY.secs+' 秒</b>，时间一到自动交棒，步数不限。'
+          +'点名字右边的 <b>🪔 灯油</b> 可以单独给谁多一份时间（×2 就是双倍时长）。'
+        : '每人每轮 <b>'+PT_MOVES+'</b> 步，走完自动交棒。')
+    +'同一轮大家拿到<b>一模一样的盘面</b>。'
+    +'<br>轮次倍率 <b>'+mult.join(' · ')+'</b> —— 越往后越关键，前面落后也翻得回来。'
+    +'<br><span style="color:var(--gold2)">预计全场约 <b>'+est+' 分钟</b></span>'
+    +'（'+PARTY.n+' 人 × '+PARTY.rounds+' 轮 = '+(PARTY.n*PARTY.rounds)+' 手）';
 }
 function startParty(){
   PARTY.on=true;PARTY.round=0;PARTY.cur=0;
   PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
     name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),
-    team:p.team||0, scores:[], total:0, idx:i,
+    team:p.team||0, oil:p.oil||1, scores:[], total:0, idx:i,
   }));
   ptHandoff();
 }
@@ -2940,7 +2989,8 @@ function ptHandoff(){
   $('#hand-kick').textContent=(PARTY.round===0&&PARTY.cur===0)?'第一位，开始':'把机器递给下一位';
   $('#hand-who').textContent=p.name+(PARTY.mode==='team'?(p.team?' · 蓝队':' · 红队'):'');
   $('#hand-meta').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
-  $('#hand-mult').textContent='本轮得分 ×'+ptMult(PARTY.round);
+  $('#hand-mult').textContent='本轮得分 ×'+ptMult(PARTY.round)
+    +(PARTY.pace==='timed'?(' · '+ptSecsFor(p)+' 秒'):(' · '+PT_MOVES+' 步'));
   $('#hand-scores').innerHTML=ptScoreLines();
   show('game');ovl('hand');
 }
@@ -2963,19 +3013,29 @@ function ptStartTurn(){
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
-  L.colors=5;L.moves=PT_MOVES;
+  L.colors=5;L.moves=PARTY.pace==='timed'?9999:PT_MOVES;
   L.goals=[{type:'score',need:999999999,got:0}];
   L.chName='聚会赛';L.era='第 '+(PARTY.round+1)+' 轮';
   L.s1=6000;L.s2=14000;L.s3=26000;
   GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
-  GS.moves=PT_MOVES;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   /* 同一轮 = 同一颗种子 = 同一个初始盘面，公平可比 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
-  $('#rush-bar').classList.remove('on');
+  if(PARTY.pace==='timed'){                                    // 快赛：复用限时条做倒计时
+    const ms=ptSecsFor(p)*1000;
+    GS.rushOn=true;GS.rushT=ms;GS.rushMax=ms;
+    $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
+    $('#rush-top').firstElementChild.textContent='快赛 · '+ptSecsFor(p)+' 秒'
+      +((p.oil||1)>1?'（灯油 ×'+p.oil+'）':'');
+    $('#rush-best').textContent='第 '+(PARTY.round+1)+' 轮';
+    /* 步数格由 updHUD 按 rushOn 自动切成「最长连锁」，这里不用管 */
+  }else{
+    GS.rushOn=false;$('#rush-bar').classList.remove('on');
+  }
   $('#toolbar').style.display='none';                          // 聚会赛不用灵器，人人同起点
   $('#tool-hint').classList.remove('on');
   const bar=$('#pt-bar');bar.classList.add('on');
@@ -2991,6 +3051,7 @@ function ptStartTurn(){
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
 }
 function ptTurnEnd(){
+  GS.rushOn=false;$('#rush-bar').classList.remove('on');
   const p=PARTY.players[PARTY.cur];
   const gained=GS.score*ptMult(PARTY.round);
   p.scores.push(gained);p.total+=gained;
@@ -3292,7 +3353,10 @@ const HOW_HTML=`
 <b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆 —— 别急着刚好走完。<br><br>
 <b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。<br><br>
 <b>聚会赛</b>　一台机器 2–6 人轮流玩，打 3–5 轮。<b>同一轮里所有人拿到一模一样的盘面</b>，比的是手艺不是运气；
-轮次倍率 ×1 ×2 ×3 越往后越重，前面落后也翻得回来。可选各打各的、两队对抗、或合力凑一个总分。<br><br>
+轮次倍率 ×1 ×2 ×3 越往后越重，前面落后也翻得回来。可选各打各的、两队对抗、或合力凑一个总分。<br>
+计时有两种：<b>步数制</b>每人 14 步走完交棒；<b>快赛</b>每人固定秒数，时间一到自动交棒、步数不限 ——
+人多的时候用快赛，全场时长可控，设置页会先告诉你预计要打多久。<br>
+快赛还能给单个人多配<b>灯油</b>：×2 就是双倍时长。谁该多拿一份由你在场下定，游戏只负责照配额发。<br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
 榜上只出现化名，不收集任何真实身份信息；离线也照常能玩，联网后自动补交。
 填同一句<b>小队口令</b>的人会自动分到同一个小队榜里。
@@ -3379,10 +3443,13 @@ function loop(now){
       GS.rushT-=dt;
       const s=Math.max(0,GS.rushT/1000);
       $('#rush-time').textContent=s.toFixed(1);
-      $('#rush-track').querySelector('i').style.width=clamp(GS.rushT/90000*100,0,100)+'%';
+      $('#rush-track').querySelector('i').style.width=clamp(GS.rushT/(GS.rushMax||90000)*100,0,100)+'%';
       $('#rush-bar').classList.toggle('crit',s<=10);
       if(s<=10&&Math.floor(s*2)!==GS.__tick){GS.__tick=Math.floor(s*2);if(s>0)SFX.tick()}
-      if(GS.rushT<=0)endRush();
+      if(GS.rushT<=0){
+        if(GS.party){GS.rushOn=false;GS.over=true;GS.busy=true;ptTurnEnd()}   // 快赛：时间到就交棒
+        else endRush();
+      }
     }
     /* 闲置久了给个提示 */
     if(!GS.busy&&!GS.over&&GS.idle&&now-GS.idle>5200){
