@@ -1036,7 +1036,16 @@ function levelDef(n){
   const rng=rngOf('lv'+n);
   const L={n,ch,pos,endless,depth,colors:5,moves:23,goals:[],ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss:null,s1:0,s2:0,s3:0,
     chName:endless?'无尽矿脉':CHAPTERS[ch-1].name,era:endless?('深度 '+depth):CHAPTERS[ch-1].era,epi:endless?'没有尽头，只有更深。矿灯管够。':CHAPTERS[ch-1].epi};
-  const pickColors=k=>{const idx=[0,1,2,3,4,5];const out=[];while(out.length<k){out.push(idx.splice(Math.floor(rng()*idx.length),1)[0])}return out};
+  /* ⚠ 只能从本关真有的颜色里抽（L.colors 到这里已经定稿）。
+     以前固定从 6 色里抽，而多数关只有 5 色 —— 一旦抽中 5 号色，
+     那种灵石根本不会出现在盘上，该关永远打不通。
+     第 3 关就中过，等于整条 64 关主线卡死在第三关。 */
+  const pickColors=k=>{
+    const idx=[];for(let i=0;i<L.colors;i++)idx.push(i);
+    const out=[];
+    while(out.length<k&&idx.length)out.push(idx.splice(Math.floor(rng()*idx.length),1)[0]);
+    return out;
+  };
   const collectGoal=(k,per)=>{for(const c of pickColors(k))L.goals.push({type:'collect',col:c,need:per})};
   if(!endless&&pos===8){ /* Boss 关 */
     L.boss=n===64?'both':(ch%2?'ye':'she');
@@ -1121,11 +1130,12 @@ function levelDef(n){
     }
   }
   /* 铃铛关不许在最底行铺岩壳（可破也别恶心人） */
-  if(L.bells>0){L.crates=L.crates.filter(([r])=>r<7);L.cages=L.cages.filter(([r])=>r<7);L.snakes=L.snakes.filter(([r])=>r<7)}
+  if(L.bells>0){L.crates=L.crates.filter(([r])=>r<7);L.crates2=(L.crates2||[]).filter(([r])=>r<7);
+    L.cages=L.cages.filter(([r])=>r<7);L.snakes=L.snakes.filter(([r])=>r<7)}
   /* ⚠ 机关对账（必须在回填 need 之前）：
      石笼若落在岩壳格上，buildBoard 会静默丢弃它，而 need 是按列表长度回填的 ——
      那一关就永远差几个笼、不可能通关。第 51 关曾因此把 52 关往后整条线全锁死。 */
-  const crateSet=new Set([...(L.crates||[]),...(L.crates2||[])].map(([r,c])=>r*N+c));
+  const crateSet=new Set((L.crates||[]).map(([r,c])=>r*N+c));   // 只用薄壳；厚壳靠它验子集，不能自己也进集合
   L.cages=(L.cages||[]).filter(([r,c])=>!crateSet.has(r*N+c));
   L.snakes=(L.snakes||[]).filter(([r,c])=>!crateSet.has(r*N+c));
   L.crates2=(L.crates2||[]).filter(([r,c])=>crateSet.has(r*N+c));   // 厚壳必须是薄壳的子集
@@ -1306,19 +1316,24 @@ const swappable=(r,c)=>inB(r,c)&&canHold(r,c)&&has(r,c)&&B[r][c].cage===0;
 function newPiece(o){return Object.assign({g:0,k:'n',bell:false,cage:0,snake:false,id:idSeq++,vx:0,vy:0,sc:1,al:1,spin:0,glow:0,born:0},o||{})}
 function randColor(rng){return Math.floor((rng||ENG.rng||rnd)()*ENG.colors)}
 
-/* ---- 找出所有三连及以上（返回若干「组」） ---- */
+/* ---- 找出所有三连及以上（返回若干「组」） ----
+   matchable 排除万象灵珠：它在渲染上是无色虹彩球、引爆时吞的也是全场最多的那色，
+   唯独配对判定里还带着炼成时的原色 —— 那会让玩家攒出来的万象被随机连锁无预警吞掉。
+   注意只能在这里排除，不能改 isGem 本身：expandBlast 靠 isGem 做连锁引爆，
+   排掉 O 会让万象再也不被连爆。 */
+function matchable(r,c){return isGem(r,c)&&B[r][c].k!=='O'}
 function scanRuns(){
   const runs=[];
   for(let r=0;r<N;r++){let s=0;while(s<N){
-    if(!isGem(r,s)){s++;continue}
+    if(!matchable(r,s)){s++;continue}
     const g=gemAt(r,s);
-    let e=s+1;while(e<N&&isGem(r,e)&&gemAt(r,e)===g)e++;
+    let e=s+1;while(e<N&&matchable(r,e)&&gemAt(r,e)===g)e++;
     if(e-s>=3)runs.push({dir:'h',r,c:s,len:e-s,g});
     s=e}}
   for(let c=0;c<N;c++){let s=0;while(s<N){
-    if(!isGem(s,c)){s++;continue}
+    if(!matchable(s,c)){s++;continue}
     const g=gemAt(s,c);
-    let e=s+1;while(e<N&&isGem(e,c)&&gemAt(e,c)===g)e++;
+    let e=s+1;while(e<N&&matchable(e,c)&&gemAt(e,c)===g)e++;
     if(e-s>=3)runs.push({dir:'v',r:s,c,len:e-s,g});
     s=e}}
   return runs;
@@ -1360,8 +1375,10 @@ function findGroups(){
     const hs=g.runs.filter(x=>x.dir==='h'), vs=g.runs.filter(x=>x.dir==='v');
     const maxH=hs.reduce((m,x)=>Math.max(m,x.len),0), maxV=vs.reduce((m,x)=>Math.max(m,x.len),0);
     g.size=g.cells.size;
-    if(hs.length&&vs.length){g.make='B'}                       // L / T 形 → 爆裂
-    else if(maxH>=5||maxV>=5){g.make='O'}                      // 五连 → 万象
+    /* 五连优先于 L/T：多数三消都是五连给最强道具。
+       原来 L/T 判在前面，玩家摆出的五连只要顺带蹭到一个三连就降级成爆裂，很招骂。 */
+    if(maxH>=5||maxV>=5){g.make='O'}                           // 五连 → 万象
+    else if(hs.length&&vs.length){g.make='B'}                  // L / T 形 → 爆裂
     else if(maxH===4){g.make='H'}                              // 横四 → 疾风·横扫
     else if(maxV===4){g.make='V'}                              // 纵四 → 疾风·纵贯
     else g.make=null;
@@ -1475,13 +1492,28 @@ function isComboPair(a,b){
 
 /* ---- 交换是否会产生消除 ---- */
 function swapPieces(a,b){const t=B[a[0]][a[1]];B[a[0]][a[1]]=B[b[0]][b[1]];B[b[0]][b[1]]=t}
+/* 只检查穿过 a、b 的那两行两列 —— 用全局 scanRuns 的话，
+   盘上只要还残留任何三连它就恒真，于是 anyMove() 也恒真，
+   shuffleBoard 失败时那道「重铺一盘」的兜底永远触发不了。 */
+function runThrough(r,c){
+  if(!matchable(r,c))return false;
+  const g=gemAt(r,c);
+  let n=1;
+  for(let i=c-1;i>=0&&matchable(r,i)&&gemAt(r,i)===g;i--)n++;
+  for(let i=c+1;i<N &&matchable(r,i)&&gemAt(r,i)===g;i++)n++;
+  if(n>=3)return true;
+  n=1;
+  for(let i=r-1;i>=0&&matchable(i,c)&&gemAt(i,c)===g;i--)n++;
+  for(let i=r+1;i<N &&matchable(i,c)&&gemAt(i,c)===g;i++)n++;
+  return n>=3;
+}
 function wouldMatch(a,b){
   const A=P(a[0],a[1]), C=P(b[0],b[1]);
   if(!A||!C)return false;
   if(A.bell&&C.bell)return false;
   if(isComboPair(a,b))return true;
   swapPieces(a,b);
-  const ok=scanRuns().length>0;
+  const ok=runThrough(a[0],a[1])||runThrough(b[0],b[1]);
   swapPieces(a,b);
   return ok;
 }
@@ -1571,7 +1603,10 @@ function buildBoard(L,seed){
     /* 放猫铃：顶部分散列 */
     if(L.bells>0){
       const R=ENG.rng||rnd;
-      const cols=[];for(let c=0;c<N;c++)if(T[0][c].crate===0)cols.push(c);
+      /* 铃要从顶一路落到底，整列都不能有岩壳 —— 只查第 0 行的话，
+         铃会卡在中间那层岩壳上，能不能绕出去全看斜滑的运气 */
+      const cols=[];
+      for(let c=0;c<N;c++){let ok=true;for(let r=0;r<N;r++)if(T[r][c].crate>0){ok=false;break}if(ok)cols.push(c)}
       for(let i=cols.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[cols[i],cols[j]]=[cols[j],cols[i]]}
       for(let i=0;i<L.bells&&cols.length;i++){
         const c=cols[i%cols.length], r=Math.floor(i/cols.length);
@@ -3778,6 +3813,17 @@ window.__selftest=function(){
     }
   }
   ok('64 关每个目标都能在盘面上真正达成'+(badLv.length?'('+badLv.slice(0,4).join('; ')+')':''),goalOk);
+  /* 17a. 收集目标要的颜色必须真的会出现在盘上。
+         曾经 pickColors 固定从 6 色里抽而多数关只有 5 色 ——
+         第 3 关要 5 号色、盘上一颗都没有，整条主线卡死在第三关。
+         上面第 17 项的 countBoard 不含 collect，抓不到这类，所以单列一条。 */
+  let colOk=true, badCol=[];
+  for(let i=1;i<=100;i++){
+    const L=levelDef(i);
+    for(const g of L.goals)
+      if(g.type==='collect'&&(g.col==null||g.col>=L.colors)){colOk=false;badCol.push(i+':要色'+g.col+'/共'+L.colors+'色')}
+  }
+  ok('收集目标的颜色都在本关色数之内'+(badCol.length?'('+badCol.slice(0,4).join('; ')+')':''),colOk);
   /* 17b. 无尽层同样对账 */
   let endOk=true, badE=[];
   for(let i=65;i<=100;i++){
