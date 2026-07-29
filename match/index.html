@@ -460,7 +460,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 #ovl-boss .ovl-card{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
 #boss-intro-face{width:120px;height:120px;margin:8px auto}
 #boss-intro-face svg{width:100%;height:100%;filter:drop-shadow(0 0 24px rgba(168,48,48,.4))}
-#boss-intro-name{font-size:30px;font-weight:300;letter-spacing:.3em;color:var(--red);animation:titleIn 1s cubic-bezier(.16,1,.3,1) both}
+#boss-intro-name{font-size:30px;font-weight:300;letter-spacing:.3em;color:var(--red);white-space:pre-line;line-height:1.35;
+  animation:titleIn 1s cubic-bezier(.16,1,.3,1) both}
 #boss-intro-title{font-size:12px;letter-spacing:.4em;color:var(--ink3);margin-top:4px}
 /* 成就 */
 #ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
@@ -680,7 +681,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <div class="ovl" id="ovl-boss"><div class="ovl-card">
   <div class="ovl-kick">矿脉深处 · 有东西醒了</div>
   <div id="boss-intro-face"></div>
-  <div id="boss-intro-name">叶王</div>
+  <div id="boss-intro-name">叶王</div><!-- 实际由 openLevel 按 BOSSES 填 -->
   <div id="boss-intro-title">红笔判官</div>
   <div class="quip boss" id="boss-intro-line"></div>
   <div class="ovl-btns"><button class="btn primary big" id="boss-go">应 战</button></div>
@@ -853,10 +854,10 @@ const CHAPTERS=[
   {name:'墨渊支脉',era:'第二地脉',epi:'叶王的墨汁渗进石缝，把灵石封在了下面。'},
   {name:'猫铃矿道',era:'第三地脉',epi:'小黑猫的铃铛滚落深处——送它们回到矿底。'},
   {name:'岩壳深堑',era:'第四地脉',epi:'老矿道塌了一半，岩壳要一层层敲开。'},
-  {name:'蛇窟缠层',era:'第五地脉',epi:'蛇女的信使先到一步，石头被缠得结结实实。'},
+  {name:'蛇窟缠层',era:'第五地脉',epi:'那位换了个称呼又来了 —— 这回不用红笔，用丝。'},
   {name:'双生裂谷',era:'第六地脉',epi:'墨与岩互相掩护，这里开始考真功夫。'},
   {name:'风暴矿心',era:'第七地脉',epi:'矿脉的心跳越来越快，稳住你的手。'},
-  {name:'王座熔窟',era:'第八地脉',epi:'两位不速之客，都在最深处等你。'},
+  {name:'王座熔窟',era:'第八地脉',epi:'王座只有一张 —— 前面两次，坐的都是同一位。'},
 ];
 const BOSSES={
   ye:{key:'ye',short:'叶王',name:'叶王 · 红笔判官',title:'红笔判官',act:'seal',every:3,
@@ -869,11 +870,13 @@ const BOSSES={
     hurt:['嘶——！','疼、疼的呢。','你这孩子，好没耐心。'],
     doing:['缠上了哦。','别挣扎，乖。','嘶嘶……'],
     ko:'好吧……这一次，算你利落。'},
-  both:{key:'both',short:'双王',name:'叶王 & 蛇女 · 王座同盟',title:'熔窟里的两位',act:'both',every:2,
-    intro:'「一起上。」「嘶——难得意见一致。」',
-    hurt:['「可恶！」','「嘶——好痛！」','「稳住！」'],
-    doing:['「判！」','「缠住！」','「一个都别放过。」'],
-    ko:'「不可能……」「嘶……撤、撤退！」'},
+  /* 叶王与蛇女是同一人的两个称谓（王老师 2026-07-29 定）。
+     前两场分别以「红笔判官」和「缠丝夫人」出现，终章揭晓本是一人、两相同现。 */
+  both:{key:'both',short:'真形',name:'叶王 · 真形',title:'朱笔与缠丝，本是一人',act:'both',every:2,
+    intro:'红笔与丝线一起抬起来。「你早该看出来了 —— 从头到尾，只有我一个。」',
+    hurt:['「放肆！」','「嘶——疼的呢。」','「两只手都还在。」'],
+    doing:['「判！」','「缠住。」','「这次两样一起来。」'],
+    ko:'「原来……两只手，也拦不住一个人往下走。」'},
 };
 
 /* ---------- 狼先生台词（原创 · 轻松第一） ---------- */
@@ -961,13 +964,13 @@ const LORE=[
    t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
   {ch:4,body:'敲开最后一层岩壳，里面是一把锈住的短剑。<br>「笼中剑，」狼先生认出来了，「有人在这儿等过很久。」',
    t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备。',u:'https://myskme.github.io/myskme-expedition-web/'},
-  {ch:5,body:'蛇女的缠丝断在你手里，散成一地细字。<br>凑近看，每一根都是一个被记错的单词。「她收集这些，」狼先生皱眉，「收集了很久。」',
+  {ch:5,body:'缠丝断在你手里，散成一地细字。凑近看，每一根都是一个被记错的单词。<br>「还是她，」狼先生认出那手笔迹，「换了个名字，换了样工具 —— 收集的还是同一批东西。」',
    t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来 —— 兑换码即卷号，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
   {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
    t:'自鸣棋',d:'肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 · 35 位正典角色，扫码即玩。',u:'https://myskme.github.io/myskme-zimingqi/'},
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
    t:'记分编年史',d:'英语课堂积分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
-  {ch:8,body:'王座熔窟安静下来。叶王的红笔断在地上，蛇女的缠丝烧成了灰。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
+  {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处 —— 从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>—— 灵石远征 · 卷一 · 终',
    t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'../'},
 ];
 
@@ -982,7 +985,7 @@ const ACHS=[
   {id:'a7', ic:'🌋', nm:'灵脉共鸣', tip:'一次交换引发 7 连锁'},
   {id:'a8', ic:'🏆', nm:'十万灵力', tip:'单关得分突破 100,000'},
   {id:'a9', ic:'📕', nm:'合上朱笔', tip:'首次击退叶王'},
-  {id:'a10',ic:'🐍', nm:'请蛇出窟', tip:'首次击退蛇女'},
+  {id:'a10',ic:'🐍', nm:'请蛇出窟', tip:'首次击退缠丝夫人（她的另一个名字）'},
   {id:'a11',ic:'👑', nm:'谷地全通', tip:'通关全部 64 关'},
   {id:'a12',ic:'🐈‍⬛',nm:'猫铃司铃', tip:'在大厅找到小黑猫'},
   {id:'a13',ic:'🕯', nm:'执灯之人', tip:'首次放出同伴大招'},
@@ -2670,7 +2673,7 @@ function openLevel(n,mode){
     bb.classList.add('on');
     $('#boss-face').innerHTML=bossFaceSVG(L.boss);
     applyArt($('#boss-face'),'boss_'+L.boss);
-    $('#boss-name').textContent=bo.name;
+    $('#boss-name').textContent=bo.title;
     $('#boss-hpbar').querySelector('i').style.width='100%';
     $('#boss-hpbar').classList.remove('low');
     $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;
@@ -2697,7 +2700,7 @@ function openLevel(n,mode){
     const bo=BOSSES[L.boss];
     $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);
     applyArt($('#boss-intro-face'),'boss_'+L.boss);
-    $('#boss-intro-name').textContent=bo.short;
+    $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');
     $('#boss-intro-title').textContent=bo.title;
     $('#boss-intro-line').textContent=bo.intro;
     ovl('boss');
