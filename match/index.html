@@ -589,6 +589,13 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 .ach.got .nm{color:var(--gold2)}
 .ach.got:hover{box-shadow:var(--glow-soft);transform:translateY(-2px)}
 
+/* 编年史里的地脉头图。没图就整个不占位（.has-art 由 applyArt 加）。 */
+#lore-banner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
+  border:1px solid var(--line2);background-repeat:no-repeat}
+#lore-banner.has-art{display:block}
+#lore-banner::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 55%,var(--panel) 100%)}
+
 /* ==================== 典藏册 ==================== */
 /* 提示条里的内嵌小图标（ICONS 的 svg 没有内联尺寸，不套一层会撑到 300×150） */
 .ic-i{display:inline-block;vertical-align:-3px;line-height:0}
@@ -658,6 +665,15 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 .cardc.t2{border-color:var(--gold2);box-shadow:0 0 10px color-mix(in srgb,var(--gold) 35%,transparent)}
 .cardc.t2 .ct{color:#f2d98a}
 .cardc.t3{border-color:var(--red)}    .cardc.t3 .ct{color:#f08a80}
+/* 异纹不另出图：把同一张立绘重新分级 + 压一层斜向纹路。
+   「异纹」本来就是「另一种纹路」的意思——再画一张反而不如这个贴切，
+   而且三张异纹卡分散在三个套组里，统一处理才看得出是同一种稀有度。 */
+.cardc.t3 .ca,.cbig.t3{filter:grayscale(1) contrast(1.32) brightness(.88) sepia(.6)
+  hue-rotate(-38deg) saturate(2.4)}
+.cardc.t3 .ca::after,.varGrain{content:''}
+.cardc.t3::before,.cbig.t3::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(58deg,rgba(240,90,70,.085) 0 2px,transparent 2px 6px);
+  mix-blend-mode:screen}
 /* 臻卡流光——整套系统的高光时刻，值得一点额外的排面 */
 @keyframes topSheen{0%{background-position:-140% 0}100%{background-position:240% 0}}
 .cardc.t2::after{content:'';position:absolute;inset:0;pointer-events:none;
@@ -1133,6 +1149,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <div class="ovl" id="ovl-lore"><div class="ovl-card">
   <div class="ovl-kick" id="lore-kick">编年史片段 · CHRONICLE</div>
   <div class="ovl-title" id="lore-title">地脉 · <em>通</em></div>
+  <!-- 地脉头图直接复用地脉图上那 8 张 1024×448 横幅，不另出图。
+       打通一条地脉后翻开编年史，本来就该先看到那条地脉长什么样。 -->
+  <div id="lore-banner"></div>
   <div id="lore-body"></div>
   <a class="lore-link" id="lore-link" target="_blank" rel="noopener">
     <div class="lk">同一个世界 · CROSSOVER</div>
@@ -4903,6 +4922,7 @@ function maybeLore(after){
   persist();
   $('#lore-kick').textContent='编年史片段 · 第 '+lo.ch+' 段';
   $('#lore-title').innerHTML=CHAPTERS[lo.ch-1].name+' · <em>通</em>';
+  applyArt($('#lore-banner'),'ch_'+lo.ch);                    // 复用地脉图的横幅，没图就静默不显示
   $('#lore-body').innerHTML=lo.body;
   const lk=$('#lore-link');
   lk.href=lo.u;
