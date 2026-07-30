@@ -1,5 +1,34 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.1.1 · 2026-07-31 · 网页接入 17 张终美化素材
+
+提交 `aa14818`，分支 `agent/gemfall-final-art-cross-platform`。
+**只动 `match/index.html` 一个文件**，素材与跨端目录一个字节未改。
+
+- 新增 17 个 ART 键，全部走既有 `art()/applyArt()` 静默回落
+- 新增通用横幅类 `.obanner`，六处共用（结算/讨伐/聚会赛/矿脉榜/无尽/编年史）
+- `CARDS` n=12–19 的 `a` 字段由 `ch_*` 改为 `vista_*`；**`n` 与顺序未动**，
+  存档主键与赠印编码不受影响
+- 开匣新增卡背翻转，纯表现层；`openBox()` 的原子结算一行未改
+
+### 对跨端的影响（重要）
+
+- **资源总账无需重新生成**。`build-resource-catalog.mjs` 只清点
+  `match/art`、`match/audio`、`match/icons`、`assets/*`，**不读 `index.html`**。
+  本次未动素材，`resource-catalog.json` 因此无变化——
+  之前"index.html 变化会导致总账更新"的说法是错的，别再照抄。
+- 五个 `.mjs` 里**只有 `ios-capacitor/scripts/sync-web.mjs` 读 `index.html`**，
+  而它只写进被 gitignore 的 `www/`，没有可提交产物。
+- iOS 副本需要重新 `npm run sync:web` 才会带上本次网页改动。
+- 微信 v0 是独立引擎，不受影响。
+
+### 环境事实
+
+**本机（王老师的 Mac）没有安装 node**，登录 shell 里也没有。
+本次的完整性校验是用 Python 等价复现 `verify-ports.mjs` 的每一条检查跑的，
+结果：资源 76 项、微信美术 56 张、目录 2,071,264 B（预算 4,194,304 B）全过。
+**有 node 的机器上应再跑一遍原脚本复核。**
+
 ## 0.1.0 · 2026-07-30
 
 ### 美术封版
