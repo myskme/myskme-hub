@@ -681,6 +681,32 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   background-size:220% 100%;animation:topSheen 3.6s linear infinite}
 @media (prefers-reduced-motion:reduce){.cardc.t2::after{animation:none;opacity:.1}}
 
+/* 开匣过场。两张匣图都是 512 见方、匣体已对齐，所以舞台必须是**正方形**、
+   用 contain —— 只要容器尺寸不变，换图时匣体就是像素级重合，不会跳位。
+   千万别改成 cover 或非正方形，那样两张的匣体会各缩各的。 */
+/* 40vh 那一条是给矮视口的（手机横屏、分屏）：只按 vw 定尺寸的话，
+   舞台会高过弹层，逼出一条纵向滚动条——全站是「一屏固定不上下滚」的。 */
+#bx-stage{position:relative;width:min(230px,58vw,40vh);aspect-ratio:1;margin:8px auto 6px}
+#bx-art{position:absolute;inset:0;background-repeat:no-repeat;background-position:center;
+  background-size:contain;z-index:1}
+#bx-glow{position:absolute;left:50%;top:52%;width:150%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.35);
+  border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--gold2) 55%,transparent) 0%,transparent 62%);
+  transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+#bx-stage.open #bx-glow{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#bx-stage.shake #bx-art{animation:bxShake .5s ease-in-out}
+@keyframes bxShake{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  20%{transform:translate(-3px,1px) rotate(-1.1deg)}
+  45%{transform:translate(3px,-1px) rotate(1.1deg)}
+  70%{transform:translate(-2px,0) rotate(-.7deg)}
+}
+#bx-hint{font-size:12px;color:var(--ink3);letter-spacing:.05em;min-height:20px}
+@media (prefers-reduced-motion:reduce){
+  #bx-stage.shake #bx-art{animation:none}
+  #bx-glow{transition:none}
+}
+
 /* 单卡 / 开匣 共用的大图 */
 .cbig{width:min(210px,58vw);aspect-ratio:3/4;margin:12px auto 0;border:1px solid var(--line);
   background:var(--bg2) no-repeat;position:relative}
@@ -1013,6 +1039,17 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="cvser" id="cv-serial"></div>
     <div id="cv-tiers"></div>
     <div class="cvacts" id="cv-acts"></div>
+  </section>
+
+  <!-- 开匣过场。卡片早在 openBox() 里就已发好存好了，这一屏纯表现，
+       中途关掉也不会漏卡或重复发。 -->
+  <section class="colv" data-v="box">
+    <div class="ovl-kick" id="bx-kick">开 匣</div>
+    <!-- data-fit/data-pos 必须写：applyArt 会内联覆盖 background-size，
+         默认是 cover，会把匣子裁掉、两张各缩各的，配准就没了。 -->
+    <div id="bx-stage"><div id="bx-glow"></div>
+      <div id="bx-art" data-fit="contain" data-pos="center"></div></div>
+    <div id="bx-hint"></div>
   </section>
 
   <section class="colv" data-v="draw">
@@ -1685,6 +1722,15 @@ const ART={
   ob_ink:'art/ob-ink.webp', ob_ink2:'art/ob-ink2.webp',
   ob_crate:'art/ob-crate.webp', ob_crate2:'art/ob-crate2.webp',
   ob_cage:'art/ob-cage.webp', ob_bell:'art/ob-bell.webp',
+  /* 典藏匣：两张必须同尺寸方形，靠换 background-image 原地切换。
+     实测两图匣体底边偏差 0px、左边 1px，所以只要容器尺寸不变就不会跳。 */
+  box_closed:'art/box-closed.webp', box_open:'art/box-open.webp',
+  /* 器物「卡面版」。上面 ob_* 那五张是**棋盘格子贴图**（墨封就是一块方形墨迹），
+     铺格子好看、当卡面就只是一块纹理。这五张是同题材的竖版卡面，两套并存：
+     棋盘继续用 ob_*，典藏册用 card_*。别把它们弄混。 */
+  card_ink:'art/card-ink.webp',     card_ink2:'art/card-ink2.webp',
+  card_crate:'art/card-crate.webp', card_crate2:'art/card-crate2.webp',
+  card_cage:'art/card-cage.webp',
   ch_1:'art/chapter-1.webp', ch_2:'art/chapter-2.webp', ch_3:'art/chapter-3.webp', ch_4:'art/chapter-4.webp',
   ch_5:'art/chapter-5.webp', ch_6:'art/chapter-6.webp', ch_7:'art/chapter-7.webp', ch_8:'art/chapter-8.webp',
 };
@@ -3349,12 +3395,14 @@ const CARDS=[
   {n:24,w:'gemfall',s:'gem',  a:'gem_4',   nm:'紫辉', sub:'VIOLA'},
   {n:25,w:'gemfall',s:'gem',  a:'gem_5',   nm:'星屑', sub:'STELLA'},
   {n:26,w:'gemfall',s:'gem',  a:'gem_orb', nm:'万象灵珠', sub:'五连所炼'},
-  {n:27,w:'gemfall',s:'relic',a:'ob_ink',    nm:'墨封', sub:'叶王的墨'},
-  {n:28,w:'gemfall',s:'relic',a:'ob_ink2',   nm:'重墨', sub:'要揭两层'},
-  {n:29,w:'gemfall',s:'relic',a:'ob_crate',  nm:'岩壳', sub:'敲得开'},
-  {n:30,w:'gemfall',s:'relic',a:'ob_crate2', nm:'厚壳', sub:'敲两下'},
-  {n:31,w:'gemfall',s:'relic',a:'ob_cage',   nm:'石笼', sub:'锁住的灵石'},
-  {n:32,w:'gemfall',s:'relic',a:'ob_bell',   nm:'猫铃', sub:'送它到矿底'},
+  /* 器物卡面走 card_*（竖版卡面），棋盘照旧走 ob_*（格子贴图）。n 不能动：存档按 n 存卡。
+     猫铃例外——ob_bell 本来就是个物件，卡面上很好看，不用另出。 */
+  {n:27,w:'gemfall',s:'relic',a:'card_ink',    nm:'墨封', sub:'叶王的墨'},
+  {n:28,w:'gemfall',s:'relic',a:'card_ink2',   nm:'重墨', sub:'要揭两层'},
+  {n:29,w:'gemfall',s:'relic',a:'card_crate',  nm:'岩壳', sub:'敲得开'},
+  {n:30,w:'gemfall',s:'relic',a:'card_crate2', nm:'厚壳', sub:'敲两下'},
+  {n:31,w:'gemfall',s:'relic',a:'card_cage',   nm:'石笼', sub:'锁住的灵石'},
+  {n:32,w:'gemfall',s:'relic',a:'ob_bell',     nm:'猫铃', sub:'送它到矿底'},
 ];
 const CARD_BY_N={}; CARDS.forEach(c=>CARD_BY_N[c.n]=c);
 /* 异纹：不掉落、不可赠，只能「做到」。是同一张卡的第 4 个品阶，不是新卡。 */
@@ -3484,11 +3532,29 @@ function drawTier(){
   const r=rnd();
   return r<COL.drop[0]?T_COMMON:r<COL.drop[0]+COL.drop[1]?T_RARE:T_TOP;
 }
+/* 开匣过场的世代号 + 定时器。沿用全站治「过期异步链」的老办法：
+   换视图/合上册子都 ++，每个回调醒来先核对，过期就自己退出。
+   只靠 clearTimeout 不够——回调可能已经排进队列了。 */
+let colEpoch=0, colTimers=[];
+function colStop(){
+  colEpoch++;
+  colTimers.forEach(clearTimeout); colTimers=[];
+  colBusy=false;                                              // 锁必须跟着世代一起放掉，否则中途关掉就再也开不了匣
+}
+function colLater(ms,fn){
+  const my=colEpoch;
+  colTimers.push(setTimeout(()=>{if(my===colEpoch)fn()},ms));
+}
+
 function openBox(){
   colFix();
-  if(colBusy)return;                                          // 连点保护
+  if(colBusy)return;                                          // 连点保护：过场期间锁住，防重复扣匣/重复发卡
   if(COLS.box<=0){toast('还没有典藏匣',1800);return}
+  colStop();                                                  // 掐掉上一次没走完的过场，再开新的
   colBusy=true;
+  /* ↓ 这一段是**原子结算**：扣匣、定品阶、发卡、存档一次做完。
+     动画只是表现层，玩家中途关掉弹层也已经拿到卡了——
+     反过来把扣匣放到动画之后，关掉就等于白开一匣。 */
   COLS.box--;
   const t=drawTier();
   COLS.pity=(t===T_TOP)?0:COLS.pity+1;
@@ -3496,8 +3562,30 @@ function openBox(){
   const dup=colHas(card.n,t);
   colGain(card.n,t,1);
   colSave(); renderMenu();
-  colView('draw',{card:card,t:t,dup:dup});
-  colBusy=false;
+  colView('box',{card:card,t:t,dup:dup});
+}
+
+/* 合匣 → 掀盖 → 翻出卡片。全程不改任何结算数据。 */
+function renderBoxOpen(d){
+  const st=$('#bx-stage'), art=$('#bx-art');
+  st.classList.remove('open','shake');
+  applyArt(art,'box_closed');
+  $('#bx-hint').textContent='匣中有物';
+  const toOpen=()=>{
+    applyArt(art,'box_open');
+    st.classList.add('open');
+    $('#bx-hint').textContent=d.t===T_COMMON?'一线金光':'金光大盛';
+    SFX.star(1);
+  };
+  const reveal=()=>colView('draw',d);                         // colView 会 colStop()，锁在那里放掉
+  if(REDUCED){
+    /* 减弱动效：不抖不淡，但**仍然先看到开启态再翻卡**——
+       口令里明确要求这一步不能跳过，那是整个仪式的落点。 */
+    toOpen(); colLater(420,reveal); return;
+  }
+  st.classList.add('shake');
+  colLater(520,toOpen);
+  colLater(1320,reveal);
 }
 function buyBox(){
   colFix(); colDay();
@@ -4480,15 +4568,25 @@ function renderAch(){
    ================================================================== */
 let colCur=1;
 function colView(v,arg){
+  /* 'box' 是开匣过场，它的世代号和锁由 openBox() 刚设好，这里不能再掐一次；
+     切到别的任何视图都表示过场作废，定时器与锁一起放掉。 */
+  if(v!=='box')colStop();
   for(const s of $$('#ovl-col .colv'))s.classList.toggle('on',s.dataset.v===v);
   const card=$('#ovl-col .ovl-card'); if(card)card.scrollTop=0;
   if(v==='list')colRender();
   else if(v==='card')renderCardView(arg&&arg.n!=null?arg.n:colCur);
+  else if(v==='box')renderBoxOpen(arg);
   else if(v==='draw')renderDraw(arg);
   else if(v==='gift')renderGift(arg);
   ovl('col');
 }
-function openCol(){colFix();colDay();colSync();colView('list')}
+function openCol(){
+  colFix();colDay();colSync();
+  /* 预热两张匣图：art() 只有在 __ok 之后才返回，没热过的话
+     第一次开匣会「合盖停一拍才掀开」。翻开册子到点开匣之间足够它们下完。 */
+  art('box_closed');art('box_open');
+  colView('list');
+}
 
 function colRender(){
   colFix(); colDay();
@@ -4842,7 +4940,9 @@ $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')})
    在子视图里退回册子，在册子里才真的合上。全站别处的 ovl(null) 惯例
    照抄过来会变成「开完匣点关闭 → 直接回大厅」。 */
 $('#btn-col').addEventListener('click',()=>{SFX.click();openCol()});
-$('#col-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
+/* colStop() 不能省：过场中合上册子若留下待触发的定时器，
+   它醒来会走 colView('draw') → 末尾那句 ovl('col') 会把已经关掉的册子又弹回来。 */
+$('#col-close').addEventListener('click',()=>{SFX.click();colStop();ovl(null);renderMenu()});
 $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
 $('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
