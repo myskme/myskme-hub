@@ -2283,9 +2283,19 @@ function renderGoals(host,size){
     host.appendChild(d);
   });
 }
+/* 分数目标的 need 大于这个数 = 「这一局压根没有分数目标」的哨兵。
+   聚会赛用 999999999，限时局用 99999999；真实关卡的门槛取自 L.s1，
+   动态算出来最多两万上下，够不到这里。 */
+const NO_SCORE_TARGET=1e7;
 function goalText(g){
   if(g.type==='boss')return Math.max(0,g.need-g.got);
-  if(g.type==='score')return Math.min(g.got,g.need)+'/'+g.need;
+  /* 没有目标就只报当前分。照旧拼成 got/need 的话，聚会赛界面上会出现
+     「180/999999999」——玩家看到的是一个永远做不完的目标。
+     聚会赛是在 buildBoard 之前就把 GS.goals 拷走的，所以 reconcileGoals
+     末尾那句 sg.need=L.s1 对账不到它，哨兵值会一路漏到界面上。 */
+  if(g.type==='score')return g.need>=NO_SCORE_TARGET
+    ? g.got.toLocaleString('en-US')
+    : Math.min(g.got,g.need)+'/'+g.need;
   return Math.max(0,g.need-g.got);
 }
 function bumpGoal(type,col,n){
@@ -3478,6 +3488,18 @@ function ptRoundBreak(){
   }
   show('game');ovl('ptround');
 }
+/* 「终结比赛」的统一入口：有人打完过一手就当场出名次，一手都没打完就散伙。
+   打到一半的那一手不计——它只用掉了部分配额，跟打满的一手不能同台比。
+   但散伙这条必须给个说法：以前是静悄悄回大厅，玩家手上那盘分数就这么没了，
+   看上去像是把按钮点坏了。 */
+function ptQuit(){
+  if(PARTY.players.some(p=>p.total>0||p.scores.length)){ptFinish();return}
+  PARTY.on=false;GS.party=false;
+  $('#toolbar').style.display='';
+  $('#pt-bar').classList.remove('on');
+  show('menu');
+  toast('还没有人打完一手 · 本场不计名次',2800);
+}
 function ptFinish(){
   PARTY.on=false;GS.party=false;
   $('#toolbar').style.display='';
@@ -3505,8 +3527,11 @@ function ptFinish(){
       +'<div class="nm">'+esc(p.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(p.team?'蓝队':'红队')+'</span>':'')+'</div>'
       +'<div class="sc">'+p.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
-  $('#pt-rounds').innerHTML=ranked.map(p=>
-    esc(p.name)+'：'+p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')).join(' · ')).join('<br>');
+  /* 中途终结时，还没轮到的人一手都没打过。以前这里会输出「选手二：」后面空着，
+     像是文案没写完；给他一句明话。 */
+  $('#pt-rounds').innerHTML=ranked.map(p=>esc(p.name)+'：'+(p.scores.length
+    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')).join(' · ')
+    : '<span style="color:var(--ink3)">未出手</span>')).join('<br>');
   $('#pte-quip').textContent=pick2(Q_WIN);
   fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
   ovl('pt-end');
@@ -4005,11 +4030,7 @@ $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
 for(const c of $$('#pt-mode .pt-chip'))c.addEventListener('click',()=>{SFX.click();PARTY.mode=c.dataset.m;renderPartySetup()});
 $('#hand-go').addEventListener('click',()=>{SFX.click();ptStartTurn()});
-$('#hand-quit').addEventListener('click',()=>{SFX.click();
-  /* 随时终结：只要有人得过分就当场出名次；一手都没打就直接散伙 */
-  if(PARTY.players.some(p=>p.total>0||p.scores.length)){ovl(null);ptFinish()}
-  else{PARTY.on=false;GS.party=false;$('#toolbar').style.display='';
-    $('#pt-bar').classList.remove('on');ovl(null);show('menu')}});
+$('#hand-quit').addEventListener('click',()=>{SFX.click();ovl(null);ptQuit()});
 $('#ptr-next').addEventListener('click',()=>{SFX.click();ovl(null);ptHandoff()});
 $('#ptr-end').addEventListener('click',()=>{SFX.click();ovl(null);ptFinish()});
 $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')});
@@ -4035,15 +4056,16 @@ $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
   /* 聚会赛不给「重开」：同一轮是同一颗种子，能重开就等于可以无限重刷到满意为止，
      「同盘面比手艺」的前提就没了 */
   $('#pause-retry').style.display=GS.party?'none':'';
+  /* 聚会赛里这个按钮点下去是**终结整场比赛、当场出名次**，不是退出这一手。
+     交接屏和轮间小结上同样的动作都写着「终结比赛」，这里也必须写一样的，
+     否则 6 人 5 轮打到一半，谁暂停时把它当成「退出本关」一点，全场就没了。 */
+  $('#pause-quit').textContent=GS.party?'终结比赛':'离开本关';
   ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
   GS.mode==='rush'?startRush():openLevel(GS.L.n)});
 $('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.paused=false;
-  if(GS.party){
-    /* 聚会赛里「退出」＝随时终结比赛：有成绩就出名次 */
-    if(PARTY.players.some(p=>p.total>0||p.scores.length)){ptFinish();return}
-    PARTY.on=false;GS.party=false;$('#toolbar').style.display='';$('#pt-bar').classList.remove('on');show('menu');return}
+  if(GS.party){ptQuit();return}                               // 聚会赛里「退出」＝随时终结比赛
   GS.mode==='rush'?show('menu'):show('map')});
 /* 地脉打通 → 先看编年史片段，再回图 */
 function loreFor(n){
@@ -4327,6 +4349,13 @@ window.__selftest=function(){
   /* 20. 关卡确定性（同一关两次生成一致） */
   const a1=JSON.stringify(levelDef(37)),a2=JSON.stringify(levelDef(37));
   ok('关卡定义确定可复现',a1===a2);
+  /* 21. 目标文案里不许出现哨兵大数。
+     聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
+     「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
+  const noTargetTxt=goalText({type:'score',need:999999999,got:180});
+  const realTxt=goalText({type:'score',need:6000,got:180});
+  ok('无目标的分数只报当前分，不漏哨兵值',
+     !/\d{7}/.test(noTargetTxt)&&noTargetTxt.replace(/,/g,'')==='180'&&realTxt==='180/6000');
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));
   console.log(out.join('\n'));
