@@ -1,0 +1,1069 @@
+{
+  "schemaVersion": 1,
+  "project": "MYSKME · 灵石远征 · GEMFALL",
+  "generatedAt": "2026-07-30T21:59:09.501Z",
+  "sourceOfTruth": [
+    "match/art",
+    "match/audio",
+    "match/icons",
+    "assets/cover-gemfall.webp",
+    "assets/og-gemfall.png"
+  ],
+  "totals": {
+    "files": 76,
+    "bytes": 22624927,
+    "byCategory": {
+      "cover": 1,
+      "social-card": 1,
+      "art": 1,
+      "ally": 6,
+      "boss": 4,
+      "collection-box": 2,
+      "collection-card": 14,
+      "easter-egg": 1,
+      "chapter": 9,
+      "retention-object": 2,
+      "gem": 7,
+      "hero": 1,
+      "mode-banner": 2,
+      "result-banner": 2,
+      "obstacle": 6,
+      "license": 1,
+      "audio": 3,
+      "icon": 4,
+      "splash": 9
+    }
+  },
+  "assets": [
+    {
+      "path": "assets/cover-gemfall.webp",
+      "bytes": 128716,
+      "sha256": "09d41dd8870cb2e43614543a0085f9ff1eb1bb04fadb605645aef90d84067e60",
+      "width": 1280,
+      "height": 800,
+      "alpha": false,
+      "category": "cover",
+      "platforms": [
+        "web",
+        "catalog"
+      ]
+    },
+    {
+      "path": "assets/og-gemfall.png",
+      "bytes": 168930,
+      "sha256": "f26e799cf5683c18be81270a5ed574546ada5689680fbf467ab6008c08a82ee1",
+      "width": 1200,
+      "height": 630,
+      "alpha": false,
+      "category": "social-card",
+      "platforms": [
+        "web",
+        "catalog"
+      ]
+    },
+    {
+      "path": "match/art/README.md",
+      "bytes": 302,
+      "sha256": "00674668c3622674365461349f546075070cc6ea3e4a9ac01ae3510d9cc180fe",
+      "category": "art",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-jun.webp",
+      "bytes": 63640,
+      "sha256": "6b42153e0dfa6f06315815355de597249c38009e79209b9f5361a04720082966",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-qi.webp",
+      "bytes": 51438,
+      "sha256": "58c127a6de2b0546fcfff5dfca33492fb935c7616dcf53341e4254c8387d2593",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-wolf.webp",
+      "bytes": 47468,
+      "sha256": "3dd559f6f283c2db7e4e74b68cca09afc205f3076cd308dc8ec899e0ace924a4",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-xi.webp",
+      "bytes": 46224,
+      "sha256": "3a164fa8713f0491bc9da0d8a8c6d8a8dada6d8fe3f5d01f6c9eab7f1c951b39",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-xiao.webp",
+      "bytes": 49304,
+      "sha256": "cec9f84a9a3b0c18c4c44228e64a7d994be62fdec588ae622df04a6ae34717c6",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ally-zi.webp",
+      "bytes": 57340,
+      "sha256": "40f3c102c583575a43b1dc3a8190fa9bce69bd9828ef507f4bba8f9fbb13d532",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "ally",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-both.webp",
+      "bytes": 62966,
+      "sha256": "a1d946d430c50e71f255499d371ab0ff2219548c34e4843bd6b359677a8c13c5",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-intro.webp",
+      "bytes": 61420,
+      "sha256": "47e6aebcb35f547bf18b659ad14bdf16380478cf859fa1c929ff4da63e592146",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-she.webp",
+      "bytes": 60374,
+      "sha256": "dcbf8289c6d67237fd51f9c02c742698f70ee3937c789fc96099a0a26978a466",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-ye.webp",
+      "bytes": 51408,
+      "sha256": "a7de1f3c2d37f80b133fc28413c4c445fbe8759835197d1e6605e2c93d07ffee",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/box-closed.webp",
+      "bytes": 29770,
+      "sha256": "129117a84e95fe40940ac4a1df6cc63bf6da0352d72612399a2be162c09147d3",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "collection-box",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/box-open.webp",
+      "bytes": 28746,
+      "sha256": "749db2e991ae788d1f105e8527e081e471309d990400738af1e7e7d46256d3a7",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "collection-box",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-back.webp",
+      "bytes": 34366,
+      "sha256": "679b80049cea17c8337a856697b769247339b9ea0ec94aeb845f82b90e5f1433",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-cage.webp",
+      "bytes": 18028,
+      "sha256": "01cf89f350300d69e7eaee754cff796df72c405c94aada99869c4804a7e9aef6",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-crate.webp",
+      "bytes": 13836,
+      "sha256": "06642169049ba8890b17cc28b8940ded21391cfcdee29ed154f9345904d20c24",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-crate2.webp",
+      "bytes": 10820,
+      "sha256": "38377457813f7ef3041aaf918d31fcc9c32adcdce94c60d0a11c627375ae32d3",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-ink.webp",
+      "bytes": 17604,
+      "sha256": "6ad35ac056afb5e9dfae3b5f023adab41eb65cec861e5f4c226474bd6b5575c9",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-ink2.webp",
+      "bytes": 11892,
+      "sha256": "c633a225f7c2d608b0f8dfae1225d01e40471a684ed8f1ed66eb673f942a64bd",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-1.webp",
+      "bytes": 24042,
+      "sha256": "ec24e3fd156956054367a63c365b0625d6e243af3ff76a8760d5b5812b052f2d",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-2.webp",
+      "bytes": 19968,
+      "sha256": "08c3d9756783ab235d1706453bcfffe5daf2468c59afba5faccab6a9e607aa66",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-3.webp",
+      "bytes": 20204,
+      "sha256": "6863a04fdd17547728b069650f0b0cae326421ef63095aaca92e1aad3c14b28a",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-4.webp",
+      "bytes": 29482,
+      "sha256": "16f7445619a757fe25caa5aaab062fd27441919e2551433c678ecf07e6856325",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-5.webp",
+      "bytes": 25796,
+      "sha256": "a4e61a0074e1b145453c16d26c93ea4fae699f4b151a226ebd0ad42def1e7d14",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-6.webp",
+      "bytes": 21646,
+      "sha256": "bb199b017e3c6a048928cd599628aacc6948c6a3a35ab9f88703a222f7a21221",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-7.webp",
+      "bytes": 41904,
+      "sha256": "d23170790ad7c0a188e66375b6b7a8f0feeb0fb77e5e8264e2d29f90003bfe7b",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/card-vista-8.webp",
+      "bytes": 25658,
+      "sha256": "3dd78e12d02e118f64745a8c0677931c0cc192f60893574ba896f00ed868717f",
+      "width": 384,
+      "height": 512,
+      "alpha": false,
+      "category": "collection-card",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/cat.webp",
+      "bytes": 7808,
+      "sha256": "4e3474a4075e26054fd8ed0b4cc5afe306a009dbd45cf8dfc4d14b3b6adaedb7",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "easter-egg",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-1.webp",
+      "bytes": 74530,
+      "sha256": "57be66260b1d39bc592059ecd059ca2742b02fd4c2c0b5997d6337c49ea9a406",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-2.webp",
+      "bytes": 40918,
+      "sha256": "834f1d7578e503ad07e9d6ab85aac04617866c3e4d9405e9c187ca1d60c0d1f3",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-3.webp",
+      "bytes": 54182,
+      "sha256": "a4b372cbd99d33d0ec4c287067b44e82edef0278e35f7959d82ba8e92c23a6ee",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-4.webp",
+      "bytes": 41736,
+      "sha256": "285c5d61fce92f18d260f0d6e3f6157c25251a25b9c1f0e384d39baabc799469",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-5.webp",
+      "bytes": 52364,
+      "sha256": "a173caff7d28dcccac82b6d3bb8219e76a92219822cd29d6fc75ff1674435499",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-6.webp",
+      "bytes": 51918,
+      "sha256": "50cf7729a839eb982e9801e5b26f3378adab4dd26a1fcffb9067bf782088253a",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-7.webp",
+      "bytes": 69230,
+      "sha256": "85f6a149d8ac8e96a92a8e19590de11be852a5226bbbd9394069079192d05886",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-8.webp",
+      "bytes": 64236,
+      "sha256": "896b3b0c95d2c61241870b586be47567f0bac45d622d5069aae47a1b7549a204",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chapter-endless.webp",
+      "bytes": 66930,
+      "sha256": "59d5a2f4c8414b00d0c1dfc098590bb3aa55add7cbeca58c57eac8a85a8decbd",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "chapter",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/chest.webp",
+      "bytes": 31344,
+      "sha256": "a32531cb9323a15639606ae4d811b7fe4e77df5ff0e6ef42719957894041cf8b",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "retention-object",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-0.webp",
+      "bytes": 12132,
+      "sha256": "6f37b6e3acd719f27234e90a78d28b6ca10d21f251997642949a0497af842ecf",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-1.webp",
+      "bytes": 11922,
+      "sha256": "84f04c70cf48ea60f890f97c0e15229f0593b1b85ff91dd20354052ad103e95f",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-2.webp",
+      "bytes": 14526,
+      "sha256": "fb79262e82619d4e940585144284cbdbfd51d01eab10dacdc7757c2b4800a2b9",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-3.webp",
+      "bytes": 11576,
+      "sha256": "bd5a83c5d93d0405e340cd77bfed90da7f17da3be496ab42753f354bdde3a5b3",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-4.webp",
+      "bytes": 8976,
+      "sha256": "6c87f59c187723d0f3108e4e994e344488631f531f45d8b62728fda571019e72",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-5.webp",
+      "bytes": 11048,
+      "sha256": "7e013a49d11b8e56f8f26696dd47569891489be433b38f8a79a4ab14b132c296",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/gem-orb.webp",
+      "bytes": 19574,
+      "sha256": "1a9ac12981877da7f60540cf3ff01ff06f025fda5f608d670c0df94648dbcdfe",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "gem",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/hero.webp",
+      "bytes": 49398,
+      "sha256": "a4a0da1cedf7f402799b967395b73e6f5a7dd444d3c05841c304653751b1253a",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "hero",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/lamp.webp",
+      "bytes": 26958,
+      "sha256": "6f5f17c29b8ff0f1b6fe475de383a385b712adf9af39649dba374409c30b9a2c",
+      "width": 512,
+      "height": 512,
+      "alpha": true,
+      "category": "retention-object",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/lb-banner.webp",
+      "bytes": 80942,
+      "sha256": "2a0e32fafe9e4cb5abff1135f913cd4d013aef85b9cfa156fc540e07e665602e",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "mode-banner",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/lose.webp",
+      "bytes": 44530,
+      "sha256": "dbb1a4bba737fe0fd82c83793aada246a70a8a2962468f2d1a22fc97a524aaa2",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "result-banner",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-bell.webp",
+      "bytes": 11696,
+      "sha256": "07b1e54de05976cb4725a2b96f5f2677b1174363fe33d55f468b816a20fd69c4",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-cage.webp",
+      "bytes": 20132,
+      "sha256": "807e2b4bfa607c3ae6c5c84af41b67ea475eaf328eeffed0e9e6851217b864e9",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-crate.webp",
+      "bytes": 19678,
+      "sha256": "94aaa82afbf6c75f3280e4dd298f41bb8f439b8577d3ee62984cc1877c5fcc41",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-crate2.webp",
+      "bytes": 15050,
+      "sha256": "7c88d04764f037d4e9866d637da394761201fe1773a461673b83bde8940600b1",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-ink.webp",
+      "bytes": 17076,
+      "sha256": "f56756ab94deb42f2efc3080ea7573bd1a3e5765a15c3b601131352db098dcb6",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ob-ink2.webp",
+      "bytes": 22948,
+      "sha256": "9afed3a7dbae3442f3bd5186faa12822c5328a10aa0cb1999f6151cfcf44fa5c",
+      "width": 256,
+      "height": 256,
+      "alpha": true,
+      "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/party-banner.webp",
+      "bytes": 75726,
+      "sha256": "16471ac5f075f6def9e0ab580c4902297803756b6702495b22a65284b136da9b",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "mode-banner",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/win.webp",
+      "bytes": 81782,
+      "sha256": "e7fc112167633ad73d413a817884b49984735ef44aa4e90019bf1e8671fd1690",
+      "width": 1024,
+      "height": 448,
+      "alpha": false,
+      "category": "result-banner",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/audio/LICENSE-音乐授权.txt",
+      "bytes": 749,
+      "sha256": "de39489846eaa42c0cfd9d4e2b887d5a7726835b7156ddf16acd13e62c1ca5d5",
+      "category": "license",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/audio/bgm_boss.m4a",
+      "bytes": 1930798,
+      "sha256": "950cb09638d7d1b44eebee3cea3b05917d06c697a6713231303b4215904d6f6e",
+      "category": "audio",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/audio/bgm_run.m4a",
+      "bytes": 1804896,
+      "sha256": "6166b26808cc74716cab0170e39cebe51bb9b2357a04a7b40d27ed180b1f17ab",
+      "category": "audio",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/audio/bgm_title.m4a",
+      "bytes": 2909579,
+      "sha256": "3af00bdfb95ab946b4797a676e4f4e395d4c4198c12a84bbb7cd0fbd24f37682",
+      "category": "audio",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/app-icon-512.png",
+      "bytes": 270429,
+      "sha256": "816afe4f5ab69ec80ac75b13b797cc7fc1117f0d069e642f1441d9324c90f1f9",
+      "width": 512,
+      "height": 512,
+      "alpha": false,
+      "category": "icon",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/apple-touch-icon.png",
+      "bytes": 42714,
+      "sha256": "98578f1d8d81895056b8c77d271e205cf93720bc3b6c1906a82b588ad0eba67d",
+      "width": 180,
+      "height": 180,
+      "alpha": false,
+      "category": "icon",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/favicon-32.png",
+      "bytes": 1651,
+      "sha256": "6954b451e96805e341124abccff6a47e0b5302987bf4779fb812e8bbba4cca6a",
+      "width": 32,
+      "height": 32,
+      "alpha": false,
+      "category": "icon",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/icon-192.png",
+      "bytes": 48241,
+      "sha256": "68fe724034d6c3ea0489ab5d27e68bf54127e801b4dac4c9e7d3c7c98ac20444",
+      "width": 192,
+      "height": 192,
+      "alpha": false,
+      "category": "icon",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1125x2436.png",
+      "bytes": 1490378,
+      "sha256": "8eab92f01dc8194a3f31c825e799bb0320451406c7dc6b14d3e1b4e1829be864",
+      "width": 1125,
+      "height": 2436,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1170x2532.png",
+      "bytes": 1497676,
+      "sha256": "62fd894a7f91fe36b9c12e77af24c0d5f93beadca2023d347e4c0ff826438faf",
+      "width": 1170,
+      "height": 2532,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1179x2556.png",
+      "bytes": 1209846,
+      "sha256": "91625fb53950aa0afc91798aa75f15da5e799336183af32bc1aa9c102cbe007c",
+      "width": 1179,
+      "height": 2556,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1206x2622.png",
+      "bytes": 1572046,
+      "sha256": "b26aad9a772fa115c9c97f41cd57a1da50012f76d07f072017f9e2f184fbc4b3",
+      "width": 1206,
+      "height": 2622,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1242x2688.png",
+      "bytes": 1630961,
+      "sha256": "515624586db79b514fdccc3786aaa43ada944a0ba1a5e55d8fbabe90a7a6b76f",
+      "width": 1242,
+      "height": 2688,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1284x2778.png",
+      "bytes": 1801728,
+      "sha256": "9a49872d6a56d71cbf4f2447556ec6a5d7120ef36d69f75d083a3e9f881c4692",
+      "width": 1284,
+      "height": 2778,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1290x2796.png",
+      "bytes": 1312088,
+      "sha256": "74a8d935ba28c775d42deedd80e7d67cbc952e8e0ee80f54757c66b058518646",
+      "width": 1290,
+      "height": 2796,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-1320x2868.png",
+      "bytes": 1827316,
+      "sha256": "793a77824ab9da50250bbd2486abab7cc9ae14a73f3d1cb46df13ce17eba483c",
+      "width": 1320,
+      "height": 2868,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/splash-828x1792.png",
+      "bytes": 939673,
+      "sha256": "41411cdc13e6e2234568705753cfcdf2b7542e713ac019be858c561d36cba463",
+      "width": 828,
+      "height": 1792,
+      "alpha": false,
+      "category": "splash",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    }
+  ]
+}

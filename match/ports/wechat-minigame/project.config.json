@@ -1,0 +1,26 @@
+{
+  "appid": "touristappid",
+  "compileType": "game",
+  "projectname": "MYSKME-GEMFALL",
+  "description": "灵石远征微信小游戏独立初代版",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "urlCheck": true,
+    "checkInvalidKey": true,
+    "postcss": false
+  },
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "test"
+      },
+      {
+        "type": "folder",
+        "value": "scripts"
+      }
+    ]
+  }
+}

@@ -2,6 +2,11 @@
 
 一份给「网页版 / 微信 / iOS」三条路的施工图。写在开工之前，是为了让代码从第一天就站在能移植的位置上。
 
+> 2026-07-30 更新：跨端独立工作区已经建立在 `match/ports/`。
+> iOS 有 Capacitor 8 可初始化壳；微信小游戏已有无 DOM Canvas v0。
+> 本文前半仍解释正式网页的分层，实际施工与版本边界以 `match/ports/README.md`
+> 和 `match/ports/CHANGELOG.md` 为准。
+
 ---
 
 ## 结论先说：推荐路线
@@ -9,8 +14,8 @@
 | 顺序 | 平台 | 做法 | 代码改动 | 成本 |
 |---|---|---|---|---|
 | ① 现在 | **自己的网站**（GitHub Pages） | 已完成，单文件、离线、扫码即玩 | 无 | 0 |
-| ② 其次 | **iOS / Android 上架** | **Capacitor** 包壳（WKWebView / WebView） | **几乎为零** | Apple 开发者账号 $99/年 |
-| ③ 最后 | **微信** | 走**小游戏**，不是小程序 | 只有 UI 层要重画 | 主体资质 + 类目审核 |
+| ② 其次 | **iOS / Android 上架** | **Capacitor 8** 包壳（WKWebView / WebView） | 壳已备好，尚未签名 | Apple 开发者账号与当期审核要求 |
+| ③ 最后 | **微信** | 走**小游戏**，不是小程序 | Canvas v0 已可玩，正式功能待迁移 | AppID、主体资质与当期类目审核 |
 
 **为什么是这个顺序**：网页版是唯一能立刻上线、立刻收反馈的形态；iOS 包壳几乎不花工时，属于"顺手就做了"；微信小游戏是三者里唯一有真实工作量的，值得等网页版数据出来再决定要不要投。
 
@@ -68,13 +73,14 @@ const PLAT={
 ## 三、iOS / Android 上架（推荐第二步）
 
 用 Capacitor 包一层原生壳，网页代码原样跑在 WKWebView 里。
+现成模板见 `match/ports/ios-capacitor/`，不要在仓库根目录重复初始化一套。
 
 ```bash
-npm init -y
-npm i @capacitor/core @capacitor/cli @capacitor/ios @capacitor/haptics
-npx cap init 灵石远征 com.myskme.gemfall --web-dir=www
-mkdir -p www && cp match/index.html www/
+cd match/ports/ios-capacitor
+npm install
+npm run sync:web
 npx cap add ios
+npx cap sync ios
 npx cap open ios      # 在 Xcode 里签名、配图标、提交
 ```
 
@@ -111,7 +117,17 @@ npx cap open ios      # 在 Xcode 里签名、配图标、提交
 - 联调与审核提交：2～3 天
 
 ### 素材与包体
-主包限制 4MB。本作单文件约 130KB，加上音效素材也远在限额内，不需要分包。
+
+不要再使用早期“单文件约 130KB、音效也远在限额内”的估算。当前实际情况是：
+
+- `match/index.html` 约 307KB
+- `match/art/` 56 张 WebP，约 2.0MB
+- `match/audio/` 三首 M4A，约 6.7MB
+- PWA 多机型启动图约 13MB，但微信版完全不需要复制
+
+微信 v0 采用保守的 4 MiB 主包预算自动检查：完整 WebP 美术可进入当前包，
+三首 BGM 不进入。后续音频应改为短循环、分包或合规 HTTPS 远程资源。
+以发布当天微信开发者工具的包体报告为最终依据。
 
 ### 资质
 小游戏需要主体资质与类目审核。个人主体可以注册，但游戏类目通常需要软著；教育向的休闲游戏相对好过。这一步的时间成本往往大于开发本身，建议提前启动。
@@ -136,7 +152,23 @@ __selftest()   // 30 项：三连判定 / 特殊灵石炼成 / 组合技 / 重�
 
 ---
 
-## 六、一个提醒
+## 六、当前可执行入口
+
+```bash
+# 资源目录与哈希
+node match/ports/tools/build-resource-catalog.mjs
+
+# 微信资源同步、引擎回归、跨端完整性
+node match/ports/wechat-minigame/scripts/sync-assets.mjs
+node match/ports/wechat-minigame/test/engine.test.js
+node match/ports/tools/verify-ports.mjs
+
+# iOS 网页副本（进入目录后）
+cd match/ports/ios-capacitor
+npm run sync:web
+```
+
+## 七、一个提醒
 
 三个平台共用一份引擎的前提，是**改动始终发生在正确的层**。加新玩法（新机关、新同伴、新关卡）应当只动纯逻辑引擎与数据表；加特效动渲染层；加平台能力动适配层。一旦在引擎里写了 `document.querySelector`，这份跨平台的便宜就没了。
 
