@@ -203,7 +203,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lv .bosscrown{position:absolute;top:4px;right:6px;line-height:0;color:var(--red)}
 .lv .bosscrown svg{width:12px;height:12px}
 .lv.done{border-color:color-mix(in srgb,var(--gold) 40%,var(--edge))}
-#map-endless{margin-top:6px;font-size:13px;color:var(--ink2);letter-spacing:.1em;text-align:center}
+#map-endless{margin:10px auto 0;width:min(340px,90vw);text-align:center}
+#map-endless .ekick{font-size:10px;letter-spacing:.34em;color:var(--ink3);margin-bottom:2px}
+#map-endless .emsg{font-size:13px;color:var(--ink2);letter-spacing:.1em;margin-top:2px}
+/* 未解锁：只去色、几乎不压暗。这张图本身就极暗，再乘 .42 就成了一块黑方块，
+   看上去像图裂了而不是「还没解锁」。 */
+#map-endless.locked .obanner{filter:grayscale(.85) brightness(.78)}
+#map-endless.unlocked .obanner{cursor:default}
 
 /* ============ 游戏局内 ============ */
 #scr-game{padding:max(8px,env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));justify-content:flex-start;overflow:hidden}
@@ -519,10 +525,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .claimcard .ct{font-size:16px;letter-spacing:.14em;color:var(--gold2);margin:3px 0 2px}
 .claimcard .cd{font-size:12px;color:var(--ink2);letter-spacing:.06em;margin-top:1px}
 .claimcard .btn{margin-top:9px;width:100%;padding:9px;font-size:15px}
+/* ---- 留存物件角饰（矿灯 / 宝箱）----
+   大厅与地脉图都是一屏定死的版式，所以这两件**绝对定位**、零布局成本：
+   撑不高任何东西，缺图时 .has-art 不加、整个不显示。
+   必须 contain —— cover 会把矿灯的提梁和宝箱盖上的星饰裁掉。 */
+.orn{position:absolute;pointer-events:none;display:none;
+  background-repeat:no-repeat;filter:drop-shadow(0 2px 10px rgba(0,0,0,.55))}
+.orn.has-art{display:block}
+#daily-orn{width:clamp(38px,7dvh,54px);aspect-ratio:1;top:-10px;right:4px;opacity:.92}
+/* 宝箱靠**左**：右边那格是「N / 15 ★」计数，放右边会把数字压掉。
+   同时给标签让出 38px，两者才不打架。 */
+#chest-orn{width:32px;aspect-ratio:1;top:-9px;left:0;opacity:.6;
+  transition:opacity .45s ease,filter .45s ease}
+#star-meter .sm-top{padding-left:38px}
+/* 攒够 15 星、宝箱可开时，箱子自己亮起来——不用读进度条也知道 */
+#star-meter:has(#chest-btn.on) #chest-orn{opacity:1;
+  filter:drop-shadow(0 0 12px color-mix(in srgb,var(--gold) 55%,transparent))}
+@media (max-height:640px){.orn{display:none!important}}
+
 .streakdots{display:flex;gap:5px;justify-content:center;margin-top:7px}
 .streakdots i{width:9px;height:9px;border:1px solid var(--line);display:block}
 .streakdots i.lit{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px color-mix(in srgb,var(--gold) 60%,transparent)}
-#star-meter{width:min(340px,90vw);margin:4px auto 0}
+#star-meter{width:min(340px,90vw);margin:4px auto 0;position:relative}
 #star-meter .sm-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.1em;margin-bottom:4px}
 #star-meter .sm-top b{color:var(--gold2);font-weight:500}
 #star-meter .bar{height:8px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;position:relative}
@@ -589,12 +613,21 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 .ach.got .nm{color:var(--gold2)}
 .ach.got:hover{box-shadow:var(--glow-soft);transform:translateY(-2px)}
 
-/* 编年史里的地脉头图。没图就整个不占位（.has-art 由 applyArt 加）。 */
-#lore-banner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
-  border:1px solid var(--line2);background-repeat:no-repeat}
-#lore-banner.has-art{display:block}
-#lore-banner::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 55%,var(--panel) 100%)}
+/* ---- 通用横幅（1024×448 的 16:7 插画统一走这一个类）----
+   全站横幅共用：编年史地脉头图、胜负结算、讨伐登场、聚会赛、矿脉榜、无尽矿脉。
+   两条不能改的约定：
+   1. **不加 CSS 边框**。这批横幅画里自带描金双线框与右上小圆（与 chapter-*.webp
+      同一套装帧），再加一道就是双框。
+   2. 压字用的暗遮罩写**固定色**，不能用 var(--panel)：浅色主题下那个变量会变成
+      浅色，遮罩反而把图提亮，压在上面的字就糊了。 */
+.obanner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
+  background-repeat:no-repeat;overflow:hidden}
+.obanner.has-art{display:block}
+.obanner::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 52%,rgba(6,6,9,.62) 82%,rgba(6,6,9,.92) 100%)}
+/* 矮屏把横幅压扁，优先保住下面的按钮与数字 */
+@media (max-height:720px){.obanner{aspect-ratio:20/6;margin:8px 0 2px}}
+@media (max-height:600px){.obanner{display:none!important}}
 
 /* ==================== 典藏册 ==================== */
 /* 提示条里的内嵌小图标（ICONS 的 svg 没有内联尺寸，不套一层会撑到 300×150） */
@@ -717,6 +750,18 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 @keyframes dwIn{from{opacity:0;transform:translateY(16px) scale(.9) rotate(-3deg)}to{opacity:1;transform:none}}
 #dw-art{animation:dwIn .6s cubic-bezier(.16,1,.3,1) both}
 @media (prefers-reduced-motion:reduce){#dw-art{animation:none}}
+/* ---- 卡背翻转（纯表现层，不碰任何结算）----
+   一个元素演两面：先立起卡背，转到侧面时换图，再转回来就是正面。
+   三个 .flip* 类的选择器特异性都高于上面那条 #dw-art，会盖掉 dwIn。 */
+#ovl-col .drawwrap,#dw-art{perspective:900px}
+@keyframes dwBack{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:none}}
+@keyframes dwFlipA{from{transform:rotateY(0)}  to{transform:rotateY(90deg)}}
+@keyframes dwFlipB{from{transform:rotateY(-90deg)}to{transform:rotateY(0)}}
+#dw-art.flipIn{animation:dwBack .2s ease-out both}
+#dw-art.flipA {animation:dwFlipA .24s ease-in both}
+#dw-art.flipB {animation:dwFlipB .3s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion:reduce){
+  #dw-art.flipIn,#dw-art.flipA,#dw-art.flipB{animation:none}}
 .cvnm{font-size:21px;letter-spacing:.14em;margin-top:12px}
 .cvsub{font-size:12px;color:var(--ink3);letter-spacing:.1em;margin-top:2px}
 .cvser{font-size:12px;color:var(--gold2);letter-spacing:.18em;margin-top:6px}
@@ -814,6 +859,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       </div>
     </div>
     <div class="claimcard" id="daily-card">
+      <div class="orn" id="daily-orn" data-fit="contain" data-pos="center"></div>
       <div class="ck">今日矿灯 · DAILY</div>
       <div class="ct" id="daily-title">矿灯已续 · 连续 0 天</div>
       <div class="cd" id="daily-desc">领取今日补给</div>
@@ -849,6 +895,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn ghost" id="map-next">▶</button>
     </div>
     <div id="star-meter">
+      <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
       <div class="sm-top"><span>星辰宝箱</span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
       <div class="bar"><i id="sm-fill"></i></div>
       <button class="btn primary" id="chest-btn"><span class="ic"></span> 开启星辰宝箱</button>
@@ -864,6 +911,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <div class="kicker">PARTY · PASS &amp; PLAY</div>
       <h2>聚会 · <em>赛</em></h2>
     </div>
+    <!-- 聚会赛设置必须一屏能操作完，所以这条横幅在矮屏由 .obanner 的媒体查询自行退场 -->
+    <div class="obanner" id="party-banner"></div>
     <div class="pt-sec">
       <div class="pt-lbl">几个人</div>
       <div class="pt-chips" id="pt-count"></div>
@@ -965,6 +1014,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- Boss 登场 -->
 <div class="ovl" id="ovl-boss"><div class="ovl-card">
   <div class="ovl-kick">矿脉深处 · 有东西醒了</div>
+  <!-- 气氛横幅。下面那个 boss-intro-face 是按 BOSSES 换的角色头像，
+       两者并存：横幅给气氛，头像给身份，横幅绝不能替掉头像。 -->
+  <div class="obanner" id="boss-banner"></div>
   <div id="boss-intro-face"></div>
   <div id="boss-intro-name">叶王</div><!-- 实际由 openLevel 按 BOSSES 填 -->
   <div id="boss-intro-title">红笔判官</div>
@@ -975,6 +1027,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- 结算 -->
 <div class="ovl" id="ovl-end"><div class="ovl-card">
   <div class="ovl-kick" id="end-kick">EXPEDITION</div>
+  <div class="obanner" id="end-banner"></div>
   <div class="ovl-title" id="end-title">脉 · <em>通</em></div>
   <div class="stars-row" id="end-stars"><s>★</s><s>★</s><s>★</s></div>
   <div id="end-score">0</div>
@@ -1158,6 +1211,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- 矿脉榜 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
+  <div class="obanner" id="lb-banner"></div>
   <div class="ovl-title">矿脉 · <em>榜</em></div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
@@ -1188,7 +1242,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="ovl-title" id="lore-title">地脉 · <em>通</em></div>
   <!-- 地脉头图直接复用地脉图上那 8 张 1024×448 横幅，不另出图。
        打通一条地脉后翻开编年史，本来就该先看到那条地脉长什么样。 -->
-  <div id="lore-banner"></div>
+  <div class="obanner" id="lore-banner"></div>
   <div id="lore-body"></div>
   <a class="lore-link" id="lore-link" target="_blank" rel="noopener">
     <div class="lk">同一个世界 · CROSSOVER</div>
@@ -1733,6 +1787,20 @@ const ART={
   card_cage:'art/card-cage.webp',
   ch_1:'art/chapter-1.webp', ch_2:'art/chapter-2.webp', ch_3:'art/chapter-3.webp', ch_4:'art/chapter-4.webp',
   ch_5:'art/chapter-5.webp', ch_6:'art/chapter-6.webp', ch_7:'art/chapter-7.webp', ch_8:'art/chapter-8.webp',
+  ch_endless:'art/chapter-endless.webp',                       // 无尽矿脉，不是「第九地脉」
+  /* 横幅：1024×448，画里自带描金双线框与右上小圆（与 ch_* 同一套装帧），
+     所以 .obanner 不能再加 CSS 边框，否则叠成双框。 */
+  end_win:'art/win.webp', end_lose:'art/lose.webp',
+  boss_banner:'art/boss-intro.webp',                           // 气氛横幅，不替代 boss_ye/boss_she 头像
+  party_banner:'art/party-banner.webp', lb_banner:'art/lb-banner.webp',
+  /* 风物「卡面版」。与 card_* 同理：ch_* 那 8 张横幅继续给地脉图与编年史用，
+     典藏册的风物卡改用这 8 张竖版重构图。两套并存。 */
+  vista_1:'art/card-vista-1.webp', vista_2:'art/card-vista-2.webp',
+  vista_3:'art/card-vista-3.webp', vista_4:'art/card-vista-4.webp',
+  vista_5:'art/card-vista-5.webp', vista_6:'art/card-vista-6.webp',
+  vista_7:'art/card-vista-7.webp', vista_8:'art/card-vista-8.webp',
+  daily_lamp:'art/lamp.webp', star_chest:'art/chest.webp',     // 透明底，必须 contain（提梁/星饰不能裁）
+  card_back:'art/card-back.webp',                              // 翻卡背面，自带完整卡框
 };
 const _art={};                                                 // key -> Image | null(确认没有)
 function art(key){
@@ -3274,6 +3342,7 @@ function renderDaily(){
   if(!st.can){card.classList.remove('on');return}
   const nextStreak=st.gap===1?st.streak+1:1;
   card.classList.add('on');
+  applyArt($('#daily-orn'),'daily_lamp');
   $('#daily-title').textContent='矿灯已续 · 连续 '+nextStreak+' 天';
   $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+dailyPow(nextStreak)
     +'</b> ＋ 灵器 '+dailyTools(nextStreak)+' 件';
@@ -3298,6 +3367,7 @@ function claimDaily(){
 const CHEST_COST=15;
 function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
 function renderChest(){
+  applyArt($('#chest-orn'),'star_chest');
   const ts=totalStars(), claimed=SAVE.chest||0;
   const inCur=ts-claimed*CHEST_COST;
   const can=inCur>=CHEST_COST;
@@ -3380,14 +3450,17 @@ const CARDS=[
   {n:9, w:'gemfall',s:'lore', a:'boss_both', nm:'两相同现', sub:'王座只有一张'},
   {n:10,w:'gemfall',s:'lore', a:'cat',       nm:'小黑猫',   sub:'司铃者'},
   {n:11,w:'gemfall',s:'lore', a:'hero',      nm:'矿灯',     sub:'夜里唯一的亮'},
-  {n:12,w:'gemfall',s:'view', a:'ch_1', nm:'晨光浅脉', sub:'第一地脉'},
-  {n:13,w:'gemfall',s:'view', a:'ch_2', nm:'墨渊支脉', sub:'第二地脉'},
-  {n:14,w:'gemfall',s:'view', a:'ch_3', nm:'猫铃矿道', sub:'第三地脉'},
-  {n:15,w:'gemfall',s:'view', a:'ch_4', nm:'岩壳深堑', sub:'第四地脉'},
-  {n:16,w:'gemfall',s:'view', a:'ch_5', nm:'蛇窟缠层', sub:'第五地脉'},
-  {n:17,w:'gemfall',s:'view', a:'ch_6', nm:'双生裂谷', sub:'第六地脉'},
-  {n:18,w:'gemfall',s:'view', a:'ch_7', nm:'风暴矿心', sub:'第七地脉'},
-  {n:19,w:'gemfall',s:'view', a:'ch_8', nm:'王座熔窟', sub:'第八地脉'},
+  /* 风物用竖版重构图 vista_*，不是 ch_* 横幅裁一刀。
+     ch_1…ch_8 仍归地脉图与编年史用，两套并存——别把这里改回 ch_*。
+     n 是存档主键（own 是 "n:tier"），只能动 a，绝不能动 n 或顺序。 */
+  {n:12,w:'gemfall',s:'view', a:'vista_1', nm:'晨光浅脉', sub:'第一地脉'},
+  {n:13,w:'gemfall',s:'view', a:'vista_2', nm:'墨渊支脉', sub:'第二地脉'},
+  {n:14,w:'gemfall',s:'view', a:'vista_3', nm:'猫铃矿道', sub:'第三地脉'},
+  {n:15,w:'gemfall',s:'view', a:'vista_4', nm:'岩壳深堑', sub:'第四地脉'},
+  {n:16,w:'gemfall',s:'view', a:'vista_5', nm:'蛇窟缠层', sub:'第五地脉'},
+  {n:17,w:'gemfall',s:'view', a:'vista_6', nm:'双生裂谷', sub:'第六地脉'},
+  {n:18,w:'gemfall',s:'view', a:'vista_7', nm:'风暴矿心', sub:'第七地脉'},
+  {n:19,w:'gemfall',s:'view', a:'vista_8', nm:'王座熔窟', sub:'第八地脉'},
   {n:20,w:'gemfall',s:'gem',  a:'gem_0',   nm:'金曜', sub:'AURUM'},
   {n:21,w:'gemfall',s:'gem',  a:'gem_1',   nm:'赤晶', sub:'EMBER'},
   {n:22,w:'gemfall',s:'gem',  a:'gem_2',   nm:'蓝月', sub:'LUNA'},
@@ -3577,15 +3650,19 @@ function renderBoxOpen(d){
     $('#bx-hint').textContent=d.t===T_COMMON?'一线金光':'金光大盛';
     SFX.star(1);
   };
-  const reveal=()=>colView('draw',d);                         // colView 会 colStop()，锁在那里放掉
+  /* box:true 让 renderDraw 知道「是从匣子来的」，才演卡背翻转。
+     从图鉴直接点开某张卡不该有翻牌动作。 */
+  const reveal=()=>colView('draw',Object.assign({},d,{box:true}));  // colView 会 colStop()，锁在那里放掉
   if(REDUCED){
-    /* 减弱动效：不抖不淡，但**仍然先看到开启态再翻卡**——
+    /* 减弱动效：不抖不淡、不翻牌，但**仍然先看到开启态再出卡**——
        口令里明确要求这一步不能跳过，那是整个仪式的落点。 */
     toOpen(); colLater(420,reveal); return;
   }
   st.classList.add('shake');
   colLater(520,toOpen);
-  colLater(1320,reveal);
+  /* 1080 而不是原来的 1320：后面接了 780ms 的卡背翻转，
+     不往回收一点，从点「开匣」到看清正面要拖到两秒开外。 */
+  colLater(1080,reveal);
 }
 function buyBox(){
   colFix(); colDay();
@@ -3786,6 +3863,7 @@ function openLevel(n,mode){
   if(L.boss){
     const bo=BOSSES[L.boss];
     $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);
+    applyArt($('#boss-banner'),'boss_banner');                 // 气氛横幅，与下面的角色头像并存
     applyArt($('#boss-intro-face'),'boss_'+L.boss);
     $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');
     $('#boss-intro-title').textContent=bo.title;
@@ -3837,6 +3915,9 @@ function endRush(){
   setTimeout(()=>LB.flush('clear'),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
+  /* 限时局天然以「灯熄」收场，所以默认用 lose 的将熄意象；
+     破了纪录才换成 win——那一下确实值得庆祝。 */
+  applyArt($('#end-banner'),best?'end_win':'end_lose');
   $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
   $('#end-score').textContent=GS.score.toLocaleString('en-US');
@@ -3879,6 +3960,7 @@ function endLevel(win){
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
     SFX.win();
+    applyArt($('#end-banner'),'end_win');
     $('#end-kick').textContent=L.era+' · '+L.chName;
     $('#end-title').innerHTML='脉 · <em>通</em>';
     const stars=$('#end-stars').children;
@@ -3891,6 +3973,7 @@ function endLevel(win){
     $('#end-retry').style.display='';
   }else{
     SFX.lose();
+    applyArt($('#end-banner'),'end_lose');
     SAVE.fails[n]=(SAVE.fails[n]||0)+1;persist();
     $('#end-kick').textContent=L.era+' · '+L.chName;
     $('#end-title').innerHTML='矿灯 · <em>暗</em>';
@@ -3992,6 +4075,7 @@ function fitScreen(id){
 }
 addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
 function renderPartySetup(){
+  applyArt($('#party-banner'),'party_banner');
   const cnt=$('#pt-count');cnt.innerHTML='';
   for(let n=2;n<=6;n++){
     const d=document.createElement('div');
@@ -4397,6 +4481,7 @@ function lbRowHTML(r,mine){
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function renderLB(){
+  applyArt($('#lb-banner'),'lb_banner');
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
   const form=$('#lb-form');
@@ -4543,10 +4628,17 @@ function renderMap(){
     if(unlocked)d.addEventListener('click',()=>{SFX.click();openLevel(n)});
     grid.appendChild(d);
   }
+  /* 无尽矿脉。它**不是第九地脉**——独立在八脉网格之外，自带标签与横幅，
+     未解锁时横幅去色压暗并保留文字说明，解锁后整块可点。
+     入口逻辑一个字没动：仍然是 openLevel(SAVE.lv)。 */
   const deep=SAVE.lv>64;
-  $('#map-endless').innerHTML=deep
-    ? '<button class="btn ghost" id="go-endless">无尽矿脉 · 深度 '+(SAVE.lv-64)+'</button>'
-    : '通关 64 关后解锁「无尽矿脉」';
+  const me=$('#map-endless');
+  me.className=deep?'unlocked':'locked';
+  me.innerHTML='<div class="ekick">无尽矿脉 · ENDLESS</div>'
+    +'<div class="obanner" id="endless-banner" data-pos="center 45%"></div>'
+    +(deep?'<button class="btn ghost" id="go-endless">继续下潜 · 深度 '+(SAVE.lv-64)+'</button>'
+          :'<div class="emsg">通关 64 关后解锁</div>');
+  applyArt($('#endless-banner'),'ch_endless');
   const ge=$('#go-endless');
   if(ge)ge.addEventListener('click',()=>{SFX.click();openLevel(SAVE.lv)});
 }
@@ -4694,7 +4786,18 @@ function renderDraw(d){
   $('#dw-kick').textContent=d.dup?'又见此石':'新入典藏';
   const a=$('#dw-art');
   a.className='cbig t'+t; a.style.backgroundImage=''; a.classList.remove('has-art');
-  a.dataset.fit='cover'; a.dataset.pos='center 30%'; applyArt(a,card.a);
+  /* 正面。卡背那条路走完也回到这里，两处只有这一份「怎么显示正面」的定义。 */
+  const face=()=>{a.dataset.fit='cover';a.dataset.pos='center 30%';
+                  a.style.backgroundImage='';a.classList.remove('has-art');applyArt(a,card.a)};
+  /* 卡背翻转：只在从匣子过来时演（d.box 由 renderBoxOpen 标）。
+     减弱动效或缺卡背图时直接给正面——结果永远可见，动画只是可选的糖。
+     ⚠ 这里绝不能做任何结算：卡在 openBox() 里就已经发了。 */
+  if(d.box&&!REDUCED&&ART.card_back){
+    a.dataset.fit='cover'; a.dataset.pos='center'; applyArt(a,'card_back');
+    a.classList.add('flipIn');
+    colLater(240,()=>{a.classList.remove('flipIn');a.classList.add('flipA')});
+    colLater(480,()=>{a.classList.remove('flipA');a.classList.add('flipB');face()});
+  }else face();
   $('#dw-tier').textContent=TIERS[t].nm; $('#dw-tier').className='dwtier t'+t;
   $('#dw-name').textContent=card.nm;
   $('#dw-sub').textContent=card.sub;
@@ -4707,10 +4810,15 @@ function renderDraw(d){
   const more=COLS.box>0;
   const ag=$('#dw-again'); ag.style.display=more?'':'none';
   ag.innerHTML='再开一匣<span class="colsub">还有 '+COLS.box+' 个</span>';
+  /* 庆祝要跟正面**同时**出现。从匣子来的那条路上，翻卡前 480ms 台上还是卡背，
+     这时候先放礼花等于提前剧透了品阶。 */
   const host=$('#ovl-col .ovl-card');
-  if(t===T_TOP){SFX.win();fxBurstDom(0,host);fxBurstDom(1,host);fxBurstDom(2,host)}
-  else if(t===T_RARE){SFX.star(1);fxBurstDom(1,host)}
-  else SFX.click();
+  const cheer=()=>{
+    if(t===T_TOP){SFX.win();fxBurstDom(0,host);fxBurstDom(1,host);fxBurstDom(2,host)}
+    else if(t===T_RARE){SFX.star(1);fxBurstDom(1,host)}
+    else SFX.click();
+  };
+  if(d.box&&!REDUCED&&ART.card_back)colLater(480,cheer); else cheer();
 }
 
 function renderGift(arg){
