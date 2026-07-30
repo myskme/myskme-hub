@@ -7,6 +7,13 @@
 document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){
 document.documentElement.setAttribute('data-theme','dark')}})();</script>
 <title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="灵石远征">
+<meta name="theme-color" content="#0a0a0c">
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
 <meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
@@ -56,7 +63,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 
 /* ============ 通用 ============ */
 #app{position:relative;z-index:2;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;overflow-x:hidden;
+.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow:hidden;
   padding:max(10px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
   overscroll-behavior:contain;scrollbar-width:none}
 .scr::-webkit-scrollbar{display:none}
@@ -75,7 +82,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .ornate::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
 .ornate::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
 .ornate:hover::before,.ornate:hover::after{width:24px;height:24px}
-.kicker{font-size:12px;letter-spacing:.42em;color:var(--ink3);text-transform:uppercase}
+.kicker{font-size:clamp(10px,1.3dvh,12px);letter-spacing:.42em;color:var(--ink3);text-transform:uppercase;margin:0}
 .gold{color:var(--gold)}
 .hr{width:min(340px,70%);height:1px;margin:14px auto;background:linear-gradient(90deg,transparent,var(--line),transparent);position:relative}
 .hr::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:8px;color:var(--gold);opacity:.8}
@@ -89,24 +96,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   #scr-menu::before{content:'';margin-top:auto}
   #scr-menu::after{content:'';margin-bottom:auto}
 }
-.title-hero{font-size:clamp(40px,9vw,76px);font-weight:300;letter-spacing:.18em;margin:6px 0 0;line-height:1.25;
+.title-hero{font-size:clamp(30px,min(8.6vw,5.4dvh),60px);font-weight:300;letter-spacing:.18em;margin:2px 0 0;line-height:1.2;
   animation:titleIn 1.3s cubic-bezier(.16,1,.3,1) both}
 .title-hero em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
 @keyframes titleIn{0%{opacity:0;letter-spacing:.4em;transform:translateY(18px);filter:blur(6px)}100%{opacity:1;letter-spacing:.18em;transform:translateY(0);filter:blur(0)}}
-.subtitle{color:var(--ink2);font-size:14px;letter-spacing:.2em;margin:2px 0 0}
-#menu-gems{height:56px;margin:6px 0 2px}
+.subtitle{color:var(--ink2);font-size:clamp(12px,1.6dvh,14px);letter-spacing:.2em;margin:0}
+#menu-gems{height:clamp(36px,5dvh,48px);margin:0}
 /* 有立绘时放大成真正的主视觉——512px 的立绘塞进 92px 徽章太可惜，
    而这是玩家打开游戏第一眼看到的东西。没有立绘时仍是原来的字形徽章尺寸。 */
 .wolf-badge{width:92px;height:92px;margin:4px auto 0;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;
   transition:width .5s cubic-bezier(.16,1,.3,1),height .5s cubic-bezier(.16,1,.3,1);
   background:radial-gradient(ellipse at center,color-mix(in srgb,var(--gold) 14%,transparent),transparent 70%)}
-.wolf-badge.has-art{flex:none;width:min(160px,42vw);height:min(180px,48vw);border-color:var(--gold-line)}
+.wolf-badge.has-art{flex:none;width:min(150px,40vw,16dvh);height:min(170px,45vw,18.5dvh);border-color:var(--gold-line)}
 .wolf-badge.has-art::before{inset:8px}
 .wolf-badge.has-art::after{inset:-9px}
 /* 底部渐隐，让立绘和背景融进去，不至于是一块硬边的方图 */
 .wolf-badge.has-art{-webkit-mask-image:linear-gradient(180deg,#000 66%,transparent);
   mask-image:linear-gradient(180deg,#000 66%,transparent)}
-@media (max-height:740px){.wolf-badge.has-art{width:min(120px,34vw);height:min(134px,38vw)}}
+@media (max-height:740px){
+  .wolf-badge.has-art{width:min(110px,30vw);height:min(122px,34vw)}
+  #scr-menu .kicker,#scr-menu .subtitle{display:none}      /* 小屏砍掉题头与副题，保住四个入口 */
+  .title-hero{margin-top:0}
+}
 .wolf-badge::before{content:'';position:absolute;inset:6px;border:1px solid var(--gold-line);opacity:.45;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s}
 .wolf-badge::after{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 24s linear infinite}
 .wolf-badge svg{position:absolute;width:70%;height:70%;opacity:.16}
@@ -114,8 +125,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .wolf-badge:hover::before{opacity:.9;transform:rotate(45deg) scale(1.1)}
 .wolf-badge:hover b{transform:scale(1.12)}
 @keyframes spin{to{transform:rotate(360deg)}}
-.menu-btns{display:flex;flex-direction:column;gap:12px;margin-top:16px;width:min(320px,86vw)}
-.menu-btns .btn{width:100%}
+.menu-btns{display:flex;flex-direction:column;gap:clamp(6px,1.1dvh,12px);margin-top:clamp(6px,1.4dvh,14px);width:min(320px,86vw)}
+.menu-btns .btn{width:100%;padding-top:clamp(6px,1dvh,11px);padding-bottom:clamp(6px,1dvh,11px);font-size:clamp(15px,2dvh,17px)}
+.menu-btns .btn .sub{margin-top:clamp(1px,.3dvh,3px)}
 .btn .sub{display:block;font-size:11px;letter-spacing:.24em;color:var(--ink3);margin-top:3px}
 .btn .ic.mi{width:1.05em;height:1.05em;vertical-align:-.16em;margin-right:4px;color:var(--gold)}
 .iconbtn .ic{width:1.1em;height:1.1em;vertical-align:-.2em}
@@ -123,15 +135,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
 .menu-sub{display:flex;gap:10px;justify-content:center;margin-top:2px}
-.menu-sub .btn{flex:1}
-#menu-stats{margin-top:14px;font-size:13px;color:var(--ink2);letter-spacing:.1em}
+.menu-sub .btn{flex:1;padding-top:clamp(6px,.9dvh,10px);padding-bottom:clamp(6px,.9dvh,10px);font-size:14px}
+#menu-stats{margin-top:clamp(4px,1dvh,10px);font-size:13px;color:var(--ink2);letter-spacing:.1em}
 #menu-stats b{color:var(--gold);font-weight:500}
-.menu-foot{margin-top:18px;font-size:12px;color:var(--ink3);letter-spacing:.12em;line-height:2}
+.menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
+  padding:0 52px;text-align:center}   /* 两侧避开右下角的主题按钮 */
 .menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
 .menu-foot a:hover{color:var(--gold)}
 /* 小黑猫 */
 /* 小黑猫是彩蛋，藏在角落即可——但不能压住页脚的「作品总目」链接 */
-#cat{position:relative;display:block;width:52px;height:45px;margin:10px 4px 0 auto;
+#cat{position:absolute;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));width:52px;height:45px;
   cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
 #cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
@@ -167,7 +180,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #map-endless{margin-top:6px;font-size:13px;color:var(--ink2);letter-spacing:.1em;text-align:center}
 
 /* ============ 游戏局内 ============ */
-#scr-game{padding:max(8px,env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));justify-content:flex-start;overflow-y:auto}
+#scr-game{padding:max(8px,env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));justify-content:flex-start;overflow:hidden}
 /* auto-margin 居中：比 justify-content:center 安全，内容超高时不会把顶部裁掉 */
 #scr-game::before{content:'';margin-top:auto}
 #scr-game::after{content:'';margin-bottom:auto}
@@ -313,10 +326,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .ally-opt.lock::after{content:'第 'attr(data-u)' 关';position:absolute;bottom:-15px;left:0;right:0;font-size:9px;color:var(--ink3);letter-spacing:.04em}
 #ally-desc{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;margin-top:20px;min-height:34px;line-height:1.7}
 #ally-desc b{color:var(--gold2);font-weight:500}
+/* 安装教程 */
+.ins-sec{margin-top:14px;border:1px solid var(--line2);padding:11px 13px;background:var(--bg2)}
+.ins-os{font-size:13.5px;color:var(--gold2);letter-spacing:.1em;margin-bottom:8px;font-weight:500}
+.ins-step{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);line-height:1.8;margin:5px 0;flex-wrap:wrap}
+.ins-step i{flex:none;font-style:normal;width:20px;height:20px;border:1px solid var(--gold-line);color:var(--gold2);
+  display:flex;align-items:center;justify-content:center;font-size:11.5px}
+.ins-step b{color:var(--gold2);font-weight:500}
+.ins-ic{width:20px;height:20px;fill:none;stroke:var(--gold);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
+  vertical-align:-4px;margin:0 2px}
+.ins-note{font-size:12px;color:var(--ink3);line-height:1.8;margin-top:7px;border-top:1px dashed var(--line2);padding-top:7px}
 /* 聚会赛 */
 /* 底部留出左下角「作品总目」浮标的高度，别压住最后一个输入框 */
 #scr-party{gap:6px;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
-.pt-head{text-align:center;margin-top:6px}
+.pt-head{text-align:center;margin-top:0}
 .pt-head h2{font-size:25px;font-weight:300;letter-spacing:.26em;margin:2px 0}
 .pt-head h2 em{font-style:normal;color:var(--gold)}
 .pt-sec{width:min(420px,94vw);margin-top:14px}
@@ -327,6 +350,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .pt-chip:hover{border-color:var(--gold);color:var(--ink)}
 .pt-chip.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 13%,var(--bg2));box-shadow:var(--glow-soft)}
 .pt-chip .d{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--ink3);margin-top:2px}
+@media (max-height:900px){.pt-chip .d{display:none}}   /* 描述行进了「怎么比」弹窗，竖向紧时不重复占地 */
 .pt-chip.on .d{color:color-mix(in srgb,var(--gold) 60%,var(--ink3))}
 #pt-names{display:flex;flex-direction:column;gap:7px;margin-top:4px}
 .pt-name{display:flex;align-items:center;gap:9px}
@@ -348,9 +372,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #ptr-quota{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 #ptr-quota .ptr-nm{flex:1;min-width:0;text-align:left;font-size:14px;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pt-hint{font-size:12.5px;color:var(--ink2);letter-spacing:.05em;text-align:center;margin-top:12px;line-height:1.8;
-  width:min(420px,94vw)}
+#pt-hint-line{font-size:12.5px;color:var(--ink3);letter-spacing:.04em;text-align:center;margin-top:clamp(6px,1dvh,12px)}
+#pt-hint-line a{color:var(--gold2);text-decoration:none;border-bottom:1px solid var(--gold-line)}
+#pt-hint{font-size:13.5px;color:var(--ink2);letter-spacing:.05em;text-align:left;line-height:2}
 #pt-hint b{color:var(--gold2);font-weight:500}
+.pt-sec{margin-top:clamp(6px,1.2dvh,14px)}
+.pt-lbl{margin-bottom:clamp(3px,.7dvh,7px)}
+.pt-chip{padding:clamp(6px,1dvh,9px) 13px}
+.pt-name input{padding:clamp(5px,.9dvh,8px) 11px;font-size:14px}
+.pt-dot{width:clamp(24px,3.4dvh,30px);height:clamp(24px,3.4dvh,30px)}
+#pt-names{gap:clamp(4px,.7dvh,7px)}
+.pt-head h2{font-size:clamp(20px,2.8dvh,25px);margin:0}
+#scr-party .ovl-btns{margin-top:clamp(8px,1.4dvh,16px);margin-bottom:0}
 /* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了 */
 #ovl-hand{background:var(--bg)}
 :root[data-theme="dark"] #ovl-hand{background:#07070a}
@@ -448,13 +481,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   text-align:center;min-height:0;height:0;overflow:hidden;transition:height .25s,margin .25s}
 #tool-hint.on{height:22px;margin-top:6px}
 /* 每日矿灯 / 星辰宝箱 */
-.claimcard{width:min(320px,86vw);margin:14px auto 0;border:1px solid var(--gold-line);
+.claimcard{width:min(320px,86vw);margin:clamp(5px,1.2dvh,12px) auto 0;border:1px solid var(--gold-line);
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 13%,var(--panel2)),var(--panel));
-  padding:12px 14px;display:none;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
+  padding:clamp(7px,1.2dvh,12px) 14px;display:none;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
+.claimcard .btn{padding-top:clamp(6px,1dvh,10px);padding-bottom:clamp(6px,1dvh,10px);margin-top:clamp(4px,.8dvh,8px)}
+.claimcard .ct{font-size:clamp(14px,1.9dvh,16px)}
+@media (max-height:860px){.claimcard .streakdots{display:none}}
+@media (max-height:740px){.claimcard .ck{display:none}.menu-foot br{display:none}}
 .claimcard.on{display:block}
 .claimcard .ck{font-size:11px;letter-spacing:.34em;color:var(--ink3)}
 .claimcard .ct{font-size:16px;letter-spacing:.14em;color:var(--gold2);margin:3px 0 2px}
-.claimcard .cd{font-size:12px;color:var(--ink2);letter-spacing:.06em}
+.claimcard .cd{font-size:12px;color:var(--ink2);letter-spacing:.06em;margin-top:1px}
 .claimcard .btn{margin-top:9px;width:100%;padding:9px;font-size:15px}
 .streakdots{display:flex;gap:5px;justify-content:center;margin-top:7px}
 .streakdots i{width:9px;height:9px;border:1px solid var(--line);display:block}
@@ -587,10 +624,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
-    <div class="hr"></div>
     <div class="menu-foot">
       把灵石三三对齐，沉睡的灵力就会醒来。<br>
-      <a href="../">← 作品总目</a>　·　MYSKME × 英语王老师
+      <a href="../">← 作品总目</a>　·　<a href="#" id="btn-install">安装到手机</a>　·　MYSKME × 英语王老师
     </div>
     <div id="cat" title="……" data-fit="contain">
       <svg viewBox="0 0 64 56" fill="#0c0c0e" stroke="rgba(201,166,74,.35)" stroke-width="1">
@@ -630,7 +666,6 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="pt-head">
       <div class="kicker">PARTY · PASS &amp; PLAY</div>
       <h2>聚会 · <em>赛</em></h2>
-      <div class="map-era">一台机器轮流玩 · 2–6 人</div>
     </div>
     <div class="pt-sec">
       <div class="pt-lbl">几个人</div>
@@ -656,7 +691,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <div class="pt-lbl">名字（可改）</div>
       <div id="pt-names"></div>
     </div>
-    <div id="pt-hint"></div>
+    <div id="pt-hint-line">同一轮所有人拿到一模一样的盘面 · <a href="#" id="pt-hint-open">怎么比、时长怎么估 →</a></div>
     <div class="ovl-btns" style="margin-bottom:20px">
       <button class="btn ghost" id="pt-back">← 回大厅</button>
       <button class="btn primary big" id="pt-go">开 局</button>
@@ -816,6 +851,42 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <button class="btn ghost" id="pte-menu">回大厅</button>
     <button class="btn primary" id="pte-again">再来一局</button>
   </div>
+</div></div>
+
+<!-- 聚会赛玩法说明 -->
+<div class="ovl" id="ovl-pt-hint"><div class="ovl-card" style="text-align:left">
+  <div class="ovl-kick" style="text-align:center">PARTY RULES</div>
+  <div class="ovl-title" style="text-align:center">聚会赛 · <em>怎么比</em></div>
+  <div id="pt-hint"></div>
+  <div class="ovl-btns"><button class="btn primary" id="pt-hint-close">明 白 了</button></div>
+</div></div>
+
+<!-- 安装到手机 -->
+<div class="ovl" id="ovl-install"><div class="ovl-card" style="text-align:left">
+  <div class="ovl-kick" style="text-align:center">ADD TO HOME SCREEN</div>
+  <div class="ovl-title" style="text-align:center">安装到<em>手机</em></div>
+  <div class="ovl-sub" style="text-align:center">加到桌面后：全屏无地址栏、有独立图标，像 App 一样点开就玩。</div>
+  <div class="ins-sec">
+    <div class="ins-os">iPhone / iPad（用 Safari 打开本页）</div>
+    <div class="ins-step"><i>1</i>点击屏幕<b>底部中间</b>的分享按钮
+      <svg class="ins-ic" viewBox="0 0 24 24"><path d="M12 3v11M8.5 6.5 12 3l3.5 3.5"/><path d="M6 10H5a1.6 1.6 0 00-1.6 1.6v7A1.6 1.6 0 005 20.2h14a1.6 1.6 0 001.6-1.6v-7A1.6 1.6 0 0019 10h-1"/></svg>
+      （方框加向上箭头）</div>
+    <div class="ins-step"><i>2</i>在弹出的菜单里<b>向下滑</b>，找到「<b>添加到主屏幕</b>」并点它
+      <svg class="ins-ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.6"/><path d="M12 8.6v6.8M8.6 12h6.8"/></svg></div>
+    <div class="ins-step"><i>3</i>点右上角「<b>添加</b>」——桌面上就多了灵石图标</div>
+    <div class="ins-note">用微信/QQ 打开的话，先点右上角「···」选「在 Safari 中打开」，再照上面做。</div>
+  </div>
+  <div class="ins-sec">
+    <div class="ins-os">安卓手机（用 Chrome / 系统浏览器打开本页）</div>
+    <div class="ins-step"><i>1</i>点右上角的菜单按钮
+      <svg class="ins-ic" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none"/></svg>
+      （竖排三个点）</div>
+    <div class="ins-step"><i>2</i>点「<b>添加到主屏幕</b>」（有的手机叫「<b>安装应用</b>」）</div>
+    <div class="ins-step"><i>3</i>点「<b>添加</b>」或「<b>安装</b>」确认——完成</div>
+    <div class="ins-note">华为/小米等自带浏览器菜单位置略有不同，一般都在菜单里找「添加到桌面」。
+      微信里同样先选「在浏览器中打开」。</div>
+  </div>
+  <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
 </div></div>
 
 <!-- 矿脉榜 -->
@@ -1414,7 +1485,13 @@ function applyArt(el,key){
     el.style.backgroundSize=fit;
     el.style.backgroundPosition=pos;
     el.style.backgroundRepeat='no-repeat';
+    const grew=!el.classList.contains('has-art');
     el.classList.add('has-art');
+    /* 贴图会改变元素尺寸（大厅立绘从 92px 徽章长到 170px）——重新适配当前屏 */
+    if(grew&&typeof fitScreen==='function'){
+      const on=document.querySelector('.scr.on');
+      if(on)fitScreen(on.id.replace('scr-',''));
+    }
   };
   if(im){put();return}
   el.classList.remove('has-art');
@@ -3170,6 +3247,21 @@ function ptStyle(el,i){
   el.style.setProperty('--pc-dark',g.dk);
   el.style.setProperty('--pg',hexA(g.base,.24));
 }
+/* 一屏定版：内容比视口高时整屏等比微缩（zoom），任何机型不再上下滑动。
+   地脉图/游戏屏本来收得进，缩放实际只作用于大厅与聚会设置这类信息密的屏。 */
+function fitScreen(id){
+  const pass=()=>{
+    const el=$('#scr-'+id); if(!el||!el.classList.contains('on'))return;
+    el.style.zoom='';
+    const need=el.scrollHeight, have=el.clientHeight;
+    if(need>have+2)el.style.zoom=Math.max(.75,have/need);
+    el.scrollTop=0;
+  };
+  /* 量两次：插画（如大厅立绘）是异步加载的，首帧测量时还没撑开高度 */
+  requestAnimationFrame(pass);
+  setTimeout(pass,650);
+}
+addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
 function renderPartySetup(){
   const cnt=$('#pt-count');cnt.innerHTML='';
   for(let n=2;n<=6;n++){
@@ -3226,6 +3318,7 @@ function renderPartySetup(){
     +'<br>同一轮大家拿到<b>一模一样的盘面</b>；每轮之间会停下来看积分，也可以再调配额。'
     +'<br><span style="color:var(--gold2)">预计全场约 <b>'+est+' 分钟</b></span>'
     +'（'+PARTY.n+' 人 × '+PARTY.rounds+' 轮 = '+(PARTY.n*PARTY.rounds)+' 手）';
+  fitScreen('party');
 }
 /* 配额按钮：时间制循环 30/45/60/75/90 秒，步数制循环 10/12/14/16/18 步 */
 function ptQuotaBtn(p,after){
@@ -3651,9 +3744,10 @@ async function lbSave(){
    ================================================================== */
 function show(id){
   for(const s of $$('.scr'))s.classList.toggle('on',s.id==='scr-'+id);
-  $('#chip-home').classList.toggle('on',id!=='menu');
+  /* 浮标不再使用：大厅脚注里已有「← 作品总目」链接，浮标在小屏会压住脚注 */
   $('#corner-ctl').classList.toggle('on',id==='menu'||id==='map');
-  if(id==='menu'){renderMenu();renderDaily();const m=$('#scr-menu');if(m)m.scrollTop=0;BGM.play('main')}
+  if(id==='menu'){renderMenu();renderDaily();BGM.play('main')}
+  fitScreen(id);
   if(id==='map'||id==='party')BGM.play('main');
   if(id==='map'){renderMap();renderChest()}
   if(id==='game'){renderTools();renderAlly()}
@@ -3875,6 +3969,8 @@ function drawMenuGems(t){
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
+$('#btn-install').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('install')});
+$('#install-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.flush('open');renderLB()});
 /* 唤醒时机：联网恢复 / 切回前台 / 页面即将被回收前用信标补一次 */
 addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
@@ -3884,6 +3980,8 @@ addEventListener('visibilitychange',()=>{
 });
 addEventListener('pagehide',()=>LB.beacon());
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
+$('#pt-hint-open').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('pt-hint')});
+$('#pt-hint-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
 for(const c of $$('#pt-mode .pt-chip'))c.addEventListener('click',()=>{SFX.click();PARTY.mode=c.dataset.m;renderPartySetup()});
@@ -4021,7 +4119,7 @@ addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCan
    暂停层被关掉则 GS.paused 不复位，限时赛倒计时永久冻结可以无限刷分。 */
 const ESC_ACT={'ovl-pause':'#pause-resume','ovl-hand':'#hand-go','ovl-ptround':'#ptr-next','ovl-end':'#end-menu',
   'ovl-pt-end':'#pte-menu','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
-  'ovl-ach':'#ach-close','ovl-how':'#how-close','ovl-lb':'#lb-close'};
+  'ovl-pt-hint':'#pt-hint-close','ovl-install':'#install-close','ovl-ach':'#ach-close','ovl-how':'#how-close','ovl-lb':'#lb-close'};
 addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   const cur=[...$$('.ovl.on')].pop();
