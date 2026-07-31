@@ -4,8 +4,8 @@ import { loadGemfall } from './headless-runtime.mjs';
 
 /*
  * 重要：这里的贪心机器人只会拿 findMove() 返回的第一步，不用灵器、不主动放大招，
- * 也不会为炼成特殊灵石规划后续。因此绝对通关率和绝对充能值不能当玩家数据；
- * 有意义的是各关之间的相对形状，以及六位同伴有没有明显掉队。
+ * 也不会为炼成特殊灵石规划后续；旧实测炼成特殊灵石为 0.0/局。因此绝对通关率和
+ * 绝对充能值不能当玩家数据；有意义的是各关之间的相对形状，以及六位同伴有没有明显掉队。
  */
 
 const DEFAULT_LEVELS = [1, 8, 16, 24, 32, 40, 48, 56, 64];
@@ -227,7 +227,7 @@ async function run() {
   const balance = installBalanceBridge(runtime);
 
   console.log('灵石远征 · 无头平衡模拟');
-  console.log('注意：贪心机器人只走 findMove() 第一解，不用灵器、不主动放大招，也不规划特殊灵石。');
+  console.log('注意：贪心机器人只走 findMove() 第一解，不用灵器、不主动放大招；旧实测炼成特殊灵石为 0.0/局。');
   console.log('绝对值不是玩家数据；只看关卡间相对形状与六位同伴是否齐平。');
   console.log('');
   const levelMoveLabel = options.moves == null ? '使用各关完整步数' : `每局最多 ${options.moves} 手`;
