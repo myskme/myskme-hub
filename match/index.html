@@ -2724,6 +2724,9 @@ function goalText(g){
 function bumpGoal(type,col,n){
   /* 墨封与岩壳的三桩计数搭这趟车。它同样不看胜负。 */
   if((type==='ink'||type==='crate')&&typeof q3Bump==='function'&&!GS.party)q3Bump(type,n);
+  /* 清机关也充能。机关关里同色灵石本来就少，不给这条的话，
+     越是需要大招的关卡越充不满 —— 正好反了。 */
+  if(typeof allyCharge==='function'&&/^(ink|crate|cage|bell)$/.test(type))allyCharge(n*CHG.block);
   let hit=false;
   GS.goals.forEach((g,i)=>{
     if(g.type!==type)return;
@@ -2810,7 +2813,7 @@ function clearCells(cells,chain,noCrateSplash){
     }
   }
   for(const g in colors)bumpGoal('collect',+g,colors[g]);
-  allyChargeFrom(colors);
+  allyChargeFrom(colors,specials);
   /* 今日三桩的计数。挂在这里而不是结算处，是因为这三样**不看胜负**——
      输的那一局消掉的石头也该算数。 */
   if(typeof q3Bump==='function'&&!GS.party){
@@ -3286,17 +3289,43 @@ async function useToolAt(r,c){
   }
 }
 /* ---- 同伴助战 ---- */
-function allyChargeFrom(colors){
-  const c=GS.compDef; if(!c||GS.over)return;
-  const n=colors[c.col]||0; if(!n)return;
+/* ---- 同伴充能 ----
+   原来只累加**主色那一色**（`colors[c.col]`）。实测下来这条路是走不通的：
+   一局总共只消掉 35–49 颗，摊到单色只有 6–11 颗，而 need 是 34–46 ——
+   **一局根本充不满**，而充能每局开局归零，所以普通关里大招几乎永远放不出来。
+   更致命的是梓：他的主色是第六色，而 64 关里只有 7 关是 6 色，
+   其余 57 关他一颗都收不到 —— 第 32 关解锁的同伴，大招是个摆设。
+
+   改成：**任何消除都充能**（0.4/颗），主色额外再给 0.6（合计 1.0/颗）。
+   主色不在本关色数内时（梓在 5 色关），把那 0.6 均摊回全色，
+   免得他因为关卡配色而白白吃亏。
+   另外炼成特殊灵石 +4、清掉机关 +2 —— 让「打得好」比「打得多」更快充满。 */
+const CHG={any:.4,own:.6,spec:4,block:2};
+function allyCharge(n){
+  const c=GS.compDef; if(!c||GS.over||!n)return;
   const was=GS.charge>=c.need;
   GS.charge=Math.min(c.need,GS.charge+n);
   renderAlly();
   if(!was&&GS.charge>=c.need){
     SFX.made();vib(26);
-    toast('<b>'+c.name+'</b> 准备好了——「'+c.ult+'」',2200);
+    toast('<b>'+c.name+'</b> 准备好了——点头像放「'+c.ult+'」',2600);
     fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*5);
+    const el=$('#ally'); if(el)el.classList.add('ready-pop');
   }
+}
+function allyChargeFrom(colors,specials){
+  const c=GS.compDef; if(!c||GS.over)return;
+  let tot=0;
+  for(const k in colors)tot+=colors[k]||0;
+  const nc=(GS.L&&GS.L.colors)||6;
+  const ownHas=!GS.L||c.col<nc;                               // 主色在本关存在吗
+  const own=ownHas?(colors[c.col]||0):0;
+  /* 主色缺席时按**一色的份额**补（tot/nc），不能整份补。
+     整份补的话梓会拿到别人近两倍的充能——从「永远放不出」直接跳到「最强」，
+     两头都不对。 */
+  let n=tot*CHG.any+CHG.own*(ownHas?own:tot/nc);
+  if(specials)n+=specials*CHG.spec;
+  allyCharge(n);
 }
 function renderAlly(){
   const c=GS.compDef, el=$('#ally');
@@ -3310,8 +3339,10 @@ function renderAlly(){
   $('#ally-badge').querySelector('b').textContent=c.g;
   applyArt($('#ally-badge'),'ally_'+c.id);
   $('#ally-name').innerHTML=c.name+' · <em>'+c.title+'</em>';
-  $('#ally-track').querySelector('i').style.width=(GS.charge/c.need*100)+'%';
-  $('#ally-fire').textContent=ready?c.ult:(GS.charge+' / '+c.need);
+  $('#ally-track').querySelector('i').style.width=Math.min(100,GS.charge/c.need*100)+'%';
+  /* 充能现在是小数（任何消除都按 0.4 计），显示必须取整——
+     否则进度上会出现「17.6 / 42」这种一看就没做完的东西。 */
+  $('#ally-fire').textContent=ready?c.ult:(Math.floor(GS.charge)+' / '+c.need);
 }
 async function fireUlt(){
   const c=GS.compDef;
@@ -3413,14 +3444,27 @@ function renderAllyPick(){
     d.style.setProperty('--ally-base',GEMS[c.col].base);
     d.style.setProperty('--ally-dark',GEMS[c.col].dk);
     d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
-    d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'+c.name+'</div>';
+    d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'
+      +(ul?c.name:'第 '+c.unlock+' 关')+'</div>';
     if(ul)applyArt(d,'ally_'+c.id);
     if(ul)d.addEventListener('click',()=>{SAVE.comp=c.id;persist();SFX.click();renderAllyPick()});
+    /* 锁着也要能点开看：不给看就永远不知道值不值得为他打到第 32 关 */
+    else d.addEventListener('click',()=>{SFX.click();
+      toast('<b>'+c.name+' · '+c.title+'</b><br>「'+c.ult+'」'+c.desc.replace(/<[^>]+>/g,'')
+        +'<br>通关第 <b>'+c.unlock+'</b> 关解锁',3600)});
     host.appendChild(d);
   });
   const c=compById(SAVE.comp);
+  /* 解锁与充能这两件事以前都没写清楚：锁着的头像只有一个灰框，
+     选中的那个也只说「消除某色充能」，玩家不知道差多少关、也不知道
+     别的颜色到底算不算。两条都摊开写。 */
+  const ul=compUnlocked(c), need=c.unlock-(SAVE.lv||1);
   $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>　「'+c.ult+'」<br>'+c.desc
-    +'<br><span style="color:var(--ink3);font-size:11.5px">消除'+GEMS[c.col].name+'充能 · 满 '+c.need+' 颗发动</span>';
+    +'<br><span style="color:var(--ink3);font-size:11.5px">'
+    +'消任意灵石都充能，'+GEMS[c.col].name+'算双倍 · 炼成特殊灵石 +'+CHG.spec
+    +' · 清机关 +'+CHG.block+' · 满 '+c.need+' 发动</span>'
+    +(ul?'':'<br><span style="color:var(--red);font-size:11.5px">还没解锁 · 通关第 '
+        +c.unlock+' 关（还差 '+Math.max(1,need)+' 关）</span>');
 }
 
 /* ---- 每日矿灯 ---- */
@@ -5920,7 +5964,28 @@ window.__selftest=function(){
     ok('本周矿脉同期同盘、跨期换盘、周一切期',
        a===b&&a!==c&&wk(20661)===wk(20667)&&wk(20668)===wk(20661)+1);
   }
-  /* 24. 目标文案里不许出现哨兵大数。
+  /* 24. 同伴充能：六人在同一批关卡上的充能速度必须接近。
+     曾经梓的主色是第六色，而 64 关里只有 7 关是 6 色——其余 57 关他一颗
+     都收不到，第 32 关解锁的同伴大招是个摆设。现在主色缺席按一色份额补，
+     补多了他会反超别人，补少了还是废，所以这条盯的是「齐不齐」。 */
+  {
+    const bak={L:GS.L,c:GS.compDef,ch:GS.charge,over:GS.over};
+    const rate=id=>{
+      const c=compById(id);let tot=0;
+      for(const nc of [5,6]){
+        GS.L={colors:nc};GS.compDef=c;GS.charge=0;GS.over=false;
+        const colors={};for(let i=0;i<nc;i++)colors[i]=10;      // 每色各 10 颗
+        allyChargeFrom(colors,0);
+        tot+=GS.charge;
+      }
+      return tot;
+    };
+    const rs=COMPANIONS.map(c=>rate(c.id));
+    Object.assign(GS,{L:bak.L,compDef:bak.c,charge:bak.ch,over:bak.over});
+    const mx=Math.max(...rs), mn=Math.min(...rs);
+    ok('六位同伴充能速度齐平（极差 <15%）',mn>0&&(mx-mn)/mx<0.15);
+  }
+  /* 25. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
