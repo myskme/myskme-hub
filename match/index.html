@@ -558,6 +558,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .q3r.done{color:var(--gold2);border-color:var(--gold-line)}
 .q3r.done i{background:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
 .q3r .q3p{font-size:10.5px;color:var(--gold2);white-space:nowrap;padding-left:8px}
+/* 同伴的两条技能：大招要充能，随身是全程生效。分开标才看得出区别。 */
+.skl{display:inline-block;font-size:12px;line-height:1.65;color:var(--ink2)}
+.skl i{display:inline-block;font-style:normal;font-size:10px;letter-spacing:.16em;
+  color:var(--bg);background:var(--gold-line);padding:1px 5px;margin-right:6px;vertical-align:1px}
+.skl.psv i{background:var(--line2);color:var(--ink2)}
+.skl b{color:var(--gold2)}
+
 /* 上传诊断 */
 #lb-diagwrap{text-align:center;margin-top:8px}
 #lb-diagwrap .lnk{background:none;border:0;color:var(--ink3);font-size:11.5px;
@@ -1504,6 +1511,46 @@ const COMPANIONS=[
 ];
 const compById=id=>COMPANIONS.find(c=>c.id===id)||COMPANIONS[0];
 const compUnlocked=c=>SAVE.lv>=c.unlock;
+/* ---- 被动 ----
+   原来同伴只有大招，选谁只在放大招那一下有区别，平时毫无差别，
+   所以「选谁」不构成决策。每人补一条**全程生效、不用充能**的被动，
+   都跟他的大招同源，这样「带谁下矿」才真的要想一想。
+   passive() 是唯一的判定入口，别在别处直接比 SAVE.comp。 */
+const PASSIVE={
+  wolf: '开局盘上先给一颗疾风灵石',
+  jun:  '岩壳与石笼每次多褪一层',
+  qi:   '墨封每次多褪一层',
+  xi:   '每关多 2 步（限时局多 5 秒）',
+  xiao: '连锁到 4 时，随机一颗灵石炼成疾风',
+  zi:   '开局时全场墨封与岩壳各先褪一层',
+};
+function passive(id){return GS.compDef&&GS.compDef.id===id}
+/* 开局就生效的两条被动。必须在 buildBoard 之后、玩家看到盘面之前跑，
+   而且**不能碰目标数**——reconcileGoals 已经按实际布上的数量对好账了，
+   这里再动机关会让「还差 N 块」和盘面对不上。所以只褪层，不清零。 */
+function applyOpeningPassives(){
+  if(passive('wolf')){
+    /* 执灯人：先照亮一处。找一颗普通灵石变成横向疾风。 */
+    const spots=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+      if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage&&!T[r][c].crate&&!T[r][c].ink)spots.push([r,c]);
+    if(spots.length){const [r,c]=spots[Math.floor(rnd()*spots.length)];B[r][c].k='H';B[r][c].sc=.4}
+  }
+  if(passive('zi')){
+    /* 解封者：开局帮着褪一层，**每种最多 5 处**。
+       实测不设上限会把第 22 关的 16 块墨封一次清空（那关墨封都是单层），
+       等于白送通关——被动是帮一把，不是替玩家打。
+       走 bumpGoal 记账，目标进度才会跟着走，
+       否则玩家看到盘上少了一层、数字却没动。 */
+    const CAP=5; let ink=0,cr=0;
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      if(ink<CAP&&T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);ink++}
+      if(cr<CAP&&T[r][c].crate>0){T[r][c].crate--;bumpGoal('crate',null,1);cr++}
+    }
+    if(ink+cr)setTimeout(()=>toast('<b>梓</b> 抬手一拂——'
+      +(ink?'墨封 '+ink+' 处':'')+(ink&&cr?'、':'')+(cr?'岩壳 '+cr+' 处':'')+'各褪一层',2600),1100);
+  }
+}
 
 /* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
 const LORE=[
@@ -2792,13 +2839,16 @@ function clearCells(cells,chain,noCrateSplash){
     /* 岩壳：被直接命中就受损（且岩壳自身不再向外溅射，否则一炸连片） */
     if(T[r][c].crate>0){crateHits.push([r,c]);continue}
     gemCells.push([r,c]);
-    if(!p)  {if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()} continue}
+    /* 麒·巡渊者的被动：墨封每次多褪一层 */
+    if(!p)  {if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
+      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()} continue}
     if(p.bell)continue;
     if(p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#c9b78a',7,.8)}
     if(p.k!=='n')specials++;
     gems++;colors[p.g]=(colors[p.g]||0)+1;
-    if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()}
+    if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
+      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()}
     fxBurst(cxOf(c)+p.vx,cyOf(r)+p.vy,GEMS[p.g]?GEMS[p.g].base:'#e8c768',p.k==='n'?7:14,p.k==='n'?1:1.5);
     killPiece(r,c);
   }
@@ -2807,7 +2857,9 @@ function clearCells(cells,chain,noCrateSplash){
   for(const [r,c] of crateHits){
     const k=KEY(r,c); if(done.has(k))continue; done.add(k);
     if(T[r][c].crate>0){
-      T[r][c].crate--;bumpGoal('crate',null,1);SFX.crate();
+      /* 钧·开山者的被动：岩壳每次多褪一层 */
+      const d=Math.min(T[r][c].crate,passive('jun')?2:1);
+      T[r][c].crate-=d;bumpGoal('crate',null,d);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#7a705c',10,1.1);
       if(T[r][c].crate===0)fxRing(cxOf(c),cyOf(r),'#9a8c68',ENG.cs*1.6);
     }
@@ -2928,6 +2980,16 @@ async function settleBoard(firstChain){
   /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
      只在这个模式记，别的模式不背这个包袱。 */
   if(GS.weekly&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
+  /* 晓·摘星者的被动：连锁到 4 就顺手摘一颗疾风下来。
+     只在这一手第一次达到 4 时给，连锁再长也不重复给。 */
+  if(chain===4&&passive('xiao')){
+    const sp=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+      if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
+    if(sp.length){const [r,c]=sp[Math.floor(rnd()*sp.length)];
+      B[r][c].k=rnd()<.5?'H':'V';B[r][c].sc=.4;SFX.made();
+      fxRing(cxOf(c),cyOf(r),GEMS[4].base,ENG.cs*2.4);}
+  }
   if(chain>=5)grant('a6');
   if(chain>=7){grant('a7');flash()}
   if(chain>=12)grantVariant(10);                  // 异纹 · 小黑猫
@@ -3459,7 +3521,9 @@ function renderAllyPick(){
      选中的那个也只说「消除某色充能」，玩家不知道差多少关、也不知道
      别的颜色到底算不算。两条都摊开写。 */
   const ul=compUnlocked(c), need=c.unlock-(SAVE.lv||1);
-  $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>　「'+c.ult+'」<br>'+c.desc
+  $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>'
+    +'<br><span class="skl"><i>大招</i>「'+c.ult+'」'+c.desc+'</span>'
+    +'<br><span class="skl psv"><i>随身</i>'+PASSIVE[c.id]+'</span>'
     +'<br><span style="color:var(--ink3);font-size:11.5px">'
     +'消任意灵石都充能，'+GEMS[c.col].name+'算双倍 · 炼成特殊灵石 +'+CHG.spec
     +' · 清机关 +'+CHG.block+' · 满 '+c.need+' 发动</span>'
@@ -4089,12 +4153,16 @@ function openLevel(n,mode){
      白白浪费一次善意。关键是**措辞不能像施舍**：说成同伴递工具，
      而不是「因为你老输所以补偿你」。 */
   if(mercy>0)setTimeout(()=>toast(icTag('pick')+' 狼先生多给了你 <b>'+mercy+'</b> 步矿镐',2800),900);
-  GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
+  /* 晰·探路者的被动：每关多 2 步。必须在 GS.compDef 定好之后判定，
+     所以这里先取一次——openLevel 里 compDef 是下面才赋的。 */
+  const xiBonus=(compById(SAVE.comp).id==='xi')?2:0;
+  GS.moves=L.moves+mercy+xiBonus;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
   GS.party=false;GS.weekly=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
+  applyOpeningPassives();
   BGM.play(L.boss?'boss':'main');
   show('game');
   fitCanvas();
@@ -4163,7 +4231,9 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
+  /* 晰·探路者的被动在限时局折算成 +5 秒（冒险关是 +2 步） */
+  const xiMs=(compById(SAVE.comp).id==='xi')?5000:0;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000+xiMs;GS.rushMax=90000+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
