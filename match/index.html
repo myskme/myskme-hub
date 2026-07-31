@@ -558,6 +558,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .q3r.done{color:var(--gold2);border-color:var(--gold-line)}
 .q3r.done i{background:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
 .q3r .q3p{font-size:10.5px;color:var(--gold2);white-space:nowrap;padding-left:8px}
+/* 拓片兜底框：剪贴板被挡时摊开让人长按自选。等宽字体才能让符号对齐成图案。 */
+#wk-tablet{display:none;margin:8px auto 0;max-width:min(300px,84vw);padding:8px 10px;
+  border:1px solid var(--gold-line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.5;
+  white-space:pre;overflow-x:auto;text-align:left;user-select:text;-webkit-user-select:text}
+
+/* 本周矿脉入口卡 */
+#wk-card{border:1px solid var(--gold-line);padding:9px 12px 11px;margin:2px 0 10px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,var(--panel2)),var(--panel));
+  text-align:center}
+#wk-card .wkl{font-size:13px;letter-spacing:.14em;color:var(--gold2)}
+#wk-card .wkl b{color:var(--gold2);font-weight:500}
+#wk-card .wkd{font-size:11.5px;color:var(--ink2);letter-spacing:.05em;margin:2px 0 7px}
+#wk-card .btn{width:100%;padding:7px;font-size:14px}
+#wk-card.done{border-color:var(--line)}
+#wk-card.done .wkl{color:var(--ink2)}
+/* 未打过本周挑战时，菜单「矿脉榜」按钮上点一颗，跟典藏册那颗同一套 */
+#lb-dot .dot,#col-dot .dot{display:inline-block;width:6px;height:6px;margin-left:5px;
+  vertical-align:2px;background:var(--gold);border-radius:50%;
+  box-shadow:0 0 7px color-mix(in srgb,var(--gold) 75%,transparent)}
+
 /* 化名行：输入框 + 换一个 */
 .aliasrow{display:flex;gap:6px;align-items:stretch}
 .aliasrow input{flex:1;min-width:0}
@@ -872,7 +893,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
       <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 矿灯将熄 · 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
       <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">一台机器轮流玩 · 2–6 人</span></button>
-      <button class="btn ornate" id="btn-lb"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 5.2H4.8a3.2 3.2 0 003.4 3.6M16 5.2h3.2a3.2 3.2 0 01-3.4 3.6"/><path d="M12 13.5v2.8M8.8 19.5h6.4M10 16.3h4l.9 3.2H9.1z"/></svg> 矿脉榜<span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
+      <button class="btn ornate" id="btn-lb"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 5.2H4.8a3.2 3.2 0 003.4 3.6M16 5.2h3.2a3.2 3.2 0 01-3.4 3.6"/><path d="M12 13.5v2.8M8.8 19.5h6.4M10 16.3h4l.9 3.2H9.1z"/></svg> 矿脉榜<span id="lb-dot"></span><span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
       <div class="menu-sub">
         <button class="btn ghost" id="btn-ach">成就</button>
         <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
@@ -1057,7 +1078,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div id="end-score">0</div>
   <div id="end-detail"></div>
   <div class="quip" id="end-quip"></div>
+  <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
+    <button class="btn ghost" id="end-tablet" style="display:none;width:100%">拓 片 · 复制战报</button>
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
     <button class="btn" id="end-retry">再来</button>
@@ -1237,6 +1260,13 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
   <div class="obanner" id="lb-banner"></div>
   <div class="ovl-title">矿脉 · <em>榜</em></div>
+  <!-- 本周矿脉入口。放在榜单里而不是大厅：一是大厅在 360×640 已经顶到
+       缩放下限、塞不下第五个主按钮，二是「比手艺」这件事本来就属于榜单语境。 -->
+  <div id="wk-card">
+    <div class="wkl">本周矿脉 · 第 <b id="wk-no">—</b> 期</div>
+    <div class="wkd" id="wk-desc">全服同一盘 · 比手艺不比运气</div>
+    <button class="btn primary" id="wk-go">下 矿</button>
+  </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
     <button data-scope="class">小队榜</button>
@@ -1306,6 +1336,9 @@ const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
+  /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
+     两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
+  wk:{w:0,score:null,best:0,plays:0},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -1316,6 +1349,7 @@ function loadSave(){
   /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
+  out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
   return out;
 }
 const SAVE=loadSave();
@@ -2872,6 +2906,9 @@ async function settleBoard(firstChain){
     await sleep(REDUCED?25:150);
     await dropAndFill();
   }
+  /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
+     只在这个模式记，别的模式不背这个包袱。 */
+  if(GS.weekly&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
   if(chain>=5)grant('a6');
   if(chain>=7){grant('a7');flash()}
   if(chain>=12)grantVariant(10);                  // 异纹 · 小黑猫
@@ -3018,6 +3055,10 @@ async function checkEnd(){
   if(GS.rushOn)return;
   if(GS.party){                                               // 聚会赛：步数走完就交棒，不走通关结算
     if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(500);ptTurnEnd()}
+    return;
+  }
+  if(GS.weekly){                                              // 本周矿脉：没有胜负，步数走完就报分
+    if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endWeekly()}
     return;
   }
   if(goalsMet()){
@@ -3991,7 +4032,7 @@ function openLevel(n,mode){
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
-  GS.party=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
+  GS.party=false;GS.weekly=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   BGM.play(L.boss?'boss':'main');
@@ -4062,7 +4103,7 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
@@ -4081,6 +4122,7 @@ function startRush(){
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
+  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
   const best=GS.score>SAVE.rushBest;
   if(best){SAVE.rushBest=GS.score;persist()}
   setTimeout(()=>LB.flush('clear'),600);
@@ -4106,6 +4148,7 @@ function endRush(){
 }
 function endLevel(win){
   const L=GS.L, n=L.n;
+  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='';
@@ -4389,7 +4432,7 @@ function ptStartTurn(){
   L.s1=6000;L.s2=14000;L.s3=26000;
   GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
-  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.weekly=false;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手**——
@@ -4673,6 +4716,149 @@ function lbRowHTML(r,mine){
     +'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+/* ==================================================================
+   [ 本周矿脉 · WEEKLY VEIN ]
+   ------------------------------------------------------------------
+   全服同一颗种子的周常挑战：这一周里所有人拿到**一模一样的盘面**，
+   比的是手艺不是运气。种子从周序号推出来，不联网也能算，
+   换设备、换平台算出来的是同一颗。
+
+   种子必须**贯穿整手**（不只铺初盘）——这是聚会赛那边踩过的坑：
+   只种初盘的话，第一次消除之后的补位各走各的 Math.random()，
+   两个人下同样的步子结果照样分岔，「同盘面比手艺」就不成立了。
+   ================================================================== */
+/* 周序号：以 1970-01-05（周一）为界，每 7 天一期。
+   用 dayNum() 而不是 Date 对象，跟每日矿灯共用同一套本地时区口径，
+   免得出现「矿灯已经翻篇、周挑战还没翻」这种错位。 */
+const weekNum=()=>Math.floor((dayNum()-4)/7);
+const weekSeed=w=>'gemfall|week|'+w;
+function wkState(){
+  const w=weekNum(), s=SAVE.wk||(SAVE.wk={w:0,score:null,best:0,plays:0});
+  if(s.w!==w){s.w=w;s.score=null;s.best=0;s.plays=0;persist()}
+  return s;
+}
+/* 本周还剩几天。**不做跳动的红色倒计时**——那是制造焦虑的手法，
+   本作受众里有学生，不用它。就静静写一句「还剩 N 天」。 */
+const wkDaysLeft=()=>7-((dayNum()-4)%7);
+const WK_MOVES=25;
+/* ---- 矿脉拓片：无剧透的纯文本战报 ----
+   照 Wordle 那套。三条讲究：
+   1. **纯文本，不出图**。微信群里粘贴不吃图片压缩、不吃截图裁切、
+      不吃长按保存的兼容坑；打输的那局也照样发得出去。
+   2. **用几何符号不用 emoji**（全站禁 emoji）。■▨◆□ 都在 Geometric Shapes
+      区段，微信、iOS、安卓、桌面都是同一个字形，不会变成彩色小图。
+   3. **不泄露走法**。只报每一手打出多长的连锁，别人看得见你打得多漂亮，
+      但照着抄不出来——这正是它能当谈资的原因。 */
+function wkTablet(){
+  const s=wkState(), log=(GS.wkLog||[]).slice();
+  /* 只留最精彩的六手，按连锁长度排；六行封顶是为了在群里一屏放得下 */
+  const top=log.filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
+  const rows=top.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
+  return '灵石远征 · 本周矿脉 第 '+s.w+' 期\n'
+    +(rows||'□')+'\n'
+    +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax+'\n'
+    +'同一副盘，你能打多少？\n'
+    +location.origin+location.pathname.replace(/index\.html$/,'');
+}
+async function copyTablet(){
+  const t=wkTablet();
+  try{
+    await navigator.clipboard.writeText(t);
+    toast('拓片已复制 · 粘到群里就行',2600);
+  }catch(e){
+    /* 剪贴板在非安全上下文或旧内核里会被拒。别只报错——把文本摊开让人自己长按选。 */
+    const box=$('#wk-tablet');
+    if(box){box.textContent=t;box.style.display='block';
+      toast('复制被浏览器挡了 · <b>长按下面这段自己选</b>',3400)}
+  }
+}
+function renderWeekCard(){
+  const s=wkState(), c=$('#wk-card'); if(!c)return;
+  $('#wk-no').textContent=s.w;
+  const first=(s.score===null), left=wkDaysLeft();
+  c.classList.toggle('done',!first);
+  $('#wk-desc').innerHTML=first
+    ? '全服同一盘 · 比手艺不比运气<br><span style="color:var(--ink3)">'
+      +'第一把记成绩，之后随便重开当练习 · 本周还剩 '+left+' 天</span>'
+    : '本周成绩 <b style="color:var(--gold2)">'+s.score.toLocaleString('en-US')+'</b>'
+      +(s.best>s.score?'　练习最佳 '+s.best.toLocaleString('en-US'):'')
+      +'<br><span style="color:var(--ink3)">已下矿 '+s.plays+' 次 · 本周还剩 '+left+' 天</span>';
+  $('#wk-go').textContent=first?'下 矿':'再挖一次（练习）';
+}
+function startWeekly(){
+  const w=weekNum(), sd=weekSeed(w);
+  GS.mode='weekly';
+  /* 用 levelDef(3) 当骨架只是图省事，随后把它彻底改造成「纯计分、无机关」：
+     周挑战要的是干净的同起点，掺机关就变成拼谁记得住机关分布。 */
+  const L=levelDef(3);
+  L.n=0;L.endless=false;L.boss=null;L.bells=0;
+  L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
+  L.colors=5;L.moves=WK_MOVES;
+  L.goals=[{type:'score',need:NO_SCORE_TARGET*10,got:0}];      // 无目标哨兵，goalText 会只报当前分
+  L.chName='本周矿脉';L.era='第 '+w+' 期';
+  L.s1=9000;L.s2=20000;L.s3=36000;
+  GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  GS.party=false;GS.weekly=true;GS.paused=false;GS.usedTool=false;GS.wkLog=[];
+  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
+  if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
+  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  /* 种子贯穿整手：建盘一条流，补位与重排另一条但同样由种子派生。
+     只种初盘的话，第一次消除之后大家就分岔了，「同盘面比手艺」不成立。 */
+  buildBoard(L,sd);
+  ENG.rng=rngOf(sd+'|play');
+  BGM.play('main');
+  show('game');fitCanvas();
+  $('#boss-bar').classList.remove('on');
+  $('#rush-bar').classList.remove('on');
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">★</s><s style="left:'
+    +(L.s2/L.s3*100)+'%">★</s><s style="left:97%">★</s>';
+  renderTools();renderAlly();renderGoals($('#goal-row'),30);
+  $('#goal-lbl').textContent='本周';
+  updHUD();
+  const s=wkState();
+  toast('本周矿脉 · 第 <b>'+w+'</b> 期<br>全服同一盘 · '+WK_MOVES+' 步'
+    +(s.best?'<br>本周最佳 <b>'+s.best.toLocaleString('en-US')+'</b>':''),3400);
+  GS.busy=false;GS.idle=PLAT.now();
+}
+function endWeekly(){
+  GS.over=true;GS.busy=true;
+  const s=wkState();
+  /* 首挖记榜：第一把是正式成绩，之后无限重开当练习场。
+     取「历次最佳」的话，肯重开二十次的人必然压过只打一次的人，
+     比的就成了耐心而不是手艺；而这个玩法的全部意义是同一副盘比手艺。 */
+  const first=(s.score===null);
+  if(first)s.score=GS.score;
+  const best=GS.score>s.best; if(best)s.best=GS.score;
+  s.plays++;
+  SAVE.power=(SAVE.power||0)+Math.round(GS.score/150);         // 介于通关与失败之间：它没有胜负之分
+  persist();
+  q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);
+  if(GS.score>=100000)grant('a8');
+  SFX.win();
+  applyArt($('#end-banner'),best?'end_win':'end_lose');
+  $('#end-kick').textContent='本周矿脉 · 第 '+s.w+' 期';
+  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'本周 · <em>矿脉</em>';
+  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  const stars=$('#end-stars').children;
+  const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
+  for(let i=0;i<3;i++)stars[i].classList.remove('lit');
+  setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
+  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>'
+    +'　本周最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　第 '+s.plays+' 次下矿';
+  $('#end-quip').textContent=best?'这一盘，全世界都在打同一副。':pick2(Q_RUSH_END);
+  $('#end-next').textContent='再挖一次';
+  $('#end-next').dataset.act='weekly';
+  $('#end-retry').style.display='none';
+  $('#end-continue').style.display='none';
+  $('#end-tablet').style.display='';                          // 只有本周矿脉给拓片
+  $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
+  setTimeout(()=>LB.flush('clear'),600);
+  ovl('end');
+}
+
 /* ---- 一键取名 ----
    起名是上榜转化的最大摩擦：很多人卡在「叫什么好」就关掉了。
    两条选词规矩：
@@ -4693,6 +4879,7 @@ function rollAlias(){
 
 async function renderLB(){
   applyArt($('#lb-banner'),'lb_banner');
+  renderWeekCard();
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
   const form=$('#lb-form');
@@ -4810,6 +4997,8 @@ function renderMenu(){
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   /* 有没开的匣就点一颗金点——不新增行高，大厅竖向已经只剩 61px 余量 */
   $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
+  /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
+  $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
   $('#wolf-badge').dataset.pos='center 18%';applyArt($('#wolf-badge'),'hero');
@@ -5296,6 +5485,8 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+$('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
+$('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
@@ -5359,6 +5550,7 @@ $('#end-next').addEventListener('click',e=>{
   SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
+  if(act==='weekly'){startWeekly();return}
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
   maybeLore(()=>openLevel(nx));
@@ -5635,7 +5827,21 @@ window.__selftest=function(){
     SAVE.daily=JSON.parse(bak);
     ok('备用灯油只挡断一天、无油不挡',g1===0&&g2===1&&g3===0&&g2n===0&&OIL_MAX===2);
   }
-  /* 23. 目标文案里不许出现哨兵大数。
+  /* 23. 本周矿脉：同一期必须铺出**一模一样**的盘，跨期必须换盘。
+     这是「全服同一盘、比手艺不比运气」的根基，塌了整个玩法就没意义了。 */
+  {
+    const snap=()=>B.map(row=>row.map(p=>p?p.g+''+p.k:'-').join('')).join('|');
+    const L1=levelDef(3);L1.ink=[];L1.ink2=[];L1.crates=[];L1.crates2=[];L1.cages=[];
+    L1.snakes=[];L1.bells=0;L1.colors=5;
+    buildBoard(L1,weekSeed(2951)); const a=snap();
+    buildBoard(L1,weekSeed(2951)); const b=snap();
+    buildBoard(L1,weekSeed(2952)); const c=snap();
+    /* 周序号还要按周一切期：同一周内恒定、跨周一 +1 */
+    const wk=dn=>Math.floor((dn-4)/7);
+    ok('本周矿脉同期同盘、跨期换盘、周一切期',
+       a===b&&a!==c&&wk(20661)===wk(20667)&&wk(20668)===wk(20661)+1);
+  }
+  /* 24. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
