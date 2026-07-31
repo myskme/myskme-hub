@@ -1,5 +1,41 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.2.1 · 2026-07-31 · 无头验证与平衡模拟 CI
+
+本版只增加验证工具、GitHub Actions 与本记录，**不修改游戏本体、玩法代码或美术**。
+
+### 新增工具
+
+- `node match/ports/tools/run-selftest.mjs`
+  - 用 `node:vm` 执行 `match/index.html` 的完整内联脚本；
+  - 以最小 DOM / Canvas / 存储 / 音频 / 动画垫片启动页面；
+  - 逐条打印 `window.__selftest()` 的 48 项结果，任何失败或数量变化均返回非零状态。
+- `node match/ports/tools/sim-balance.mjs`
+  - 复用同一无头加载器，直接驱动 `buildBoard` / `findMove` / `swapPieces` /
+    `settleBoard`；
+  - 通关率默认使用各关完整步数；同伴批次默认按 10 手标准化贪心局，报告代表关
+    通关率、失败目标完成度，以及六位同伴的原始充能和按各自门槛折算的等效大招次数；
+  - 贪心机器人不用灵器、不主动放大招、不做特殊灵石规划，绝对值**不是玩家数据**，
+    只用来比较关卡相对形状和六人是否掉队。
+- `normalize-resource-catalog.mjs` 只在 CI 重新生成总账后恢复 `generatedAt`，
+  避免时间戳制造假差异；素材清单、字节数、哈希、尺寸、分类或平台有变化时，
+  精确 `git diff` 仍会失败。
+
+### 自动验证
+
+`.github/workflows/gemfall-verify.yml` 在任意分支 push 且命中以下路径时触发：
+`match/index.html`、`match/art/**`、`match/ports/**` 或 workflow 自身。
+
+CI 依次执行：48 项网页无头自检、资源总账重建与差异检查、微信美术同步与差异检查、
+微信引擎测试、跨端资源/哈希/包体预算验证。工作流权限为 `contents: read`，
+**不会提交、推送或改写分支**。
+
+### 本地环境事实
+
+王老师当前那台 Mac 的登录 shell **没有安装 node**，因此无法直接运行这些 `.mjs`。
+本机本地复核仍只能使用 Python 等价脚本；有 Node 的机器与 GitHub Actions
+应以本节列出的 Node 命令作为正式验证口径。
+
 ## 0.2.0 · 2026-07-31 · 玩法与留存一轮（`5be03d8`…`3568da3`）
 
 **只动 `match/index.html`**，素材、`ports/`、资源总账均零改动，
