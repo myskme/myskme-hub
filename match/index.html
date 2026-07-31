@@ -558,6 +558,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .q3r.done{color:var(--gold2);border-color:var(--gold-line)}
 .q3r.done i{background:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
 .q3r .q3p{font-size:10.5px;color:var(--gold2);white-space:nowrap;padding-left:8px}
+/* 上传诊断 */
+#lb-diagwrap{text-align:center;margin-top:8px}
+#lb-diagwrap .lnk{background:none;border:0;color:var(--ink3);font-size:11.5px;
+  letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+  font-family:inherit;padding:4px}
+#lb-diagwrap .lnk:active{color:var(--gold2)}
+#lb-diagout{display:none;margin:8px auto 0;max-width:min(320px,86vw);padding:8px 10px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.6;
+  white-space:pre-wrap;word-break:break-all;text-align:left;
+  user-select:text;-webkit-user-select:text;max-height:38dvh;overflow-y:auto}
+
 /* 拓片兜底框：剪贴板被挡时摊开让人长按自选。等宽字体才能让符号对齐成图案。 */
 #wk-tablet{display:none;margin:8px auto 0;max-width:min(300px,84vw);padding:8px 10px;
   border:1px solid var(--gold-line);background:var(--bg2);color:var(--ink2);
@@ -1285,6 +1297,10 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <label>小队口令（可留空，填了才进小队榜）</label>
     <input id="lb-pw" maxlength="24" autocapitalize="none" autocorrect="off" placeholder="同一句口令 = 同一个小队">
     <div class="tip">榜上只出现化名，不收集任何真实身份信息。设备换了或清了缓存，成绩要重新上榜。</div>
+  </div>
+  <div id="lb-diagwrap">
+    <button type="button" class="lnk" id="lb-diag">上传不了？点这里诊断</button>
+    <pre id="lb-diagout"></pre>
   </div>
   <div class="ovl-btns">
     <button class="btn ghost" id="lb-close">合上</button>
@@ -4659,10 +4675,17 @@ const LB={
       }else if(d&&(d.status===429||/频繁/.test(String(d.err||'')))){
         SAVE.lbErr='';this.plan(25000);                        // 服务端 15 秒冷却
       }else if(d&&d.status>=400&&d.status<500){
-        /* 永久性拒绝（化名违规、格式不对）：重试一万次也不会成功，
-           停下来并把原因显示给玩家，让他去改化名 */
-        SAVE.lbErr=(d&&d.err)||'上传被拒绝';this.stop=true;
-        clearTimeout(this.timer);this.timer=0;persist();
+        /* 4xx 不能一律当成永久拒绝。
+           **弱网下一个被截断的 POST 会让后端回 400 "bad json"** ——
+           那是网络问题不是玩家问题，原来的写法会把它当永久拒绝，
+           `stop=true` 之后整个会话再也不上传，玩家只看到「上传不了」。
+           只有玩家改得动的那几种（化名违规/保留词）才值得停下来等他改；
+           其余一律照常退避重试。 */
+        const perm=/化名|保留词|门派/.test(String(d.err||''));
+        SAVE.lbErr=(d&&d.err)||'上传被拒绝';
+        if(perm){this.stop=true;clearTimeout(this.timer);this.timer=0}
+        else this.plan();
+        persist();
       }else{
         SAVE.lbErr=(d&&d.err)||'上传没成功';this.plan();
       }
@@ -4691,7 +4714,15 @@ const LB={
 /* 大厅上的同步状态：有没传上去的成绩就说一声，传完了也让人安心 */
 function lbMenuStatus(){
   const el=$('#lb-sub');if(!el)return;
-  if(!LB.registered()){el.textContent='看看别人挖到哪了';el.classList.remove('warn');return}
+  /* 没起名 = 永远不会上传。原来这里只写「看看别人挖到哪了」，玩家打了半天
+     发现榜上没有自己，结论就是「上传不了」——其实是压根没开始。
+     有成绩了就明说要起名，没成绩就照旧不打扰。 */
+  if(!LB.registered()){
+    const s=LB.stats();
+    if(s.lv>0||s.score>0){el.innerHTML='成绩还没上榜 · <b>点进去起个化名</b>';el.classList.add('warn')}
+    else{el.textContent='看看别人挖到哪了';el.classList.remove('warn')}
+    return;
+  }
   if(LB.pending()){
     el.innerHTML=LB.busy?'正在上传成绩…'
       :(SAVE.lbErr?('上榜被拒 · <b>'+esc(SAVE.lbErr)+'</b> · 点进去改化名')
@@ -4939,6 +4970,53 @@ function lbOpenForm(){
 const LB_BLOCK=['管理员','admin','老师','王老师','狼先生','mrwolf','myskme','客服','官方','系统'];
 const lbNorm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[\s·\-_]+/g,'');
 const lbBlocked=s=>{const n=lbNorm(s);return LB_BLOCK.some(w=>n.includes(lbNorm(w)))};
+/* ---- 上传诊断 ----
+   「上传不了」在群里是一句没法定位的话：可能是没起名、可能是被后端拒了、
+   可能是网络到不了、也可能只是他没看懂。这个按钮把它变成一份可复制的事实，
+   玩家发给王老师，一眼就知道卡在哪一环。
+   每一步都单独计时，因为「慢」和「不通」要区分开。 */
+async function lbDiagnose(){
+  const out=$('#lb-diagout'), btn=$('#lb-diag');
+  out.style.display='block';btn.disabled=true;
+  const L=[], t=()=>performance.now();
+  const line=(k,v)=>{L.push(k+'：'+v);out.textContent=L.join('\n')};
+  line('诊断时间',new Date().toLocaleString('zh-CN'));
+  line('联网状态',navigator.onLine?'在线':'系统报离线');
+  const s=LB.stats();
+  line('本机成绩','通关 '+s.lv+' 关 · '+s.stars+' 星 · 单关最高 '+s.score+' · 限时 '+s.rush+' · 连锁 '+s.chain);
+  line('化名',SAVE.lbAlias?('已起「'+SAVE.lbAlias+'」'):'✗ 还没起 —— 这就是没上榜的原因');
+  /* pending() 里含 registered()，没起名时恒为 false——直接写「已是最新」是骗人的，
+     那种情况根本没开始上传过。分开讲。 */
+  line('待上传',!LB.registered()?'—— 起名后才会开始上传'
+    :(LB.pending()?('有（本机 '+LB.sig()+' / 已上传 '+(SAVE.lbSig||'无')+'）'):'无，已是最新'));
+  line('上次错误',SAVE.lbErr||'无');
+  line('重试已停',LB.stop?'是（需改化名）':'否');
+  /* 三段连通性分开测：能连上但读不到 = 后端问题；连都连不上 = 网络问题 */
+  for(const [nm,url,opt] of [
+    ['连到矿脉榜',LB.api+'/',null],
+    ['读取榜单',LB.api+'/gf/board?scope=world&limit=5',null],
+  ]){
+    const t0=t();
+    try{
+      const r=await Promise.race([fetch(url,opt||{}),
+        new Promise((_,j)=>setTimeout(()=>j(new Error('超时')),12000))]);
+      line(nm,'HTTP '+r.status+' · '+Math.round(t()-t0)+'ms');
+    }catch(e){line(nm,'✗ 失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
+  }
+  if(!LB.registered()){
+    line('提交测试','跳过 —— 先起个化名再测');
+  }else{
+    const t0=t(), before=LB.stop; LB.stop=false;
+    const d=await LB.flush('diag',true);
+    LB.stop=before&&!(d&&d.ok);
+    line('提交测试',(d&&d.ok)?('成功 · 世界第 '+d.rank+' · '+Math.round(t()-t0)+'ms')
+      :('✗ '+((d&&d.err)||'未知')+((d&&d.status)?(' · HTTP '+d.status):'')+' · '+Math.round(t()-t0)+'ms'));
+  }
+  line('浏览器',(navigator.userAgent||'').slice(0,90));
+  L.push('——— 把以上整段发给王老师 ———');out.textContent=L.join('\n');
+  btn.disabled=false;btn.textContent='重新诊断';
+}
+
 async function lbSave(){
   const form=$('#lb-form');
   if(form.hidden&&!LB.registered())form.hidden=false;      // 没化名却没开表单：兜底打开，别静默失败
@@ -5485,6 +5563,7 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+$('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
 $('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
 $('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
