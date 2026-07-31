@@ -543,6 +543,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   filter:drop-shadow(0 0 12px color-mix(in srgb,var(--gold) 55%,transparent))}
 @media (max-height:640px){.orn{display:none!important}}
 
+/* 今日三桩：三行细进度条，塞进矿灯卡原来的位置。
+   **必须和矿灯态一样高**——首页是一屏定死的，高一点就整页溢出。
+   矿灯态是 ck+标题+说明+七点+按钮；三桩态省掉 ck（标题已写明）和按钮，
+   腾出来的高度正好给三行。 */
+#daily-card.q3mode .ck{display:none}
+#daily-card.q3mode .cd{font-size:11px;margin-top:0}
+#q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+.q3r{position:relative;display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11px;letter-spacing:.04em;color:var(--ink2);
+  border:1px solid var(--line);padding:2px 7px 3px;overflow:hidden}
+.q3r i{position:absolute;left:0;bottom:0;height:2px;background:var(--gold-line);
+  transition:width .6s cubic-bezier(.16,1,.3,1)}
+.q3r.done{color:var(--gold2);border-color:var(--gold-line)}
+.q3r.done i{background:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
+.q3r .q3p{font-size:10.5px;color:var(--gold2);white-space:nowrap;padding-left:8px}
+/* 化名行：输入框 + 换一个 */
+.aliasrow{display:flex;gap:6px;align-items:stretch}
+.aliasrow input{flex:1;min-width:0}
+.aliasrow .btn{flex:0 0 auto;padding:0 12px;font-size:12px;letter-spacing:.08em;white-space:nowrap}
+@media (max-height:780px){.q3r{font-size:11px;padding:2px 6px 3px}}
+
 .streakdots{display:flex;gap:5px;justify-content:center;margin-top:7px}
 .streakdots i{width:9px;height:9px;border:1px solid var(--line);display:block}
 .streakdots i.lit{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px color-mix(in srgb,var(--gold) 60%,transparent)}
@@ -860,10 +881,13 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     </div>
     <div class="claimcard" id="daily-card">
       <div class="orn" id="daily-orn" data-fit="contain" data-pos="center"></div>
-      <div class="ck">今日矿灯 · DAILY</div>
+      <div class="ck" id="daily-ck">今日矿灯 · DAILY</div>
       <div class="ct" id="daily-title">矿灯已续 · 连续 0 天</div>
       <div class="cd" id="daily-desc">领取今日补给</div>
       <div class="streakdots" id="daily-dots"></div>
+      <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
+           改成同一张卡的第二态：今日三桩。不新增高度。 -->
+      <div id="q3-rows"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
@@ -1222,7 +1246,10 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div id="lb-mine"></div>
   <div class="lb-form" id="lb-form" hidden>
     <label>化名（2–12 位中英文/数字，别用真名）</label>
-    <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：持镐的阿狼">
+    <div class="aliasrow">
+      <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：提灯的河狸">
+      <button type="button" class="btn ghost" id="lb-roll">换一个</button>
+    </div>
     <label>门派（可留空）</label>
     <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
     <label>小队口令（可留空，填了才进小队榜）</label>
@@ -1277,14 +1304,18 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- 存档 ---------- */
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
-  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
+  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
+  q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
-  out.daily=Object.assign({},SAVE_DEF.daily,s.daily||{});
+  out.daily=Object.assign({day:0,streak:0,oil:0},s.daily||{});
   out.fails=s.fails||{};
+  /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
+     同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
+  out.q3=Object.assign({d:0,q:null},s.q3||{});
   return out;
 }
 const SAVE=loadSave();
@@ -1362,6 +1393,15 @@ const Q_WIN=[
   '我就说吧，你有这个手感。',
   'Well done。下一层的灵石已经开始紧张了。',
   '这一关的故事，可以写进编年史了。',
+];
+/* 「差一点」专用。跟惨败共用一套文案是不对的——玩家自己知道刚才多接近，
+   系统装作没看见，那点惋惜就变成了不被理解。这几句只在完成度 ≥80% 时出。 */
+const Q_NEAR=[
+  '就差那么一下。这一盘你其实已经会打了。',
+  '差一点点——不是运气问题，是矿脉欠你一步。',
+  '这局的手感是对的。同样的打法，再来一次多半就过了。',
+  '看见了，你差一点就成了。再点一次矿灯吧。',
+  'So close。狼先生在旁边都替你可惜。',
 ];
 const Q_LOSE=[
   '差一步而已。矿脉又不会跑。',
@@ -2632,6 +2672,8 @@ function goalText(g){
   return Math.max(0,g.need-g.got);
 }
 function bumpGoal(type,col,n){
+  /* 墨封与岩壳的三桩计数搭这趟车。它同样不看胜负。 */
+  if((type==='ink'||type==='crate')&&typeof q3Bump==='function'&&!GS.party)q3Bump(type,n);
   let hit=false;
   GS.goals.forEach((g,i)=>{
     if(g.type!==type)return;
@@ -2719,6 +2761,12 @@ function clearCells(cells,chain,noCrateSplash){
   }
   for(const g in colors)bumpGoal('collect',+g,colors[g]);
   allyChargeFrom(colors);
+  /* 今日三桩的计数。挂在这里而不是结算处，是因为这三样**不看胜负**——
+     输的那一局消掉的石头也该算数。 */
+  if(typeof q3Bump==='function'&&!GS.party){
+    q3Bump('gem',gems);
+    if(specials)q3Bump('spec',specials);
+  }
   return {gems,specials,colors};
 }
 
@@ -3326,7 +3374,18 @@ function dailyState(){
   /* 机器时钟曾经跑到未来（RTC 没电等）→ last 是个巨大值，校回来后就再也领不到了。
      当成存档损坏重置，而不是把玩家永久锁在门外。 */
   if(last>d){last=0;SAVE.daily={day:0,streak:0};persist()}
-  return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0};
+  return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0, oil:SAVE.daily.oil||0};
+}
+/* ---- 备用灯油：断一天不清零 ----
+   原本断一天连续天数直接归 1。攒了三十几天的人出趟门就归零，这个惩罚
+   比它想鼓励的行为还重，纯劝退。做法照搬 Duolingo 的 streak freeze，
+   但**只走免费路径**：连续满 10 天自动得一罐，最多存 2 罐。
+   只挡「正好断一天」；断两天以上说明是真的离开了，不硬留。 */
+const OIL_MAX=2, OIL_EVERY=10;
+function lampOilCheck(st){
+  if(st.gap!==2)return 0;                                      // gap=2 → 昨天没领，正好断一天
+  const oil=SAVE.daily.oil||0;
+  return oil>0?1:0;
 }
 /* 补给公式只写这一处。以前 renderDaily 的预告和 claimDaily 的实发
    各抄了一遍同样的表达式，改一处就会出现「卡片写着 3200、点下去只给 1400」。
@@ -3339,30 +3398,138 @@ function dailyPow(s){return 200+Math.min(s,10)*100+boonLampPow()}
 function dailyTools(s){return (s%3===0?2:1)+boonLampTool()}
 function renderDaily(){
   const st=dailyState(), card=$('#daily-card');
-  if(!st.can){card.classList.remove('on');return}
-  const nextStreak=st.gap===1?st.streak+1:1;
-  card.classList.add('on');
+  card.classList.add('on');                                    // 两态都要显示，不再整块隐藏
   applyArt($('#daily-orn'),'daily_lamp');
-  $('#daily-title').textContent='矿灯已续 · 连续 '+nextStreak+' 天';
-  $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+dailyPow(nextStreak)
-    +'</b> ＋ 灵器 '+dailyTools(nextStreak)+' 件';
-  const dots=$('#daily-dots');dots.innerHTML='';
-  for(let i=0;i<7;i++){const d=document.createElement('i');if(i<((nextStreak-1)%7)+1)d.className='lit';dots.appendChild(d)}
+  const lamp=st.can;
+  card.classList.toggle('q3mode',!lamp);
+  $('#daily-claim').style.display=lamp?'':'none';
+  $('#daily-dots').style.display=lamp?'':'none';
+  $('#q3-rows').style.display=lamp?'none':'';
+  if(lamp){
+    const used=lampOilCheck(st);
+    const nextStreak=(st.gap===1||used)?st.streak+1:1;
+    $('#daily-ck').textContent='今日矿灯 · DAILY';
+    $('#daily-title').textContent=(used?'灯油续上 · 连续 ':'矿灯已续 · 连续 ')+nextStreak+' 天';
+    $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+dailyPow(nextStreak)
+      +'</b> ＋ 灵器 '+dailyTools(nextStreak)+' 件'
+      +(used?'<br><span style="color:var(--gold2)">'+icTag('candle')+' 昨天断了，备用灯油替你续上</span>'
+            :(st.oil>0?'　<span style="color:var(--ink3)">'+icTag('candle')+' 灯油 ×'+st.oil+'</span>':''));
+    const dots=$('#daily-dots');dots.innerHTML='';
+    for(let i=0;i<7;i++){const d=document.createElement('i');if(i<((nextStreak-1)%7)+1)d.className='lit';dots.appendChild(d)}
+    return;
+  }
+  /* 第二态：今日三桩 */
+  const s=q3State(), done=s.q.filter(q=>q.done).length;
+  $('#daily-ck').textContent='今日三桩 · DAILY THREE';
+  $('#daily-title').textContent=done>=3?'三桩已齐':'今日三桩 · '+done+' / 3';
+  $('#daily-desc').innerHTML=done>=3
+    ? '明天再来 · 换三桩新的'
+    : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>　<span style="color:var(--ink3)">输了也算数</span>';
+  $('#q3-rows').innerHTML=s.q.map(q=>{
+    const def=Q3BY[q.k], pct=Math.min(100,(def.best?q.got:Math.min(q.got,q.need))/q.need*100);
+    return '<div class="q3r'+(q.done?' done':'')+'">'
+      +'<span class="q3t">'+q3Text(q)+'</span>'
+      +'<span class="q3p">'+(q.done?'+'+def.pow:'')+'</span>'
+      +'<i style="width:'+pct+'%"></i></div>';
+  }).join('');
 }
 function claimDaily(){
   const st=dailyState(); if(!st.can)return;
-  const nextStreak=st.gap===1?st.streak+1:1;
-  SAVE.daily={day:dayNum(),streak:nextStreak};
+  const used=lampOilCheck(st);                                 // 断一天且有灯油 → 续上
+  const nextStreak=(st.gap===1||used)?st.streak+1:1;
+  let oil=(SAVE.daily.oil||0)-used;
+  /* 连续满 10 天补一罐，最多存 2 罐。放在算完 nextStreak 之后，
+     这样第 10 天当场就能拿到，不用等到第 11 天。 */
+  if(nextStreak%OIL_EVERY===0&&oil<OIL_MAX)oil++;
+  SAVE.daily={day:dayNum(),streak:nextStreak,oil:oil};
   const pw=dailyPow(nextStreak);
   SAVE.power=(SAVE.power||0)+pw;
   const got=giveRandomTool(dailyTools(nextStreak));
   persist();
   const gotBox=colLampTick();                    // 每领 7 次矿灯得 1 个典藏匣
   SFX.win();fxBurstDom(1,$('#daily-card'));
-  toast('今日矿灯 · 连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got
-    +(gotBox?'<br>'+icTag('box')+' <b>典藏匣 +1</b>':''),gotBox?3800:3200);
+  toast((used?'<b>备用灯油</b>替你续上了昨天 · ':'今日矿灯 · ')
+    +'连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got
+    +(gotBox?'<br>'+icTag('box')+' <b>典藏匣 +1</b>':'')
+    +(!used&&nextStreak%OIL_EVERY===0?'<br>'+icTag('candle')+' <b>备用灯油 +1</b>（断一天可自动续上）':''),
+    (gotBox||used)?3800:3200);
   renderDaily();renderMenu();
 }
+/* ==================================================================
+   [ 今日三桩 · DAILY THREE ]
+   ------------------------------------------------------------------
+   为什么做这个：领完矿灯之后，这游戏当天就再没有「今天为什么打开它」的
+   理由了。调研下来三消品类的每日任务其实很稀缺（头部大多只有登录礼），
+   所以把它做扎实反而是差异点。
+
+   三条硬规矩：
+   1. **输了也算数**。头部三消刻意让失败页一无所获，因为那是它们的收银台；
+      本作没有收银台，正好反着做——下矿、消石、连锁这些不看胜负。
+   2. **不能刷新、不能重roll**。三条按日期种子定死，换设备也一样。
+   3. **不做倒计时压迫**。过了今天自然换新的，不写「还剩几小时」。
+   ================================================================== */
+const Q3POOL=[
+  {k:'gem',  nm:'唤醒灵石', u:'颗', n:[240,320,400],   pow:180},
+  {k:'spec', nm:'炼成灵石', u:'颗', n:[6,8,10],        pow:200},
+  {k:'chain',nm:'打出连锁', u:'连', n:[5,6,7],         pow:220, best:true},
+  {k:'play', nm:'下矿',     u:'局', n:[3,4,5],         pow:150},
+  {k:'clear',nm:'通关',     u:'关', n:[2,3],           pow:260},
+  {k:'ink',  nm:'化开墨封', u:'块', n:[12,16,20],      pow:180},
+  {k:'crate',nm:'敲开岩壳', u:'块', n:[12,16,20],      pow:180},
+  {k:'score',nm:'单局得分', u:'分', n:[12000,18000],   pow:220, best:true},
+];
+const Q3BY={};Q3POOL.forEach(p=>Q3BY[p.k]=p);
+/* best:true 的记「本日最好的一次」，其余记累计。
+   连锁和单局得分如果按累计算，三连锁打十次就等于三十连锁，那不叫本事。 */
+function q3Roll(d){
+  const r=rngOf('q3|'+d), pool=Q3POOL.slice(), out=[];
+  for(let i=0;i<3&&pool.length;i++){
+    const p=pool.splice(Math.floor(r()*pool.length),1)[0];
+    out.push({k:p.k,need:p.n[Math.floor(r()*p.n.length)],got:0,done:0});
+  }
+  return out;
+}
+function q3State(){
+  const d=dayNum(), s=SAVE.q3||(SAVE.q3={d:0,q:null});
+  /* 机器时钟跑到未来过（RTC 没电）→ d 会小于存档里的 d。当天数据作废重发，
+     不然玩家要等到真实日期追上来才能再拿到三桩。 */
+  if(s.d!==d||!Array.isArray(s.q)||s.q.length!==3){s.d=d;s.q=q3Roll(d);persist()}
+  return s;
+}
+function q3Bump(k,n){
+  if(!n)return;
+  const s=q3State(); let dirty=false, justDone=null;
+  for(const q of s.q){
+    if(q.k!==k||q.done)continue;
+    const def=Q3BY[k];
+    const nv=def.best?Math.max(q.got,n):Math.min(q.need,q.got+n);
+    if(nv===q.got)continue;
+    q.got=nv;dirty=true;
+    if(q.got>=q.need){q.done=1;justDone=q}
+  }
+  if(!dirty)return;
+  if(justDone){
+    /* 达成即发，不设「领取」按钮：一是少一次点击，二是免得有人忘了领、
+       第二天进度清空反而变成惩罚。 */
+    const def=Q3BY[justDone.k];
+    SAVE.power=(SAVE.power||0)+def.pow;
+    const all=s.q.every(x=>x.done);
+    persist();
+    setTimeout(()=>{
+      toast('今日三桩 · <b>'+def.nm+'</b> 已成　灵力 +'+def.pow,2600);
+      if(all)setTimeout(()=>{giveBox(1,'今日三桩');
+        toast(icTag('box')+' 三桩齐 · <b>典藏匣 +1</b>',3000)},1500);
+    },600);
+  }else persist();
+  if($('#daily-card'))renderDaily();
+}
+function q3Text(q){
+  const def=Q3BY[q.k];
+  const g=def.best?q.got:Math.min(q.got,q.need);
+  return def.nm+' '+(def.k==='score'?g.toLocaleString('en-US'):g)+' / '
+        +(def.k==='score'?q.need.toLocaleString('en-US'):q.need)+' '+def.u;
+}
+
 /* ---- 星辰宝箱 ---- */
 const CHEST_COST=15;
 function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
@@ -3817,6 +3984,10 @@ function openLevel(n,mode){
   buildBoard(L);                                    // 先建盘——reconcileGoals 会按实际布上的数量校准 need
   GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   const mercy=mercyMoves(n);
+  /* 补偿原本是完全静默的（注释写着「悄悄多给两步」）。但玩家不知道就等于没给——
+     白白浪费一次善意。关键是**措辞不能像施舍**：说成同伴递工具，
+     而不是「因为你老输所以补偿你」。 */
+  if(mercy>0)setTimeout(()=>toast(icTag('pick')+' 狼先生多给了你 <b>'+mercy+'</b> 步矿镐',2800),900);
   GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
@@ -3938,6 +4109,16 @@ function endLevel(win){
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='';
+  /* 完成度：所有目标各自封顶 100% 后取平均。用来判「差一点」，
+     也用来算失败时的余烬回报——打到 90% 和一步没走，不该同一个待遇。 */
+  const prog=GS.goals.length
+    ? GS.goals.reduce((a,g)=>a+Math.min(1,g.need?g.got/g.need:1),0)/GS.goals.length : 0;
+  const nearMiss=!win&&prog>=.8;
+  let emberShown=0;                                            // 失败时的余烬回报，供下面的明细行显示
+  /* 三桩：这三样不看胜负，赢了输了都记 */
+  q3Bump('play',1);
+  q3Bump('chain',GS.chainMax);
+  q3Bump('score',GS.score);
   if(win){
     const st=starsOf(L,GS.score);
     if(!L.endless){
@@ -3956,6 +4137,7 @@ function endLevel(win){
     }
     SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
+    q3Bump('clear',1);
     setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
@@ -3974,11 +4156,17 @@ function endLevel(win){
   }else{
     SFX.lose();
     applyArt($('#end-banner'),'end_lose');
-    SAVE.fails[n]=(SAVE.fails[n]||0)+1;persist();
+    SAVE.fails[n]=(SAVE.fails[n]||0)+1;
+    /* 输了也要有回报。头部三消刻意让失败页一无所获——因为那是它们卖复活的地方；
+       本作没有付费口，那套包袱不必背。按完成度给，是胜利的三分之一上下：
+       够让「这一局没白打」成立，又不至于让输赢没区别。 */
+    emberShown=Math.round(GS.score/300*(.5+prog*.5));
+    if(emberShown>0)SAVE.power=(SAVE.power||0)+emberShown;
+    persist();
     $('#end-kick').textContent=L.era+' · '+L.chName;
-    $('#end-title').innerHTML='矿灯 · <em>暗</em>';
+    $('#end-title').innerHTML=nearMiss?'就 · <em>差</em> 一 点':'矿灯 · <em>暗</em>';
     for(const s of $('#end-stars').children)s.classList.remove('lit');
-    $('#end-quip').textContent=pick2(Q_LOSE);
+    $('#end-quip').textContent=nearMiss?pick2(Q_NEAR):pick2(Q_LOSE);
     $('#end-next').textContent='再挖一次';
     $('#end-next').dataset.act='retry';
     $('#end-retry').style.display='none';
@@ -3994,9 +4182,14 @@ function endLevel(win){
   }
   $('#end-score').textContent=GS.score.toLocaleString('en-US');
   const left=GS.goals.filter(g=>g.got<g.need).length;
+  /* 失败页要把「差了多少」说具体。只说「还差 1 项目标」，玩家不知道是差一步
+     还是差一半；说到「还差 3 颗」，他才知道值不值得再来一次。 */
+  const short=GS.goals.filter(g=>g.got<g.need)
+    .map(g=>(g.need-g.got)+(g.type==='score'?' 分':' 个')).slice(0,2).join(' · ');
   $('#end-detail').innerHTML=win
     ? '最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>　灵器 <b>'+toolGot+'</b>'
-    : '还差 <b>'+left+'</b> 项目标　最长连锁 <b>'+GS.chainMax+'</b>';
+    : '还差 <b>'+(short||left+' 项')+'</b>　已完成 <b>'+Math.round(prog*100)+'%</b>'
+      +(emberShown>0?'　余烬 灵力 <b style="color:var(--gold2)">+'+emberShown+'</b>':'');
   renderTools();
   ovl('end');
 }
@@ -4480,6 +4673,24 @@ function lbRowHTML(r,mine){
     +'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+/* ---- 一键取名 ----
+   起名是上榜转化的最大摩擦：很多人卡在「叫什么好」就关掉了。
+   两条选词规矩：
+   1. **不用狼**。狼先生是王老师本人的化身，随机昵称里出现「阿狼」
+      等于拿他本人开玩笑。
+   2. **避开六位同伴的兽形**（狼/虎/鲨/兔/飞鼠/鹿）——玩家随机到「钧」的老虎
+      会以为自己变成了正典角色。所以这里全用档案里没有的动物。 */
+const NM_A=['提灯的','数星星的','会吹口哨的','不睡的','带着地图的','半夜下矿的',
+  '口袋里全是碎石的','挖穿三层的','迷路又找回来的','跟矿灯说话的','捡到一颗金曜的',
+  '总走最深那条道的','把镐子磨得很亮的','听得见灵石的','一路哼歌的'];
+const NM_B=['河狸','猞猁','水獭','雪鸮','游隼','穿山甲','刺猬','松鼠','獾',
+  '貂','蜥','鹤','蝠','乌鸦','山猫','犀','鲸','章鱼','狐'];
+function rollAlias(){
+  const a=NM_A[Math.floor(rnd()*NM_A.length)], b=NM_B[Math.floor(rnd()*NM_B.length)];
+  const s=a+b;
+  return s.length<=12?s:b+'先生';                              // 超长就退回短式，别撞 maxlength
+}
+
 async function renderLB(){
   applyArt($('#lb-banner'),'lb_banner');
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
@@ -5085,6 +5296,8 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+$('#lb-roll').addEventListener('click',()=>{SFX.click();
+  const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
 for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
@@ -5399,7 +5612,30 @@ window.__selftest=function(){
   /* 20. 关卡确定性（同一关两次生成一致） */
   const a1=JSON.stringify(levelDef(37)),a2=JSON.stringify(levelDef(37));
   ok('关卡定义确定可复现',a1===a2);
-  /* 21. 目标文案里不许出现哨兵大数。
+  /* 21. 今日三桩：同一天必须完全可复现（换设备、重开页面都一样），
+     不同天要能换出不同组合；三条不许重复；need 必须来自各自的档位表。 */
+  {
+    const d=20260731;
+    const a=JSON.stringify(q3Roll(d)), b=JSON.stringify(q3Roll(d));
+    const c=q3Roll(d+1);
+    const one=q3Roll(d);
+    const kinds=new Set(one.map(x=>x.k));
+    let needOk=one.every(x=>Q3BY[x.k]&&Q3BY[x.k].n.includes(x.need));
+    let diff=false; for(let i=d+1;i<d+40;i++){if(JSON.stringify(q3Roll(i))!==a){diff=true;break}}
+    ok('今日三桩同日可复现、三条不重复、档位合法',
+       a===b&&one.length===3&&kinds.size===3&&needOk&&diff);
+  }
+  /* 22. 备用灯油：只挡「正好断一天」，断两天不挡；没油时不挡；油不超上限。 */
+  {
+    const bak=JSON.stringify(SAVE.daily);
+    SAVE.daily={day:0,streak:9,oil:1};
+    const g1=lampOilCheck({gap:1}), g2=lampOilCheck({gap:2}), g3=lampOilCheck({gap:3});
+    SAVE.daily={day:0,streak:9,oil:0};
+    const g2n=lampOilCheck({gap:2});
+    SAVE.daily=JSON.parse(bak);
+    ok('备用灯油只挡断一天、无油不挡',g1===0&&g2===1&&g3===0&&g2n===0&&OIL_MAX===2);
+  }
+  /* 23. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
