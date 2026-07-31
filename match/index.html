@@ -565,6 +565,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 @media (prefers-reduced-motion:reduce){.tool.nudge{animation:none;
   box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent)}}
 
+/* 图鉴条目与来历。条目要像书里印的一句，不要像 UI 提示——
+   所以给衬线、给行距、不加边框，只用左侧一道细金线把它和上面的信息分开。 */
+.cvlore{max-width:min(300px,84vw);margin:10px auto 0;padding:2px 0 2px 11px;
+  border-left:2px solid var(--gold-line);text-align:left;
+  font-size:12.5px;line-height:1.85;color:var(--ink2);letter-spacing:.02em}
+.cvorg{margin:7px auto 0;font-size:11px;letter-spacing:.08em;color:var(--ink3)}
+
 /* 同伴的两条技能：大招要充能，随身是全程生效。分开标才看得出区别。 */
 .skl{display:inline-block;font-size:12px;line-height:1.65;color:var(--ink2)}
 .skl i{display:inline-block;font-style:normal;font-size:10px;letter-spacing:.16em;
@@ -1163,6 +1170,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="cvnm" id="cv-name"></div>
     <div class="cvsub" id="cv-sub"></div>
     <div class="cvser" id="cv-serial"></div>
+  <div class="cvlore" id="cv-lore"></div>
+  <div class="cvorg" id="cv-org"></div>
     <div id="cv-tiers"></div>
     <div class="cvacts" id="cv-acts"></div>
   </section>
@@ -1185,6 +1194,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="cvnm" id="dw-name"></div>
     <div class="cvsub" id="dw-sub"></div>
     <div class="cvser" id="dw-serial"></div>
+  <div class="cvlore" id="dw-lore"></div>
     <div id="dw-dup"></div>
     <div class="ovl-btns">
       <button class="btn primary" id="dw-again"></button>
@@ -3825,6 +3835,47 @@ const CSETS=[
 /* n = 永不变更的卡号，赠印按它编码。w = 出自哪个作品。
    ⚠ 只许在末尾追加，绝不可重排或复用旧号——否则流在外面的旧赠印会兑成别的卡。
    别的作品将来加卡，从 101 起另开号段。 */
+/* ---- 图鉴条目 ----
+   每张卡一句短文，**只有拿到之后才看得见**。这是收藏系统里最便宜也最保值的东西：
+   零美术、零机制风险，但它把「一张图」变成「一件有来历的东西」。
+   写作口径：不写攻略、不写数值，只写这件东西在学院谷地里是什么。
+   正典约束——六位同伴兽形已核对；叶王与缠丝夫人是**同一个角色的两个称谓**，
+   不是两个人；小黑猫是档案「特殊」组角色。
+   与 CARDS 分开放：那张表的 n 是存档主键，能少动就少动。 */
+const CARD_LORE={
+  1:'矿灯是他自己做的。灯芯换过很多次，罩子上的划痕一道没擦。',
+  2:'他敲石头的规矩是：先听，再下手。听不出空处的那一镐，多半是白费的。',
+  3:'谷地没有海。他仍旧管所有深水叫「渊」，管所有下潜叫「回去」。',
+  4:'跑得最快的那个，往往也是最先停下来等人的那个。',
+  5:'飞鼠不会飞，只会滑。他说这两件事的区别，就是有没有先爬上去。',
+  6:'她记得每一棵树被砍的日子。也记得每一棵重新长出来的。',
+  7:'红笔判官。圈起来的地方从来没错过——错的是他很少写为什么。',
+  8:'换个名号再来一次，是他惯用的法子。丝比墨软，缠上了却更难解。',
+  9:'两个称谓，一张王座。见过这一幕的人才明白，从头到尾只有他一个。',
+  10:'没人给它起过名字。铃铛是它自己挂上的，谁也没听过它怎么挂上去的。',
+  11:'矿灯不属于任何人。谁提着，谁就负责照亮后面那一段。',
+  12:'第一地脉最浅，光还能照进来。所有人的第一铲都落在这里。',
+  13:'墨渗下来的那年，浅层的灵石一夜之间全暗了。擦掉墨，它们还在。',
+  14:'铃声从深处传上来，一路都有回音。跟着回音走，不会迷路。',
+  15:'老矿道塌了一半。塌下来的那半，是当年最富的一条。',
+  16:'丝挂满了整个洞顶。往上看很好看，别往上看太久。',
+  17:'一道谷，两面壁，一面渗墨一面覆岩。走中间的人最累，也最稳。',
+  18:'越靠近矿心，脚下的震动越像心跳。老矿工说那是矿脉在数你的步子。',
+  19:'王座是石头凿的，凿的人没留名。坐过的人倒是留了三次名。',
+  20:'金曜最常见，也最经得起看。谷地里第一颗被人捡起来的灵石就是它。',
+  21:'赤晶在手里是温的。矿工冬天下矿，兜里总揣一颗。',
+  22:'蓝月只在没有光的地方亮。把它拿到日头底下，它就只是一块石头。',
+  23:'翠叶是唯一会长的灵石。放着不管，三年能多出一片叶子的形状。',
+  24:'紫辉照不亮路，只照得亮人的脸。所以矿工用它认人，不用它走路。',
+  25:'星屑碎得太厉害，凑不成一颗完整的。它本来就不是一颗。',
+  26:'五连才炼得成。传说第一颗万象是有人连着摆了一整夜摆出来的。',
+  27:'叶王的墨。盖住的地方不是没有灵石，是不许你看见。',
+  28:'墨盖了两层的，底下多半压着好东西——他不会为普通石头费两遍墨。',
+  29:'岩壳是矿脉自己长的痂。敲开它不算破坏，算是替它揭掉。',
+  30:'两层的岩壳只在深处有。越难敲的地方，越少有人先到过。',
+  31:'笼是铁的，锁是石的。锁石头的笼子，比锁人的更难开。',
+  32:'把铃送到矿底，它就自己响了。没人知道它在跟谁报信。',
+};
 const CARDS=[
   {n:1, w:'gemfall',s:'ally', a:'ally_wolf', nm:'狼先生',   sub:'执灯人'},
   {n:2, w:'gemfall',s:'ally', a:'ally_jun',  nm:'钧',       sub:'开山者'},
@@ -3866,21 +3917,57 @@ const CARDS=[
 ];
 const CARD_BY_N={}; CARDS.forEach(c=>CARD_BY_N[c.n]=c);
 /* 异纹：不掉落、不可赠，只能「做到」。是同一张卡的第 4 个品阶，不是新卡。 */
+/* 明示的异纹：条件写在卡面上，玩家看得见目标、可以奔着去做。 */
 const VARIANTS={1:'192 星全满',7:'终章讨伐全程不用灵器',10:'单局连锁 12 重'};
+/* ---- 隐藏款 ----
+   **不预告条件**，撞出来才知道。这是泡泡玛特「隐藏款」那份惊喜的来源，
+   但去掉了赌的部分——它不是极低概率抽出来的，是**做到**才有的，
+   所以对学生受众没有开箱赌博的观感（这条是红线）。
+   拿到之前界面上只显示「隐藏 · 尚未显形」，不给任何提示；
+   拿到之后才把条件说出来，让人有「原来如此」而不是「早说啊」。
+   条件都选了「正常玩着玩着就可能撞上」的，不做需要攻略才可能达成的。 */
+const SECRETS={
+  11:{nm:'矿灯', when:'开到第 100 匣', test:c=>(c.opened||0)>=100},
+  25:{nm:'星屑', when:'在午夜零点到一点之间开匣',
+      test:()=>{const h=new Date().getHours();return h===0}},
+  32:{nm:'猫铃', when:'连续 7 次领到每日矿灯', test:c=>(c.lamp||0)>=7&&(c.lamp||0)%7===0},
+};
+/* 每次开匣后查一遍。放在开匣后而不是各处散着判，是因为三条里两条都跟匣有关，
+   而且集中一处才不会漏掉某个入口。 */
+function checkSecrets(){
+  colFix();
+  for(const k in SECRETS){
+    const n=+k;
+    if(colHas(n,T_VAR))continue;
+    let hit=false; try{hit=!!SECRETS[k].test(COLS)}catch(e){hit=false}
+    if(!hit)continue;
+    colGain(n,T_VAR,1,'deed'); colSave();
+    SFX.win();
+    setTimeout(()=>toast('隐藏款显形 · <b>'+CARD_BY_N[n].nm+' · 异纹</b><br>'
+      +'<span style="font-size:11.5px">'+SECRETS[k].when+'</span>',4200),900);
+  }
+}
 
 /* ---------- 存取层（换后端只动这一段） ---------- */
 const CKEY='myskme-col-v1';
 const COL_DEF={own:{},dust:0,box:0,pity:0,day:0,bought:0,serial:{},seen:0,
-  uid:'',lamp:0,wmAch:0,wmCh:0,wmChest:0,out:{},recv:{},gday:0,gcnt:0};
+  uid:'',lamp:0,wmAch:0,wmCh:0,wmChest:0,out:{},recv:{},gday:0,gcnt:0,opened:0,
+  /* org = 来历。键同 own（「卡号:品阶」），值 {d:日序号, s:来源, k:上下文}。
+     只在**第一次**拿到时写，之后再拿到重复的不覆盖——
+     一张卡最有意义的是「我第一次见到它」的那一刻。
+     宝可梦最狠的一招不是收集，是「这一只是我的」：什么时候、在哪拿到的。
+     不这么记的话，我的臻品和别人的臻品除了编号完全一样。 */
+  org:{}};
+const ORG={box:'开匣所得',up:'星屑炼成',fill:'寻卡补得',gift:'友人所赠',deed:'亲手做到'};
 let COLS=null, colT=null, colWFail=false;
 function colFix(){
   if(!COLS){let raw={};try{raw=JSON.parse(localStorage.getItem(CKEY)||'{}')||{}}catch(e){}COLS=raw}
   const c=Object.assign({},COL_DEF,COLS);
   const num=v=>{const n=Math.floor(Number(v));return Number.isFinite(n)&&n>=0?n:0};
   const obj=v=>(v&&typeof v==='object'&&!Array.isArray(v))?v:{};
-  c.serial=obj(c.serial); c.out=obj(c.out); c.recv=obj(c.recv);
+  c.serial=obj(c.serial); c.out=obj(c.out); c.recv=obj(c.recv); c.org=obj(c.org);
   for(const k of ['dust','box','pity','day','bought','gday','gcnt','seen','lamp',
-                  'wmAch','wmCh','wmChest'])c[k]=num(c[k]);
+                  'wmAch','wmCh','wmChest','opened'])c[k]=num(c[k]);
   /* own 的键必须是「卡号:品阶」且卡号真实存在，否则丢弃：
      存档是玩家随手能改的地方，一条脏数据不该让整册崩掉。 */
   const own={};
@@ -3915,7 +4002,7 @@ function colSave(){
 /* 跨作品发卡的公开接口。别的 MYSKME 作品（同源）将来只要调这两个。 */
 const MC={
   box:(n,why)=>giveBox(n,why),
-  grant:(n,t)=>{colFix();if(CARD_BY_N[n]){colGain(n,t||0,1);colSave()}},
+  grant:(n,t,src)=>{colFix();if(CARD_BY_N[n]){colGain(n,t||0,1,src||'deed');colSave()}},
   state:()=>{colFix();return COLS},
 };
 /* ⚠ 全部读取都要防 COLS 为空：boon* 会被 renderDaily() 调用，
@@ -3926,11 +4013,30 @@ const colHas  =(n,t)=>colCnt(n,t)>0;
 const colAny  =n=>colHas(n,0)||colHas(n,1)||colHas(n,2)||colHas(n,3);
 const colTop  =n=>{for(let t=3;t>=0;t--)if(colHas(n,t))return t;return -1};
 const colSpare=(n,t)=>Math.max(0,colCnt(n,t)-1);       // 多出来的份：可赠出
-function colGain(n,t,k){
+function colGain(n,t,k,src,ctx){
   const cur=colCnt(n,t), want=cur+(k||1);
-  if(want>COL.keep){COLS.dust+=(want-COL.keep)*TIERS[t].dust;COLS.own[n+':'+t]=COL.keep}
-  else COLS.own[n+':'+t]=want;
+  /* 来历只在**第一次**拿到时写。之后再开出重复的不覆盖——
+     记的是「我第一次见到它」的那一刻，不是最近一次。 */
+  const key=n+':'+t;
+  if(cur<=0&&!COLS.org[key]){
+    COLS.org[key]={d:dayNum(),s:src||'box'};
+    if(ctx!=null&&ctx!=='')COLS.org[key].k=ctx;
+  }
+  if(want>COL.keep){COLS.dust+=(want-COL.keep)*TIERS[t].dust;COLS.own[key]=COL.keep}
+  else COLS.own[key]=want;
   if(t===T_TOP&&!COLS.serial[n]){COLS.seen++;COLS.serial[n]=COLS.seen}
+}
+/* 来历的人话。dayNum 是本地时区的天序号，反推回月日即可——
+   存年月日会让存档变大而且没必要，同一本册子不会跨年还在看。 */
+function orgText(n,t){
+  const o=COLS&&COLS.org&&COLS.org[n+':'+t]; if(!o)return '';
+  const ms=(o.d*86400000)+new Date().getTimezoneOffset()*60000;
+  const dt=new Date(ms);
+  const when=(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日';
+  let how=ORG[o.s]||ORG.box;
+  if(o.s==='box'&&o.k)how='第 '+o.k+' 匣开出';
+  else if(o.s==='gift'&&o.k)how='由矿工 '+esc(String(o.k))+' 所赠';
+  return when+' · '+how;
 }
 /* 日序重置。dailyState() 踩过的坑照抄防线：机器时钟跑到未来时，
    存下来的 day 是个巨大值，之后校回来就再也重置不了配额——
@@ -3964,6 +4070,7 @@ function colSync(){
    而且一天最多领一次，刷不出来。 */
 function colLampTick(){
   colFix(); COLS.lamp++;
+  checkSecrets();                     // 连续领矿灯那条隐藏款
   const got=COLS.lamp%COL.lamp===0;
   if(got)COLS.box++;
   colSave(); return got;
@@ -4020,7 +4127,9 @@ function openBox(){
   COLS.pity=(t===T_TOP)?0:COLS.pity+1;
   const card=CARDS[Math.floor(rnd()*CARDS.length)];
   const dup=colHas(card.n,t);
-  colGain(card.n,t,1);
+  colGain(card.n,t,1,'box',(COLS.opened||0)+1);
+  COLS.opened=(COLS.opened||0)+1;   // 累计开匣数，来历里写「第 N 匣开出」
+  checkSecrets();                   // 隐藏款：三条里两条跟匣有关，集中在这里查
   colSave(); renderMenu();
   colView('box',{card:card,t:t,dup:dup});
 }
@@ -4073,7 +4182,7 @@ function doUpgrade(n){
   colFix();
   const u=upNext(n); if(!u)return;
   if(COLS.dust<u.cost){toast('星屑不足 · 需 <b>'+u.cost+'</b>',2000);return}
-  COLS.dust-=u.cost; colGain(n,u.to,1); colSave(); SFX.star(1);
+  COLS.dust-=u.cost; colGain(n,u.to,1,'up'); colSave(); SFX.star(1);
   toast('炼成 <b>'+TIERS[u.to].nm+' · '+CARD_BY_N[n].nm+'</b>',2400);
   colView('card',{n:n});
 }
@@ -4081,14 +4190,14 @@ function doFill(n){
   colFix();
   if(colAny(n))return;
   if(COLS.dust<COL.fill){toast('星屑不足 · 需 <b>'+COL.fill+'</b>',2000);return}
-  COLS.dust-=COL.fill; colGain(n,T_COMMON,1); colSave(); SFX.star(0);
+  COLS.dust-=COL.fill; colGain(n,T_COMMON,1,'fill'); colSave(); SFX.star(0);
   toast('寻得 <b>'+CARD_BY_N[n].nm+'</b>',2400);
   colView('card',{n:n});
 }
 function grantVariant(n){
   colFix();
   if(colHas(n,T_VAR))return;
-  colGain(n,T_VAR,1); colSave(); SFX.win();
+  colGain(n,T_VAR,1,'deed'); colSave(); SFX.win();
   toast('异纹显形 · <b>'+CARD_BY_N[n].nm+'</b>',3200);
 }
 
@@ -4181,7 +4290,7 @@ function giftRedeem(code){
      两个不同的人完全可能撞上同一个号。 */
   if(COLS.recv[d.code]){toast('这枚赠印已经用过了',2400);return false}
   COLS.recv[d.code]=1;
-  colGain(d.n,d.t,1);
+  colGain(d.n,d.t,1,'gift');   // 赠印编码里没有寄件人，只能记「友人所赠」
   colSave(); SFX.win(); renderMenu();
   toast('收下 '+TIERS[d.t].nm+' · <b>'+CARD_BY_N[d.n].nm+'</b>',3000);
   return true;
@@ -5399,12 +5508,20 @@ function renderCardView(n){
   $('#cv-sub').textContent=have?cd.sub:'这一张还没见过';
   const ser=COLS.serial[n];
   $('#cv-serial').textContent=ser?('臻 · 第 '+String(ser).padStart(3,'0')+' 号'):'';
+  /* 图鉴条目只有拿到之后才看得见——没拿到就剧透，这句话就不值钱了。
+     来历取**最高品阶**那一份：手上最好的那张才是「你的」那张。 */
+  const lore=CARD_LORE[n];
+  $('#cv-lore').innerHTML=have&&lore?esc(lore):'';
+  $('#cv-lore').style.display=(have&&lore)?'':'none';
+  const org=have?orgText(n,top):'';
+  $('#cv-org').innerHTML=org?('得于 '+org):'';
+  $('#cv-org').style.display=org?'':'none';
 
   $('#cv-tiers').innerHTML=[0,1,2,3].map(t=>{
-    if(t===T_VAR&&!VARIANTS[n]&&!colHas(n,t))return '';
+    if(t===T_VAR&&!VARIANTS[n]&&!SECRETS[n]&&!colHas(n,t))return '';
     const cnt=colCnt(n,t);
     return '<div class="cvt'+(cnt?' on t'+t:'')+'"><b>'+TIERS[t].nm+'</b><i>'
-      +(cnt?(cnt>1?'多 1 张':'已收'):(t===T_VAR?'未显形':'—'))+'</i></div>';
+      +(cnt?(cnt>1?'多 1 张':'已收'):(t===T_VAR?(SECRETS[n]&&!VARIANTS[n]?'隐藏':'未显形'):'—'))+'</i></div>';
   }).join('');
 
   const u=upNext(n); let h='';
@@ -5420,6 +5537,13 @@ function renderCardView(n){
       +' 赠 出<span class="colsub">只能送多出来的那份</span></button>';
   if(VARIANTS[n]&&!colHas(n,T_VAR))
     h+='<div class="colsub" style="margin-top:2px">异纹 · '+esc(VARIANTS[n])+'</div>';
+  /* 隐藏款：拿到之前一个字都不提（提了就不叫隐藏），拿到之后才揭晓，
+     让人有「原来如此」而不是「早说啊」。 */
+  if(SECRETS[n]&&!VARIANTS[n]){
+    h+=colHas(n,T_VAR)
+      ? '<div class="colsub" style="margin-top:2px;color:var(--gold2)">隐藏款 · '+esc(SECRETS[n].when)+'</div>'
+      : '<div class="colsub" style="margin-top:2px">这一张还有一个<b>隐藏款</b> · 条件不说</div>';
+  }
   h+='<button class="btn ghost" id="cv-back">返 回</button>';
   $('#cv-acts').innerHTML=h;
   if($('#cv-fill'))$('#cv-fill').onclick=()=>{SFX.click();doFill(n)};
@@ -5450,6 +5574,11 @@ function renderDraw(d){
   $('#dw-sub').textContent=card.sub;
   const ser=COLS.serial[card.n];
   $('#dw-serial').textContent=(t===T_TOP&&ser)?('臻 · 第 '+String(ser).padStart(3,'0')+' 号'):'';
+  /* 开匣揭示那一刻情绪最高，图鉴条目摆在这里比藏进详情页值钱。
+     重复卡不再显示——第二次看同一句就成了噪音。 */
+  const dl=CARD_LORE[card.n];
+  $('#dw-lore').innerHTML=(dl&&!d.dup)?esc(dl):'';
+  $('#dw-lore').style.display=(dl&&!d.dup)?'':'none';
   $('#dw-dup').innerHTML=d.dup
     ? (colSpare(card.n,t)>0?'手上已有一张 · 多出来的这份可以<b>赠给朋友</b>'
                           :'第三份起自动熔成星屑 · <b>星屑 +'+TIERS[t].dust+'</b>')
@@ -6133,7 +6262,31 @@ window.__selftest=function(){
     Object.assign(GS,{goals:bakG,moves:bakM,over:bakO,rushOn:bakR,party:bakP2,toldTool:bakT2});
     ok('灵器封顶折灵力，且提醒只在真吃紧时响',capOk&&nudgeOk);
   }
-  /* 26. 目标文案里不许出现哨兵大数。
+  /* 26. 图鉴条目 32 张齐、不重样；隐藏款不与明示异纹撞车、条件都可判定。 */
+  {
+    const ids=CARDS.map(c=>c.n);
+    const full=ids.every(n=>typeof CARD_LORE[n]==='string'&&CARD_LORE[n].length>=8);
+    const uniq=new Set(Object.values(CARD_LORE)).size===ids.length;
+    const noClash=Object.keys(SECRETS).every(k=>!VARIANTS[k]);   // 同一张不能既明示又隐藏
+    const realCard=Object.keys(SECRETS).every(k=>!!CARD_BY_N[+k]);
+    let callable=true;
+    try{for(const k in SECRETS)SECRETS[k].test({opened:0,lamp:0})}catch(e){callable=false}
+    ok('图鉴 32 条齐备不重样，隐藏款不撞明示异纹',full&&uniq&&noClash&&realCard&&callable);
+  }
+  /* 27. 来历只在第一次拿到时写，之后拿到重复的不许覆盖。
+     覆盖了就变成「最近一次」，而这张卡最有意义的是「我第一次见到它」。 */
+  {
+    const bak=JSON.stringify(COLS);
+    COLS.own={};COLS.org={};COLS.serial={};COLS.seen=0;COLS.dust=0;
+    colGain(5,T_COMMON,1,'box',7);
+    const first=JSON.stringify(COLS.org['5:0']);
+    colGain(5,T_COMMON,1,'gift');                 // 再拿一张重复的
+    const after=JSON.stringify(COLS.org['5:0']);
+    const txt=orgText(5,T_COMMON);
+    COLS=JSON.parse(bak);
+    ok('卡的来历只记第一次，重复不覆盖',first===after&&/第 7 匣开出/.test(txt));
+  }
+  /* 28. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
