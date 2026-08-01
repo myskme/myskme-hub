@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - 'match/index.html'
+      - 'match/manifest.json'
+      - 'match/network-config.js'
+      - 'match/sw.js'
+      - 'match/icons/**'
       - 'match/art/**'
       - 'match/ports/**'
       - '.github/workflows/gemfall-verify.yml'
@@ -27,8 +31,20 @@ jobs:
         with:
           node-version: '22'
 
-      - name: 运行网页内建 48 项无头自检
+      - name: 运行网页内建无头自检
         run: node match/ports/tools/run-selftest.mjs
+
+      - name: 验证排行榜网络切换与免预检提交
+        run: node match/ports/tools/test-network-layer.mjs
+
+      - name: 核对离线缓存清单
+        run: |
+          node match/ports/tools/build-service-worker.mjs
+          node --check match/sw.js
+          if ! git diff --exit-code match/sw.js; then
+            echo "::error::网页、图片或图标变了但离线缓存清单没重生成"
+            exit 1
+          fi
 
       - name: 核对正式素材总账
         run: |

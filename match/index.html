@@ -6,6 +6,8 @@
 <script>(function(){try{var v=localStorage.getItem('myskme-theme');
 document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){
 document.documentElement.setAttribute('data-theme','dark')}})();</script>
+<!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
+<script src="network-config.js"></script>
 <title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -4855,12 +4857,44 @@ function ptFinish(){
    [ 矿脉榜 · NETWORK LEADERBOARD ]
    后端复用 MYSKME 现有的 Cloudflare Worker + D1，走独立的 /gf/* 路由与
    独立的 gemfall 表，和词灵榜互不影响。
-   隐私：只上传化名与几个数字；设备键在服务端加盐哈希，原始 UUID 不出本机。
+   隐私：只上传化名与几个数字；设备键经 HTTPS 发送后在服务端加盐哈希，
+   原始 UUID 不展示也不入库。
    离线 / 后端未部署 / 断网 时全部静默降级——游戏本体永远照常能玩。
    ================================================================== */
+const LB_NET=(()=>{
+  const cfg=window.MYSKME_GEMFALL_NETWORK||{};
+  const clean=s=>String(s||'').trim().replace(/\/+$/,'');
+  const bases=[];
+  const add=s=>{s=clean(s);if(/^https?:\/\//.test(s)&&!bases.includes(s))bases.push(s)};
+  for(const s of (Array.isArray(cfg.apiBases)?cfg.apiBases:[]))add(s);
+  /* 香港主站接好反向代理后把 network-config.js 的 sameOriginApi 改成 true。
+     现在保持 false：不能让尚未配置 /api 的 GitHub Pages 白等一次 404。 */
+  if(cfg.sameOriginApi===true&&/^https?:$/.test(location.protocol)){
+    const p='/'+String(cfg.sameOriginPath||'api').replace(/^\/+|\/+$/g,'');
+    add(location.origin+p);
+  }
+  if(cfg.legacyFallback!==false)
+    add(cfg.legacyFallback||'https://myskme-leaderboard.wzc1020.workers.dev');
+  return {bases,probeMs:Math.max(2000,Math.min(8000,Number(cfg.probeTimeoutMs)||4500)),
+    hintMs:Math.max(60000,Number(cfg.endpointHintMs)||1800000)};
+})();
 const LB={
-  api:'https://myskme-leaderboard.wzc1020.workers.dev',
+  bases:LB_NET.bases,
   scope:'world',
+  baseOrder(){
+    const xs=this.bases.slice(), h=SAVE.lbApiHint;
+    if(h&&xs.includes(h)&&Date.now()-(SAVE.lbApiAt||0)<LB_NET.hintMs){
+      xs.splice(xs.indexOf(h),1);xs.unshift(h);
+    }
+    return xs;
+  },
+  get api(){return this.baseOrder()[0]||''},                 // 兼容诊断区的只读展示
+  rememberApi(base){
+    if(!base)return;
+    if(SAVE.lbApiHint!==base||Date.now()-(SAVE.lbApiAt||0)>60000){
+      SAVE.lbApiHint=base;SAVE.lbApiAt=Date.now();persist();
+    }
+  },
   dev(){
     if(!SAVE.lbDev){
       SAVE.lbDev=(crypto.randomUUID?crypto.randomUUID():
@@ -4878,24 +4912,48 @@ const LB={
   },
   /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
      后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
-  async fetchJSON(url,opt,ms){
+  async fetchOne(url,opt,ms){
     const ctl=new AbortController();
     const to=setTimeout(()=>ctl.abort(),ms||8000);
     try{
       const r=await fetch(url,Object.assign({signal:ctl.signal},opt||{}));
-      const d=await r.json().catch(()=>({ok:false,err:'返回格式不对'}));
+      let badPayload=false;
+      const d=await r.json().catch(()=>{badPayload=true;return {ok:false,err:'返回格式不对'}});
       d.status=r.status;
+      d.badPayload=badPayload;
       return d;
     }catch(e){
       return {ok:false,err:e.name==='AbortError'?'连接超时':'连不上矿脉榜',offline:true,status:0};
     }finally{clearTimeout(to)}
   },
+  /* path 而不是完整 URL：候选入口可以按部署配置依次尝试。
+     只有断网、网关错误、404/405 或非 JSON 假接口才切换；化名违规等真实 4xx
+     必须原样返回，不能换个后端绕过。最近成功的入口记 30 分钟，弱网下不反复探测。 */
+  async fetchJSON(path,opt,ms){
+    const bases=this.baseOrder();
+    if(!bases.length)return {ok:false,err:'未配置矿脉榜入口',offline:true,status:0};
+    let last=null;
+    for(let i=0;i<bases.length;i++){
+      const base=bases[i];
+      const budget=i<bases.length-1?Math.min(ms||8000,LB_NET.probeMs):(ms||8000);
+      const d=await this.fetchOne(base+path,opt,budget);d.api=base;
+      const retry=d.offline||d.badPayload||d.status===404||d.status===405||d.status>=502;
+      if(!retry||i===bases.length-1){
+        if(!d.offline&&!d.badPayload)this.rememberApi(base);
+        return d;
+      }
+      last=d;
+    }
+    return last||{ok:false,err:'连不上矿脉榜',offline:true,status:0};
+  },
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
       pw:SAVE.lbPw||'',stats:this.stats()};
-    const d=await this.fetchJSON(this.api+'/gf/submit',
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},15000);
+    /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
+       正常解析；国内移动网由两次往返变一次，sendBeacon 也与普通提交同口径。 */
+    const d=await this.fetchJSON('/gf/submit',
+      {method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(body)},15000);
     if(d.ok){
       SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
@@ -4905,7 +4963,7 @@ const LB={
     return d;
   },
   async board(scope){
-    let u=this.api+'/gf/board?scope='+scope+'&limit=50';
+    let u='/gf/board?scope='+scope+'&limit=50';
     if(scope==='class'){
       if(!SAVE.lbPw)return {ok:false,err:'nopw'};
       u+='&pw='+encodeURIComponent(SAVE.lbPw);
@@ -5269,17 +5327,21 @@ async function lbDiagnose(){
     :(LB.pending()?('有（本机 '+LB.sig()+' / 已上传 '+(SAVE.lbSig||'无')+'）'):'无，已是最新'));
   line('上次错误',SAVE.lbErr||'无');
   line('重试已停',LB.stop?'是（需改化名）':'否');
+  line('候选入口',LB.baseOrder().join(' → ')||'无');
   /* 三段连通性分开测：能连上但读不到 = 后端问题；连都连不上 = 网络问题 */
-  for(const [nm,url,opt] of [
-    ['连到矿脉榜',LB.api+'/',null],
-    ['读取榜单',LB.api+'/gf/board?scope=world&limit=5',null],
-  ]){
-    const t0=t();
-    try{
-      const r=await Promise.race([fetch(url,opt||{}),
-        new Promise((_,j)=>setTimeout(()=>j(new Error('超时')),12000))]);
-      line(nm,'HTTP '+r.status+' · '+Math.round(t()-t0)+'ms');
-    }catch(e){line(nm,'✗ 失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
+  for(const base of LB.baseOrder()){
+    let host=base;try{host=new URL(base).host}catch(e){}
+    for(const [nm,url,opt] of [
+      ['连到矿脉榜 ['+host+']',base+'/',null],
+      ['读取榜单 ['+host+']',base+'/gf/board?scope=world&limit=5',null],
+    ]){
+      const t0=t();
+      try{
+        const r=await Promise.race([fetch(url,opt||{}),
+          new Promise((_,j)=>setTimeout(()=>j(new Error('超时')),12000))]);
+        line(nm,'HTTP '+r.status+' · '+Math.round(t()-t0)+'ms');
+      }catch(e){line(nm,'✗ 失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
+    }
   }
   if(!LB.registered()){
     line('提交测试','跳过 —— 先起个化名再测');
@@ -6378,6 +6440,15 @@ show('menu');
 PLAT.raf(loop);
 /* 开局补交上次没传成功的成绩（延后一点，别和首屏抢带宽） */
 setTimeout(()=>LB.flush('boot'),1800);
+/* 网页安装版：首屏完全加载后再注册，避免和第一次可操作时间抢带宽。
+   Capacitor 原生壳有自己的离线副本，不让 Service Worker 再套一层缓存。 */
+if((window.MYSKME_GEMFALL_NETWORK||{}).serviceWorker!==false&&'serviceWorker' in navigator
+   &&/^https?:$/.test(location.protocol)){
+  window.addEventListener('load',()=>{
+    const native=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
+    if(!native)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+  },{once:true});
+}
 
 </script>
 </body>

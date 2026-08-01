@@ -20,6 +20,10 @@
 4. PWA/iOS 启动素材：`match/icons/`
 5. 跨端派生物：`match/ports/`
 
+网页的排行榜入口、香港同源代理、离线缓存与回滚流程见
+[`../NETWORK-DEPLOYMENT.md`](../NETWORK-DEPLOYMENT.md)。部署域名只改
+`match/network-config.js`；不要把新域名再次硬编码进 `index.html`。
+
 不要直接手工维护派生目录里的资源副本。图片更新后运行：
 
 ```bash

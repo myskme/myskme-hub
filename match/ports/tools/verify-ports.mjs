@@ -24,6 +24,11 @@ function fail(message) {
 }
 
 const required = [
+  'match/network-config.js',
+  'match/sw.js',
+  'match/NETWORK-DEPLOYMENT.md',
+  'match/ports/tools/build-service-worker.mjs',
+  'match/ports/tools/test-network-layer.mjs',
   'match/ports/ios-capacitor/package.json',
   'match/ports/ios-capacitor/capacitor.config.ts',
   'match/ports/ios-capacitor/scripts/sync-web.mjs',

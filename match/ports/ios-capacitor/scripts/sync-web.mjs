@@ -16,6 +16,7 @@ await Promise.all([
   cp(path.join(source, 'audio'), path.join(target, 'audio'), { recursive: true }),
   cp(path.join(source, 'icons'), path.join(target, 'icons'), { recursive: true }),
   cp(path.join(source, 'manifest.json'), path.join(target, 'manifest.json')),
+  cp(path.join(source, 'network-config.js'), path.join(target, 'network-config.js')),
   cp(path.join(iosRoot, 'native-bridge.js'), path.join(target, 'native-bridge.js')),
 ]);
 
@@ -30,8 +31,20 @@ const nativeStyle = [
   '<!-- GEMFALL_NATIVE_PATCH_END -->',
 ].join('\n');
 
+const nativeNetwork = [
+  '<!-- GEMFALL_NATIVE_NETWORK_START -->',
+  '<script>window.MYSKME_GEMFALL_NETWORK={serviceWorker:false}</script>',
+  '<!-- GEMFALL_NATIVE_NETWORK_END -->',
+].join('\n');
+
 if (!html.includes('GEMFALL_NATIVE_PATCH_START')) {
   html = html.replace('</head>', `${nativeStyle}\n</head>`);
+}
+/* 原生壳已经把网页与资源打进安装包，显式关闭 PWA Service Worker。
+   这段放在 network-config.js 前面；配置文件会合并已有值并保留 false。 */
+if (!html.includes('GEMFALL_NATIVE_NETWORK_START')) {
+  html = html.replace('<script src="network-config.js"></script>',
+    `${nativeNetwork}\n<script src="network-config.js"></script>`);
 }
 if (!html.includes('src="./native-bridge.js"')) {
   html = html.replace('</body>', '<script src="./native-bridge.js"></script>\n</body>');
@@ -42,6 +55,7 @@ await writeFile(path.join(target, 'index.html'), html);
 const copied = [
   'index.html',
   'manifest.json',
+  'network-config.js',
   'native-bridge.js',
   'art/',
   'audio/',
