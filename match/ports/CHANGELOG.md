@@ -1,5 +1,19 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.3.1 · 2026-08-02 · myskme.com 与 EdgeOne Makers 首发部署
+
+- EdgeOne Makers 项目 `myskme-gemfall` 已部署到全球可用区（不含中国
+  大陆），无需 ICP 备案；DNS 继续由 DNSPod 免费版托管。
+- 已在 EdgeOne 创建 `play.myskme.com` 自定义域名；DNSPod 最终保存触发
+  腾讯云账号微信 MFA，需账号持有人扫码后完成 TXT、CNAME 与 HTTPS。
+- 新增 `edgeone.json`，对 HTML/配置/Service Worker 使用 `no-cache`，美术、
+  音频与图标缓存 1 天。
+- 本版只迁移网页静态资源；排行榜仍由浏览器直连现有
+  `myskme-leaderboard.wzc1020.workers.dev` 和同一份 D1，没有新增代理、
+  没有双写，也没有改变玩家数据的传输目的地。
+- GitHub Pages 仍作为灾备地址；域名上线后要回滚时，只需在 DNSPod 暂停
+  `play` 记录，不影响原网址、存档或榜单。
+
 ## 0.3.0 · 2026-08-01 · C 端弱网与 PWA 离线加固
 
 ### 网页网络层

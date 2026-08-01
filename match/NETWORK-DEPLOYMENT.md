@@ -17,6 +17,40 @@
 - 导航采用网络优先、离线回落；图片与音乐采用缓存优先；排行榜请求和所有非 GET 请求
   永远不进缓存。
 
+## 2026-08-02 EdgeOne Makers 首发实施记录
+
+- 域名：`myskme.com`，个人名义注册 3 年，DNSPod 免费版托管。
+- 静态项目：`myskme-gemfall`，EdgeOne Makers 项目 ID
+  `makers-qjmcskwgq0q6`。
+- 加速区域：全球可用区（不含中国大陆），不使用需备案的大陆节点。
+- 首次直传包：79 个运行文件、22.36MB；构建与部署 22 秒，配置校验通过。
+- 稳定项目域名：`myskme-gemfall-z3maxc4l.edgeone.dev`。该测试域名在中国
+  网络会按平台规则返回 401，正式传播只使用自定义域名。
+- 已创建自定义域名 `play.myskme.com`。域名归属验证需 DNSPod TXT：
+  `edgeonereclaim.play` → `reclaim-tnq57o0yksn9tqvl69201j5dldlfrvse`。
+- DNSPod 最终保存会触发腾讯云账号微信 MFA；持有人完成扫码后，再按
+  EdgeOne 提示添加 CNAME、免费证书并开启强制 HTTPS。
+- 本次不增加榜单代理。排行榜请求仍由浏览器直连原 Cloudflare Worker，
+  仍只有一份 D1 权威数据。
+
+### EdgeOne 直传发布
+
+直传时将 `match/` 中的以下内容放在 ZIP 根目录，不要再套一层 `match/`：
+
+```text
+index.html
+manifest.json
+network-config.js
+sw.js
+edgeone.json
+art/
+audio/
+icons/
+```
+
+EdgeOne 项目必须继续选「全球可用区（不含中国大陆）」。新版发布前先运行本文
+末尾的验证命令，且确认 `sw.js` 已随资源变化重生。
+
 ## 推荐域名结构
 
 购买品牌主域名后建议固定以下入口，具体服务商以后可以换：
