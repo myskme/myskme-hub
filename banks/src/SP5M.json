@@ -1,0 +1,158 @@
+{
+ "date": "2026-07-31",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "进阶",
+ "tier": "free",
+ "name": "三影敲门 · 学徒篇 VOL.4（中级）",
+ "code": "SP5M",
+ "desc": "2026 暑假特辑 SP5M《三影敲门·学徒篇》中级档（学徒版）语法命门 12 题。本卷的看图命门（13–17）、传记阅读（18–20）、单词接龙、角色互批区依赖纸面主图与机关，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "There ___ nine coins on the step and one more in Ming's hand.",
+    "ops": [
+     "is",
+     "have",
+     "are",
+     "has"
+    ],
+    "ans": 2,
+    "why": "there be 看最近的主语，nine coins 是复数，用 are。",
+    "lv": 1
+   },
+   {
+    "q": "Jun ___ his old ball everywhere. He never leaves it at home.",
+    "ops": [
+     "take",
+     "taking",
+     "takes",
+     "to take"
+    ],
+    "ans": 2,
+    "why": "主语 Jun 是第三人称单数，一般现在时动词加 -s。",
+    "lv": 1
+   },
+   {
+    "q": "Ming's father ___ the coins in a paper bag two years ago, and Ming still keeps them today.",
+    "ops": [
+     "put",
+     "puts",
+     "will put",
+     "is putting"
+    ],
+    "ans": 0,
+    "why": "two years ago 是明确的过去时间，用一般过去时；put 的过去式与原形同形。",
+    "lv": 2
+   },
+   {
+    "q": "The window is ___ high that Jie has to raise his arm to knock on it.",
+    "ops": [
+     "such",
+     "very",
+     "too",
+     "so"
+    ],
+    "ans": 3,
+    "why": "so + 形容词 + that 从句，表示“如此……以至于……”。",
+    "lv": 2
+   },
+   {
+    "q": "___ of the three boys is standing outside. Nobody has gone in.",
+    "ops": [
+     "Both",
+     "Each",
+     "All",
+     "Every"
+    ],
+    "ans": 1,
+    "why": "Each of + 复数名词，谓语用单数 is，表示“三人中的每一个”。",
+    "lv": 2
+   },
+   {
+    "q": "If it ___ tomorrow night, the three boys will still wait at the door.",
+    "ops": [
+     "rains",
+     "will rain",
+     "rained",
+     "is raining"
+    ],
+    "ans": 0,
+    "why": "if 引导的条件句用一般现在时表示将来，主句用 will（主将从现）。",
+    "lv": 2
+   },
+   {
+    "q": "Jie has five prizes on his net, but Jun has ___ prizes than Jie does — he has none at all.",
+    "ops": [
+     "less",
+     "few",
+     "fewer",
+     "little"
+    ],
+    "ans": 2,
+    "why": "prizes 是可数名词复数，“更少的奖品”用 fewer。",
+    "lv": 2
+   },
+   {
+    "q": "Jun's ball is very old. It ___ to him by his uncle three years ago.",
+    "ops": [
+     "gave",
+     "gives",
+     "has given",
+     "was given"
+    ],
+    "ans": 3,
+    "why": "球是“被给”的，主语是物；three years ago 是过去时间，用一般过去时的被动 was given。",
+    "lv": 2
+   },
+   {
+    "q": "— I'm afraid I can't wait here any longer.　— ___ Let's come back tomorrow.",
+    "ops": [
+     "You're welcome.",
+     "That's all right.",
+     "It's very kind of you.",
+     "The same to you."
+    ],
+    "ans": 1,
+    "why": "对方表达为难，回应“没关系”，再提出新方案，语气自然。",
+    "lv": 2
+   },
+   {
+    "q": "Jun's mother made him ___ two pieces of bread before he left home.",
+    "ops": [
+     "eat",
+     "to eat",
+     "eating",
+     "ate"
+    ],
+    "ans": 0,
+    "why": "make sb do sth，中间的不定式不带 to。",
+    "lv": 1
+   },
+   {
+    "q": "Neither Jie nor his two friends ___ the last level of the game.",
+    "ops": [
+     "has finished",
+     "finishes",
+     "is finishing",
+     "have finished"
+    ],
+    "ans": 3,
+    "why": "neither...nor 用就近原则，靠近谓语的是 his two friends（复数），用 have。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "Each of them is waiting outside the door.",
+     "Ming have kept the coins for two years.",
+     "There is a lamp and three shadows on the wall.",
+     "The tenth place on the string is still empty."
+    ],
+    "ans": 1,
+    "why": "主语 Ming 是第三人称单数，现在完成时要用 has kept。",
+    "lv": 2
+   }
+  ]
+ }
+}
