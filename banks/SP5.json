@@ -1,0 +1,157 @@
+{
+  "name": "三影敲门 · 人物传 VOL.4（高级）",
+  "code": "SP5",
+  "desc": "2026 暑假特辑 SP5《三影敲门》高级档（陷阱猎人版）语法命门 12 题。本卷的看图命门（13–18）、传记阅读（19–22）、单词接龙、角色互批区依赖纸面主图与机关，未进题库。",
+  "tier": "free",
+  "level": "炼狱",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "Jun's mother gave the boys three ___ of bread before they left home.",
+        "ops": [
+          "piece",
+          "breads",
+          "bread",
+          "pieces"
+        ],
+        "ans": 3,
+        "why": "bread 不可数，要借量词计量；three 后面量词用复数 pieces。",
+        "lv": 1
+      },
+      {
+        "q": "If the man ___ the door tomorrow, only one of the three boys will go in.",
+        "ops": [
+          "opens",
+          "will open",
+          "opened",
+          "is going to open"
+        ],
+        "ans": 0,
+        "why": "if 引导条件状语从句，用一般现在时表示将来（主将从现），主句才用 will。",
+        "lv": 1
+      },
+      {
+        "q": "The street was ___ quiet that the three boys could hear their own breath.",
+        "ops": [
+          "such",
+          "such a",
+          "very",
+          "so"
+        ],
+        "ans": 3,
+        "why": "so + 形容词 + that 从句，quiet 是形容词，只能用 so。",
+        "lv": 2
+      },
+      {
+        "q": "Jie knocked ___ on the glass twice, but nobody inside answered him.",
+        "ops": [
+          "hardly",
+          "hardness",
+          "hard",
+          "hard-working"
+        ],
+        "ans": 2,
+        "why": "hard 作副词意思是“用力地”，修饰 knocked，与“敲了两下却没人应”完全吻合。",
+        "lv": 2
+      },
+      {
+        "q": "Ming ___ the same nine coins since his father went away two years ago.",
+        "ops": [
+          "has kept",
+          "kept",
+          "keeps",
+          "had kept"
+        ],
+        "ans": 0,
+        "why": "since + 过去时间点，主句用现在完成时，表示从过去一直延续到现在。",
+        "lv": 2
+      },
+      {
+        "q": "A boy knocked at this door last summer. Nobody knows what ___ to him that night.",
+        "ops": [
+          "was happened",
+          "happened",
+          "has happened",
+          "had been happened"
+        ],
+        "ans": 1,
+        "why": "happen 是不及物动词，只能用主动；last year 是明确过去时间，用一般过去时。",
+        "lv": 2
+      },
+      {
+        "q": "The light behind the window is still on, so someone ___ be at home now.",
+        "ops": [
+          "can't",
+          "needn't",
+          "must",
+          "shouldn't"
+        ],
+        "ans": 2,
+        "why": "灯亮着是证据，对现在情况作肯定推测用 must be，“一定在家”。",
+        "lv": 2
+      },
+      {
+        "q": "The man behind the door never makes his students ___ him the same question twice.",
+        "ops": [
+          "ask",
+          "to ask",
+          "asking",
+          "asked"
+        ],
+        "ans": 0,
+        "why": "make sb do sth，主动语态下不定式要省略 to。",
+        "lv": 2
+      },
+      {
+        "q": "Behind the door there is a small room ___ the man keeps every letter his students wrote.",
+        "ops": [
+          "which",
+          "what",
+          "where",
+          "when"
+        ],
+        "ans": 2,
+        "why": "先行词 room 表地点，后面从句 the man keeps every letter 成分完整，要用关系副词 where。",
+        "lv": 2
+      },
+      {
+        "q": "The number of students who knock at this door ___ smaller year by year.",
+        "ops": [
+          "get",
+          "gets",
+          "are getting",
+          "have got"
+        ],
+        "ans": 1,
+        "why": "主语是 The number（数量），作单数；who 从句只是修饰 students，谓语用 gets。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "None of the nine coins has been spent.",
+          "There is nine coins on the step.",
+          "Each of them is waiting outside the door.",
+          "Neither of his two shoes is new."
+        ],
+        "ans": 1,
+        "why": "there be 用就近原则，最近的主语是复数 nine coins → There are nine coins on the step。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "The five prizes were won after midnight.",
+          "This door is opened only once a year.",
+          "The tenth place on the string is still empty.",
+          "The old ball is belonged to Jun."
+        ],
+        "ans": 3,
+        "why": "belong to 是不及物的状态动词，没有被动语态 → The old ball belongs to Jun。",
+        "lv": 2
+      }
+    ]
+  }
+}
