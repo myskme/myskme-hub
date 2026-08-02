@@ -5,7 +5,8 @@
 
 ## 已经落地的能力
 
-- 当前 GitHub Pages 继续使用既有 Cloudflare Worker，不因域名尚未购买而中断排行榜。
+- `https://play.myskme.com/` 已成为 EdgeOne Makers 正式网页入口；GitHub Pages
+  继续作为灾备。两者目前都仍由浏览器直连既有 Cloudflare Worker 读取和提交排行榜。
 - 普通成绩提交使用 `text/plain;charset=UTF-8`，属于 CORS simple request，不先发
   `OPTIONS`；后端仍用 `req.json()` 解析同一份 JSON。
 - 排行榜支持多个 API 候选入口。只在断网、502+、404/405 或返回非 JSON 时切换；真实
@@ -26,12 +27,34 @@
 - 首次直传包：79 个运行文件、22.36MB；构建与部署 22 秒，配置校验通过。
 - 稳定项目域名：`myskme-gemfall-z3maxc4l.edgeone.dev`。该测试域名在中国
   网络会按平台规则返回 401，正式传播只使用自定义域名。
-- 已创建自定义域名 `play.myskme.com`。域名归属验证需 DNSPod TXT：
+- 已创建并启用自定义域名 `play.myskme.com`。域名归属验证使用 DNSPod TXT：
   `edgeonereclaim.play` → `reclaim-tnq57o0yksn9tqvl69201j5dldlfrvse`。
-- DNSPod 最终保存会触发腾讯云账号微信 MFA；持有人完成扫码后，再按
-  EdgeOne 提示添加 CNAME、免费证书并开启强制 HTTPS。
+- DNSPod CNAME 已由 EdgeOne 一键添加：`play` →
+  `play.myskme.com.pages.dnsoe6.com`。EdgeOne 与 DNSPod 控制台均显示已生效，
+  DNSPod 权威解析器 `119.29.29.29` 已返回该准确目标。
+- EdgeOne 免费证书已自动申请并部署，证书为 RSA 2048、自动续签；当前证书主体
+  `play.myskme.com`，TrustAsia 签发，控制台到期时间为
+  `2026-10-30 07:59:59`（北京时间）。
+- 已开启强制 HTTPS，重定向方式为 `301`。HSTS 与 OCSP 装订暂不启用；前者避免
+  初期运维时浏览器长期锁定，后者留待后续性能实测再决定。
 - 本次不增加榜单代理。排行榜请求仍由浏览器直连原 Cloudflare Worker，
   仍只有一份 D1 权威数据。
+
+### 2026-08-02 线上验收结果
+
+- `http://play.myskme.com/` 返回 `301`，目标为
+  `https://play.myskme.com/`；HTTPS 首页返回 `200`。
+- `network-config.js`、`manifest.json`、`sw.js` 均返回 `200` 与
+  `Cache-Control: no-cache`；首页使用 `max-age=0,must-revalidate`。
+- `art/hero.webp` 与 `icons/app-icon-512.png` 均返回 `200`，缓存为
+  `public, max-age=86400`。
+- 线上首屏在桌面端与 `390×844` 手机竖屏实际加载；手机视口
+  `scrollWidth = 390`，无横向溢出，浏览器控制台错误为 0。
+- **已知未完成项：**从当前中国大陆网络直连
+  `myskme-leaderboard.wzc1020.workers.dev` 的只读榜单请求在 30 秒后超时。
+  因此本次已经解决网页与 PWA 静态资源访问，但尚未解决榜单读取与成绩上传的国内链路。
+  在得到“允许玩家化名、设备标识与成绩经由新服务转发”的明确数据路由授权前，
+  不启用 EdgeOne 同源代理，也不迁移或双写数据库。
 
 ### EdgeOne 直传发布
 
@@ -65,9 +88,10 @@ EdgeOne 项目必须继续选「全球可用区（不含中国大陆）」。新
 
 域名本身不负责加速。`play` 应指向香港静态托管，`api` 应指向香港 API 或稳定的反向代理。
 
-## 第一阶段：香港静态主站，API 仍复用现有 Worker
+## 后续候选：同源代理，API 仍复用现有 Worker（尚未实施）
 
-这是最安全的迁移方式：先解决 GitHub Pages 在国内打开不稳的问题，不同时搬数据库。
+这是静态主站上线后的下一候选方案，不同时搬数据库。它会让玩家化名、设备标识与成绩
+先经过新的代理服务，属于数据传输路径变化，实施前必须取得明确授权并补充隐私说明。
 
 1. 将仓库中的 `match/` 原样部署为站点根目录，不能打平 `art/`、`audio/`、`icons/`。
 2. 为 `play.<主域名>` 配置 HTTPS。

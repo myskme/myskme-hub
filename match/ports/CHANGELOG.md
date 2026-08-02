@@ -1,11 +1,25 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.3.2 · 2026-08-02 · play.myskme.com DNS 与 HTTPS 正式上线
+
+- DNSPod 已完成域名归属 TXT 与 `play` CNAME；CNAME 准确指向
+  `play.myskme.com.pages.dnsoe6.com`，EdgeOne 状态为“已生效”。
+- EdgeOne 免费 RSA 2048 证书已自动申请、部署并启用自动续签；强制 HTTPS 使用
+  `301`，HSTS 与 OCSP 装订暂不启用。
+- 公网验收通过：HTTP 301、HTTPS 首页 200、PWA 与 Service Worker 200；HTML/配置
+  不缓存，插画和图标缓存 1 天。桌面端与 `390×844` 手机竖屏首屏正常，手机无横向
+  溢出，浏览器控制台错误为 0。
+- 已知偏差：当前中国大陆网络直连原 `workers.dev` 榜单接口仍在 30 秒后超时。
+  静态站国内访问已改善，但榜单读取与成绩上传的国内链路未因此解决。
+- 本次仍未增加代理或新数据目的地。启用 EdgeOne 同源代理、腾讯云后端或迁移数据库前，
+  需先获得玩家数据经新服务转发的明确授权，并继续保持单一权威库、禁止双写。
+
 ## 0.3.1 · 2026-08-02 · myskme.com 与 EdgeOne Makers 首发部署
 
 - EdgeOne Makers 项目 `myskme-gemfall` 已部署到全球可用区（不含中国
   大陆），无需 ICP 备案；DNS 继续由 DNSPod 免费版托管。
-- 已在 EdgeOne 创建 `play.myskme.com` 自定义域名；DNSPod 最终保存触发
-  腾讯云账号微信 MFA，需账号持有人扫码后完成 TXT、CNAME 与 HTTPS。
+- 已在 EdgeOne 创建 `play.myskme.com` 自定义域名；该阶段 DNSPod 最终保存触发
+  腾讯云账号微信 MFA，后续完成情况见 0.3.2。
 - 新增 `edgeone.json`，对 HTML/配置/Service Worker 使用 `no-cache`，美术、
   音频与图标缓存 1 天。
 - 本版只迁移网页静态资源；排行榜仍由浏览器直连现有
