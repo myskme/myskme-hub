@@ -1,5 +1,18 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.3.4 · 2026-08-02 · MYSKME 多作品品牌 API 网关
+
+- `play.myskme.com/api` 从《灵石远征》单一代理扩展为四个隔离命名空间：
+  `gf`、`quiz`、`game`、`publish`；分别固定指向三套既有 Worker，不迁库、不双写。
+- 词灵榜补齐世界榜、班级榜、门派榜、名人堂、提交和教师审核路由；`game` 保持原
+  GET/POST 协议，课堂发布通道只允许 POST。
+- `game-api` 旧来源校验由网关写入固定 GitHub Pages Origin；玩家请求中的 Origin、
+  Cookie、Authorization、Referer 与 Host 均不向上游透传。
+- 代理自动测试由 10 项扩到 17 项；线上 `gf`、`quiz`、`game` 均验收 200，发布通道
+  错误密码返回预期 401 且未写入数据。
+- 当前生产部署 `dp7gexyniafl`，81 个运行文件、22.36MB、构建 23 秒；部署包
+  SHA-256 为 `c2353da467e9c2a25f21deafffb1aeaf3781aa5ef3d70a99d551d0d335499008`。
+
 ## 0.3.3 · 2026-08-02 · EdgeOne 同源榜单代理正式上线
 
 - 经明确授权，新增 `edge-functions/api/[[default]].js`，将品牌入口

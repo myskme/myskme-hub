@@ -23,7 +23,8 @@ export default function onRequest(context) {
   }
   return new Response(JSON.stringify({
     ok: true,
-    service: 'gemfall-edge-proxy',
-    upstream: 'existing-d1',
+    service: 'myskme-edge-gateway',
+    upstream: 'existing-databases',
+    namespaces: ['gf', 'quiz', 'game', 'publish'],
   }), { status: 200, headers: headers() });
 }

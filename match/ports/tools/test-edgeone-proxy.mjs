@@ -33,7 +33,9 @@ try {
   const healthResponse = health({ request: new Request('https://play.myskme.com/api/') });
   const healthBody = await healthResponse.json();
   check('健康检查不触碰上游', healthResponse.status === 200
-    && healthBody.service === 'gemfall-edge-proxy' && calls.length === 0);
+    && healthBody.service === 'myskme-edge-gateway'
+    && healthBody.namespaces?.join(',') === 'gf,quiz,game,publish'
+    && calls.length === 0);
 
   calls = [];
   const board = await proxy({
@@ -71,6 +73,69 @@ try {
   check('成绩提交仍只写同一个 Worker', calls[0]?.url
     === 'https://myskme-leaderboard.wzc1020.workers.dev/gf/submit', calls[0]?.url || 'no request');
   check('跨端 CORS 仍可读取代理结果', submit.headers.get('Access-Control-Allow-Origin') === '*');
+
+  calls = [];
+  await proxy({
+    request: new Request('https://play.myskme.com/api/quiz/board?scope=world&limit=20'),
+  });
+  check('词灵榜读取映射到排行榜 Worker 根路由', calls.length === 1
+    && calls[0].url === 'https://myskme-leaderboard.wzc1020.workers.dev/board?scope=world&limit=20',
+  calls[0]?.url || 'no request');
+
+  calls = [];
+  await proxy({
+    request: new Request('https://play.myskme.com/api/quiz/hall?scope=world&limit=60'),
+  });
+  await proxy({
+    request: new Request('https://play.myskme.com/api/quiz/factions?scope=world&limit=30'),
+  });
+  check('词灵榜名人堂与门派榜均准确映射', calls.length === 2
+    && calls[0].url.includes('/hall?') && calls[1].url.includes('/factions?'));
+
+  calls = [];
+  await proxy({
+    request: new Request('https://play.myskme.com/api/quiz/submit', {
+      method: 'POST', body: JSON.stringify({ deviceUUID: 'quiz-test' }),
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+  check('词灵对决提交仍写原排行榜 Worker', calls.length === 1
+    && calls[0].url === 'https://myskme-leaderboard.wzc1020.workers.dev/submit');
+
+  calls = [];
+  await proxy({
+    request: new Request('https://play.myskme.com/api/quiz/admin', {
+      method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+  check('教师审核入口固定映射且密码不由网关处理', calls.length === 1
+    && calls[0].url === 'https://myskme-leaderboard.wzc1020.workers.dev/admin');
+
+  calls = [];
+  await proxy({ request: new Request('https://play.myskme.com/api/game?config') });
+  check('多作品游戏 API 查询映射到既有 game Worker', calls.length === 1
+    && calls[0].url === 'https://myskme-game-api.wzc1020.workers.dev/?config');
+
+  calls = [];
+  const gameBody = JSON.stringify({ action: 'dmtop', board: 'zmq', day: '0' });
+  await proxy({
+    request: new Request('https://play.myskme.com/api/game', {
+      method: 'POST', body: gameBody, headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+  check('多作品游戏 API 写请求保持原文且不串库', calls.length === 1
+    && calls[0].url === 'https://myskme-game-api.wzc1020.workers.dev/'
+    && calls[0].body === gameBody
+    && calls[0].init.headers.get('Origin') === 'https://myskme.github.io');
+
+  calls = [];
+  await proxy({
+    request: new Request('https://play.myskme.com/api/publish', {
+      method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json' },
+    }),
+  });
+  check('课堂发布入口只转发到既有 publish Worker', calls.length === 1
+    && calls[0].url === 'https://myskme-publish.wzc1020.workers.dev/');
 
   calls = [];
   const blocked = await proxy({ request: new Request('https://play.myskme.com/api/https://evil.example/') });

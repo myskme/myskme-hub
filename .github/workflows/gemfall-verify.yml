@@ -39,7 +39,7 @@ jobs:
       - name: 验证排行榜网络切换与免预检提交
         run: node match/ports/tools/test-network-layer.mjs
 
-      - name: 验证 EdgeOne 同源代理白名单与单一上游
+      - name: 验证 EdgeOne 品牌网关白名单与固定上游
         run: node match/ports/tools/test-edgeone-proxy.mjs
 
       - name: 验证 EdgeOne 可重复发布包

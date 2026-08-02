@@ -1,4 +1,4 @@
-# 灵石远征 · C 端网络与香港部署手册
+# MYSKME · C 端网络与品牌网关部署手册
 
 本手册对应网页版《灵石远征 · GEMFALL》。目标是：不依赖中国大陆 ICP 备案，先让普通
 用户通过稳定的 MYSKME 链接打开游戏；网络不稳时照常玩，成绩留在本机，恢复后自动补交。
@@ -42,9 +42,27 @@
   `GET /gf/board` 与 `POST /gf/submit`，固定转发到原 Cloudflare Worker；不记录
   请求体、不迁移数据库、不双写，仍只有一份 D1 权威数据。上游请求头使用严格白名单，
   不转发 Cookie、Authorization、Origin、Referer 或 Host。
-- 最终生产部署 ID：`dpldjpmepm2b`；81 个运行文件、22.36MB，构建 25 秒，
+- 当前生产部署 ID：`dp7gexyniafl`；81 个运行文件、22.36MB，构建 23 秒，
   `edgeone.json` 校验和 Edge Functions 编译均通过。部署包 SHA-256 为
-  `5fc45db2040c7846d22332dc4bfa4f82630519a5ece0e5a49b234a1a78e9f2ed`。
+  `c2353da467e9c2a25f21deafffb1aeaf3781aa5ef3d70a99d551d0d335499008`。
+
+## 2026-08-02 多作品品牌网关
+
+在不迁移、不双写任何数据库的前提下，`play.myskme.com/api` 已扩展为固定命名空间：
+
+| 品牌入口 | 固定上游 | 作品与用途 |
+|---|---|---|
+| `/api/gf/*` | `myskme-leaderboard` | 《灵石远征》矿脉榜 |
+| `/api/quiz/*` | `myskme-leaderboard` | 词灵对决、题库书架、教师审核 |
+| `/api/game` | `myskme-game-api` | 《远征录》《星徒地牢》《星灵远征》《自鸣棋》 |
+| `/api/publish` | `myskme-publish` | 课堂记分编年史发布通道（前端切换需单独确认真实姓名数据授权） |
+
+- 网关仍只向固定上游转发，不接受 URL 参数指定目标，不构成开放代理。
+- `game` 上游沿用旧 Worker 的来源校验，由网关写入固定
+  `Origin: https://myskme.github.io`；客户端提交的 Origin、Cookie、Authorization、
+  Referer 与 Host 一律不透传。
+- 线上验收：`gf`、`quiz` 读取均为 200；`game` GET 与只读 `dmtop` POST 均为 200；
+  `publish` 错误密码返回预期 401，未写入数据。
 
 ### 2026-08-02 线上验收结果
 
