@@ -6,7 +6,8 @@
 ## 已经落地的能力
 
 - `https://play.myskme.com/` 已成为 EdgeOne Makers 正式网页入口；GitHub Pages
-  继续作为灾备。两者目前都仍由浏览器直连既有 Cloudflare Worker 读取和提交排行榜。
+  继续作为灾备。网页、GitHub Pages 与后续 iOS 壳统一使用
+  `https://play.myskme.com/api` 品牌入口，不再由客户端直连 `workers.dev`。
 - 普通成绩提交使用 `text/plain;charset=UTF-8`，属于 CORS simple request，不先发
   `OPTIONS`；后端仍用 `req.json()` 解析同一份 JSON。
 - 排行榜支持多个 API 候选入口。只在断网、502+、404/405 或返回非 JSON 时切换；真实
@@ -37,8 +38,13 @@
   `2026-10-30 07:59:59`（北京时间）。
 - 已开启强制 HTTPS，重定向方式为 `301`。HSTS 与 OCSP 装订暂不启用；前者避免
   初期运维时浏览器长期锁定，后者留待后续性能实测再决定。
-- 本次不增加榜单代理。排行榜请求仍由浏览器直连原 Cloudflare Worker，
-  仍只有一份 D1 权威数据。
+- 已在获得明确数据路由授权后启用 EdgeOne 同源榜单代理。代理只允许
+  `GET /gf/board` 与 `POST /gf/submit`，固定转发到原 Cloudflare Worker；不记录
+  请求体、不迁移数据库、不双写，仍只有一份 D1 权威数据。上游请求头使用严格白名单，
+  不转发 Cookie、Authorization、Origin、Referer 或 Host。
+- 最终生产部署 ID：`dpldjpmepm2b`；81 个运行文件、22.36MB，构建 25 秒，
+  `edgeone.json` 校验和 Edge Functions 编译均通过。部署包 SHA-256 为
+  `5fc45db2040c7846d22332dc4bfa4f82630519a5ece0e5a49b234a1a78e9f2ed`。
 
 ### 2026-08-02 线上验收结果
 
@@ -50,11 +56,11 @@
   `public, max-age=86400`。
 - 线上首屏在桌面端与 `390×844` 手机竖屏实际加载；手机视口
   `scrollWidth = 390`，无横向溢出，浏览器控制台错误为 0。
-- **已知未完成项：**从当前中国大陆网络直连
-  `myskme-leaderboard.wzc1020.workers.dev` 的只读榜单请求在 30 秒后超时。
-  因此本次已经解决网页与 PWA 静态资源访问，但尚未解决榜单读取与成绩上传的国内链路。
-  在得到“允许玩家化名、设备标识与成绩经由新服务转发”的明确数据路由授权前，
-  不启用 EdgeOne 同源代理，也不迁移或双写数据库。
+- 当前中国大陆网络直连 `workers.dev` 的只读请求曾在 30 秒后超时；改走
+  `https://play.myskme.com/api/gf/board?scope=world&limit=5` 后返回 `200`、原 D1
+  的真实榜单与 `X-MYSKME-Proxy: edgeone`。
+- `/api/` 健康检查返回 `200`；无效设备提交穿透到原 Worker 后返回预期 `400 no device`，
+  未写入 D1；非白名单代理路径返回 `404`。所有 `/api/*` 响应均为 `no-store`。
 
 ### EdgeOne 直传发布
 
@@ -66,6 +72,7 @@ manifest.json
 network-config.js
 sw.js
 edgeone.json
+edge-functions/
 art/
 audio/
 icons/
@@ -73,6 +80,12 @@ icons/
 
 EdgeOne 项目必须继续选「全球可用区（不含中国大陆）」。新版发布前先运行本文
 末尾的验证命令，且确认 `sw.js` 已随资源变化重生。
+
+推荐用可重复打包脚本生成 ZIP，避免漏掉函数或多套一层目录：
+
+```bash
+node match/ports/tools/build-edgeone-package.mjs /private/tmp/gemfall-edgeone.zip
+```
 
 ## 推荐域名结构
 
@@ -88,26 +101,28 @@ EdgeOne 项目必须继续选「全球可用区（不含中国大陆）」。新
 
 域名本身不负责加速。`play` 应指向香港静态托管，`api` 应指向香港 API 或稳定的反向代理。
 
-## 后续候选：同源代理，API 仍复用现有 Worker（尚未实施）
+## 已实施：EdgeOne 同源代理，API 仍复用现有 Worker
 
-这是静态主站上线后的下一候选方案，不同时搬数据库。它会让玩家化名、设备标识与成绩
-先经过新的代理服务，属于数据传输路径变化，实施前必须取得明确授权并补充隐私说明。
+玩家化名、设备标识与成绩会先经过 EdgeOne，再由固定上游转发到原 Worker。该数据路径
+已于 2026-08-02 获得明确授权；数据库不搬迁，旧榜无需转换，D1 继续作为唯一权威库。
 
 1. 将仓库中的 `match/` 原样部署为站点根目录，不能打平 `art/`、`audio/`、`icons/`。
 2. 为 `play.<主域名>` 配置 HTTPS。
-3. 在香港站点把 `/api/*` 反向代理到
-   `https://myskme-leaderboard.wzc1020.workers.dev/*`，并去掉前缀 `/api`。
+3. `match/edge-functions/api/[[default]].js` 将 `/api/gf/*` 映射到
+   `https://myskme-leaderboard.wzc1020.workers.dev/gf/*`。
 4. 确认以下地址返回 JSON：
    - `https://play.<主域名>/api/`
    - `https://play.<主域名>/api/gf/board?scope=world&limit=5`
-5. 在 `match/network-config.js` 把 `sameOriginApi` 改成 `true`。
+5. `match/network-config.js` 固定以 `https://play.myskme.com/api` 为第一入口，
+   `sameOriginApi: true`，且 `legacyFallback: false`。
 6. 重新生成 Service Worker：
 
    ```bash
    node match/ports/tools/build-service-worker.mjs
    ```
 
-一个等价的 Nginx 反向代理示例（尾部 `/` 负责去掉 `/api/` 前缀）：
+如果以后离开 EdgeOne，下面的 Nginx 配置可作为等价替代（尾部 `/` 负责去掉
+`/api/` 前缀），当前线上没有使用它：
 
 ```nginx
 location /api/ {
@@ -152,29 +167,28 @@ Worker。以后把代理的上游换成香港 API，网页地址不变。
 
 正式配置只改 `match/network-config.js`。
 
-### 推荐：网页同源代理
+### 当前正式配置
 
 ```js
+apiBases: ['https://play.myskme.com/api'],
 sameOriginApi: true,
 sameOriginPath: '/api',
-apiBases: [],
-legacyFallback: 'https://myskme-leaderboard.wzc1020.workers.dev',
+legacyFallback: false,
 ```
 
 ### iOS/微信等非同源客户端
 
-```js
-apiBases: ['https://api.<主域名>'],
-sameOriginApi: false,
-legacyFallback: false,
-```
+当前 iOS 壳同样读取 `network-config.js`，通过绝对地址
+`https://play.myskme.com/api` 跨源访问；代理显式返回 CORS 响应头。微信小游戏正式版
+仍需在微信后台把最终 API 域名加入合法域名列表。
 
 若 `api.<主域名>` 只是同一权威后端的另一个入口，可以保留旧 Worker 作为网络灾备；若已
 换成独立香港数据库，必须按上一节完成迁移后再决定是否保留。
 
 ### 一键回滚
 
-香港入口出问题时恢复以下默认值并重新生成 `sw.js`：
+EdgeOne 函数出问题且必须紧急回退时，可临时恢复以下值并重新生成 `sw.js`；该方案在
+当前中国大陆网络可能超时，只作为故障隔离手段：
 
 ```js
 apiBases: [],
@@ -207,7 +221,7 @@ Service Worker 内容哈希会随 HTML、配置、核心图标或美术变化自
 5. 离线完成一局时大厅显示“待上传”，恢复网络后自动变成“已同步”。
 6. “上传不了？点这里诊断”能列出所有候选入口和每段耗时。
 7. 新旧入口读取到同一名次与同一条最高成绩。
-8. GitHub Pages 灾备地址仍可打开，且仍指向旧 Worker。
+8. GitHub Pages 灾备地址仍可打开，且通过 `play.myskme.com/api` 访问同一 D1。
 
 ## 跨端边界
 
@@ -222,7 +236,9 @@ Service Worker 内容哈希会随 HTML、配置、核心图标或美术变化自
 ```bash
 node match/ports/tools/run-selftest.mjs
 node match/ports/tools/test-network-layer.mjs
+node match/ports/tools/test-edgeone-proxy.mjs
 node match/ports/tools/build-service-worker.mjs
 node --check match/sw.js
 node match/ports/tools/verify-ports.mjs
+node match/ports/tools/build-edgeone-package.mjs /private/tmp/gemfall-edgeone.zip
 ```

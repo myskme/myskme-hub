@@ -818,7 +818,10 @@ function makeEnvironment(html, consoleLines, randomSeed) {
 export async function loadGemfall(options = {}) {
   const repoRoot = resolve(options.repoRoot || DEFAULT_REPO_ROOT);
   const indexPath = resolve(repoRoot, options.indexPath || 'match/index.html');
+  const networkConfigPath = resolve(repoRoot,
+    options.networkConfigPath || 'match/network-config.js');
   const html = await readFile(indexPath, 'utf8');
+  const networkConfig = await readFile(networkConfigPath, 'utf8');
   const inlineScripts = extractInlineScripts(html);
   if (inlineScripts.length === 0) throw new Error(`没有在 ${indexPath} 找到内联脚本`);
 
@@ -828,6 +831,13 @@ export async function loadGemfall(options = {}) {
     name: 'gemfall-headless',
     codeGeneration: { strings: true, wasm: false },
   });
+
+  // 浏览器会先执行 <script src="network-config.js">，再执行页面内联脚本。
+  // 无头环境保持同一顺序，避免网络测试悄悄落回 index.html 的旧默认值。
+  new vm.Script(networkConfig, {
+    filename: networkConfigPath,
+    displayErrors: true,
+  }).runInContext(context, { timeout: options.timeoutMs || 30_000 });
 
   for (let index = 0; index < inlineScripts.length; index++) {
     const script = new vm.Script(inlineScripts[index], {
@@ -847,6 +857,7 @@ export async function loadGemfall(options = {}) {
     document: context.document,
     consoleLines,
     indexPath,
+    networkConfigPath,
     inlineScriptCount: inlineScripts.length,
     run(code, filename = 'gemfall-headless-bridge.mjs') {
       return new vm.Script(code, { filename, displayErrors: true }).runInContext(context);

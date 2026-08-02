@@ -6,6 +6,8 @@ on:
       - 'match/index.html'
       - 'match/manifest.json'
       - 'match/network-config.js'
+      - 'match/edgeone.json'
+      - 'match/edge-functions/**'
       - 'match/sw.js'
       - 'match/icons/**'
       - 'match/art/**'
@@ -36,6 +38,14 @@ jobs:
 
       - name: 验证排行榜网络切换与免预检提交
         run: node match/ports/tools/test-network-layer.mjs
+
+      - name: 验证 EdgeOne 同源代理白名单与单一上游
+        run: node match/ports/tools/test-edgeone-proxy.mjs
+
+      - name: 验证 EdgeOne 可重复发布包
+        run: |
+          node match/ports/tools/build-edgeone-package.mjs /tmp/gemfall-edgeone-ci.zip
+          unzip -tq /tmp/gemfall-edgeone-ci.zip
 
       - name: 核对离线缓存清单
         run: |

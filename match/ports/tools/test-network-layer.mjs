@@ -9,9 +9,11 @@ const check = (name, pass, detail = '') => {
 };
 
 const defaultBases = Array.from(runtime.run('LB.bases.slice()'));
-check('默认生产入口仍指向现有 Worker',
-  defaultBases.length === 1 && defaultBases[0] === 'https://myskme-leaderboard.wzc1020.workers.dev',
+check('默认生产入口先走 play.myskme.com 品牌代理',
+  defaultBases[0] === 'https://play.myskme.com/api',
   defaultBases.join(' → '));
+check('客户端不再直连 workers.dev',
+  !defaultBases.some(base => base.includes('workers.dev')), defaultBases.join(' → '));
 
 runtime.run(`
   LB.bases.splice(0, LB.bases.length, 'https://primary.example', 'https://fallback.example');

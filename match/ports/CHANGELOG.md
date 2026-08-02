@@ -1,5 +1,25 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.3.3 · 2026-08-02 · EdgeOne 同源榜单代理正式上线
+
+- 经明确授权，新增 `edge-functions/api/[[default]].js`，将品牌入口
+  `play.myskme.com/api/gf/*` 固定转发到原 Cloudflare Worker；仅放行榜单读取和成绩
+  提交，不记录请求体，不构成开放代理；上游请求头采用严格白名单，不携带 Cookie、
+  Authorization 或浏览器来源信息。
+- `network-config.js` 已切到品牌 API，网页、GitHub Pages 与 iOS 壳不再直接依赖
+  `workers.dev`；`legacyFallback` 关闭，弱网失败继续由原有本机待上传队列处理。
+- 现有 D1 继续是唯一权威库，不迁移、不双写。旧内测榜无需转换也得以保留；未来若重置，
+  应作为新赛季维护操作处理，不与本次网络切换耦合。
+- EdgeOne 最终生产部署 `dpldjpmepm2b` 成功，81 个运行文件、22.36MB、构建 25 秒；
+  函数编译与配置校验通过。部署包 SHA-256 为
+  `5fc45db2040c7846d22332dc4bfa4f82630519a5ece0e5a49b234a1a78e9f2ed`。
+- 国内链路实测：`/api/` 200；世界榜读取 200 并返回原 D1 数据；无效设备提交由原
+  Worker 返回预期 400 且未落库；非白名单路径 404；所有 API 响应 `no-store`。
+- 新增 `test-edgeone-proxy.mjs`（10 项）和 CI 步骤，验证固定上游、方法/路径白名单、
+  POST 原文、CORS、禁缓存与 502 降级；无头加载器补齐真实 `network-config.js` 执行顺序。
+- 新增 `build-edgeone-package.mjs`，可重复生成含静态资源、配置和 Edge Functions 的
+  根目录 ZIP；CI 会构建并执行 ZIP 完整性检查。
+
 ## 0.3.2 · 2026-08-02 · play.myskme.com DNS 与 HTTPS 正式上线
 
 - DNSPod 已完成域名归属 TXT 与 `play` CNAME；CNAME 准确指向

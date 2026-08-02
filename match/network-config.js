@@ -1,16 +1,15 @@
 /* 灵石远征 · 网络入口配置
-   当前线上保持旧 Worker，不改变已有玩家。香港主站与 /api 反向代理上线后：
-     1. 把 sameOriginApi 改成 true；或
-     2. 把 https://api.<你的域名> 放进 apiBases。
-   游戏本体不再需要跟着域名迁移反复修改。 */
+   正式入口统一走 play.myskme.com/api：网页为同源请求，GitHub Pages、iOS 等
+   跨端包也复用同一个品牌地址。EdgeOne 只转发到现有 Worker，同一份 D1 仍是
+   唯一权威数据源；不再让客户端绕过品牌入口直连 workers.dev。 */
 (function (root) {
   'use strict';
   const existing = root.MYSKME_GEMFALL_NETWORK || {};
   root.MYSKME_GEMFALL_NETWORK = Object.assign({
-    apiBases: [],
-    sameOriginApi: false,
+    apiBases: ['https://play.myskme.com/api'],
+    sameOriginApi: true,
     sameOriginPath: '/api',
-    legacyFallback: 'https://myskme-leaderboard.wzc1020.workers.dev',
+    legacyFallback: false,
     probeTimeoutMs: 4500,
     endpointHintMs: 30 * 60 * 1000,
     serviceWorker: true,

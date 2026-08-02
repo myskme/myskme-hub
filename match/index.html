@@ -1322,7 +1322,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
     <label>小队口令（可留空，填了才进小队榜）</label>
     <input id="lb-pw" maxlength="24" autocapitalize="none" autocorrect="off" placeholder="同一句口令 = 同一个小队">
-    <div class="tip">榜上只出现化名，不收集任何真实身份信息。设备换了或清了缓存，成绩要重新上榜。</div>
+    <div class="tip">榜上只出现化名，不收集真实身份信息。化名、设备标识和成绩会经 play.myskme.com 加密转发到榜单服务；设备标识在服务端加盐哈希，原值不入库。设备换了或清了缓存，成绩要重新上榜。</div>
   </div>
   <div id="lb-diagwrap">
     <button type="button" class="lnk" id="lb-diag">上传不了？点这里诊断</button>
@@ -5755,7 +5755,7 @@ const HOW_HTML=`
 （时间 30–90 秒、步数 10–18 步，档位差距刻意不大）——谁拿哪一档由你们场下商定，游戏只照配额发。<br>
 每一轮打完会停下来看积分，下一轮开始前还能再调配额；想收就随时点<b>终结比赛</b>，当场出名次。<br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
-榜上只出现化名，不收集任何真实身份信息；离线也照常能玩，联网后自动补交。
+榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 填同一句<b>小队口令</b>的人会自动分到同一个小队榜里。
 `;
 
