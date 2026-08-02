@@ -22,7 +22,8 @@ node deploy/homepage/build-edgeone-homepage.mjs /private/tmp/myskme-homepage.zip
 3. 按控制台给出的目标值在 DNSPod 添加记录；主域使用 DNSPod/EdgeOne 支持的根域接入方式，
    不要把 `play.myskme.com` 的 CNAME 目标照抄给主域。
 4. 为两个域名启用自动 HTTPS 和 HTTP → HTTPS。
-5. `myskme.com` 为 canonical；`www.myskme.com` 可在 EdgeOne 域名规则中 301 到主域。
+5. `myskme.com` 为 canonical；发布包的 `edgeone.json` 使用 EdgeOne 官方
+   `$wwwhost` → `$host` 反向重定向，将 `www.myskme.com` 以 301 跳到主域。
 
 ## 验收
 
