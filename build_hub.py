@@ -19,7 +19,7 @@ DEFAULT_DATA = {
     "titleEm": "编年史",
     "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
     "hint": "往下是 娱乐 与 学习 两区 —— 每一件都免下载免安装，扫码即玩，手机直接开。",
-    "hubUrl": "https://myskme.github.io/myskme-hub/",
+    "hubUrl": "https://myskme.com/",
     "sections": [
         {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
          "epigraph": "剑与星辰，茶与远方 —— 走进狼先生学院的世界。", "icon": "sword", "items": [
@@ -38,7 +38,7 @@ DEFAULT_DATA = {
             {"key": "gemfall", "glyph": "消", "cat": "game", "rarity": "SSR", "cover": "assets/cover-gemfall.webp",
              "tag": "消消乐 · 三消远征", "title": "灵石远征", "en": "GEMFALL",
              "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
-             "url": "https://myskme.github.io/myskme-hub/match/"},
+             "url": "https://play.myskme.com/"},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
              "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 35 位正典角色，扫码即玩。",
@@ -64,25 +64,25 @@ DEFAULT_DATA = {
             {"key": "listen", "glyph": "听", "cat": "tool", "rarity": "R", "cover": "assets/cover-listen.webp",
              "tag": "中考 · 听力", "title": "听力训练场", "en": "LISTENING",
              "desc": "中考听力精练 · 多语音朗读 · 逐句跟读 · 浏览器直接播放，免下载。",
-             "url": "https://myskme.github.io/myskme-hub/listen/"},
+             "url": "https://myskme.com/listen/"},
             {"key": "write", "glyph": "写", "cat": "tool", "rarity": "R", "cover": "assets/cover-write.webp",
              "tag": "中考 · 写作", "title": "作文训练场", "en": "WRITING",
              "desc": "中考写作分步训练 · 范文 · 句式脚手架 · 自评清单。",
-             "url": "https://myskme.github.io/myskme-hub/write/"},
+             "url": "https://myskme.com/write/"},
             {"key": "daily", "glyph": "日", "cat": "tool", "rarity": "R", "cover": "assets/cover-daily.webp",
              "tag": "每日打卡", "title": "每日一题", "en": "DAILY QUIZ",
              "desc": "全网同题 · 每天一换 · 答题即揭示解析 · 连胜打卡。",
-             "url": "https://myskme.github.io/myskme-hub/daily/"},
+             "url": "https://myskme.com/daily/"},
             {"key": "banks", "glyph": "库", "cat": "tool", "rarity": "SR", "cover": "assets/cover-banks.webp",
              "tag": "题库 · 词灵对决", "title": "题库书架", "en": "QUESTION BANKS",
              "desc": "词灵对决的书架 · 全部题库亮在架上点开即玩 · 时态 / 完形 / 阅读 / 陷阱专项 + 剧集卷。",
-             "url": "https://myskme.github.io/myskme-hub/banks/"},
+             "url": "https://myskme.com/banks/"},
             {"key": "wall", "glyph": "范", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-wall-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
              "coverLegacy": "assets/cover-wall.webp",
              "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
              "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
-             "url": "https://myskme.github.io/myskme-hub/wall/"},
+             "url": "https://myskme.com/wall/"},
             {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-scoreboard-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
              "coverLegacy": "assets/cover-scoreboard.webp",
@@ -92,7 +92,7 @@ DEFAULT_DATA = {
             {"key": "print", "glyph": "印", "cat": "tool", "rarity": "N", "cover": "assets/cover-print.webp",
              "tag": "打印 / PDF", "title": "打印中心", "en": "PRINT CENTER",
              "desc": "从题库一键生成 选择卷 / 答案版 / 词表 / 默写版，A4 存 PDF。答案版需口令。",
-             "url": "https://myskme.github.io/myskme-hub/print/"},
+             "url": "https://myskme.com/print/"},
         ]},
     ],
 }
@@ -646,7 +646,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     var srcset=coverSmall?' srcset="'+esc(coverSmall)+' 640w, '+esc(cover)+' 1280w" sizes="(max-width:720px) 94vw, 600px"':'';
     var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'"'+srcset+' onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
     var rar=esc(it.rarity||'N');
-    var ext=(it.url||'').indexOf('myskme.github.io/myskme-hub/')<0; // hub 自家子页当前标签打开,保住返回键;外站才开新标签
+    var ext=(it.url||'').indexOf('https://myskme.com/')!==0; // 主域自家子页当前标签打开,保住返回键;外站才开新标签
     var tgt=ext?' target="_blank" rel="noopener"':'';
     var badges=catIcon(it.cat)+'<span class="rarity-badge">'+rar+'</span>'; // 稀有度角标接线——CSS 早就写好(rar-* 左描边+角标),markup 一直没输出
     var thumb='<a class="thumb" href="'+esc(it.url)+'"'+tgt+' aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
@@ -1064,16 +1064,18 @@ var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'lig
 var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p);}catch(err){}})();
 </script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
+<link rel="canonical" href="https://myskme.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
 <meta name="description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
 <meta property="og:description" content="王老师的原创作品总目：星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块（题库 · 听力 · 写作 · 每日一题）—— 扫码即玩。">
-<meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
-<meta property="og:url" content="https://myskme.github.io/myskme-hub/">
+<meta property="og:image" content="https://myskme.com/og-cover.png">
+<meta property="og:image:alt" content="MYSKME · 狼先生与他的学生们作品总目">
+<meta property="og:url" content="https://myskme.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta name="twitter:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
+<meta name="twitter:image" content="https://myskme.com/og-cover.png">
 <style>%%CSS%%</style>
 </head>
 <body>
@@ -1117,17 +1119,17 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
       <a href="https://myskme.github.io/myskme-chronicle/" target="_blank" rel="noopener">世界编年史</a>
     </div>
     <div class="foot-links">
-      <a href="https://myskme.github.io/myskme-hub/banks/">题库书架</a>
+      <a href="https://myskme.com/banks/">题库书架</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/wall/">优秀作文墙</a>
+      <a href="https://myskme.com/wall/">优秀作文墙</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/write/">作文训练场</a>
+      <a href="https://myskme.com/write/">作文训练场</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/daily/">每日一题</a>
+      <a href="https://myskme.com/daily/">每日一题</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/listen/">听力训练场</a>
+      <a href="https://myskme.com/listen/">听力训练场</a>
       <span>·</span>
-      <a href="https://myskme.github.io/myskme-hub/print/">打印中心</a>
+      <a href="https://myskme.com/print/">打印中心</a>
     </div>
     <div><b>MYSKME</b> — Make Yourself Special &amp; Kind · Mr. Wang（王老师）</div>
     <div>免下载免安装 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>

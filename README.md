@@ -2,11 +2,14 @@
 
 狼先生与他的学生们（*Make Yourself Special & Kind*）课堂作品的聚合入口页 —— 单文件、离线、可投屏，**扫码即玩**。
 
-**线上地址：** https://myskme.github.io/myskme-hub/
+**正式入口：** https://myskme.com/
+
+**旧入口 / 灾备：** https://myskme.github.io/myskme-hub/
 
 ## 收录作品
 | 作品 | 地址 |
 |---|---|
+| 灵石远征 · GEMFALL | https://play.myskme.com/ |
 | 星徒地牢 | https://myskme.github.io/myskme-star-dungeon/ |
 | MYSKME 积分板 | https://myskme.github.io/myskme-scoreboard/ |
 | 三国军师争霸积分器 | https://myskme.github.io/three-kingdoms-classroom-scoreboard/ |
@@ -17,17 +20,17 @@
 | MYSKME 题库训练场 | https://myskme.github.io/myskme-quiz/ |
 | MYSKME自鸣棋 · 课堂肉鸽自走棋 | https://myskme.github.io/myskme-zimingqi/ |
 
-## 学习工具（本仓库托管 · GitHub Pages · 免后端）
+## 学习工具（本仓库托管 · EdgeOne + GitHub Pages 灾备）
 中考四板块（词汇语法 / 阅读完形 / 写作 / 听力）全数字化，纯静态、扫码即用：
 
 | 工具 | 地址 |
 |---|---|
-| 题库书架 | https://myskme.github.io/myskme-hub/banks/ |
-| 优秀作文墙 | https://myskme.github.io/myskme-hub/wall/ |
-| 作文训练场 | https://myskme.github.io/myskme-hub/write/ |
-| 听力训练场 | https://myskme.github.io/myskme-hub/listen/ |
-| 每日一题 | https://myskme.github.io/myskme-hub/daily/ |
-| 打印中心 | https://myskme.github.io/myskme-hub/print/ |
+| 题库书架 | https://myskme.com/banks/ |
+| 优秀作文墙 | https://myskme.com/wall/ |
+| 作文训练场 | https://myskme.com/write/ |
+| 听力训练场 | https://myskme.com/listen/ |
+| 每日一题 | https://myskme.com/daily/ |
+| 打印中心 | https://myskme.com/print/ |
 
 > 出题工坊（`maker/`）与控制台（`console/`）为王老师后台，需管理员密码，未从主页公开链接。
 
@@ -44,3 +47,5 @@
 ```bash
 python3 build_hub.py   # 读取内置数据 + qrcode-generator.js，生成 index.html
 ```
+
+正式域名的可重复发布流程、缓存策略与验收清单见 `deploy/homepage/README.md`。
