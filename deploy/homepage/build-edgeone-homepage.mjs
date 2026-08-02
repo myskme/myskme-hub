@@ -11,9 +11,11 @@ const output = path.resolve(process.argv[2]
   || path.join(tmpdir(), 'myskme-homepage-' + Date.now() + '.zip'));
 const runtimeEntries = [
   'index.html',
+  'manifest.webmanifest',
   'og-cover.png',
   'robots.txt',
   'sitemap.xml',
+  'icons',
   'assets',
   'banks',
   'daily',
@@ -67,7 +69,9 @@ try {
 
   const files = (await filesUnder(staging)).sort();
   const required = [
-    'index.html', 'og-cover.png', 'robots.txt', 'sitemap.xml',
+    'index.html', 'manifest.webmanifest', 'og-cover.png', 'robots.txt', 'sitemap.xml',
+    path.join('icons', 'app-icon-512.png'),
+    path.join('icons', 'apple-touch-icon.png'),
     path.join('assets', 'hero-wolf.webp'),
     path.join('banks', 'index.html'),
   ];
