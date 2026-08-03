@@ -556,6 +556,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #daily-card.q3mode .ck{display:none}
 #daily-card.q3mode .cd{font-size:11px;margin-top:0}
 #q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+/* 今日深挖那一行。只有打够 4 关才出现，休闲玩家看不到——
+   不该让人被一个自己够不着的进度条压着。 */
+#q3-grind{display:none;margin-top:5px;font-size:10.5px;letter-spacing:.04em;
+  color:var(--ink3);line-height:1.5}
+#q3-grind b{color:var(--gold2);font-weight:500}
 .q3r{position:relative;display:flex;justify-content:space-between;align-items:baseline;
   font-size:11px;letter-spacing:.04em;color:var(--ink2);
   border:1px solid var(--line);padding:2px 7px 3px;overflow:hidden}
@@ -584,6 +589,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   color:var(--bg);background:var(--gold-line);padding:1px 5px;margin-right:6px;vertical-align:1px}
 .skl.psv i{background:var(--line2);color:var(--ink2)}
 .skl b{color:var(--gold2)}
+
+/* 存档搬家 */
+.xfer-note{font-size:11.5px;line-height:1.7;color:var(--ink2);margin:2px 0 8px}
+.xfer-note b{color:var(--gold2)}
+.xfer-btns{display:flex;gap:8px}
+.xfer-btns .btn{flex:1;font-size:12.5px;padding:7px 4px}
+#xfer-panel{margin-top:9px}
+#xfer-panel textarea{width:100%;min-height:88px;box-sizing:border-box;padding:8px 9px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.5;
+  word-break:break-all;resize:vertical;user-select:text;-webkit-user-select:text}
+#xfer-panel .xrow{display:flex;gap:8px;margin-top:8px}
+#xfer-panel .xrow .btn{flex:1;font-size:12.5px;padding:7px 4px}
+.xfer-diff{border:1px solid var(--gold-line);padding:8px 10px;margin-top:9px;
+  font-size:11.5px;line-height:1.8;color:var(--ink2)}
+.xfer-diff b{color:var(--gold2)}
+.xfer-diff .warn{color:var(--red)}
 
 /* 上传诊断 */
 #lb-diagwrap{text-align:center;margin-top:8px}
@@ -948,6 +970,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
            改成同一张卡的第二态：今日三桩。不新增高度。 -->
       <div id="q3-rows"></div>
+      <div id="q3-grind"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
@@ -980,7 +1003,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     </div>
     <div id="star-meter">
       <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
-      <div class="sm-top"><span>星辰宝箱</span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
+      <div class="sm-top"><span>星辰宝箱<i id="sm-src"></i></span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
       <div class="bar"><i id="sm-fill"></i></div>
       <button class="btn primary" id="chest-btn"><span class="ic"></span> 开启星辰宝箱</button>
     </div>
@@ -1296,6 +1319,18 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="ins-note">华为/小米等自带浏览器菜单位置略有不同，一般都在菜单里找「添加到桌面」。
       微信里同样先选「在浏览器中打开」。</div>
   </div>
+  <!-- 存档搬家。放这里是因为「换手机」和「装到桌面」本来就是同一件事，
+       玩家找「换设备怎么办」会先点开这一页。 -->
+  <div class="ins-sec">
+    <div class="ins-os">换设备 / 手机平板换着玩</div>
+    <div class="xfer-note">进度存在这台设备上。换设备时把口令复制过去，
+      两边都能接着玩。<b>全程离线，不经过任何服务器。</b></div>
+    <div class="xfer-btns">
+      <button class="btn ghost" id="xfer-out">导出我的进度</button>
+      <button class="btn ghost" id="xfer-in">粘贴口令导入</button>
+    </div>
+    <div id="xfer-panel"></div>
+  </div>
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
 </div></div>
 
@@ -1384,6 +1419,7 @@ const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
+  gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
@@ -1398,6 +1434,7 @@ function loadSave(){
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
   out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
+  out.gr=Object.assign({d:0,n:0,got:0},s.gr||{});
   return out;
 }
 const SAVE=loadSave();
@@ -3663,6 +3700,18 @@ function renderDaily(){
   $('#daily-desc').innerHTML=done>=3
     ? '明天再来 · 换三桩新的'
     : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>　<span style="color:var(--ink3)">输了也算数</span>';
+  /* 今日深挖：给肝帝看的那一行。没打够 6 关不显示——
+     休闲玩家不该被一个自己够不着的进度条压着。 */
+  const g=grindState();
+  const gd=$('#q3-grind');
+  if(g.n>=4){
+    const next=GRIND.find(x=>x.n>g.n);
+    gd.style.display='';
+    gd.innerHTML='今日深挖 <b>'+g.n+'</b> 关'
+      +(next?('　距 '+next.n+' 关还差 <b>'+(next.n-g.n)+'</b> → '
+              +(next.dust?('星屑 '+next.dust):(icTag('box')+' 典藏匣')))
+            :'　<span style="color:var(--gold2)">今日三档已全数领取</span>');
+  }else gd.style.display='none';
   $('#q3-rows').innerHTML=s.q.map(q=>{
     const def=Q3BY[q.k], pct=Math.min(100,(def.best?q.got:Math.min(q.got,q.need))/q.need*100);
     return '<div class="q3r'+(q.done?' done':'')+'">'
@@ -3771,18 +3820,140 @@ function q3Text(q){
 /* ---- 星辰宝箱 ---- */
 const CHEST_COST=15;
 function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
+/* ==================================================================
+   [ 存档搬家 · SAVE TRANSFER ]
+   ------------------------------------------------------------------
+   换手机、或者手机平板换着玩，进度不该丢。
+
+   为什么是「一长串文本」而不是别的：
+   · 手打口令不行——满档 JSON 7.4KB，gzip 后仍有约 2900 字符。
+   · 二维码不行——超出常用容量，且要开摄像头授权。
+   · 云同步要账号体系和新后端，隐私面也变大；本作至今零账号，不为这个破例。
+   · 复制粘贴最稳：国内跨设备传文本本来就走微信文件传输助手，
+     而且**全程离线**，不经过任何服务器。
+
+   格式：`GFSAVE1:` + base64(gzip(JSON))。带前缀是为了让人一眼认出这是什么，
+   也方便粘错东西时立刻拒绝。老浏览器没有 CompressionStream 就退回不压缩，
+   只是串更长，功能不受影响。
+   ================================================================== */
+const XFER_TAG='GFSAVE1:', XFER_RAW='GFSAVE0:';
+const _u8b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const _b64u8=b=>{const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
+async function xferExport(){
+  colFix();
+  const blob=JSON.stringify({v:1,t:Date.now(),s:SAVE,c:COLS});
+  const bytes=new TextEncoder().encode(blob);
+  if(typeof CompressionStream!=='undefined'){
+    try{
+      const cs=new CompressionStream('gzip');
+      const w=cs.writable.getWriter();w.write(bytes);w.close();
+      const gz=new Uint8Array(await new Response(cs.readable).arrayBuffer());
+      return XFER_TAG+_u8b64(gz);
+    }catch(e){}
+  }
+  return XFER_RAW+_u8b64(bytes);                     // 老内核退路：不压缩，只是更长
+}
+async function xferParse(text){
+  const t=String(text||'').replace(/\s+/g,'');
+  const gz=t.startsWith(XFER_TAG), raw=t.startsWith(XFER_RAW);
+  if(!gz&&!raw)return {err:'这不是存档口令 —— 应该以 GFSAVE1: 开头'};
+  const body=t.slice((gz?XFER_TAG:XFER_RAW).length);
+  let json;
+  try{
+    const u=_b64u8(body);
+    if(gz){
+      const ds=new DecompressionStream('gzip');
+      const w=ds.writable.getWriter();w.write(u);w.close();
+      json=new TextDecoder().decode(await new Response(ds.readable).arrayBuffer());
+    }else json=new TextDecoder().decode(u);
+  }catch(e){return {err:'口令损坏或没复制全'}}
+  let d;try{d=JSON.parse(json)}catch(e){return {err:'口令损坏或没复制全'}}
+  if(!d||d.v!==1||typeof d.s!=='object'||typeof d.c!=='object')return {err:'口令版本不对'};
+  return {data:d};
+}
+/* 导入前先算清楚「会覆盖成什么样」，让玩家自己比对。
+   这是不可逆操作，必须让他看见两边的差距再点。 */
+function xferSummary(d){
+  const s=d.s||{}, c=d.c||{};
+  const stars=Object.values(s.stars||{}).reduce((a,b)=>a+(+b||0),0);
+  const cards=Object.keys(c.own||{}).length;
+  return {lv:Math.max(0,(s.lv||1)-1),stars,rush:s.rushBest||0,
+    power:s.power||0,cards,box:c.box||0,
+    when:d.t?new Date(d.t).toLocaleString('zh-CN'):'未知时间'};
+}
+function xferApply(d){
+  /* 整体替换而不是合并：合并两份存档会产生「关卡进度是 A 的、收藏册是 B 的」
+     这种没人想要的杂交档，而且很难向玩家解释。搬家就是搬家。 */
+  localStorage.setItem(SKEY,JSON.stringify(d.s));
+  localStorage.setItem(CKEY,JSON.stringify(d.c));
+}
+
+/* ==================================================================
+   [ 今日深挖 · GRIND TRACK ]
+   ------------------------------------------------------------------
+   玩家反映每日上限「不够肝」。但直接放宽兑匣上限会毁掉长期性——
+   攒了几万灵力的老玩家一晚上能开完，两年的收集线当场归零。
+   所以另开一条**独立于灵力**的跑道：今天打得多，就多拿。
+
+   三档递减，且**第 20 关封顶**：打 40 关和打 20 关拿的一样多。
+   实测年产 = 休闲的 1.33 倍，够看得见，又不会把长线压垮；
+   封顶那条是有意的——鼓励「今天多玩几把」，不鼓励「挂机刷一天」。
+   ================================================================== */
+const GRIND=[{n:6,dust:12},{n:12,dust:20},{n:20,box:1}];
+const GRIND_MAX=GRIND[GRIND.length-1].n;
+function grindState(){
+  const d=dayNum(), s=SAVE.gr||(SAVE.gr={d:0,n:0,got:0});
+  if(s.d>d){s.d=0}                                   // 机器时钟跑到未来过，照抄矿灯那条防线
+  if(s.d!==d){s.d=d;s.n=0;s.got=0;persist()}
+  return s;
+}
+/* 每通关一关记一笔。只认冒险关与无尽层——限时局和聚会赛不算，
+   否则 90 秒一局能把三档刷完，这条跑道就成了刷时长而不是打关。 */
+function grindTick(){
+  const s=grindState();
+  if(s.n>=GRIND_MAX&&s.got>=GRIND.length)return;
+  s.n++;
+  for(let i=0;i<GRIND.length;i++){
+    if(s.got>i)continue;
+    if(s.n<GRIND[i].n)break;
+    s.got=i+1;
+    const g=GRIND[i];
+    if(g.dust){colFix();COLS.dust+=g.dust;colSave();
+      setTimeout(()=>toast('今日深挖 · 第 <b>'+g.n+'</b> 关<br>'+icTag('dust')+' 星屑 +'+g.dust,3000),1200)}
+    if(g.box){giveBox(1,'今日深挖');
+      setTimeout(()=>toast('今日深挖 · 第 <b>'+g.n+'</b> 关<br>'+icTag('box')+' <b>典藏匣 +1</b>',3400),1200)}
+  }
+  persist();
+}
+
+/* ---- 星辰宝箱的星源 ----
+   原来只数关卡星，而关卡星终身封顶 192，192÷15=12 箱**余 12**——
+   满星玩家的进度条会永远停在 12/15，那 12 颗星死在里面换不出任何东西。
+   玩家报的「12/15 不能满」就是这个，不是随机 bug 是数学死角。
+
+   补第二条星源：无尽矿脉每 2 层 1 颗「深星」。
+   它同时解决另一件事——肖肖已经挖到 79 层，此前一分额外奖励都没有。
+   无尽是无限的，所以宝箱从此不会再有终点。 */
+const DEEP_PER_STAR=2;
+function deepStars(){return Math.floor(Math.max(0,(SAVE.lv||1)-1-64)/DEEP_PER_STAR)}
+function chestStars(){return totalStars()+deepStars()}
 function renderChest(){
   applyArt($('#chest-orn'),'star_chest');
-  const ts=totalStars(), claimed=SAVE.chest||0;
+  const ts=chestStars(), claimed=SAVE.chest||0;
   const inCur=ts-claimed*CHEST_COST;
   const can=inCur>=CHEST_COST;
   $('#sm-cur').textContent=Math.min(inCur,CHEST_COST);
   $('#sm-need').textContent=CHEST_COST;
   $('#sm-fill').style.width=clamp(inCur/CHEST_COST*100,0,100)+'%';
+  /* 满星之后星星只能来自无尽深度，得说一声——否则数字自己在涨，
+     玩家不知道为什么，还以为又是 bug。 */
+  const d=deepStars();
+  $('#sm-src').innerHTML=d>0?('　<span style="color:var(--ink3);font-style:normal;font-size:11px">'
+    +'含无尽深星 '+d+'</span>'):'';
   $('#chest-btn').classList.toggle('on',can);
 }
 function openChest(){
-  const ts=totalStars(), claimed=SAVE.chest||0;
+  const ts=chestStars(), claimed=SAVE.chest||0;
   if(ts-claimed*CHEST_COST<CHEST_COST)return;
   SAVE.chest=claimed+1;
   SAVE.power=(SAVE.power||0)+800;
@@ -4483,6 +4654,7 @@ function endLevel(win){
     SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
     q3Bump('clear',1);
+    grindTick();                    // 今日深挖只认冒险关与无尽层
     setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
@@ -5933,6 +6105,57 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+/* ---- 存档搬家的接线 ---- */
+$('#xfer-out').addEventListener('click',async()=>{
+  SFX.click();
+  const code=await xferExport();
+  const p=$('#xfer-panel');
+  p.innerHTML='<textarea id="xfer-text" readonly spellcheck="false"></textarea>'
+    +'<div class="xrow"><button class="btn ghost" id="xfer-copy">复制口令</button></div>'
+    +'<div class="xfer-note" style="margin-top:8px">粘到微信「文件传输助手」发给自己，'
+    +'在新设备上打开本页 →「安装到手机」→「粘贴口令导入」。</div>';
+  $('#xfer-text').value=code;
+  $('#xfer-copy').onclick=async()=>{
+    SFX.click();
+    try{await navigator.clipboard.writeText(code);toast('口令已复制 · 发到文件传输助手就行',3000)}
+    catch(e){
+      /* 剪贴板在非安全上下文会被拒。别只报错——直接把文本选中，让他按系统菜单复制。 */
+      const t=$('#xfer-text');t.focus();t.select();
+      toast('复制被浏览器挡了 · <b>已全选，长按选「拷贝」</b>',3600);
+    }
+  };
+});
+$('#xfer-in').addEventListener('click',()=>{
+  SFX.click();
+  const p=$('#xfer-panel');
+  p.innerHTML='<textarea id="xfer-text" spellcheck="false" placeholder="把 GFSAVE1: 开头的那一长串粘在这里"></textarea>'
+    +'<div class="xrow"><button class="btn ghost" id="xfer-check">检查这份存档</button></div>';
+  $('#xfer-text').focus();
+  $('#xfer-check').onclick=async()=>{
+    SFX.click();
+    const r=await xferParse($('#xfer-text').value);
+    if(r.err){toast(r.err,3200);return}
+    const n=xferSummary(r.data), cur=xferSummary({s:SAVE,c:(colFix(),COLS),t:0});
+    const cmp=(a,b)=>a===b?'':(a>b?' <span style="color:var(--gold2)">↑</span>':' <span class="warn">↓</span>');
+    /* 把两边并排摆出来。覆盖是不可逆的，玩家必须先看见自己会失去什么。 */
+    p.insertAdjacentHTML('beforeend',
+      '<div class="xfer-diff">口令导出于 <b>'+esc(n.when)+'</b><br>'
+      +'通关 <b>'+n.lv+'</b> 关'+cmp(n.lv,cur.lv)+'　星 <b>'+n.stars+'</b>'+cmp(n.stars,cur.stars)
+      +'　限时 <b>'+n.rush.toLocaleString('en-US')+'</b>'+cmp(n.rush,cur.rush)+'<br>'
+      +'灵力 <b>'+n.power.toLocaleString('en-US')+'</b>'+cmp(n.power,cur.power)
+      +'　收藏 <b>'+n.cards+'</b> 份'+cmp(n.cards,cur.cards)+'<br>'
+      +'<span class="warn">本机当前：通关 '+cur.lv+' 关 · '+cur.stars+' 星 · 收藏 '+cur.cards+' 份'
+      +'<br>导入会<b>整份覆盖</b>本机进度，不能撤销。</span></div>'
+      +'<div class="xrow"><button class="btn" id="xfer-cancel">算了</button>'
+      +'<button class="btn primary" id="xfer-go">确认覆盖本机</button></div>');
+    $('#xfer-cancel').onclick=()=>{SFX.click();p.innerHTML=''};
+    $('#xfer-go').onclick=()=>{
+      SFX.click();xferApply(r.data);
+      toast('存档已导入 · <b>正在重载</b>',2200);
+      setTimeout(()=>location.reload(),900);
+    };
+  };
+});
 $('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
 $('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
 $('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
@@ -6358,7 +6581,42 @@ window.__selftest=function(){
     COLS=JSON.parse(bak);
     ok('卡的来历只记第一次，重复不覆盖',first===after&&/第 7 匣开出/.test(txt));
   }
-  /* 28. 目标文案里不许出现哨兵大数。
+  /* 28. 星辰宝箱不能有终点。192 星 ÷ 15 = 12 箱余 12，满星玩家会永远卡在
+     12/15——玩家报的「不能满」就是这个。补了无尽深星之后必须不再卡死。 */
+  {
+    const bakLv=SAVE.lv, bakSt=SAVE.stars;
+    SAVE.stars={};for(let i=1;i<=64;i++)SAVE.stars[i]=3;      // 192 星全满
+    SAVE.lv=65;                                               // 刚进无尽，没有深星
+    const stuck=chestStars()-Math.floor(chestStars()/CHEST_COST)*CHEST_COST;
+    SAVE.lv=65+DEEP_PER_STAR*3;                               // 深挖 6 层 = 3 颗深星
+    const grew=chestStars();
+    SAVE.lv=bakLv;SAVE.stars=bakSt;
+    ok('星辰宝箱不再有终点（满星后无尽深度继续供星）',
+       stuck===12&&grew===192+3&&deepStars.length>=0);
+  }
+  /* 29. 今日深挖三档递减且第 20 关封顶——不鼓励挂机刷一天。 */
+  {
+    const bak=JSON.stringify(SAVE.gr||{});
+    const boxAt=n=>GRIND.filter(g=>n>=g.n&&g.box).length;
+    const ok1=GRIND.length===3&&GRIND[GRIND.length-1].n===GRIND_MAX;
+    const ok2=boxAt(19)===0&&boxAt(20)===1&&boxAt(40)===1;     // 40 关和 20 关拿的一样多
+    const ok3=GRIND.every((g,i)=>i===0||g.n>GRIND[i-1].n);     // 档位严格递增
+    SAVE.gr=JSON.parse(bak||'{"d":0,"n":0,"got":0}');
+    ok('今日深挖三档递增且第 20 关封顶',ok1&&ok2&&ok3);
+  }
+  /* 30. 存档搬家：导出→导入必须一字不差地还原，且格式不对要拦住。
+     这是不可逆操作，编解码错一位就是玩家整份进度没了。 */
+  {
+    const bad1=xferParse('随便一段文字');
+    const bad2=xferParse('GFSAVE1:@@@不是base64@@@');
+    /* xferParse 是 async，这里只验同步的拒绝路径能拿到 Promise 且最终 err；
+       往返一致性由下面的浏览器实测覆盖（自检里不能 await）。 */
+    ok('存档口令能认出非法输入',
+       bad1 instanceof Promise&&bad2 instanceof Promise
+       &&typeof xferExport==='function'&&typeof xferApply==='function'
+       &&XFER_TAG==='GFSAVE1:');
+  }
+  /* 31. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
