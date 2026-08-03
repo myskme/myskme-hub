@@ -101,6 +101,15 @@ async function verify() {
       `预检 Max-Age 为 ${response.headers.get('access-control-max-age') || '空'}`);
   });
 
+  await check('题库等公开 JSON 允许跨域读取', async () => {
+    // 各作品页面还在 myskme.github.io 上，要拉 myskme.com 的题库书架就是跨域请求。
+    // 少了这个头，浏览器会静默拦掉——学生那边表现为书架空白，且控制台之外看不出原因。
+    const response = await get(`https://myskme.com/banks/index.json?${cacheBust}`);
+    assert(response.status === 200, `题库目录状态码 ${response.status}`);
+    assert(response.headers.get('access-control-allow-origin') === '*',
+      `题库目录 Allow-Origin 为 ${response.headers.get('access-control-allow-origin') || '空'}`);
+  });
+
   await check('网关源码不会被当静态文件公开', async () => {
     // EdgeOne 把 edge-functions/ 当特殊目录、不作静态内容下发。这里固化成常驻检查：
     // 一旦哪天能读到源码，上游 Worker 地址（含邮箱前缀）就会重新暴露在公网上。
