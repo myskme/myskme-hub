@@ -31,7 +31,11 @@ document.documentElement.setAttribute('data-theme','dark')}})();</script>
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
 <meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
-<meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
+<!-- 分享卡片走品牌域名：网页玩家基本在国内，github.io 的图爬虫抓不到，
+     卡片就成了无图裸链。og.png 随 EdgeOne 直传包的 icons/ 目录发布，
+     GitHub Pages 上同路径也有，两边都不断。 -->
+<meta property="og:url" content="https://play.myskme.com/">
+<meta property="og:image" content="https://play.myskme.com/icons/og.png">
 <style>
 :root{
   --bg:#0a0a0c;--bg2:#111114;--panel:#16161a;--panel2:#1c1c22;--edge:#26262e;
@@ -1269,7 +1273,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <div class="ovl" id="ovl-install"><div class="ovl-card" style="text-align:left">
   <div class="ovl-kick" style="text-align:center">ADD TO HOME SCREEN</div>
   <div class="ovl-title" style="text-align:center">安装到<em>手机</em></div>
-  <div class="ovl-sub" style="text-align:center">加到桌面后：全屏无地址栏、有独立图标，像 App 一样点开就玩。</div>
+  <div class="ovl-sub" style="text-align:center">加到桌面后：全屏无地址栏、有独立图标，像 App 一样点开就玩。<br>
+    <span style="color:var(--gold2)">记住正门：<b>play.myskme.com</b></span>
+    <span style="color:var(--ink3)">—— 告诉朋友这一个就够</span></div>
   <div class="ins-sec">
     <div class="ins-os">iPhone / iPad（用 Safari 打开本页）</div>
     <div class="ins-step"><i>1</i>点击屏幕<b>底部中间</b>的分享按钮
@@ -5122,11 +5128,15 @@ function wkTablet(){
   const top=log.filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
   const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
   const rows=top.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
+  /* 分享链接优先品牌域名（国内可达），没配置才回落到当前地址。
+     从 GitHub Pages 打开的人如果发出去 github.io 链接，群里根本点不开。 */
+  const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
+    ||location.origin+location.pathname.replace(/index\.html$/,'');
   return '灵石远征 · 本周矿脉 第 '+s.w+' 期\n'
     +(rows||'□')+'\n'
     +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax+'\n'
     +'同一副盘，你能打多少？\n'
-    +location.origin+location.pathname.replace(/index\.html$/,'');
+    +share;
 }
 async function copyTablet(){
   const t=wkTablet();

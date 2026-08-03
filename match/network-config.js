@@ -6,6 +6,10 @@
   'use strict';
   const existing = root.MYSKME_GEMFALL_NETWORK || {};
   root.MYSKME_GEMFALL_NETWORK = Object.assign({
+    /* 对外分享一律用品牌域名，不用 location.origin：
+       网页玩家基本在国内，从 GitHub Pages 打开的人分享出去的
+       github.io 链接在群里点不开，等于把传播链掐断在第一环。 */
+    shareUrl: 'https://play.myskme.com/',
     apiBases: ['https://play.myskme.com/api'],
     sameOriginApi: true,
     sameOriginPath: '/api',
