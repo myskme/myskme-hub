@@ -15,6 +15,40 @@ node deploy/homepage/build-edgeone-homepage.mjs /private/tmp/myskme-homepage.zip
 发布包只包含总主页、分享封面、公共封面资源以及题库书架、听力、写作、每日一题、
 作文墙和打印中心，不包含管理员控制台、源码工具或《灵石远征》运行目录。
 
+## GitHub 半自动发布
+
+工作流：`.github/workflows/deploy-homepage.yml`。
+
+- 合并到 `main` 且主页运行资源发生变化时，GitHub Actions 自动重新生成主页、确认
+  `index.html` 没有漏提交、构建并校验 EdgeOne ZIP，再把 ZIP 与 SHA-256 保存为 14 天制品。
+- 普通 `push` **只构建，不发布**，因此试验性提交不会直接覆盖 `myskme.com`。
+- 正式发布时进入 GitHub 仓库的 Actions，选择“`MYSKME 主页 · 构建与人工发布`”，
+  点击“Run workflow”，分支必须选择 `main`，目标选择 `production`。
+- 生产任务会重新使用同一次运行刚构建的 ZIP，调用 EdgeOne Makers CLI 发布，随后自动验收
+  主域、`www` 301、Manifest、主页图标哈希和 `play.myskme.com`。
+
+首次启用需要完成两项仓库设置：
+
+1. 在 EdgeOne Makers 控制台创建有有效期的 API Token。
+2. 在 GitHub 仓库 Actions Secret 中保存为 `EDGEONE_API_TOKEN`；不要把 Token 写进文件、
+   PR、日志或命令示例。生产任务使用 Environment `myskme-homepage-production`，可在
+   GitHub 设置中为它增加 required reviewers，形成第二道人工批准。
+
+CLI 固定为 `edgeone@1.6.19`，并使用官方推荐的新命名空间：
+
+```bash
+edgeone makers deploy myskme-homepage.zip \
+  -n myskme-homepage -e production -t "$EDGEONE_API_TOKEN"
+```
+
+如果 Token 失效，自动构建仍会正常工作，只有人工生产发布会明确失败并提示重新配置。
+
+本地或 CI 部署后可单独复验线上状态：
+
+```bash
+node deploy/homepage/verify-online-homepage.mjs
+```
+
 ## EdgeOne 与域名
 
 1. 新建独立 Makers 项目，建议命名 `myskme-homepage`，上传上述 ZIP。
