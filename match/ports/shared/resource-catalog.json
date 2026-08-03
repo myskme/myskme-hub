@@ -10,8 +10,8 @@
     "assets/og-gemfall.png"
   ],
   "totals": {
-    "files": 76,
-    "bytes": 22624927,
+    "files": 77,
+    "bytes": 22793857,
     "byCategory": {
       "cover": 1,
       "social-card": 1,
@@ -30,7 +30,7 @@
       "obstacle": 6,
       "license": 1,
       "audio": 3,
-      "icon": 4,
+      "icon": 5,
       "splash": 9
     }
   },
@@ -941,6 +941,19 @@
       "sha256": "68fe724034d6c3ea0489ab5d27e68bf54127e801b4dac4c9e7d3c7c98ac20444",
       "width": 192,
       "height": 192,
+      "alpha": false,
+      "category": "icon",
+      "platforms": [
+        "web",
+        "ios"
+      ]
+    },
+    {
+      "path": "match/icons/og.png",
+      "bytes": 168930,
+      "sha256": "f26e799cf5683c18be81270a5ed574546ada5689680fbf467ab6008c08a82ee1",
+      "width": 1200,
+      "height": 630,
       "alpha": false,
       "category": "icon",
       "platforms": [

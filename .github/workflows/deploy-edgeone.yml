@@ -1,0 +1,82 @@
+name: 灵石远征 · 发布到 EdgeOne 正门
+
+# 合并进 main 即视为发版：GitHub Pages（灾备门）由 Pages 自身跟随 main 更新，
+# 这里负责另一扇门——play.myskme.com（EdgeOne Makers，国内玩家的正门）。
+# 两扇门共用同一份 match/ 内容，发版只需要「合并进 main」这一个动作。
+#
+# 凭证：仓库 Secrets 里的 EDGEONE_API_TOKEN（EdgeOne 控制台生成）。
+# 没配 token 时不算失败——打好可直传的 ZIP 挂在 Actions 产物里，
+# 去控制台手动上传同样能发，流程见 match/NETWORK-DEPLOYMENT.md。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'match/index.html'
+      - 'match/manifest.json'
+      - 'match/network-config.js'
+      - 'match/sw.js'
+      - 'match/edgeone.json'
+      - 'match/edge-functions/**'
+      - 'match/art/**'
+      - 'match/audio/**'
+      - 'match/icons/**'
+      - '.github/workflows/deploy-edgeone.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-edgeone
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 构建发布包（与 CI 校验同一脚本）
+        run: |
+          node match/ports/tools/build-edgeone-package.mjs /tmp/gemfall-edgeone.zip
+          unzip -tq /tmp/gemfall-edgeone.zip
+
+      - name: 检查部署凭证
+        id: tok
+        run: echo "have=${{ secrets.EDGEONE_API_TOKEN != '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: 部署到 play.myskme.com
+        if: steps.tok.outputs.have == 'true'
+        run: |
+          npm install -g edgeone
+          edgeone makers deploy /tmp/gemfall-edgeone.zip -n myskme-gemfall -t "$EDGEONE_API_TOKEN"
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+
+      - name: 线上冒烟（部署后正门必须活着）
+        if: steps.tok.outputs.have == 'true'
+        run: |
+          sleep 20
+          code=$(curl -s -o /dev/null -w '%{http_code}' -m 30 https://play.myskme.com/)
+          echo "首页 HTTP $code"
+          test "$code" = "200"
+          api=$(curl -s -o /dev/null -w '%{http_code}' -m 30 'https://play.myskme.com/api/gf/board?scope=world&limit=1')
+          echo "榜单代理 HTTP $api"
+          test "$api" = "200"
+
+      - name: 未配 token · 留手动直传包
+        if: steps.tok.outputs.have != 'true'
+        run: |
+          echo "::notice::未配置 EDGEONE_API_TOKEN，跳过自动部署。"
+          echo "::notice::ZIP 已挂在本次运行的产物里：下载后到 EdgeOne 控制台直传项目 myskme-gemfall 即可。"
+
+      - name: 挂出发布包
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemfall-edgeone-zip
+          path: /tmp/gemfall-edgeone.zip
+          retention-days: 14

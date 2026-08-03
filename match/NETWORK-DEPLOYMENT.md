@@ -80,6 +80,42 @@
 - `/api/` 健康检查返回 `200`；无效设备提交穿透到原 Worker 后返回预期 `400 no device`，
   未写入 D1；非白名单代理路径返回 `404`。所有 `/api/*` 响应均为 `no-store`。
 
+### 分享链路（2026-08-03）
+
+- 对外分享一律走 `network-config.js` 的 `shareUrl`（`https://play.myskme.com/`），
+  **不用 `location.origin`**：网页玩家基本在国内，从 GitHub Pages 打开的人
+  分享出去的 github.io 链接在群里点不开，传播链会断在第一环。
+  本周矿脉拓片已切换；以后新增任何分享出口都读这个字段。
+- `og:url` / `og:image` 指向 `play.myskme.com`；og 图为
+  `match/icons/og.png`（1200×630，即 assets/og-gemfall.png 的同域副本，
+  已入素材总账）。icons/ 整目录本来就在直传包里，
+  ⚠ 但 **og 卡片要等下一次 EdgeOne 直传后才有图**——发布前线上是 404。
+
+## 发版流程（2026-08-03 起，一页说清）
+
+两扇门，一个动作：**合并进 main 就是发版**。
+
+| 门 | 域名 | 怎么更新 |
+|---|---|---|
+| 正门（国内玩家） | `play.myskme.com` | main 变更触发 `.github/workflows/deploy-edgeone.yml` 自动直传 |
+| 灾备门 | `myskme.github.io/myskme-hub/match/` | GitHub Pages 跟随 main，自动 |
+
+标准步骤：
+
+1. 在工作分支改完，`gemfall-verify` CI 必须绿（自检、总账、SW、代理 17 项全在里面）
+2. 开 PR 合并进 main
+3. 合并后两扇门各自自动更新；EdgeOne 那步末尾带线上冒烟（首页与榜单代理都要 200）
+
+前置一次性配置：EdgeOne 控制台生成 API Token → 存进仓库
+Settings → Secrets → `EDGEONE_API_TOKEN`。**没配 token 时不算失败**：
+工作流会把可直传的 ZIP 挂在 Actions 产物里（保留 14 天），
+下载后到控制台直传项目 `myskme-gemfall`，效果相同。
+
+⚠ 两个生成物改了源必须重生成，否则 `gemfall-verify` 会红：
+`sw.js`（index.html/配置/图标/任一 webp 变了就要）与
+`ports/shared/resource-catalog.json`（art/audio/icons/assets 单品增减就要）。
+本机没有 node 的话，Python 复刻算法见 `玩法与留存-实测记录.md` 与项目记忆。
+
 ### EdgeOne 直传发布
 
 直传时将 `match/` 中的以下内容放在 ZIP 根目录，不要再套一层 `match/`：

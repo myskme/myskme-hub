@@ -1,5 +1,15 @@
 # 灵石远征 · 跨端更新记录
 
+## 0.3.5 · 2026-08-03 · 分享链路统一品牌域名
+
+- 本周矿脉拓片的落款链接改读 `network-config.js` 新增的 `shareUrl`
+  （`https://play.myskme.com/`），不再用 `location.origin`——
+  从 GitHub Pages 打开的玩家分享出去的 github.io 链接国内点不开。
+- `og:url` / `og:image` 切到品牌域名；og 图新增 `match/icons/og.png`
+  （1200×630，assets/og-gemfall.png 的同域副本），已入素材总账（77 项）。
+- 安装弹层补一句「记住正门 play.myskme.com」。
+- ⚠ og 卡片要等**下一次 EdgeOne 直传**（icons/ 目录随包）后才有图。
+
 ## 0.3.4 · 2026-08-02 · MYSKME 多作品品牌 API 网关
 
 - `play.myskme.com/api` 从《灵石远征》单一代理扩展为四个隔离命名空间：
