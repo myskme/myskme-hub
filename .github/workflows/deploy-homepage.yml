@@ -1,0 +1,136 @@
+name: MYSKME 主页 · 构建与人工发布
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'build_hub.py'
+      - 'qrcode-generator.js'
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'og-cover.png'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'icons/**'
+      - 'assets/**'
+      - 'banks/**'
+      - 'daily/**'
+      - 'listen/**'
+      - 'write/**'
+      - 'wall/**'
+      - 'print/**'
+      - 'deploy/homepage/**'
+      - '.github/workflows/deploy-homepage.yml'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: '只构建，或确认发布到 myskme.com 生产环境'
+        required: true
+        default: build-only
+        type: choice
+        options:
+          - build-only
+          - production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: myskme-homepage-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 生成并校验 EdgeOne 发布包
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.11.0'
+
+      - name: 从唯一数据源重新生成主页
+        run: python3 build_hub.py
+
+      - name: 确认生成结果已经提交
+        run: |
+          if ! git diff --exit-code -- index.html; then
+            echo '::error title=主页生成结果未提交::build_hub.py 生成的 index.html 与仓库不一致，请先在本地重新生成并提交。'
+            exit 1
+          fi
+
+      - name: 构建 EdgeOne ZIP
+        run: node deploy/homepage/build-edgeone-homepage.mjs "$RUNNER_TEMP/myskme-homepage.zip"
+
+      - name: 校验 ZIP 完整性并生成摘要
+        run: |
+          unzip -t "$RUNNER_TEMP/myskme-homepage.zip"
+          shasum -a 256 "$RUNNER_TEMP/myskme-homepage.zip" | tee "$RUNNER_TEMP/myskme-homepage.zip.sha256"
+
+      - name: 保存可下载发布包
+        uses: actions/upload-artifact@v4
+        with:
+          name: myskme-homepage-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/myskme-homepage.zip
+            ${{ runner.temp }}/myskme-homepage.zip.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  deploy-production:
+    name: 人工确认后发布生产环境
+    needs: build
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.target == 'production' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: myskme-homepage-production
+      url: https://myskme.com/
+    steps:
+      - name: 检出仓库用于线上验收
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.11.0'
+
+      - name: 下载本次构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: myskme-homepage-${{ github.sha }}
+          path: dist
+
+      - name: 确认 EdgeOne 凭证已配置
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: |
+          if [ -z "$EDGEONE_API_TOKEN" ]; then
+            echo '::error title=缺少 EdgeOne Token::请在 GitHub Actions Secret 中配置 EDGEONE_API_TOKEN。'
+            exit 1
+          fi
+
+      - name: 发布到 myskme-homepage 生产环境
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: >-
+          npx --yes edgeone@1.6.19 makers deploy dist/myskme-homepage.zip
+          -n myskme-homepage
+          -e production
+          -t "$EDGEONE_API_TOKEN"
+
+      - name: 验收正式域名、Manifest 与图标
+        run: node deploy/homepage/verify-online-homepage.mjs
