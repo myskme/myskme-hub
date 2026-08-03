@@ -5947,7 +5947,14 @@ async function renderLB(){
   const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
   const form=$('#lb-form');
   for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
-  if(!LB.registered()){
+  /* 门派榜是**纯只读的公开榜**，不该被注册闸挡住。
+     线上实测发现：没起过化名的浏览器点门派榜是空的——而新人最该看到的
+     恰恰是「已经有帮派在玩」，看到了才有加入的念头。世界榜同理：
+     先给看，看完想上榜再起名，别拿一道表单堵在门口。
+     小队榜例外，它本来就要口令才有内容。 */
+  if(!LB.registered()&&LB.scope!=='class'){
+    form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='起名上榜';
+  }else if(!LB.registered()){
     form.hidden=false;list.innerHTML='';mine.innerHTML='';
     /* 输入框与存档同步，避免显示上一次残留的值 */
     $('#lb-alias').value=SAVE.lbAlias||'';
@@ -5985,9 +5992,11 @@ async function renderLB(){
         +'<span class="cnt">'+r.n+' 人 · 人均 '+r.avg.toLocaleString('en-US')+'</span>'
         +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>';
     }).join('');
-    mine.innerHTML=mineF
-      ?'我的门派 <b>'+esc(mineF)+'</b> · 每拉一位朋友入门，总矿力立刻多一份'
-      :'还没有门派。点「改化名」填一个——<b>同名即同门</b>，和朋友约好名字就行。';
+    mine.innerHTML=!LB.registered()
+      ?'你还没上榜。点「<b>起名上榜</b>」起个化名、填个门派——<b>同名即同门</b>，和朋友约好名字就行。'
+      :(mineF
+        ?'我的门派 <b>'+esc(mineF)+'</b> · 每拉一位朋友入门，总矿力立刻多一份'
+        :'还没有门派。点「改化名」填一个——<b>同名即同门</b>，和朋友约好名字就行。');
     return;
   }
   const d=await LB.board(LB.scope);
@@ -6015,6 +6024,11 @@ async function renderLB(){
   }
   list.innerHTML=html;
   const s=LB.stats();
+  if(!LB.registered()){
+    mine.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
+      +'</b> —— 点「<b>起名上榜</b>」就能排进去。';
+    return;
+  }
   mine.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
     +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
     +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
@@ -7324,6 +7338,15 @@ window.__selftest=function(){
     const okImg=/<img id="wk-cardimg"/.test(String(showCard));
     const okDpr=/devicePixelRatio/.test(src);
     ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
+  }
+  /* 32b. 公开榜（世界/门派）不该被注册闸挡住——线上实测过：
+     没起过化名的浏览器点门派榜是空的，而新人最该看到的恰恰是
+     「已经有帮派在玩」。小队榜例外，它本来就要口令。 */
+  {
+    const src=String(renderLB);
+    const openGate=/!LB\.registered\(\)&&LB\.scope!=='class'/.test(src);
+    const guide=/起名上榜/.test(src)&&/同名即同门/.test(src);
+    ok('世界榜与门派榜未注册也可浏览，且给出上榜引导',openGate&&guide);
   }
   /* 32. 求卡帖：编解码往返一致、错字拦得住、异纹不可求，
      而且**不能和赠印互相认**——两种帖长得像但用途相反，
