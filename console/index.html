@@ -388,11 +388,11 @@ function renderCheat(){
 }
 
 /* ---- 排行榜审核（调词灵榜 Worker /admin，复用本页解锁密码）---- */
-var LB_API="https://myskme-leaderboard.wzc1020.workers.dev";
+var LB_API="https://play.myskme.com/api";
 var LBA_BOARD='word';                       // 'word'=词灵榜  'gem'=矿脉榜（灵石远征）
 function lbaCall(action,extra){
   var b=extra||{}; b.pw=ADMIN_PW; b.action=action; b.act=action;
-  var path=(LBA_BOARD==='gem')?'/gf/admin':'/admin';
+  var path=(LBA_BOARD==='gem')?'/gf/admin':'/quiz/admin';
   return fetch(LB_API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json();});
 }
 function lbaLoad(){

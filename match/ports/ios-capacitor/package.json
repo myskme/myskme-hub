@@ -1,0 +1,21 @@
+{
+  "name": "myskme-gemfall-ios",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MYSKME 灵石远征的独立 Capacitor iOS 壳",
+  "scripts": {
+    "sync:web": "node scripts/sync-web.mjs",
+    "cap:add:ios": "npm run sync:web && npx cap add ios",
+    "cap:sync:ios": "npm run sync:web && npx cap sync ios",
+    "cap:open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "8.4.0",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.0"
+  }
+}

@@ -6,6 +6,8 @@
 <script>(function(){try{var v=localStorage.getItem('myskme-theme');
 document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){
 document.documentElement.setAttribute('data-theme','dark')}})();</script>
+<!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
+<script src="network-config.js"></script>
 <title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -203,7 +205,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lv .bosscrown{position:absolute;top:4px;right:6px;line-height:0;color:var(--red)}
 .lv .bosscrown svg{width:12px;height:12px}
 .lv.done{border-color:color-mix(in srgb,var(--gold) 40%,var(--edge))}
-#map-endless{margin-top:6px;font-size:13px;color:var(--ink2);letter-spacing:.1em;text-align:center}
+#map-endless{margin:10px auto 0;width:min(340px,90vw);text-align:center}
+#map-endless .ekick{font-size:10px;letter-spacing:.34em;color:var(--ink3);margin-bottom:2px}
+#map-endless .emsg{font-size:13px;color:var(--ink2);letter-spacing:.1em;margin-top:2px}
+/* 未解锁：只去色、几乎不压暗。这张图本身就极暗，再乘 .42 就成了一块黑方块，
+   看上去像图裂了而不是「还没解锁」。 */
+#map-endless.locked .obanner{filter:grayscale(.85) brightness(.78)}
+#map-endless.unlocked .obanner{cursor:default}
 
 /* ============ 游戏局内 ============ */
 #scr-game{padding:max(8px,env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));justify-content:flex-start;overflow:hidden}
@@ -519,10 +527,103 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .claimcard .ct{font-size:16px;letter-spacing:.14em;color:var(--gold2);margin:3px 0 2px}
 .claimcard .cd{font-size:12px;color:var(--ink2);letter-spacing:.06em;margin-top:1px}
 .claimcard .btn{margin-top:9px;width:100%;padding:9px;font-size:15px}
+/* ---- 留存物件角饰（矿灯 / 宝箱）----
+   大厅与地脉图都是一屏定死的版式，所以这两件**绝对定位**、零布局成本：
+   撑不高任何东西，缺图时 .has-art 不加、整个不显示。
+   必须 contain —— cover 会把矿灯的提梁和宝箱盖上的星饰裁掉。 */
+.orn{position:absolute;pointer-events:none;display:none;
+  background-repeat:no-repeat;filter:drop-shadow(0 2px 10px rgba(0,0,0,.55))}
+.orn.has-art{display:block}
+#daily-orn{width:clamp(38px,7dvh,54px);aspect-ratio:1;top:-10px;right:4px;opacity:.92}
+/* 宝箱靠**左**：右边那格是「N / 15 ★」计数，放右边会把数字压掉。
+   同时给标签让出 38px，两者才不打架。 */
+#chest-orn{width:32px;aspect-ratio:1;top:-9px;left:0;opacity:.6;
+  transition:opacity .45s ease,filter .45s ease}
+#star-meter .sm-top{padding-left:38px}
+/* 攒够 15 星、宝箱可开时，箱子自己亮起来——不用读进度条也知道 */
+#star-meter:has(#chest-btn.on) #chest-orn{opacity:1;
+  filter:drop-shadow(0 0 12px color-mix(in srgb,var(--gold) 55%,transparent))}
+@media (max-height:640px){.orn{display:none!important}}
+
+/* 今日三桩：三行细进度条，塞进矿灯卡原来的位置。
+   **必须和矿灯态一样高**——首页是一屏定死的，高一点就整页溢出。
+   矿灯态是 ck+标题+说明+七点+按钮；三桩态省掉 ck（标题已写明）和按钮，
+   腾出来的高度正好给三行。 */
+#daily-card.q3mode .ck{display:none}
+#daily-card.q3mode .cd{font-size:11px;margin-top:0}
+#q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+.q3r{position:relative;display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11px;letter-spacing:.04em;color:var(--ink2);
+  border:1px solid var(--line);padding:2px 7px 3px;overflow:hidden}
+.q3r i{position:absolute;left:0;bottom:0;height:2px;background:var(--gold-line);
+  transition:width .6s cubic-bezier(.16,1,.3,1)}
+.q3r.done{color:var(--gold2);border-color:var(--gold-line)}
+.q3r.done i{background:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
+.q3r .q3p{font-size:10.5px;color:var(--gold2);white-space:nowrap;padding-left:8px}
+/* 灵器提醒时按钮呼吸一下——只靠一条 toast 太容易被划走 */
+@keyframes toolNudge{0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 55%,transparent)}}
+.tool.nudge{animation:toolNudge 1.1s ease-in-out 3}
+@media (prefers-reduced-motion:reduce){.tool.nudge{animation:none;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent)}}
+
+/* 图鉴条目与来历。条目要像书里印的一句，不要像 UI 提示——
+   所以给衬线、给行距、不加边框，只用左侧一道细金线把它和上面的信息分开。 */
+.cvlore{max-width:min(300px,84vw);margin:10px auto 0;padding:2px 0 2px 11px;
+  border-left:2px solid var(--gold-line);text-align:left;
+  font-size:12.5px;line-height:1.85;color:var(--ink2);letter-spacing:.02em}
+.cvorg{margin:7px auto 0;font-size:11px;letter-spacing:.08em;color:var(--ink3)}
+
+/* 同伴的两条技能：大招要充能，随身是全程生效。分开标才看得出区别。 */
+.skl{display:inline-block;font-size:12px;line-height:1.65;color:var(--ink2)}
+.skl i{display:inline-block;font-style:normal;font-size:10px;letter-spacing:.16em;
+  color:var(--bg);background:var(--gold-line);padding:1px 5px;margin-right:6px;vertical-align:1px}
+.skl.psv i{background:var(--line2);color:var(--ink2)}
+.skl b{color:var(--gold2)}
+
+/* 上传诊断 */
+#lb-diagwrap{text-align:center;margin-top:8px}
+#lb-diagwrap .lnk{background:none;border:0;color:var(--ink3);font-size:11.5px;
+  letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;cursor:pointer;
+  font-family:inherit;padding:4px}
+#lb-diagwrap .lnk:active{color:var(--gold2)}
+#lb-diagout{display:none;margin:8px auto 0;max-width:min(320px,86vw);padding:8px 10px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.6;
+  white-space:pre-wrap;word-break:break-all;text-align:left;
+  user-select:text;-webkit-user-select:text;max-height:38dvh;overflow-y:auto}
+
+/* 拓片兜底框：剪贴板被挡时摊开让人长按自选。等宽字体才能让符号对齐成图案。 */
+#wk-tablet{display:none;margin:8px auto 0;max-width:min(300px,84vw);padding:8px 10px;
+  border:1px solid var(--gold-line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.5;
+  white-space:pre;overflow-x:auto;text-align:left;user-select:text;-webkit-user-select:text}
+
+/* 本周矿脉入口卡 */
+#wk-card{border:1px solid var(--gold-line);padding:9px 12px 11px;margin:2px 0 10px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,var(--panel2)),var(--panel));
+  text-align:center}
+#wk-card .wkl{font-size:13px;letter-spacing:.14em;color:var(--gold2)}
+#wk-card .wkl b{color:var(--gold2);font-weight:500}
+#wk-card .wkd{font-size:11.5px;color:var(--ink2);letter-spacing:.05em;margin:2px 0 7px}
+#wk-card .btn{width:100%;padding:7px;font-size:14px}
+#wk-card.done{border-color:var(--line)}
+#wk-card.done .wkl{color:var(--ink2)}
+/* 未打过本周挑战时，菜单「矿脉榜」按钮上点一颗，跟典藏册那颗同一套 */
+#lb-dot .dot,#col-dot .dot{display:inline-block;width:6px;height:6px;margin-left:5px;
+  vertical-align:2px;background:var(--gold);border-radius:50%;
+  box-shadow:0 0 7px color-mix(in srgb,var(--gold) 75%,transparent)}
+
+/* 化名行：输入框 + 换一个 */
+.aliasrow{display:flex;gap:6px;align-items:stretch}
+.aliasrow input{flex:1;min-width:0}
+.aliasrow .btn{flex:0 0 auto;padding:0 12px;font-size:12px;letter-spacing:.08em;white-space:nowrap}
+@media (max-height:780px){.q3r{font-size:11px;padding:2px 6px 3px}}
+
 .streakdots{display:flex;gap:5px;justify-content:center;margin-top:7px}
 .streakdots i{width:9px;height:9px;border:1px solid var(--line);display:block}
 .streakdots i.lit{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px color-mix(in srgb,var(--gold) 60%,transparent)}
-#star-meter{width:min(340px,90vw);margin:4px auto 0}
+#star-meter{width:min(340px,90vw);margin:4px auto 0;position:relative}
 #star-meter .sm-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.1em;margin-bottom:4px}
 #star-meter .sm-top b{color:var(--gold2);font-weight:500}
 #star-meter .bar{height:8px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;position:relative}
@@ -589,12 +690,21 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 .ach.got .nm{color:var(--gold2)}
 .ach.got:hover{box-shadow:var(--glow-soft);transform:translateY(-2px)}
 
-/* 编年史里的地脉头图。没图就整个不占位（.has-art 由 applyArt 加）。 */
-#lore-banner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
-  border:1px solid var(--line2);background-repeat:no-repeat}
-#lore-banner.has-art{display:block}
-#lore-banner::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 55%,var(--panel) 100%)}
+/* ---- 通用横幅（1024×448 的 16:7 插画统一走这一个类）----
+   全站横幅共用：编年史地脉头图、胜负结算、讨伐登场、聚会赛、矿脉榜、无尽矿脉。
+   两条不能改的约定：
+   1. **不加 CSS 边框**。这批横幅画里自带描金双线框与右上小圆（与 chapter-*.webp
+      同一套装帧），再加一道就是双框。
+   2. 压字用的暗遮罩写**固定色**，不能用 var(--panel)：浅色主题下那个变量会变成
+      浅色，遮罩反而把图提亮，压在上面的字就糊了。 */
+.obanner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
+  background-repeat:no-repeat;overflow:hidden}
+.obanner.has-art{display:block}
+.obanner::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 52%,rgba(6,6,9,.62) 82%,rgba(6,6,9,.92) 100%)}
+/* 矮屏把横幅压扁，优先保住下面的按钮与数字 */
+@media (max-height:720px){.obanner{aspect-ratio:20/6;margin:8px 0 2px}}
+@media (max-height:600px){.obanner{display:none!important}}
 
 /* ==================== 典藏册 ==================== */
 /* 提示条里的内嵌小图标（ICONS 的 svg 没有内联尺寸，不套一层会撑到 300×150） */
@@ -717,6 +827,18 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 @keyframes dwIn{from{opacity:0;transform:translateY(16px) scale(.9) rotate(-3deg)}to{opacity:1;transform:none}}
 #dw-art{animation:dwIn .6s cubic-bezier(.16,1,.3,1) both}
 @media (prefers-reduced-motion:reduce){#dw-art{animation:none}}
+/* ---- 卡背翻转（纯表现层，不碰任何结算）----
+   一个元素演两面：先立起卡背，转到侧面时换图，再转回来就是正面。
+   三个 .flip* 类的选择器特异性都高于上面那条 #dw-art，会盖掉 dwIn。 */
+#ovl-col .drawwrap,#dw-art{perspective:900px}
+@keyframes dwBack{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:none}}
+@keyframes dwFlipA{from{transform:rotateY(0)}  to{transform:rotateY(90deg)}}
+@keyframes dwFlipB{from{transform:rotateY(-90deg)}to{transform:rotateY(0)}}
+#dw-art.flipIn{animation:dwBack .2s ease-out both}
+#dw-art.flipA {animation:dwFlipA .24s ease-in both}
+#dw-art.flipB {animation:dwFlipB .3s cubic-bezier(.16,1,.3,1) both}
+@media (prefers-reduced-motion:reduce){
+  #dw-art.flipIn,#dw-art.flipA,#dw-art.flipB{animation:none}}
 .cvnm{font-size:21px;letter-spacing:.14em;margin-top:12px}
 .cvsub{font-size:12px;color:var(--ink3);letter-spacing:.1em;margin-top:2px}
 .cvser{font-size:12px;color:var(--gold2);letter-spacing:.18em;margin-top:6px}
@@ -806,7 +928,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
       <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 矿灯将熄 · 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
       <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">一台机器轮流玩 · 2–6 人</span></button>
-      <button class="btn ornate" id="btn-lb"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 5.2H4.8a3.2 3.2 0 003.4 3.6M16 5.2h3.2a3.2 3.2 0 01-3.4 3.6"/><path d="M12 13.5v2.8M8.8 19.5h6.4M10 16.3h4l.9 3.2H9.1z"/></svg> 矿脉榜<span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
+      <button class="btn ornate" id="btn-lb"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 5.2H4.8a3.2 3.2 0 003.4 3.6M16 5.2h3.2a3.2 3.2 0 01-3.4 3.6"/><path d="M12 13.5v2.8M8.8 19.5h6.4M10 16.3h4l.9 3.2H9.1z"/></svg> 矿脉榜<span id="lb-dot"></span><span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
       <div class="menu-sub">
         <button class="btn ghost" id="btn-ach">成就</button>
         <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
@@ -814,10 +936,14 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       </div>
     </div>
     <div class="claimcard" id="daily-card">
-      <div class="ck">今日矿灯 · DAILY</div>
+      <div class="orn" id="daily-orn" data-fit="contain" data-pos="center"></div>
+      <div class="ck" id="daily-ck">今日矿灯 · DAILY</div>
       <div class="ct" id="daily-title">矿灯已续 · 连续 0 天</div>
       <div class="cd" id="daily-desc">领取今日补给</div>
       <div class="streakdots" id="daily-dots"></div>
+      <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
+           改成同一张卡的第二态：今日三桩。不新增高度。 -->
+      <div id="q3-rows"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
@@ -849,6 +975,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn ghost" id="map-next">▶</button>
     </div>
     <div id="star-meter">
+      <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
       <div class="sm-top"><span>星辰宝箱</span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
       <div class="bar"><i id="sm-fill"></i></div>
       <button class="btn primary" id="chest-btn"><span class="ic"></span> 开启星辰宝箱</button>
@@ -864,6 +991,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <div class="kicker">PARTY · PASS &amp; PLAY</div>
       <h2>聚会 · <em>赛</em></h2>
     </div>
+    <!-- 聚会赛设置必须一屏能操作完，所以这条横幅在矮屏由 .obanner 的媒体查询自行退场 -->
+    <div class="obanner" id="party-banner"></div>
     <div class="pt-sec">
       <div class="pt-lbl">几个人</div>
       <div class="pt-chips" id="pt-count"></div>
@@ -965,6 +1094,9 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- Boss 登场 -->
 <div class="ovl" id="ovl-boss"><div class="ovl-card">
   <div class="ovl-kick">矿脉深处 · 有东西醒了</div>
+  <!-- 气氛横幅。下面那个 boss-intro-face 是按 BOSSES 换的角色头像，
+       两者并存：横幅给气氛，头像给身份，横幅绝不能替掉头像。 -->
+  <div class="obanner" id="boss-banner"></div>
   <div id="boss-intro-face"></div>
   <div id="boss-intro-name">叶王</div><!-- 实际由 openLevel 按 BOSSES 填 -->
   <div id="boss-intro-title">红笔判官</div>
@@ -975,12 +1107,15 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- 结算 -->
 <div class="ovl" id="ovl-end"><div class="ovl-card">
   <div class="ovl-kick" id="end-kick">EXPEDITION</div>
+  <div class="obanner" id="end-banner"></div>
   <div class="ovl-title" id="end-title">脉 · <em>通</em></div>
   <div class="stars-row" id="end-stars"><s>★</s><s>★</s><s>★</s></div>
   <div id="end-score">0</div>
   <div id="end-detail"></div>
   <div class="quip" id="end-quip"></div>
+  <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
+    <button class="btn ghost" id="end-tablet" style="display:none;width:100%">拓 片 · 复制战报</button>
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
     <button class="btn" id="end-retry">再来</button>
@@ -1037,6 +1172,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="cvnm" id="cv-name"></div>
     <div class="cvsub" id="cv-sub"></div>
     <div class="cvser" id="cv-serial"></div>
+  <div class="cvlore" id="cv-lore"></div>
+  <div class="cvorg" id="cv-org"></div>
     <div id="cv-tiers"></div>
     <div class="cvacts" id="cv-acts"></div>
   </section>
@@ -1059,6 +1196,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="cvnm" id="dw-name"></div>
     <div class="cvsub" id="dw-sub"></div>
     <div class="cvser" id="dw-serial"></div>
+  <div class="cvlore" id="dw-lore"></div>
     <div id="dw-dup"></div>
     <div class="ovl-btns">
       <button class="btn primary" id="dw-again"></button>
@@ -1158,7 +1296,15 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 <!-- 矿脉榜 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
+  <div class="obanner" id="lb-banner"></div>
   <div class="ovl-title">矿脉 · <em>榜</em></div>
+  <!-- 本周矿脉入口。放在榜单里而不是大厅：一是大厅在 360×640 已经顶到
+       缩放下限、塞不下第五个主按钮，二是「比手艺」这件事本来就属于榜单语境。 -->
+  <div id="wk-card">
+    <div class="wkl">本周矿脉 · 第 <b id="wk-no">—</b> 期</div>
+    <div class="wkd" id="wk-desc">全服同一盘 · 比手艺不比运气</div>
+    <button class="btn primary" id="wk-go">下 矿</button>
+  </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
     <button data-scope="class">小队榜</button>
@@ -1168,12 +1314,19 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div id="lb-mine"></div>
   <div class="lb-form" id="lb-form" hidden>
     <label>化名（2–12 位中英文/数字，别用真名）</label>
-    <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：持镐的阿狼">
+    <div class="aliasrow">
+      <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：提灯的河狸">
+      <button type="button" class="btn ghost" id="lb-roll">换一个</button>
+    </div>
     <label>门派（可留空）</label>
     <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
     <label>小队口令（可留空，填了才进小队榜）</label>
     <input id="lb-pw" maxlength="24" autocapitalize="none" autocorrect="off" placeholder="同一句口令 = 同一个小队">
-    <div class="tip">榜上只出现化名，不收集任何真实身份信息。设备换了或清了缓存，成绩要重新上榜。</div>
+    <div class="tip">榜上只出现化名，不收集真实身份信息。化名、设备标识和成绩会经 play.myskme.com 加密转发到榜单服务；设备标识在服务端加盐哈希，原值不入库。设备换了或清了缓存，成绩要重新上榜。</div>
+  </div>
+  <div id="lb-diagwrap">
+    <button type="button" class="lnk" id="lb-diag">上传不了？点这里诊断</button>
+    <pre id="lb-diagout"></pre>
   </div>
   <div class="ovl-btns">
     <button class="btn ghost" id="lb-close">合上</button>
@@ -1188,7 +1341,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="ovl-title" id="lore-title">地脉 · <em>通</em></div>
   <!-- 地脉头图直接复用地脉图上那 8 张 1024×448 横幅，不另出图。
        打通一条地脉后翻开编年史，本来就该先看到那条地脉长什么样。 -->
-  <div id="lore-banner"></div>
+  <div class="obanner" id="lore-banner"></div>
   <div id="lore-body"></div>
   <a class="lore-link" id="lore-link" target="_blank" rel="noopener">
     <div class="lk">同一个世界 · CROSSOVER</div>
@@ -1223,14 +1376,22 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- 存档 ---------- */
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
-  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0},chest:0,fails:{},chainBest:0,
+  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
+  q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
+  /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
+     两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
+  wk:{w:0,score:null,best:0,plays:0},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
-  out.daily=Object.assign({},SAVE_DEF.daily,s.daily||{});
+  out.daily=Object.assign({day:0,streak:0,oil:0},s.daily||{});
   out.fails=s.fails||{};
+  /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
+     同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
+  out.q3=Object.assign({d:0,q:null},s.q3||{});
+  out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
   return out;
 }
 const SAVE=loadSave();
@@ -1309,6 +1470,15 @@ const Q_WIN=[
   'Well done。下一层的灵石已经开始紧张了。',
   '这一关的故事，可以写进编年史了。',
 ];
+/* 「差一点」专用。跟惨败共用一套文案是不对的——玩家自己知道刚才多接近，
+   系统装作没看见，那点惋惜就变成了不被理解。这几句只在完成度 ≥80% 时出。 */
+const Q_NEAR=[
+  '就差那么一下。这一盘你其实已经会打了。',
+  '差一点点——不是运气问题，是矿脉欠你一步。',
+  '这局的手感是对的。同样的打法，再来一次多半就过了。',
+  '看见了，你差一点就成了。再点一次矿灯吧。',
+  'So close。狼先生在旁边都替你可惜。',
+];
 const Q_LOSE=[
   '差一步而已。矿脉又不会跑。',
   '换个角度，再来一铲。',
@@ -1360,6 +1530,46 @@ const COMPANIONS=[
 ];
 const compById=id=>COMPANIONS.find(c=>c.id===id)||COMPANIONS[0];
 const compUnlocked=c=>SAVE.lv>=c.unlock;
+/* ---- 被动 ----
+   原来同伴只有大招，选谁只在放大招那一下有区别，平时毫无差别，
+   所以「选谁」不构成决策。每人补一条**全程生效、不用充能**的被动，
+   都跟他的大招同源，这样「带谁下矿」才真的要想一想。
+   passive() 是唯一的判定入口，别在别处直接比 SAVE.comp。 */
+const PASSIVE={
+  wolf: '开局盘上先给一颗疾风灵石',
+  jun:  '岩壳与石笼每次多褪一层',
+  qi:   '墨封每次多褪一层',
+  xi:   '每关多 2 步（限时局多 5 秒）',
+  xiao: '连锁到 4 时，随机一颗灵石炼成疾风',
+  zi:   '开局时全场墨封与岩壳各先褪一层',
+};
+function passive(id){return GS.compDef&&GS.compDef.id===id}
+/* 开局就生效的两条被动。必须在 buildBoard 之后、玩家看到盘面之前跑，
+   而且**不能碰目标数**——reconcileGoals 已经按实际布上的数量对好账了，
+   这里再动机关会让「还差 N 块」和盘面对不上。所以只褪层，不清零。 */
+function applyOpeningPassives(){
+  if(passive('wolf')){
+    /* 执灯人：先照亮一处。找一颗普通灵石变成横向疾风。 */
+    const spots=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+      if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage&&!T[r][c].crate&&!T[r][c].ink)spots.push([r,c]);
+    if(spots.length){const [r,c]=spots[Math.floor(rnd()*spots.length)];B[r][c].k='H';B[r][c].sc=.4}
+  }
+  if(passive('zi')){
+    /* 解封者：开局帮着褪一层，**每种最多 5 处**。
+       实测不设上限会把第 22 关的 16 块墨封一次清空（那关墨封都是单层），
+       等于白送通关——被动是帮一把，不是替玩家打。
+       走 bumpGoal 记账，目标进度才会跟着走，
+       否则玩家看到盘上少了一层、数字却没动。 */
+    const CAP=5; let ink=0,cr=0;
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      if(ink<CAP&&T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);ink++}
+      if(cr<CAP&&T[r][c].crate>0){T[r][c].crate--;bumpGoal('crate',null,1);cr++}
+    }
+    if(ink+cr)setTimeout(()=>toast('<b>梓</b> 抬手一拂——'
+      +(ink?'墨封 '+ink+' 处':'')+(ink&&cr?'、':'')+(cr?'岩壳 '+cr+' 处':'')+'各褪一层',2600),1100);
+  }
+}
 
 /* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
 const LORE=[
@@ -1733,6 +1943,20 @@ const ART={
   card_cage:'art/card-cage.webp',
   ch_1:'art/chapter-1.webp', ch_2:'art/chapter-2.webp', ch_3:'art/chapter-3.webp', ch_4:'art/chapter-4.webp',
   ch_5:'art/chapter-5.webp', ch_6:'art/chapter-6.webp', ch_7:'art/chapter-7.webp', ch_8:'art/chapter-8.webp',
+  ch_endless:'art/chapter-endless.webp',                       // 无尽矿脉，不是「第九地脉」
+  /* 横幅：1024×448，画里自带描金双线框与右上小圆（与 ch_* 同一套装帧），
+     所以 .obanner 不能再加 CSS 边框，否则叠成双框。 */
+  end_win:'art/win.webp', end_lose:'art/lose.webp',
+  boss_banner:'art/boss-intro.webp',                           // 气氛横幅，不替代 boss_ye/boss_she 头像
+  party_banner:'art/party-banner.webp', lb_banner:'art/lb-banner.webp',
+  /* 风物「卡面版」。与 card_* 同理：ch_* 那 8 张横幅继续给地脉图与编年史用，
+     典藏册的风物卡改用这 8 张竖版重构图。两套并存。 */
+  vista_1:'art/card-vista-1.webp', vista_2:'art/card-vista-2.webp',
+  vista_3:'art/card-vista-3.webp', vista_4:'art/card-vista-4.webp',
+  vista_5:'art/card-vista-5.webp', vista_6:'art/card-vista-6.webp',
+  vista_7:'art/card-vista-7.webp', vista_8:'art/card-vista-8.webp',
+  daily_lamp:'art/lamp.webp', star_chest:'art/chest.webp',     // 透明底，必须 contain（提梁/星饰不能裁）
+  card_back:'art/card-back.webp',                              // 翻卡背面，自带完整卡框
 };
 const _art={};                                                 // key -> Image | null(确认没有)
 function art(key){
@@ -2564,6 +2788,11 @@ function goalText(g){
   return Math.max(0,g.need-g.got);
 }
 function bumpGoal(type,col,n){
+  /* 墨封与岩壳的三桩计数搭这趟车。它同样不看胜负。 */
+  if((type==='ink'||type==='crate')&&typeof q3Bump==='function'&&!GS.party)q3Bump(type,n);
+  /* 清机关也充能。机关关里同色灵石本来就少，不给这条的话，
+     越是需要大招的关卡越充不满 —— 正好反了。 */
+  if(typeof allyCharge==='function'&&/^(ink|crate|cage|bell)$/.test(type))allyCharge(n*CHG.block);
   let hit=false;
   GS.goals.forEach((g,i)=>{
     if(g.type!==type)return;
@@ -2629,13 +2858,16 @@ function clearCells(cells,chain,noCrateSplash){
     /* 岩壳：被直接命中就受损（且岩壳自身不再向外溅射，否则一炸连片） */
     if(T[r][c].crate>0){crateHits.push([r,c]);continue}
     gemCells.push([r,c]);
-    if(!p)  {if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()} continue}
+    /* 麒·巡渊者的被动：墨封每次多褪一层 */
+    if(!p)  {if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
+      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()} continue}
     if(p.bell)continue;
     if(p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#c9b78a',7,.8)}
     if(p.k!=='n')specials++;
     gems++;colors[p.g]=(colors[p.g]||0)+1;
-    if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()}
+    if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
+      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()}
     fxBurst(cxOf(c)+p.vx,cyOf(r)+p.vy,GEMS[p.g]?GEMS[p.g].base:'#e8c768',p.k==='n'?7:14,p.k==='n'?1:1.5);
     killPiece(r,c);
   }
@@ -2644,13 +2876,21 @@ function clearCells(cells,chain,noCrateSplash){
   for(const [r,c] of crateHits){
     const k=KEY(r,c); if(done.has(k))continue; done.add(k);
     if(T[r][c].crate>0){
-      T[r][c].crate--;bumpGoal('crate',null,1);SFX.crate();
+      /* 钧·开山者的被动：岩壳每次多褪一层 */
+      const d=Math.min(T[r][c].crate,passive('jun')?2:1);
+      T[r][c].crate-=d;bumpGoal('crate',null,d);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#7a705c',10,1.1);
       if(T[r][c].crate===0)fxRing(cxOf(c),cyOf(r),'#9a8c68',ENG.cs*1.6);
     }
   }
   for(const g in colors)bumpGoal('collect',+g,colors[g]);
-  allyChargeFrom(colors);
+  allyChargeFrom(colors,specials);
+  /* 今日三桩的计数。挂在这里而不是结算处，是因为这三样**不看胜负**——
+     输的那一局消掉的石头也该算数。 */
+  if(typeof q3Bump==='function'&&!GS.party){
+    q3Bump('gem',gems);
+    if(specials)q3Bump('spec',specials);
+  }
   return {gems,specials,colors};
 }
 
@@ -2755,6 +2995,19 @@ async function settleBoard(firstChain){
     GS.lastChain=chain;
     await sleep(REDUCED?25:150);
     await dropAndFill();
+  }
+  /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
+     只在这个模式记，别的模式不背这个包袱。 */
+  if(GS.weekly&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
+  /* 晓·摘星者的被动：连锁到 4 就顺手摘一颗疾风下来。
+     只在这一手第一次达到 4 时给，连锁再长也不重复给。 */
+  if(chain===4&&passive('xiao')){
+    const sp=[];
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+      if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
+    if(sp.length){const [r,c]=sp[Math.floor(rnd()*sp.length)];
+      B[r][c].k=rnd()<.5?'H':'V';B[r][c].sc=.4;SFX.made();
+      fxRing(cxOf(c),cyOf(r),GEMS[4].base,ENG.cs*2.4);}
   }
   if(chain>=5)grant('a6');
   if(chain>=7){grant('a7');flash()}
@@ -2904,6 +3157,10 @@ async function checkEnd(){
     if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(500);ptTurnEnd()}
     return;
   }
+  if(GS.weekly){                                              // 本周矿脉：没有胜负，步数走完就报分
+    if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endWeekly()}
+    return;
+  }
   if(goalsMet()){
     GS.over=true;GS.busy=true;GS.won=true;
     if(GS.boss){await bossDown()}
@@ -2916,7 +3173,32 @@ async function checkEnd(){
     GS.over=true;GS.busy=true;
     await sleep(400);
     endLevel(false);
+    return;
   }
+  toolNudge();
+}
+/* ---- 灵器提醒 ----
+   「攒了一堆也不用」有一半是没人提醒。玩家不会在中途盘算「我是不是该用矿镐了」，
+   等他想起来时步数已经没了。
+   规矩：**一关只提一次**，而且只在真的吃紧时提——步数见底、目标还差得远。
+   不吃紧的时候一声不吭，否则就成了唠叨，比不提还烦。 */
+function toolNudge(){
+  if(GS.over||GS.party||GS.toldTool||GS.rushOn)return;
+  if(GS.moves>5||GS.moves<2)return;                           // 太早不提；只剩 1 步提了也没用
+  const prog=GS.goals.length
+    ? GS.goals.reduce((a,g)=>a+Math.min(1,g.need?g.got/g.need:1),0)/GS.goals.length : 1;
+  if(prog>=.72)return;                                        // 眼看要过了，不打扰
+  const have=TOOLKEYS.filter(t=>toolCount(t)>0);
+  if(!have.length)return;
+  GS.toldTool=true;
+  const t=have.includes('mix')&&prog<.45?'mix':have[0];       // 差得远就先建议重整令
+  setTimeout(()=>{
+    if(GS.over)return;
+    toast('只剩 <b>'+GS.moves+'</b> 步了 · 试试 '+icTag(TOOLS[t].ic)+' <b>'+TOOLS[t].nm+'</b>（还有 '
+      +toolCount(t)+' 件）',3200);
+    const b=document.querySelector('.tool[data-t="'+t+'"]');
+    if(b){b.classList.add('nudge');setTimeout(()=>b.classList.remove('nudge'),3600)}
+  },500);
 }
 async function bossDown(){
   const bo=BOSSES[GS.boss];
@@ -3018,11 +3300,34 @@ const TOOLS={
   mix:{ic:'mix',nm:'重整令',hint:'整盘灵石重新排布，不扣步数'},
 };
 const TOOLKEYS=['pick','swap','mix'];
+/* 灵器上限。原本无封顶，实测每天玩 5 关的人 90 天会攒到 200 件以上、
+   重度玩家 600 件以上——一件到手毫无重量，「攒了一堆也不用」就是这么来的。
+   封顶之后每一件都还有用；满了再发就折成灵力，不浪费也不膨胀。 */
+const TOOL_CAP=9, TOOL_TO_POWER=120;
 function toolCount(t){return Math.max(0,(SAVE.tools&&SAVE.tools[t])||0)}
-function giveTool(t,n){SAVE.tools[t]=toolCount(t)+(n||1);persist();renderTools()}
+function toolFull(t){return toolCount(t)>=TOOL_CAP}
+function giveTool(t,n){
+  const want=toolCount(t)+(n||1);
+  const over=Math.max(0,want-TOOL_CAP);
+  SAVE.tools[t]=Math.min(TOOL_CAP,want);
+  if(over>0)SAVE.power=(SAVE.power||0)+over*TOOL_TO_POWER;   // 溢出折灵力，正好进典藏册
+  persist();renderTools();
+  return over;
+}
 function giveRandomTool(n){
-  const got={};
-  for(let i=0;i<(n||1);i++){const t=TOOLKEYS[Math.floor(rnd()*3)];giveTool(t,1);got[t]=(got[t]||0)+1}
+  const got={}; let over=0;
+  for(let i=0;i<(n||1);i++){
+    /* 优先发**没满**的那种。三种都满了才随机发一件去折灵力——
+       否则运气差的人会一直收到已经满仓的那一件，白白折钱。 */
+    const pool=TOOLKEYS.filter(k=>!toolFull(k));
+    const t=(pool.length?pool:TOOLKEYS)[Math.floor(rnd()*(pool.length||3))];
+    over+=giveTool(t,1);
+    if(!toolFull(t)||over===0)got[t]=(got[t]||0)+1;
+  }
+  if(over>0){
+    const s=Object.keys(got).map(t=>icTag(TOOLS[t].ic)+' '+TOOLS[t].nm+'×'+got[t]).join('　');
+    return (s?s+'　':'')+'灵器已满 · 折灵力 +'+(over*TOOL_TO_POWER);
+  }
   /* 去 emoji 那一轮漏改：.ic 现在是图标**键名**，直接拼进字符串
      会让提示条上出现「pick 矿镐×1」。要渲染成图标。 */
   return Object.keys(got).map(t=>icTag(TOOLS[t].ic)+' '+TOOLS[t].nm+'×'+got[t]).join('　');
@@ -3113,17 +3418,43 @@ async function useToolAt(r,c){
   }
 }
 /* ---- 同伴助战 ---- */
-function allyChargeFrom(colors){
-  const c=GS.compDef; if(!c||GS.over)return;
-  const n=colors[c.col]||0; if(!n)return;
+/* ---- 同伴充能 ----
+   原来只累加**主色那一色**（`colors[c.col]`）。实测下来这条路是走不通的：
+   一局总共只消掉 35–49 颗，摊到单色只有 6–11 颗，而 need 是 34–46 ——
+   **一局根本充不满**，而充能每局开局归零，所以普通关里大招几乎永远放不出来。
+   更致命的是梓：他的主色是第六色，而 64 关里只有 7 关是 6 色，
+   其余 57 关他一颗都收不到 —— 第 32 关解锁的同伴，大招是个摆设。
+
+   改成：**任何消除都充能**（0.4/颗），主色额外再给 0.6（合计 1.0/颗）。
+   主色不在本关色数内时（梓在 5 色关），把那 0.6 均摊回全色，
+   免得他因为关卡配色而白白吃亏。
+   另外炼成特殊灵石 +4、清掉机关 +2 —— 让「打得好」比「打得多」更快充满。 */
+const CHG={any:.4,own:.6,spec:4,block:2};
+function allyCharge(n){
+  const c=GS.compDef; if(!c||GS.over||!n)return;
   const was=GS.charge>=c.need;
   GS.charge=Math.min(c.need,GS.charge+n);
   renderAlly();
   if(!was&&GS.charge>=c.need){
     SFX.made();vib(26);
-    toast('<b>'+c.name+'</b> 准备好了——「'+c.ult+'」',2200);
+    toast('<b>'+c.name+'</b> 准备好了——点头像放「'+c.ult+'」',2600);
     fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*5);
+    const el=$('#ally'); if(el)el.classList.add('ready-pop');
   }
+}
+function allyChargeFrom(colors,specials){
+  const c=GS.compDef; if(!c||GS.over)return;
+  let tot=0;
+  for(const k in colors)tot+=colors[k]||0;
+  const nc=(GS.L&&GS.L.colors)||6;
+  const ownHas=!GS.L||c.col<nc;                               // 主色在本关存在吗
+  const own=ownHas?(colors[c.col]||0):0;
+  /* 主色缺席时按**一色的份额**补（tot/nc），不能整份补。
+     整份补的话梓会拿到别人近两倍的充能——从「永远放不出」直接跳到「最强」，
+     两头都不对。 */
+  let n=tot*CHG.any+CHG.own*(ownHas?own:tot/nc);
+  if(specials)n+=specials*CHG.spec;
+  allyCharge(n);
 }
 function renderAlly(){
   const c=GS.compDef, el=$('#ally');
@@ -3137,8 +3468,10 @@ function renderAlly(){
   $('#ally-badge').querySelector('b').textContent=c.g;
   applyArt($('#ally-badge'),'ally_'+c.id);
   $('#ally-name').innerHTML=c.name+' · <em>'+c.title+'</em>';
-  $('#ally-track').querySelector('i').style.width=(GS.charge/c.need*100)+'%';
-  $('#ally-fire').textContent=ready?c.ult:(GS.charge+' / '+c.need);
+  $('#ally-track').querySelector('i').style.width=Math.min(100,GS.charge/c.need*100)+'%';
+  /* 充能现在是小数（任何消除都按 0.4 计），显示必须取整——
+     否则进度上会出现「17.6 / 42」这种一看就没做完的东西。 */
+  $('#ally-fire').textContent=ready?c.ult:(Math.floor(GS.charge)+' / '+c.need);
 }
 async function fireUlt(){
   const c=GS.compDef;
@@ -3240,14 +3573,29 @@ function renderAllyPick(){
     d.style.setProperty('--ally-base',GEMS[c.col].base);
     d.style.setProperty('--ally-dark',GEMS[c.col].dk);
     d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
-    d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'+c.name+'</div>';
+    d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'
+      +(ul?c.name:'第 '+c.unlock+' 关')+'</div>';
     if(ul)applyArt(d,'ally_'+c.id);
     if(ul)d.addEventListener('click',()=>{SAVE.comp=c.id;persist();SFX.click();renderAllyPick()});
+    /* 锁着也要能点开看：不给看就永远不知道值不值得为他打到第 32 关 */
+    else d.addEventListener('click',()=>{SFX.click();
+      toast('<b>'+c.name+' · '+c.title+'</b><br>「'+c.ult+'」'+c.desc.replace(/<[^>]+>/g,'')
+        +'<br>通关第 <b>'+c.unlock+'</b> 关解锁',3600)});
     host.appendChild(d);
   });
   const c=compById(SAVE.comp);
-  $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>　「'+c.ult+'」<br>'+c.desc
-    +'<br><span style="color:var(--ink3);font-size:11.5px">消除'+GEMS[c.col].name+'充能 · 满 '+c.need+' 颗发动</span>';
+  /* 解锁与充能这两件事以前都没写清楚：锁着的头像只有一个灰框，
+     选中的那个也只说「消除某色充能」，玩家不知道差多少关、也不知道
+     别的颜色到底算不算。两条都摊开写。 */
+  const ul=compUnlocked(c), need=c.unlock-(SAVE.lv||1);
+  $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>'
+    +'<br><span class="skl"><i>大招</i>「'+c.ult+'」'+c.desc+'</span>'
+    +'<br><span class="skl psv"><i>随身</i>'+PASSIVE[c.id]+'</span>'
+    +'<br><span style="color:var(--ink3);font-size:11.5px">'
+    +'消任意灵石都充能，'+GEMS[c.col].name+'算双倍 · 炼成特殊灵石 +'+CHG.spec
+    +' · 清机关 +'+CHG.block+' · 满 '+c.need+' 发动</span>'
+    +(ul?'':'<br><span style="color:var(--red);font-size:11.5px">还没解锁 · 通关第 '
+        +c.unlock+' 关（还差 '+Math.max(1,need)+' 关）</span>');
 }
 
 /* ---- 每日矿灯 ---- */
@@ -3258,7 +3606,18 @@ function dailyState(){
   /* 机器时钟曾经跑到未来（RTC 没电等）→ last 是个巨大值，校回来后就再也领不到了。
      当成存档损坏重置，而不是把玩家永久锁在门外。 */
   if(last>d){last=0;SAVE.daily={day:0,streak:0};persist()}
-  return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0};
+  return {can:d>last, gap:d-last, streak:SAVE.daily.streak||0, oil:SAVE.daily.oil||0};
+}
+/* ---- 备用灯油：断一天不清零 ----
+   原本断一天连续天数直接归 1。攒了三十几天的人出趟门就归零，这个惩罚
+   比它想鼓励的行为还重，纯劝退。做法照搬 Duolingo 的 streak freeze，
+   但**只走免费路径**：连续满 10 天自动得一罐，最多存 2 罐。
+   只挡「正好断一天」；断两天以上说明是真的离开了，不硬留。 */
+const OIL_MAX=2, OIL_EVERY=10;
+function lampOilCheck(st){
+  if(st.gap!==2)return 0;                                      // gap=2 → 昨天没领，正好断一天
+  const oil=SAVE.daily.oil||0;
+  return oil>0?1:0;
 }
 /* 补给公式只写这一处。以前 renderDaily 的预告和 claimDaily 的实发
    各抄了一遍同样的表达式，改一处就会出现「卡片写着 3200、点下去只给 1400」。
@@ -3271,33 +3630,143 @@ function dailyPow(s){return 200+Math.min(s,10)*100+boonLampPow()}
 function dailyTools(s){return (s%3===0?2:1)+boonLampTool()}
 function renderDaily(){
   const st=dailyState(), card=$('#daily-card');
-  if(!st.can){card.classList.remove('on');return}
-  const nextStreak=st.gap===1?st.streak+1:1;
-  card.classList.add('on');
-  $('#daily-title').textContent='矿灯已续 · 连续 '+nextStreak+' 天';
-  $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+dailyPow(nextStreak)
-    +'</b> ＋ 灵器 '+dailyTools(nextStreak)+' 件';
-  const dots=$('#daily-dots');dots.innerHTML='';
-  for(let i=0;i<7;i++){const d=document.createElement('i');if(i<((nextStreak-1)%7)+1)d.className='lit';dots.appendChild(d)}
+  card.classList.add('on');                                    // 两态都要显示，不再整块隐藏
+  applyArt($('#daily-orn'),'daily_lamp');
+  const lamp=st.can;
+  card.classList.toggle('q3mode',!lamp);
+  $('#daily-claim').style.display=lamp?'':'none';
+  $('#daily-dots').style.display=lamp?'':'none';
+  $('#q3-rows').style.display=lamp?'none':'';
+  if(lamp){
+    const used=lampOilCheck(st);
+    const nextStreak=(st.gap===1||used)?st.streak+1:1;
+    $('#daily-ck').textContent='今日矿灯 · DAILY';
+    $('#daily-title').textContent=(used?'灯油续上 · 连续 ':'矿灯已续 · 连续 ')+nextStreak+' 天';
+    $('#daily-desc').innerHTML='今日补给：灵力 <b style="color:var(--gold2)">'+dailyPow(nextStreak)
+      +'</b> ＋ 灵器 '+dailyTools(nextStreak)+' 件'
+      +(used?'<br><span style="color:var(--gold2)">'+icTag('candle')+' 昨天断了，备用灯油替你续上</span>'
+            :(st.oil>0?'　<span style="color:var(--ink3)">'+icTag('candle')+' 灯油 ×'+st.oil+'</span>':''));
+    const dots=$('#daily-dots');dots.innerHTML='';
+    for(let i=0;i<7;i++){const d=document.createElement('i');if(i<((nextStreak-1)%7)+1)d.className='lit';dots.appendChild(d)}
+    return;
+  }
+  /* 第二态：今日三桩 */
+  const s=q3State(), done=s.q.filter(q=>q.done).length;
+  $('#daily-ck').textContent='今日三桩 · DAILY THREE';
+  $('#daily-title').textContent=done>=3?'三桩已齐':'今日三桩 · '+done+' / 3';
+  $('#daily-desc').innerHTML=done>=3
+    ? '明天再来 · 换三桩新的'
+    : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>　<span style="color:var(--ink3)">输了也算数</span>';
+  $('#q3-rows').innerHTML=s.q.map(q=>{
+    const def=Q3BY[q.k], pct=Math.min(100,(def.best?q.got:Math.min(q.got,q.need))/q.need*100);
+    return '<div class="q3r'+(q.done?' done':'')+'">'
+      +'<span class="q3t">'+q3Text(q)+'</span>'
+      +'<span class="q3p">'+(q.done?'+'+def.pow:'')+'</span>'
+      +'<i style="width:'+pct+'%"></i></div>';
+  }).join('');
 }
 function claimDaily(){
   const st=dailyState(); if(!st.can)return;
-  const nextStreak=st.gap===1?st.streak+1:1;
-  SAVE.daily={day:dayNum(),streak:nextStreak};
+  const used=lampOilCheck(st);                                 // 断一天且有灯油 → 续上
+  const nextStreak=(st.gap===1||used)?st.streak+1:1;
+  let oil=(SAVE.daily.oil||0)-used;
+  /* 连续满 10 天补一罐，最多存 2 罐。放在算完 nextStreak 之后，
+     这样第 10 天当场就能拿到，不用等到第 11 天。 */
+  if(nextStreak%OIL_EVERY===0&&oil<OIL_MAX)oil++;
+  SAVE.daily={day:dayNum(),streak:nextStreak,oil:oil};
   const pw=dailyPow(nextStreak);
   SAVE.power=(SAVE.power||0)+pw;
   const got=giveRandomTool(dailyTools(nextStreak));
   persist();
   const gotBox=colLampTick();                    // 每领 7 次矿灯得 1 个典藏匣
   SFX.win();fxBurstDom(1,$('#daily-card'));
-  toast('今日矿灯 · 连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got
-    +(gotBox?'<br>'+icTag('box')+' <b>典藏匣 +1</b>':''),gotBox?3800:3200);
+  toast((used?'<b>备用灯油</b>替你续上了昨天 · ':'今日矿灯 · ')
+    +'连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got
+    +(gotBox?'<br>'+icTag('box')+' <b>典藏匣 +1</b>':'')
+    +(!used&&nextStreak%OIL_EVERY===0?'<br>'+icTag('candle')+' <b>备用灯油 +1</b>（断一天可自动续上）':''),
+    (gotBox||used)?3800:3200);
   renderDaily();renderMenu();
 }
+/* ==================================================================
+   [ 今日三桩 · DAILY THREE ]
+   ------------------------------------------------------------------
+   为什么做这个：领完矿灯之后，这游戏当天就再没有「今天为什么打开它」的
+   理由了。调研下来三消品类的每日任务其实很稀缺（头部大多只有登录礼），
+   所以把它做扎实反而是差异点。
+
+   三条硬规矩：
+   1. **输了也算数**。头部三消刻意让失败页一无所获，因为那是它们的收银台；
+      本作没有收银台，正好反着做——下矿、消石、连锁这些不看胜负。
+   2. **不能刷新、不能重roll**。三条按日期种子定死，换设备也一样。
+   3. **不做倒计时压迫**。过了今天自然换新的，不写「还剩几小时」。
+   ================================================================== */
+const Q3POOL=[
+  {k:'gem',  nm:'唤醒灵石', u:'颗', n:[240,320,400],   pow:180},
+  {k:'spec', nm:'炼成灵石', u:'颗', n:[6,8,10],        pow:200},
+  {k:'chain',nm:'打出连锁', u:'连', n:[5,6,7],         pow:220, best:true},
+  {k:'play', nm:'下矿',     u:'局', n:[3,4,5],         pow:150},
+  {k:'clear',nm:'通关',     u:'关', n:[2,3],           pow:260},
+  {k:'ink',  nm:'化开墨封', u:'块', n:[12,16,20],      pow:180},
+  {k:'crate',nm:'敲开岩壳', u:'块', n:[12,16,20],      pow:180},
+  {k:'score',nm:'单局得分', u:'分', n:[12000,18000],   pow:220, best:true},
+];
+const Q3BY={};Q3POOL.forEach(p=>Q3BY[p.k]=p);
+/* best:true 的记「本日最好的一次」，其余记累计。
+   连锁和单局得分如果按累计算，三连锁打十次就等于三十连锁，那不叫本事。 */
+function q3Roll(d){
+  const r=rngOf('q3|'+d), pool=Q3POOL.slice(), out=[];
+  for(let i=0;i<3&&pool.length;i++){
+    const p=pool.splice(Math.floor(r()*pool.length),1)[0];
+    out.push({k:p.k,need:p.n[Math.floor(r()*p.n.length)],got:0,done:0});
+  }
+  return out;
+}
+function q3State(){
+  const d=dayNum(), s=SAVE.q3||(SAVE.q3={d:0,q:null});
+  /* 机器时钟跑到未来过（RTC 没电）→ d 会小于存档里的 d。当天数据作废重发，
+     不然玩家要等到真实日期追上来才能再拿到三桩。 */
+  if(s.d!==d||!Array.isArray(s.q)||s.q.length!==3){s.d=d;s.q=q3Roll(d);persist()}
+  return s;
+}
+function q3Bump(k,n){
+  if(!n)return;
+  const s=q3State(); let dirty=false, justDone=null;
+  for(const q of s.q){
+    if(q.k!==k||q.done)continue;
+    const def=Q3BY[k];
+    const nv=def.best?Math.max(q.got,n):Math.min(q.need,q.got+n);
+    if(nv===q.got)continue;
+    q.got=nv;dirty=true;
+    if(q.got>=q.need){q.done=1;justDone=q}
+  }
+  if(!dirty)return;
+  if(justDone){
+    /* 达成即发，不设「领取」按钮：一是少一次点击，二是免得有人忘了领、
+       第二天进度清空反而变成惩罚。 */
+    const def=Q3BY[justDone.k];
+    SAVE.power=(SAVE.power||0)+def.pow;
+    const all=s.q.every(x=>x.done);
+    persist();
+    setTimeout(()=>{
+      toast('今日三桩 · <b>'+def.nm+'</b> 已成　灵力 +'+def.pow,2600);
+      if(all)setTimeout(()=>{giveBox(1,'今日三桩');
+        toast(icTag('box')+' 三桩齐 · <b>典藏匣 +1</b>',3000)},1500);
+    },600);
+  }else persist();
+  if($('#daily-card'))renderDaily();
+}
+function q3Text(q){
+  const def=Q3BY[q.k];
+  const g=def.best?q.got:Math.min(q.got,q.need);
+  return def.nm+' '+(def.k==='score'?g.toLocaleString('en-US'):g)+' / '
+        +(def.k==='score'?q.need.toLocaleString('en-US'):q.need)+' '+def.u;
+}
+
 /* ---- 星辰宝箱 ---- */
 const CHEST_COST=15;
 function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
 function renderChest(){
+  applyArt($('#chest-orn'),'star_chest');
   const ts=totalStars(), claimed=SAVE.chest||0;
   const inCur=ts-claimed*CHEST_COST;
   const can=inCur>=CHEST_COST;
@@ -3368,6 +3837,47 @@ const CSETS=[
 /* n = 永不变更的卡号，赠印按它编码。w = 出自哪个作品。
    ⚠ 只许在末尾追加，绝不可重排或复用旧号——否则流在外面的旧赠印会兑成别的卡。
    别的作品将来加卡，从 101 起另开号段。 */
+/* ---- 图鉴条目 ----
+   每张卡一句短文，**只有拿到之后才看得见**。这是收藏系统里最便宜也最保值的东西：
+   零美术、零机制风险，但它把「一张图」变成「一件有来历的东西」。
+   写作口径：不写攻略、不写数值，只写这件东西在学院谷地里是什么。
+   正典约束——六位同伴兽形已核对；叶王与缠丝夫人是**同一个角色的两个称谓**，
+   不是两个人；小黑猫是档案「特殊」组角色。
+   与 CARDS 分开放：那张表的 n 是存档主键，能少动就少动。 */
+const CARD_LORE={
+  1:'矿灯是他自己做的。灯芯换过很多次，罩子上的划痕一道没擦。',
+  2:'他敲石头的规矩是：先听，再下手。听不出空处的那一镐，多半是白费的。',
+  3:'谷地没有海。他仍旧管所有深水叫「渊」，管所有下潜叫「回去」。',
+  4:'跑得最快的那个，往往也是最先停下来等人的那个。',
+  5:'飞鼠不会飞，只会滑。他说这两件事的区别，就是有没有先爬上去。',
+  6:'她记得每一棵树被砍的日子。也记得每一棵重新长出来的。',
+  7:'红笔判官。圈起来的地方从来没错过——错的是他很少写为什么。',
+  8:'换个名号再来一次，是他惯用的法子。丝比墨软，缠上了却更难解。',
+  9:'两个称谓，一张王座。见过这一幕的人才明白，从头到尾只有他一个。',
+  10:'没人给它起过名字。铃铛是它自己挂上的，谁也没听过它怎么挂上去的。',
+  11:'矿灯不属于任何人。谁提着，谁就负责照亮后面那一段。',
+  12:'第一地脉最浅，光还能照进来。所有人的第一铲都落在这里。',
+  13:'墨渗下来的那年，浅层的灵石一夜之间全暗了。擦掉墨，它们还在。',
+  14:'铃声从深处传上来，一路都有回音。跟着回音走，不会迷路。',
+  15:'老矿道塌了一半。塌下来的那半，是当年最富的一条。',
+  16:'丝挂满了整个洞顶。往上看很好看，别往上看太久。',
+  17:'一道谷，两面壁，一面渗墨一面覆岩。走中间的人最累，也最稳。',
+  18:'越靠近矿心，脚下的震动越像心跳。老矿工说那是矿脉在数你的步子。',
+  19:'王座是石头凿的，凿的人没留名。坐过的人倒是留了三次名。',
+  20:'金曜最常见，也最经得起看。谷地里第一颗被人捡起来的灵石就是它。',
+  21:'赤晶在手里是温的。矿工冬天下矿，兜里总揣一颗。',
+  22:'蓝月只在没有光的地方亮。把它拿到日头底下，它就只是一块石头。',
+  23:'翠叶是唯一会长的灵石。放着不管，三年能多出一片叶子的形状。',
+  24:'紫辉照不亮路，只照得亮人的脸。所以矿工用它认人，不用它走路。',
+  25:'星屑碎得太厉害，凑不成一颗完整的。它本来就不是一颗。',
+  26:'五连才炼得成。传说第一颗万象是有人连着摆了一整夜摆出来的。',
+  27:'叶王的墨。盖住的地方不是没有灵石，是不许你看见。',
+  28:'墨盖了两层的，底下多半压着好东西——他不会为普通石头费两遍墨。',
+  29:'岩壳是矿脉自己长的痂。敲开它不算破坏，算是替它揭掉。',
+  30:'两层的岩壳只在深处有。越难敲的地方，越少有人先到过。',
+  31:'笼是铁的，锁是石的。锁石头的笼子，比锁人的更难开。',
+  32:'把铃送到矿底，它就自己响了。没人知道它在跟谁报信。',
+};
 const CARDS=[
   {n:1, w:'gemfall',s:'ally', a:'ally_wolf', nm:'狼先生',   sub:'执灯人'},
   {n:2, w:'gemfall',s:'ally', a:'ally_jun',  nm:'钧',       sub:'开山者'},
@@ -3380,14 +3890,17 @@ const CARDS=[
   {n:9, w:'gemfall',s:'lore', a:'boss_both', nm:'两相同现', sub:'王座只有一张'},
   {n:10,w:'gemfall',s:'lore', a:'cat',       nm:'小黑猫',   sub:'司铃者'},
   {n:11,w:'gemfall',s:'lore', a:'hero',      nm:'矿灯',     sub:'夜里唯一的亮'},
-  {n:12,w:'gemfall',s:'view', a:'ch_1', nm:'晨光浅脉', sub:'第一地脉'},
-  {n:13,w:'gemfall',s:'view', a:'ch_2', nm:'墨渊支脉', sub:'第二地脉'},
-  {n:14,w:'gemfall',s:'view', a:'ch_3', nm:'猫铃矿道', sub:'第三地脉'},
-  {n:15,w:'gemfall',s:'view', a:'ch_4', nm:'岩壳深堑', sub:'第四地脉'},
-  {n:16,w:'gemfall',s:'view', a:'ch_5', nm:'蛇窟缠层', sub:'第五地脉'},
-  {n:17,w:'gemfall',s:'view', a:'ch_6', nm:'双生裂谷', sub:'第六地脉'},
-  {n:18,w:'gemfall',s:'view', a:'ch_7', nm:'风暴矿心', sub:'第七地脉'},
-  {n:19,w:'gemfall',s:'view', a:'ch_8', nm:'王座熔窟', sub:'第八地脉'},
+  /* 风物用竖版重构图 vista_*，不是 ch_* 横幅裁一刀。
+     ch_1…ch_8 仍归地脉图与编年史用，两套并存——别把这里改回 ch_*。
+     n 是存档主键（own 是 "n:tier"），只能动 a，绝不能动 n 或顺序。 */
+  {n:12,w:'gemfall',s:'view', a:'vista_1', nm:'晨光浅脉', sub:'第一地脉'},
+  {n:13,w:'gemfall',s:'view', a:'vista_2', nm:'墨渊支脉', sub:'第二地脉'},
+  {n:14,w:'gemfall',s:'view', a:'vista_3', nm:'猫铃矿道', sub:'第三地脉'},
+  {n:15,w:'gemfall',s:'view', a:'vista_4', nm:'岩壳深堑', sub:'第四地脉'},
+  {n:16,w:'gemfall',s:'view', a:'vista_5', nm:'蛇窟缠层', sub:'第五地脉'},
+  {n:17,w:'gemfall',s:'view', a:'vista_6', nm:'双生裂谷', sub:'第六地脉'},
+  {n:18,w:'gemfall',s:'view', a:'vista_7', nm:'风暴矿心', sub:'第七地脉'},
+  {n:19,w:'gemfall',s:'view', a:'vista_8', nm:'王座熔窟', sub:'第八地脉'},
   {n:20,w:'gemfall',s:'gem',  a:'gem_0',   nm:'金曜', sub:'AURUM'},
   {n:21,w:'gemfall',s:'gem',  a:'gem_1',   nm:'赤晶', sub:'EMBER'},
   {n:22,w:'gemfall',s:'gem',  a:'gem_2',   nm:'蓝月', sub:'LUNA'},
@@ -3406,21 +3919,57 @@ const CARDS=[
 ];
 const CARD_BY_N={}; CARDS.forEach(c=>CARD_BY_N[c.n]=c);
 /* 异纹：不掉落、不可赠，只能「做到」。是同一张卡的第 4 个品阶，不是新卡。 */
+/* 明示的异纹：条件写在卡面上，玩家看得见目标、可以奔着去做。 */
 const VARIANTS={1:'192 星全满',7:'终章讨伐全程不用灵器',10:'单局连锁 12 重'};
+/* ---- 隐藏款 ----
+   **不预告条件**，撞出来才知道。这是泡泡玛特「隐藏款」那份惊喜的来源，
+   但去掉了赌的部分——它不是极低概率抽出来的，是**做到**才有的，
+   所以对学生受众没有开箱赌博的观感（这条是红线）。
+   拿到之前界面上只显示「隐藏 · 尚未显形」，不给任何提示；
+   拿到之后才把条件说出来，让人有「原来如此」而不是「早说啊」。
+   条件都选了「正常玩着玩着就可能撞上」的，不做需要攻略才可能达成的。 */
+const SECRETS={
+  11:{nm:'矿灯', when:'开到第 100 匣', test:c=>(c.opened||0)>=100},
+  25:{nm:'星屑', when:'在午夜零点到一点之间开匣',
+      test:()=>{const h=new Date().getHours();return h===0}},
+  32:{nm:'猫铃', when:'连续 7 次领到每日矿灯', test:c=>(c.lamp||0)>=7&&(c.lamp||0)%7===0},
+};
+/* 每次开匣后查一遍。放在开匣后而不是各处散着判，是因为三条里两条都跟匣有关，
+   而且集中一处才不会漏掉某个入口。 */
+function checkSecrets(){
+  colFix();
+  for(const k in SECRETS){
+    const n=+k;
+    if(colHas(n,T_VAR))continue;
+    let hit=false; try{hit=!!SECRETS[k].test(COLS)}catch(e){hit=false}
+    if(!hit)continue;
+    colGain(n,T_VAR,1,'deed'); colSave();
+    SFX.win();
+    setTimeout(()=>toast('隐藏款显形 · <b>'+CARD_BY_N[n].nm+' · 异纹</b><br>'
+      +'<span style="font-size:11.5px">'+SECRETS[k].when+'</span>',4200),900);
+  }
+}
 
 /* ---------- 存取层（换后端只动这一段） ---------- */
 const CKEY='myskme-col-v1';
 const COL_DEF={own:{},dust:0,box:0,pity:0,day:0,bought:0,serial:{},seen:0,
-  uid:'',lamp:0,wmAch:0,wmCh:0,wmChest:0,out:{},recv:{},gday:0,gcnt:0};
+  uid:'',lamp:0,wmAch:0,wmCh:0,wmChest:0,out:{},recv:{},gday:0,gcnt:0,opened:0,
+  /* org = 来历。键同 own（「卡号:品阶」），值 {d:日序号, s:来源, k:上下文}。
+     只在**第一次**拿到时写，之后再拿到重复的不覆盖——
+     一张卡最有意义的是「我第一次见到它」的那一刻。
+     宝可梦最狠的一招不是收集，是「这一只是我的」：什么时候、在哪拿到的。
+     不这么记的话，我的臻品和别人的臻品除了编号完全一样。 */
+  org:{}};
+const ORG={box:'开匣所得',up:'星屑炼成',fill:'寻卡补得',gift:'友人所赠',deed:'亲手做到'};
 let COLS=null, colT=null, colWFail=false;
 function colFix(){
   if(!COLS){let raw={};try{raw=JSON.parse(localStorage.getItem(CKEY)||'{}')||{}}catch(e){}COLS=raw}
   const c=Object.assign({},COL_DEF,COLS);
   const num=v=>{const n=Math.floor(Number(v));return Number.isFinite(n)&&n>=0?n:0};
   const obj=v=>(v&&typeof v==='object'&&!Array.isArray(v))?v:{};
-  c.serial=obj(c.serial); c.out=obj(c.out); c.recv=obj(c.recv);
+  c.serial=obj(c.serial); c.out=obj(c.out); c.recv=obj(c.recv); c.org=obj(c.org);
   for(const k of ['dust','box','pity','day','bought','gday','gcnt','seen','lamp',
-                  'wmAch','wmCh','wmChest'])c[k]=num(c[k]);
+                  'wmAch','wmCh','wmChest','opened'])c[k]=num(c[k]);
   /* own 的键必须是「卡号:品阶」且卡号真实存在，否则丢弃：
      存档是玩家随手能改的地方，一条脏数据不该让整册崩掉。 */
   const own={};
@@ -3455,7 +4004,7 @@ function colSave(){
 /* 跨作品发卡的公开接口。别的 MYSKME 作品（同源）将来只要调这两个。 */
 const MC={
   box:(n,why)=>giveBox(n,why),
-  grant:(n,t)=>{colFix();if(CARD_BY_N[n]){colGain(n,t||0,1);colSave()}},
+  grant:(n,t,src)=>{colFix();if(CARD_BY_N[n]){colGain(n,t||0,1,src||'deed');colSave()}},
   state:()=>{colFix();return COLS},
 };
 /* ⚠ 全部读取都要防 COLS 为空：boon* 会被 renderDaily() 调用，
@@ -3466,11 +4015,30 @@ const colHas  =(n,t)=>colCnt(n,t)>0;
 const colAny  =n=>colHas(n,0)||colHas(n,1)||colHas(n,2)||colHas(n,3);
 const colTop  =n=>{for(let t=3;t>=0;t--)if(colHas(n,t))return t;return -1};
 const colSpare=(n,t)=>Math.max(0,colCnt(n,t)-1);       // 多出来的份：可赠出
-function colGain(n,t,k){
+function colGain(n,t,k,src,ctx){
   const cur=colCnt(n,t), want=cur+(k||1);
-  if(want>COL.keep){COLS.dust+=(want-COL.keep)*TIERS[t].dust;COLS.own[n+':'+t]=COL.keep}
-  else COLS.own[n+':'+t]=want;
+  /* 来历只在**第一次**拿到时写。之后再开出重复的不覆盖——
+     记的是「我第一次见到它」的那一刻，不是最近一次。 */
+  const key=n+':'+t;
+  if(cur<=0&&!COLS.org[key]){
+    COLS.org[key]={d:dayNum(),s:src||'box'};
+    if(ctx!=null&&ctx!=='')COLS.org[key].k=ctx;
+  }
+  if(want>COL.keep){COLS.dust+=(want-COL.keep)*TIERS[t].dust;COLS.own[key]=COL.keep}
+  else COLS.own[key]=want;
   if(t===T_TOP&&!COLS.serial[n]){COLS.seen++;COLS.serial[n]=COLS.seen}
+}
+/* 来历的人话。dayNum 是本地时区的天序号，反推回月日即可——
+   存年月日会让存档变大而且没必要，同一本册子不会跨年还在看。 */
+function orgText(n,t){
+  const o=COLS&&COLS.org&&COLS.org[n+':'+t]; if(!o)return '';
+  const ms=(o.d*86400000)+new Date().getTimezoneOffset()*60000;
+  const dt=new Date(ms);
+  const when=(dt.getMonth()+1)+' 月 '+dt.getDate()+' 日';
+  let how=ORG[o.s]||ORG.box;
+  if(o.s==='box'&&o.k)how='第 '+o.k+' 匣开出';
+  else if(o.s==='gift'&&o.k)how='由矿工 '+esc(String(o.k))+' 所赠';
+  return when+' · '+how;
 }
 /* 日序重置。dailyState() 踩过的坑照抄防线：机器时钟跑到未来时，
    存下来的 day 是个巨大值，之后校回来就再也重置不了配额——
@@ -3504,6 +4072,7 @@ function colSync(){
    而且一天最多领一次，刷不出来。 */
 function colLampTick(){
   colFix(); COLS.lamp++;
+  checkSecrets();                     // 连续领矿灯那条隐藏款
   const got=COLS.lamp%COL.lamp===0;
   if(got)COLS.box++;
   colSave(); return got;
@@ -3560,7 +4129,9 @@ function openBox(){
   COLS.pity=(t===T_TOP)?0:COLS.pity+1;
   const card=CARDS[Math.floor(rnd()*CARDS.length)];
   const dup=colHas(card.n,t);
-  colGain(card.n,t,1);
+  colGain(card.n,t,1,'box',(COLS.opened||0)+1);
+  COLS.opened=(COLS.opened||0)+1;   // 累计开匣数，来历里写「第 N 匣开出」
+  checkSecrets();                   // 隐藏款：三条里两条跟匣有关，集中在这里查
   colSave(); renderMenu();
   colView('box',{card:card,t:t,dup:dup});
 }
@@ -3577,15 +4148,19 @@ function renderBoxOpen(d){
     $('#bx-hint').textContent=d.t===T_COMMON?'一线金光':'金光大盛';
     SFX.star(1);
   };
-  const reveal=()=>colView('draw',d);                         // colView 会 colStop()，锁在那里放掉
+  /* box:true 让 renderDraw 知道「是从匣子来的」，才演卡背翻转。
+     从图鉴直接点开某张卡不该有翻牌动作。 */
+  const reveal=()=>colView('draw',Object.assign({},d,{box:true}));  // colView 会 colStop()，锁在那里放掉
   if(REDUCED){
-    /* 减弱动效：不抖不淡，但**仍然先看到开启态再翻卡**——
+    /* 减弱动效：不抖不淡、不翻牌，但**仍然先看到开启态再出卡**——
        口令里明确要求这一步不能跳过，那是整个仪式的落点。 */
     toOpen(); colLater(420,reveal); return;
   }
   st.classList.add('shake');
   colLater(520,toOpen);
-  colLater(1320,reveal);
+  /* 1080 而不是原来的 1320：后面接了 780ms 的卡背翻转，
+     不往回收一点，从点「开匣」到看清正面要拖到两秒开外。 */
+  colLater(1080,reveal);
 }
 function buyBox(){
   colFix(); colDay();
@@ -3609,7 +4184,7 @@ function doUpgrade(n){
   colFix();
   const u=upNext(n); if(!u)return;
   if(COLS.dust<u.cost){toast('星屑不足 · 需 <b>'+u.cost+'</b>',2000);return}
-  COLS.dust-=u.cost; colGain(n,u.to,1); colSave(); SFX.star(1);
+  COLS.dust-=u.cost; colGain(n,u.to,1,'up'); colSave(); SFX.star(1);
   toast('炼成 <b>'+TIERS[u.to].nm+' · '+CARD_BY_N[n].nm+'</b>',2400);
   colView('card',{n:n});
 }
@@ -3617,14 +4192,14 @@ function doFill(n){
   colFix();
   if(colAny(n))return;
   if(COLS.dust<COL.fill){toast('星屑不足 · 需 <b>'+COL.fill+'</b>',2000);return}
-  COLS.dust-=COL.fill; colGain(n,T_COMMON,1); colSave(); SFX.star(0);
+  COLS.dust-=COL.fill; colGain(n,T_COMMON,1,'fill'); colSave(); SFX.star(0);
   toast('寻得 <b>'+CARD_BY_N[n].nm+'</b>',2400);
   colView('card',{n:n});
 }
 function grantVariant(n){
   colFix();
   if(colHas(n,T_VAR))return;
-  colGain(n,T_VAR,1); colSave(); SFX.win();
+  colGain(n,T_VAR,1,'deed'); colSave(); SFX.win();
   toast('异纹显形 · <b>'+CARD_BY_N[n].nm+'</b>',3200);
 }
 
@@ -3717,7 +4292,7 @@ function giftRedeem(code){
      两个不同的人完全可能撞上同一个号。 */
   if(COLS.recv[d.code]){toast('这枚赠印已经用过了',2400);return false}
   COLS.recv[d.code]=1;
-  colGain(d.n,d.t,1);
+  colGain(d.n,d.t,1,'gift');   // 赠印编码里没有寄件人，只能记「友人所赠」
   colSave(); SFX.win(); renderMenu();
   toast('收下 '+TIERS[d.t].nm+' · <b>'+CARD_BY_N[d.n].nm+'</b>',3000);
   return true;
@@ -3740,12 +4315,20 @@ function openLevel(n,mode){
   buildBoard(L);                                    // 先建盘——reconcileGoals 会按实际布上的数量校准 need
   GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   const mercy=mercyMoves(n);
-  GS.moves=L.moves+mercy;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
+  /* 补偿原本是完全静默的（注释写着「悄悄多给两步」）。但玩家不知道就等于没给——
+     白白浪费一次善意。关键是**措辞不能像施舍**：说成同伴递工具，
+     而不是「因为你老输所以补偿你」。 */
+  if(mercy>0)setTimeout(()=>toast(icTag('pick')+' 狼先生多给了你 <b>'+mercy+'</b> 步矿镐',2800),900);
+  /* 晰·探路者的被动：每关多 2 步。必须在 GS.compDef 定好之后判定，
+     所以这里先取一次——openLevel 里 compDef 是下面才赋的。 */
+  const xiBonus=(compById(SAVE.comp).id==='xi')?2:0;
+  GS.moves=L.moves+mercy+xiBonus;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
-  GS.party=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
+  GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;
+  applyOpeningPassives();
   BGM.play(L.boss?'boss':'main');
   show('game');
   fitCanvas();
@@ -3786,6 +4369,7 @@ function openLevel(n,mode){
   if(L.boss){
     const bo=BOSSES[L.boss];
     $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);
+    applyArt($('#boss-banner'),'boss_banner');                 // 气氛横幅，与下面的角色头像并存
     applyArt($('#boss-intro-face'),'boss_'+L.boss);
     $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');
     $('#boss-intro-title').textContent=bo.title;
@@ -3813,7 +4397,9 @@ function startRush(){
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
   L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000;GS.rushMax=90000;GS.started=PLAT.now();GS.paused=false;GS.party=false;
+  /* 晰·探路者的被动在限时局折算成 +5 秒（冒险关是 +2 步） */
+  const xiMs=(compById(SAVE.comp).id==='xi')?5000:0;
+  GS.boss=null;GS.rushOn=true;GS.rushT=90000+xiMs;GS.rushMax=90000+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
@@ -3832,11 +4418,15 @@ function startRush(){
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
+  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
   const best=GS.score>SAVE.rushBest;
   if(best){SAVE.rushBest=GS.score;persist()}
   setTimeout(()=>LB.flush('clear'),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
+  /* 限时局天然以「灯熄」收场，所以默认用 lose 的将熄意象；
+     破了纪录才换成 win——那一下确实值得庆祝。 */
+  applyArt($('#end-banner'),best?'end_win':'end_lose');
   $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
   $('#end-score').textContent=GS.score.toLocaleString('en-US');
@@ -3854,9 +4444,20 @@ function endRush(){
 }
 function endLevel(win){
   const L=GS.L, n=L.n;
+  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='';
+  /* 完成度：所有目标各自封顶 100% 后取平均。用来判「差一点」，
+     也用来算失败时的余烬回报——打到 90% 和一步没走，不该同一个待遇。 */
+  const prog=GS.goals.length
+    ? GS.goals.reduce((a,g)=>a+Math.min(1,g.need?g.got/g.need:1),0)/GS.goals.length : 0;
+  const nearMiss=!win&&prog>=.8;
+  let emberShown=0;                                            // 失败时的余烬回报，供下面的明细行显示
+  /* 三桩：这三样不看胜负，赢了输了都记 */
+  q3Bump('play',1);
+  q3Bump('chain',GS.chainMax);
+  q3Bump('score',GS.score);
   if(win){
     const st=starsOf(L,GS.score);
     if(!L.endless){
@@ -3875,10 +4476,12 @@ function endLevel(win){
     }
     SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
+    q3Bump('clear',1);
     setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
     SFX.win();
+    applyArt($('#end-banner'),'end_win');
     $('#end-kick').textContent=L.era+' · '+L.chName;
     $('#end-title').innerHTML='脉 · <em>通</em>';
     const stars=$('#end-stars').children;
@@ -3891,11 +4494,18 @@ function endLevel(win){
     $('#end-retry').style.display='';
   }else{
     SFX.lose();
-    SAVE.fails[n]=(SAVE.fails[n]||0)+1;persist();
+    applyArt($('#end-banner'),'end_lose');
+    SAVE.fails[n]=(SAVE.fails[n]||0)+1;
+    /* 输了也要有回报。头部三消刻意让失败页一无所获——因为那是它们卖复活的地方；
+       本作没有付费口，那套包袱不必背。按完成度给，是胜利的三分之一上下：
+       够让「这一局没白打」成立，又不至于让输赢没区别。 */
+    emberShown=Math.round(GS.score/300*(.5+prog*.5));
+    if(emberShown>0)SAVE.power=(SAVE.power||0)+emberShown;
+    persist();
     $('#end-kick').textContent=L.era+' · '+L.chName;
-    $('#end-title').innerHTML='矿灯 · <em>暗</em>';
+    $('#end-title').innerHTML=nearMiss?'就 · <em>差</em> 一 点':'矿灯 · <em>暗</em>';
     for(const s of $('#end-stars').children)s.classList.remove('lit');
-    $('#end-quip').textContent=pick2(Q_LOSE);
+    $('#end-quip').textContent=nearMiss?pick2(Q_NEAR):pick2(Q_LOSE);
     $('#end-next').textContent='再挖一次';
     $('#end-next').dataset.act='retry';
     $('#end-retry').style.display='none';
@@ -3911,9 +4521,14 @@ function endLevel(win){
   }
   $('#end-score').textContent=GS.score.toLocaleString('en-US');
   const left=GS.goals.filter(g=>g.got<g.need).length;
+  /* 失败页要把「差了多少」说具体。只说「还差 1 项目标」，玩家不知道是差一步
+     还是差一半；说到「还差 3 颗」，他才知道值不值得再来一次。 */
+  const short=GS.goals.filter(g=>g.got<g.need)
+    .map(g=>(g.need-g.got)+(g.type==='score'?' 分':' 个')).slice(0,2).join(' · ');
   $('#end-detail').innerHTML=win
     ? '最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>　灵器 <b>'+toolGot+'</b>'
-    : '还差 <b>'+left+'</b> 项目标　最长连锁 <b>'+GS.chainMax+'</b>';
+    : '还差 <b>'+(short||left+' 项')+'</b>　已完成 <b>'+Math.round(prog*100)+'%</b>'
+      +(emberShown>0?'　余烬 灵力 <b style="color:var(--gold2)">+'+emberShown+'</b>':'');
   renderTools();
   ovl('end');
 }
@@ -3992,6 +4607,7 @@ function fitScreen(id){
 }
 addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
 function renderPartySetup(){
+  applyArt($('#party-banner'),'party_banner');
   const cnt=$('#pt-count');cnt.innerHTML='';
   for(let n=2;n<=6;n++){
     const d=document.createElement('div');
@@ -4112,7 +4728,7 @@ function ptStartTurn(){
   L.s1=6000;L.s2=14000;L.s3=26000;
   GS.mode='party';GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
-  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.paused=false;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.weekly=false;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(SAVE.comp);GS.charge=0;
   /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手**——
@@ -4241,12 +4857,44 @@ function ptFinish(){
    [ 矿脉榜 · NETWORK LEADERBOARD ]
    后端复用 MYSKME 现有的 Cloudflare Worker + D1，走独立的 /gf/* 路由与
    独立的 gemfall 表，和词灵榜互不影响。
-   隐私：只上传化名与几个数字；设备键在服务端加盐哈希，原始 UUID 不出本机。
+   隐私：只上传化名与几个数字；设备键经 HTTPS 发送后在服务端加盐哈希，
+   原始 UUID 不展示也不入库。
    离线 / 后端未部署 / 断网 时全部静默降级——游戏本体永远照常能玩。
    ================================================================== */
+const LB_NET=(()=>{
+  const cfg=window.MYSKME_GEMFALL_NETWORK||{};
+  const clean=s=>String(s||'').trim().replace(/\/+$/,'');
+  const bases=[];
+  const add=s=>{s=clean(s);if(/^https?:\/\//.test(s)&&!bases.includes(s))bases.push(s)};
+  for(const s of (Array.isArray(cfg.apiBases)?cfg.apiBases:[]))add(s);
+  /* 香港主站接好反向代理后把 network-config.js 的 sameOriginApi 改成 true。
+     现在保持 false：不能让尚未配置 /api 的 GitHub Pages 白等一次 404。 */
+  if(cfg.sameOriginApi===true&&/^https?:$/.test(location.protocol)){
+    const p='/'+String(cfg.sameOriginPath||'api').replace(/^\/+|\/+$/g,'');
+    add(location.origin+p);
+  }
+  if(cfg.legacyFallback!==false)
+    add(cfg.legacyFallback||'https://myskme-leaderboard.wzc1020.workers.dev');
+  return {bases,probeMs:Math.max(2000,Math.min(8000,Number(cfg.probeTimeoutMs)||4500)),
+    hintMs:Math.max(60000,Number(cfg.endpointHintMs)||1800000)};
+})();
 const LB={
-  api:'https://myskme-leaderboard.wzc1020.workers.dev',
+  bases:LB_NET.bases,
   scope:'world',
+  baseOrder(){
+    const xs=this.bases.slice(), h=SAVE.lbApiHint;
+    if(h&&xs.includes(h)&&Date.now()-(SAVE.lbApiAt||0)<LB_NET.hintMs){
+      xs.splice(xs.indexOf(h),1);xs.unshift(h);
+    }
+    return xs;
+  },
+  get api(){return this.baseOrder()[0]||''},                 // 兼容诊断区的只读展示
+  rememberApi(base){
+    if(!base)return;
+    if(SAVE.lbApiHint!==base||Date.now()-(SAVE.lbApiAt||0)>60000){
+      SAVE.lbApiHint=base;SAVE.lbApiAt=Date.now();persist();
+    }
+  },
   dev(){
     if(!SAVE.lbDev){
       SAVE.lbDev=(crypto.randomUUID?crypto.randomUUID():
@@ -4264,24 +4912,48 @@ const LB={
   },
   /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
      后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
-  async fetchJSON(url,opt,ms){
+  async fetchOne(url,opt,ms){
     const ctl=new AbortController();
     const to=setTimeout(()=>ctl.abort(),ms||8000);
     try{
       const r=await fetch(url,Object.assign({signal:ctl.signal},opt||{}));
-      const d=await r.json().catch(()=>({ok:false,err:'返回格式不对'}));
+      let badPayload=false;
+      const d=await r.json().catch(()=>{badPayload=true;return {ok:false,err:'返回格式不对'}});
       d.status=r.status;
+      d.badPayload=badPayload;
       return d;
     }catch(e){
       return {ok:false,err:e.name==='AbortError'?'连接超时':'连不上矿脉榜',offline:true,status:0};
     }finally{clearTimeout(to)}
   },
+  /* path 而不是完整 URL：候选入口可以按部署配置依次尝试。
+     只有断网、网关错误、404/405 或非 JSON 假接口才切换；化名违规等真实 4xx
+     必须原样返回，不能换个后端绕过。最近成功的入口记 30 分钟，弱网下不反复探测。 */
+  async fetchJSON(path,opt,ms){
+    const bases=this.baseOrder();
+    if(!bases.length)return {ok:false,err:'未配置矿脉榜入口',offline:true,status:0};
+    let last=null;
+    for(let i=0;i<bases.length;i++){
+      const base=bases[i];
+      const budget=i<bases.length-1?Math.min(ms||8000,LB_NET.probeMs):(ms||8000);
+      const d=await this.fetchOne(base+path,opt,budget);d.api=base;
+      const retry=d.offline||d.badPayload||d.status===404||d.status===405||d.status>=502;
+      if(!retry||i===bases.length-1){
+        if(!d.offline&&!d.badPayload)this.rememberApi(base);
+        return d;
+      }
+      last=d;
+    }
+    return last||{ok:false,err:'连不上矿脉榜',offline:true,status:0};
+  },
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
       pw:SAVE.lbPw||'',stats:this.stats()};
-    const d=await this.fetchJSON(this.api+'/gf/submit',
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},15000);
+    /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
+       正常解析；国内移动网由两次往返变一次，sendBeacon 也与普通提交同口径。 */
+    const d=await this.fetchJSON('/gf/submit',
+      {method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(body)},15000);
     if(d.ok){
       SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
@@ -4291,7 +4963,7 @@ const LB={
     return d;
   },
   async board(scope){
-    let u=this.api+'/gf/board?scope='+scope+'&limit=50';
+    let u='/gf/board?scope='+scope+'&limit=50';
     if(scope==='class'){
       if(!SAVE.lbPw)return {ok:false,err:'nopw'};
       u+='&pw='+encodeURIComponent(SAVE.lbPw);
@@ -4339,10 +5011,17 @@ const LB={
       }else if(d&&(d.status===429||/频繁/.test(String(d.err||'')))){
         SAVE.lbErr='';this.plan(25000);                        // 服务端 15 秒冷却
       }else if(d&&d.status>=400&&d.status<500){
-        /* 永久性拒绝（化名违规、格式不对）：重试一万次也不会成功，
-           停下来并把原因显示给玩家，让他去改化名 */
-        SAVE.lbErr=(d&&d.err)||'上传被拒绝';this.stop=true;
-        clearTimeout(this.timer);this.timer=0;persist();
+        /* 4xx 不能一律当成永久拒绝。
+           **弱网下一个被截断的 POST 会让后端回 400 "bad json"** ——
+           那是网络问题不是玩家问题，原来的写法会把它当永久拒绝，
+           `stop=true` 之后整个会话再也不上传，玩家只看到「上传不了」。
+           只有玩家改得动的那几种（化名违规/保留词）才值得停下来等他改；
+           其余一律照常退避重试。 */
+        const perm=/化名|保留词|门派/.test(String(d.err||''));
+        SAVE.lbErr=(d&&d.err)||'上传被拒绝';
+        if(perm){this.stop=true;clearTimeout(this.timer);this.timer=0}
+        else this.plan();
+        persist();
       }else{
         SAVE.lbErr=(d&&d.err)||'上传没成功';this.plan();
       }
@@ -4371,7 +5050,15 @@ const LB={
 /* 大厅上的同步状态：有没传上去的成绩就说一声，传完了也让人安心 */
 function lbMenuStatus(){
   const el=$('#lb-sub');if(!el)return;
-  if(!LB.registered()){el.textContent='看看别人挖到哪了';el.classList.remove('warn');return}
+  /* 没起名 = 永远不会上传。原来这里只写「看看别人挖到哪了」，玩家打了半天
+     发现榜上没有自己，结论就是「上传不了」——其实是压根没开始。
+     有成绩了就明说要起名，没成绩就照旧不打扰。 */
+  if(!LB.registered()){
+    const s=LB.stats();
+    if(s.lv>0||s.score>0){el.innerHTML='成绩还没上榜 · <b>点进去起个化名</b>';el.classList.add('warn')}
+    else{el.textContent='看看别人挖到哪了';el.classList.remove('warn')}
+    return;
+  }
   if(LB.pending()){
     el.innerHTML=LB.busy?'正在上传成绩…'
       :(SAVE.lbErr?('上榜被拒 · <b>'+esc(SAVE.lbErr)+'</b> · 点进去改化名')
@@ -4396,7 +5083,170 @@ function lbRowHTML(r,mine){
     +'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+/* ==================================================================
+   [ 本周矿脉 · WEEKLY VEIN ]
+   ------------------------------------------------------------------
+   全服同一颗种子的周常挑战：这一周里所有人拿到**一模一样的盘面**，
+   比的是手艺不是运气。种子从周序号推出来，不联网也能算，
+   换设备、换平台算出来的是同一颗。
+
+   种子必须**贯穿整手**（不只铺初盘）——这是聚会赛那边踩过的坑：
+   只种初盘的话，第一次消除之后的补位各走各的 Math.random()，
+   两个人下同样的步子结果照样分岔，「同盘面比手艺」就不成立了。
+   ================================================================== */
+/* 周序号：以 1970-01-05（周一）为界，每 7 天一期。
+   用 dayNum() 而不是 Date 对象，跟每日矿灯共用同一套本地时区口径，
+   免得出现「矿灯已经翻篇、周挑战还没翻」这种错位。 */
+const weekNum=()=>Math.floor((dayNum()-4)/7);
+const weekSeed=w=>'gemfall|week|'+w;
+function wkState(){
+  const w=weekNum(), s=SAVE.wk||(SAVE.wk={w:0,score:null,best:0,plays:0});
+  if(s.w!==w){s.w=w;s.score=null;s.best=0;s.plays=0;persist()}
+  return s;
+}
+/* 本周还剩几天。**不做跳动的红色倒计时**——那是制造焦虑的手法，
+   本作受众里有学生，不用它。就静静写一句「还剩 N 天」。 */
+const wkDaysLeft=()=>7-((dayNum()-4)%7);
+const WK_MOVES=25;
+/* ---- 矿脉拓片：无剧透的纯文本战报 ----
+   照 Wordle 那套。三条讲究：
+   1. **纯文本，不出图**。微信群里粘贴不吃图片压缩、不吃截图裁切、
+      不吃长按保存的兼容坑；打输的那局也照样发得出去。
+   2. **用几何符号不用 emoji**（全站禁 emoji）。■▨◆□ 都在 Geometric Shapes
+      区段，微信、iOS、安卓、桌面都是同一个字形，不会变成彩色小图。
+   3. **不泄露走法**。只报每一手打出多长的连锁，别人看得见你打得多漂亮，
+      但照着抄不出来——这正是它能当谈资的原因。 */
+function wkTablet(){
+  const s=wkState(), log=(GS.wkLog||[]).slice();
+  /* 只留最精彩的六手，按连锁长度排；六行封顶是为了在群里一屏放得下 */
+  const top=log.filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
+  const rows=top.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
+  return '灵石远征 · 本周矿脉 第 '+s.w+' 期\n'
+    +(rows||'□')+'\n'
+    +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax+'\n'
+    +'同一副盘，你能打多少？\n'
+    +location.origin+location.pathname.replace(/index\.html$/,'');
+}
+async function copyTablet(){
+  const t=wkTablet();
+  try{
+    await navigator.clipboard.writeText(t);
+    toast('拓片已复制 · 粘到群里就行',2600);
+  }catch(e){
+    /* 剪贴板在非安全上下文或旧内核里会被拒。别只报错——把文本摊开让人自己长按选。 */
+    const box=$('#wk-tablet');
+    if(box){box.textContent=t;box.style.display='block';
+      toast('复制被浏览器挡了 · <b>长按下面这段自己选</b>',3400)}
+  }
+}
+function renderWeekCard(){
+  const s=wkState(), c=$('#wk-card'); if(!c)return;
+  $('#wk-no').textContent=s.w;
+  const first=(s.score===null), left=wkDaysLeft();
+  c.classList.toggle('done',!first);
+  $('#wk-desc').innerHTML=first
+    ? '全服同一盘 · 比手艺不比运气<br><span style="color:var(--ink3)">'
+      +'第一把记成绩，之后随便重开当练习 · 本周还剩 '+left+' 天</span>'
+    : '本周成绩 <b style="color:var(--gold2)">'+s.score.toLocaleString('en-US')+'</b>'
+      +(s.best>s.score?'　练习最佳 '+s.best.toLocaleString('en-US'):'')
+      +'<br><span style="color:var(--ink3)">已下矿 '+s.plays+' 次 · 本周还剩 '+left+' 天</span>';
+  $('#wk-go').textContent=first?'下 矿':'再挖一次（练习）';
+}
+function startWeekly(){
+  const w=weekNum(), sd=weekSeed(w);
+  GS.mode='weekly';
+  /* 用 levelDef(3) 当骨架只是图省事，随后把它彻底改造成「纯计分、无机关」：
+     周挑战要的是干净的同起点，掺机关就变成拼谁记得住机关分布。 */
+  const L=levelDef(3);
+  L.n=0;L.endless=false;L.boss=null;L.bells=0;
+  L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
+  L.colors=5;L.moves=WK_MOVES;
+  L.goals=[{type:'score',need:NO_SCORE_TARGET*10,got:0}];      // 无目标哨兵，goalText 会只报当前分
+  L.chName='本周矿脉';L.era='第 '+w+' 期';
+  L.s1=9000;L.s2=20000;L.s3=36000;
+  GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  GS.party=false;GS.weekly=true;GS.paused=false;GS.usedTool=false;GS.wkLog=[];
+  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
+  if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
+  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  /* 种子贯穿整手：建盘一条流，补位与重排另一条但同样由种子派生。
+     只种初盘的话，第一次消除之后大家就分岔了，「同盘面比手艺」不成立。 */
+  buildBoard(L,sd);
+  ENG.rng=rngOf(sd+'|play');
+  BGM.play('main');
+  show('game');fitCanvas();
+  $('#boss-bar').classList.remove('on');
+  $('#rush-bar').classList.remove('on');
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">★</s><s style="left:'
+    +(L.s2/L.s3*100)+'%">★</s><s style="left:97%">★</s>';
+  renderTools();renderAlly();renderGoals($('#goal-row'),30);
+  $('#goal-lbl').textContent='本周';
+  updHUD();
+  const s=wkState();
+  toast('本周矿脉 · 第 <b>'+w+'</b> 期<br>全服同一盘 · '+WK_MOVES+' 步'
+    +(s.best?'<br>本周最佳 <b>'+s.best.toLocaleString('en-US')+'</b>':''),3400);
+  GS.busy=false;GS.idle=PLAT.now();
+}
+function endWeekly(){
+  GS.over=true;GS.busy=true;
+  const s=wkState();
+  /* 首挖记榜：第一把是正式成绩，之后无限重开当练习场。
+     取「历次最佳」的话，肯重开二十次的人必然压过只打一次的人，
+     比的就成了耐心而不是手艺；而这个玩法的全部意义是同一副盘比手艺。 */
+  const first=(s.score===null);
+  if(first)s.score=GS.score;
+  const best=GS.score>s.best; if(best)s.best=GS.score;
+  s.plays++;
+  SAVE.power=(SAVE.power||0)+Math.round(GS.score/150);         // 介于通关与失败之间：它没有胜负之分
+  persist();
+  q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);
+  if(GS.score>=100000)grant('a8');
+  SFX.win();
+  applyArt($('#end-banner'),best?'end_win':'end_lose');
+  $('#end-kick').textContent='本周矿脉 · 第 '+s.w+' 期';
+  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'本周 · <em>矿脉</em>';
+  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  const stars=$('#end-stars').children;
+  const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
+  for(let i=0;i<3;i++)stars[i].classList.remove('lit');
+  setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
+  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>'
+    +'　本周最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　第 '+s.plays+' 次下矿';
+  $('#end-quip').textContent=best?'这一盘，全世界都在打同一副。':pick2(Q_RUSH_END);
+  $('#end-next').textContent='再挖一次';
+  $('#end-next').dataset.act='weekly';
+  $('#end-retry').style.display='none';
+  $('#end-continue').style.display='none';
+  $('#end-tablet').style.display='';                          // 只有本周矿脉给拓片
+  $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
+  setTimeout(()=>LB.flush('clear'),600);
+  ovl('end');
+}
+
+/* ---- 一键取名 ----
+   起名是上榜转化的最大摩擦：很多人卡在「叫什么好」就关掉了。
+   两条选词规矩：
+   1. **不用狼**。狼先生是王老师本人的化身，随机昵称里出现「阿狼」
+      等于拿他本人开玩笑。
+   2. **避开六位同伴的兽形**（狼/虎/鲨/兔/飞鼠/鹿）——玩家随机到「钧」的老虎
+      会以为自己变成了正典角色。所以这里全用档案里没有的动物。 */
+const NM_A=['提灯的','数星星的','会吹口哨的','不睡的','带着地图的','半夜下矿的',
+  '口袋里全是碎石的','挖穿三层的','迷路又找回来的','跟矿灯说话的','捡到一颗金曜的',
+  '总走最深那条道的','把镐子磨得很亮的','听得见灵石的','一路哼歌的'];
+const NM_B=['河狸','猞猁','水獭','雪鸮','游隼','穿山甲','刺猬','松鼠','獾',
+  '貂','蜥','鹤','蝠','乌鸦','山猫','犀','鲸','章鱼','狐'];
+function rollAlias(){
+  const a=NM_A[Math.floor(rnd()*NM_A.length)], b=NM_B[Math.floor(rnd()*NM_B.length)];
+  const s=a+b;
+  return s.length<=12?s:b+'先生';                              // 超长就退回短式，别撞 maxlength
+}
+
 async function renderLB(){
+  applyArt($('#lb-banner'),'lb_banner');
+  renderWeekCard();
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
   const form=$('#lb-form');
@@ -4456,6 +5306,57 @@ function lbOpenForm(){
 const LB_BLOCK=['管理员','admin','老师','王老师','狼先生','mrwolf','myskme','客服','官方','系统'];
 const lbNorm=s=>String(s).normalize('NFKC').toLowerCase().replace(/[\s·\-_]+/g,'');
 const lbBlocked=s=>{const n=lbNorm(s);return LB_BLOCK.some(w=>n.includes(lbNorm(w)))};
+/* ---- 上传诊断 ----
+   「上传不了」在群里是一句没法定位的话：可能是没起名、可能是被后端拒了、
+   可能是网络到不了、也可能只是他没看懂。这个按钮把它变成一份可复制的事实，
+   玩家发给王老师，一眼就知道卡在哪一环。
+   每一步都单独计时，因为「慢」和「不通」要区分开。 */
+async function lbDiagnose(){
+  const out=$('#lb-diagout'), btn=$('#lb-diag');
+  out.style.display='block';btn.disabled=true;
+  const L=[], t=()=>performance.now();
+  const line=(k,v)=>{L.push(k+'：'+v);out.textContent=L.join('\n')};
+  line('诊断时间',new Date().toLocaleString('zh-CN'));
+  line('联网状态',navigator.onLine?'在线':'系统报离线');
+  const s=LB.stats();
+  line('本机成绩','通关 '+s.lv+' 关 · '+s.stars+' 星 · 单关最高 '+s.score+' · 限时 '+s.rush+' · 连锁 '+s.chain);
+  line('化名',SAVE.lbAlias?('已起「'+SAVE.lbAlias+'」'):'✗ 还没起 —— 这就是没上榜的原因');
+  /* pending() 里含 registered()，没起名时恒为 false——直接写「已是最新」是骗人的，
+     那种情况根本没开始上传过。分开讲。 */
+  line('待上传',!LB.registered()?'—— 起名后才会开始上传'
+    :(LB.pending()?('有（本机 '+LB.sig()+' / 已上传 '+(SAVE.lbSig||'无')+'）'):'无，已是最新'));
+  line('上次错误',SAVE.lbErr||'无');
+  line('重试已停',LB.stop?'是（需改化名）':'否');
+  line('候选入口',LB.baseOrder().join(' → ')||'无');
+  /* 三段连通性分开测：能连上但读不到 = 后端问题；连都连不上 = 网络问题 */
+  for(const base of LB.baseOrder()){
+    let host=base;try{host=new URL(base).host}catch(e){}
+    for(const [nm,url,opt] of [
+      ['连到矿脉榜 ['+host+']',base+'/',null],
+      ['读取榜单 ['+host+']',base+'/gf/board?scope=world&limit=5',null],
+    ]){
+      const t0=t();
+      try{
+        const r=await Promise.race([fetch(url,opt||{}),
+          new Promise((_,j)=>setTimeout(()=>j(new Error('超时')),12000))]);
+        line(nm,'HTTP '+r.status+' · '+Math.round(t()-t0)+'ms');
+      }catch(e){line(nm,'✗ 失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
+    }
+  }
+  if(!LB.registered()){
+    line('提交测试','跳过 —— 先起个化名再测');
+  }else{
+    const t0=t(), before=LB.stop; LB.stop=false;
+    const d=await LB.flush('diag',true);
+    LB.stop=before&&!(d&&d.ok);
+    line('提交测试',(d&&d.ok)?('成功 · 世界第 '+d.rank+' · '+Math.round(t()-t0)+'ms')
+      :('✗ '+((d&&d.err)||'未知')+((d&&d.status)?(' · HTTP '+d.status):'')+' · '+Math.round(t()-t0)+'ms'));
+  }
+  line('浏览器',(navigator.userAgent||'').slice(0,90));
+  L.push('——— 把以上整段发给王老师 ———');out.textContent=L.join('\n');
+  btn.disabled=false;btn.textContent='重新诊断';
+}
+
 async function lbSave(){
   const form=$('#lb-form');
   if(form.hidden&&!LB.registered())form.hidden=false;      // 没化名却没开表单：兜底打开，别静默失败
@@ -4514,6 +5415,8 @@ function renderMenu(){
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   /* 有没开的匣就点一颗金点——不新增行高，大厅竖向已经只剩 61px 余量 */
   $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
+  /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
+  $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
   $('#wolf-badge').dataset.pos='center 18%';applyArt($('#wolf-badge'),'hero');
@@ -4543,10 +5446,17 @@ function renderMap(){
     if(unlocked)d.addEventListener('click',()=>{SFX.click();openLevel(n)});
     grid.appendChild(d);
   }
+  /* 无尽矿脉。它**不是第九地脉**——独立在八脉网格之外，自带标签与横幅，
+     未解锁时横幅去色压暗并保留文字说明，解锁后整块可点。
+     入口逻辑一个字没动：仍然是 openLevel(SAVE.lv)。 */
   const deep=SAVE.lv>64;
-  $('#map-endless').innerHTML=deep
-    ? '<button class="btn ghost" id="go-endless">无尽矿脉 · 深度 '+(SAVE.lv-64)+'</button>'
-    : '通关 64 关后解锁「无尽矿脉」';
+  const me=$('#map-endless');
+  me.className=deep?'unlocked':'locked';
+  me.innerHTML='<div class="ekick">无尽矿脉 · ENDLESS</div>'
+    +'<div class="obanner" id="endless-banner" data-pos="center 45%"></div>'
+    +(deep?'<button class="btn ghost" id="go-endless">继续下潜 · 深度 '+(SAVE.lv-64)+'</button>'
+          :'<div class="emsg">通关 64 关后解锁</div>');
+  applyArt($('#endless-banner'),'ch_endless');
   const ge=$('#go-endless');
   if(ge)ge.addEventListener('click',()=>{SFX.click();openLevel(SAVE.lv)});
 }
@@ -4660,12 +5570,20 @@ function renderCardView(n){
   $('#cv-sub').textContent=have?cd.sub:'这一张还没见过';
   const ser=COLS.serial[n];
   $('#cv-serial').textContent=ser?('臻 · 第 '+String(ser).padStart(3,'0')+' 号'):'';
+  /* 图鉴条目只有拿到之后才看得见——没拿到就剧透，这句话就不值钱了。
+     来历取**最高品阶**那一份：手上最好的那张才是「你的」那张。 */
+  const lore=CARD_LORE[n];
+  $('#cv-lore').innerHTML=have&&lore?esc(lore):'';
+  $('#cv-lore').style.display=(have&&lore)?'':'none';
+  const org=have?orgText(n,top):'';
+  $('#cv-org').innerHTML=org?('得于 '+org):'';
+  $('#cv-org').style.display=org?'':'none';
 
   $('#cv-tiers').innerHTML=[0,1,2,3].map(t=>{
-    if(t===T_VAR&&!VARIANTS[n]&&!colHas(n,t))return '';
+    if(t===T_VAR&&!VARIANTS[n]&&!SECRETS[n]&&!colHas(n,t))return '';
     const cnt=colCnt(n,t);
     return '<div class="cvt'+(cnt?' on t'+t:'')+'"><b>'+TIERS[t].nm+'</b><i>'
-      +(cnt?(cnt>1?'多 1 张':'已收'):(t===T_VAR?'未显形':'—'))+'</i></div>';
+      +(cnt?(cnt>1?'多 1 张':'已收'):(t===T_VAR?(SECRETS[n]&&!VARIANTS[n]?'隐藏':'未显形'):'—'))+'</i></div>';
   }).join('');
 
   const u=upNext(n); let h='';
@@ -4681,6 +5599,13 @@ function renderCardView(n){
       +' 赠 出<span class="colsub">只能送多出来的那份</span></button>';
   if(VARIANTS[n]&&!colHas(n,T_VAR))
     h+='<div class="colsub" style="margin-top:2px">异纹 · '+esc(VARIANTS[n])+'</div>';
+  /* 隐藏款：拿到之前一个字都不提（提了就不叫隐藏），拿到之后才揭晓，
+     让人有「原来如此」而不是「早说啊」。 */
+  if(SECRETS[n]&&!VARIANTS[n]){
+    h+=colHas(n,T_VAR)
+      ? '<div class="colsub" style="margin-top:2px;color:var(--gold2)">隐藏款 · '+esc(SECRETS[n].when)+'</div>'
+      : '<div class="colsub" style="margin-top:2px">这一张还有一个<b>隐藏款</b> · 条件不说</div>';
+  }
   h+='<button class="btn ghost" id="cv-back">返 回</button>';
   $('#cv-acts').innerHTML=h;
   if($('#cv-fill'))$('#cv-fill').onclick=()=>{SFX.click();doFill(n)};
@@ -4694,12 +5619,28 @@ function renderDraw(d){
   $('#dw-kick').textContent=d.dup?'又见此石':'新入典藏';
   const a=$('#dw-art');
   a.className='cbig t'+t; a.style.backgroundImage=''; a.classList.remove('has-art');
-  a.dataset.fit='cover'; a.dataset.pos='center 30%'; applyArt(a,card.a);
+  /* 正面。卡背那条路走完也回到这里，两处只有这一份「怎么显示正面」的定义。 */
+  const face=()=>{a.dataset.fit='cover';a.dataset.pos='center 30%';
+                  a.style.backgroundImage='';a.classList.remove('has-art');applyArt(a,card.a)};
+  /* 卡背翻转：只在从匣子过来时演（d.box 由 renderBoxOpen 标）。
+     减弱动效或缺卡背图时直接给正面——结果永远可见，动画只是可选的糖。
+     ⚠ 这里绝不能做任何结算：卡在 openBox() 里就已经发了。 */
+  if(d.box&&!REDUCED&&ART.card_back){
+    a.dataset.fit='cover'; a.dataset.pos='center'; applyArt(a,'card_back');
+    a.classList.add('flipIn');
+    colLater(240,()=>{a.classList.remove('flipIn');a.classList.add('flipA')});
+    colLater(480,()=>{a.classList.remove('flipA');a.classList.add('flipB');face()});
+  }else face();
   $('#dw-tier').textContent=TIERS[t].nm; $('#dw-tier').className='dwtier t'+t;
   $('#dw-name').textContent=card.nm;
   $('#dw-sub').textContent=card.sub;
   const ser=COLS.serial[card.n];
   $('#dw-serial').textContent=(t===T_TOP&&ser)?('臻 · 第 '+String(ser).padStart(3,'0')+' 号'):'';
+  /* 开匣揭示那一刻情绪最高，图鉴条目摆在这里比藏进详情页值钱。
+     重复卡不再显示——第二次看同一句就成了噪音。 */
+  const dl=CARD_LORE[card.n];
+  $('#dw-lore').innerHTML=(dl&&!d.dup)?esc(dl):'';
+  $('#dw-lore').style.display=(dl&&!d.dup)?'':'none';
   $('#dw-dup').innerHTML=d.dup
     ? (colSpare(card.n,t)>0?'手上已有一张 · 多出来的这份可以<b>赠给朋友</b>'
                           :'第三份起自动熔成星屑 · <b>星屑 +'+TIERS[t].dust+'</b>')
@@ -4707,10 +5648,15 @@ function renderDraw(d){
   const more=COLS.box>0;
   const ag=$('#dw-again'); ag.style.display=more?'':'none';
   ag.innerHTML='再开一匣<span class="colsub">还有 '+COLS.box+' 个</span>';
+  /* 庆祝要跟正面**同时**出现。从匣子来的那条路上，翻卡前 480ms 台上还是卡背，
+     这时候先放礼花等于提前剧透了品阶。 */
   const host=$('#ovl-col .ovl-card');
-  if(t===T_TOP){SFX.win();fxBurstDom(0,host);fxBurstDom(1,host);fxBurstDom(2,host)}
-  else if(t===T_RARE){SFX.star(1);fxBurstDom(1,host)}
-  else SFX.click();
+  const cheer=()=>{
+    if(t===T_TOP){SFX.win();fxBurstDom(0,host);fxBurstDom(1,host);fxBurstDom(2,host)}
+    else if(t===T_RARE){SFX.star(1);fxBurstDom(1,host)}
+    else SFX.click();
+  };
+  if(d.box&&!REDUCED&&ART.card_back)colLater(480,cheer); else cheer();
 }
 
 function renderGift(arg){
@@ -4809,7 +5755,7 @@ const HOW_HTML=`
 （时间 30–90 秒、步数 10–18 步，档位差距刻意不大）——谁拿哪一档由你们场下商定，游戏只照配额发。<br>
 每一轮打完会停下来看积分，下一轮开始前还能再调配额；想收就随时点<b>终结比赛</b>，当场出名次。<br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
-榜上只出现化名，不收集任何真实身份信息；离线也照常能玩，联网后自动补交。
+榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 填同一句<b>小队口令</b>的人会自动分到同一个小队榜里。
 `;
 
@@ -4977,6 +5923,11 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+$('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
+$('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
+$('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
+$('#lb-roll').addEventListener('click',()=>{SFX.click();
+  const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
 for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
@@ -5038,6 +5989,7 @@ $('#end-next').addEventListener('click',e=>{
   SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
+  if(act==='weekly'){startWeekly();return}
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
   maybeLore(()=>openLevel(nx));
@@ -5291,7 +6243,112 @@ window.__selftest=function(){
   /* 20. 关卡确定性（同一关两次生成一致） */
   const a1=JSON.stringify(levelDef(37)),a2=JSON.stringify(levelDef(37));
   ok('关卡定义确定可复现',a1===a2);
-  /* 21. 目标文案里不许出现哨兵大数。
+  /* 21. 今日三桩：同一天必须完全可复现（换设备、重开页面都一样），
+     不同天要能换出不同组合；三条不许重复；need 必须来自各自的档位表。 */
+  {
+    const d=20260731;
+    const a=JSON.stringify(q3Roll(d)), b=JSON.stringify(q3Roll(d));
+    const c=q3Roll(d+1);
+    const one=q3Roll(d);
+    const kinds=new Set(one.map(x=>x.k));
+    let needOk=one.every(x=>Q3BY[x.k]&&Q3BY[x.k].n.includes(x.need));
+    let diff=false; for(let i=d+1;i<d+40;i++){if(JSON.stringify(q3Roll(i))!==a){diff=true;break}}
+    ok('今日三桩同日可复现、三条不重复、档位合法',
+       a===b&&one.length===3&&kinds.size===3&&needOk&&diff);
+  }
+  /* 22. 备用灯油：只挡「正好断一天」，断两天不挡；没油时不挡；油不超上限。 */
+  {
+    const bak=JSON.stringify(SAVE.daily);
+    SAVE.daily={day:0,streak:9,oil:1};
+    const g1=lampOilCheck({gap:1}), g2=lampOilCheck({gap:2}), g3=lampOilCheck({gap:3});
+    SAVE.daily={day:0,streak:9,oil:0};
+    const g2n=lampOilCheck({gap:2});
+    SAVE.daily=JSON.parse(bak);
+    ok('备用灯油只挡断一天、无油不挡',g1===0&&g2===1&&g3===0&&g2n===0&&OIL_MAX===2);
+  }
+  /* 23. 本周矿脉：同一期必须铺出**一模一样**的盘，跨期必须换盘。
+     这是「全服同一盘、比手艺不比运气」的根基，塌了整个玩法就没意义了。 */
+  {
+    const snap=()=>B.map(row=>row.map(p=>p?p.g+''+p.k:'-').join('')).join('|');
+    const L1=levelDef(3);L1.ink=[];L1.ink2=[];L1.crates=[];L1.crates2=[];L1.cages=[];
+    L1.snakes=[];L1.bells=0;L1.colors=5;
+    buildBoard(L1,weekSeed(2951)); const a=snap();
+    buildBoard(L1,weekSeed(2951)); const b=snap();
+    buildBoard(L1,weekSeed(2952)); const c=snap();
+    /* 周序号还要按周一切期：同一周内恒定、跨周一 +1 */
+    const wk=dn=>Math.floor((dn-4)/7);
+    ok('本周矿脉同期同盘、跨期换盘、周一切期',
+       a===b&&a!==c&&wk(20661)===wk(20667)&&wk(20668)===wk(20661)+1);
+  }
+  /* 24. 同伴充能：六人在同一批关卡上的充能速度必须接近。
+     曾经梓的主色是第六色，而 64 关里只有 7 关是 6 色——其余 57 关他一颗
+     都收不到，第 32 关解锁的同伴大招是个摆设。现在主色缺席按一色份额补，
+     补多了他会反超别人，补少了还是废，所以这条盯的是「齐不齐」。 */
+  {
+    const bak={L:GS.L,c:GS.compDef,ch:GS.charge,over:GS.over};
+    const rate=id=>{
+      const c=compById(id);let tot=0;
+      for(const nc of [5,6]){
+        GS.L={colors:nc};GS.compDef=c;GS.charge=0;GS.over=false;
+        const colors={};for(let i=0;i<nc;i++)colors[i]=10;      // 每色各 10 颗
+        allyChargeFrom(colors,0);
+        tot+=GS.charge;
+      }
+      return tot;
+    };
+    const rs=COMPANIONS.map(c=>rate(c.id));
+    Object.assign(GS,{L:bak.L,compDef:bak.c,charge:bak.ch,over:bak.over});
+    const mx=Math.max(...rs), mn=Math.min(...rs);
+    ok('六位同伴充能速度齐平（极差 <15%）',mn>0&&(mx-mn)/mx<0.15);
+  }
+  /* 25. 灵器：上限与溢出折算；提醒只在真吃紧时响一次。
+     提醒这条盯的是**不唠叨**——比漏提更伤的是每关都弹。 */
+  {
+    const bakT=JSON.stringify(SAVE.tools), bakP=SAVE.power;
+    SAVE.tools={pick:0,swap:0,mix:0};SAVE.power=0;
+    for(let i=0;i<40;i++)giveRandomTool(1);
+    const capOk=TOOLKEYS.every(k=>SAVE.tools[k]===TOOL_CAP)&&SAVE.power===(40-TOOL_CAP*3)*TOOL_TO_POWER;
+    SAVE.tools=JSON.parse(bakT);SAVE.power=bakP;
+
+    const bakG=GS.goals,bakM=GS.moves,bakO=GS.over,bakR=GS.rushOn,bakP2=GS.party,bakT2=GS.toldTool;
+    const fire=(moves,prog,tools,rush)=>{
+      GS.over=false;GS.party=false;GS.rushOn=!!rush;GS.toldTool=false;GS.moves=moves;
+      GS.goals=[{type:'x',need:100,got:Math.round(prog*100)}];
+      const sv=SAVE.tools;SAVE.tools=tools;toolNudge();SAVE.tools=sv;
+      return GS.toldTool;
+    };
+    const T={pick:3,swap:2,mix:2}, none={pick:0,swap:0,mix:0};
+    const nudgeOk = fire(5,.30,T,0)===true && fire(4,.80,T,0)===false
+      && fire(9,.30,T,0)===false && fire(1,.30,T,0)===false
+      && fire(5,.30,none,0)===false && fire(5,.30,T,1)===false;
+    Object.assign(GS,{goals:bakG,moves:bakM,over:bakO,rushOn:bakR,party:bakP2,toldTool:bakT2});
+    ok('灵器封顶折灵力，且提醒只在真吃紧时响',capOk&&nudgeOk);
+  }
+  /* 26. 图鉴条目 32 张齐、不重样；隐藏款不与明示异纹撞车、条件都可判定。 */
+  {
+    const ids=CARDS.map(c=>c.n);
+    const full=ids.every(n=>typeof CARD_LORE[n]==='string'&&CARD_LORE[n].length>=8);
+    const uniq=new Set(Object.values(CARD_LORE)).size===ids.length;
+    const noClash=Object.keys(SECRETS).every(k=>!VARIANTS[k]);   // 同一张不能既明示又隐藏
+    const realCard=Object.keys(SECRETS).every(k=>!!CARD_BY_N[+k]);
+    let callable=true;
+    try{for(const k in SECRETS)SECRETS[k].test({opened:0,lamp:0})}catch(e){callable=false}
+    ok('图鉴 32 条齐备不重样，隐藏款不撞明示异纹',full&&uniq&&noClash&&realCard&&callable);
+  }
+  /* 27. 来历只在第一次拿到时写，之后拿到重复的不许覆盖。
+     覆盖了就变成「最近一次」，而这张卡最有意义的是「我第一次见到它」。 */
+  {
+    const bak=JSON.stringify(COLS);
+    COLS.own={};COLS.org={};COLS.serial={};COLS.seen=0;COLS.dust=0;
+    colGain(5,T_COMMON,1,'box',7);
+    const first=JSON.stringify(COLS.org['5:0']);
+    colGain(5,T_COMMON,1,'gift');                 // 再拿一张重复的
+    const after=JSON.stringify(COLS.org['5:0']);
+    const txt=orgText(5,T_COMMON);
+    COLS=JSON.parse(bak);
+    ok('卡的来历只记第一次，重复不覆盖',first===after&&/第 7 匣开出/.test(txt));
+  }
+  /* 28. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
@@ -5383,6 +6440,15 @@ show('menu');
 PLAT.raf(loop);
 /* 开局补交上次没传成功的成绩（延后一点，别和首屏抢带宽） */
 setTimeout(()=>LB.flush('boot'),1800);
+/* 网页安装版：首屏完全加载后再注册，避免和第一次可操作时间抢带宽。
+   Capacitor 原生壳有自己的离线副本，不让 Service Worker 再套一层缓存。 */
+if((window.MYSKME_GEMFALL_NETWORK||{}).serviceWorker!==false&&'serviceWorker' in navigator
+   &&/^https?:$/.test(location.protocol)){
+  window.addEventListener('load',()=>{
+    const native=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform();
+    if(!native)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+  },{once:true});
+}
 
 </script>
 </body>

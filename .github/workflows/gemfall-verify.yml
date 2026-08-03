@@ -1,0 +1,80 @@
+name: 灵石远征 · 自动验证
+
+on:
+  push:
+    paths:
+      - 'match/index.html'
+      - 'match/manifest.json'
+      - 'match/network-config.js'
+      - 'match/edgeone.json'
+      - 'match/edge-functions/**'
+      - 'match/sw.js'
+      - 'match/icons/**'
+      - 'match/art/**'
+      - 'match/ports/**'
+      - '.github/workflows/gemfall-verify.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gemfall-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 准备 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 运行网页内建无头自检
+        run: node match/ports/tools/run-selftest.mjs
+
+      - name: 验证排行榜网络切换与免预检提交
+        run: node match/ports/tools/test-network-layer.mjs
+
+      - name: 验证 EdgeOne 品牌网关白名单与固定上游
+        run: node match/ports/tools/test-edgeone-proxy.mjs
+
+      - name: 验证 EdgeOne 可重复发布包
+        run: |
+          node match/ports/tools/build-edgeone-package.mjs /tmp/gemfall-edgeone-ci.zip
+          unzip -tq /tmp/gemfall-edgeone-ci.zip
+
+      - name: 核对离线缓存清单
+        run: |
+          node match/ports/tools/build-service-worker.mjs
+          node --check match/sw.js
+          if ! git diff --exit-code match/sw.js; then
+            echo "::error::网页、图片或图标变了但离线缓存清单没重生成"
+            exit 1
+          fi
+
+      - name: 核对正式素材总账
+        run: |
+          node match/ports/tools/build-resource-catalog.mjs
+          node match/ports/tools/normalize-resource-catalog.mjs
+          if ! git diff --exit-code match/ports/shared/resource-catalog.json; then
+            echo "::error::素材变了但总账没重生成"
+            exit 1
+          fi
+
+      - name: 核对微信小游戏美术副本
+        run: |
+          node match/ports/wechat-minigame/scripts/sync-assets.mjs
+          if ! git diff --exit-code match/ports/wechat-minigame/assets/art; then
+            echo "::error::网页美术与微信小游戏副本不同步"
+            exit 1
+          fi
+
+      - name: 运行微信小游戏引擎测试
+        run: node match/ports/wechat-minigame/test/engine.test.js
+
+      - name: 验证跨端资源、哈希与包体预算
+        run: node match/ports/tools/verify-ports.mjs
