@@ -104,7 +104,11 @@ async function verify() {
   await check('题库等公开 JSON 允许跨域读取', async () => {
     // 各作品页面还在 myskme.github.io 上，要拉 myskme.com 的题库书架就是跨域请求。
     // 少了这个头，浏览器会静默拦掉——学生那边表现为书架空白，且控制台之外看不出原因。
-    const response = await get(`https://myskme.com/banks/index.json?${cacheBust}`);
+    // ⚠ 这里**不能加防缓存查询串**：EdgeOne 的自定义响应头规则按原始路径匹配，
+    // 带查询串会绕开规则，头就不会下发（实测带查询串 0 个 Allow-Origin、不带 1 个），
+    // 于是检查会误判成配置没生效。/banks/*.json 本来就配了 no-cache，不需要查询串。
+    // 同一个坑上面 Manifest 那条检查也踩过，注释里已有记载。
+    const response = await get('https://myskme.com/banks/index.json');
     assert(response.status === 200, `题库目录状态码 ${response.status}`);
     assert(response.headers.get('access-control-allow-origin') === '*',
       `题库目录 Allow-Origin 为 ${response.headers.get('access-control-allow-origin') || '空'}`);
