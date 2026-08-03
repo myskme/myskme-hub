@@ -1,0 +1,157 @@
+{
+  "name": "两个名字 · 学徒篇 VOL.5（中级）",
+  "code": "SP6M",
+  "desc": "2026 暑假特辑 SP6M《两个名字·学徒篇》中级档（学徒版）语法命门 12 题。本卷的看图命门（13–17）、传记阅读（18–20）、词梯、辨笔迹区依赖纸面主图与机关，未进题库。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "The swap spell lasts only ___ hour, not a day.",
+        "ops": [
+          "a",
+          "an",
+          "the",
+          "any"
+        ],
+        "ans": 1,
+        "why": "hour 的 h 不发音，开口就是元音音素，所以用 an。",
+        "lv": 1
+      },
+      {
+        "q": "Xi's pen ___ the truth, even when her mouth is joking.",
+        "ops": [
+          "tells always",
+          "always tells",
+          "always is telling",
+          "always tell"
+        ],
+        "ans": 1,
+        "why": "频度副词 always 站在实义动词前面；主语 pen 是单数，动词用 tells。",
+        "lv": 2
+      },
+      {
+        "q": "Look! Xi ___ Jin's hair by the window again.",
+        "ops": [
+          "braids",
+          "braided",
+          "will braid",
+          "is braiding"
+        ],
+        "ans": 3,
+        "why": "Look! 提示动作正在眼前发生，用现在进行时 is braiding。",
+        "lv": 1
+      },
+      {
+        "q": "This time yesterday, the two girls ___ each other's names in the illusion.",
+        "ops": [
+          "used",
+          "are using",
+          "were using",
+          "have used"
+        ],
+        "ans": 2,
+        "why": "this time yesterday（昨天这个时候）是过去进行时的专用锚：主语复数，用 were using。",
+        "lv": 2
+      },
+      {
+        "q": "Xi didn't leave ___ coins in the jar — not even one.",
+        "ops": [
+          "some",
+          "no",
+          "every",
+          "any"
+        ],
+        "ans": 3,
+        "why": "否定句里用 any。",
+        "lv": 1
+      },
+      {
+        "q": "Nobody in the school writes as ___ as Xi.",
+        "ops": [
+          "beautiful",
+          "more beautifully",
+          "most beautifully",
+          "beautifully"
+        ],
+        "ans": 3,
+        "why": "as…as 中间放原级；修饰动词 writes 要用副词 beautifully。",
+        "lv": 2
+      },
+      {
+        "q": "Both of the notes on the wall ___ lies — read together, they tell the truth.",
+        "ops": [
+          "is",
+          "are",
+          "was",
+          "has been"
+        ],
+        "ans": 1,
+        "why": "both = 两个都，主语天生复数，现在时用 are。",
+        "lv": 2
+      },
+      {
+        "q": "Jin decided ___ Xi's name to protect her.",
+        "ops": [
+          "to borrow",
+          "borrowing",
+          "borrow",
+          "borrowed"
+        ],
+        "ans": 0,
+        "why": "decide to do sth 是固定搭配。",
+        "lv": 1
+      },
+      {
+        "q": "— Thank you for braiding my hair again.　— ___ I liked doing it.",
+        "ops": [
+          "Never mind.",
+          "That's right.",
+          "My pleasure.",
+          "Take it easy."
+        ],
+        "ans": 2,
+        "why": "对方在道谢，回 My pleasure（我的荣幸／不客气），后一句 I liked doing it 正好接上。",
+        "lv": 2
+      },
+      {
+        "q": "Xi ___ Jin's name for an hour and gave it back when the spell ended.",
+        "ops": [
+          "borrowed",
+          "lent",
+          "kept",
+          "returned"
+        ],
+        "ans": 0,
+        "why": "从别人那里拿来用，方向朝里，用 borrow；过去式 borrowed。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "The words on the jar are in Jin's small letters.",
+          "Xi was naughty, but she fixed everything in the end.",
+          "Xi runned out of the study with the snacks.",
+          "The girls' hour in the illusion changed them both."
+        ],
+        "ans": 2,
+        "why": "run 是不规则动词，过去式是 ran——没有 runned 这个词。",
+        "lv": 2
+      },
+      {
+        "q": "Mr Wolf noticed ___ in the crooked letters at once.",
+        "ops": [
+          "something strange",
+          "strange something",
+          "anything strange",
+          "something strangely"
+        ],
+        "ans": 0,
+        "why": "形容词修饰不定代词一律后置——something strange。",
+        "lv": 2
+      }
+    ]
+  }
+}
