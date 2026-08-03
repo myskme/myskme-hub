@@ -80,6 +80,17 @@
 - `/api/` 健康检查返回 `200`；无效设备提交穿透到原 Worker 后返回预期 `400 no device`，
   未写入 D1；非白名单代理路径返回 `404`。所有 `/api/*` 响应均为 `no-store`。
 
+### 分享链路（2026-08-03）
+
+- 对外分享一律走 `network-config.js` 的 `shareUrl`（`https://play.myskme.com/`），
+  **不用 `location.origin`**：网页玩家基本在国内，从 GitHub Pages 打开的人
+  分享出去的 github.io 链接在群里点不开，传播链会断在第一环。
+  本周矿脉拓片已切换；以后新增任何分享出口都读这个字段。
+- `og:url` / `og:image` 指向 `play.myskme.com`；og 图为
+  `match/icons/og.png`（1200×630，即 assets/og-gemfall.png 的同域副本，
+  已入素材总账）。icons/ 整目录本来就在直传包里，
+  ⚠ 但 **og 卡片要等下一次 EdgeOne 直传后才有图**——发布前线上是 404。
+
 ### EdgeOne 直传发布
 
 直传时将 `match/` 中的以下内容放在 ZIP 根目录，不要再套一层 `match/`：
