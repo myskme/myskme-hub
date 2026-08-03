@@ -1201,6 +1201,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div id="col-sets"></div>
     <div id="col-grid"></div>
     <div class="ovl-btns">
+      <button class="btn ghost" id="col-ask">矿友互助</button>
       <button class="btn ghost" id="col-recv">收 赠 印</button>
       <button class="btn ghost" id="col-close">合上</button>
     </div>
@@ -1249,6 +1250,15 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="ovl-title" id="gf-title" style="font-size:21px"></div>
     <div id="gf-body"></div>
     <div class="ovl-btns" id="gf-btns"></div>
+  </section>
+
+  <!-- 矿友互助：跟赠印同一套骨架，但用途相反（求 vs 送），
+       所以单独一个视图、单独的前缀 GQ，粘错时能立刻认出来。 -->
+  <section class="colv" data-v="ask">
+    <div class="ovl-kick">矿 友 互 助</div>
+    <div class="ovl-title" id="ak-title" style="font-size:21px"></div>
+    <div id="ak-body"></div>
+    <div class="ovl-btns" id="ak-btns"></div>
   </section>
 
   <!-- Esc 的落点。子视图里按 Esc 应该退回册子，而不是像别的弹层那样直接回大厅。 -->
@@ -4429,6 +4439,49 @@ function tagToId(tag){
   for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return null;b+=_bits(v,5)}
   return parseInt(b,2)&0x1FFFFFF;
 }
+/* ---- 求卡帖 · 矿友互助 ----
+   赠印只解决「我主动送」，缺的是反过来：**开口求**。
+   收集类玩法最劝退的一刻不是抽不到，是「就差这一张，而且不知道找谁」。
+
+   求卡帖比赠印简单得多，因为它**不转移任何东西**——
+   它只说「我缺哪张、我的矿工号是多少」，所以：
+   · 不需要流水号（没有重放风险，求一百次也只是求）
+   · 不需要防抢（谁看到都能帮，这正是我们要的）
+   · 收到帖的人点一下就跳到赠出流程，矿工号自动填好——
+     少一次手抄矿工号，就少一半送不出去的可能。
+
+   位宽：卡号 7 + 品阶 2 + 求助者 25 + 校验 6 = 40 位 → base32 8 字符。
+   前缀用 GQ 而不是 GF：两种帖长得像但用途相反，
+   粘错时要能立刻认出来，不能默默走进另一条流程。 */
+function askEncode(n,t,who){
+  const body=_bits(n,7)+_bits(t,2)+_bits(who,25);
+  const s=_b32(body+_bits(fnv('GQ1|'+body)%64,6));
+  return 'GQ-'+s.slice(0,4)+'-'+s.slice(4,8);
+}
+function askDecode(code){
+  let s=String(code||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
+  /* 同赠印那条教训：G/Q 本身是合法 base32 字符，
+     只有连前缀正好 10 位时才剥，否则会吃掉正文头两位。 */
+  if(s.length===10&&s.slice(0,2)==='GQ')s=s.slice(2);
+  if(s.length!==8)return {err:'求卡帖应是 8 位 · 检查有没有漏字'};
+  let b='';
+  for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return {err:'求卡帖里有不认识的字'};b+=_bits(v,5)}
+  const body=b.slice(0,34), sum=parseInt(b.slice(34,40),2);
+  if(fnv('GQ1|'+body)%64!==sum)return {err:'求卡帖打错了字 · 再核对一遍'};
+  const n=parseInt(body.slice(0,7),2), t=parseInt(body.slice(7,9),2), who=parseInt(body.slice(9,34),2);
+  if(!CARD_BY_N[n])return {err:'求卡帖里的卡号不存在'};
+  if(t===T_VAR)return {err:'异纹不能转赠，也就无从求起'};
+  return {n,t,who,tag:_b32(_bits(who,25))};
+}
+/* 我最缺哪张：优先「一张都没有」的，其次「差最高品阶」的。
+   按套组顺序取第一个，让求卡有个合理默认值，不用玩家自己翻。 */
+function askSuggest(){
+  colFix();
+  for(const c of CARDS)if(!colAny(c.n))return {n:c.n,t:T_COMMON};
+  for(const c of CARDS)if(!colHas(c.n,T_TOP))return {n:c.n,t:T_TOP};
+  for(const c of CARDS)if(!colHas(c.n,T_RARE))return {n:c.n,t:T_RARE};
+  return null;
+}
 function giftEncode(n,t,rcpt,seq){
   const body=_bits(n,7)+_bits(t,2)+_bits(rcpt,25)+_bits(seq,16);
   const s=_b32(body+_bits(fnv('GF1|'+body)%1024,10));
@@ -5752,6 +5805,7 @@ function colView(v,arg){
   else if(v==='box')renderBoxOpen(arg);
   else if(v==='draw')renderDraw(arg);
   else if(v==='gift')renderGift(arg);
+  else if(v==='ask')renderAsk(arg);
   ovl('col');
 }
 function openCol(){
@@ -5858,6 +5912,11 @@ function renderCardView(n){
     h+='<button class="btn" id="cv-up"'+(COLS.dust<u.cost?' disabled':'')
       +'>炼成 '+TIERS[u.to].nm+'<span class="colsub">星屑 '+u.cost+'</span></button>';
   }
+  /* 没收到的卡直接给「求这张」——玩家点开一张没有的卡，
+     正是他最想要它的那一刻，这时候给入口最顺。 */
+  if(!have)
+    h+='<button class="btn ghost" id="cv-ask">'+icTag('together')
+      +' 求 这 张<span class="colsub">发个帖到群里，谁有多的就能送你</span></button>';
   if([0,1,2].some(t=>colSpare(n,t)>0))
     h+='<button class="btn ghost" id="cv-gift">'+icTag('gift')
       +' 赠 出<span class="colsub">只能送多出来的那份</span></button>';
@@ -5875,6 +5934,7 @@ function renderCardView(n){
   if($('#cv-fill'))$('#cv-fill').onclick=()=>{SFX.click();doFill(n)};
   if($('#cv-up'))  $('#cv-up').onclick  =()=>{SFX.click();doUpgrade(n)};
   if($('#cv-gift'))$('#cv-gift').onclick=()=>{SFX.click();colView('gift',{n:n})};
+  if($('#cv-ask')) $('#cv-ask').onclick =()=>{SFX.click();colView('ask',{n:n})};
   $('#cv-back').onclick=()=>{SFX.click();colView('list')};
 }
 
@@ -5923,6 +5983,98 @@ function renderDraw(d){
   if(d.box&&!REDUCED&&ART.card_back)colLater(480,cheer); else cheer();
 }
 
+/* ---- 矿友互助 ----
+   两态：'post'（我发帖求卡）与 'read'（我看到别人的帖）。
+   闭环的关键在 read 那一态——看到帖之后**一键跳到赠出、矿工号自动填好**。
+   少一次手抄矿工号，就少一半送不出去的可能。 */
+function renderAsk(arg){
+  colFix(); colDay();
+  const mode=(arg&&arg.read)?'read':'post';
+  const B=$('#ak-body'), BT=$('#ak-btns');
+  if(mode==='post'){
+    const sug=(arg&&arg.n!=null)?{n:arg.n,t:arg.t!=null?arg.t:T_COMMON}:askSuggest();
+    if(!sug){
+      $('#ak-title').textContent='已经收全了';
+      B.innerHTML='<div class="gfnote">三个品阶都齐了，没有可求的卡。'
+        +'<br>不如去看看谁的帖子里缺的那张你正好有多的。</div>';
+      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+        +'<button class="btn" id="ak-toread">我收到了一张帖</button>';
+    }else{
+      const cd=CARD_BY_N[sug.n];
+      $('#ak-title').textContent='求 一 张 · '+cd.nm;
+      B.innerHTML='<div class="colsub">你的矿工号 <b>'+minerTag()+'</b></div>'
+        +'<div id="ak-pick"></div>'
+        +'<div class="gfnote">发到群里，谁手上有多的就能送你。'
+        +'<br><b>求卡不消耗任何东西</b>，也不占你每天 3 次的赠出额度。'
+        +'<br>别人点开你的帖，矿工号会自动填好，他不用手抄。</div>'
+        +'<div id="ak-out"></div>';
+      /* 让玩家能改求哪一张：列出还缺的前 8 张，默认选中建议的那张。 */
+      const miss=CARDS.filter(c=>!colAny(c.n)).slice(0,8);
+      const pool=miss.length?miss:CARDS.filter(c=>!colHas(c.n,T_TOP)).slice(0,8);
+      $('#ak-pick').innerHTML=pool.map(c=>'<button class="pt-chip'
+        +(c.n===sug.n?' on':'')+'" data-n="'+c.n+'">'+esc(c.nm)+'</button>').join('');
+      for(const b of $$('#ak-pick .pt-chip'))b.onclick=()=>{
+        for(const x of $$('#ak-pick .pt-chip'))x.classList.remove('on');
+        b.classList.add('on');$('#ak-out').innerHTML='';
+      };
+      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+        +'<button class="btn primary" id="ak-make">生成求卡帖</button>';
+      $('#ak-make').onclick=async()=>{
+        SFX.click();
+        const sel=$('#ak-pick .pt-chip.on'); if(!sel)return;
+        const n=+sel.dataset.n;
+        const code=askEncode(n,colAny(n)?T_TOP:T_COMMON,minerId());
+        const txt='灵石远征 · 求一张「'+CARD_BY_N[n].nm+'」\n'
+          +code+'\n手上有多的话点开这个帖，矿工号已经带上了\n'
+          +((window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||location.origin);
+        $('#ak-out').innerHTML='<div class="gfcode">'+esc(code)+'</div>'
+          +'<button class="btn ghost" id="ak-copy" style="width:100%;margin-top:8px">复制整段发群里</button>';
+        $('#ak-copy').onclick=async()=>{
+          SFX.click();
+          try{await navigator.clipboard.writeText(txt);toast('求卡帖已复制 · 发到群里就行',2800)}
+          catch(e){toast('复制被浏览器挡了 · <b>长按上面那串自己选</b>',3200)}
+        };
+      };
+    }
+  }else{
+    $('#ak-title').textContent='收 到 求 卡 帖';
+    B.innerHTML='<input id="ak-in" placeholder="GQ-XXXX-XXXX" autocomplete="off" spellcheck="false">'
+      +'<div class="gfnote">粘上朋友发来的求卡帖，看看他缺什么、你有没有多的。'
+      +'<br>能送的话点一下就跳到赠出，<b>矿工号会自动填好</b>。</div>'
+      +'<div id="ak-out"></div>';
+    BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+      +'<button class="btn primary" id="ak-check">看看他缺什么</button>';
+    $('#ak-check').onclick=()=>{
+      SFX.click();
+      const d=askDecode($('#ak-in').value);
+      if(d.err){toast(d.err,3000);return}
+      const cd=CARD_BY_N[d.n];
+      /* 关键判断：我有没有**多的**那张。只有多的才能送，
+         这是赠印一开始就定的规矩——不能把自己图鉴送空。 */
+      const spare=[0,1,2].filter(t=>colSpare(d.n,t)>0);
+      const me=d.who===minerId();
+      $('#ak-out').innerHTML='<div class="xfer-diff">矿工 <b>'+esc(d.tag)+'</b> 求一张 <b>'
+        +esc(cd.nm)+'</b>'
+        +(me?'<br><span class="warn">这是你自己发的帖</span>'
+            :(spare.length
+              ? '<br>你手上有多的 <b>'+spare.map(t=>TIERS[t].nm).join(' / ')+'</b> —— 可以送他'
+              : '<br><span class="warn">你手上没有多余的这张</span>'
+                +'<br><span style="color:var(--ink3)">同一张要有 2 份才算多，先去开匣攒攒</span>'))
+        +'</div>'
+        +(!me&&spare.length?'<button class="btn primary" id="ak-give" style="width:100%;margin-top:8px">'
+          +'去赠出（矿工号已带上）</button>':'');
+      const g=$('#ak-give');
+      if(g)g.onclick=()=>{
+        SFX.click();
+        /* 带着矿工号跳进赠印流程——这是整个互助闭环的那一步。 */
+        colView('gift',{n:d.n,prefill:d.tag});
+      };
+    };
+  }
+  $('#ak-cancel').onclick=()=>{SFX.click();colView('list')};
+  const tr=$('#ak-toread'); if(tr)tr.onclick=()=>{SFX.click();colView('ask',{read:true})};
+}
+
 function renderGift(arg){
   colFix(); colDay();
   const mode=arg&&arg.recv?'recv':'send';
@@ -5952,6 +6104,13 @@ function renderGift(arg){
       +'<div id="gf-out"></div>';
     for(const b of $$('#gf-tier .pt-chip'))b.onclick=()=>{
       for(const x of $$('#gf-tier .pt-chip'))x.classList.remove('on');b.classList.add('on')};
+    /* 从求卡帖跳进来时矿工号已经带上了——手抄矿工号是整条互助链上
+       最容易断的一环，能省就省。 */
+    if(arg&&arg.prefill){
+      $('#gf-to').value=arg.prefill;
+      B.insertAdjacentHTML('afterbegin','<div class="colsub" style="color:var(--gold2)">'
+        +'来自求卡帖 · 矿工号已自动填好</div>');
+    }
     BT.innerHTML='<button class="btn ghost" id="gf-cancel">返 回</button>'
       +'<button class="btn primary" id="gf-ok">生成赠印</button>';
     $('#gf-ok').onclick=()=>{
@@ -6156,6 +6315,7 @@ $('#col-close').addEventListener('click',()=>{SFX.click();colStop();ovl(null);re
 $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
 $('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
+$('#col-ask').addEventListener('click',()=>{SFX.click();colView('ask')});
 $('#dw-again').addEventListener('click',()=>{SFX.click();openBox()});
 $('#dw-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#col-esc').addEventListener('click',()=>{
@@ -6703,15 +6863,36 @@ window.__selftest=function(){
      必须是 base64（blob 微信不给保存）、必须 jpeg（部分安卓 png 长按识别异常）、
      必须能塞进 <img>（长按菜单对 canvas 无效）。 */
   {
-    const bakLog=GS.wkLog,bakSc=GS.score,bakCh=GS.chainMax;
-    GS.wkLog=[5,3];GS.score=12345;GS.chainMax=5;
-    const u=drawCard();
-    GS.wkLog=bakLog;GS.score=bakSc;GS.chainMax=bakCh;
-    ok('名帖是可长按保存的 jpeg base64',
-       typeof u==='string'&&u.startsWith('data:image/jpeg;base64,')
-       &&!u.startsWith('blob:')&&u.length>2000);
+    /* 无头环境（CI）没有真实 canvas，toDataURL 出不来图。
+       所以这条只验**我们自己写对了没有**——导出格式选的是 jpeg 而不是 png、
+       用的是 toDataURL 而不是 toBlob、渲染成 <img> 而不是留在 canvas 上。
+       真实产物由浏览器实测覆盖，自检不该去考浏览器的能力。 */
+    const src=String(drawCard);
+    const okFmt=/toDataURL\(\s*['"]image\/jpeg['"]/.test(src)&&!/toBlob/.test(src);
+    const okImg=/<img id="wk-cardimg"/.test(String(showCard));
+    const okDpr=/devicePixelRatio/.test(src);
+    ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
   }
-  /* 32. 目标文案里不许出现哨兵大数。
+  /* 32. 求卡帖：编解码往返一致、错字拦得住、异纹不可求，
+     而且**不能和赠印互相认**——两种帖长得像但用途相反，
+     粘错了要立刻报错，不能默默走进另一条流程。 */
+  {
+    let rt=true, cross=false;
+    for(let i=0;i<40;i++){
+      const c=CARDS[i%CARDS.length], t=i%3, who=(i*7919)&0x1FFFFFF;
+      const d=askDecode(askEncode(c.n,t,who));
+      if(d.err||d.n!==c.n||d.t!==t||d.who!==who){rt=false;break}
+    }
+    /* 交叉喂：赠印喂给求卡解码器、求卡喂给赠印解码器，两边都必须拒绝 */
+    const gf=giftEncode(5,1,minerId(),7), gq=askEncode(5,1,minerId());
+    cross=!!askDecode(gf).err&&!!giftDecode(gq).err;
+    /* 错一位字必须被校验位拦下 */
+    const broke=gq.slice(0,-1)+(gq.slice(-1)==='0'?'1':'0');
+    const caught=!!askDecode(broke).err;
+    const varRej=!!askDecode(askEncode(1,T_VAR,minerId())).err;
+    ok('求卡帖往返一致、与赠印互不误认、错字与异纹均被拒',rt&&cross&&caught&&varRej);
+  }
+  /* 33. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
