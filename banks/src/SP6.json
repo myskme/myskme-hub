@@ -1,0 +1,158 @@
+{
+ "date": "2026-08-01",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "炼狱",
+ "tier": "free",
+ "name": "两个名字 · 人物传 VOL.5（高级）",
+ "code": "SP6",
+ "desc": "2026 暑假特辑 SP6《两个名字》高级档（陷阱猎人版）语法命门 12 题。本卷的看图命门（13–18）、传记阅读（19–22）、词梯、辨笔迹区依赖纸面主图与机关，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "Nobody could tell Mr Wolf where Jin ___ at that moment.",
+    "ops": [
+     "is",
+     "has been",
+     "will be",
+     "was"
+    ],
+    "ans": 3,
+    "why": "主句 could tell 是过去时，宾语从句时态要跟着退回过去；at that moment 也指当时。",
+    "lv": 2
+   },
+   {
+    "q": "— Where is Xi? — She ___ the illusion world. She isn't back yet.",
+    "ops": [
+     "has been to",
+     "goes to",
+     "has been",
+     "has gone to"
+    ],
+    "ans": 3,
+    "why": "has gone to =“去了还没回来”，与 She isn't back yet 完全咬合。",
+    "lv": 2
+   },
+   {
+    "q": "Xi ___ every coin in the jar on snacks that afternoon.",
+    "ops": [
+     "paid",
+     "cost",
+     "spent",
+     "took"
+    ],
+    "ans": 2,
+    "why": "人作主语，spend + 钱 + on + 物，花钱买零食。",
+    "lv": 2
+   },
+   {
+    "q": "Jin still remembers Xi ___ her hair for the first time years ago.",
+    "ops": [
+     "to braid",
+     "braiding",
+     "braid",
+     "braids"
+    ],
+    "ans": 1,
+    "why": "remember doing 表示“记得做过的事”，多年前编发是已经发生的记忆。",
+    "lv": 2
+   },
+   {
+    "q": "Xi seldom says sorry with her mouth, ___?",
+    "ops": [
+     "doesn't she",
+     "does she",
+     "is she",
+     "isn't she"
+    ],
+    "ans": 1,
+    "why": "seldom 带否定意味，前半句算否定句，反义疑问用肯定 does she。",
+    "lv": 2
+   },
+   {
+    "q": "Jin ___ be the quietest girl in class — or so everyone thought.",
+    "ops": [
+     "used to",
+     "is used to",
+     "was used to",
+     "uses to"
+    ],
+    "ans": 0,
+    "why": "used to do =“过去常常是/曾经是”，现在不是了——正合“大家以前都这么以为”。",
+    "lv": 2
+   },
+   {
+    "q": "In that world, whatever is done ___ in the end, but whatever is written remains.",
+    "ops": [
+     "erases",
+     "is erasing",
+     "is erased",
+     "erased"
+    ],
+    "ans": 2,
+    "why": "做过的事是“被擦除”的，主语是事不是人，用一般现在时被动表规则。",
+    "lv": 2
+   },
+   {
+    "q": "___ beautiful handwriting Xi has!",
+    "ops": [
+     "How",
+     "What",
+     "What a",
+     "How a"
+    ],
+    "ans": 1,
+    "why": "感叹的中心是名词 handwriting（不可数），用 What + 形容词 + 不可数名词。",
+    "lv": 2
+   },
+   {
+    "q": "One of them borrowed a quiet name, and ___ borrowed a loud one.",
+    "ops": [
+     "the other",
+     "another",
+     "other",
+     "the others"
+    ],
+    "ans": 0,
+    "why": "一共只有两个人，one… the other… 表示“一个……另一个……”。",
+    "lv": 2
+   },
+   {
+    "q": "The trick seemed too perfect ___ — until the handwriting spoke.",
+    "ops": [
+     "failing",
+     "fail",
+     "to fail",
+     "to failing"
+    ],
+    "ans": 2,
+    "why": "too + 形容词 + to do，“完美得不可能失败”。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "Xi's handwriting is more better than anyone else's.",
+     "The coins were put back into the jar.",
+     "Jin is one of the few girls who keep long hair in the class.",
+     "Xi herself does not know how strong her writing is."
+    ],
+    "ans": 0,
+    "why": "better 本身已是比较级，前面不能再加 more → Xi's handwriting is better than…。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "Xi was made to clean the study in the real world.",
+     "Jin found it hard to say the word aloud.",
+     "The new pen was paid for with Jin's own coins.",
+     "The illusion was ended by itself when the hour was up."
+    ],
+    "ans": 3,
+    "why": "by itself（自行）只能配主动——The illusion ended by itself；“被自己结束”自相矛盾。",
+    "lv": 2
+   }
+  ]
+ }
+}
