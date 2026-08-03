@@ -590,6 +590,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .skl.psv i{background:var(--line2);color:var(--ink2)}
 .skl b{color:var(--gold2)}
 
+/* 分享：拓片（文字）与名帖（图片）两颗并排 */
+#end-share{display:none;gap:8px;width:100%}
+#end-share .btn{flex:1;font-size:13px;padding:8px 4px}
+/* 名帖必须是真 <img>：微信的长按菜单对 <canvas> 不生效，
+   对 blob: 也不给保存——所以走 toDataURL 的 base64 塞进 img。 */
+#wk-tablet.asimg{border:0;background:none;padding:0;white-space:normal;max-height:none}
+#wk-cardimg{display:block;width:min(268px,74vw);height:auto;margin:0 auto;
+  border:1px solid var(--gold-line)}
+.cardtip{margin-top:8px;font-size:11.5px;color:var(--gold2);letter-spacing:.04em;text-align:center}
+
 /* 存档搬家 */
 .xfer-note{font-size:11.5px;line-height:1.7;color:var(--ink2);margin:2px 0 8px}
 .xfer-note b{color:var(--gold2)}
@@ -1142,7 +1152,10 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="quip" id="end-quip"></div>
   <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
-    <button class="btn ghost" id="end-tablet" style="display:none;width:100%">拓 片 · 复制战报</button>
+    <div id="end-share" style="display:none;gap:8px">
+      <button class="btn ghost" id="end-tablet">拓 片 · 文字</button>
+      <button class="btn ghost" id="end-card">名 帖 · 图片</button>
+    </div>
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
     <button class="btn" id="end-retry">再来</button>
@@ -4595,7 +4608,7 @@ function startRush(){
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
-  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
+  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   const best=GS.score>SAVE.rushBest;
   if(best){SAVE.rushBest=GS.score;persist()}
   setTimeout(()=>LB.flush('clear'),600);
@@ -4621,7 +4634,7 @@ function endRush(){
 }
 function endLevel(win){
   const L=GS.L, n=L.n;
-  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
+  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='';
@@ -5310,6 +5323,75 @@ function wkTablet(){
     +'同一副盘，你能打多少？\n'
     +share;
 }
+/* ---- 矿脉名帖：拓片的图片版 ----
+   微信群里图片比文本传得开，但微信有几个硬坑，全都绕过：
+   · 长按菜单只对 <img> 生效，对 <canvas> 无效 → 必须导出成 <img>
+   · blob: 类型的图微信不给保存 → 必须用 toDataURL 的 base64
+   · 部分安卓机 png 长按识别异常 → 用 jpeg
+   · 高清屏要按 dpr 放大画布，否则糊
+   内容仍然**防剧透**：只画分数、连锁形状、期号，不画盘面也不画走法——
+   没玩的人看不出今天怎么解，这是拓片一开始就守的规矩。 */
+function drawCard(){
+  const s=wkState(), log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const dpr=Math.min(devicePixelRatio||1,3);
+  const W=540,H=760;
+  const cv=document.createElement('canvas');
+  cv.width=W*dpr;cv.height=H*dpr;
+  const x=cv.getContext('2d');x.scale(dpr,dpr);
+  const GOLD='#c9a64a', GOLD2='#e8c768', INK='#8b8578';
+  x.fillStyle='#0a0a0c';x.fillRect(0,0,W,H);
+  /* 描金双线框——与全站插画同一套装帧语言 */
+  x.strokeStyle=GOLD;x.lineWidth=1.5;x.strokeRect(18,18,W-36,H-36);
+  x.globalAlpha=.5;x.strokeRect(25,25,W-50,H-50);x.globalAlpha=1;
+  const mid=W/2;
+  x.textAlign='center';
+  x.fillStyle=INK;x.font='500 15px serif';
+  x.fillText('M Y S K M E   ·   G E M F A L L',mid,72);
+  x.fillStyle=GOLD2;x.font='600 40px serif';
+  x.fillText('本周矿脉',mid,132);
+  x.fillStyle=INK;x.font='400 17px serif';
+  x.fillText('第 '+s.w+' 期 · 全服同一副盘',mid,164);
+  /* 连锁形状：把拓片那几行画成金块。行数即手数，块数即连锁长度。 */
+  let y=232;
+  const sym=n=>n>=6?GOLD2:n>=4?GOLD:'#7a6a3f';
+  if(log.length){
+    for(const n of log){
+      const cnt=Math.min(n,8), bw=30, gap=7;
+      const tot=cnt*bw+(cnt-1)*gap;
+      let bx=mid-tot/2;
+      for(let i=0;i<cnt;i++){
+        x.fillStyle=sym(n);
+        x.globalAlpha=.35+.65*(i+1)/cnt;
+        x.fillRect(bx,y,bw,18);
+        bx+=bw+gap;
+      }
+      x.globalAlpha=1;y+=30;
+    }
+  }else{x.fillStyle=INK;x.font='400 16px serif';x.fillText('—',mid,y);y+=30}
+  y=Math.max(y,430);
+  x.fillStyle=GOLD2;x.font='700 64px serif';
+  x.fillText(GS.score.toLocaleString('en-US'),mid,y+62);
+  x.fillStyle=INK;x.font='400 16px serif';
+  x.fillText('分   ·   最长连锁 '+GS.chainMax,mid,y+96);
+  x.fillStyle=GOLD;x.font='400 19px serif';
+  x.fillText('同一副盘，你能打多少？',mid,H-118);
+  x.fillStyle=INK;x.font='500 17px serif';
+  x.fillText('play.myskme.com',mid,H-82);
+  x.fillStyle='#5a564c';x.font='400 13px serif';
+  x.fillText('狼先生与他的学生们 · 学院谷地',mid,H-52);
+  /* jpeg 而不是 png：部分安卓机对 png 的长按识别有问题 */
+  return cv.toDataURL('image/jpeg',0.92);
+}
+function showCard(){
+  const p=$('#wk-tablet');
+  p.style.display='block';
+  /* 同一个容器两种形态：文字拓片要等宽带框，图片名帖要素底。
+     加类切换，别让 <pre> 的等宽与边框套在图片上。 */
+  p.classList.add('asimg');
+  p.innerHTML='<img id="wk-cardimg" alt="本周矿脉成绩卡">'
+    +'<div class="cardtip">长按上面这张图 →「保存图片」，发到群里比一比</div>';
+  $('#wk-cardimg').src=drawCard();
+}
 async function copyTablet(){
   const t=wkTablet();
   try{
@@ -5318,7 +5400,7 @@ async function copyTablet(){
   }catch(e){
     /* 剪贴板在非安全上下文或旧内核里会被拒。别只报错——把文本摊开让人自己长按选。 */
     const box=$('#wk-tablet');
-    if(box){box.textContent=t;box.style.display='block';
+    if(box){box.classList.remove('asimg');box.textContent=t;box.style.display='block';
       toast('复制被浏览器挡了 · <b>长按下面这段自己选</b>',3400)}
   }
 }
@@ -5402,7 +5484,7 @@ function endWeekly(){
   $('#end-next').dataset.act='weekly';
   $('#end-retry').style.display='none';
   $('#end-continue').style.display='none';
-  $('#end-tablet').style.display='';                          // 只有本周矿脉给拓片
+  $('#end-share').style.display='flex';                       // 只有本周矿脉给分享（拓片/名帖）
   $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
   setTimeout(()=>LB.flush('clear'),600);
   ovl('end');
@@ -6158,6 +6240,7 @@ $('#xfer-in').addEventListener('click',()=>{
 });
 $('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
 $('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
+$('#end-card').addEventListener('click',()=>{SFX.click();showCard()});
 $('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
@@ -6616,7 +6699,19 @@ window.__selftest=function(){
        &&typeof xferExport==='function'&&typeof xferApply==='function'
        &&XFER_TAG==='GFSAVE1:');
   }
-  /* 31. 目标文案里不许出现哨兵大数。
+  /* 31. 矿脉名帖：微信有三个硬坑，任何一条破了图就发不出去——
+     必须是 base64（blob 微信不给保存）、必须 jpeg（部分安卓 png 长按识别异常）、
+     必须能塞进 <img>（长按菜单对 canvas 无效）。 */
+  {
+    const bakLog=GS.wkLog,bakSc=GS.score,bakCh=GS.chainMax;
+    GS.wkLog=[5,3];GS.score=12345;GS.chainMax=5;
+    const u=drawCard();
+    GS.wkLog=bakLog;GS.score=bakSc;GS.chainMax=bakCh;
+    ok('名帖是可长按保存的 jpeg base64',
+       typeof u==='string'&&u.startsWith('data:image/jpeg;base64,')
+       &&!u.startsWith('blob:')&&u.length>2000);
+  }
+  /* 32. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});
