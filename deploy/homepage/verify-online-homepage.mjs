@@ -101,6 +101,14 @@ async function verify() {
       `预检 Max-Age 为 ${response.headers.get('access-control-max-age') || '空'}`);
   });
 
+  await check('网关源码不会被当静态文件公开', async () => {
+    // EdgeOne 把 edge-functions/ 当特殊目录、不作静态内容下发。这里固化成常驻检查：
+    // 一旦哪天能读到源码，上游 Worker 地址（含邮箱前缀）就会重新暴露在公网上。
+    const response = await get(`https://myskme.com/edge-functions/api/index.js?${cacheBust}`);
+    assert(response.status === 404,
+      `边缘函数源码返回 ${response.status}，应为 404；能读到源码意味着上游 Worker 地址已公开，需立即处理`);
+  });
+
   await check('play.myskme.com 仍独立在线', async () => {
     const response = await get(`https://play.myskme.com/?${cacheBust}`);
     const html = await response.text();
