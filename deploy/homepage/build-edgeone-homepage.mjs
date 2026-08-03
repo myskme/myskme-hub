@@ -4,6 +4,7 @@ import { access, cp, mkdir, mkdtemp, readFile, readdir, rm, stat } from 'node:fs
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkParity } from '../gateway/check-parity.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '../..');
@@ -67,13 +68,13 @@ try {
   }
   await cp(path.join(here, 'edgeone.json'), path.join(staging, 'edgeone.json'));
 
-  // 品牌 API 网关：直接取《灵石远征》那一份源码，仓库里始终只有一份，
-  // 两个站点不可能出现路由表不一致。过渡期 play.myskme.com 与 myskme.com
-  // 各自部署一份完全相同的网关；待六个作品全部切到 myskme.com/api/* 之后，
-  // 再把这份源码移出 match/ 并下线 play 侧的旧入口。
-  const gatewaySource = path.join(repoRoot, 'match', 'edge-functions');
-  if (!(await exists(gatewaySource))) throw new Error('缺少品牌 API 网关源码：match/edge-functions');
-  await cp(gatewaySource, path.join(staging, 'edge-functions'), { recursive: true });
+  // 品牌 API 网关：正本在 deploy/gateway/api/（中立位置，不属于任何一个作品）。
+  // match/edge-functions/api/ 是《灵石远征》发布包用的副本，两份必须逐字节一致——
+  // 分叉会让两个域名上的网关行为不一样，是最难查的一类故障，所以这里先校验、再打包。
+  await checkParity();
+  const gatewaySource = path.join(repoRoot, 'deploy', 'gateway', 'api');
+  if (!(await exists(gatewaySource))) throw new Error('缺少品牌 API 网关正本：deploy/gateway/api');
+  await cp(gatewaySource, path.join(staging, 'edge-functions', 'api'), { recursive: true });
 
   const files = (await filesUnder(staging)).sort();
   const required = [

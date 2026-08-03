@@ -20,7 +20,10 @@ on:
       - 'wall/**'
       - 'print/**'
       - 'deploy/homepage/**'
-      # 品牌 API 网关源码只有一份，发布包直接从这里取；改了它主页也要重新构建
+      # 品牌 API 网关：正本在 deploy/gateway/，改了它主页要重新构建；
+      # 副本 match/edge-functions/ 也要盯着——它一旦被单独改动，构建会在一致性校验处失败，
+      # 这正是我们想要的告警（两份分叉会让两个域名上的网关行为不一样）。
+      - 'deploy/gateway/**'
       - 'match/edge-functions/**'
       - '.github/workflows/deploy-homepage.yml'
   workflow_dispatch:
