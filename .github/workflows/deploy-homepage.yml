@@ -20,6 +20,8 @@ on:
       - 'wall/**'
       - 'print/**'
       - 'deploy/homepage/**'
+      # 品牌 API 网关源码只有一份，发布包直接从这里取；改了它主页也要重新构建
+      - 'match/edge-functions/**'
       - '.github/workflows/deploy-homepage.yml'
   workflow_dispatch:
     inputs:

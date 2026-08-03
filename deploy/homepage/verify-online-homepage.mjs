@@ -72,6 +72,43 @@ async function verify() {
       `图标 SHA-256 不一致：线上 ${actualHash}；仓库 ${expectedIconHash}`);
   });
 
+  await check('品牌 API 网关在 myskme.com 上就位', async () => {
+    const response = await get('https://myskme.com/api/');
+    assert(response.status === 200,
+      `网关健康检查状态码 ${response.status}；若为 404，通常是该 EdgeOne 项目没有启用边缘函数，`
+      + '此时 play.myskme.com 上的旧网关仍在服务，作品不会中断');
+    const body = await response.json();
+    assert(body.ok === true && body.service === 'myskme-edge-gateway',
+      `网关健康检查内容不符：${JSON.stringify(body)}`);
+  });
+
+  await check('网关预检带 CORS 且缓存一天', async () => {
+    // OPTIONS 预检是浏览器跨域前自己就会发的那一发，不写入任何榜单数据。
+    // 缺了 Max-Age，弱网下每次提交成绩都要多跑一次询问——这是搬网关前的老毛病。
+    const response = await fetch('https://myskme.com/api/quiz/submit', {
+      method: 'OPTIONS',
+      headers: {
+        origin: 'https://myskme.com',
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'content-type',
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    assert(response.status === 204, `预检状态码 ${response.status}`);
+    assert(response.headers.get('access-control-allow-origin') === '*',
+      `预检 Allow-Origin 为 ${response.headers.get('access-control-allow-origin') || '空'}`);
+    assert(response.headers.get('access-control-max-age') === '86400',
+      `预检 Max-Age 为 ${response.headers.get('access-control-max-age') || '空'}`);
+  });
+
+  await check('网关源码不会被当静态文件公开', async () => {
+    // EdgeOne 把 edge-functions/ 当特殊目录、不作静态内容下发。这里固化成常驻检查：
+    // 一旦哪天能读到源码，上游 Worker 地址（含邮箱前缀）就会重新暴露在公网上。
+    const response = await get(`https://myskme.com/edge-functions/api/index.js?${cacheBust}`);
+    assert(response.status === 404,
+      `边缘函数源码返回 ${response.status}，应为 404；能读到源码意味着上游 Worker 地址已公开，需立即处理`);
+  });
+
   await check('play.myskme.com 仍独立在线', async () => {
     const response = await get(`https://play.myskme.com/?${cacheBust}`);
     const html = await response.text();

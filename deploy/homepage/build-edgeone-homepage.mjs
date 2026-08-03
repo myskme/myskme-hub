@@ -67,6 +67,14 @@ try {
   }
   await cp(path.join(here, 'edgeone.json'), path.join(staging, 'edgeone.json'));
 
+  // 品牌 API 网关：直接取《灵石远征》那一份源码，仓库里始终只有一份，
+  // 两个站点不可能出现路由表不一致。过渡期 play.myskme.com 与 myskme.com
+  // 各自部署一份完全相同的网关；待六个作品全部切到 myskme.com/api/* 之后，
+  // 再把这份源码移出 match/ 并下线 play 侧的旧入口。
+  const gatewaySource = path.join(repoRoot, 'match', 'edge-functions');
+  if (!(await exists(gatewaySource))) throw new Error('缺少品牌 API 网关源码：match/edge-functions');
+  await cp(gatewaySource, path.join(staging, 'edge-functions'), { recursive: true });
+
   const files = (await filesUnder(staging)).sort();
   const required = [
     'index.html', 'manifest.webmanifest', 'og-cover.png', 'robots.txt', 'sitemap.xml',
@@ -74,6 +82,8 @@ try {
     path.join('icons', 'apple-touch-icon.png'),
     path.join('assets', 'hero-wolf.webp'),
     path.join('banks', 'index.html'),
+    path.join('edge-functions', 'api', 'index.js'),
+    path.join('edge-functions', 'api', '[[default]].js'),
   ];
   for (const file of required) {
     if (!files.includes(file)) throw new Error('发布包缺少关键资源：' + file);
