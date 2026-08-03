@@ -76,6 +76,16 @@ try {
   if (!(await exists(gatewaySource))) throw new Error('缺少品牌 API 网关正本：deploy/gateway/api');
   await cp(gatewaySource, path.join(staging, 'edge-functions', 'api'), { recursive: true });
 
+  // 主页专有的边缘函数（目前只有题库短链 /q/<兑换码>）。与网关分开放：
+  // 网关那份要与《灵石远征》的副本保持一致，这些则只属于 myskme.com。
+  const homepageFunctions = path.join(here, 'edge-functions');
+  if (await exists(homepageFunctions)) {
+    for (const entry of await readdir(homepageFunctions)) {
+      await cp(path.join(homepageFunctions, entry),
+        path.join(staging, 'edge-functions', entry), { recursive: true });
+    }
+  }
+
   const files = (await filesUnder(staging)).sort();
   const required = [
     'index.html', 'manifest.webmanifest', 'og-cover.png', 'robots.txt', 'sitemap.xml',
@@ -85,6 +95,7 @@ try {
     path.join('banks', 'index.html'),
     path.join('edge-functions', 'api', 'index.js'),
     path.join('edge-functions', 'api', '[[default]].js'),
+    path.join('edge-functions', 'q', '[[default]].js'),
   ];
   for (const file of required) {
     if (!files.includes(file)) throw new Error('发布包缺少关键资源：' + file);

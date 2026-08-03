@@ -114,6 +114,22 @@ async function verify() {
       `题库目录 Allow-Origin 为 ${response.headers.get('access-control-allow-origin') || '空'}`);
   });
 
+  await check('题库短链 /q/<兑换码> 正确跳转', async () => {
+    // 卷子上印的是品牌短址，这一跳断了等于学生手里的码全部作废——必须每次发布都确认。
+    const response = await get('https://myskme.com/q/S2E5');
+    assert(response.status === 302, `短链状态码 ${response.status}`);
+    const location = response.headers.get('location') || '';
+    assert(location.includes('word-duel.html'), `短链去向异常：${location || '空'}`);
+    assert(location.includes('code=S2E5'), `短链没带上兑换码：${location}`);
+  });
+
+  await check('题库短链不带码时回书架', async () => {
+    const response = await get('https://myskme.com/q/');
+    assert(response.status === 302, `无码短链状态码 ${response.status}`);
+    assert((response.headers.get('location') || '').includes('/banks/'),
+      `无码短链去向异常：${response.headers.get('location') || '空'}`);
+  });
+
   await check('网关源码不会被当静态文件公开', async () => {
     // EdgeOne 把 edge-functions/ 当特殊目录、不作静态内容下发。这里固化成常驻检查：
     // 一旦哪天能读到源码，上游 Worker 地址（含邮箱前缀）就会重新暴露在公网上。

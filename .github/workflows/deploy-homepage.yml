@@ -49,9 +49,46 @@ jobs:
     name: 生成并校验 EdgeOne 发布包
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      data_only: ${{ steps.scope.outputs.data_only }}
     steps:
       - name: 检出仓库
         uses: actions/checkout@v4
+        with:
+          # 需要历史才能判断这次推送改了哪些文件
+          fetch-depth: 0
+
+      # 题库数据（banks/）变更后如果不自动上线，myskme.com 上的书架就会比
+      # GitHub Pages 那份旧——学生扫新卷子上的兑换码会找不到题库。
+      # 所以只给「纯数据变更」开一条窄道自动发布；只要掺了任何其他文件，
+      # 仍然必须人工确认，闸门不动。
+      - name: 判断本次推送是否只动了题库数据
+        id: scope
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            base="$(git rev-parse HEAD~1 2>/dev/null || echo '')"
+          else
+            base="$BEFORE"
+          fi
+          if [ -z "$base" ]; then
+            echo "data_only=false" >> "$GITHUB_OUTPUT"
+            echo "拿不到对比基点，按非数据变更处理（仍需人工确认）"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$base" "$GITHUB_SHA")"
+          echo "本次改动："; echo "$changed"
+          if [ -n "$changed" ] && ! echo "$changed" | grep -qvE '^banks/'; then
+            echo "data_only=true" >> "$GITHUB_OUTPUT"
+            echo "→ 纯题库数据变更，将自动发布生产环境"
+          else
+            echo "data_only=false" >> "$GITHUB_OUTPUT"
+            echo "→ 含非数据改动，仍需人工确认才发布"
+          fi
 
       - name: 配置 Python
         uses: actions/setup-python@v5
@@ -93,12 +130,13 @@ jobs:
           retention-days: 14
 
   deploy-production:
-    name: 人工确认后发布生产环境
+    name: 发布生产环境（人工确认，或纯题库数据自动）
     needs: build
     if: >-
-      github.event_name == 'workflow_dispatch' &&
-      inputs.target == 'production' &&
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/main' && (
+        (github.event_name == 'workflow_dispatch' && inputs.target == 'production') ||
+        (github.event_name == 'push' && needs.build.outputs.data_only == 'true')
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
