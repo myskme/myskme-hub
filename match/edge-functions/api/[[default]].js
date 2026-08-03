@@ -9,6 +9,7 @@ const UPSTREAMS = Object.freeze({
 });
 const ROUTES = new Map([
   ['/gf/board', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/board', methods: new Set(['GET']) }],
+  ['/gf/factions', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/factions', methods: new Set(['GET']) }],
   ['/gf/submit', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/submit', methods: new Set(['POST']) }],
   ['/gf/admin', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/admin', methods: new Set(['POST']) }],
   ['/quiz/board', { origin: UPSTREAMS.leaderboard, upstreamPath: '/board', methods: new Set(['GET']) }],

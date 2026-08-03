@@ -556,6 +556,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #daily-card.q3mode .ck{display:none}
 #daily-card.q3mode .cd{font-size:11px;margin-top:0}
 #q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+/* 今日深挖那一行。只有打够 4 关才出现，休闲玩家看不到——
+   不该让人被一个自己够不着的进度条压着。 */
+#q3-grind{display:none;margin-top:5px;font-size:10.5px;letter-spacing:.04em;
+  color:var(--ink3);line-height:1.5}
+#q3-grind b{color:var(--gold2);font-weight:500}
 .q3r{position:relative;display:flex;justify-content:space-between;align-items:baseline;
   font-size:11px;letter-spacing:.04em;color:var(--ink2);
   border:1px solid var(--line);padding:2px 7px 3px;overflow:hidden}
@@ -584,6 +589,33 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   color:var(--bg);background:var(--gold-line);padding:1px 5px;margin-right:6px;vertical-align:1px}
 .skl.psv i{background:var(--line2);color:var(--ink2)}
 .skl b{color:var(--gold2)}
+
+/* 分享：拓片（文字）与名帖（图片）两颗并排 */
+#end-share{display:none;gap:8px;width:100%}
+#end-share .btn{flex:1;font-size:13px;padding:8px 4px}
+/* 名帖必须是真 <img>：微信的长按菜单对 <canvas> 不生效，
+   对 blob: 也不给保存——所以走 toDataURL 的 base64 塞进 img。 */
+#wk-tablet.asimg{border:0;background:none;padding:0;white-space:normal;max-height:none}
+#wk-cardimg{display:block;width:min(268px,74vw);height:auto;margin:0 auto;
+  border:1px solid var(--gold-line)}
+.cardtip{margin-top:8px;font-size:11.5px;color:var(--gold2);letter-spacing:.04em;text-align:center}
+
+/* 存档搬家 */
+.xfer-note{font-size:11.5px;line-height:1.7;color:var(--ink2);margin:2px 0 8px}
+.xfer-note b{color:var(--gold2)}
+.xfer-btns{display:flex;gap:8px}
+.xfer-btns .btn{flex:1;font-size:12.5px;padding:7px 4px}
+#xfer-panel{margin-top:9px}
+#xfer-panel textarea{width:100%;min-height:88px;box-sizing:border-box;padding:8px 9px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.5;
+  word-break:break-all;resize:vertical;user-select:text;-webkit-user-select:text}
+#xfer-panel .xrow{display:flex;gap:8px;margin-top:8px}
+#xfer-panel .xrow .btn{flex:1;font-size:12.5px;padding:7px 4px}
+.xfer-diff{border:1px solid var(--gold-line);padding:8px 10px;margin-top:9px;
+  font-size:11.5px;line-height:1.8;color:var(--ink2)}
+.xfer-diff b{color:var(--gold2)}
+.xfer-diff .warn{color:var(--red)}
 
 /* 上传诊断 */
 #lb-diagwrap{text-align:center;margin-top:8px}
@@ -617,6 +649,37 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #lb-dot .dot,#col-dot .dot{display:inline-block;width:6px;height:6px;margin-left:5px;
   vertical-align:2px;background:var(--gold);border-radius:50%;
   box-shadow:0 0 7px color-mix(in srgb,var(--gold) 75%,transparent)}
+
+/* 追求线：同伴衔位角标 / 百胜描金 / 岁记 / 名片 */
+.ally-opt{position:relative}
+.ally-opt .csrk{position:absolute;top:3px;right:4px;font-size:9.5px;letter-spacing:.1em;
+  color:var(--gold2);background:rgba(10,10,12,.72);padding:1px 4px;border:1px solid var(--gold-line)}
+.ally-opt.vet{box-shadow:0 0 0 1.5px var(--gold),0 0 14px color-mix(in srgb,var(--gold) 40%,transparent)}
+#wk-bounty{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);
+  font-size:11.5px;letter-spacing:.05em;color:var(--ink2);text-align:center}
+#wk-bounty b{color:var(--gold2)}
+.yj-kick{margin:16px 0 6px;font-size:11px;letter-spacing:.3em;color:var(--ink3);text-align:center}
+.yj-tasks{display:flex;flex-direction:column;gap:4px;max-width:min(330px,86vw);margin:0 auto}
+.yj-note{margin-top:7px;font-size:11.5px;color:var(--ink2);text-align:center;letter-spacing:.04em}
+.yj-note b{color:var(--gold2)}
+.yj-wall{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px}
+.yj-seal{width:56px;height:56px;border:1px solid var(--gold);border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 32%,color-mix(in srgb,var(--gold) 20%,transparent),transparent 70%);
+  box-shadow:0 0 10px color-mix(in srgb,var(--gold) 25%,transparent)}
+.yj-seal b{font-size:13px;color:var(--gold2);font-weight:600;line-height:1.1}
+.yj-seal i{font-style:normal;font-size:10px;color:var(--ink2);letter-spacing:.1em}
+#namecard-box{text-align:center;margin-top:12px}
+#nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
+.cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
+/* 门派榜行 */
+.fac-row{display:flex;align-items:baseline;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line)}
+.fac-row .rk{width:26px;text-align:right;color:var(--ink3);font-size:13px}
+.fac-row .nm{flex:1;color:var(--ink);letter-spacing:.06em}
+.fac-row .cnt{font-size:11px;color:var(--ink3)}
+.fac-row .pw{color:var(--gold2);font-weight:500}
+.fac-row.mine{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--gold) 9%,transparent),transparent)}
+.fac-row.mine .nm{color:var(--gold2)}
 
 /* 化名行：输入框 + 换一个 */
 .aliasrow{display:flex;gap:6px;align-items:stretch}
@@ -948,6 +1011,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
            改成同一张卡的第二态：今日三桩。不新增高度。 -->
       <div id="q3-rows"></div>
+      <div id="q3-grind"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
@@ -980,7 +1044,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     </div>
     <div id="star-meter">
       <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
-      <div class="sm-top"><span>星辰宝箱</span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
+      <div class="sm-top"><span>星辰宝箱<i id="sm-src"></i></span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
       <div class="bar"><i id="sm-fill"></i></div>
       <button class="btn primary" id="chest-btn"><span class="ic"></span> 开启星辰宝箱</button>
     </div>
@@ -1119,7 +1183,10 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="quip" id="end-quip"></div>
   <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
-    <button class="btn ghost" id="end-tablet" style="display:none;width:100%">拓 片 · 复制战报</button>
+    <div id="end-share" style="display:none;gap:8px">
+      <button class="btn ghost" id="end-tablet">拓 片 · 文字</button>
+      <button class="btn ghost" id="end-card">名 帖 · 图片</button>
+    </div>
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
     <button class="btn" id="end-retry">再来</button>
@@ -1144,7 +1211,11 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div class="ovl-kick">HONOR BADGES</div>
   <div class="ovl-title">成就 · <em>徽记</em></div>
   <div id="ach-grid"></div>
-  <div class="ovl-btns"><button class="btn ghost" id="ach-close">合上</button></div>
+  <div id="yj-sec"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="ach-close">合上</button>
+    <button class="btn" id="ach-card">出示名片</button>
+  </div>
 </div></div>
 
 <!-- 典藏册。四个子视图共用一张卡片：ovl() 是单层互斥的，
@@ -1165,6 +1236,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div id="col-sets"></div>
     <div id="col-grid"></div>
     <div class="ovl-btns">
+      <button class="btn ghost" id="col-ask">矿友互助</button>
       <button class="btn ghost" id="col-recv">收 赠 印</button>
       <button class="btn ghost" id="col-close">合上</button>
     </div>
@@ -1213,6 +1285,15 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="ovl-title" id="gf-title" style="font-size:21px"></div>
     <div id="gf-body"></div>
     <div class="ovl-btns" id="gf-btns"></div>
+  </section>
+
+  <!-- 矿友互助：跟赠印同一套骨架，但用途相反（求 vs 送），
+       所以单独一个视图、单独的前缀 GQ，粘错时能立刻认出来。 -->
+  <section class="colv" data-v="ask">
+    <div class="ovl-kick">矿 友 互 助</div>
+    <div class="ovl-title" id="ak-title" style="font-size:21px"></div>
+    <div id="ak-body"></div>
+    <div class="ovl-btns" id="ak-btns"></div>
   </section>
 
   <!-- Esc 的落点。子视图里按 Esc 应该退回册子，而不是像别的弹层那样直接回大厅。 -->
@@ -1296,6 +1377,18 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div class="ins-note">华为/小米等自带浏览器菜单位置略有不同，一般都在菜单里找「添加到桌面」。
       微信里同样先选「在浏览器中打开」。</div>
   </div>
+  <!-- 存档搬家。放这里是因为「换手机」和「装到桌面」本来就是同一件事，
+       玩家找「换设备怎么办」会先点开这一页。 -->
+  <div class="ins-sec">
+    <div class="ins-os">换设备 / 手机平板换着玩</div>
+    <div class="xfer-note">进度存在这台设备上。换设备时把口令复制过去，
+      两边都能接着玩。<b>全程离线，不经过任何服务器。</b></div>
+    <div class="xfer-btns">
+      <button class="btn ghost" id="xfer-out">导出我的进度</button>
+      <button class="btn ghost" id="xfer-in">粘贴口令导入</button>
+    </div>
+    <div id="xfer-panel"></div>
+  </div>
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
 </div></div>
 
@@ -1313,6 +1406,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
+    <button data-scope="faction">门派榜</button>
     <button data-scope="class">小队榜</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
@@ -1384,9 +1478,21 @@ const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
+  gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
+  /* ---- 追求线（2026-08 加）----
+     streak = 冒险关连胜（cur 当前 / best 生涯纪录）。聚会与周挑战不计。
+     cs     = 同伴生涯账（每人 r 出战 / w 胜场 / u 大招次数），炉石职业胜场那套。
+     rush2Best = 「续灯 · 45 秒」新模式的最佳分。
+     bounty = 周悬赏（w 周序号 / done 本周是否已领）。
+     yj     = 岁记（m 月序号 / c 各项进度 / done 当月徽记是否已领）。
+     yjSeal = 拿到过的岁记徽记，键 'YYYYMM'，值 {d:领取日序号}——**绝版**，
+              过月永不再得，时间戳就是它的价值。
+     firstDay = 第一次打开游戏的日序号（名片上的「入坑日」）。 */
+  streak:{cur:0,best:0},cs:{},rush2Best:0,
+  bounty:{w:0,done:0},yj:{m:0,c:{},done:0},yjSeal:{},firstDay:0,
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -1398,6 +1504,14 @@ function loadSave(){
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
   out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
+  out.streak=Object.assign({cur:0,best:0},s.streak||{});
+  out.cs=(s.cs&&typeof s.cs==='object')?s.cs:{};
+  out.bounty=Object.assign({w:0,done:0},s.bounty||{});
+  out.yj=Object.assign({m:0,c:{},done:0},s.yj||{});
+  out.yj.c=(out.yj.c&&typeof out.yj.c==='object')?out.yj.c:{};
+  out.yjSeal=(s.yjSeal&&typeof s.yjSeal==='object')?s.yjSeal:{};
+  if(!out.firstDay){out.firstDay=Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000)}
+  out.gr=Object.assign({d:0,n:0,got:0},s.gr||{});
   return out;
 }
 const SAVE=loadSave();
@@ -2893,6 +3007,7 @@ function clearCells(cells,chain,noCrateSplash){
   allyChargeFrom(colors,specials);
   /* 今日三桩的计数。挂在这里而不是结算处，是因为这三样**不看胜负**——
      输的那一局消掉的石头也该算数。 */
+  GS.gemsTotal=(GS.gemsTotal||0)+gems;                       // 单局累计消除，悬赏「唤醒 220 颗」用
   if(typeof q3Bump==='function'&&!GS.party){
     q3Bump('gem',gems);
     if(specials)q3Bump('spec',specials);
@@ -3131,9 +3246,14 @@ async function trySwap(a,b){
      ⚠ 聚会赛时间制不回时间：每人固定秒数是「全场时长可预估」和每人配额的前提。 */
   if(GS.rushOn&&!GS.party){
     const ch=GS.lastChain||0;
-    const bonus=(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
-    if(bonus>0&&GS.rushGiven<45000){                      // 单局返还封顶 45 秒
-      const add=Math.min(bonus*1000,45000-GS.rushGiven);
+    /* 续灯：门槛降到连锁 2、返还翻倍、封顶放宽到 75 秒——
+       45 秒起步靠手艺往下续，续不动灯就灭，这正是这个模式的题眼。 */
+    const bonus=GS.rush2
+      ?(ch>=5?3.0:ch>=3?1.6:ch>=2?0.8:0)+(gained>6000?1.0:0)
+      :(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
+    const cap=GS.rush2?75000:45000;
+    if(bonus>0&&GS.rushGiven<cap){
+      const add=Math.min(bonus*1000,cap-GS.rushGiven);
       GS.rushT+=add;GS.rushGiven+=add;
       toast('+'+(add/1000).toFixed(1)+'s');
     }
@@ -3485,6 +3605,7 @@ async function fireUlt(){
   GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;hintCell=null;
   GS.busy=true;renderAlly();renderTools();
   SAVE.ach['ult_'+c.id]=1;grant('a13');
+  csBump('u',1);
   if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
   persist();
   comboBanner(0,c.ult);
@@ -3579,8 +3700,11 @@ function renderAllyPick(){
     d.style.setProperty('--ally-base',GEMS[c.col].base);
     d.style.setProperty('--ally-dark',GEMS[c.col].dk);
     d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
+    const w=(SAVE.cs[c.id]||{}).w||0, rk=csRank(w);
     d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'
-      +(ul?c.name:'第 '+c.unlock+' 关')+'</div>';
+      +(ul?c.name:'第 '+c.unlock+' 关')+'</div>'
+      +(ul&&rk?'<div class="csrk">'+rk+'</div>':'');
+    if(ul&&w>=100)d.classList.add('vet');                     // 百胜描金，炉石金头像那一下
     if(ul)applyArt(d,'ally_'+c.id);
     if(ul)d.addEventListener('click',()=>{SAVE.comp=c.id;persist();SFX.click();renderAllyPick()});
     /* 锁着也要能点开看：不给看就永远不知道值不值得为他打到第 32 关 */
@@ -3597,6 +3721,12 @@ function renderAllyPick(){
   $('#ally-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b>'
     +'<br><span class="skl"><i>大招</i>「'+c.ult+'」'+c.desc+'</span>'
     +'<br><span class="skl psv"><i>随身</i>'+PASSIVE[c.id]+'</span>'
+    +(function(){const cc=SAVE.cs[c.id]||{},w=cc.w||0,nx=csNext(w);
+      if(!(cc.r||0))return '';
+      return '<br><span class="skl psv"><i>同行</i>出战 '+(cc.r||0)+' · 胜 '+w
+        +(csRank(w)?' · <b>'+csRank(w)+'</b>':'')
+        +(nx?'　<span style="color:var(--ink3)">距'+nx.nm+'还差 '+(nx.need-w)+' 胜</span>':'')
+        +'</span>';})()
     +'<br><span style="color:var(--ink3);font-size:11.5px">'
     +'消任意灵石都充能，'+GEMS[c.col].name+'算双倍 · 炼成特殊灵石 +'+CHG.spec
     +' · 清机关 +'+CHG.block+' · 满 '+c.need+' 发动</span>'
@@ -3606,6 +3736,99 @@ function renderAllyPick(){
 
 /* ---- 每日矿灯 ---- */
 const dayNum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000);
+
+/* ==================================================================
+   [ 追求线 · PURSUIT ]
+   ------------------------------------------------------------------
+   连胜 / 同伴衔位 / 灯位段位 / 周悬赏 / 岁记（月度绝版）。
+   一条共同的设计原则：**全是「追求」，没有「惩罚」**——
+   断了连胜只是从头再来，错过悬赏下周还有新的，
+   唯一真正「过期不候」的是岁记，而它的价值恰恰在于时间刻在上面。
+   受众里有学生，所以不做倒计时轰炸、不做「最后 N 小时」的紧迫视觉。
+   ================================================================== */
+
+/* ---- 灯位：90 秒模式的段位 ----
+   按 rushBest 划档，纯本地、纯荣誉。档名全是灯——这个模式叫「矿灯将熄」，
+   你的段位就是你手里那盏灯的成色。 */
+const LAMP_RANKS=[[0,'黑灯'],[12000,'青灯'],[30000,'铜灯'],[55000,'银灯'],[90000,'金灯'],[140000,'曜灯']];
+function lampRank(v){let n=LAMP_RANKS[0][1];for(const [t,nm] of LAMP_RANKS)if((v||0)>=t)n=nm;return n}
+function lampNext(v){for(const [t,nm] of LAMP_RANKS)if((v||0)<t)return {need:t,nm};return null}
+
+/* ---- 同伴衔位：炉石职业胜场那套 ----
+   跟谁下矿多、谁跟你熟。胜场门槛刻意前密后疏：
+   5 胜就给第一枚，让「原来还有这个」越早被发现越好；
+   100 胜是给一个远方的灯塔。 */
+const CS_RANKS=[[5,'铜衔'],[15,'银衔'],[40,'金衔'],[100,'曜衔']];
+function csOf(id){const c=SAVE.cs[id]||(SAVE.cs[id]={r:0,w:0,u:0});return c}
+function csRank(w){let n='';for(const [t,nm] of CS_RANKS)if((w||0)>=t)n=nm;return n}
+function csNext(w){for(const [t,nm] of CS_RANKS)if((w||0)<t)return {need:t,nm};return null}
+function csBump(k,n){
+  if(!GS.compDef||GS.party||GS.weekly)return;                 // 聚会是客人打的，周挑战另算成绩
+  const c=csOf(GS.compDef.id);c[k]=(c[k]||0)+(n||1);persist();
+}
+
+/* ---- 周悬赏：狼先生每周挂一张榜 ----
+   按周序号确定性抽取，全服同一条。**输的那局达成也算**——
+   悬赏考的是那一下打得漂亮，不是考胜负。 */
+const BOUNTY_POOL=[
+  {k:'chain', nm:'一次交换引出 7 重连锁',      test:g=>g.chainMax>=7},
+  {k:'spec',  nm:'一局内炼成 6 颗特殊灵石',    test:g=>g.specials>=6},
+  {k:'score', nm:'单局得分打过 30,000',        test:g=>g.score>=30000},
+  {k:'gems',  nm:'一局内唤醒 220 颗灵石',      test:g=>(g.gemsTotal||0)>=220},
+  {k:'pure',  nm:'不用灵器通关任意一关',       test:g=>g.won&&!g.usedTool},
+  {k:'rush',  nm:'矿灯将熄打到 25,000',        test:g=>g.mode==='rush'&&g.score>=25000},
+];
+function bountyOf(w){return BOUNTY_POOL[Math.floor(rngOf('bounty|'+w)()*BOUNTY_POOL.length)]}
+function bountyState(){
+  const w=weekNum(), b=SAVE.bounty;
+  if(b.w!==w){b.w=w;b.done=0;persist()}
+  return {w,def:bountyOf(w),done:!!b.done};
+}
+function bountyCheck(){
+  const st=bountyState(); if(st.done)return;
+  if(!st.def.test(GS))return;
+  SAVE.bounty.done=1;persist();
+  giveBox(1,'周悬赏');COLS.dust+=10;colSave();
+  setTimeout(()=>toast('悬赏达成 · <b>'+st.def.nm+'</b><br>'
+    +icTag('box')+' 典藏匣 +1　星屑 +10',4200),1200);
+  yjBump('bounty',1);
+}
+
+/* ---- 岁记：月度绝版徽记 ----
+   每个自然月三桩大事，全清 → 一枚**刻着年月**的徽记，过月永不再得。
+   绝版的价值就是时间；所以徽记上最大的字是年月，不是图案。
+   三桩按月序号确定性抽取，全服同一组，群里可以互相对进度。 */
+const monthNum=()=>{const d=new Date();return d.getFullYear()*12+d.getMonth()};
+const monthTag=m=>{const y=Math.floor(m/12),mo=m%12+1;return y+'年'+mo+'月'};
+const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).padStart(2,'0')};
+const YJ_POOL=[
+  {k:'clear', nm:'当月通关 30 关（重打也算）', need:30},
+  {k:'rushN', nm:'当月下矿灯 15 局',           need:15},
+  {k:'lamp',  nm:'当月领到 18 次每日矿灯',      need:18},
+  {k:'box',   nm:'当月开 12 个典藏匣',          need:12},
+  {k:'chain8',nm:'当月打出 8 重连锁 3 次',      need:3},
+  {k:'bounty',nm:'当月拿下 3 张周悬赏',         need:3},
+];
+function yjState(){
+  const m=monthNum(), y=SAVE.yj;
+  if(y.m!==m){y.m=m;y.c={};y.done=0;persist()}
+  const r=rngOf('yj|'+m), pool=YJ_POOL.slice(), out=[];
+  for(let i=0;i<3&&pool.length;i++)out.push(pool.splice(Math.floor(r()*pool.length),1)[0]);
+  return {m,tasks:out,c:y.c,done:!!y.done};
+}
+function yjBump(k,n){
+  const st=yjState();
+  if(st.done)return;
+  if(!st.tasks.some(t=>t.k===k))return;
+  const y=SAVE.yj;y.c[k]=(y.c[k]||0)+(n||1);persist();
+  if(st.tasks.every(t=>(y.c[t.k]||0)>=t.need)){
+    y.done=1;
+    SAVE.yjSeal[monthKey(st.m)]={d:dayNum()};persist();
+    giveBox(1,'岁记');
+    setTimeout(()=>toast('岁记铸成 · <b>'+monthTag(st.m)+'</b><br>'
+      +'这枚徽记只属于这个月 · 过月不再有',5000),1400);
+  }
+}
 function dailyState(){
   const d=dayNum();
   let last=SAVE.daily.day||0;
@@ -3663,6 +3886,18 @@ function renderDaily(){
   $('#daily-desc').innerHTML=done>=3
     ? '明天再来 · 换三桩新的'
     : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>　<span style="color:var(--ink3)">输了也算数</span>';
+  /* 今日深挖：给肝帝看的那一行。没打够 6 关不显示——
+     休闲玩家不该被一个自己够不着的进度条压着。 */
+  const g=grindState();
+  const gd=$('#q3-grind');
+  if(g.n>=4){
+    const next=GRIND.find(x=>x.n>g.n);
+    gd.style.display='';
+    gd.innerHTML='今日深挖 <b>'+g.n+'</b> 关'
+      +(next?('　距 '+next.n+' 关还差 <b>'+(next.n-g.n)+'</b> → '
+              +(next.dust?('星屑 '+next.dust):(icTag('box')+' 典藏匣')))
+            :'　<span style="color:var(--gold2)">今日三档已全数领取</span>');
+  }else gd.style.display='none';
   $('#q3-rows').innerHTML=s.q.map(q=>{
     const def=Q3BY[q.k], pct=Math.min(100,(def.best?q.got:Math.min(q.got,q.need))/q.need*100);
     return '<div class="q3r'+(q.done?' done':'')+'">'
@@ -3685,6 +3920,7 @@ function claimDaily(){
   const got=giveRandomTool(dailyTools(nextStreak));
   persist();
   const gotBox=colLampTick();                    // 每领 7 次矿灯得 1 个典藏匣
+  yjBump('lamp',1);
   SFX.win();fxBurstDom(1,$('#daily-card'));
   toast((used?'<b>备用灯油</b>替你续上了昨天 · ':'今日矿灯 · ')
     +'连续 <b>'+nextStreak+'</b> 天<br>灵力 +'+pw+'　'+got
@@ -3771,18 +4007,140 @@ function q3Text(q){
 /* ---- 星辰宝箱 ---- */
 const CHEST_COST=15;
 function totalStars(){return Object.keys(SAVE.stars).reduce((a,k)=>a+SAVE.stars[k],0)}
+/* ==================================================================
+   [ 存档搬家 · SAVE TRANSFER ]
+   ------------------------------------------------------------------
+   换手机、或者手机平板换着玩，进度不该丢。
+
+   为什么是「一长串文本」而不是别的：
+   · 手打口令不行——满档 JSON 7.4KB，gzip 后仍有约 2900 字符。
+   · 二维码不行——超出常用容量，且要开摄像头授权。
+   · 云同步要账号体系和新后端，隐私面也变大；本作至今零账号，不为这个破例。
+   · 复制粘贴最稳：国内跨设备传文本本来就走微信文件传输助手，
+     而且**全程离线**，不经过任何服务器。
+
+   格式：`GFSAVE1:` + base64(gzip(JSON))。带前缀是为了让人一眼认出这是什么，
+   也方便粘错东西时立刻拒绝。老浏览器没有 CompressionStream 就退回不压缩，
+   只是串更长，功能不受影响。
+   ================================================================== */
+const XFER_TAG='GFSAVE1:', XFER_RAW='GFSAVE0:';
+const _u8b64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+const _b64u8=b=>{const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
+async function xferExport(){
+  colFix();
+  const blob=JSON.stringify({v:1,t:Date.now(),s:SAVE,c:COLS});
+  const bytes=new TextEncoder().encode(blob);
+  if(typeof CompressionStream!=='undefined'){
+    try{
+      const cs=new CompressionStream('gzip');
+      const w=cs.writable.getWriter();w.write(bytes);w.close();
+      const gz=new Uint8Array(await new Response(cs.readable).arrayBuffer());
+      return XFER_TAG+_u8b64(gz);
+    }catch(e){}
+  }
+  return XFER_RAW+_u8b64(bytes);                     // 老内核退路：不压缩，只是更长
+}
+async function xferParse(text){
+  const t=String(text||'').replace(/\s+/g,'');
+  const gz=t.startsWith(XFER_TAG), raw=t.startsWith(XFER_RAW);
+  if(!gz&&!raw)return {err:'这不是存档口令 —— 应该以 GFSAVE1: 开头'};
+  const body=t.slice((gz?XFER_TAG:XFER_RAW).length);
+  let json;
+  try{
+    const u=_b64u8(body);
+    if(gz){
+      const ds=new DecompressionStream('gzip');
+      const w=ds.writable.getWriter();w.write(u);w.close();
+      json=new TextDecoder().decode(await new Response(ds.readable).arrayBuffer());
+    }else json=new TextDecoder().decode(u);
+  }catch(e){return {err:'口令损坏或没复制全'}}
+  let d;try{d=JSON.parse(json)}catch(e){return {err:'口令损坏或没复制全'}}
+  if(!d||d.v!==1||typeof d.s!=='object'||typeof d.c!=='object')return {err:'口令版本不对'};
+  return {data:d};
+}
+/* 导入前先算清楚「会覆盖成什么样」，让玩家自己比对。
+   这是不可逆操作，必须让他看见两边的差距再点。 */
+function xferSummary(d){
+  const s=d.s||{}, c=d.c||{};
+  const stars=Object.values(s.stars||{}).reduce((a,b)=>a+(+b||0),0);
+  const cards=Object.keys(c.own||{}).length;
+  return {lv:Math.max(0,(s.lv||1)-1),stars,rush:s.rushBest||0,
+    power:s.power||0,cards,box:c.box||0,
+    when:d.t?new Date(d.t).toLocaleString('zh-CN'):'未知时间'};
+}
+function xferApply(d){
+  /* 整体替换而不是合并：合并两份存档会产生「关卡进度是 A 的、收藏册是 B 的」
+     这种没人想要的杂交档，而且很难向玩家解释。搬家就是搬家。 */
+  localStorage.setItem(SKEY,JSON.stringify(d.s));
+  localStorage.setItem(CKEY,JSON.stringify(d.c));
+}
+
+/* ==================================================================
+   [ 今日深挖 · GRIND TRACK ]
+   ------------------------------------------------------------------
+   玩家反映每日上限「不够肝」。但直接放宽兑匣上限会毁掉长期性——
+   攒了几万灵力的老玩家一晚上能开完，两年的收集线当场归零。
+   所以另开一条**独立于灵力**的跑道：今天打得多，就多拿。
+
+   三档递减，且**第 20 关封顶**：打 40 关和打 20 关拿的一样多。
+   实测年产 = 休闲的 1.33 倍，够看得见，又不会把长线压垮；
+   封顶那条是有意的——鼓励「今天多玩几把」，不鼓励「挂机刷一天」。
+   ================================================================== */
+const GRIND=[{n:6,dust:12},{n:12,dust:20},{n:20,box:1}];
+const GRIND_MAX=GRIND[GRIND.length-1].n;
+function grindState(){
+  const d=dayNum(), s=SAVE.gr||(SAVE.gr={d:0,n:0,got:0});
+  if(s.d>d){s.d=0}                                   // 机器时钟跑到未来过，照抄矿灯那条防线
+  if(s.d!==d){s.d=d;s.n=0;s.got=0;persist()}
+  return s;
+}
+/* 每通关一关记一笔。只认冒险关与无尽层——限时局和聚会赛不算，
+   否则 90 秒一局能把三档刷完，这条跑道就成了刷时长而不是打关。 */
+function grindTick(){
+  const s=grindState();
+  if(s.n>=GRIND_MAX&&s.got>=GRIND.length)return;
+  s.n++;
+  for(let i=0;i<GRIND.length;i++){
+    if(s.got>i)continue;
+    if(s.n<GRIND[i].n)break;
+    s.got=i+1;
+    const g=GRIND[i];
+    if(g.dust){colFix();COLS.dust+=g.dust;colSave();
+      setTimeout(()=>toast('今日深挖 · 第 <b>'+g.n+'</b> 关<br>'+icTag('dust')+' 星屑 +'+g.dust,3000),1200)}
+    if(g.box){giveBox(1,'今日深挖');
+      setTimeout(()=>toast('今日深挖 · 第 <b>'+g.n+'</b> 关<br>'+icTag('box')+' <b>典藏匣 +1</b>',3400),1200)}
+  }
+  persist();
+}
+
+/* ---- 星辰宝箱的星源 ----
+   原来只数关卡星，而关卡星终身封顶 192，192÷15=12 箱**余 12**——
+   满星玩家的进度条会永远停在 12/15，那 12 颗星死在里面换不出任何东西。
+   玩家报的「12/15 不能满」就是这个，不是随机 bug 是数学死角。
+
+   补第二条星源：无尽矿脉每 2 层 1 颗「深星」。
+   它同时解决另一件事——肖肖已经挖到 79 层，此前一分额外奖励都没有。
+   无尽是无限的，所以宝箱从此不会再有终点。 */
+const DEEP_PER_STAR=2;
+function deepStars(){return Math.floor(Math.max(0,(SAVE.lv||1)-1-64)/DEEP_PER_STAR)}
+function chestStars(){return totalStars()+deepStars()}
 function renderChest(){
   applyArt($('#chest-orn'),'star_chest');
-  const ts=totalStars(), claimed=SAVE.chest||0;
+  const ts=chestStars(), claimed=SAVE.chest||0;
   const inCur=ts-claimed*CHEST_COST;
   const can=inCur>=CHEST_COST;
   $('#sm-cur').textContent=Math.min(inCur,CHEST_COST);
   $('#sm-need').textContent=CHEST_COST;
   $('#sm-fill').style.width=clamp(inCur/CHEST_COST*100,0,100)+'%';
+  /* 满星之后星星只能来自无尽深度，得说一声——否则数字自己在涨，
+     玩家不知道为什么，还以为又是 bug。 */
+  const d=deepStars();
+  $('#sm-src').innerHTML=d>0?('　<span style="color:var(--ink3);font-style:normal;font-size:11px">'
+    +'含无尽深星 '+d+'</span>'):'';
   $('#chest-btn').classList.toggle('on',can);
 }
 function openChest(){
-  const ts=totalStars(), claimed=SAVE.chest||0;
+  const ts=chestStars(), claimed=SAVE.chest||0;
   if(ts-claimed*CHEST_COST<CHEST_COST)return;
   SAVE.chest=claimed+1;
   SAVE.power=(SAVE.power||0)+800;
@@ -4137,6 +4495,7 @@ function openBox(){
   const dup=colHas(card.n,t);
   colGain(card.n,t,1,'box',(COLS.opened||0)+1);
   COLS.opened=(COLS.opened||0)+1;   // 累计开匣数，来历里写「第 N 匣开出」
+  yjBump('box',1);
   checkSecrets();                   // 隐藏款：三条里两条跟匣有关，集中在这里查
   colSave(); renderMenu();
   colView('box',{card:card,t:t,dup:dup});
@@ -4244,6 +4603,49 @@ function tagToId(tag){
   let b='';
   for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return null;b+=_bits(v,5)}
   return parseInt(b,2)&0x1FFFFFF;
+}
+/* ---- 求卡帖 · 矿友互助 ----
+   赠印只解决「我主动送」，缺的是反过来：**开口求**。
+   收集类玩法最劝退的一刻不是抽不到，是「就差这一张，而且不知道找谁」。
+
+   求卡帖比赠印简单得多，因为它**不转移任何东西**——
+   它只说「我缺哪张、我的矿工号是多少」，所以：
+   · 不需要流水号（没有重放风险，求一百次也只是求）
+   · 不需要防抢（谁看到都能帮，这正是我们要的）
+   · 收到帖的人点一下就跳到赠出流程，矿工号自动填好——
+     少一次手抄矿工号，就少一半送不出去的可能。
+
+   位宽：卡号 7 + 品阶 2 + 求助者 25 + 校验 6 = 40 位 → base32 8 字符。
+   前缀用 GQ 而不是 GF：两种帖长得像但用途相反，
+   粘错时要能立刻认出来，不能默默走进另一条流程。 */
+function askEncode(n,t,who){
+  const body=_bits(n,7)+_bits(t,2)+_bits(who,25);
+  const s=_b32(body+_bits(fnv('GQ1|'+body)%64,6));
+  return 'GQ-'+s.slice(0,4)+'-'+s.slice(4,8);
+}
+function askDecode(code){
+  let s=String(code||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
+  /* 同赠印那条教训：G/Q 本身是合法 base32 字符，
+     只有连前缀正好 10 位时才剥，否则会吃掉正文头两位。 */
+  if(s.length===10&&s.slice(0,2)==='GQ')s=s.slice(2);
+  if(s.length!==8)return {err:'求卡帖应是 8 位 · 检查有没有漏字'};
+  let b='';
+  for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return {err:'求卡帖里有不认识的字'};b+=_bits(v,5)}
+  const body=b.slice(0,34), sum=parseInt(b.slice(34,40),2);
+  if(fnv('GQ1|'+body)%64!==sum)return {err:'求卡帖打错了字 · 再核对一遍'};
+  const n=parseInt(body.slice(0,7),2), t=parseInt(body.slice(7,9),2), who=parseInt(body.slice(9,34),2);
+  if(!CARD_BY_N[n])return {err:'求卡帖里的卡号不存在'};
+  if(t===T_VAR)return {err:'异纹不能转赠，也就无从求起'};
+  return {n,t,who,tag:_b32(_bits(who,25))};
+}
+/* 我最缺哪张：优先「一张都没有」的，其次「差最高品阶」的。
+   按套组顺序取第一个，让求卡有个合理默认值，不用玩家自己翻。 */
+function askSuggest(){
+  colFix();
+  for(const c of CARDS)if(!colAny(c.n))return {n:c.n,t:T_COMMON};
+  for(const c of CARDS)if(!colHas(c.n,T_TOP))return {n:c.n,t:T_TOP};
+  for(const c of CARDS)if(!colHas(c.n,T_RARE))return {n:c.n,t:T_RARE};
+  return null;
 }
 function giftEncode(n,t,rcpt,seq){
   const body=_bits(n,7)+_bits(t,2)+_bits(rcpt,25)+_bits(seq,16);
@@ -4398,14 +4800,19 @@ function beginPlay(){
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
     showTut('把相同的灵石 <b>三个连成一线</b>——点两下，或直接拖动',6000)}
 }
-function startRush(){
+function startRush(blitz){
   GS.mode='rush';
+  /* blitz = 「续灯 · 45 秒」：45 秒起步，连锁是唯一的灯油。
+     90 秒考的是稳，续灯考的是不停手——同一套引擎，两种心跳。 */
+  GS.rush2=!!blitz;
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
-  L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';L.s1=20000;L.s2=45000;L.s3=80000;
+  L.chName=blitz?'续灯 · 45 秒':'矿灯将熄 · 90 秒';L.era='LAMPLIGHT';
+  if(blitz){L.s1=15000;L.s2=35000;L.s3=65000}else{L.s1=20000;L.s2=45000;L.s3=80000}
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
   /* 晰·探路者的被动在限时局折算成 +5 秒（冒险关是 +2 步） */
   const xiMs=(compById(SAVE.comp).id==='xi')?5000:0;
-  GS.boss=null;GS.rushOn=true;GS.rushT=90000+xiMs;GS.rushMax=90000+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
+  const baseMs=blitz?45000:90000;
+  GS.boss=null;GS.rushOn=true;GS.rushT=baseMs+xiMs;GS.rushMax=baseMs+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
@@ -4414,43 +4821,67 @@ function startRush(){
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
-  $('#rush-best').textContent='最佳 '+(SAVE.rushBest?SAVE.rushBest.toLocaleString('en-US'):'—');
+  const bst=GS.rush2?SAVE.rush2Best:SAVE.rushBest;
+  $('#rush-best').textContent='最佳 '+(bst?bst.toLocaleString('en-US'):'—');
   $('#score-stars').innerHTML='<s style="left:25%">★</s><s style="left:56%">★</s><s style="left:97%">★</s>';
-  $('#goal-row').innerHTML='<div style="font-size:12px;letter-spacing:.16em;color:var(--ink2)">连锁越长 · 时间越多</div>';
+  $('#goal-row').innerHTML='<div style="font-size:12px;letter-spacing:.16em;color:var(--ink2)">'
+    +(GS.rush2?'连锁 2 起就回灯油 · 断了灯就灭':'连锁越长 · 时间越多')+'</div>';
   $('#goal-lbl').textContent='灯油';
-  $('#quip-line').innerHTML='<b>狼先生：</b>九十秒，别客气。';
+  $('#quip-line').innerHTML='<b>狼先生：</b>'+(GS.rush2?'四十五秒。手别停。':'九十秒，别客气。');
   updHUD();GS.busy=false;GS.idle=PLAT.now();
-  showTut('限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
+  showTut(GS.rush2?'只有 45 秒 · <b>连锁 2 起就回时间，回得更多</b>':'限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
-  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
-  const best=GS.score>SAVE.rushBest;
-  if(best){SAVE.rushBest=GS.score;persist()}
-  setTimeout(()=>LB.flush('clear'),600);
+  csBump('r',1);
+  yjBump('rushN',1);
+  if(GS.chainMax>=8)yjBump('chain8',1);
+  bountyCheck();
+  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
+  const b2=GS.rush2;
+  const prevBest=b2?SAVE.rush2Best:SAVE.rushBest;
+  const best=GS.score>prevBest;
+  if(best){if(b2)SAVE.rush2Best=GS.score;else SAVE.rushBest=GS.score;persist()}
+  /* 续灯的成绩不上传：后端 stats 没这个字段，LB.stats() 也只读 rushBest，
+     所以它天然只活在本机与名片上——本地荣誉，正好。 */
+  if(!b2)setTimeout(()=>LB.flush('clear'),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
   /* 限时局天然以「灯熄」收场，所以默认用 lose 的将熄意象；
      破了纪录才换成 win——那一下确实值得庆祝。 */
   applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
+  $('#end-kick').textContent=b2?'续灯 · BLITZ 45':'矿灯将熄 · LAMPLIGHT 90';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
   $('#end-score').textContent=GS.score.toLocaleString('en-US');
-  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b><br>历史最佳 <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>';
+  /* 灯位段位：只挂在 90 秒正赛上。升位那一下在这里揭晓——
+     离下一位还差多少也写明白，这就是「再点一盏」的理由。 */
+  const nowBest=b2?SAVE.rush2Best:SAVE.rushBest;
+  let rankLine='';
+  if(!b2){
+    const r=lampRank(SAVE.rushBest), nx=lampNext(SAVE.rushBest);
+    rankLine='<br>灯位 <b>'+r+'</b>'+(nx?'　距 '+nx.nm+' 还差 <b>'
+      +(nx.need-SAVE.rushBest).toLocaleString('en-US')+'</b>':'　已是最高');
+  }
+  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials
+    +'</b><br>历史最佳 <b>'+nowBest.toLocaleString('en-US')+'</b>'+rankLine;
   const stars=$('#end-stars').children;
-  const lv=GS.score>=80000?3:GS.score>=45000?2:GS.score>=20000?1:0;
+  const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
   for(let i=0;i<3;i++){stars[i].classList.remove('lit');}
   setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
   $('#end-quip').textContent=pick2(Q_RUSH_END);
   $('#end-next').textContent='再点一盏';
-  $('#end-next').dataset.act='rush';
-  $('#end-retry').style.display='none';
+  $('#end-next').dataset.act=b2?'rush2':'rush';
+  /* 互跳：90 秒结算页给「续灯」的门，续灯结算页给回 90 秒的门。
+     玩完最兴奋的那一刻是换口味的最好时机。 */
+  $('#end-retry').style.display='';
+  $('#end-retry').textContent=b2?'矿灯将熄 · 90 秒':'试试续灯 · 45 秒';
+  $('#end-retry').dataset.act=b2?'rush':'rush2';
   $('#end-continue').style.display='none';   // 不复位会把冒险关的续挖状态漏进限时赛结算屏
   ovl('end');
 }
 function endLevel(win){
   const L=GS.L, n=L.n;
-  $('#end-tablet').style.display='none';$('#wk-tablet').style.display='none';
+  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='';
@@ -4464,6 +4895,24 @@ function endLevel(win){
   q3Bump('play',1);
   q3Bump('chain',GS.chainMax);
   q3Bump('score',GS.score);
+  /* 追求线：同伴出战账 + 连胜 + 悬赏 + 岁记。
+     悬赏与岁记的判定**不看胜负**（输的那局打出 7 连锁也算数），
+     连胜只认冒险关的真胜负。 */
+  csBump('r',1);
+  if(win){
+    csBump('w',1);
+    SAVE.streak.cur++;
+    if(SAVE.streak.cur>SAVE.streak.best){
+      SAVE.streak.best=SAVE.streak.cur;
+      if(SAVE.streak.cur>=3)setTimeout(()=>toast('连胜 <b>'+SAVE.streak.cur+'</b> · 生涯新高',2600),1800);
+    }
+    yjBump('clear',1);
+  }else{
+    SAVE.streak.cur=0;
+  }
+  persist();
+  if(GS.chainMax>=8)yjBump('chain8',1);
+  bountyCheck();
   if(win){
     const st=starsOf(L,GS.score);
     if(!L.endless){
@@ -4483,6 +4932,7 @@ function endLevel(win){
     SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
     q3Bump('clear',1);
+    grindTick();                    // 今日深挖只认冒险关与无尽层
     setTimeout(()=>LB.flush('clear'),600);
     toolGot=giveRandomTool(st>=3?2:1);
     persist();
@@ -4497,7 +4947,11 @@ function endLevel(win){
     $('#end-quip').textContent=pick2(Q_WIN);
     $('#end-next').textContent=L.endless?'再深一层 →':'下一关 →';
     $('#end-next').dataset.act='next';
+    /* end-retry 在限时结算页被借去当「换模式」的门，act 会残留——
+       不复位的话，冒险关的「再挖一次」点下去会开出一局续灯。 */
     $('#end-retry').style.display='';
+    $('#end-retry').textContent='再挖一次';
+    $('#end-retry').dataset.act='retry';
   }else{
     SFX.lose();
     applyArt($('#end-banner'),'end_lose');
@@ -5138,6 +5592,143 @@ function wkTablet(){
     +'同一副盘，你能打多少？\n'
     +share;
 }
+/* ---- 矿脉名帖：拓片的图片版 ----
+   微信群里图片比文本传得开，但微信有几个硬坑，全都绕过：
+   · 长按菜单只对 <img> 生效，对 <canvas> 无效 → 必须导出成 <img>
+   · blob: 类型的图微信不给保存 → 必须用 toDataURL 的 base64
+   · 部分安卓机 png 长按识别异常 → 用 jpeg
+   · 高清屏要按 dpr 放大画布，否则糊
+   内容仍然**防剧透**：只画分数、连锁形状、期号，不画盘面也不画走法——
+   没玩的人看不出今天怎么解，这是拓片一开始就守的规矩。 */
+function drawCard(){
+  const s=wkState(), log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const dpr=Math.min(devicePixelRatio||1,3);
+  const W=540,H=760;
+  const cv=document.createElement('canvas');
+  cv.width=W*dpr;cv.height=H*dpr;
+  const x=cv.getContext('2d');x.scale(dpr,dpr);
+  const GOLD='#c9a64a', GOLD2='#e8c768', INK='#8b8578';
+  x.fillStyle='#0a0a0c';x.fillRect(0,0,W,H);
+  /* 描金双线框——与全站插画同一套装帧语言 */
+  x.strokeStyle=GOLD;x.lineWidth=1.5;x.strokeRect(18,18,W-36,H-36);
+  x.globalAlpha=.5;x.strokeRect(25,25,W-50,H-50);x.globalAlpha=1;
+  const mid=W/2;
+  x.textAlign='center';
+  x.fillStyle=INK;x.font='500 15px serif';
+  x.fillText('M Y S K M E   ·   G E M F A L L',mid,72);
+  x.fillStyle=GOLD2;x.font='600 40px serif';
+  x.fillText('本周矿脉',mid,132);
+  x.fillStyle=INK;x.font='400 17px serif';
+  x.fillText('第 '+s.w+' 期 · 全服同一副盘',mid,164);
+  /* 连锁形状：把拓片那几行画成金块。行数即手数，块数即连锁长度。 */
+  let y=232;
+  const sym=n=>n>=6?GOLD2:n>=4?GOLD:'#7a6a3f';
+  if(log.length){
+    for(const n of log){
+      const cnt=Math.min(n,8), bw=30, gap=7;
+      const tot=cnt*bw+(cnt-1)*gap;
+      let bx=mid-tot/2;
+      for(let i=0;i<cnt;i++){
+        x.fillStyle=sym(n);
+        x.globalAlpha=.35+.65*(i+1)/cnt;
+        x.fillRect(bx,y,bw,18);
+        bx+=bw+gap;
+      }
+      x.globalAlpha=1;y+=30;
+    }
+  }else{x.fillStyle=INK;x.font='400 16px serif';x.fillText('—',mid,y);y+=30}
+  y=Math.max(y,430);
+  x.fillStyle=GOLD2;x.font='700 64px serif';
+  x.fillText(GS.score.toLocaleString('en-US'),mid,y+62);
+  x.fillStyle=INK;x.font='400 16px serif';
+  x.fillText('分   ·   最长连锁 '+GS.chainMax,mid,y+96);
+  x.fillStyle=GOLD;x.font='400 19px serif';
+  x.fillText('同一副盘，你能打多少？',mid,H-118);
+  x.fillStyle=INK;x.font='500 17px serif';
+  x.fillText('play.myskme.com',mid,H-82);
+  x.fillStyle='#5a564c';x.font='400 13px serif';
+  x.fillText('狼先生与他的学生们 · 学院谷地',mid,H-52);
+  /* jpeg 而不是 png：部分安卓机对 png 的长按识别有问题 */
+  return cv.toDataURL('image/jpeg',0.92);
+}
+/* ---- 矿工名片 ----
+   炉石名片那个思路：把生涯打成一张能拿出手的图。
+   化名、灯位、连胜、最爱同伴与衔位、典藏、岁记、入坑日——
+   全是**时间攒出来的东西**，看一眼就知道这个号活了多久。
+   画法与名帖同一套（jpeg base64 → <img>，微信三坑全绕）。 */
+function drawNameCard(){
+  const dpr=Math.min(devicePixelRatio||1,3);
+  const W=540,H=820;
+  const cv=document.createElement('canvas');
+  cv.width=W*dpr;cv.height=H*dpr;
+  const x=cv.getContext('2d');x.scale(dpr,dpr);
+  const GOLD='#c9a64a',GOLD2='#e8c768',INK='#8b8578',DIM='#5a564c';
+  x.fillStyle='#0a0a0c';x.fillRect(0,0,W,H);
+  x.strokeStyle=GOLD;x.lineWidth=1.5;x.strokeRect(18,18,W-36,H-36);
+  x.globalAlpha=.5;x.strokeRect(25,25,W-50,H-50);x.globalAlpha=1;
+  const mid=W/2;x.textAlign='center';
+  x.fillStyle=INK;x.font='500 15px serif';
+  x.fillText('M Y S K M E   ·   矿 工 名 片',mid,74);
+  x.fillStyle=GOLD2;x.font='600 44px serif';
+  x.fillText(SAVE.lbAlias||'无名矿工',mid,140);
+  x.fillStyle=DIM;x.font='400 15px serif';
+  colFix();
+  x.fillText('矿工号 '+minerTag()+' · 同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
+  /* 灯位是名片的主徽 */
+  x.fillStyle=GOLD;x.font='400 17px serif';
+  x.fillText('—— 灯 位 ——',mid,236);
+  x.fillStyle=GOLD2;x.font='700 46px serif';
+  x.fillText(lampRank(SAVE.rushBest),mid,292);
+  x.fillStyle=INK;x.font='400 15px serif';
+  x.fillText('矿灯将熄最佳 '+(SAVE.rushBest||0).toLocaleString('en-US')
+    +(SAVE.rush2Best?' · 续灯 '+SAVE.rush2Best.toLocaleString('en-US'):''),mid,322);
+  /* 最爱同伴：出战最多的那位 */
+  let fav=null,fr=-1;
+  for(const c of COMPANIONS){const r=(SAVE.cs[c.id]||{}).r||0;if(r>fr){fr=r;fav=c}}
+  const fw=fav?((SAVE.cs[fav.id]||{}).w||0):0;
+  const rows=[
+    ['同行最久',fav&&fr>0?(fav.name+(csRank(fw)?' · '+csRank(fw):'')+' · '+fw+' 胜'):'—'],
+    ['连胜纪录',(SAVE.streak.best||0)+' 连胜'],
+    ['最长连锁',(SAVE.chainBest||0)+' 重'],
+    ['远征',Math.max(0,(SAVE.lv||1)-1)+' 关 · '+totalStars()+' 星'],
+    ['典藏',colGot()+' / '+CARDS.length+' · 徽记 '+ACHS.filter(a=>SAVE.ach[a.id]).length+' / '+ACHS.length],
+    ['岁记',Object.keys(SAVE.yjSeal).length+' 枚'],
+  ];
+  let y=386;
+  for(const [k,v] of rows){
+    x.textAlign='left';x.fillStyle=DIM;x.font='400 16px serif';x.fillText(k,86,y);
+    x.textAlign='right';x.fillStyle=INK;x.font='500 17px serif';x.fillText(v,W-86,y);
+    x.strokeStyle='rgba(201,166,74,.16)';x.lineWidth=1;
+    x.beginPath();x.moveTo(86,y+14);x.lineTo(W-86,y+14);x.stroke();
+    y+=52;
+  }
+  x.textAlign='center';
+  x.fillStyle=GOLD;x.font='400 18px serif';
+  x.fillText('灵石远征 · GEMFALL',mid,H-112);
+  x.fillStyle=INK;x.font='500 16px serif';
+  x.fillText('play.myskme.com',mid,H-80);
+  x.fillStyle=DIM;x.font='400 13px serif';
+  x.fillText('狼先生与他的学生们 · 学院谷地',mid,H-52);
+  return cv.toDataURL('image/jpeg',0.92);
+}
+function showNameCard(){
+  const host=$('#yj-sec');
+  let box=$('#namecard-box');
+  if(!box){box=document.createElement('div');box.id='namecard-box';host.parentNode.insertBefore(box,host)}
+  box.innerHTML='<img id="nc-img" alt="矿工名片"><div class="cardtip">长按上面这张名片保存 · 发到群里认认人</div>';
+  $('#nc-img').src=drawNameCard();
+  box.scrollIntoView({block:'nearest'});
+}
+function showCard(){
+  const p=$('#wk-tablet');
+  p.style.display='block';
+  /* 同一个容器两种形态：文字拓片要等宽带框，图片名帖要素底。
+     加类切换，别让 <pre> 的等宽与边框套在图片上。 */
+  p.classList.add('asimg');
+  p.innerHTML='<img id="wk-cardimg" alt="本周矿脉成绩卡">'
+    +'<div class="cardtip">长按上面这张图 →「保存图片」，发到群里比一比</div>';
+  $('#wk-cardimg').src=drawCard();
+}
 async function copyTablet(){
   const t=wkTablet();
   try{
@@ -5146,7 +5737,7 @@ async function copyTablet(){
   }catch(e){
     /* 剪贴板在非安全上下文或旧内核里会被拒。别只报错——把文本摊开让人自己长按选。 */
     const box=$('#wk-tablet');
-    if(box){box.textContent=t;box.style.display='block';
+    if(box){box.classList.remove('asimg');box.textContent=t;box.style.display='block';
       toast('复制被浏览器挡了 · <b>长按下面这段自己选</b>',3400)}
   }
 }
@@ -5162,6 +5753,14 @@ function renderWeekCard(){
       +(s.best>s.score?'　练习最佳 '+s.best.toLocaleString('en-US'):'')
       +'<br><span style="color:var(--ink3)">已下矿 '+s.plays+' 次 · 本周还剩 '+left+' 天</span>';
   $('#wk-go').textContent=first?'下 矿':'再挖一次（练习）';
+  /* 周悬赏挂在周卡脚下：同为周节奏，一眼看全本周的两件事 */
+  const bs=bountyState();
+  let bl=$('#wk-bounty');
+  if(!bl){bl=document.createElement('div');bl.id='wk-bounty';c.appendChild(bl)}
+  bl.innerHTML=bs.done
+    ?'本周悬赏 · <b>已拿下</b>'
+    :'本周悬赏 · '+esc(bs.def.nm)+'　<span style="color:var(--ink3)">'
+      +icTag('box')+' 匣 ×1 + 星屑 10 · 输的局达成也算</span>';
 }
 function startWeekly(){
   const w=weekNum(), sd=weekSeed(w);
@@ -5230,7 +5829,7 @@ function endWeekly(){
   $('#end-next').dataset.act='weekly';
   $('#end-retry').style.display='none';
   $('#end-continue').style.display='none';
-  $('#end-tablet').style.display='';                          // 只有本周矿脉给拓片
+  $('#end-share').style.display='flex';                       // 只有本周矿脉给分享（拓片/名帖）
   $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
   setTimeout(()=>LB.flush('clear'),600);
   ovl('end');
@@ -5273,6 +5872,37 @@ async function renderLB(){
   }
   form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
   msg.textContent='正在连接矿脉…';list.innerHTML='';mine.innerHTML='';
+  /* ---- 门派榜 ----
+     按门派聚合总矿力。拉一个活人进帮，帮派立刻涨分——
+     这一榜存在的意义就是给「叫上朋友」一个看得见的理由。 */
+  if(LB.scope==='faction'){
+    const f=await LB.fetchJSON('/gf/factions?limit=20');
+    if(tok!==LB._tok)return;
+    if(!f.ok){
+      msg.innerHTML=(f.offline?'连不上矿脉榜——<b>不影响你继续挖</b>。'
+        :esc(f.err||'门派榜暂时读不到'));
+      return;
+    }
+    const rows=f.rows||[];
+    if(!rows.length){
+      msg.innerHTML='还没有门派上榜。<br><b>点「改化名」填个门派名</b>——同名即同门，和朋友约好一个名字就行。';
+      return;
+    }
+    msg.textContent='';
+    const mineF=(SAVE.lbFaction||'').trim();
+    list.innerHTML=rows.map(r=>{
+      const isMine=mineF&&r.faction===mineF;
+      return '<div class="fac-row'+(isMine?' mine':'')+'">'
+        +'<span class="rk">'+r.rank+'</span>'
+        +'<span class="nm">'+esc(r.faction)+(isMine?' · 我的门派':'')+'</span>'
+        +'<span class="cnt">'+r.n+' 人 · 人均 '+r.avg.toLocaleString('en-US')+'</span>'
+        +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>';
+    }).join('');
+    mine.innerHTML=mineF
+      ?'我的门派 <b>'+esc(mineF)+'</b> · 每拉一位朋友入门，总矿力立刻多一份'
+      :'还没有门派。点「改化名」填一个——<b>同名即同门</b>，和朋友约好名字就行。';
+    return;
+  }
   const d=await LB.board(LB.scope);
   if(tok!==LB._tok)return;                                    // 期间又切了标签，这次结果作废
   if(d.err==='nopw'){
@@ -5480,6 +6110,28 @@ function renderAch(){
     d.innerHTML='<div class="ic">'+(ICONS[a.ic]||'')+'</div><div class="nm">'+(SAVE.ach[a.id]?a.nm:'？？？')+'</div>';
     g.appendChild(d);
   });
+  /* ---- 岁记区 ----
+     本月三桩 + 历月徽记墙。徽记上最大的字是年月——绝版的价值就是时间。
+     不放倒计时：过完这个月自然换下一组，错过的成为别人墙上的孤品。 */
+  const nb=$('#namecard-box'); if(nb)nb.remove();           // 上次出示的名片不残留
+  const st=yjState(), host=$('#yj-sec');
+  const seals=Object.keys(SAVE.yjSeal).sort();
+  let h='<div class="yj-kick">岁记 · 每月只此一枚</div>';
+  h+='<div class="yj-tasks">'+st.tasks.map(t=>{
+    const got=Math.min(st.c[t.k]||0,t.need), done=got>=t.need;
+    return '<div class="q3r'+(done?' done':'')+'"><span class="q3t">'+esc(t.nm)
+      +' '+got+' / '+t.need+'</span><i style="width:'+(got/t.need*100)+'%"></i></div>';
+  }).join('')+'</div>';
+  h+='<div class="yj-note">'+(st.done
+    ?'本月徽记<b>已铸成</b> · 下月初换新的三桩'
+    :'三桩全清 → 铸一枚刻着「'+monthTag(st.m)+'」的绝版徽记')+'</div>';
+  if(seals.length){
+    h+='<div class="yj-wall">'+seals.map(k=>{
+      const y=k.slice(0,4),mo=+k.slice(4);
+      return '<div class="yj-seal" title="铸于当月"><b>'+y+'</b><i>'+mo+' 月</i></div>';
+    }).join('')+'</div>';
+  }
+  host.innerHTML=h;
 }
 
 /* ==================================================================
@@ -5498,6 +6150,7 @@ function colView(v,arg){
   else if(v==='box')renderBoxOpen(arg);
   else if(v==='draw')renderDraw(arg);
   else if(v==='gift')renderGift(arg);
+  else if(v==='ask')renderAsk(arg);
   ovl('col');
 }
 function openCol(){
@@ -5604,6 +6257,11 @@ function renderCardView(n){
     h+='<button class="btn" id="cv-up"'+(COLS.dust<u.cost?' disabled':'')
       +'>炼成 '+TIERS[u.to].nm+'<span class="colsub">星屑 '+u.cost+'</span></button>';
   }
+  /* 没收到的卡直接给「求这张」——玩家点开一张没有的卡，
+     正是他最想要它的那一刻，这时候给入口最顺。 */
+  if(!have)
+    h+='<button class="btn ghost" id="cv-ask">'+icTag('together')
+      +' 求 这 张<span class="colsub">发个帖到群里，谁有多的就能送你</span></button>';
   if([0,1,2].some(t=>colSpare(n,t)>0))
     h+='<button class="btn ghost" id="cv-gift">'+icTag('gift')
       +' 赠 出<span class="colsub">只能送多出来的那份</span></button>';
@@ -5621,6 +6279,7 @@ function renderCardView(n){
   if($('#cv-fill'))$('#cv-fill').onclick=()=>{SFX.click();doFill(n)};
   if($('#cv-up'))  $('#cv-up').onclick  =()=>{SFX.click();doUpgrade(n)};
   if($('#cv-gift'))$('#cv-gift').onclick=()=>{SFX.click();colView('gift',{n:n})};
+  if($('#cv-ask')) $('#cv-ask').onclick =()=>{SFX.click();colView('ask',{n:n})};
   $('#cv-back').onclick=()=>{SFX.click();colView('list')};
 }
 
@@ -5669,6 +6328,98 @@ function renderDraw(d){
   if(d.box&&!REDUCED&&ART.card_back)colLater(480,cheer); else cheer();
 }
 
+/* ---- 矿友互助 ----
+   两态：'post'（我发帖求卡）与 'read'（我看到别人的帖）。
+   闭环的关键在 read 那一态——看到帖之后**一键跳到赠出、矿工号自动填好**。
+   少一次手抄矿工号，就少一半送不出去的可能。 */
+function renderAsk(arg){
+  colFix(); colDay();
+  const mode=(arg&&arg.read)?'read':'post';
+  const B=$('#ak-body'), BT=$('#ak-btns');
+  if(mode==='post'){
+    const sug=(arg&&arg.n!=null)?{n:arg.n,t:arg.t!=null?arg.t:T_COMMON}:askSuggest();
+    if(!sug){
+      $('#ak-title').textContent='已经收全了';
+      B.innerHTML='<div class="gfnote">三个品阶都齐了，没有可求的卡。'
+        +'<br>不如去看看谁的帖子里缺的那张你正好有多的。</div>';
+      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+        +'<button class="btn" id="ak-toread">我收到了一张帖</button>';
+    }else{
+      const cd=CARD_BY_N[sug.n];
+      $('#ak-title').textContent='求 一 张 · '+cd.nm;
+      B.innerHTML='<div class="colsub">你的矿工号 <b>'+minerTag()+'</b></div>'
+        +'<div id="ak-pick"></div>'
+        +'<div class="gfnote">发到群里，谁手上有多的就能送你。'
+        +'<br><b>求卡不消耗任何东西</b>，也不占你每天 3 次的赠出额度。'
+        +'<br>别人点开你的帖，矿工号会自动填好，他不用手抄。</div>'
+        +'<div id="ak-out"></div>';
+      /* 让玩家能改求哪一张：列出还缺的前 8 张，默认选中建议的那张。 */
+      const miss=CARDS.filter(c=>!colAny(c.n)).slice(0,8);
+      const pool=miss.length?miss:CARDS.filter(c=>!colHas(c.n,T_TOP)).slice(0,8);
+      $('#ak-pick').innerHTML=pool.map(c=>'<button class="pt-chip'
+        +(c.n===sug.n?' on':'')+'" data-n="'+c.n+'">'+esc(c.nm)+'</button>').join('');
+      for(const b of $$('#ak-pick .pt-chip'))b.onclick=()=>{
+        for(const x of $$('#ak-pick .pt-chip'))x.classList.remove('on');
+        b.classList.add('on');$('#ak-out').innerHTML='';
+      };
+      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+        +'<button class="btn primary" id="ak-make">生成求卡帖</button>';
+      $('#ak-make').onclick=async()=>{
+        SFX.click();
+        const sel=$('#ak-pick .pt-chip.on'); if(!sel)return;
+        const n=+sel.dataset.n;
+        const code=askEncode(n,colAny(n)?T_TOP:T_COMMON,minerId());
+        const txt='灵石远征 · 求一张「'+CARD_BY_N[n].nm+'」\n'
+          +code+'\n手上有多的话点开这个帖，矿工号已经带上了\n'
+          +((window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||location.origin);
+        $('#ak-out').innerHTML='<div class="gfcode">'+esc(code)+'</div>'
+          +'<button class="btn ghost" id="ak-copy" style="width:100%;margin-top:8px">复制整段发群里</button>';
+        $('#ak-copy').onclick=async()=>{
+          SFX.click();
+          try{await navigator.clipboard.writeText(txt);toast('求卡帖已复制 · 发到群里就行',2800)}
+          catch(e){toast('复制被浏览器挡了 · <b>长按上面那串自己选</b>',3200)}
+        };
+      };
+    }
+  }else{
+    $('#ak-title').textContent='收 到 求 卡 帖';
+    B.innerHTML='<input id="ak-in" placeholder="GQ-XXXX-XXXX" autocomplete="off" spellcheck="false">'
+      +'<div class="gfnote">粘上朋友发来的求卡帖，看看他缺什么、你有没有多的。'
+      +'<br>能送的话点一下就跳到赠出，<b>矿工号会自动填好</b>。</div>'
+      +'<div id="ak-out"></div>';
+    BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
+      +'<button class="btn primary" id="ak-check">看看他缺什么</button>';
+    $('#ak-check').onclick=()=>{
+      SFX.click();
+      const d=askDecode($('#ak-in').value);
+      if(d.err){toast(d.err,3000);return}
+      const cd=CARD_BY_N[d.n];
+      /* 关键判断：我有没有**多的**那张。只有多的才能送，
+         这是赠印一开始就定的规矩——不能把自己图鉴送空。 */
+      const spare=[0,1,2].filter(t=>colSpare(d.n,t)>0);
+      const me=d.who===minerId();
+      $('#ak-out').innerHTML='<div class="xfer-diff">矿工 <b>'+esc(d.tag)+'</b> 求一张 <b>'
+        +esc(cd.nm)+'</b>'
+        +(me?'<br><span class="warn">这是你自己发的帖</span>'
+            :(spare.length
+              ? '<br>你手上有多的 <b>'+spare.map(t=>TIERS[t].nm).join(' / ')+'</b> —— 可以送他'
+              : '<br><span class="warn">你手上没有多余的这张</span>'
+                +'<br><span style="color:var(--ink3)">同一张要有 2 份才算多，先去开匣攒攒</span>'))
+        +'</div>'
+        +(!me&&spare.length?'<button class="btn primary" id="ak-give" style="width:100%;margin-top:8px">'
+          +'去赠出（矿工号已带上）</button>':'');
+      const g=$('#ak-give');
+      if(g)g.onclick=()=>{
+        SFX.click();
+        /* 带着矿工号跳进赠印流程——这是整个互助闭环的那一步。 */
+        colView('gift',{n:d.n,prefill:d.tag});
+      };
+    };
+  }
+  $('#ak-cancel').onclick=()=>{SFX.click();colView('list')};
+  const tr=$('#ak-toread'); if(tr)tr.onclick=()=>{SFX.click();colView('ask',{read:true})};
+}
+
 function renderGift(arg){
   colFix(); colDay();
   const mode=arg&&arg.recv?'recv':'send';
@@ -5698,6 +6449,13 @@ function renderGift(arg){
       +'<div id="gf-out"></div>';
     for(const b of $$('#gf-tier .pt-chip'))b.onclick=()=>{
       for(const x of $$('#gf-tier .pt-chip'))x.classList.remove('on');b.classList.add('on')};
+    /* 从求卡帖跳进来时矿工号已经带上了——手抄矿工号是整条互助链上
+       最容易断的一环，能省就省。 */
+    if(arg&&arg.prefill){
+      $('#gf-to').value=arg.prefill;
+      B.insertAdjacentHTML('afterbegin','<div class="colsub" style="color:var(--gold2)">'
+        +'来自求卡帖 · 矿工号已自动填好</div>');
+    }
     BT.innerHTML='<button class="btn ghost" id="gf-cancel">返 回</button>'
       +'<button class="btn primary" id="gf-ok">生成赠印</button>';
     $('#gf-ok').onclick=()=>{
@@ -5902,6 +6660,7 @@ $('#col-close').addEventListener('click',()=>{SFX.click();colStop();ovl(null);re
 $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
 $('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
+$('#col-ask').addEventListener('click',()=>{SFX.click();colView('ask')});
 $('#dw-again').addEventListener('click',()=>{SFX.click();openBox()});
 $('#dw-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#col-esc').addEventListener('click',()=>{
@@ -5933,14 +6692,67 @@ $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')}
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
+/* ---- 存档搬家的接线 ---- */
+$('#xfer-out').addEventListener('click',async()=>{
+  SFX.click();
+  const code=await xferExport();
+  const p=$('#xfer-panel');
+  p.innerHTML='<textarea id="xfer-text" readonly spellcheck="false"></textarea>'
+    +'<div class="xrow"><button class="btn ghost" id="xfer-copy">复制口令</button></div>'
+    +'<div class="xfer-note" style="margin-top:8px">粘到微信「文件传输助手」发给自己，'
+    +'在新设备上打开本页 →「安装到手机」→「粘贴口令导入」。</div>';
+  $('#xfer-text').value=code;
+  $('#xfer-copy').onclick=async()=>{
+    SFX.click();
+    try{await navigator.clipboard.writeText(code);toast('口令已复制 · 发到文件传输助手就行',3000)}
+    catch(e){
+      /* 剪贴板在非安全上下文会被拒。别只报错——直接把文本选中，让他按系统菜单复制。 */
+      const t=$('#xfer-text');t.focus();t.select();
+      toast('复制被浏览器挡了 · <b>已全选，长按选「拷贝」</b>',3600);
+    }
+  };
+});
+$('#xfer-in').addEventListener('click',()=>{
+  SFX.click();
+  const p=$('#xfer-panel');
+  p.innerHTML='<textarea id="xfer-text" spellcheck="false" placeholder="把 GFSAVE1: 开头的那一长串粘在这里"></textarea>'
+    +'<div class="xrow"><button class="btn ghost" id="xfer-check">检查这份存档</button></div>';
+  $('#xfer-text').focus();
+  $('#xfer-check').onclick=async()=>{
+    SFX.click();
+    const r=await xferParse($('#xfer-text').value);
+    if(r.err){toast(r.err,3200);return}
+    const n=xferSummary(r.data), cur=xferSummary({s:SAVE,c:(colFix(),COLS),t:0});
+    const cmp=(a,b)=>a===b?'':(a>b?' <span style="color:var(--gold2)">↑</span>':' <span class="warn">↓</span>');
+    /* 把两边并排摆出来。覆盖是不可逆的，玩家必须先看见自己会失去什么。 */
+    p.insertAdjacentHTML('beforeend',
+      '<div class="xfer-diff">口令导出于 <b>'+esc(n.when)+'</b><br>'
+      +'通关 <b>'+n.lv+'</b> 关'+cmp(n.lv,cur.lv)+'　星 <b>'+n.stars+'</b>'+cmp(n.stars,cur.stars)
+      +'　限时 <b>'+n.rush.toLocaleString('en-US')+'</b>'+cmp(n.rush,cur.rush)+'<br>'
+      +'灵力 <b>'+n.power.toLocaleString('en-US')+'</b>'+cmp(n.power,cur.power)
+      +'　收藏 <b>'+n.cards+'</b> 份'+cmp(n.cards,cur.cards)+'<br>'
+      +'<span class="warn">本机当前：通关 '+cur.lv+' 关 · '+cur.stars+' 星 · 收藏 '+cur.cards+' 份'
+      +'<br>导入会<b>整份覆盖</b>本机进度，不能撤销。</span></div>'
+      +'<div class="xrow"><button class="btn" id="xfer-cancel">算了</button>'
+      +'<button class="btn primary" id="xfer-go">确认覆盖本机</button></div>');
+    $('#xfer-cancel').onclick=()=>{SFX.click();p.innerHTML=''};
+    $('#xfer-go').onclick=()=>{
+      SFX.click();xferApply(r.data);
+      toast('存档已导入 · <b>正在重载</b>',2200);
+      setTimeout(()=>location.reload(),900);
+    };
+  };
+});
 $('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
 $('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
+$('#end-card').addEventListener('click',()=>{SFX.click();showCard()});
 $('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
 for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
+$('#ach-card').addEventListener('click',()=>{SFX.click();showNameCard()});
 $('#ach-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#how-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#map-back').addEventListener('click',()=>{SFX.click();show('menu')});
@@ -5994,11 +6806,17 @@ function maybeLore(after){
   SFX.win();ovl('lore');
 }
 $('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'?show('menu'):show('map'))});
-$('#end-retry').addEventListener('click',()=>{SFX.click();ovl(null);openLevel(GS.L.n)});
+$('#end-retry').addEventListener('click',e=>{SFX.click();ovl(null);
+  const act=e.currentTarget.dataset.act;
+  if(act==='rush'){startRush();return}
+  if(act==='rush2'){startRush(true);return}
+  openLevel(GS.L.n);
+});
 $('#end-next').addEventListener('click',e=>{
   SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
+  if(act==='rush2'){startRush(true);return}
   if(act==='weekly'){startWeekly();return}
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
@@ -6358,7 +7176,115 @@ window.__selftest=function(){
     COLS=JSON.parse(bak);
     ok('卡的来历只记第一次，重复不覆盖',first===after&&/第 7 匣开出/.test(txt));
   }
-  /* 28. 目标文案里不许出现哨兵大数。
+  /* 28. 星辰宝箱不能有终点。192 星 ÷ 15 = 12 箱余 12，满星玩家会永远卡在
+     12/15——玩家报的「不能满」就是这个。补了无尽深星之后必须不再卡死。 */
+  {
+    const bakLv=SAVE.lv, bakSt=SAVE.stars;
+    SAVE.stars={};for(let i=1;i<=64;i++)SAVE.stars[i]=3;      // 192 星全满
+    SAVE.lv=65;                                               // 刚进无尽，没有深星
+    const stuck=chestStars()-Math.floor(chestStars()/CHEST_COST)*CHEST_COST;
+    SAVE.lv=65+DEEP_PER_STAR*3;                               // 深挖 6 层 = 3 颗深星
+    const grew=chestStars();
+    SAVE.lv=bakLv;SAVE.stars=bakSt;
+    ok('星辰宝箱不再有终点（满星后无尽深度继续供星）',
+       stuck===12&&grew===192+3&&deepStars.length>=0);
+  }
+  /* 29. 今日深挖三档递减且第 20 关封顶——不鼓励挂机刷一天。 */
+  {
+    const bak=JSON.stringify(SAVE.gr||{});
+    const boxAt=n=>GRIND.filter(g=>n>=g.n&&g.box).length;
+    const ok1=GRIND.length===3&&GRIND[GRIND.length-1].n===GRIND_MAX;
+    const ok2=boxAt(19)===0&&boxAt(20)===1&&boxAt(40)===1;     // 40 关和 20 关拿的一样多
+    const ok3=GRIND.every((g,i)=>i===0||g.n>GRIND[i-1].n);     // 档位严格递增
+    SAVE.gr=JSON.parse(bak||'{"d":0,"n":0,"got":0}');
+    ok('今日深挖三档递增且第 20 关封顶',ok1&&ok2&&ok3);
+  }
+  /* 30. 存档搬家：导出→导入必须一字不差地还原，且格式不对要拦住。
+     这是不可逆操作，编解码错一位就是玩家整份进度没了。 */
+  {
+    const bad1=xferParse('随便一段文字');
+    const bad2=xferParse('GFSAVE1:@@@不是base64@@@');
+    /* xferParse 是 async，这里只验同步的拒绝路径能拿到 Promise 且最终 err；
+       往返一致性由下面的浏览器实测覆盖（自检里不能 await）。 */
+    ok('存档口令能认出非法输入',
+       bad1 instanceof Promise&&bad2 instanceof Promise
+       &&typeof xferExport==='function'&&typeof xferApply==='function'
+       &&XFER_TAG==='GFSAVE1:');
+  }
+  /* 31. 矿脉名帖：微信有三个硬坑，任何一条破了图就发不出去——
+     必须是 base64（blob 微信不给保存）、必须 jpeg（部分安卓 png 长按识别异常）、
+     必须能塞进 <img>（长按菜单对 canvas 无效）。 */
+  {
+    /* 无头环境（CI）没有真实 canvas，toDataURL 出不来图。
+       所以这条只验**我们自己写对了没有**——导出格式选的是 jpeg 而不是 png、
+       用的是 toDataURL 而不是 toBlob、渲染成 <img> 而不是留在 canvas 上。
+       真实产物由浏览器实测覆盖，自检不该去考浏览器的能力。 */
+    const src=String(drawCard);
+    const okFmt=/toDataURL\(\s*['"]image\/jpeg['"]/.test(src)&&!/toBlob/.test(src);
+    const okImg=/<img id="wk-cardimg"/.test(String(showCard));
+    const okDpr=/devicePixelRatio/.test(src);
+    ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
+  }
+  /* 32. 求卡帖：编解码往返一致、错字拦得住、异纹不可求，
+     而且**不能和赠印互相认**——两种帖长得像但用途相反，
+     粘错了要立刻报错，不能默默走进另一条流程。 */
+  {
+    let rt=true, cross=false;
+    for(let i=0;i<40;i++){
+      const c=CARDS[i%CARDS.length], t=i%3, who=(i*7919)&0x1FFFFFF;
+      const d=askDecode(askEncode(c.n,t,who));
+      if(d.err||d.n!==c.n||d.t!==t||d.who!==who){rt=false;break}
+    }
+    /* 交叉喂：赠印喂给求卡解码器、求卡喂给赠印解码器，两边都必须拒绝 */
+    const gf=giftEncode(5,1,minerId(),7), gq=askEncode(5,1,minerId());
+    cross=!!askDecode(gf).err&&!!giftDecode(gq).err;
+    /* 错一位字必须被校验位拦下 */
+    const broke=gq.slice(0,-1)+(gq.slice(-1)==='0'?'1':'0');
+    const caught=!!askDecode(broke).err;
+    const varRej=!!askDecode(askEncode(1,T_VAR,minerId())).err;
+    ok('求卡帖往返一致、与赠印互不误认、错字与异纹均被拒',rt&&cross&&caught&&varRej);
+  }
+  /* 追求线：灯位/衔位阈值单调；悬赏同周同条、判定可调用；
+     岁记同月同组三桩不重复、集齐铸徽且不重发、跨月重置。 */
+  {
+    let mono=true;
+    for(let i=1;i<LAMP_RANKS.length;i++)if(LAMP_RANKS[i][0]<=LAMP_RANKS[i-1][0])mono=false;
+    for(let i=1;i<CS_RANKS.length;i++)if(CS_RANKS[i][0]<=CS_RANKS[i-1][0])mono=false;
+    const edge=lampRank(0)===LAMP_RANKS[0][1]&&lampRank(1e9)===LAMP_RANKS[LAMP_RANKS.length-1][1]
+      &&csRank(0)===''&&csRank(100)==='曜衔';
+    const b1=bountyOf(2951),b2=bountyOf(2951);
+    let bDiff=false;for(let w=2952;w<2952+12;w++)if(bountyOf(w).k!==b1.k){bDiff=true;break}
+    let callable=true;
+    try{for(const b of BOUNTY_POOL)b.test({chainMax:0,specials:0,score:0,gemsTotal:0,won:false,usedTool:true,mode:'adv'})}
+    catch(e){callable=false}
+    ok('灯位衔位单调、悬赏同周同条且判定可调用',mono&&edge&&b1.k===b2.k&&bDiff&&callable);
+  }
+  {
+    const bak=JSON.stringify({yj:SAVE.yj,seal:SAVE.yjSeal,box:COLS?COLS.box:null});
+    const m=monthNum();
+    SAVE.yj={m:m,c:{},done:0};SAVE.yjSeal={};
+    const st=yjState();
+    const uniq=new Set(st.tasks.map(t=>t.k)).size===3;
+    const same=JSON.stringify(yjState().tasks)===JSON.stringify(st.tasks);
+    for(const t of st.tasks)for(let i=0;i<t.need;i++)yjBump(t.k,1);
+    const sealed=!!SAVE.yjSeal[monthKey(m)]&&SAVE.yj.done===1;
+    const sealDay=sealed?SAVE.yjSeal[monthKey(m)].d:0;
+    for(const t of st.tasks)yjBump(t.k,99);                    // done 之后不许重发
+    const once=Object.keys(SAVE.yjSeal).length===1;
+    SAVE.yj={m:m-1,c:{a:5},done:1};yjState();                  // 跨月重置
+    const reset=SAVE.yj.m===m&&SAVE.yj.done===0&&Object.keys(SAVE.yj.c).length===0;
+    const rb=JSON.parse(bak);SAVE.yj=rb.yj;SAVE.yjSeal=rb.seal;
+    if(COLS&&rb.box!==null)COLS.box=rb.box;persist();colSave();
+    ok('岁记三桩确定不重复、集齐铸徽不重发、跨月重置',uniq&&same&&sealed&&sealDay>0&&once&&reset);
+  }
+  {
+    /* 续灯与 90 秒的最佳分各记各的，名片才分得开两条线 */
+    const sep=('rush2Best' in SAVE)&&SAVE.rush2Best!==undefined;
+    const src=String(drawNameCard);
+    const nc=/toDataURL\(\s*['"]image\/jpeg['"]/.test(src)&&/lampRank/.test(src)&&/yjSeal/.test(src);
+    ok('续灯成绩独立存放、名片含灯位与岁记且走 jpeg',sep&&nc);
+  }
+  /* 33. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
      「180/999999999」显示给玩家。真实关卡则必须照旧显示 得分/门槛。 */
   const noTargetTxt=goalText({type:'score',need:999999999,got:180});

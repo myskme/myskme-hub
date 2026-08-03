@@ -461,6 +461,25 @@ async function gfSubmit(req, env, origin) {
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
     classJoined, season: sea }, 200, origin);
 }
+/* 门派榜：faction 是玩家自由填的帮派名，按名字聚合。
+   排序用**总矿力**——拉一个活人进帮，帮派立刻涨分，这正是要的社交动力；
+   人均和人数一并返回，小而精的帮也有自己的看点。
+   只统计非空门派；聚合上限 200 行足够（自由文本门派不会太多）。 */
+async function gfFactions(req, env, origin, url) {
+  await gfEnsure(env);
+  const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
+  const rows = await env.DB.prepare(
+    `SELECT faction, COUNT(*) AS n, SUM(power) AS p, MAX(power) AS top
+       FROM gemfall WHERE hidden=0 AND faction!=''
+       GROUP BY faction ORDER BY p DESC LIMIT ?`
+  ).bind(limit).all();
+  const list = (rows.results || []).map((r, i) => ({
+    rank: i + 1, faction: r.faction, n: r.n || 0, power: r.p || 0,
+    avg: r.n ? Math.round((r.p || 0) / r.n) : 0, top: r.top || 0,
+  }));
+  return json({ ok: true, count: list.length, rows: list }, 200, origin);
+}
+
 async function gfBoard(req, env, origin, url) {
   await gfEnsure(env);
   const sea = url.searchParams.get("season") || await getSeason(env);
@@ -535,6 +554,7 @@ export default {
       if (p === "/submit" && request.method === "POST") return await handleSubmit(request, env, origin);
       if (p === "/admin" && request.method === "POST") return await handleAdmin(request, env, origin);
       if (p === "/gf/board" && request.method === "GET") return await gfBoard(request, env, origin, url);
+      if (p === "/gf/factions" && request.method === "GET") return await gfFactions(request, env, origin, url);
       if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
       if (p === "/gf/admin" && request.method === "POST") return await gfAdmin(request, env, origin);
       if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 4, games: ["wordduel", "gemfall"], season: await getSeason(env) }, 200, origin);
