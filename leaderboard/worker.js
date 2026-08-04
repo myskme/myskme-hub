@@ -542,9 +542,16 @@ async function gfFactions(req, env, origin, url) {
   const names = list.map((x) => x.faction);
   if (names.length) {
     const ph = names.map(() => "?").join(",");
+    /* 必须按门派各取前 N，不能全局 ORDER BY + LIMIT：
+       全局截断时人一多，排在后面的小门派会一个成员都分不到，
+       点开是空的——而「拉朋友进门后要能确认他真进来了」恰恰是小门派最需要的。
+       D1(SQLite) 支持窗口函数，已在线上库验过。 */
     const mem = await env.DB.prepare(
-      `SELECT faction, alias, power FROM gemfall
-        WHERE hidden=0 AND faction IN (${ph}) ORDER BY power DESC LIMIT 80`
+      `SELECT faction, alias, power FROM (
+         SELECT faction, alias, power,
+                ROW_NUMBER() OVER (PARTITION BY faction ORDER BY power DESC) AS rn
+           FROM gemfall WHERE hidden=0 AND faction IN (${ph})
+       ) WHERE rn<=12`
     ).bind(...names).all();
     const by = {};
     for (const r of (mem.results || [])) {

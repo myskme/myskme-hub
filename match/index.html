@@ -706,6 +706,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .cm-metric b{color:var(--ink)}
 .cm-score{margin-top:7px;font-size:13px;color:var(--ink2)}
 .cm-score b{font-size:20px;color:var(--gold2)}
+.cm-cap{margin-top:4px;font-size:11px;color:var(--ink3);line-height:1.5}
 .cm-sw{margin-top:9px}
 .cm-sw .btn{padding:6px 14px;font-size:12.5px}
 .camp-pick-hd{font-size:13px;letter-spacing:.16em;color:var(--ink2);text-align:center;margin-bottom:9px}
@@ -736,6 +737,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .fac-wrap .fac-row{border-bottom:0;cursor:pointer}
 .fac-mem{display:none;padding:2px 4px 8px 30px}
 .fac-mem.open{display:block}
+/* 手机上没有 hover，cursor:pointer 等于不存在——可展开这件事必须画出来。
+   而且自己的门派默认是展开的，玩家会以为「只有我这行特殊」，看不到别家有谁。 */
+.fac-row .ar{display:inline-flex;width:14px;height:14px;color:var(--ink3);
+  transition:transform .18s ease;flex:none}
+.fac-row .ar svg{width:14px;height:14px}
+.fac-wrap.open .fac-row .ar{transform:rotate(90deg)}
+.fac-tip{padding:6px 4px 2px;font-size:11px;color:var(--ink3);letter-spacing:.04em}
 
 /* 门派榜行 */
 .fac-row{display:flex;align-items:baseline;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line)}
@@ -3469,6 +3477,7 @@ const _IC=(inner,vb)=>'<svg class="ic" viewBox="'+(vb||'0 0 24 24')+'" fill="non
 const ICONS={
   pick:_IC('<path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/>'),
   swap:_IC('<path d="M4.5 9H18l-3-3M19.5 15H6l3 3"/>'),
+  chev:_IC('<path d="M9.5 5.5 16 12l-6.5 6.5"/>'),        // 折角：手机没有 hover，可展开必须画出来
   mix:_IC('<path d="M12 3l1.7 7.3L21 12l-7.3 1.7L12 21l-1.7-7.3L3 12l7.3-1.7z"/>'),
   lamp:_IC('<path d="M9.5 3.5h5M12 3.5V6"/><path d="M8.5 6h7v9a3.5 3.5 0 01-7 0z"/><path d="M12 9.5v3.5"/><path d="M10 18.5v2h4v-2"/>'),
   candle:_IC('<path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/>'),
@@ -3976,12 +3985,18 @@ function bindCampPicker(after){
     if(campPick(el.dataset.c)){LB.flush('camp',false);if(after)after()}
   };
 }
+/* 每人计入上限，必须和 leaderboard/worker.js 里 gfCamps 的 CAP 是同一个数字。
+   以前这边不封顶、服务端封顶，同一屏上「我的贡献 507」和同伴名单里自己那行
+   「白水清新 400（你）」当面打架，而且再通关也只有前者会动——玩家只会当是游戏坏了。
+   封顶本身对普通玩家是好消息（你也做得满），所以界面上要明写，别藏着。 */
+const CAMP_CAP=400;
 function campMyScore(){
   const c=myCamp(); if(!c)return 0;
   const s=LB.stats();
-  return Math.max(0,c.score({lv:s.lv,stars:s.stars,chain:s.chain,score:s.score,
-    rush:s.rush,rush2:SAVE.rush2Best||0}));
+  return Math.min(CAMP_CAP,Math.max(0,c.score({lv:s.lv,stars:s.stars,chain:s.chain,score:s.score,
+    rush:s.rush,rush2:SAVE.rush2Best||0})));
 }
+function campCapped(){return campMyScore()>=CAMP_CAP}
 const YJ_POOL=[
   {k:'clear', nm:'当月通关 30 关（重打也算）', need:30},
   {k:'rushN', nm:'当月下矿灯 15 局',           need:15},
@@ -5679,8 +5694,12 @@ const LB={
     if(!this.registered()||this.stop||!this.pending())return false;
     if(!navigator.sendBeacon)return false;
     try{
+      /* camp 必须带上，字段要和 submit() 完全一致：
+         换边那一发若正卡在弱网退避里，玩家一关页面就走 beacon，
+         漏了 camp 换边就白换了（服务端 camp='' 时保留旧值）。 */
       const body=JSON.stringify({deviceUUID:this.dev(),alias:SAVE.lbAlias,
-        faction:SAVE.lbFaction||'',pw:SAVE.lbPw||'',stats:this.stats()});
+        faction:SAVE.lbFaction||'',pw:SAVE.lbPw||'',
+        camp:(SAVE.camp&&SAVE.camp.side)||'',stats:this.stats()});
       return navigator.sendBeacon(this.api+'/gf/submit',new Blob([body],{type:'text/plain'}));
     }catch(e){return false}
   },
@@ -5704,6 +5723,12 @@ function lbMenuStatus(){
     el.classList.add('warn');return;
   }
   el.classList.remove('warn');
+  /* 没选边就一直挂着这句，直到他选了为止——这是全站第二处提及阵营 */
+  if(!(SAVE.camp&&SAVE.camp.side)){
+    el.innerHTML=(SAVE.lbPower?('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '):'')
+      +'<b>还没选挖法</b>';
+    el.classList.add('warn');return;
+  }
   el.textContent=SAVE.lbPower
     ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
     : '看看三营谁在领先';
@@ -6152,14 +6177,22 @@ async function renderLB(){
     h+='<div class="camp-me"><div class="cm-hd">'+esc(mine.nm)+' · '+esc(mine.lead)+'</div>'
       +'<div class="cm-creed">「'+esc(mine.creed)+'」</div>'
       +'<div class="cm-metric">本营看 <b>'+esc(mine.metric)+'</b>（'+esc(mine.how)+'）</div>'
-      +'<div class="cm-score">我的贡献 <b>'+campMyScore().toLocaleString('en-US')+'</b></div>'
+      +'<div class="cm-score">'+(!LB.registered()
+        ? '我的贡献 <b>起名上榜后开始计入</b>'          // 没化名时 flush 直接 return，先给数字是骗人
+        : '我的贡献 <b>'+campMyScore().toLocaleString('en-US')+'</b> / '+CAMP_CAP
+          +(campCapped()?' · <b>这条线你已经做满</b>':''))+'</div>'
+      +'<div class="cm-cap">每人计入上限 '+CAMP_CAP+'，做满的部分不再计入 —— 让人少的一营也追得动。</div>'
       +'<div class="cm-sw">'+(campCanSwitch()
         ?'<button class="btn ghost" id="camp-switch">改投他营</button>'
         :'<span class="qs-dim">本月已定 · 下月初可改投</span>')+'</div></div>';
     list.innerHTML=h;
     const sw=$('#camp-switch');
     if(sw)sw.onclick=()=>{SFX.click();list.innerHTML=campPickerHTML();bindCampPicker(()=>renderLB())};
-    mine2.innerHTML='三营各看各的本事 —— 走得远、打得险、来得勤，各有各的算法。';
+    /* 门派那栏对「没起化名」有明确提示，阵营这栏以前没有——
+       同一个面板里两个标签行为不一致，新玩家走完整套入营仪式却一分没算。 */
+    mine2.innerHTML=!LB.registered()
+      ?'你还没上榜——点「<b>起名上榜</b>」起个化名，这份贡献才会算进本营。'
+      :'三营各看各的本事 —— 走得远、打得险、来得勤，各有各的算法。';
     return;
   }
   if(LB.scope==='faction'){
@@ -6185,17 +6218,22 @@ async function renderLB(){
         return '<div class="cmem'+(me?' me':'')+'"><span>'+esc(x.alias)
           +(me?' <b>（你）</b>':'')+'</span><i>'+(x.power||0).toLocaleString('en-US')+'</i></div>';
       }).join('');
-      return '<div class="fac-wrap">'
+      /* 成员为空也要渲染出一块，否则点了没反应，看上去就是按钮坏了 */
+      return '<div class="fac-wrap'+(isMine?' open':'')+'">'
         +'<div class="fac-row'+(isMine?' mine':'')+'" data-f="'+esc(r.faction)+'">'
         +'<span class="rk">'+r.rank+'</span>'
+        +'<span class="ar">'+ICONS.chev+'</span>'
         +'<span class="nm">'+esc(r.faction)+(isMine?' · 我的门派':'')+'</span>'
         +'<span class="cnt">'+r.n+' 人 · 人均 '+r.avg.toLocaleString('en-US')+'</span>'
         +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>'
-        +(mem?'<div class="fac-mem'+(isMine?' open':'')+'">'+mem+'</div>':'')+'</div>';
+        +'<div class="fac-mem'+(isMine?' open':'')+'">'
+        +(mem||'<div class="cmem"><span class="qs-dim">这一派的名单还没读到</span></div>')
+        +'</div></div>';
     }).join('');
+    list.insertAdjacentHTML('afterbegin','<div class="fac-tip">点门派名看都有谁</div>');
     for(const row of $$('#lb-list .fac-row'))row.onclick=()=>{
-      const m=row.parentNode.querySelector('.fac-mem');
-      if(m){SFX.click();m.classList.toggle('open')}
+      const w=row.parentNode, m=w.querySelector('.fac-mem');
+      if(m){SFX.click();m.classList.toggle('open');w.classList.toggle('open')}
     };
     mine2.innerHTML=!LB.registered()
       ?'你还没上榜。点「<b>起名上榜</b>」起个化名、填个门派——<b>同名即同门</b>，和朋友约好名字就行。'
@@ -6982,7 +7020,13 @@ $('#col-esc').addEventListener('click',()=>{
 });
 $('#btn-install').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('install')});
 $('#install-close').addEventListener('click',()=>{SFX.click();ovl(null)});
-$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');LB.scope='world';LB.flush('open');renderLB()});
+/* 还没选边的人直接落在阵营页。以前永远开在世界榜，选边要走三步
+   （点矿脉榜 → 意识到顶上三个标签能点 → 点中间那个），全站再无第二处提及，
+   结果线上 17 人有 15 人没选过边——他们连入营选择器长什么样都没见过。 */
+$('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');
+  const s=LB.stats();
+  LB.scope=(!(SAVE.camp&&SAVE.camp.side)&&(s.lv>0||s.rush>0))?'camp':'world';
+  LB.flush('open');renderLB()});
 /* 唤醒时机：联网恢复 / 切回前台 / 页面即将被回收前用信标补一次 */
 addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
 addEventListener('visibilitychange',()=>{
