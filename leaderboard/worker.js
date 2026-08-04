@@ -342,7 +342,10 @@ async function handleAdmin(req, env, origin) {
    消消乐的分数没法像答题那样服务端重算，所以走「硬上限 + 限频 +
    老师可删」的课堂级防线，与词灵榜同级，不是银行级。
    ══════════════════════════════════════════════════════════════ */
-const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30 };
+/* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
+   定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
+const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
+                 runs: 45000, days: 3000 };
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
@@ -371,11 +374,17 @@ async function gfEnsure(env) {
        power INTEGER DEFAULT 0, best_score INTEGER DEFAULT 0, best_rush INTEGER DEFAULT 0,
        lv INTEGER DEFAULT 0, stars INTEGER DEFAULT 0, chain INTEGER DEFAULT 0,
        rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
+       runs INTEGER DEFAULT 0, days INTEGER DEFAULT 0,
        first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
   /* 老表升级：camp 列后加的，ALTER 失败说明已经有了，忽略即可 */
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN camp TEXT DEFAULT ''").run(); } catch (e) {}
+  /* runs/days 是仅有的两个累计项。其余五项统计列全是历史最高值，
+     破纪录才动 —— 玩家打了十局没破纪录，服务端看来等于什么都没发生。
+     「只要肝就有回报」全靠这两列撑着。 */
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN runs INTEGER DEFAULT 0").run(); } catch (e) {}
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN days INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
@@ -423,15 +432,19 @@ async function gfSubmit(req, env, origin) {
     score: clampInt(st.score, 0, GF_CAP.score), rush: clampInt(st.rush, 0, GF_CAP.rush),
     lv: clampInt(st.lv, 0, GF_CAP.lv), stars: clampInt(st.stars, 0, GF_CAP.stars),
     chain: clampInt(st.chain, 0, GF_CAP.chain),
+    runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
   };
+  /* 下矿天数不可能多于下矿局数——一天至少打一局才算来过。
+     老客户端不送这两个字段，落到 0，MAX 合并时不会覆盖已有值。 */
+  s.days = Math.min(s.days, s.runs);
   // 星数不可能超过已通关卡数的三倍
   s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
   const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
     `INSERT INTO gemfall (id,alias,faction,camp,class_tag,power,best_score,best_rush,lv,stars,chain,
-       rank_name,badges,season,first_seen,last_write,hidden)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+       runs,days,rank_name,badges,season,first_seen,last_write,hidden)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
        camp=CASE WHEN excluded.camp!='' THEN excluded.camp ELSE gemfall.camp END,
@@ -441,10 +454,12 @@ async function gfSubmit(req, env, origin) {
        best_rush=MAX(COALESCE(gemfall.best_rush,0),excluded.best_rush),
        lv=MAX(COALESCE(gemfall.lv,0),excluded.lv), stars=MAX(COALESCE(gemfall.stars,0),excluded.stars),
        chain=MAX(COALESCE(gemfall.chain,0),excluded.chain),
+       runs=MAX(COALESCE(gemfall.runs,0),excluded.runs),
+       days=MAX(COALESCE(gemfall.days,0),excluded.days),
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
-         rname, badges, sea, seen, now).run();
+         s.runs, s.days, rname, badges, sea, seen, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */

@@ -1596,6 +1596,14 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
      每月只能换一次：既有承诺感又不锁死人。 */
   camp:{side:'',m:0},
   bounty:{w:0,done:0},yj:{m:0,c:{},done:0},yjSeal:{},firstDay:0,
+  /* ---- 累计账（2026-08 加）----
+     矿力原来五项全是「历史最高值」：星数、关卡、最佳分、矿灯最佳、最长连锁，
+     破纪录才动。今天打十局一局没破纪录，矿力纹丝不动——「只要肝就有回报」
+     在旧公式下根本不成立。这两个数只增不减，每下一次矿都实打实往上走一点。
+     runs = 累计下矿局数（任何模式，局**结束**才记，避免开了就退刷数）
+     days = 累计下矿天数，**去重不连续**——放假一周回来不清零，那是惩罚
+     lastDay = 上次下矿的日序号，给 days 去重用 */
+  runs:0,days:0,lastDay:0,
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -4181,6 +4189,14 @@ function q3State(){
   if(s.d!==d||!Array.isArray(s.q)||s.q.length!==3){s.d=d;s.q=q3Roll(d);persist()}
   return s;
 }
+/* 累计账：每下完一次矿就记一笔。局**结束**才记，开了就退不算，
+   否则反复开局退出能白刷。天数去重不连续——断几天回来接着往上加，不清零。 */
+function markRun(){
+  SAVE.runs=(SAVE.runs||0)+1;
+  const d=dayNum();
+  if(d!==(SAVE.lastDay||0)){SAVE.days=(SAVE.days||0)+1;SAVE.lastDay=d}
+  persist();
+}
 function q3Bump(k,n){
   if(!n)return;
   const s=q3State(); let dirty=false, justDone=null;
@@ -5044,6 +5060,7 @@ function startRush(blitz){
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
+  markRun();
   csBump('r',1);
   yjBump('rushN',1);
   if(GS.chainMax>=8)yjBump('chain8',1);
@@ -5103,6 +5120,7 @@ function endLevel(win){
   const nearMiss=!win&&prog>=.8;
   let emberShown=0;                                            // 失败时的余烬回报，供下面的明细行显示
   /* 三桩：这三样不看胜负，赢了输了都记 */
+  markRun();
   q3Bump('play',1);
   q3Bump('chain',GS.chainMax);
   q3Bump('score',GS.score);
@@ -5580,7 +5598,10 @@ const LB={
     const stars=totalStars();
     const lv=Math.max(0,(SAVE.lv||1)-1);                       // 已通关卡数
     let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
-    return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0};
+    /* runs/days 是仅有的两个**累计**项，其余五项都是历史最高值。
+       没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。 */
+    return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0,
+            runs:SAVE.runs||0,days:SAVE.days||0};
   },
   /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
      后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
@@ -5648,7 +5669,10 @@ const LB={
        · 多入口唤醒——开局、通关、联网恢复、切回前台、打开榜单、退避定时器
        · 429 不算错——那是服务端 15 秒冷却，等一会儿再来就行
      只要还没成功，pending() 就一直为真，玩家在大厅能看到「待上传」。 */
-  sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain,(SAVE.camp&&SAVE.camp.side)||''].join('|')},
+  /* 指纹里必须包含 runs/days，否则「只涨天数不涨成绩」的人 pending() 永远为假、
+     flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
+  sig(){const s=this.stats();
+    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,(SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
   plan(ms){
@@ -6071,6 +6095,7 @@ function startWeekly(){
 }
 function endWeekly(){
   GS.over=true;GS.busy=true;
+  markRun();
   const s=wkState();
   /* 首挖记榜：第一把是正式成绩，之后无限重开当练习场。
      取「历次最佳」的话，肯重开二十次的人必然压过只打一次的人，
@@ -7813,6 +7838,26 @@ window.__selftest=function(){
     ok('贴身对手：榜满且够不到时给出确切差额',fullB.indexOf('410')>=0);
     ok('贴身对手：榜满但战力已超末位时不显示',over==='');
     SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;
+  }
+  /* 31. 累计账：矿力原来五项全是历史最高值，破纪录才动 —— 打十局没破纪录
+     等于什么都没发生。runs/days 是仅有的两个只增项，「只要肝就有回报」全靠它们。
+     天数必须**去重且不清零**：同一天打多局只算一天，断几天回来接着加，
+     断签清零那是惩罚，受众里有学生，不做。 */
+  {
+    const bak={r:SAVE.runs,d:SAVE.days,l:SAVE.lastDay};
+    const today=dayNum();
+    SAVE.runs=0;SAVE.days=0;SAVE.lastDay=0;
+    markRun();markRun();markRun();                       // 今天连打三局
+    const sameDay=(SAVE.runs===3&&SAVE.days===1);
+    SAVE.lastDay=today-9;                                // 假装上次下矿是九天前
+    markRun();
+    const afterGap=(SAVE.runs===4&&SAVE.days===2);        // 断九天，天数继续加而不是清零
+    const st=LB.stats(), sg=LB.sig();
+    ok('累计账：同一天多局只算一天，断几天回来不清零',sameDay&&afterGap);
+    ok('累计账：runs/days 进了 stats() 与 sig()（否则只涨天数永远不重传）',
+       st.runs===SAVE.runs&&st.days===SAVE.days
+       &&sg.split('|').length===8&&sg.indexOf('|'+SAVE.days+'|')>=0);
+    SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));
