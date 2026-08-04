@@ -1540,7 +1540,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn ghost" id="xfer-out">导出我的进度</button>
       <button class="btn ghost" id="xfer-in">粘贴口令导入</button>
     </div>
-    <div class="xfer-note" style="margin-top:6px">也可以从<b>成就页底部</b>直接打开这一页。</div>
+    <div class="xfer-note" style="margin-top:6px">这一页还有两个入口：<b>玩法</b>页里的「导出 / 导入进度口令」，
+      和<b>成就</b>页底部的「换设备」。</div>
     <div id="xfer-panel"></div>
   </div>
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
@@ -7338,7 +7339,7 @@ const HOW_HTML=`
 <b>攒什么</b>　90 秒模式打出<b>灯位</b>（黑灯到曜灯六档）；带同伴打胜场攒<b>衔位</b>（5/15/40/100 胜）；
 典藏册收 32 张卡，重复卡化星屑、可赠印送朋友、缺卡能发<b>求卡帖</b>；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
-<b>换设备</b>　页脚「安装 · 换机」里可以<b>导出进度口令</b>，粘到新设备就接着玩，全程离线。<br><br>
+<b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明、冒险的黑域、勤勉的灰塔，三营各看各的本事，每月可改投一次。
@@ -7578,7 +7579,14 @@ $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
 for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-quest').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
 $('#quest-close').addEventListener('click',()=>{SFX.click();ovl(null)});
-$('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
+$('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how');
+  /* 玩法页每次打开都重插 HTML，按钮得现挂。
+     王老师反馈过「迁移存档好像没太怎么找到」——原来这里只写了「去页脚找」，
+     等于把门的位置告诉你却不给门。现在直接给门。 */
+  const xb=$('#how-xfer');
+  if(xb)xb.onclick=()=>{SFX.click();ovl('install');setTimeout(()=>{
+    const p=$('#xfer-panel');if(p)p.scrollIntoView({block:'center'});},60)};
+});
 $('#ach-card').addEventListener('click',()=>{SFX.click();showNameCard()});
 /* 换设备的第二个入口。存档搬家原本只藏在页脚「安装 · 换机」里两层深，
    玩家反馈找不到。成就页是看生涯数据的地方，「换设备保住这些数据」
