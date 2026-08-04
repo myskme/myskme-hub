@@ -801,6 +801,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-d{flex:1 0 100%;order:3;font-size:11px;color:var(--ink3);line-height:1.6}
 .sp-r{display:flex;align-items:center;gap:8px;margin-left:auto}
 .sp-c{font-size:11.5px;color:var(--ink3);white-space:nowrap}
+/* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
+.sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
+.sp-i.seal .sp-d{opacity:.7}
 .sp-have{font-size:11.5px;color:var(--gold2);letter-spacing:.08em}
 .btn.sp-b{padding:4px 12px;font-size:12px;letter-spacing:.08em}
 .btn.sp-b.off{opacity:.45}
@@ -6843,7 +6846,23 @@ const GOODS=[
   {id:'ps4',s:4,nm:'题跋 · 我从暗河来',cur:'pw',cost:5000,slot:'post',d:'拓片落款'},
   /* ── 断层架 50k ── */
   {id:'dep2',s:5,nm:'长明碑 · 年号',cur:'pw',cost:15000,d:'一年刻一次名，名片上多一行「长明 · 二〇二六」，年年成序列'},
+  /* ── 矿心架 78k 起：这三层是**封样**层，未解锁时只露价签不露名。
+       上面三层刻意只放「已经接好线的」槽位商品（题名/题跋/落印），
+       不放需要另做一整套表现的东西 —— 摆一件点了没反应的货比空货架更伤。 ── */
+  {id:'tt6',s:6,nm:'题名 · 长夜行者',cur:'pw',cost:6000,slot:'title',d:'名片称衔',need:()=>(SAVE.days||0)>=100,needTxt:'累计下矿 100 天'},
+  {id:'sl6',s:6,nm:'落印 · 长明灯',  cur:'pw',cost:5000,slot:'seal', d:'一盏点了很久的灯'},
+  {id:'ps5',s:7,nm:'题跋 · 灯下无人',cur:'pw',cost:8000,slot:'post', d:'拓片落款'},
+  {id:'tt7',s:7,nm:'题名 · 满轮者',  cur:'pw',cost:9000,slot:'title',d:'名片称衔',need:()=>Object.values(SAVE.yjSeal||{}).filter(x=>(x&&x.n)>=3).length>=6,needTxt:'集满 6 个月的三轮岁记'},
+  {id:'sl7',s:8,nm:'落印 · 未名',    cur:'pw',cost:20000,slot:'seal',d:'没有人见过这枚印'},
 ];
+/* 从这一层起未解锁就封样：只露价签，不露名字与说明。
+   评审原话是「全案最干净的一条」——无窗口、无名额、无消耗，纯好奇心。
+   它同时是「永远不知道接下来有什么惊喜」最便宜的实现：什么都不用新建。
+   ⚠ 将来做「今日矿口」轮换时，抽到封样层的商品必须也走封样文案，
+     否则当场穿帮；「公开轮换表」那条同理，只能公开已解锁层。 */
+const SEAL_FROM=6;
+const SEAL_TAG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+function shopSealed(g){return g.s>=SEAL_FROM&&!shopUnlocked(g)}
 const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
 function shopFix(){
   if(!SAVE.shop||typeof SAVE.shop!=='object')SAVE.shop={own:{},worn:{}};
@@ -6902,11 +6921,15 @@ function renderShop(){
       +'<span class="sp-gate">'+(open?'已开':'矿力 '+sh.p.toLocaleString('en-US')
         +' · 还差 '+(sh.p-pw).toLocaleString('en-US'))+'</span></div>';
     if(!list.length){h+='<div class="sp-empty">尚未开凿</div></div>';continue}
+    let si=0;
     for(const g of list){
       const own=shopOwn(g.id), why=shopCanBuy(g), worn=g.slot&&shopWorn(g.slot)===g.id;
-      h+='<div class="sp-i'+(own?' own':'')+'">'
-        +'<div class="sp-t">'+esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':'')+'</div>'
-        +'<div class="sp-d">'+esc(g.d)+'</div>'
+      /* 封样：够不着的高层只露价签。名字与说明都不给，连是不是称衔都看不出来。
+         解锁那一刻自己揭开，那一下就是这条机制的全部收益。 */
+      const seal=shopSealed(g), tag=SEAL_TAG[si++]||'？';
+      h+='<div class="sp-i'+(own?' own':'')+(seal?' seal':'')+'">'
+        +'<div class="sp-t">'+(seal?'封样 · '+tag:esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':''))+'</div>'
+        +'<div class="sp-d">'+(seal?'解开这一层才揭样':esc(g.d))+'</div>'
         +'<div class="sp-r">'
         +(own
           ? (g.slot?'<button class="btn ghost sp-b" data-wear="'+g.id+'">'+(worn?'摘下':'戴上')+'</button>'
@@ -8309,6 +8332,18 @@ window.__selftest=function(){
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
     ok('矿场：称衔一律要先做到，不能纯花钱买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
+    /* 封样：够不着的高层不许泄露名字。这条同时防两种回归——
+       将来做轮换或公开表时，把封样层的真名漏出去，这条会红。 */
+    {
+      const hi=GOODS.filter(g=>g.s>=SEAL_FROM);
+      SAVE.lbPower=0;   renderShop(); const shut=$('#shop-list').textContent;
+      SAVE.lbPower=1e9; renderShop(); const open=$('#shop-list').textContent;
+      ok('封样：矿力不够时高层商品的真名一个都不泄露',
+         hi.length>0 && hi.every(g=>shut.indexOf(g.nm)<0) && shut.indexOf('封样')>=0);
+      ok('封样：解锁之后真名照常显示，封样字样消失',
+         hi.every(g=>open.indexOf(g.nm)>=0) && open.indexOf('封样')<0);
+      SAVE.lbPower=bakL;
+    }
     /* 全站不许再出现「要求玩家在某个具体时刻在线」的条件。
        隐藏卡 25 原来要求午夜零点开匣，受众里有学生，已改掉。
        这条断言把它钉死：任何 SECRETS 条件都不许读小时。 */
