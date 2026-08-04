@@ -1693,7 +1693,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   pwHist:{},
   /* 矿场 · 兑。own = 买过的（永久拥有），worn = 每个槽位正戴着哪件（随时免费换）。
      买断的是拥有权不是佩戴权，所以换戴不花钱 —— 收集的乐趣在「都有」，不在「都戴着」。 */
-  shop:{own:{},worn:{},at:{},q:{m:0,n:0}},
+  shop:{own:{},worn:{},at:{},q:{m:0,n:0},seen:-1},
   /* 今日矿口：w=期号（weekNum），used=本期已折价买过哪些。跨期整块重置。 */
   stall:{w:0,used:{}},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
@@ -6713,8 +6713,10 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'　典藏 <b>'+colGot()+'</b> / '+CARDS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
-  /* 有没开的匣就点一颗金点——不新增行高，大厅竖向已经只剩 61px 余量 */
-  $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
+  /* 有没开的匣、或矿场有新解锁/买得起的折价货，就点一颗金点。
+     矿场藏在典藏册里（大厅竖向只剩 61px，塞不下第五个按钮），
+     不点这一颗的话，整套货架门槛的情绪回报——「我又开了一层」——没有任何地方告诉他。 */
+  $('#col-dot').innerHTML=(COLS.box>0||shopNews())?'<i class="dot"></i>':'';
   /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
   $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   /* 挑战点：本周矿脉没首挖、或悬赏没拿，就亮一颗——周一自然重亮，绝不闪烁催促 */
@@ -6918,6 +6920,33 @@ function stallState(){
 }
 function stallPrice(g){return Math.max(1,Math.round(g.cost*(1-STALL_OFF)))}
 function stallHas(id){return stallState().items.some(g=>g.id===id)}
+/* ────────── 新解锁提示 ──────────
+   矿力跨过一层门槛是整套货架唯一的高光时刻，可它发生在后台、无声无息。
+   这里记住「已经看过第几层」，跨过新层就在大厅点一颗金点、进店时说一声。
+   看过就熄，不重复骚扰；也绝不闪烁、不倒计时。 */
+function shopTopShelf(){
+  const pw=Number(SAVE.lbPower)||0;
+  let i=-1; for(let k=0;k<SHELF.length;k++)if(pw>=SHELF[k].p)i=k;
+  return i;
+}
+function shopNews(){
+  shopFix();
+  if(shopTopShelf()>(SAVE.shop.seen==null?-1:SAVE.shop.seen))return true;
+  /* 本期矿口里有买得起、还没买、且已解锁的货 —— 那是真的「今天可以去看一眼」 */
+  return stallState().items.some(g=>!shopOwn(g.id)&&!shopCanBuy(g));
+}
+function shopSeeNews(){
+  shopFix();
+  const t=shopTopShelf(), was=(SAVE.shop.seen==null?-1:SAVE.shop.seen);
+  if(t>was){
+    SAVE.shop.seen=t;persist();
+    const nm=SHELF[t].nm;
+    setTimeout(()=>toast('矿场开了新一层 · <b>'+esc(nm)+'</b>'
+      +(t>=SEAL_FROM?'<br>封样揭开了':''),3800),400);
+    return true;
+  }
+  return false;
+}
 const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
 /* ────────── 兑窗 · 月配额 ──────────
    每月只开这么多扇窗。它是「一个月内解锁不完」唯一的硬保证 ——
@@ -7579,7 +7608,7 @@ $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
 $('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
 $('#col-ask').addEventListener('click',()=>{SFX.click();colView('ask')});
-$('#col-shop').addEventListener('click',()=>{SFX.click();colView('shop');renderShop()});
+$('#col-shop').addEventListener('click',()=>{SFX.click();colView('shop');shopSeeNews();renderShop()});
 $('#shop-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#dw-again').addEventListener('click',()=>{SFX.click();openBox()});
 $('#dw-back').addEventListener('click',()=>{SFX.click();colView('list')});
