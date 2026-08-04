@@ -1091,10 +1091,19 @@ body{--shk:4px}
 .quip.boss::after{content:'」'}
 .ovl-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
 .stars-row{display:flex;justify-content:center;gap:16px;margin:14px 0 4px;height:52px}
-.stars-row s{font-size:44px;line-height:1;text-decoration:none;color:var(--ink3);opacity:.28;transform:scale(.6);transition:none}
-.stars-row s.lit{color:var(--gold2);opacity:1;text-shadow:0 0 22px color-mix(in srgb,var(--gold) 65%,transparent);animation:starPop .5s cubic-bezier(.34,1.56,.64,1) both}
+.stars-row s{line-height:0;text-decoration:none;color:var(--ink3);opacity:.28;transform:scale(.6);transition:none;display:block}
+.stars-row s .ic{width:44px;height:44px;vertical-align:0}
+.stars-row s.lit{color:var(--gold2);opacity:1;animation:starPop .5s cubic-bezier(.34,1.56,.64,1) both}
+/* 亮起来的星要真的在发光：drop-shadow 才能跟着星形的轮廓，
+   text-shadow 在 SVG 上不起作用（换成 SVG 之后原来那条就是死代码了）。 */
+.stars-row s.lit .ic{filter:drop-shadow(0 0 10px color-mix(in srgb,var(--gold) 85%,transparent))
+                            drop-shadow(0 0 22px color-mix(in srgb,var(--gold) 45%,transparent))}
 @keyframes starPop{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25) rotate(6deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 #end-score{font-size:34px;color:var(--gold2);letter-spacing:.06em;margin:6px 0 0;font-variant-numeric:tabular-nums}
+/* 分数从 0 滚上去。直接把最终值写上去，玩家只看到一个静止的数字；
+   滚动这一下把「这局我挣了多少」变成一个可以看着它长的过程 ——
+   这是结算屏最便宜的一次情绪兑现。
+   ⚠ tabular-nums 是前提：比例数字滚起来整行会左右抽动。 */
 #end-detail{font-size:12.5px;color:var(--ink3);letter-spacing:.14em;margin-top:4px;line-height:2}
 #end-detail b{color:var(--ink2);font-weight:500}
 /* Boss 登场 */
@@ -1545,7 +1554,7 @@ body{--shk:4px}
   <div class="ovl-kick" id="end-kick">EXPEDITION</div>
   <div class="obanner" id="end-banner"></div>
   <div class="ovl-title" id="end-title">脉 · <em>通</em></div>
-  <div class="stars-row" id="end-stars"><s>★</s><s>★</s><s>★</s></div>
+  <div class="stars-row" id="end-stars"><s></s><s></s><s></s></div>
   <div id="end-score">0</div>
   <div id="end-detail"></div>
   <div class="quip" id="end-quip"></div>
@@ -3343,6 +3352,27 @@ function floatNum(r,c,txt,color){
   d.style.left=cxOf(c)+'px';d.style.top=(cyOf(r)-ENG.cs*.3)+'px';
   wrap.appendChild(d);setTimeout(()=>d.remove(),1020);
 }
+/* 数字滚动。**不用 setInterval**：后台标签页里 interval 会被节流成一秒一次，
+   玩家切回来会看到数字还在慢慢爬。用 rAF + 真实时间，切回来时直接是终值。
+   开了「减少动效」就不滚，直接给结果。 */
+function countTo(el,to,ms){
+  if(!el)return;
+  const fin=()=>{el.textContent=to.toLocaleString('en-US')};
+  /* ⚠ **先把终值写上去，再开始滚**。看着多余，其实是必需的：
+     rAF 在后台标签页会被完全冻住（实测一帧都不跑）。玩家如果在结算这一刻
+     切去微信再回来，动画从没开始过 —— 先写终值的话，最坏情况也只是「没滚动」，
+     而不是「分数永远停在 0」。 */
+  fin();
+  if(REDUCED||!to)return;
+  const t0=performance.now(), dur=ms||900;
+  const tick=now=>{
+    const k=Math.min(1,(now-t0)/dur);
+    const e=1-Math.pow(1-k,3);                       // easeOutCubic：先快后慢，像落定
+    el.textContent=Math.round(to*e).toLocaleString('en-US');
+    if(k<1)PLAT.raf(tick); else fin();
+  };
+  PLAT.raf(tick);
+}
 function comboBanner(n,label){
   const el=$('#combo-banner');
   const w=label?[label,'COMBO']:comboWord(n);
@@ -3916,6 +3946,10 @@ const ICONS={
   dust:_IC('<path d="M12 3.4l1.1 4L17 8.5l-3.9 1.1L12 13.5l-1.1-3.9L7 8.5l3.9-1.1z"/><path d="M18 14.4l.55 1.95 1.95.55-1.95.55-.55 1.95-.55-1.95-1.95-.55 1.95-.55z"/><path d="M5.9 15.6l.42 1.5 1.5.42-1.5.42-.42 1.5-.42-1.5-1.5-.42 1.5-.42z"/>'),
   seal:_IC('<rect x="4.8" y="4.8" width="14.4" height="14.4" rx="2.2"/><path d="M8.8 12h6.4M12 8.8v6.4"/>'),
   gift:_IC('<rect x="3.6" y="6.2" width="16.8" height="11.6" rx="1.6"/><path d="M3.6 7.4 12 13l8.4-5.6"/>'),
+/* 结算屏那三颗星。用 SVG 而不是 ★ 字形：44px 下字形的形状随平台字体变，
+     有的瘦有的胖，还可能被 emoji 字体接管变成彩色 —— 那是全站禁 emoji 的红线。
+     这一枚是实心的，靠 fill:currentColor 跟着状态走。 */
+  star:_IC('<path fill="currentColor" stroke="none" d="M12 2.6l2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.62l-5.88 3.09 1.12-6.55L2.48 9.52l6.58-.96z"/>'),
   unknown:_IC('<path d="M12 3.6 20 12l-8 8.4L4 12z"/><path d="M12 14.6v.1"/><path d="M10.2 10.2a1.9 1.9 0 113.2 1.4c-.72.58-1.35.87-1.35 1.8"/>'),
 };
 /* 提示条 / 结算行里的小图标。ICONS 里的 <svg class="ic"> 没有内联尺寸，
@@ -5528,7 +5562,7 @@ function endRush(){
   applyArt($('#end-banner'),best?'end_win':'end_lose');
   $('#end-kick').textContent=b2?'续灯 · BLITZ 45':'矿灯将熄 · LAMPLIGHT 90';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
-  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  countTo($('#end-score'),GS.score);
   /* 灯位段位：只挂在 90 秒正赛上。升位那一下在这里揭晓——
      离下一位还差多少也写明白，这就是「再点一盏」的理由。 */
   const nowBest=b2?SAVE.rush2Best:SAVE.rushBest;
@@ -5656,7 +5690,7 @@ function endLevel(win){
       cb.dataset.cost=cost;
     }
   }
-  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  countTo($('#end-score'),GS.score);
   const left=GS.goals.filter(g=>g.got<g.need).length;
   /* 失败页要把「差了多少」说具体。只说「还差 1 项目标」，玩家不知道是差一步
      还是差一半；说到「还差 3 颗」，他才知道值不值得再来一次。 */
@@ -6589,7 +6623,7 @@ function endWeekly(){
   applyArt($('#end-banner'),best?'end_win':'end_lose');
   $('#end-kick').textContent='本周矿脉 · 第 '+s.w+' 期';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'本周 · <em>矿脉</em>';
-  $('#end-score').textContent=GS.score.toLocaleString('en-US');
+  countTo($('#end-score'),GS.score);
   const stars=$('#end-stars').children;
   const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
   for(let i=0;i<3;i++)stars[i].classList.remove('lit');
@@ -8902,6 +8936,17 @@ window.__selftest=function(){
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
     }
+    /* 分数滚动必须**先写终值再滚**：rAF 在后台标签页会被完全冻住（实测一帧不跑），
+       玩家结算时切走再回来，动画从没开始过 —— 先写终值最坏只是「没滚动」，
+       不先写就是「分数永远停在 0」。这条盯的就是那个先后顺序。 */
+    {
+      const el=document.createElement('div');
+      countTo(el,12345);
+      ok('结算：分数先落终值再滚动（后台标签页 rAF 冻住时也不会停在 0）',
+         el.textContent==='12,345');
+      countTo(el,0);
+      ok('结算：零分也照常显示',el.textContent==='0');
+    }
     /* 图标体系：`.ic` 只许指 svg 本体，外层容器一律 `.icw`。
        两者都叫 .ic 的后果是**样式被施加两次**——成就页就踩过：
        opacity .35 施加在外层 div 和里面的 svg 上相乘成 .1225，
@@ -9095,6 +9140,7 @@ window.__selftest=function(){
    ================================================================== */
 $('#btn-pause').innerHTML=ICONS.pause;
 $('#chest-btn').querySelector('.icw').innerHTML=ICONS.gem;
+for(const el of $$('#end-stars s'))el.innerHTML=ICONS.star;
 $('#btn-sound').innerHTML=SAVE.mute?ICONS.soundOff:ICONS.soundOn;
 $('#btn-sound').style.opacity=SAVE.mute?.45:1;
 $('#btn-music').innerHTML=SAVE.muteBgm?ICONS.musicOff:ICONS.musicOn;
