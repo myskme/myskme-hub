@@ -822,6 +822,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .near-gap{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
   font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
 .near-gap.only{margin-top:0;padding-top:0;border-top:0}   /* 上面没有名次行时不留那条分隔线 */
+/* ── 数字排版统一 ──
+   全站有 64 处 toLocaleString 出来的**会变的数字**（矿力、价格、余额、差距、
+   贡献值…），但原来只有 12 处设了 tabular-nums。等宽数字不是审美讲究：
+   比例数字里「1」比「8」窄一大截，价格从 490 跳到 1,680 时整行会左右抽动，
+   榜单滚动时一列数字更是参差不齐。凡是会变的数字，一律等宽。
+   （固定不动的数字不用管，比如版本号。） */
+.sp-c,.sp-bal,.sp-si i,.sp-at,.sp-shd i,.sp-have,
+.near-gap,.nr-rk,.pw-tip,.cmem,.pd-row,.yj-seal,
+.qs-sub,.q3r,.thr-n{font-variant-numeric:tabular-nums}
 /* 矿力该往哪使劲：一句话，不铺明细表 */
 .pw-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
   font-size:11.5px;line-height:1.75;color:var(--ink3);letter-spacing:.03em}
