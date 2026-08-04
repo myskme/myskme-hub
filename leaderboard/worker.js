@@ -511,14 +511,23 @@ async function gfSubmit(req, env, origin) {
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
+  /* ⚠ 这条 SELECT 的字段必须与 gfPower 用到的**每一项**对齐。
+     2026-08-04 真踩过：加 runs/days/dbest/best_dig 四列时，INSERT 和 UPDATE 都加了，
+     唯独漏了这里 —— merged 里那四项是 undefined，undefined*160 = NaN，
+     NaN 一路写进库变成 NULL，玩家的矿力当场归零、段位掉回学徒，而且**没有任何报错**。
+     所以下面既对齐了字段，又加了一道 isFinite 兜底：宁可退回本次提交值，绝不写 NaN。 */
   const row = await env.DB.prepare(
-    "SELECT best_score,best_rush,lv,stars,chain FROM gemfall WHERE id=?"
+    "SELECT best_score,best_rush,lv,stars,chain,runs,days,dbest,best_dig FROM gemfall WHERE id=?"
   ).bind(id).first();
   const merged = row ? {
     score: row.best_score || 0, rush: row.best_rush || 0,
     lv: row.lv || 0, stars: row.stars || 0, chain: row.chain || 0,
+    runs: row.runs || 0, days: row.days || 0,
+    dbest: row.dbest || 0, mv: row.best_dig || 0,
   } : s;
-  const myPower = gfPower(merged);
+  let myPower = gfPower(merged);
+  if (!Number.isFinite(myPower)) myPower = gfPower(s);      // 回读缺项时退回本次提交
+  if (!Number.isFinite(myPower)) myPower = 0;               // 再不行也不能把 NaN 写进库
   const myRank = gfRankFor(myPower);
   const myBadges = gfBadges(merged);
   await env.DB.prepare("UPDATE gemfall SET power=?, rank_name=?, badges=? WHERE id=?")

@@ -758,6 +758,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .near-gap{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
   font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
 .near-gap.only{margin-top:0;padding-top:0;border-top:0}   /* 上面没有名次行时不留那条分隔线 */
+/* 矿力该往哪使劲：一句话，不铺明细表 */
+.pw-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
+  font-size:11.5px;line-height:1.75;color:var(--ink3);letter-spacing:.03em}
+.pw-tip b{color:var(--ink2)}
 .near-gap b{color:var(--gold2);font-size:15px}
 
 /* 门派榜行 */
@@ -6332,7 +6336,49 @@ async function renderLB(){
   mine2.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
     +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
     +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
-      +(found?'':' · 未进前 '+LB_LIMIT+'，继续挖')):'');
+      +(found?'':' · 未进前 '+LB_LIMIT+'，继续挖')):'')
+    +'<div class="pw-tip">'+pwAdviceHTML()+'</div>';
+}
+/* ────────── 矿力三线（客户端镜像）──────────
+   ⚠ 必须与 leaderboard/worker.js 的 gfDepth/gfSkill/gfGrind **逐字一致**。
+   这一片踩过：客户端算一套、服务端算另一套，玩家同屏看到两个数打架。
+   自测第 32 条钉了三组已知值，改任何一边而不改另一边都会红。 */
+function pwLadder(lv){
+  let n=lv,p=0;
+  for(const [w,r] of [[64,100],[86,150]]){
+    const k=Math.min(n,w); p+=k*r; n-=k;
+    if(n<=0)return p;
+  }
+  return p+n*200;
+}
+function pwLines(s){
+  s=s||LB.stats();
+  return {
+    depth:pwLadder(s.lv)+(s.lv>=75?Math.floor((s.lv-50)/25)*600:0)+s.stars*120,
+    skill:Math.max(s.chain*60,s.chain*s.chain*30)+Math.floor((s.mv||0)/12)
+          +Math.floor(s.score/50)+Math.floor(s.rush/40),
+    grind:(s.days||0)*160+(s.runs||0)*6+(s.dbest||0)*120,
+  };
+}
+function pwTotal(s){
+  const L=pwLines(s);
+  return L.depth+L.skill+L.grind+3*Math.min(L.depth,L.skill,L.grind);
+}
+/* 玩家反复在问「矿力怎么来的」。不铺一张明细表——王老师要的是「知道大概就行」。
+   均衡奖让每个人最短的那条线不一样，所以这里只说**他自己**该往哪使劲，一句话。 */
+const PW_HINT={
+  depth:{nm:'走多远',do:'往深里挖一关，顺手把星拿满'},
+  skill:{nm:'打多险',do:'去矿灯局冲一次连锁纪录'},
+  grind:{nm:'来多勤',do:'明天再来挖一次，光是来了就算'},
+};
+function pwAdviceHTML(){
+  const L=pwLines();
+  const k=(L.grind<=L.depth&&L.grind<=L.skill)?'grind'
+         :(L.depth<=L.skill?'depth':'skill');
+  const h=PW_HINT[k];
+  return '矿力看三样：<b>走多远</b>、<b>打多险</b>、<b>来多勤</b>，'
+    +'三样里<b>最短的那样算四倍</b>。<br>'
+    +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
 }
 /* ────────── 贴身对手 ──────────
    榜单原来是一次平铺 50 行，谁跟谁咬得紧完全看不出来。而线上真实数据里
@@ -7881,6 +7927,38 @@ window.__selftest=function(){
        &&typeof st.dbest==='number'&&typeof st.mv==='number'
        &&sg.split('|').length===10&&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
+  }
+  /* 32. 矿力三线：客户端镜像必须和 worker.js 的 gfDepth/gfSkill/gfGrind 算出同一个数。
+     下面五组是**合成用例**，2026-08-04 拿服务端 SQL 表达式在线上 D1 逐组对过，全部一致。
+     ⚠ 千万别改用真实玩家的档案来钉这条：第一版就是那么写的，结果肖肖当晚从 264 关
+     打到 267 关、白水清新从 105 到 110，输入和期望值来自两个快照，测试当场变红。
+     覆盖面：151+ 那一档阶梯、无尽里程碑、均衡奖、深掘项、连锁平方。 */
+  {
+    const P=o=>pwTotal(Object.assign({lv:0,stars:0,chain:0,score:0,rush:0,
+      mv:0,runs:0,days:0,dbest:0},o));
+    ok('矿力三线与服务端一致（阶梯 64/150 分界 + 满星）',
+       P({lv:100,stars:192,chain:10,score:50000,rush:80000})===42040
+       && P({lv:200,stars:192})===55940);
+    ok('矿力三线与服务端一致（纯技术流 + 深掘项 + 勤勉项）',
+       P({lv:0,chain:12,rush:162221})===8375
+       && P({lv:10,stars:30,chain:5,score:10000,rush:4000,days:20,runs:100,dbest:10})===13800
+       && P({lv:30,stars:60,chain:8,score:20000,rush:15000,mv:36000,days:5,runs:40,dbest:5})===22455);
+    /* 均衡奖：最短那条线算四倍。勤勉从 0 涨到 1 天时，三线里勤勉最短，
+       所以这一天的实际到手是 160×4=640 —— 「只要肝就有回报」在数字上要立得住。 */
+    const a=P({lv:105,stars:192,chain:11,score:91905,rush:121830});
+    const b=P({lv:105,stars:192,chain:11,score:91905,rush:121830,days:1});
+    ok('均衡奖：最短那条线算四倍（第一天到场实际到手 640）',b-a===640);
+    /* 只增不减：连锁 1 是旧公式唯一会掉分的点，靠 max(chain*60,chain²*30) 守着 */
+    ok('连锁 1 不掉分（旧 60 vs 新 30，靠 max 守住）',
+       pwLines({lv:0,stars:0,chain:1,score:0,rush:0}).skill===60);
+    /* 建议语必须**因人而异**——均衡奖的全部意义就在这。三条线各造一个短板，
+       给出的下一步动作必须是三句不同的话，否则这个功能等于没做。 */
+    const adv=s=>{const L=pwLines(s);
+      return (L.grind<=L.depth&&L.grind<=L.skill)?'grind':(L.depth<=L.skill?'depth':'skill')};
+    ok('矿力建议因人而异：三种短板给出三种不同的下一步',
+       adv({lv:200,stars:192,chain:0,score:0,rush:0,days:99,runs:900,dbest:99})==='skill'
+       && adv({lv:0,stars:0,chain:12,score:0,rush:162221,days:99,runs:900,dbest:99})==='depth'
+       && adv({lv:105,stars:192,chain:11,score:91905,rush:121830,days:0,runs:0,dbest:0})==='grind');
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));
