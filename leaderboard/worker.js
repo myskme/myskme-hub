@@ -367,13 +367,16 @@ async function gfEnsure(env) {
   if (_gfReady) return;                 // isolate 重启最多多跑一次，无害；读路径不该每次都写 DDL
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gemfall (
-       id TEXT PRIMARY KEY, alias TEXT NOT NULL, faction TEXT DEFAULT '', class_tag TEXT DEFAULT '',
+       id TEXT PRIMARY KEY, alias TEXT NOT NULL, faction TEXT DEFAULT '', camp TEXT DEFAULT '', class_tag TEXT DEFAULT '',
        power INTEGER DEFAULT 0, best_score INTEGER DEFAULT 0, best_rush INTEGER DEFAULT 0,
        lv INTEGER DEFAULT 0, stars INTEGER DEFAULT 0, chain INTEGER DEFAULT 0,
        rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
        first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
+  /* 老表升级：camp 列后加的，ALTER 失败说明已经有了，忽略即可 */
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN camp TEXT DEFAULT ''").run(); } catch (e) {}
+  try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
 }
@@ -407,6 +410,8 @@ async function gfSubmit(req, env, origin) {
   if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
   let faction = String(body.faction || "").trim().slice(0, 8);
   if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
+  /* 阵营只认三个固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
+  const camp = ["light", "dark", "grey"].includes(String(body.camp || "")) ? String(body.camp) : "";
   let classTag = "", classJoined = false;
   if (body.pw && String(body.pw).trim()) {
     classTag = await sha256("class|" + String(body.pw).trim() + "|" + env.LB_SALT);
@@ -424,11 +429,12 @@ async function gfSubmit(req, env, origin) {
   const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
-    `INSERT INTO gemfall (id,alias,faction,class_tag,power,best_score,best_rush,lv,stars,chain,
+    `INSERT INTO gemfall (id,alias,faction,camp,class_tag,power,best_score,best_rush,lv,stars,chain,
        rank_name,badges,season,first_seen,last_write,hidden)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
+       camp=CASE WHEN excluded.camp!='' THEN excluded.camp ELSE gemfall.camp END,
        class_tag=CASE WHEN excluded.class_tag!='' THEN excluded.class_tag ELSE gemfall.class_tag END,
        power=MAX(COALESCE(gemfall.power,0),excluded.power),
        best_score=MAX(COALESCE(gemfall.best_score,0),excluded.best_score),
@@ -437,7 +443,7 @@ async function gfSubmit(req, env, origin) {
        chain=MAX(COALESCE(gemfall.chain,0),excluded.chain),
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
-  ).bind(id, alias, faction, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
+  ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
          rname, badges, sea, seen, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
@@ -465,6 +471,60 @@ async function gfSubmit(req, env, origin) {
    排序用**总矿力**——拉一个活人进帮，帮派立刻涨分，这正是要的社交动力；
    人均和人数一并返回，小而精的帮也有自己的看点。
    只统计非空门派；聚合上限 200 行足够（自由文本门派不会太多）。 */
+/* 三阵营拔河。**刻意不返回人数**——「光明 5 人」这种数字一露就露怯，
+   而比例条在任何人数下都在动。前端拿到的就是三个占比。
+   每个阵营用**各自的指标**算分（光明看关卡星数、黑域看连锁分数、
+   灰塔看限时局），所以不存在「总矿力最高的人决定一切」。 */
+async function gfCamps(req, env, origin, url) {
+  await gfEnsure(env);
+  /* 单人封顶：CAP 之上的部分不再计入。
+     真实分布里头号玩家的矿力 = 其余 12 人总和的 63%，不封顶的话
+     他一个人就替自己阵营把条子拉满，另外两营再怎么努力都不动——
+     那才是「看起来没人玩」的真正原因（跟人数无关）。
+     取各营中位数×3 太重（要两次查询），这里用固定量级封顶，
+     数量级与当前中位数（5,560 矿力 ≈ 各指标百来分）对齐。 */
+  const CAP = 400;
+  const rows = await env.DB.prepare(
+    `SELECT camp,
+            SUM(MIN(lv*3 + stars, ?))                  AS light,
+            SUM(MIN(chain*40 + best_score/300, ?))     AS dark,
+            SUM(MIN(best_rush/200, ?))                 AS grey
+       FROM gemfall WHERE hidden=0 AND camp!='' GROUP BY camp`
+  ).bind(CAP, CAP, CAP).all();
+  const raw = { light: 0, dark: 0, grey: 0 };
+  for (const r of (rows.results || [])) {
+    if (r.camp === "light") raw.light = Math.max(0, Math.round(r.light || 0));
+    else if (r.camp === "dark") raw.dark = Math.max(0, Math.round(r.dark || 0));
+    else if (r.camp === "grey") raw.grey = Math.max(0, Math.round(r.grey || 0));
+  }
+  /* 各营成员名单：只出化名与本营指标分，**不出人数总计**。
+     看得见队友是归属感的来源；但「本营 4 人」这种总数一露就露怯，
+     所以给名单不给计数——列表长度玩家自己看得到，那是「有谁」不是「才几个」。
+     每营最多 12 人，按本营指标降序。 */
+  const mem = await env.DB.prepare(
+    `SELECT camp, alias,
+            CASE camp
+              WHEN 'light' THEN MIN(lv*3 + stars, ?)
+              WHEN 'dark'  THEN MIN(chain*40 + best_score/300, ?)
+              ELSE MIN(best_rush/200, ?) END AS sc
+       FROM gemfall WHERE hidden=0 AND camp!='' ORDER BY sc DESC LIMIT 60`
+  ).bind(CAP, CAP, CAP).all();
+  const members = { light: [], dark: [], grey: [] };
+  for (const r of (mem.results || [])) {
+    const k = r.camp;
+    if (members[k] && members[k].length < 12)
+      members[k].push({ alias: r.alias, sc: Math.max(0, Math.round(r.sc || 0)) });
+  }
+
+  const tot = raw.light + raw.dark + raw.grey;
+  /* 全空时给等分，界面上就是三段一样长的静止拔河带——
+     比显示三个 0 体面得多，也不算撒谎（确实还没人挖）。 */
+  const pct = tot > 0
+    ? { light: raw.light / tot, dark: raw.dark / tot, grey: raw.grey / tot }
+    : { light: 1 / 3, dark: 1 / 3, grey: 1 / 3 };
+  return json({ ok: true, empty: tot === 0, pct, members }, 200, origin);
+}
+
 async function gfFactions(req, env, origin, url) {
   await gfEnsure(env);
   const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
@@ -477,6 +537,21 @@ async function gfFactions(req, env, origin, url) {
     rank: i + 1, faction: r.faction, n: r.n || 0, power: r.p || 0,
     avg: r.n ? Math.round((r.p || 0) / r.n) : 0, top: r.top || 0,
   }));
+  /* 门派成员：点开一个门派要能看见都有谁。门派是玩家自己约的名字，
+     人数本来就少且是明账（不像阵营需要藏），所以这里连人数一起给。 */
+  const names = list.map((x) => x.faction);
+  if (names.length) {
+    const ph = names.map(() => "?").join(",");
+    const mem = await env.DB.prepare(
+      `SELECT faction, alias, power FROM gemfall
+        WHERE hidden=0 AND faction IN (${ph}) ORDER BY power DESC LIMIT 80`
+    ).bind(...names).all();
+    const by = {};
+    for (const r of (mem.results || [])) {
+      (by[r.faction] = by[r.faction] || []).push({ alias: r.alias, power: r.power || 0 });
+    }
+    for (const x of list) x.members = (by[x.faction] || []).slice(0, 12);
+  }
   return json({ ok: true, count: list.length, rows: list }, 200, origin);
 }
 
@@ -555,6 +630,7 @@ export default {
       if (p === "/admin" && request.method === "POST") return await handleAdmin(request, env, origin);
       if (p === "/gf/board" && request.method === "GET") return await gfBoard(request, env, origin, url);
       if (p === "/gf/factions" && request.method === "GET") return await gfFactions(request, env, origin, url);
+      if (p === "/gf/camps" && request.method === "GET") return await gfCamps(request, env, origin, url);
       if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
       if (p === "/gf/admin" && request.method === "POST") return await gfAdmin(request, env, origin);
       if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 4, games: ["wordduel", "gemfall"], season: await getSeason(env) }, 200, origin);
