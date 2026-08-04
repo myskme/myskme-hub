@@ -6093,7 +6093,7 @@ async function renderLB(){
      线上实测发现：没起过化名的浏览器点门派榜是空的——而新人最该看到的
      恰恰是「已经有帮派在玩」，看到了才有加入的念头。世界榜同理：
      先给看，看完想上榜再起名，别拿一道表单堵在门口。
-     小队榜例外，它本来就要口令才有内容。 */
+     （小队榜曾是例外——它要口令才有内容；小队已随三阵营下线。） */
   if(!LB.registered()&&LB.scope!=='class'){
     form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='起名上榜';
   }else if(!LB.registered()){
@@ -7566,7 +7566,7 @@ window.__selftest=function(){
   }
   /* 32b. 公开榜（世界/门派）不该被注册闸挡住——线上实测过：
      没起过化名的浏览器点门派榜是空的，而新人最该看到的恰恰是
-     「已经有帮派在玩」。小队榜例外，它本来就要口令。 */
+     「已经有帮派在玩」。 */
   {
     const src=String(renderLB);
     const openGate=/!LB\.registered\(\)&&LB\.scope!=='class'/.test(src);
