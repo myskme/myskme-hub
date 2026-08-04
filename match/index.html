@@ -1,11 +1,9 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="dark" data-themepref="auto">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<script>(function(){try{var v=localStorage.getItem('myskme-theme');
-document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){
-document.documentElement.setAttribute('data-theme','dark')}})();</script>
+
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
 <title>灵石远征 · MYSKME 消消乐 | GEMFALL</title>
@@ -48,38 +46,7 @@ document.documentElement.setAttribute('data-theme','dark')}})();</script>
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --mine:#0d0d11;--mine2:#131318;--mine-edge:#2a2820;
 }
-/* ── 浅色主题（羊皮纸）──
-   2026-08-05 重做。旧版王老师的评价是「深色挺融合，浅色一般」，测下来毛病很具体：
-   **文字对比度全部合格（5.5–14），问题根本不在字**，而在表面分层：
-     edge on panel = 1.31（描边需 ≥3.0）→ 边框等于不存在
-     panel on bg   = 1.15（图底分离）  → 卡片和页面粘成一片
-     明度阶梯全挤在 L* 85–96 这 10 个点里
-   所以地图页里锁着的关卡格和背景分不出来、进度条看不见 —— 那已经不是好看不好看，
-   是功能可读性。
 
-   重排后的阶梯（L*）：bg2 78.2 → bg 83.7 → edge 57.8 → panel2 92.5 → panel 97.3，
-   页面是纸、卡片是压上去的更白的纸、描边真的看得见。
-   金色也修了方向：旧版 gold2（强调色）比 gold 还灰，深色主题里它却是最亮的那个 ——
-   同一个变量在两套主题里担任相反的角色，用到它的地方轻重全反。现在统一为
-   「gold 是底色、gold2 是强调」，浅色下强调 = 更深更饱和（L* 36.9 → 27.3）。
-
-   下面每一对都用 WCAG 算过，正文 ≥4.5、描边 ≥3.0，改任何一个值都要重算。 */
-:root[data-theme="light"]{
-  --bg:#ddd0ae;--bg2:#d2c096;--panel:#fbf7ec;--panel2:#f2e9d4;--edge:#a4874e;
-  --ink:#221b10;--ink2:#4a3e2a;--ink3:#655840;   /* ink3 承载信息，浅色下同样过 AA（6.49 / 4.53） */
-  --gold:#70520a;--gold2:#563c03;--gold-hi:#96700f;--gold-line:#b59a5e;
-  --red:#93231a;--green:#2a6339;--blue:#2d4d85;--purple:#633586;
-  --line:rgba(112,82,10,.34);--line2:rgba(112,82,10,.15);
-  /* 浅色下没有辉光可言，改成分层暖投影：近处一层压实边缘，远处一层给体积。
-     单层大模糊在米色上什么都看不出来，这是旧版「浮着」的另一半原因。 */
-  --glow:0 1px 2px rgba(90,66,10,.20),0 6px 18px rgba(90,66,10,.16);
-  --glow-soft:0 1px 2px rgba(90,66,10,.14),0 3px 10px rgba(90,66,10,.10);
-  --paper:#fffdf6;--noise-op:.16;--noise-blend:multiply;
-  /* ⚠ 矿坑三色以前**没在浅色里覆盖**，直接继承了深色的近黑 —— 白天开着浅色主题，
-     棋盘却是一块纯黑（实测画布左上角 rgb(0,0,0)），和整页米色割裂得厉害。
-     矿坑本来就该比周围暗（它是坑），但要暗成同一个色系的深棕，不是冷黑。 */
-  --mine:#4a3b22;--mine2:#5a4829;--mine-edge:#7d6636;
-}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* 页面级锁死：不滚动、不回弹、不选字、不长按弹菜单——网页做游戏的通病一次治掉。
    长内容（玩法卷轴/成就/榜单）都在弹窗卡片内部滚，屏幕本身永远定住。 */
@@ -88,15 +55,23 @@ html,body{height:100%;position:fixed;inset:0;width:100%;overflow:hidden;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   -webkit-tap-highlight-color:transparent}
 input,textarea{-webkit-user-select:text;user-select:text}
+/* ── 光源与暗角 ──
+   立绘里狼先生提着一盏矿灯 —— 那是这个世界唯一的光，但界面原来完全没有承接它：
+   整页是均匀的平黑，读起来像一张深色的纸，不像一个有纵深的地方。
+   现在把光坐实成两层：上方偏暖的灯光（更强、落点更靠近立绘），
+   四周压暗的暗角（vignette）。暗角是「像游戏」这件事上性价比最高的一步 ——
+   它让屏幕有了中心与边界，视线自然被收进画面里。 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;
-  background-image:radial-gradient(1100px 640px at 50% -8%,color-mix(in srgb,var(--gold) 12%,transparent),transparent 60%);
+  background-image:
+    radial-gradient(760px 420px at 50% 4%,color-mix(in srgb,var(--gold) 22%,transparent),transparent 62%),
+    radial-gradient(1200px 900px at 50% 40%,transparent 34%,rgba(0,0,0,.55) 100%);
   transition:background-color .35s,color .35s;
   -webkit-user-select:none;user-select:none;touch-action:manipulation}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:var(--noise-op);mix-blend-mode:var(--noise-blend);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
 /* 环境光斑：缓慢漂移，永不死寂 */
 #amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-#amb i{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(60px);opacity:.07;
+#amb i{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(60px);opacity:.11;
   background:radial-gradient(circle,var(--gold),transparent 62%);animation:ambDrift 26s ease-in-out infinite alternate}
 #amb i:nth-child(2){left:60%;top:55%;width:38vmax;height:38vmax;opacity:.05;animation-duration:34s;animation-delay:-12s}
 @keyframes ambDrift{0%{transform:translate(-6%,-4%) scale(1)}100%{transform:translate(7%,6%) scale(1.12)}}
@@ -109,11 +84,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   overscroll-behavior:contain;scrollbar-width:none}
 .scr::-webkit-scrollbar{display:none}
 .scr.on{display:flex}
+/* 按钮要有厚度。原来是「1px 发丝线 + 平渐变」，读作纸上印的框；
+   现在压四层：顶内高光（受光面）、底内暗边（背光面）、一道硬落影（厚度）、
+   一片软落影（离地）。这四层是「金属片」和「印刷框」的全部区别。 */
 .btn{font-family:var(--serif);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
   color:var(--ink);padding:12px 22px;font-size:17px;letter-spacing:.14em;cursor:pointer;position:relative;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 14%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.55),
+             0 2px 0 rgba(0,0,0,.45),
+             0 6px 16px rgba(0,0,0,.42);
   transition:transform .12s,box-shadow .12s,border-color .2s}
-.btn:hover{transform:translateY(-2px);box-shadow:var(--glow-soft);border-color:var(--gold)}
-.btn:active{transform:translateY(1px) scale(.97);box-shadow:none;transition-duration:.05s}
+.btn:hover{transform:translateY(-2px);border-color:var(--gold);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 24%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.55),
+             0 3px 0 rgba(0,0,0,.45),
+             0 10px 22px rgba(0,0,0,.5),var(--glow-soft)}
+/* 按下去要真的陷进去：落影收掉、整体下沉，而不是缩放一下 */
+.btn:active{transform:translateY(2px);transition-duration:.05s;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6),inset 0 -1px 0 rgba(0,0,0,.3)}
 /* 以前全站没有这条：禁用的按钮和可用的长得一模一样。
    受影响的不止典藏册——灵力不够时的「续挖」也一直是亮着的，点了没反应。 */
 .btn:disabled{opacity:.42;cursor:default;filter:grayscale(.5)}
@@ -122,6 +110,29 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .btn.primary{border-color:var(--gold-line);color:var(--gold2);
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 16%,var(--panel2)),var(--panel))}
 .btn.big{font-size:20px;padding:15px 34px;letter-spacing:.22em}
+/* ── 主玩法要一眼压倒一切 ──
+   原来大厅四条按钮一模一样厚薄：主线「灵脉远征」和「聚会赛」同等分量，
+   新玩家不知道该按哪个。游戏跟工具的区别就在这 —— 工具讲究并列，游戏必须有主角。
+   给主按钮：更暖的底、更亮的金边、一圈自身的光晕，以及更沉的落影（抬得更高）。 */
+#btn-adventure{
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--gold) 22%,var(--panel2)),
+    color-mix(in srgb,var(--gold) 6%,var(--panel)));
+  border-color:var(--gold);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 40%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),
+             0 3px 0 rgba(0,0,0,.5),
+             0 10px 26px rgba(0,0,0,.5),
+             0 0 26px color-mix(in srgb,var(--gold) 22%,transparent)}
+#btn-adventure .mi{color:var(--gold2)}
+#btn-adventure:hover{
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 55%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),
+             0 4px 0 rgba(0,0,0,.5),
+             0 14px 32px rgba(0,0,0,.55),
+             0 0 38px color-mix(in srgb,var(--gold) 32%,transparent)}
+/* 次级四连（挑战/成就/典藏/玩法）反过来要退后，别跟主按钮抢 */
+.menu-sub .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 8px rgba(0,0,0,.35)}
 .btn.ghost{background:transparent;border-color:var(--line2);color:var(--ink2);font-size:14px;padding:9px 16px}
 .ornate{position:relative;border:1px solid var(--line)}
 .ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;border:1px solid var(--gold);transition:all .3s;pointer-events:none}
@@ -200,12 +211,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 小黑猫是彩蛋，藏在角落即可——但不能压住页脚的「作品总目」链接 */
 #cat{position:absolute;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));width:52px;height:45px;
   cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3;
-  /* 猫身走 currentColor，这样两套主题各给各的黑：深色下是冷近黑，
-     浅色羊皮纸下要用暖深棕，否则一坨冷黑贴在米色上很脏。
-     （这只是贴图没加载出来时的兜底线稿，has-art 之后会被隐藏，但首帧会闪到。） */
+  /* 猫身走 currentColor（贴图没加载出来时的兜底线稿，has-art 之后会被隐藏） */
   color:#0c0c0e}
-:root[data-theme="light"] #cat{color:#3a2f1c;opacity:.5}
-:root[data-theme="light"] #cat.found{opacity:.92}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
 #cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
 @keyframes tailFlick{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-16deg)}94%{transform:rotate(6deg)}}
@@ -236,15 +243,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
    浅色主题里面板本来就**比页面亮**，半透明之后仍是一块比背景更亮的斑 ——
    于是锁着的关卡反而比能点的还抢眼，地图页那一屏就是这么糊成一片的。
    浅色下改成压到页面之下，读作「凹进去的槽」，这才是纸上表达禁用的方式。 */
-:root[data-theme="light"] .lv.locked,
-:root[data-theme="light"] .ally-opt.lock,
-:root[data-theme="light"] .tool:disabled{
-  opacity:1;filter:none;background:var(--bg2);border-color:var(--line2);
-  box-shadow:inset 0 1px 3px rgba(90,66,10,.13)}
-:root[data-theme="light"] .lv.locked .n,
-:root[data-theme="light"] .lv.locked .st{color:var(--ink3);opacity:.6}
-:root[data-theme="light"] .ach .ic{opacity:.5;filter:grayscale(1) contrast(.75)}
-:root[data-theme="light"] .stars-row s{opacity:.42}
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
 .lv.cur{border-color:var(--gold);animation:curPulse 2.2s ease-in-out infinite}
 @keyframes curPulse{50%{box-shadow:0 0 18px color-mix(in srgb,var(--gold) 38%,transparent)}}
@@ -375,7 +373,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 同伴色：深色主题用灵石本色，浅色主题换成同色系的深色版，
    否则星屑(米白)这类颜色在羊皮纸底上等于隐形 */
 #ally,.ally-opt{--ally-c:var(--ally-base,var(--gold))}
-:root[data-theme="light"] #ally,:root[data-theme="light"] .ally-opt{--ally-c:var(--ally-dark,var(--gold))}
 #ally-badge b{font-size:23px;font-weight:300;color:var(--ally-c);font-style:normal;
   text-shadow:0 0 16px var(--ally-glow,rgba(201,166,74,.5));position:relative}
 #ally-mid{flex:1;min-width:0}
@@ -467,7 +464,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #scr-party .ovl-btns{margin-top:clamp(8px,1.4dvh,16px);margin-bottom:0}
 /* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了 */
 #ovl-hand{background:var(--bg)}
-:root[data-theme="dark"] #ovl-hand{background:#07070a}
+#ovl-hand{background:#07070a}
 #ovl-hand .ovl-card{text-align:center}
 #hand-dot{width:88px;height:88px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:40px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg,rgba(201,166,74,.16)),transparent 72%);
@@ -486,7 +483,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   font-size:15px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
 /* 选手色随主题走，不烤死在内联样式里 */
 [style*="--pc-base"]{--pc:var(--pc-base)}
-:root[data-theme="light"] [style*="--pc-base"]{--pc:var(--pc-dark)}
 #pt-bar .mid{flex:1;min-width:0}
 #pt-bar .nm{font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pt-bar .sub{font-size:11px;color:var(--ink3);letter-spacing:.12em;margin-top:1px}
@@ -828,6 +824,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
    比例数字里「1」比「8」窄一大截，价格从 490 跳到 1,680 时整行会左右抽动，
    榜单滚动时一列数字更是参差不齐。凡是会变的数字，一律等宽。
    （固定不动的数字不用管，比如版本号。） */
+.nb{white-space:nowrap}
 .sp-c,.sp-bal,.sp-si i,.sp-at,.sp-shd i,.sp-have,
 .near-gap,.nr-rk,.pw-tip,.cmem,.pd-row,.yj-seal,
 .qs-sub,.q3r,.thr-n{font-variant-numeric:tabular-nums}
@@ -871,6 +868,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-d{flex:1 0 100%;order:3;font-size:11px;color:var(--ink3);line-height:1.6}
 .sp-r{display:flex;align-items:center;gap:8px;margin-left:auto}
 .sp-c{font-size:11.5px;color:var(--ink3);white-space:nowrap}
+/* 槽位图标：跟标题基线对齐，尺寸压到跟字一样高，不要抢戏 */
+.sp-ic{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--gold)}
+.sp-ic .ic{width:14px;height:14px}
+.sp-i.own .sp-ic{color:var(--ink3)}
+.sp-i.seal .sp-ic{color:var(--ink3);opacity:.65}
 /* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
 .sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
 .sp-i.seal .sp-d{opacity:.7}
@@ -946,7 +948,7 @@ body{--shk:4px}
 /* ============ 覆盖层 ============ */
 .ovl{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;
   background:color-mix(in srgb,var(--bg) 62%,transparent)}
-:root[data-theme="dark"] .ovl{background:rgba(4,4,6,.72)}
+.ovl{background:rgba(4,4,6,.72)}
 .ovl.on{display:flex}
 .ovl-card{width:min(400px,94vw);max-height:88dvh;overflow-y:auto;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
   padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -1185,6 +1187,10 @@ body{--shk:4px}
   opacity:0;transition:all .35s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:86vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast b{color:var(--gold2);font-weight:500}
+/* 数字与日期不许断行。窄屏上「2026年8月」会在「8」和「月」之间折断，
+   读起来像两个不相干的碎片 —— toast 里恰恰全是这种「年月」「第 N 关」「+240」。
+   中文本身可以任意断行，所以必须显式挡住带数字的那一段。 */
+#toast b,#toast .nb{white-space:nowrap}
 /* 教学提示条 */
 #tut{position:absolute;left:50%;bottom:-2px;transform:translate(-50%,110%);z-index:6;background:color-mix(in srgb,var(--panel) 88%,transparent);
   border:1px solid var(--line);padding:7px 14px;font-size:12.5px;color:var(--ink2);letter-spacing:.06em;white-space:nowrap;
@@ -1196,9 +1202,9 @@ body{--shk:4px}
   color:var(--ink2);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:7px 12px;display:none;transition:all .2s}
 #chip-home:hover{color:var(--gold);border-color:var(--gold)}
 #chip-home.on{display:block}
-#corner-ctl{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:85;display:none;gap:8px}
-#corner-ctl.on{display:flex}
-#corner-ctl .iconbtn{width:36px;height:36px;font-size:15px}
+
+
+
 @media (max-width:420px){
   #hud-moves{min-width:62px}
   #hud-moves .num{font-size:25px}
@@ -1726,7 +1732,7 @@ body{--shk:4px}
 
 <div id="toast"></div>
 <a id="chip-home" href="../">← 作品总目</a>
-<div id="corner-ctl"><button class="iconbtn" id="themeBtn" title="主题">◐</button></div>
+
 
 <script>
 'use strict';
@@ -2845,15 +2851,13 @@ function drawGem(ctx,x,y,size,gi,kind,o){
        浅底上加亮什么也看不出来，只会糊成一团奶白色雾（大厅那排灵石就是这么脏的）。
      纸面上表达发光的正确做法是**压暗周围**，即让宝石往纸上投一圈同色系的影。
      所以浅色下换成压暗版本，且范围收窄（影子比辉光贴身）。 */
-  const ambR=LIGHT?R*1.45:R*1.9;
+  /* o.amb 让调用方收窄底光。大厅那排装饰灵石画在一张只有 54px 高的画布上，
+     而默认底光半径 R*1.9≈30px、灵石还在上下漂 ±7px —— 光晕上下都被画布边缘
+     切平，看起来就是一条硬边的浅色带子，像穿帮的方块。收窄到能装下为止。 */
+  const ambR=R*1.9*(o.amb||1);
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,ambR);
-  if(LIGHT){
-    amb.addColorStop(0,hexDark(G.base,.55,kind==='n'?.22:.34));
-    amb.addColorStop(1,hexDark(G.base,.55,0));
-  }else{
-    amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
-    amb.addColorStop(1,hexA(G.base,0));
-  }
+  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
+  amb.addColorStop(1,hexA(G.base,0));
   ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,ambR,0,Math.PI*2);ctx.fill();
   /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
   if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){ctx.restore();return}
@@ -2924,17 +2928,7 @@ function hexA(h,a){
   const n=parseInt(h.slice(1),16);
   return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
 }
-/* 把 hex 压暗到 f 倍（0~1）。浅色主题下「发光」要靠压暗周围来表达，
-   所以需要一个同色系的深色版本。 */
-function hexDark(h,f,a){
-  const n=parseInt(h.slice(1),16);
-  return 'rgba('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','
-        +Math.round((n&255)*f)+','+a+')';
-}
-/* 画布绘制要知道当前主题。DOM 属性每帧读一次太浪费（棋盘一帧画几十颗灵石），
-   缓存起来、切主题时刷新。 */
-let LIGHT=document.documentElement.getAttribute('data-theme')==='light';
-function syncTheme(){LIGHT=document.documentElement.getAttribute('data-theme')==='light'}
+
 /* ---- 机关绘制 ---- */
 /* 墨封铺满整格——灵石会盖住格子中央，画成小墨点等于看不见 */
 function drawInk(ctx,x,y,s,layers,t){
@@ -4156,7 +4150,11 @@ function bountyCheck(){
    绝版的价值就是时间；所以徽记上最大的字是年月，不是图案。
    三桩按月序号确定性抽取，全服同一组，群里可以互相对进度。 */
 const monthNum=()=>{const d=new Date();return d.getFullYear()*12+d.getMonth()};
-const monthTag=m=>{const y=Math.floor(m/12),mo=m%12+1;return y+'年'+mo+'月'};
+/* 年月是全站出现最多的「不该断行」的串（岁记、绝版、首兑戳都用它）。
+   在源头包一层 nowrap，比在三十多个引用点各自加保险靠谱。
+   monthTagPlain 给需要纯文本的地方（画布绘制、导出名片）用。 */
+const monthTagPlain=m=>{const y=Math.floor(m/12),mo=m%12+1;return y+'年'+mo+'月'};
+const monthTag=m=>'<span class="nb">'+monthTagPlain(m)+'</span>';
 const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).padStart(2,'0')};
 
 /* ==================================================================
@@ -6921,7 +6919,7 @@ async function lbSave(){
 function show(id){
   for(const s of $$('.scr'))s.classList.toggle('on',s.id==='scr-'+id);
   /* 浮标不再使用：大厅脚注里已有「← 作品总目」链接，浮标在小屏会压住脚注 */
-  $('#corner-ctl').classList.toggle('on',id==='menu'||id==='map');
+
   if(id==='menu'){renderMenu();renderDaily();BGM.play('main')}
   fitScreen(id);
   if(id==='map'||id==='party')BGM.play('main');
@@ -7117,6 +7115,13 @@ const GOODS=[
    它同时是「永远不知道接下来有什么惊喜」最便宜的实现：什么都不用新建。
    ⚠ 将来做「今日矿口」轮换时，抽到封样层的商品必须也走封样文案，
      否则当场穿帮；「公开轮换表」那条同理，只能公开已解锁层。 */
+/* 商品的槽位图标。全部复用现成的 ICONS 线稿，零新美术：
+     题名 medal（挂在名字旁的衔）／题跋 scroll（拓片上的落款）／落印 seal（印章）。
+   商店原来是 22 行纯文字，同一层里三类商品混在一起看不出区别 ——
+   一眼分类是这一条的全部目的，不是为了好看。
+   ⚠ 封样的图标必须**跟真名一样被盖住**，否则从图标就能反推出这是称衔还是印，
+   封样就白封了。所以封样统一用 unknown。 */
+const SLOT_IC={title:'medal',post:'scroll',seal:'seal'};
 const SEAL_FROM=6;
 const SEAL_TAG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 function shopSealed(g){return g.s>=SEAL_FROM&&!shopUnlocked(g)}
@@ -7289,8 +7294,10 @@ function renderShop(){
       /* 封样：够不着的高层只露价签。名字与说明都不给，连是不是称衔都看不出来。
          解锁那一刻自己揭开，那一下就是这条机制的全部收益。 */
       const seal=shopSealed(g), tag=SEAL_TAG[si++]||'？';
+      const gic=ICONS[seal?'unknown':(SLOT_IC[g.slot]||'gem')]||'';
       h+='<div class="sp-i'+(own?' own':'')+(seal?' seal':'')+'">'
-        +'<div class="sp-t">'+(seal?'封样 · '+tag:esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':''))+'</div>'
+        +'<div class="sp-t"><span class="sp-ic">'+gic+'</span>'
+          +(seal?'封样 · '+tag:esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':''))+'</div>'
         +'<div class="sp-d">'+(seal?'解开这一层才揭样':esc(g.d))
           +(own&&SAVE.shop.at[g.id]
             ?'　<em class="sp-at">'+SAVE.shop.at[g.id].slice(0,4)+'.'+SAVE.shop.at[g.id].slice(4)+' 兑</em>':'')
@@ -7829,7 +7836,7 @@ function drawMenuGems(t){
   for(let i=0;i<n;i++){
     const y=H/2+Math.sin(t*.0016+i*.8)*7;
     const orb=(i===6);
-    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),orb?0:i,orb?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16});
+    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),orb?0:i,orb?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16,amb:.62});
   }
 }
 
@@ -8071,21 +8078,13 @@ $('#cat').addEventListener('click',()=>{
   if(!SAVE.cat){SAVE.cat=1;persist();grant('a12');renderMenu()}
   else toast('小黑猫：<b>……喵。</b>',1500);
 });
-(function(){var TLS='myskme-theme',mq=null;
- /* 深色是这个作品的本色（黑金编年史），默认就给最好的效果；
-    只留 深↔浅 两态，不再跟随系统（王老师定）。旧存档里的 auto 一律当深色。 */
- function pref(){try{var v=localStorage.getItem(TLS);return v==='light'?'light':'dark'}catch(e){return 'dark'}}
- function ap(p){var e=document.documentElement;e.setAttribute('data-theme',p);e.setAttribute('data-themepref',p);
-   if(typeof syncTheme==='function')syncTheme();          // 画布那边缓存了主题，切换时要刷
-   var b=$('#themeBtn');if(b){b.innerHTML=ICONS[p==='dark'?'moon':'sun'];b.title='主题：'+(p==='dark'?'深色':'浅色')}}
- ap(pref());
- var bb=$('#themeBtn');
- if(bb)bb.addEventListener('click',function(){
-   var nx=pref()==='dark'?'light':'dark';
-   try{localStorage.setItem(TLS,nx)}catch(e){}
-   ap(nx);SFX.click&&SFX.click();
- });
-})();
+/* 2026-08-05：**只有一套配色**，主题开关整个拆掉。
+   王老师定的：「人家世界一流游戏也没有两种模式切换」。
+   两套主题的实际代价是今晚现修的一串 bug（矿坑在浅色下是纯黑、小黑猫是一坨黑块、
+   「不可用」用降透明度在浅底上反而更抢眼、灵石底光在浅底糊成奶白雾）——
+   每一条都只在另一套里出问题，等于把测试面翻倍换来一个没人真正需要的开关。
+   顺手清掉旧存档里的偏好键，免得下次有人再想加回来时读到脏数据。 */
+try{localStorage.removeItem('myskme-theme')}catch(e){}
 addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCanvas()});
 /* Esc 一律走该弹层自己的按钮，让它跑完自己的收尾逻辑。
    以前直接 ovl(null) 无差别关闭：交接屏/结算页被关掉后 GS.over 与 GS.busy 还是 true，
@@ -8819,6 +8818,18 @@ window.__selftest=function(){
          hi.length>0 && hi.every(g=>shut.indexOf(g.nm)<0) && shut.indexOf('封样')>=0);
       ok('封样：解锁之后真名照常显示，封样字样消失',
          hi.every(g=>open.indexOf(g.nm)>=0) && open.indexOf('封样')<0);
+      /* 封样连**图标**也必须盖住：留着 medal/scroll/seal 就能反推出这是称衔还是印，
+         封样就白封了。
+         ⚠ 别拿 innerHTML 跟 ICONS.unknown 比字符串 —— 浏览器解析后会重排属性，
+         看着一模一样却不相等（踩过）。比「路径数据」才是真正要保的性质。 */
+      SAVE.lbPower=0;renderShop();
+      const dOf=el=>[...el.querySelectorAll('path')].map(p=>p.getAttribute('d')).join('|');
+      const tmp=document.createElement('div');
+      const slotD=Object.values(SLOT_IC).map(k=>{tmp.innerHTML=ICONS[k];return dOf(tmp)});
+      const sealedIC=[...$('#shop-list').querySelectorAll('.sp-i.seal .sp-ic')];
+      ok('封样：图标也一并盖住，不许从图标反推出商品类型',
+         sealedIC.length>0 && sealedIC.every(e=>slotD.indexOf(dOf(e))<0));
+      SAVE.lbPower=bakL;
       SAVE.lbPower=bakL;
     }
     /* 全站不许再出现「要求玩家在某个具体时刻在线」的条件。
