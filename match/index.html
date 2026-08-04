@@ -762,6 +762,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .pw-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
   font-size:11.5px;line-height:1.75;color:var(--ink3);letter-spacing:.03em}
 .pw-tip b{color:var(--ink2)}
+/* 明牌配速员：必须一眼看出不是真人，所以标签写死在最前面、整块压暗、不进名次序列 */
+.pacer{margin:-6px 0 12px;padding:8px 10px;border:1px dashed var(--line);border-radius:6px;
+  font-size:12.5px;color:var(--ink3);letter-spacing:.04em}
+.pacer b{color:var(--ink2)}
+.pc-tag{display:inline-block;margin-right:7px;padding:1px 6px;border:1px solid var(--line);
+  border-radius:3px;font-size:10px;color:var(--ink3);letter-spacing:.1em;vertical-align:1px}
+.pc-w{margin-top:3px;font-size:11px;color:var(--ink3);opacity:.8}
+.pc-gap{margin-top:5px;font-size:12px;color:var(--ink2)}
+.pc-gap b{color:var(--gold2);font-size:14px}
+/* 赛季幽灵：跟上个月的自己比 */
+.pw-ghost{margin-top:5px;font-size:12px;color:var(--ink2);letter-spacing:.04em}
+.pw-ghost b{color:var(--gold2)}
 .near-gap b{color:var(--gold2);font-size:15px}
 
 /* 门派榜行 */
@@ -1608,10 +1620,15 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
      days = 累计下矿天数，**去重不连续**——放假一周回来不清零，那是惩罚
      lastDay = 上次下矿的日序号，给 days 去重用 */
   runs:0,days:0,lastDay:0,todayRuns:0,
-  /* 深掘 · 二十四手（每日同盘定量局，替换掉重复的 45 秒续灯）。
-     d=当期日序号，score=当天**首把**的正式成绩（之后重开只当练习），
-     best=生涯最佳（喂矿力技巧线），plays=当天下矿次数，days=累计打过正式局的天数。 */
+  /* ⚠ 2026-08-04：步数局（深掘·二十四手）经评估**决定不做**——收益配不上工作量。
+     这个字段与矿力技巧线里的 mv 项、服务端的 best_dig 列一并**保留为占位**，
+     值恒为 0，对任何计算都无影响。保留而不删的理由：删掉要再改一次矿力公式并再回填
+     一次存量，而回填链路刚出过 NaN 事故，为一个恒零项冒这个险不划算。
+     将来若要接入新的定量玩法，直接往 best 里写即可，公式和管线都是通的。 */
   dig:{d:0,score:null,best:0,plays:0,days:0},
+  /* 赛季幽灵：每月记一次自己的矿力快照，键 'YYYYMM'。
+     跟别人比会输，跟上个月的自己比只会赢——这条只用真实数据，不虚构任何东西。 */
+  pwHist:{},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -4553,7 +4570,11 @@ const SECRETS={
   11:{nm:'矿灯', when:'开到第 100 匣', test:c=>(c.opened||0)>=100},
   25:{nm:'星屑', when:'在午夜零点到一点之间开匣',
       test:()=>{const h=new Date().getHours();return h===0}},
-  32:{nm:'猫铃', when:'连续 7 次领到每日矿灯', test:c=>(c.lamp||0)>=7&&(c.lamp||0)%7===0},
+  /* 文案原来写「连续 7 次」，判定却读累计次数 —— 断断续续领满 7 次也会拿到一张
+     写着「连续」的卡，文案在骗人。而且 %7===0 那个条件意味着**错过那一刻就要再等七次**，
+     是个没必要的脆弱窗口（checkSecrets 开头本来就有 colHas 去重，不会重复发）。
+     两处一起改成累计口径，名实相符，也不再有窗口。 */
+  32:{nm:'猫铃', when:'累计领到 7 次每日矿灯', test:c=>(c.lamp||0)>=7},
 };
 /* 每次开匣后查一遍。放在开匣后而不是各处散着判，是因为三条里两条都跟匣有关，
    而且集中一处才不会漏掉某个入口。 */
@@ -5682,7 +5703,7 @@ const LB={
     if(d.ok){
       SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
-      SAVE.lbAt=Date.now();persist();
+      SAVE.lbAt=Date.now();pwGhostTick();persist();
       if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
@@ -5965,6 +5986,9 @@ function drawNameCard(){
   const rows=[
     ['同行最久',fav&&fr>0?(fav.name+(csRank(fw)?' · '+csRank(fw):'')+' · '+fw+' 胜'):'—'],
     ['连胜纪录',(SAVE.streak.best||0)+' 连胜'],
+    /* 「连续下矿」只上名片，**不进任何公式** —— 进了公式就成了「放假会掉分」，
+       那是惩罚式设计。这里只是把「我曾经连过多少天」这件事记下来，断了也不掉。 */
+    ['下矿',(SAVE.days||0)+' 天 · 连续纪录 '+((SAVE.daily&&SAVE.daily.best)||0)+' 天'],
     ['最长连锁',(SAVE.chainBest||0)+' 重'],
     ['远征',Math.max(0,(SAVE.lv||1)-1)+' 关 · '+totalStars()+' 星'],
     ['典藏',colGot()+' / '+CARDS.length+' · 徽记 '+ACHS.filter(a=>SAVE.ach[a.id]).length+' / '+ACHS.length],
@@ -6348,6 +6372,7 @@ async function renderLB(){
     +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
     +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
       +(found?'':' · 未进前 '+LB_LIMIT+'，继续挖')):'')
+    +pwGhostHTML()
     +'<div class="pw-tip">'+pwAdviceHTML()+'</div>';
 }
 /* ────────── 矿力三线（客户端镜像）──────────
@@ -6391,6 +6416,47 @@ function pwAdviceHTML(){
     +'三样里<b>最短的那样算四倍</b>。<br>'
     +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
 }
+/* ────────── 明牌配速员 ──────────
+   作者最初想放「不被玩家发现的虚拟人」来制造竞争感。劝阻的理由不是道德，是它在这里
+   会失败：十来个人的熟人圈里，一个上榜很积极、从不说话、群里没人认识的名字不是伪装
+   而是靶子；而且作者是老师，穿帮的代价不对称。
+   替代方案是明牌——正典人物的记录**公开标注为传说**，不冒充真人。追赶欲照样在，
+   甚至更干净：谁都知道那是一条线，不会有人事后觉得被骗。
+   数值挑真人榜的空档，保证**每个人前面都有一盏灯**（2026-08-04 线上分布：
+   3.6k/4.5k/6.5k/6.7k/8.4k/12.6k/13.6k/30.3k/39.0k/46.9k/84.0k）。
+   狼先生是作者本人的化身，措辞要庄重：他是最远那盏灯，不是「打败」的对象。 */
+const PACERS=[
+  {p:22000, by:'鹦鹉教授', word:'重复一百遍，直到真理点头'},
+  {p:60000, by:'叶王',     word:'标准答案自有它的重量'},
+  {p:130000,by:'狼先生',   word:'让你们变得有趣一点', rev:true},
+];
+function pacerNext(pw){return PACERS.find(x=>x.p>(Number(pw)||0))||null}
+function pacerHTML(){
+  if(!LB.registered())return '';
+  const mine=Number(SAVE.lbPower)||0, x=pacerNext(mine);
+  if(!x)return '';
+  return '<div class="pacer"><span class="pc-tag">传说记录</span>'
+    +'<b>'+esc(x.by)+'</b> '+x.p.toLocaleString('en-US')
+    +'<div class="pc-w">「'+esc(x.word)+'」</div>'
+    +'<div class="pc-gap">'+(x.rev?'还差 ':'再挖 ')+'<b>'+(x.p-mine).toLocaleString('en-US')+'</b>'
+    +(x.rev?' 就追到那盏灯':' 就越过这条线')+'</div></div>';
+}
+/* ────────── 赛季幽灵 ──────────
+   追自己上个月的成绩。用的是**你自己的真实数据**，明写月份，没有任何虚构。
+   赛车游戏几十年的老办法：跟别人比会输，跟上个月的自己比只会赢。 */
+function pwGhostTick(){
+  const k=monthKey(monthNum()), pw=Number(SAVE.lbPower)||0;
+  if(!SAVE.pwHist)SAVE.pwHist={};
+  if(pw>0&&SAVE.pwHist[k]!==pw){SAVE.pwHist[k]=pw;persist()}
+}
+function pwGhostHTML(){
+  const h=SAVE.pwHist||{}, now=Number(SAVE.lbPower)||0;
+  const prev=monthKey(monthNum()-1), v=Number(h[prev])||0;
+  if(!v||now<=v)return '';
+  const y=prev.slice(0,4), m=prev.slice(4);
+  return '<div class="pw-ghost">比 '+y+' 年 '+Number(m)+' 月的自己多挖了 <b>'
+    +(now-v).toLocaleString('en-US')+'</b></div>';
+}
 /* ────────── 贴身对手 ──────────
    榜单原来是一次平铺 50 行，谁跟谁咬得紧完全看不出来。而线上真实数据里
    10 个玩家的 9 组相邻关系中有 4 组差距不到 15%（赫则离白水清新只差 8.2%），
@@ -6424,7 +6490,7 @@ function nearHTML(rows,i){
       +(dn?(' —— <b>'+esc(dn.alias||'')+'</b> 落后 '
         +((Number(me.power)||0)-(Number(dn.power)||0)).toLocaleString('en-US')):'')+'</div>';
   }
-  return h+'</div>';
+  return h+'</div>'+pacerHTML();
 }
 function lbOpenForm(){
   $('#lb-form').hidden=false;
@@ -7983,6 +8049,30 @@ window.__selftest=function(){
       ok('一关没通的人在光明贡献为 0（旧公式下他能把黑域打满）',
          CAMPS.find(c=>c.id==='light').score(only)===0
          && CAMPS.find(c=>c.id==='dark').score(only)===279);
+    }
+    /* 33. 明牌配速员：每个人前面都得有一盏灯，而且必须一眼看出不是真人。
+       线上真实分布 3.6k~84k，三条线要把这个区间铺满，不能有人无灯可追。 */
+    {
+      const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakH=SAVE.pwHist;
+      SAVE.lbAlias='测试者';
+      const live=[3643,4458,6507,6710,8375,12630,13575,30319,39002,46939,84043];
+      ok('配速员：线上每一个真实矿力都能找到下一盏灯',live.every(p=>pacerNext(p)));
+      SAVE.lbPower=84043;
+      const h=pacerHTML();
+      ok('配速员明牌：标着「传说记录」，且不混进名次序列',
+         h.indexOf('传说记录')>=0 && h.indexOf('rank')<0 && h.indexOf('130,000')>=0);
+      /* 狼先生是作者本人的化身，措辞必须是「追到」不是「越过／打败」 */
+      ok('配速员：狼先生那条用庄重措辞',
+         h.indexOf('追到那盏灯')>=0 && h.indexOf('打败')<0);
+      /* 赛季幽灵只用真实数据，且只在真的涨了的时候才出现 */
+      SAVE.pwHist={};SAVE.pwHist[monthKey(monthNum()-1)]=50000;
+      SAVE.lbPower=62000;
+      const g1=pwGhostHTML();
+      SAVE.lbPower=40000;
+      const g2=pwGhostHTML();
+      ok('赛季幽灵：涨了才显示，且给的是真实差额',
+         g1.indexOf('12,000')>=0 && g2==='');
+      SAVE.lbPower=bakP;SAVE.lbAlias=bakA;SAVE.pwHist=bakH;
     }
     ok('矿力建议因人而异：三种短板给出三种不同的下一步',
        adv({lv:200,stars:192,chain:0,score:0,rush:0,days:99,runs:900,dbest:99})==='skill'
