@@ -804,6 +804,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
 .sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
 .sp-i.seal .sp-d{opacity:.7}
+/* 首兑戳：哪个月头一回兑的。是履历不是内容，所以做得很轻。 */
+.sp-at{font-style:normal;font-size:10px;color:var(--gold2);opacity:.85;letter-spacing:.06em}
 .sp-c s{opacity:.5;margin-right:3px}
 .sp-c b{color:var(--gold2)}
 /* 本期矿口：全服同一份，摆在最上面当门面 */
@@ -1691,7 +1693,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   pwHist:{},
   /* 矿场 · 兑。own = 买过的（永久拥有），worn = 每个槽位正戴着哪件（随时免费换）。
      买断的是拥有权不是佩戴权，所以换戴不花钱 —— 收集的乐趣在「都有」，不在「都戴着」。 */
-  shop:{own:{},worn:{}},
+  shop:{own:{},worn:{},at:{},q:{m:0,n:0}},
   /* 今日矿口：w=期号（weekNum），used=本期已折价买过哪些。跨期整块重置。 */
   stall:{w:0,used:{}},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
@@ -6917,10 +6919,28 @@ function stallState(){
 function stallPrice(g){return Math.max(1,Math.round(g.cost*(1-STALL_OFF)))}
 function stallHas(id){return stallState().items.some(g=>g.id===id)}
 const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
+/* ────────── 兑窗 · 月配额 ──────────
+   每月只开这么多扇窗。它是「一个月内解锁不完」唯一的硬保证 ——
+   光靠矿力门槛挡不住有钱人一周清空货架，靠涨价又会把新人挡在外面。
+
+   刻意做成**纯限购、零竞争**：这是你自己的额度，不跟任何人抢，
+   没有名额、没有先到先得、没有排名。用不完的不结转，但用不完也不损失什么
+   （货一直在架上，下个月接着买）—— 所以它限的是速度，不是机会。 */
+const SHOP_QUOTA=6;
+function shopQuota(){
+  const m=monthNum(), q=SAVE.shop.q;
+  if(!q||q.m!==m){SAVE.shop.q={m:m,n:0};persist()}
+  return SAVE.shop.q;
+}
+const shopQuotaLeft=()=>Math.max(0,SHOP_QUOTA-(shopQuota().n||0));
 function shopFix(){
   if(!SAVE.shop||typeof SAVE.shop!=='object')SAVE.shop={own:{},worn:{}};
   if(!SAVE.shop.own||typeof SAVE.shop.own!=='object')SAVE.shop.own={};
   if(!SAVE.shop.worn||typeof SAVE.shop.worn!=='object')SAVE.shop.worn={};
+  /* at = 首兑戳：这件是你哪个月头一回兑的。**是履历不是内容** ——
+     错过的只是「我是八月拿的」这件事，物件本身永远还在架上。
+     评审判定这是全案最轻的一种「错过」，所以它可以放心做。 */
+  if(!SAVE.shop.at||typeof SAVE.shop.at!=='object')SAVE.shop.at={};
   /* 存档里可能留着已下架商品的 id，清掉，免得渲染时取到 undefined */
   for(const k in SAVE.shop.own)if(!GOODS_BY[k])delete SAVE.shop.own[k];
   for(const s in SAVE.shop.worn){const v=SAVE.shop.worn[s];if(v&&!GOODS_BY[v])delete SAVE.shop.worn[s]}
@@ -6938,6 +6958,9 @@ function shopCanBuy(g){
   if(g.need&&!g.need())return g.needTxt||'条件未达成';
   const have=g.cur==='dust'?(colFix().dust||0):(SAVE.power||0);
   if(have<shopPrice(g))return (g.cur==='dust'?'星屑':'灵力')+'不够';
+  /* 配额放在最后判：先让玩家看到「买得起」，再告诉他这个月窗满了。
+     顺序反过来的话，钱不够的人会看到「兑窗已满」，把两件事搞混。 */
+  if(shopQuotaLeft()<=0)return '本月兑窗已满';
   return '';
 }
 function shopBuy(id){
@@ -6948,7 +6971,9 @@ function shopBuy(id){
   if(g.cur==='dust'){colFix();COLS.dust-=pay;colSave()}
   else SAVE.power=(SAVE.power||0)-pay;
   if(sale){stallState().used[id]=1;}
+  shopQuota().n=(shopQuota().n||0)+1;
   shopFix().own[id]=1;
+  SAVE.shop.at[id]=monthKey(monthNum());        // 首兑戳：哪个月头一回兑的
   if(g.slot)SAVE.shop.worn[g.slot]=id;          // 新买的直接戴上，省一步
   persist();
   SFX.star(1);
@@ -6979,7 +7004,8 @@ function renderShop(){
     +'<div class="sp-sfoot">一周内随时买都算 · 过期只是折扣没了，货照样在架上</div></div>';
   $('#shop-mine').innerHTML='<div class="sp-bal">灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')
     +'</b>　星屑 <b>'+(COLS.dust||0).toLocaleString('en-US')+'</b></div>'
-    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。</div>'
+    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。<br>'
+      +'本月兑窗 <b>'+shopQuotaLeft()+' / '+SHOP_QUOTA+'</b> 扇 · 用不完不结转，但货一直在架上</div>'
     +stall;
   let h='';
   for(let i=0;i<SHELF.length;i++){
@@ -6998,7 +7024,10 @@ function renderShop(){
       const seal=shopSealed(g), tag=SEAL_TAG[si++]||'？';
       h+='<div class="sp-i'+(own?' own':'')+(seal?' seal':'')+'">'
         +'<div class="sp-t">'+(seal?'封样 · '+tag:esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':''))+'</div>'
-        +'<div class="sp-d">'+(seal?'解开这一层才揭样':esc(g.d))+'</div>'
+        +'<div class="sp-d">'+(seal?'解开这一层才揭样':esc(g.d))
+          +(own&&SAVE.shop.at[g.id]
+            ?'　<em class="sp-at">'+SAVE.shop.at[g.id].slice(0,4)+'.'+SAVE.shop.at[g.id].slice(4)+' 兑</em>':'')
+          +'</div>'
         +'<div class="sp-r">'
         +(own
           ? (g.slot?'<button class="btn ghost sp-b" data-wear="'+g.id+'">'+(worn?'摘下':'戴上')+'</button>'
@@ -8396,7 +8425,9 @@ window.__selftest=function(){
     const bakS=JSON.stringify(SAVE.shop||{}), bakP=SAVE.power, bakL=SAVE.lbPower;
     const before=JSON.stringify(LB.stats());
     SAVE.shop={own:{},worn:{}};SAVE.power=999999;SAVE.lbPower=999999;
-    for(const g of GOODS)shopBuy(g.id);                    // 把货架上每一件都买下来
+    /* 这一条要把货架买光才能验「九项输入一个不变」，所以要绕开月配额：
+       每买一件就把窗口清零。配额本身另有专门的一条盯着。 */
+    for(const g of GOODS){shopBuy(g.id);if(SAVE.shop.q)SAVE.shop.q.n=0}
     ok('矿场：买光全部商品也不改动矿力的任何一项输入',JSON.stringify(LB.stats())===before);
     /* 带 need 的商品在测试档案下条件不满足，买不到才是对的 —— 只断言无条件的那些。
        同时反过来验一条：有条件的确实被挡住了，钱多也买不到。 */
@@ -8411,6 +8442,23 @@ window.__selftest=function(){
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
     ok('矿场：称衔一律要先做到，不能纯花钱买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
+    /* 兑窗月配额：限的是速度不是机会。零竞争（自己的额度）、跨月重置、
+       用满之后钱再多也买不动 —— 这是「一个月内解锁不完」唯一的硬保证。 */
+    {
+      const m=monthNum();
+      SAVE.shop={own:{},worn:{},at:{},q:{m:m,n:0}};SAVE.power=1e9;SAVE.lbPower=1e9;
+      let bought=0;
+      for(const g of GOODS.filter(x=>!x.need))if(shopBuy(g.id))bought++;
+      ok('兑窗：一个月最多兑 '+SHOP_QUOTA+' 件，钱再多也买不动第 '+(SHOP_QUOTA+1)+' 件',
+         bought===SHOP_QUOTA && shopQuotaLeft()===0);
+      /* 首兑戳记的是「哪个月头一回兑的」，是履历不是内容 */
+      const stamped=Object.keys(SAVE.shop.at).length===SHOP_QUOTA
+        && Object.values(SAVE.shop.at).every(v=>v===monthKey(m));
+      ok('兑窗：每件都盖了首兑戳（记月份，不是记内容）',stamped);
+      SAVE.shop.q={m:m-1,n:SHOP_QUOTA};                       // 跨月
+      ok('兑窗：跨月重置，新的一月重新开窗',shopQuotaLeft()===SHOP_QUOTA);
+      SAVE.lbPower=bakL;
+    }
     /* 今日矿口：全服同期同货（否则群里没法讨论），折扣只动价格不动条件，
        而且过期只没折扣、货还在架上——「错过就没了」在这里只是最轻的一种。 */
     {
@@ -8434,7 +8482,7 @@ window.__selftest=function(){
       ok('矿口：每期至少一件低层货、三件不重复、且跨期真的换货（连查 60 期）',
          allHaveLow&&noDup&&changed>=45);
       /* 折扣不许把「没解锁 / 条件没到」变成能买 */
-      SAVE.lbPower=0;SAVE.power=1e9;SAVE.shop={own:{},worn:{}};
+      SAVE.lbPower=0;SAVE.power=1e9;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};
       const g0=GOODS_BY[stallState().items[0].id];
       ok('矿口：打折不改解锁与达成条件',
          shopPrice(g0)<g0.cost
@@ -8459,15 +8507,15 @@ window.__selftest=function(){
     ok('全站没有任何条件要求在某个时刻在线（隐藏卡不许读小时）',
        Object.keys(SECRETS).every(k=>!/getHours|getMinutes/.test(String(SECRETS[k].test))));
     /* 矿力是门槛不是货币：兑换绝不能扣它 */
-    SAVE.lbPower=50000;SAVE.shop={own:{},worn:{}};SAVE.power=999999;
+    SAVE.lbPower=50000;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};SAVE.power=999999;
     shopBuy('dep');
     ok('矿场：矿力是门槛不是货币，兑换后一分不扣',SAVE.lbPower===50000);
     /* 未解锁的层买不到；解锁与否只看矿力 */
-    SAVE.lbPower=0;SAVE.shop={own:{},worn:{}};SAVE.power=999999;
+    SAVE.lbPower=0;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};SAVE.power=999999;
     ok('矿场：矿力不够时高层商品买不动，低层照买',
        shopCanBuy(GOODS_BY['dep2'])==='未解锁' && shopBuy('ps1')===true);
     /* 灵力不够就是不够，不许透支 */
-    SAVE.power=10;SAVE.lbPower=999999;SAVE.shop={own:{},worn:{}};
+    SAVE.power=10;SAVE.lbPower=999999;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};
     ok('矿场：灵力不够时买不动，且不会把余额扣成负数',
        shopBuy('dep')===false && SAVE.power===10);
     SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
