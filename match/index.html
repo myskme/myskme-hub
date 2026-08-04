@@ -155,7 +155,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 }
 .title-hero{font-size:clamp(30px,min(8.6vw,5.4dvh),60px);font-weight:300;letter-spacing:.18em;margin:2px 0 0;line-height:1.2;
   animation:titleIn 1.3s cubic-bezier(.16,1,.3,1) both}
-.title-hero em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:0 0 26px color-mix(in srgb,var(--gold) 45%,transparent)}
+/* ── 金色要读作金属，不是印上去的字 ──
+   平涂一个金色号，眼睛读到的是「黄色的字」；真金属的特征是**同一个面上有明暗**：
+   顶边受光最亮、中间是本色、底边转入暗部。用渐变填充文字做出这条明暗轴，
+   再补一层极细的暗色描边把字从背景上「抬」起来。
+   ⚠ background-clip:text 会吃掉 text-shadow，所以外发光改用 drop-shadow 滤镜。 */
+.title-hero em{font-style:normal;font-weight:500;
+  background:linear-gradient(175deg,
+    color-mix(in srgb,var(--gold-hi) 92%,#fff) 0%,
+    var(--gold-hi) 26%,
+    var(--gold) 52%,
+    color-mix(in srgb,var(--gold) 62%,#000) 82%,
+    color-mix(in srgb,var(--gold) 80%,#000) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 0 22px color-mix(in srgb,var(--gold) 42%,transparent))
+         drop-shadow(0 1px 0 rgba(0,0,0,.55))}
+/* 金属渐变在极窄的字重下会糊成一片，所以只给标题这种大字用。
+   小字仍旧走平涂 var(--gold2)，那是可读性优先的场合。 */
 @keyframes titleIn{0%{opacity:0;letter-spacing:.4em;transform:translateY(18px);filter:blur(6px)}100%{opacity:1;letter-spacing:.18em;transform:translateY(0);filter:blur(0)}}
 .subtitle{color:var(--ink2);font-size:clamp(12px,1.6dvh,14px);letter-spacing:.2em;margin:0}
 #menu-gems{height:clamp(36px,5dvh,48px);margin:0}
@@ -264,7 +281,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #scr-game::before{content:'';margin-top:auto}
 #scr-game::after{content:'';margin-bottom:auto}
 #hud{width:min(520px,100%);display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
-.hud-box{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 10px;text-align:center}
+/* HUD 与棋盘是一家人：同样给厚度，不然三块平板浮在一口有厚度的井上面很割裂 */
+.hud-box{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 10px;text-align:center;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 12%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),
+             0 2px 0 rgba(0,0,0,.4),
+             0 5px 14px rgba(0,0,0,.4)}
 #hud-moves{min-width:74px;display:flex;flex-direction:column;justify-content:center}
 #hud-moves .num{font-size:30px;line-height:1.1;color:var(--ink);font-weight:500;transition:color .3s}
 #hud-moves.low .num{color:var(--red);animation:lowPulse 1s ease-in-out infinite}
@@ -309,12 +331,31 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #boss-say.on{opacity:1;transform:translateY(0)}
 /* 棋盘 */
 #board-wrap{position:relative;width:min(94vw,520px);margin:0 auto;flex:none}
+/* ── 棋盘要像凿进岩壁的一口井，不是一片平铺的格子 ──
+   原来只有一圈 1px 边和一层内阴影，边缘直接切断，读作「贴在页面上的图」。
+   现在压五层，从外到内：
+     1) 一圈金线（矿脉的封边）
+     2) 一圈岩色厚边（凿出来的石壁断面，比金线粗）
+     3) 深内阴影（往里凹，这是「井」的关键）
+     4) 顶部一道细内高光（上沿受矿灯的光）
+     5) 外部落影（整块从页面上浮起来）
+   顺带把角落那两个金色折角加粗一点，压住这圈更厚的边。 */
 #board{display:block;width:100%;touch-action:none;
   border:1px solid var(--mine-edge);background:var(--mine);
-  box-shadow:inset 0 0 44px rgba(0,0,0,.55),0 6px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(201,166,74,.08)}
-#board-wrap::before,#board-wrap::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);opacity:.7;pointer-events:none;z-index:3}
-#board-wrap::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
-#board-wrap::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+  box-shadow:
+    0 0 0 1px rgba(201,166,74,.16),
+    0 0 0 5px color-mix(in srgb,var(--mine-edge) 70%,#000),
+    0 0 0 6px rgba(201,166,74,.10),
+    inset 0 0 60px rgba(0,0,0,.72),
+    inset 0 2px 0 rgba(201,166,74,.09),
+    inset 0 -3px 12px rgba(0,0,0,.6),
+    0 10px 34px rgba(0,0,0,.55)}
+#board-wrap::before,#board-wrap::after{content:'';position:absolute;width:20px;height:20px;border:2px solid var(--gold);opacity:.75;pointer-events:none;z-index:3}
+#board-wrap::before{top:-6px;left:-6px;border-right:0;border-bottom:0}
+#board-wrap::after{bottom:-6px;right:-6px;border-left:0;border-top:0}
+/* 棋盘上方留一条缝：原来 HUD 和棋盘顶边直接贴在一起，
+   石壁的厚边压上去会显得挤。 */
+#board-wrap{margin-top:4px}
 #fly-layer{position:fixed;inset:0;pointer-events:none;z-index:60}
 .flygem{position:fixed;width:30px;height:30px;pointer-events:none;z-index:61}
 #combo-banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);pointer-events:none;z-index:5;text-align:center;opacity:0}
