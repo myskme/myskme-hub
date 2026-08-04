@@ -3950,22 +3950,33 @@ const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).pad
    正典里黑域确实是反派，但玩家选的是打法不是道德立场，
    叶王照旧是终章 BOSS。这对面向学生的品牌很要紧。
    ================================================================== */
+/* 三营各吃矿力的一条线，与 gfDepth/gfSkill/gfGrind 同源 —— 不再另立公式。
+   以前三条线其实在量同一件事（光明×黑域 秩相关 0.815、前六名同一批人同一顺序），
+   根子是没有任何一条在量「勤」：旧灰塔读的是 best_rush，那是单局峰值，
+   一局手气好打到 8 万就永久满格，天天来的人反而追不上，跟教义正好相反。
+
+   三条线量纲差很远（深度上限约 7 万、技巧约 1.2 万、勤勉按天累），所以各有除数，
+   让「打满」所需投入大致相当（都约等于一个月的专注投入）：
+     深度 48000 ≈ 第 150 关满星   技巧 12000 ≈ 15 重连锁加高分   勤勉 10400 ≈ 30 天满勤
+   改后：光明×灰塔 +0.025、黑域×灰塔 −0.277，灰塔彻底独立；
+   光明×黑域 仍有 0.606 —— 技巧线含最佳分与矿灯分，天然跟「玩得多」相关，
+   这条要彻底解耦得靠固定盘定量局，那个玩法 2026-08-04 决定暂不做。 */
+const CAMP_DIV={light:120,dark:30,grey:26};
 const CAMPS=[
   {id:'light',nm:'光明',lead:'狼先生',seat:'学院谷地',
    creed:'让你们变得有趣一点',
-   metric:'走多远',how:'关卡与星数',col:'#e8c768',
-   /* 探索派：推进主线、攒星 */
-   score:s=>s.lv*3+s.stars},
+   metric:'走多远',how:'关卡深度与星数',col:'#e8c768',
+   score:s=>Math.floor(pwLines(s).depth/CAMP_DIV.light)},
   {id:'dark', nm:'黑域',lead:'叶王',  seat:'紫蛇森林',
    creed:'标准答案自有它的重量',
    metric:'打多险',how:'连锁与单局高分',col:'#a2568f',
-   /* 冒险派：一击之美 */
-   score:s=>s.chain*40+Math.floor(s.score/300)},
+   score:s=>Math.floor(pwLines(s).skill/CAMP_DIV.dark)},
   {id:'grey', nm:'灰塔',lead:'鹦鹉教授',seat:'复读灰塔',
    creed:'重复一百遍，直到真理点头',
-   metric:'来多勤',how:'限时局与日日下矿',col:'#8fa3b0',
-   /* 勤勉派：肯天天来的普通玩家在这条线上能赢过大号 —— 这是三阵营最大的价值 */
-   score:s=>Math.floor(s.rush/200)+Math.floor((s.rush2||0)/150)},
+   metric:'来多勤',how:'下矿的天数与局数',col:'#8fa3b0',
+   /* 勤勉派：肯天天来的普通玩家在这条线上能赢过大号 —— 这是三阵营最大的价值。
+      现在它真的成立了：勤勉每天封顶，榜首一天最多也就那么多，结构上快不过新人。 */
+   score:s=>Math.floor(pwLines(s).grind/CAMP_DIV.grey)},
 ];
 const campById=id=>CAMPS.find(c=>c.id===id)||null;
 const myCamp=()=>campById(SAVE.camp&&SAVE.camp.side);
@@ -4023,9 +4034,9 @@ function bindCampPicker(after){
 const CAMP_CAP=400;
 function campMyScore(){
   const c=myCamp(); if(!c)return 0;
-  const s=LB.stats();
-  return Math.min(CAMP_CAP,Math.max(0,c.score({lv:s.lv,stars:s.stars,chain:s.chain,score:s.score,
-    rush:s.rush,rush2:SAVE.rush2Best||0})));
+  /* 直接把整份 stats 交给 score()，别再一个字段一个字段地摘 ——
+     以前这里手抄字段，漏了服务端根本收不到的 rush2，还多算进去，两边对不上。 */
+  return Math.min(CAMP_CAP,Math.max(0,c.score(LB.stats())));
 }
 function campCapped(){return campMyScore()>=CAMP_CAP}
 const YJ_POOL=[
@@ -7955,6 +7966,24 @@ window.__selftest=function(){
        给出的下一步动作必须是三句不同的话，否则这个功能等于没做。 */
     const adv=s=>{const L=pwLines(s);
       return (L.grind<=L.depth&&L.grind<=L.skill)?'grind':(L.depth<=L.skill?'depth':'skill')};
+    /* 三营各吃一条线且各有除数。以前三营另立公式，光明与黑域在量同一件事；
+       这条盯住「同一份档案在三营得分不同」，也盯住除数没被人顺手改掉。 */
+    {
+      const s={lv:111,stars:192,chain:11,score:91905,rush:121830,mv:0,runs:0,days:0,dbest:0};
+      const byId=id=>CAMPS.find(c=>c.id===id).score(s);
+      const L=pwLines(s);
+      ok('三阵营各吃一条线，且除数与服务端一致',
+         byId('light')===Math.floor(L.depth/120)
+         && byId('dark')===Math.floor(L.skill/30)
+         && byId('grey')===Math.floor(L.grind/26)
+         && byId('light')===314 && byId('dark')===283);
+      /* 纯限时局玩家（一关没通）在光明必须是 0 —— 旧公式下他靠一次连锁就把黑域打满，
+         那正是「一关没通的人把阵营贡献拉满」那个事故。 */
+      const only={lv:0,stars:0,chain:12,score:0,rush:162221,mv:0,runs:0,days:0,dbest:0};
+      ok('一关没通的人在光明贡献为 0（旧公式下他能把黑域打满）',
+         CAMPS.find(c=>c.id==='light').score(only)===0
+         && CAMPS.find(c=>c.id==='dark').score(only)===279);
+    }
     ok('矿力建议因人而异：三种短板给出三种不同的下一步',
        adv({lv:200,stars:192,chain:0,score:0,rush:0,days:99,runs:900,dbest:99})==='skill'
        && adv({lv:0,stars:0,chain:12,score:0,rush:162221,days:99,runs:900,dbest:99})==='depth'

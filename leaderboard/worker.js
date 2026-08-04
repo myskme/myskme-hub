@@ -397,6 +397,19 @@ function gfPower(s) {
   const d = gfDepth(s), t = gfSkill(s), g = gfGrind(s);
   return d + t + g + 3 * Math.min(d, t, g);
 }
+/* 三阵营各吃矿力的一条线，和上面三个函数**同源**——以前三营另立公式，
+   结果光明与黑域在量同一件事（秩相关 0.815、前六名同一批人同一顺序），
+   而灰塔号称「来多勤」却读 best_rush（单局峰值），跟教义正好相反。
+   除数让三边「打满 400」所需投入大致相当，各约一个月的专注投入：
+     深度 48000 ≈ 第 150 关满星   技巧 12000 ≈ 15 重连锁加高分   勤勉 10400 ≈ 30 天满勤
+   ⚠ 必须与 match/index.html 的 CAMP_DIV 和 pwLines 保持一致，改一边就要改另一边。
+   SQLite 的整数除法向零取整，与客户端 Math.floor 在非负区间等价。 */
+const GF_LINE = {
+  light: `((MIN(lv,64)*100 + MAX(0,MIN(lv-64,86))*150 + MAX(0,lv-150)*200
+            + (CASE WHEN lv>=75 THEN ((lv-50)/25)*600 ELSE 0 END) + stars*120) / 120)`,
+  dark:  `((MAX(chain*60, chain*chain*30) + best_dig/12 + best_score/50 + best_rush/40) / 30)`,
+  grey:  `((days*160 + runs*6 + dbest*120) / 26)`,
+};
 function gfBadges(s) {
   const b = [], add = (c, id) => { if (c) b.push(id); };
   add(s.lv >= 8, "g1"); add(s.lv >= 32, "g2"); add(s.lv >= 64, "g3"); add(s.lv > 64, "g4");
@@ -545,8 +558,10 @@ async function gfSubmit(req, env, origin) {
    只统计非空门派；聚合上限 200 行足够（自由文本门派不会太多）。 */
 /* 三阵营拔河。**刻意不返回人数**——「光明 5 人」这种数字一露就露怯，
    而比例条在任何人数下都在动。前端拿到的就是三个占比。
-   每个阵营用**各自的指标**算分（光明看关卡星数、黑域看连锁分数、
-   灰塔看限时局），所以不存在「总矿力最高的人决定一切」。 */
+   每个阵营用**各自的指标**算分（光明看关卡深度、黑域看连锁与高分、
+   灰塔看下矿的天数与局数），所以不存在「总矿力最高的人决定一切」。
+   灰塔那条尤其关键：它每天封顶，榜首一天最多也就那么多，
+   「肯天天来的普通玩家能赢过大号」结构上才真的成立。 */
 async function gfCamps(req, env, origin, url) {
   await gfEnsure(env);
   /* 单人封顶：CAP 之上的部分不再计入。
@@ -556,13 +571,19 @@ async function gfCamps(req, env, origin, url) {
      取各营中位数×3 太重（要两次查询），这里用固定量级封顶，
      数量级与当前中位数（5,560 矿力 ≈ 各指标百来分）对齐。 */
   const CAP = 400;
+  /* 只算**近 7 天来过的人**。以前这条 SQL 没有任何时间窗，而统计列全是 MAX 只增不减，
+     于是贡献一旦进池就永不衰减：设计注释里承诺的「每周结算、永远没有永久输家」
+     从来没实现过——落后的一营没法靠「这周打得比你好」翻盘，只能靠拉新人。
+     用滚动 7 天而不是自然周：自然周会在周一零点造成一次断崖式清零，
+     那对受众里的学生是惩罚感；滚动窗口没有那一刻，不玩就慢慢淡出，回来就慢慢回来。 */
+  const SINCE = Date.now() - 7 * 86400000;
   const rows = await env.DB.prepare(
     `SELECT camp,
-            SUM(MIN(lv*3 + stars, ?))                  AS light,
-            SUM(MIN(chain*40 + best_score/300, ?))     AS dark,
-            SUM(MIN(best_rush/200, ?))                 AS grey
-       FROM gemfall WHERE hidden=0 AND camp!='' GROUP BY camp`
-  ).bind(CAP, CAP, CAP).all();
+            SUM(MIN(${GF_LINE.light}, ?)) AS light,
+            SUM(MIN(${GF_LINE.dark},  ?)) AS dark,
+            SUM(MIN(${GF_LINE.grey},  ?)) AS grey
+       FROM gemfall WHERE hidden=0 AND camp!='' AND last_write > ? GROUP BY camp`
+  ).bind(CAP, CAP, CAP, SINCE).all();
   const raw = { light: 0, dark: 0, grey: 0 };
   for (const r of (rows.results || [])) {
     if (r.camp === "light") raw.light = Math.max(0, Math.round(r.light || 0));
@@ -576,11 +597,12 @@ async function gfCamps(req, env, origin, url) {
   const mem = await env.DB.prepare(
     `SELECT camp, alias,
             CASE camp
-              WHEN 'light' THEN MIN(lv*3 + stars, ?)
-              WHEN 'dark'  THEN MIN(chain*40 + best_score/300, ?)
-              ELSE MIN(best_rush/200, ?) END AS sc
-       FROM gemfall WHERE hidden=0 AND camp!='' ORDER BY sc DESC LIMIT 60`
-  ).bind(CAP, CAP, CAP).all();
+              WHEN 'light' THEN MIN(${GF_LINE.light}, ?)
+              WHEN 'dark'  THEN MIN(${GF_LINE.dark},  ?)
+              ELSE MIN(${GF_LINE.grey},  ?) END AS sc
+       FROM gemfall WHERE hidden=0 AND camp!='' AND last_write > ?
+       ORDER BY sc DESC LIMIT 60`
+  ).bind(CAP, CAP, CAP, SINCE).all();
   const members = { light: [], dark: [], grey: [] };
   for (const r of (mem.results || [])) {
     const k = r.camp;
