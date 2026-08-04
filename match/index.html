@@ -744,6 +744,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .fac-row .ar svg{width:14px;height:14px}
 .fac-wrap.open .fac-row .ar{transform:rotate(90deg)}
 .fac-tip{padding:6px 4px 2px;font-size:11px;color:var(--ink3);letter-spacing:.04em}
+/* 贴身对手：端在榜单最上面，只显示你前后各一名和确切差距 */
+.near{margin:0 0 12px;padding:9px 10px 8px;border:1px solid var(--line);border-radius:6px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 6%,transparent),transparent)}
+.near-hd{font-size:11px;color:var(--ink3);letter-spacing:.06em;margin-bottom:4px}
+.near-r{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:13px;color:var(--ink3)}
+.near-r .nr-rk{width:24px;text-align:right;font-size:12px}
+.near-r .nr-nm{flex:1;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.near-r .nr-pw{font-variant-numeric:tabular-nums}
+.near-r.me{color:var(--ink);font-size:14px}
+.near-r.me .nr-pw{color:var(--gold2);font-weight:500}
+.near-r.up .nr-nm,.near-r.up .nr-pw{color:var(--ink2)}
+.near-gap{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
+.near-gap.only{margin-top:0;padding-top:0;border-top:0}   /* 上面没有名次行时不留那条分隔线 */
+.near-gap b{color:var(--gold2);font-size:15px}
 
 /* 门派榜行 */
 .fac-row{display:flex;align-items:baseline;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line)}
@@ -5534,6 +5549,7 @@ const LB_NET=(()=>{
   return {bases,probeMs:Math.max(2000,Math.min(8000,Number(cfg.probeTimeoutMs)||4500)),
     hintMs:Math.max(60000,Number(cfg.endpointHintMs)||1800000)};
 })();
+const LB_LIMIT=50;              // 榜单一次取多少行；贴身对手判断「榜满没满」也要用它
 const LB={
   bases:LB_NET.bases,
   scope:'world',
@@ -5621,7 +5637,7 @@ const LB={
   /* 小队（口令私榜）已下线，与门派功能重复且 77% 的人从没填过。
      后端 /gf/board?scope=class 与 class_tag 列保留不动，存量数据不丢。 */
   async board(scope){
-    return await this.fetchJSON('/gf/board?scope='+scope+'&limit=50');
+    return await this.fetchJSON('/gf/board?scope='+scope+'&limit='+LB_LIMIT);
   },
   /* ────────── 上传管理器 ──────────
      成绩全是单调递增的最大值（最佳分/关卡/星数/连锁只增不减），
@@ -6255,14 +6271,15 @@ async function renderLB(){
     return;
   }
   msg.textContent='';
-  let html='',found=false;
-  for(const r of rows){
+  let html='',found=false,myIdx=-1;
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i];
     /* 同名很常见，光比化名会把两个人都标成「你」。后端给了 tag（设备键末两位），有就一起比 */
     const isMe=r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag);
-    if(isMe)found=true;
+    if(isMe){found=true;myIdx=i}
     html+=lbRowHTML(r,isMe);
   }
-  list.innerHTML=html;
+  list.innerHTML=nearHTML(rows,myIdx)+html;
   const s=LB.stats();
   if(!LB.registered()){
     mine2.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
@@ -6272,7 +6289,42 @@ async function renderLB(){
   mine2.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
     +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
     +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
-      +(found?'':' · 未进前 50，继续挖')):'');
+      +(found?'':' · 未进前 '+LB_LIMIT+'，继续挖')):'');
+}
+/* ────────── 贴身对手 ──────────
+   榜单原来是一次平铺 50 行，谁跟谁咬得紧完全看不出来。而线上真实数据里
+   10 个玩家的 9 组相邻关系中有 4 组差距不到 15%（赫则离白水清新只差 8.2%），
+   紧咬感本来就存在，只是被埋在长列表里 —— 把它端到最上面，不用造任何假人。
+   差距一律写成「再挖多少」这种能行动的数，不写百分比：百分比不指导下一步。 */
+function nearHTML(rows,i){
+  if(i<0){
+    /* 榜没满的时候不存在「挤进去」这回事 —— 一提交就在上面，
+       这时候提示差多少反而是假的。只有榜真的满了才给追赶目标。 */
+    if(rows.length<LB_LIMIT||!LB.registered())return '';
+    const last=rows[rows.length-1];
+    const gap=(Number(last&&last.power)||0)-(Number(SAVE.lbPower)||0);
+    if(gap<=0)return '';
+    return '<div class="near"><div class="near-gap only">再挖 <b>'
+      +gap.toLocaleString('en-US')+'</b> 就能挤进前 '+rows.length+'</div></div>';
+  }
+  const me=rows[i], up=rows[i-1], dn=rows[i+1];
+  const line=(r,tag)=>'<div class="near-r'+(tag?' '+tag:'')+'">'
+    +'<span class="nr-rk">'+(Number(r.rank)||0)+'</span>'
+    +'<span class="nr-nm">'+esc(r.alias||'')+(tag==='me'?' <b>（你）</b>':'')+'</span>'
+    +'<span class="nr-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'</span></div>';
+  let h='<div class="near">';
+  if(up)h+=line(up,'up');
+  h+=line(me,'me');
+  if(dn)h+=line(dn,'dn');
+  if(up){
+    const gap=(Number(up.power)||0)-(Number(me.power)||0)+1;
+    h+='<div class="near-gap">再挖 <b>'+gap.toLocaleString('en-US')+'</b> 就能越过 <b>'+esc(up.alias||'')+'</b></div>';
+  }else{
+    h+='<div class="near-gap">你在最前面'
+      +(dn?(' —— <b>'+esc(dn.alias||'')+'</b> 落后 '
+        +((Number(me.power)||0)-(Number(dn.power)||0)).toLocaleString('en-US')):'')+'</div>';
+  }
+  return h+'</div>';
 }
 function lbOpenForm(){
   $('#lb-form').hidden=false;
@@ -7739,6 +7791,29 @@ window.__selftest=function(){
   let safe=true; try{colAny(1);colTop(1);setDone('gem');boonLampPow();dailyPow(3)}catch(e){safe=false}
   COLS=bak2;
   ok('典藏册未初始化时读取不抛异常（启动路径）',safe);
+  /* 30. 贴身对手：榜单一次平铺 50 行时，谁跟谁咬得紧完全看不出来，
+     而真实数据里 9 组相邻关系有 4 组差距不到 15%。这块把它端到最上面。
+     四个分支都要盯：中段/榜首/榜没满/榜满够不到——「榜没满」那条尤其容易写错，
+     榜没满时压根不存在「挤进去」这回事（一提交就在上面），提差多少是假的。 */
+  {
+    const bakA=SAVE.lbAlias,bakP=SAVE.lbPower,bakT=SAVE.lbTag;
+    const txt=h=>h.replace(/<[^>]+>/g,'');
+    const R=[{rank:1,alias:'甲',power:1000},{rank:2,alias:'乙',power:800},{rank:3,alias:'丙',power:790}];
+    SAVE.lbAlias='乙乙';SAVE.lbPower=800;SAVE.lbTag='';
+    const mid=txt(nearHTML(R,1)), top=txt(nearHTML(R,0));
+    const shortB=nearHTML(R,-1);
+    const full=[];for(let i=0;i<LB_LIMIT;i++)full.push({rank:i+1,alias:'p'+i,power:1000-i*10});
+    SAVE.lbPower=100; const fullB=txt(nearHTML(full,-1));
+    SAVE.lbPower=9999; const over=nearHTML(full,-1);
+    ok('贴身对手：中段显示前后各一名与确切差距',
+       mid.indexOf('甲')>=0&&mid.indexOf('丙')>=0&&mid.indexOf('201')>=0);
+    ok('贴身对手：榜首不写「再挖多少越过」而写身后差距',
+       top.indexOf('你在最前面')>=0&&top.indexOf('200')>=0);
+    ok('贴身对手：榜没满时不提「挤进前 N」（一提交就在上面）',shortB==='');
+    ok('贴身对手：榜满且够不到时给出确切差额',fullB.indexOf('410')>=0);
+    ok('贴身对手：榜满但战力已超末位时不显示',over==='');
+    SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;
+  }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));
   console.log(out.join('\n'));
