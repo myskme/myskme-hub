@@ -906,7 +906,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #chest-btn{margin-top:8px;display:none}
 #chest-btn.on{display:inline-block;animation:curPulse 2s ease-in-out infinite}
 body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
-@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(3px,-1px)}30%,70%{transform:translate(-4px,2px)}40%,60%{transform:translate(4px,-2px)}50%{transform:translate(-3px,1px)}}
+/* 幅度改成变量：3 连轻轻一顿，8 连才真的晃。原来是 chain>=5 的一刀切，
+   3、4 连和不连一模一样，中段完全没有体感递进。--shk 由 shakeBy() 按连锁设。 */
+body{--shk:4px}
+@keyframes shake{
+  10%,90%{transform:translate(calc(var(--shk) * -.5),calc(var(--shk) * .25))}
+  20%,80%{transform:translate(calc(var(--shk) * .75),calc(var(--shk) * -.25))}
+  30%,70%{transform:translate(calc(var(--shk) * -1),calc(var(--shk) * .5))}
+  40%,60%{transform:translate(var(--shk),calc(var(--shk) * -.5))}
+  50%{transform:translate(calc(var(--shk) * -.75),calc(var(--shk) * .25))}}
+/* 边缘泛光：大连锁时四周透进一层暖光。刻意**不做全屏闪白** ——
+   受众含学生，全屏频闪要避免；四周内收的光既有冲击力又不刺眼。 */
+#rimlight{position:fixed;inset:0;pointer-events:none;z-index:79;opacity:0;
+  background:radial-gradient(ellipse at center,transparent 52%,
+    color-mix(in srgb,var(--gold) 70%,transparent) 100%)}
+#rimlight.go{animation:rimOut .42s ease-out}
+@keyframes rimOut{0%{opacity:var(--rim,.2)}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#rimlight{display:none}}
 #flash{position:fixed;inset:0;pointer-events:none;z-index:80;opacity:0;background:radial-gradient(ellipse at center,rgba(255,255,255,.9),rgba(255,255,255,.28))}
 #flash.go{animation:flashOut .5s ease-out}
 #flash.red{background:radial-gradient(ellipse at center,rgba(200,40,40,.62),rgba(120,20,20,.25))}
@@ -1184,6 +1200,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 </head>
 <body>
 <div id="amb"><i></i><i></i></div>
+<div id="rimlight"></div>
 <div id="flash"></div>
 <div id="app">
 
@@ -3105,6 +3122,37 @@ function toast(msg,ms){
   clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),ms||1900);
 }
 function shake(){if(REDUCED)return;document.body.classList.remove('shaking');void document.body.offsetWidth;document.body.classList.add('shaking');setTimeout(()=>document.body.classList.remove('shaking'),420)}
+/* ────────── 连击手感 ──────────
+   同类里做得最好的那些，快感其实来自三件事叠在一起：**声音上行、顿帧、强度递进**。
+   前一件本作已经有了（SFX.pop 走五声音阶）；后两件缺，补上。
+
+   1) 顿帧（hitstop）—— 业界性价比最高的一招：命中瞬间把画面**冻住几十毫秒**，
+      大脑会把这一顿读成「打到了」。做法是让主循环在这几十毫秒里 dt 记 0，
+      注意**不能真的停 raf**，否则限时局的计时也会跟着停 —— 那就成作弊了。
+   2) 强度递进 —— 原来震屏是 chain>=5 的一刀切，3、4 连没有任何体感差别。
+      改成 3 连起就有，幅度随连锁涨。
+   3) 边缘泛光 —— 大连锁时屏幕四周透进一层暖光，不是全屏闪白
+      （受众含学生，全屏频闪是要避免的，也过不了 reduced-motion 那一关）。 */
+let HITSTOP=0;
+function hitstop(chain){
+  if(REDUCED)return;
+  /* 3 连 40ms 起，每多一连加 18ms，封顶 130ms。再长就从「有力」变成「卡顿」了。 */
+  HITSTOP=Math.max(HITSTOP,Math.min(130,40+(chain-3)*18));
+}
+function shakeBy(chain){
+  if(REDUCED)return;
+  const amp=Math.min(9,2.5+(chain-3)*1.5);        // 3 连 2.5px → 8 连封顶 9px
+  document.body.style.setProperty('--shk',amp.toFixed(1)+'px');
+  document.body.classList.remove('shaking');void document.body.offsetWidth;
+  document.body.classList.add('shaking');
+  setTimeout(()=>document.body.classList.remove('shaking'),420);
+}
+function rimFlash(chain){
+  if(REDUCED)return;
+  const el=$('#rimlight'); if(!el)return;
+  el.style.setProperty('--rim',Math.min(.5,.12+(chain-3)*.07).toFixed(2));
+  el.classList.remove('go');void el.offsetWidth;el.classList.add('go');
+}
 function flash(red){const f=$('#flash');f.classList.toggle('red',!!red);f.classList.remove('go');void f.offsetWidth;f.classList.add('go');setTimeout(()=>f.classList.remove('go'),520)}
 function floatNum(r,c,txt,color){
   const wrap=$('#board-wrap'), d=document.createElement('div');
@@ -3359,8 +3407,11 @@ async function settleBoard(firstChain){
     addScore(base,anchor[0],anchor[1],chain>=3?'#e8c768':null);
     if(GS.boss)bossHurt(res.gems+res.specials*5);
     SFX.pop(chain);
-    if(chain>=3){comboBanner(chain);vib(chain>=5?30:14)}
-    if(chain>=5)shake();
+    if(chain>=3){
+      comboBanner(chain);
+      vib(Math.min(38,10+(chain-3)*7));    // 震感也跟着涨，不再是两档
+      hitstop(chain);shakeBy(chain);rimFlash(chain);
+    }
     /* 炼成特殊灵石 */
     for(const m of makes){
       const [r,c]=m.at;
@@ -7699,7 +7750,11 @@ function loop(now){
   PLAT.raf(loop);
   const dt=Math.min(48,now-(lastT||now));lastT=now;
   if($('#scr-game').classList.contains('on')){
-    stepPieces(dt);stepFX(dt);
+    /* 顿帧：这几十毫秒里棋子与特效不推进，读作「打到了」。
+       ⚠ 只冻画面 —— 下面限时局的倒计时照常走 dt，否则连锁越多剩的时间越多，那是作弊。 */
+    let vdt=dt;
+    if(HITSTOP>0){HITSTOP-=dt;vdt=0;if(HITSTOP<0)HITSTOP=0}
+    stepPieces(vdt);stepFX(vdt);
     if(GS.rushOn&&!GS.over&&!GS.paused){
       GS.rushT-=dt;
       const s=Math.max(0,GS.rushT/1000);
@@ -8647,6 +8702,26 @@ window.__selftest=function(){
       /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
+    }
+    /* 连击手感：强度必须**随连锁递进**，且顿帧绝不能冻住限时局的计时。
+       后一条是硬红线 —— 冻住就等于连锁越多剩的时间越多，那是作弊。 */
+    {
+      const bakR=HITSTOP;
+      HITSTOP=0;hitstop(3);const h3=HITSTOP;
+      HITSTOP=0;hitstop(8);const h8=HITSTOP;
+      HITSTOP=0;hitstop(30);const hMax=HITSTOP;
+      ok('连击：顿帧随连锁递进且封顶（3 连 '+h3+'ms → 8 连 '+h8+'ms → 封顶 '+hMax+'ms）',
+         h3>0&&h8>h3&&hMax<=130);
+      /* 顿帧只冻画面：源码里 stepPieces/stepFX 吃 vdt，倒计时那段必须仍吃 dt */
+      const src=String(loop);
+      ok('连击：顿帧只冻画面，限时局倒计时照常走（不给作弊留口子）',
+         /stepPieces\(vdt\)/.test(src)&&/stepFX\(vdt\)/.test(src)&&/GS\.rushT-=dt/.test(src));
+      HITSTOP=bakR;
+      /* reduced-motion 下三样都必须闭嘴 */
+      const quiet=/if\(REDUCED\)return/.test(String(hitstop))
+        &&/if\(REDUCED\)return/.test(String(shakeBy))
+        &&/if\(REDUCED\)return/.test(String(rimFlash));
+      ok('连击：开了「减少动效」时顿帧/震屏/泛光全部让路',quiet);
     }
     /* 兑窗月配额：限的是速度不是机会。零竞争（自己的额度）、跨月重置、
        用满之后钱再多也买不动 —— 这是「一个月内解锁不完」唯一的硬保证。 */
