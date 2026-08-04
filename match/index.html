@@ -688,6 +688,55 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #namecard-box{text-align:center;margin-top:12px}
 #nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
 .cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
+/* 三阵营。三色只用在这一处，别处不铺——颜色一泛滥就不成标识了。 */
+.cs-light{--cc:#e8c768} .cs-dark{--cc:#a2568f} .cs-grey{--cc:#8fa3b0}
+.camp-bar{display:flex;height:14px;border:1px solid var(--line2);overflow:hidden;margin:2px 0 7px}
+.camp-bar i{display:block;background:var(--cc);transition:width .8s cubic-bezier(.16,1,.3,1);
+  box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
+.camp-legend{display:flex;justify-content:center;gap:14px;font-size:11.5px;color:var(--ink2);letter-spacing:.05em}
+.camp-legend .cl.me{color:var(--gold2)}
+.camp-legend .dot{display:inline-block;width:7px;height:7px;background:var(--cc);margin-right:4px;vertical-align:1px}
+.camp-note{margin-top:8px;font-size:11.5px;color:var(--ink3);text-align:center}
+.camp-note b{color:var(--gold2)}
+.camp-me{margin-top:11px;border:1px solid var(--gold-line);padding:10px 12px;text-align:center;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,var(--panel2)),var(--panel))}
+.cm-hd{font-size:15px;letter-spacing:.12em;color:var(--gold2)}
+.cm-creed{margin-top:3px;font-size:12px;color:var(--ink2);letter-spacing:.04em}
+.cm-metric{margin-top:6px;font-size:11.5px;color:var(--ink3)}
+.cm-metric b{color:var(--ink)}
+.cm-score{margin-top:7px;font-size:13px;color:var(--ink2)}
+.cm-score b{font-size:20px;color:var(--gold2)}
+.cm-sw{margin-top:9px}
+.cm-sw .btn{padding:6px 14px;font-size:12.5px}
+.camp-pick-hd{font-size:13px;letter-spacing:.16em;color:var(--ink2);text-align:center;margin-bottom:9px}
+.camp-pick{display:flex;flex-direction:column;gap:8px}
+.cp{border:1px solid var(--line);padding:10px 12px;cursor:pointer;position:relative;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 8%,var(--panel2)),var(--panel));
+  transition:border-color .2s,box-shadow .2s}
+.cp:active{border-color:var(--cc);box-shadow:0 0 0 1px var(--cc)}
+.cp.cur{border-color:var(--cc);box-shadow:0 0 12px color-mix(in srgb,var(--cc) 30%,transparent)}
+.cp-nm{font-size:17px;letter-spacing:.2em;color:var(--cc)}
+.cp-lead{font-size:11px;color:var(--ink3);letter-spacing:.06em;margin-top:1px}
+.cp-creed{font-size:12.5px;color:var(--ink2);margin-top:5px;letter-spacing:.03em}
+.cp-metric{font-size:11px;color:var(--ink3);margin-top:5px;line-height:1.6}
+.cp-metric b{color:var(--ink2)}
+.cp-cur{position:absolute;top:8px;right:10px;font-size:10px;letter-spacing:.14em;color:var(--cc)}
+.camp-pick-note{margin-top:9px;font-size:11.5px;color:var(--ink3);text-align:center;line-height:1.7}
+.camp-pick-note b{color:var(--gold2)}
+
+/* 成员名单（阵营与门派共用） */
+.camp-mem{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.cmem-hd{font-size:11px;letter-spacing:.24em;color:var(--ink3);text-align:center;margin-bottom:5px}
+.cmem{display:flex;justify-content:space-between;align-items:baseline;padding:3px 6px;
+  font-size:12px;color:var(--ink2);letter-spacing:.04em}
+.cmem i{font-style:normal;font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.cmem.me{color:var(--gold2)} .cmem.me i{color:var(--gold2)}
+.cmem.me b{color:var(--gold2);font-weight:500}
+.fac-wrap{border-bottom:1px solid var(--line)}
+.fac-wrap .fac-row{border-bottom:0;cursor:pointer}
+.fac-mem{display:none;padding:2px 4px 8px 30px}
+.fac-mem.open{display:block}
+
 /* 门派榜行 */
 .fac-row{display:flex;align-items:baseline;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line)}
 .fac-row .rk{width:26px;text-align:right;color:var(--ink3);font-size:13px}
@@ -1231,6 +1280,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   <div id="yj-sec"></div>
   <div class="ovl-btns">
     <button class="btn ghost" id="ach-close">合上</button>
+    <button class="btn ghost" id="ach-xfer">换设备</button>
     <button class="btn" id="ach-card">出示名片</button>
   </div>
 </div></div>
@@ -1404,6 +1454,7 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <button class="btn ghost" id="xfer-out">导出我的进度</button>
       <button class="btn ghost" id="xfer-in">粘贴口令导入</button>
     </div>
+    <div class="xfer-note" style="margin-top:6px">也可以从<b>成就页底部</b>直接打开这一页。</div>
     <div id="xfer-panel"></div>
   </div>
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
@@ -1423,8 +1474,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
   </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
+    <button data-scope="camp">阵营</button>
     <button data-scope="faction">门派榜</button>
-    <button data-scope="class">小队榜</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
   <div id="lb-list"></div>
@@ -1435,10 +1486,8 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
       <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：提灯的河狸">
       <button type="button" class="btn ghost" id="lb-roll">换一个</button>
     </div>
-    <label>门派（可留空）</label>
+    <label>门派（可留空 · <b>同名即同门</b>，和朋友约好一个名字就行）</label>
     <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
-    <label>小队口令（可留空，填了才进小队榜）</label>
-    <input id="lb-pw" maxlength="24" autocapitalize="none" autocorrect="off" placeholder="同一句口令 = 同一个小队">
     <div class="tip">榜上只出现化名，不收集真实身份信息。化名、设备标识和成绩会经 play.myskme.com 加密转发到榜单服务；设备标识在服务端加盐哈希，原值不入库。设备换了或清了缓存，成绩要重新上榜。</div>
   </div>
   <div id="lb-diagwrap">
@@ -1520,6 +1569,9 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
               过月永不再得，时间戳就是它的价值。
      firstDay = 第一次打开游戏的日序号（名片上的「入坑日」）。 */
   streak:{cur:0,best:0},cs:{},rush2Best:0,
+  /* 三阵营。side = 'light'|'dark'|'grey'，m = 选定/上次换边的月序号。
+     每月只能换一次：既有承诺感又不锁死人。 */
+  camp:{side:'',m:0},
   bounty:{w:0,done:0},yj:{m:0,c:{},done:0},yjSeal:{},firstDay:0,
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
@@ -1533,6 +1585,7 @@ function loadSave(){
   out.q3=Object.assign({d:0,q:null},s.q3||{});
   out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
   out.streak=Object.assign({cur:0,best:0},s.streak||{});
+  out.camp=Object.assign({side:'',m:0},s.camp||{});
   out.cs=(s.cs&&typeof s.cs==='object')?s.cs:{};
   out.bounty=Object.assign({w:0,done:0},s.bounty||{});
   out.yj=Object.assign({m:0,c:{},done:0},s.yj||{});
@@ -3837,6 +3890,98 @@ function bountyCheck(){
 const monthNum=()=>{const d=new Date();return d.getFullYear()*12+d.getMonth()};
 const monthTag=m=>{const y=Math.floor(m/12),mo=m%12+1;return y+'年'+mo+'月'};
 const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).padStart(2,'0')};
+
+/* ==================================================================
+   [ 三阵营 · CAMPS ]
+   ------------------------------------------------------------------
+   为什么是三个而不是两个（这条是拿真实数据算出来的，别改回两阵营）：
+   榜上 13 人里，头号玩家的矿力 = 其余 12 人**总和的 63%**。
+   两阵营 + 总量制 → 他在哪边哪边赢，其余人只能围观。
+   这跟人多人少无关，500 人也一样——鲸鱼效应是结构问题。
+
+   三条解法叠在一起：
+   1. **每个阵营考各自的指标**，不比总矿力。实测同一个人在三条线上
+      名次完全不同（有人「来得勤」92% 但「打得险」0%），没有全能碾压者。
+   2. **只报比例不报人头**。三色拔河带在任何人数下都在动；
+      「光明 5 人 / 黑域 4 人」这种数字一露就露怯。
+   3. **每周结算、每周重置**，永远没有永久输家。
+
+   另外，三选一把「善恶题」变成了「你信哪种挖法」——
+   正典里黑域确实是反派，但玩家选的是打法不是道德立场，
+   叶王照旧是终章 BOSS。这对面向学生的品牌很要紧。
+   ================================================================== */
+const CAMPS=[
+  {id:'light',nm:'光明',lead:'狼先生',seat:'学院谷地',
+   creed:'让你们变得有趣一点',
+   metric:'走多远',how:'关卡与星数',col:'#e8c768',
+   /* 探索派：推进主线、攒星 */
+   score:s=>s.lv*3+s.stars},
+  {id:'dark', nm:'黑域',lead:'叶王',  seat:'紫蛇森林',
+   creed:'标准答案自有它的重量',
+   metric:'打多险',how:'连锁与单局高分',col:'#a2568f',
+   /* 冒险派：一击之美 */
+   score:s=>s.chain*40+Math.floor(s.score/300)},
+  {id:'grey', nm:'灰塔',lead:'鹦鹉教授',seat:'复读灰塔',
+   creed:'重复一百遍，直到真理点头',
+   metric:'来多勤',how:'限时局与日日下矿',col:'#8fa3b0',
+   /* 勤勉派：肯天天来的普通玩家在这条线上能赢过大号 —— 这是三阵营最大的价值 */
+   score:s=>Math.floor(s.rush/200)+Math.floor((s.rush2||0)/150)},
+];
+const campById=id=>CAMPS.find(c=>c.id===id)||null;
+const myCamp=()=>campById(SAVE.camp&&SAVE.camp.side);
+/* 换边：每月一次。没选过的随时可选（第一次不算换）。 */
+function campCanSwitch(){
+  if(!SAVE.camp.side)return true;
+  return monthNum()>(SAVE.camp.m||0);
+}
+function campPick(id){
+  if(!campById(id))return false;
+  if(SAVE.camp.side===id)return false;
+  if(!campCanSwitch())return false;
+  const first=!SAVE.camp.side;
+  SAVE.camp={side:id,m:monthNum()};
+  SAVE.lbSig='';                                   // 阵营变了要重传，否则榜上还是旧的
+  persist();
+  const c=campById(id);
+  toast((first?'你入了 <b>':'改投 <b>')+c.nm+'</b> · '+c.lead
+    +'<br><span style="font-size:11.5px">'+esc(c.creed)+'</span>',4000);
+  return true;
+}
+/* 本机在自己阵营指标上的贡献分。首页只显示这个——
+   「我今天为这边挣了多少」比「我们领先几分」更抓人，也不怕人少。 */
+/* 入营选择器。零美术预算，仪式感靠三样：信条原文、首领署名、
+   以及「选了这个月就定了」这句分量。三张并排、不预选不推荐——
+   **选边这件事不该被引导**。 */
+function campPickerHTML(){
+  const cur=(SAVE.camp&&SAVE.camp.side)||'';
+  const can=campCanSwitch();
+  let h='<div class="camp-pick-hd">选一条你信的挖法</div><div class="camp-pick">';
+  for(const c of CAMPS){
+    h+='<div class="cp cs-'+c.id+(c.id===cur?' cur':'')+'" data-c="'+c.id+'">'
+      +'<div class="cp-nm">'+esc(c.nm)+'</div>'
+      +'<div class="cp-lead">'+esc(c.lead)+' · '+esc(c.seat)+'</div>'
+      +'<div class="cp-creed">「'+esc(c.creed)+'」</div>'
+      +'<div class="cp-metric">本营看 <b>'+esc(c.metric)+'</b><br>'+esc(c.how)+'</div>'
+      +(c.id===cur?'<div class="cp-cur">当前</div>':'')+'</div>';
+  }
+  h+='</div><div class="camp-pick-note">'
+    +(can?'选定后<b>本月不再更改</b>，下月初可以改投。三营没有强弱，只有你更认哪一种。'
+         :'本月已定 · 下月初可改投')+'</div>';
+  return h;
+}
+function bindCampPicker(after){
+  for(const el of $$('.camp-pick .cp'))el.onclick=()=>{
+    if(!campCanSwitch()){toast('本月已定 · 下月初可改投',2600);return}
+    SFX.click();
+    if(campPick(el.dataset.c)){LB.flush('camp',false);if(after)after()}
+  };
+}
+function campMyScore(){
+  const c=myCamp(); if(!c)return 0;
+  const s=LB.stats();
+  return Math.max(0,c.score({lv:s.lv,stars:s.stars,chain:s.chain,score:s.score,
+    rush:s.rush,rush2:SAVE.rush2Best||0}));
+}
 const YJ_POOL=[
   {k:'clear', nm:'当月通关 30 关（重打也算）', need:30},
   {k:'rushN', nm:'当月下矿灯 15 局',           need:15},
@@ -5445,7 +5590,7 @@ const LB={
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
-      pw:SAVE.lbPw||'',stats:this.stats()};
+      camp:(SAVE.camp&&SAVE.camp.side)||'',pw:SAVE.lbPw||'',stats:this.stats()};
     /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
        正常解析；国内移动网由两次往返变一次，sendBeacon 也与普通提交同口径。 */
     const d=await this.fetchJSON('/gf/submit',
@@ -5458,13 +5603,10 @@ const LB={
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
   },
+  /* 小队（口令私榜）已下线，与门派功能重复且 77% 的人从没填过。
+     后端 /gf/board?scope=class 与 class_tag 列保留不动，存量数据不丢。 */
   async board(scope){
-    let u='/gf/board?scope='+scope+'&limit=50';
-    if(scope==='class'){
-      if(!SAVE.lbPw)return {ok:false,err:'nopw'};
-      u+='&pw='+encodeURIComponent(SAVE.lbPw);
-    }
-    return await this.fetchJSON(u);
+    return await this.fetchJSON('/gf/board?scope='+scope+'&limit=50');
   },
   /* ────────── 上传管理器 ──────────
      成绩全是单调递增的最大值（最佳分/关卡/星数/连锁只增不减），
@@ -5475,7 +5617,7 @@ const LB={
        · 多入口唤醒——开局、通关、联网恢复、切回前台、打开榜单、退避定时器
        · 429 不算错——那是服务端 15 秒冷却，等一会儿再来就行
      只要还没成功，pending() 就一直为真，玩家在大厅能看到「待上传」。 */
-  sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain].join('|')},
+  sig(){const s=this.stats();return [s.score,s.rush,s.lv,s.stars,s.chain,(SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
   plan(ms){
@@ -5564,7 +5706,7 @@ function lbMenuStatus(){
   el.classList.remove('warn');
   el.textContent=SAVE.lbPower
     ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
-    : '查看世界榜与小队榜';
+    : '看看三营谁在领先';
 }
 function lbRowHTML(r,mine){
   const rank=Number(r.rank)||0;
@@ -5944,7 +6086,7 @@ async function renderLB(){
   applyArt($('#lb-banner'),'lb_banner');
   renderWeekCard();
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
-  const msg=$('#lb-msg'), list=$('#lb-list'), mine=$('#lb-mine');
+  const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
   const form=$('#lb-form');
   for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
   /* 门派榜是**纯只读的公开榜**，不该被注册闸挡住。
@@ -5955,20 +6097,71 @@ async function renderLB(){
   if(!LB.registered()&&LB.scope!=='class'){
     form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='起名上榜';
   }else if(!LB.registered()){
-    form.hidden=false;list.innerHTML='';mine.innerHTML='';
+    form.hidden=false;list.innerHTML='';mine2.innerHTML='';
     /* 输入框与存档同步，避免显示上一次残留的值 */
     $('#lb-alias').value=SAVE.lbAlias||'';
     $('#lb-faction').value=SAVE.lbFaction||'';
-    $('#lb-pw').value=SAVE.lbPw||'';
     msg.innerHTML='起个化名就能上榜——<b>不要用真名</b>。';
     $('#lb-submit').textContent='起名上榜';$('#lb-edit').style.display='none';
     return;
   }
   form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
-  msg.textContent='正在连接矿脉…';list.innerHTML='';mine.innerHTML='';
+  msg.textContent='正在连接矿脉…';list.innerHTML='';mine2.innerHTML='';
   /* ---- 门派榜 ----
      按门派聚合总矿力。拉一个活人进帮，帮派立刻涨分——
      这一榜存在的意义就是给「叫上朋友」一个看得见的理由。 */
+  /* ---- 阵营 ----
+     只画三色拔河带与「我的贡献」，**绝不显示人头数**。
+     「光明 5 人」这种数字一露就露怯；而比例条在任何人数下都在动。 */
+  if(LB.scope==='camp'){
+    const mine=myCamp();
+    if(!mine){
+      msg.innerHTML='';
+      list.innerHTML=campPickerHTML();
+      bindCampPicker(()=>renderLB());
+      mine2.innerHTML='';
+      return;
+    }
+    const d=await LB.fetchJSON('/gf/camps');
+    if(tok!==LB._tok)return;
+    msg.textContent='';
+    /* 读不到就退回等分三段的静止带，**下面自己的营和贡献照常显示**。
+       离线/后端没跟上时整块空白，玩家会以为功能坏了——而这一屏最核心的
+       「我属于哪一营、我挣了多少」本来就是纯本地算得出来的。 */
+    const okNet=!!(d&&d.ok&&d.pct);
+    const pct=okNet?d.pct:{light:1/3,dark:1/3,grey:1/3};
+    let h='<div class="camp-bar">';
+    for(const c of CAMPS)h+='<i class="cs-'+c.id+'" style="width:'+(pct[c.id]*100).toFixed(1)+'%"></i>';
+    h+='</div><div class="camp-legend">';
+    for(const c of CAMPS)h+='<span class="cl'+(c.id===mine.id?' me':'')+'">'
+      +'<b class="dot cs-'+c.id+'"></b>'+esc(c.nm)+' '+Math.round(pct[c.id]*100)+'%</span>';
+    h+='</div>';
+    if(!okNet)h+='<div class="camp-note">三营战况暂时读不到 —— <b>不影响你继续挖</b>，联网后自动刷新。</div>';
+    else if(d.empty)h+='<div class="camp-note">本周还没人开挖 —— <b>你挖的第一铲就会让这条带子动起来</b>。</div>';
+    /* 本营同伴名单。看得见队友才有归属感——但**不写人数**，
+       列表有多长玩家自己看得到，那是「有谁」不是「才几个」。 */
+    const ms=((d&&d.members)||{})[mine.id]||[];
+    if(ms.length){
+      h+='<div class="camp-mem"><div class="cmem-hd">本营同伴</div>'
+        +ms.map(x=>{
+          const me=x.alias===SAVE.lbAlias;
+          return '<div class="cmem'+(me?' me':'')+'"><span>'+esc(x.alias)
+            +(me?' <b>（你）</b>':'')+'</span><i>'+x.sc.toLocaleString('en-US')+'</i></div>';
+        }).join('')+'</div>';
+    }
+    h+='<div class="camp-me"><div class="cm-hd">'+esc(mine.nm)+' · '+esc(mine.lead)+'</div>'
+      +'<div class="cm-creed">「'+esc(mine.creed)+'」</div>'
+      +'<div class="cm-metric">本营看 <b>'+esc(mine.metric)+'</b>（'+esc(mine.how)+'）</div>'
+      +'<div class="cm-score">我的贡献 <b>'+campMyScore().toLocaleString('en-US')+'</b></div>'
+      +'<div class="cm-sw">'+(campCanSwitch()
+        ?'<button class="btn ghost" id="camp-switch">改投他营</button>'
+        :'<span class="qs-dim">本月已定 · 下月初可改投</span>')+'</div></div>';
+    list.innerHTML=h;
+    const sw=$('#camp-switch');
+    if(sw)sw.onclick=()=>{SFX.click();list.innerHTML=campPickerHTML();bindCampPicker(()=>renderLB())};
+    mine2.innerHTML='三营各看各的本事 —— 走得远、打得险、来得勤，各有各的算法。';
+    return;
+  }
   if(LB.scope==='faction'){
     const f=await LB.fetchJSON('/gf/factions?limit=20');
     if(tok!==LB._tok)return;
@@ -5984,15 +6177,27 @@ async function renderLB(){
     }
     msg.textContent='';
     const mineF=(SAVE.lbFaction||'').trim();
+    /* 门派行可展开看成员——「同名即同门」，得让人确认朋友真的进来了 */
     list.innerHTML=rows.map(r=>{
       const isMine=mineF&&r.faction===mineF;
-      return '<div class="fac-row'+(isMine?' mine':'')+'">'
+      const mem=(r.members||[]).map(x=>{
+        const me=x.alias===SAVE.lbAlias;
+        return '<div class="cmem'+(me?' me':'')+'"><span>'+esc(x.alias)
+          +(me?' <b>（你）</b>':'')+'</span><i>'+(x.power||0).toLocaleString('en-US')+'</i></div>';
+      }).join('');
+      return '<div class="fac-wrap">'
+        +'<div class="fac-row'+(isMine?' mine':'')+'" data-f="'+esc(r.faction)+'">'
         +'<span class="rk">'+r.rank+'</span>'
         +'<span class="nm">'+esc(r.faction)+(isMine?' · 我的门派':'')+'</span>'
         +'<span class="cnt">'+r.n+' 人 · 人均 '+r.avg.toLocaleString('en-US')+'</span>'
-        +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>';
+        +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>'
+        +(mem?'<div class="fac-mem'+(isMine?' open':'')+'">'+mem+'</div>':'')+'</div>';
     }).join('');
-    mine.innerHTML=!LB.registered()
+    for(const row of $$('#lb-list .fac-row'))row.onclick=()=>{
+      const m=row.parentNode.querySelector('.fac-mem');
+      if(m){SFX.click();m.classList.toggle('open')}
+    };
+    mine2.innerHTML=!LB.registered()
       ?'你还没上榜。点「<b>起名上榜</b>」起个化名、填个门派——<b>同名即同门</b>，和朋友约好名字就行。'
       :(mineF
         ?'我的门派 <b>'+esc(mineF)+'</b> · 每拉一位朋友入门，总矿力立刻多一份'
@@ -6001,9 +6206,6 @@ async function renderLB(){
   }
   const d=await LB.board(LB.scope);
   if(tok!==LB._tok)return;                                    // 期间又切了标签，这次结果作废
-  if(d.err==='nopw'){
-    msg.innerHTML='还没填小队口令。点「改化名」补上，就能看小队榜。';return;
-  }
   if(!d.ok){
     msg.innerHTML=(d.offline?'连不上矿脉榜——<b>不影响你继续挖</b>，联网后再来看。'
       :esc(d.err||'榜单暂时读不到'))+'<br><span style="font-size:11.5px">（榜单是加分项，离线一样能玩）</span>';
@@ -6025,11 +6227,11 @@ async function renderLB(){
   list.innerHTML=html;
   const s=LB.stats();
   if(!LB.registered()){
-    mine.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
+    mine2.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
       +'</b> —— 点「<b>起名上榜</b>」就能排进去。';
     return;
   }
-  mine.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
+  mine2.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
     +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
     +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
       +(found?'':' · 未进前 50，继续挖')):'');
@@ -6038,7 +6240,6 @@ function lbOpenForm(){
   $('#lb-form').hidden=false;
   $('#lb-alias').value=SAVE.lbAlias||'';
   $('#lb-faction').value=SAVE.lbFaction||'';
-  $('#lb-pw').value=SAVE.lbPw||'';
   $('#lb-msg').innerHTML='改完点「上榜」保存。';
   $('#lb-list').innerHTML='';$('#lb-mine').innerHTML='';
   $('#lb-submit').textContent='保存并上榜';
@@ -6110,7 +6311,6 @@ async function lbSave(){
     if(f&&lbBlocked(f)){toast('门派名是保留词——<b>换一个</b>');return}
     SAVE.lbAlias=a;
     SAVE.lbFaction=$('#lb-faction').value.trim().slice(0,8);
-    SAVE.lbPw=$('#lb-pw').value.trim().slice(0,24);
     SAVE.lbSig='';persist();
   }
   $('#lb-msg').textContent='上传中…';
@@ -6636,7 +6836,7 @@ const HOW_HTML=`
 <b>换设备</b>　页脚「安装 · 换机」里可以<b>导出进度口令</b>，粘到新设备就接着玩，全程离线。<br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
-填同一句<b>小队口令</b>的人会自动分到同一个小队榜里。
+还可以选一条你信的<b>挖法</b>——持灯的光明、冒险的黑域、勤勉的灰塔，三营各看各的本事，每月可改投一次。
 `;
 
 /* ==================================================================
@@ -6867,6 +7067,11 @@ $('#btn-quest').addEventListener('click',()=>{SFX.click();renderQuest();ovl('que
 $('#quest-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how')});
 $('#ach-card').addEventListener('click',()=>{SFX.click();showNameCard()});
+/* 换设备的第二个入口。存档搬家原本只藏在页脚「安装 · 换机」里两层深，
+   玩家反馈找不到。成就页是看生涯数据的地方，「换设备保住这些数据」
+   属于同一个心智，放这儿比放典藏册顺。 */
+$('#ach-xfer').addEventListener('click',()=>{SFX.click();ovl('install');
+  const el=$('#xfer-out'); if(el)el.scrollIntoView({block:'center'})});
 $('#ach-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#how-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#map-back').addEventListener('click',()=>{SFX.click();show('menu')});
@@ -7338,6 +7543,26 @@ window.__selftest=function(){
     const okImg=/<img id="wk-cardimg"/.test(String(showCard));
     const okDpr=/devicePixelRatio/.test(src);
     ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
+  }
+  /* 32c. 三阵营：三营各有独立指标（不能都看总矿力，否则鲸鱼一人定胜负——
+     实测头号玩家矿力 = 其余 12 人总和的 63%）；换边每月一次；
+     且**阵营视图绝不渲染人头数**——「光明 5 人」一露就露怯。 */
+  {
+    const ids=CAMPS.map(c=>c.id);
+    const uniq=new Set(ids).size===3&&ids.join()==='light,dark,grey';
+    const st={lv:20,stars:40,chain:8,score:30000,rush:20000,rush2:9000};
+    const scores=CAMPS.map(c=>c.score(st));
+    const indep=new Set(scores).size===3;              // 同一份数据在三营算出三个不同分
+    const src=String(renderLB);
+    const noHead=!/人</.test(src.slice(src.indexOf("scope==='camp'"),src.indexOf("scope==='faction'")));
+    const bak=JSON.parse(JSON.stringify(SAVE.camp));
+    SAVE.camp={side:'light',m:monthNum()};
+    const locked=!campCanSwitch();                    // 本月已选 → 不能再换
+    SAVE.camp={side:'light',m:monthNum()-1};
+    const open=campCanSwitch();                       // 上月选的 → 可以换
+    SAVE.camp=bak;
+    ok('三营指标各自独立、换边每月一次、阵营视图不露人头数',
+       uniq&&indep&&noHead&&locked&&open);
   }
   /* 32b. 公开榜（世界/门派）不该被注册闸挡住——线上实测过：
      没起过化名的浏览器点门派榜是空的，而新人最该看到的恰恰是
