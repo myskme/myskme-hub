@@ -47,6 +47,22 @@
   --mine:#0d0d11;--mine2:#131318;--mine-edge:#2a2820;
 }
 
+/* ── 图标基线 ──
+   `.ic` 这一个类名以前有三种身份：有时是外层 span、有时是里面的 svg、
+   有时 svg 本体就叫 .ic。三套约定并存，而**全站没有任何一条基线 .ic{} 规则**，
+   于是每个消费点各写各的尺寸，分叉出 8 个不同值、5 种 vertical-align。
+   更实际的后果有两个：
+     · 成就页 .ach .ic 同时命中外层 div 和里面的 svg，opacity 相乘（见那条注释）
+     · 新加一个消费点若忘了写尺寸，svg 会被撑到浏览器默认的 300×150 —— 这坑踩过，
+       icTag 包一层 .ic-i 就是为了绕它
+
+   现在约定死：**`.ic` 永远只指 svg 本体，外层容器一律叫 `.icw`**，
+   并给 .ic 一条基线，让「不写尺寸」的默认结果是对的而不是 300×150。
+   尺寸收敛成四档变量，改一处全站跟着走。 */
+:root{--ic-xs:12px;--ic-sm:15px;--ic-md:18px;--ic-lg:26px}
+.ic{width:var(--ic-sm);height:var(--ic-sm);display:inline-block;
+  vertical-align:-.15em;flex:none;line-height:0}
+.icw{display:inline-block;line-height:0;vertical-align:-.15em}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* 页面级锁死：不滚动、不回弹、不选字、不长按弹菜单——网页做游戏的通病一次治掉。
    长内容（玩法卷轴/成就/榜单）都在弹窗卡片内部滚，屏幕本身永远定住。 */
@@ -203,8 +219,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-btns .btn{width:100%;padding-top:clamp(6px,1dvh,11px);padding-bottom:clamp(6px,1dvh,11px);font-size:clamp(15px,2dvh,17px)}
 .menu-btns .btn .sub{margin-top:clamp(1px,.3dvh,3px)}
 .btn .sub{display:block;font-size:11px;letter-spacing:.24em;color:var(--ink3);margin-top:3px}
-.btn .ic.mi{width:1.05em;height:1.05em;vertical-align:-.16em;margin-right:4px;color:var(--gold)}
-.iconbtn .ic{width:1.1em;height:1.1em;vertical-align:-.2em}
+.btn .ic.mi{width:var(--ic-md);height:var(--ic-md);margin-right:4px;color:var(--gold)}
+.iconbtn .ic{width:var(--ic-md);height:var(--ic-md)}
 .btn .sub.warn{color:var(--gold2)}                 /* 有成绩没传上去时描金提醒 */
 .btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
@@ -485,7 +501,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* （旧灯油样式已由 .quota 取代，保留占位注释防止选择器悬空） */
 /* 配额按钮：改动过默认档才描金，一眼看出谁被单独调过 */
 .pt-name .tm.quota{min-width:72px;white-space:nowrap}
-.pt-name .tm.quota .ic{width:1em;height:1em;vertical-align:-.14em;margin-right:2px}
+.pt-name .tm.quota .ic{margin-right:2px}
 .pt-name .tm.quota.hi{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
 #ptr-board{margin-top:8px;text-align:left}
 #ptr-quota{display:flex;flex-direction:column;gap:6px;margin-top:8px}
@@ -598,15 +614,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .tool:not(:disabled){border-color:color-mix(in srgb,var(--gold) 34%,var(--line));color:var(--ink)}
 .tool:not(:disabled):active{transform:translateY(2px);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.6);transition-duration:.05s}
-.tool .ic{line-height:0;color:var(--gold)}
-.tool .ic svg{width:17px;height:17px}
+.tool .icw{color:var(--gold)}
+.tool .icw .ic{width:var(--ic-md);height:var(--ic-md)}
 .tool:hover:not(:disabled){transform:translateY(-2px);border-color:var(--gold);color:var(--ink);box-shadow:var(--glow-soft)}
 .tool:active:not(:disabled){transform:translateY(1px) scale(.97);transition-duration:.05s}
 .tool .cnt{position:absolute;top:-7px;right:-6px;min-width:19px;height:19px;line-height:17px;padding:0 4px;
   border:1px solid var(--gold-line);background:var(--bg);color:var(--gold2);font-size:11px;font-style:normal;
   font-variant-numeric:tabular-nums;text-align:center}
 .tool:disabled{opacity:.34;cursor:default}
-.tool:disabled .ic{color:var(--ink3)}
+.tool:disabled .icw{color:var(--ink3)}
 .tool.armed{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);animation:armedPulse 1.5s ease-in-out infinite}
 @keyframes armedPulse{50%{box-shadow:0 0 32px color-mix(in srgb,var(--gold) 55%,transparent)}}
 #tool-hint{width:min(520px,100%);margin-top:6px;font-size:12.5px;color:var(--gold2);letter-spacing:.08em;
@@ -925,7 +941,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-note b{color:var(--ink2)}
 .sp-shelf{margin-bottom:14px;padding-top:8px;border-top:1px solid var(--line)}
 /* 未解锁不隐藏，压暗摆着 —— 看得见够不着才有期待。沿用典藏册缺卡那套观感。 */
-.sp-shelf.lock{opacity:.42}
+/* ── 锁着的货架：压表面，不压字 ──
+   原来是整块 opacity:.42。透明度会**乘算**：--ink3 在 --panel 上本来 4.86:1，
+   压完只剩 1.87:1；封样说明再乘 .7 → 1.50:1，封样图标乘 .65 → 1.46:1。
+   正文门槛是 4.5:1、界面元素 3.0:1 —— 也就是说这三样在手机上根本看不见，
+   连**「矿力 78,000 · 还差 41,300」这句全店最有驱动力的话**都是 1.87:1。
+
+   这和浅色主题里那个「不可用不该靠降透明度」是同一个病，当时只修了浅色那边。
+   锁态应该由**表面**表达（压暗底、收掉描边），字该看得见照样看得见 ——
+   尤其「还差多少」根本不是禁用态，它是号召，反而要更醒目。 */
+.sp-shelf.lock{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent);
+  border-top-color:var(--line2)}
+.sp-shelf.lock .sp-nm{color:var(--ink2)}
+.sp-shelf.lock .sp-gate{color:var(--gold2)}          /* 「还差多少」要抢眼，不要退让 */
 .sp-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
 .sp-nm{font-size:13px;color:var(--ink);letter-spacing:.14em}
 .sp-gate{flex:1;text-align:right;font-size:11px;color:var(--ink3)}
@@ -944,9 +972,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-c{font-size:11.5px;color:var(--ink3);white-space:nowrap}
 /* 槽位图标：跟标题基线对齐，尺寸压到跟字一样高，不要抢戏 */
 .sp-ic{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--gold)}
-.sp-ic .ic{width:14px;height:14px}
+.sp-ic .ic{width:var(--ic-sm);height:var(--ic-sm)}
 .sp-i.own .sp-ic{color:var(--ink3)}
-.sp-i.seal .sp-ic{color:var(--ink3);opacity:.65}
+.sp-i.seal .sp-ic{color:var(--ink3)}
 /* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
 /* 封样：整条压一层斜向封纹 + 一圈虚线，读作「盖着布、还没揭」。
    纯文字的「封样 · 甲」看着像占位符（做漏了），有这层纹才像刻意封着的货。
@@ -956,7 +984,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
     color-mix(in srgb,var(--gold) 5%,transparent) 0 6px,
     transparent 6px 14px)}
 .sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
-.sp-i.seal .sp-d{opacity:.7}
+.sp-i.seal .sp-d{color:var(--ink3)}
 /* 首兑戳：哪个月头一回兑的。是履历不是内容，所以做得很轻。 */
 .sp-at{font-style:normal;font-size:10px;color:var(--gold2);opacity:.85;letter-spacing:.06em}
 .sp-c s{opacity:.5;margin-right:3px}
@@ -999,8 +1027,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #star-meter .sm-top b{color:var(--gold2);font-weight:500}
 #star-meter .bar{height:8px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;position:relative}
 #star-meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold));transition:width .5s cubic-bezier(.16,1,.3,1)}
-#chest-btn .ic{line-height:0;display:inline-block;vertical-align:-3px}
-#chest-btn .ic svg{width:15px;height:15px}
+#chest-btn .icw .ic{width:var(--ic-sm);height:var(--ic-sm)}
 #chest-btn{margin-top:8px;display:none}
 #chest-btn.on{display:inline-block;animation:curPulse 2s ease-in-out infinite}
 body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
@@ -1080,13 +1107,16 @@ body{--shk:4px}
 /* 成就 */
 #ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
 .ach{border:1px solid var(--line2);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--bg2);transition:all .2s}
-.ach .ic{line-height:0;filter:grayscale(1);opacity:.35;color:var(--ink2)}
-.ach .ic svg{width:26px;height:26px}                    /* SVG 必须给显式尺寸——旧规则是按 emoji 字号写的 */
-.ach.got .ic{filter:none;opacity:1;color:var(--gold)}
-.ach.got .ic svg{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--gold) 45%,transparent))}
+/* ⚠ 这里以前写的是 .ach .ic，而外层 div 和里面的 svg **都带 .ic** ——
+   opacity 被施加两次并相乘：0.35×0.35=0.1225，对比度从设计意图的 1.92:1
+   掉到 1.20:1，未获得的徽记图标几乎看不见。改名之后 .ic 只指 svg 本体，不会再撞。 */
+.ach .icw{filter:grayscale(1);opacity:.35;color:var(--ink2)}
+.ach .icw .ic{width:var(--ic-lg);height:var(--ic-lg)}
+.ach.got .icw{filter:none;opacity:1;color:var(--gold)}
+.ach.got .icw .ic{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--gold) 45%,transparent))}
 .ach .nm{font-size:11px;color:var(--ink3);letter-spacing:.08em;text-align:center}
 .ach.got{border-color:var(--line)}
-.ach.got .ic{filter:none;opacity:1}
+.ach.got .icw{filter:none;opacity:1}
 .ach.got .nm{color:var(--gold2)}
 .ach.got:hover{box-shadow:var(--glow-soft);transform:translateY(-2px)}
 
@@ -1108,8 +1138,7 @@ body{--shk:4px}
 
 /* ==================== 典藏册 ==================== */
 /* 提示条里的内嵌小图标（ICONS 的 svg 没有内联尺寸，不套一层会撑到 300×150） */
-.ic-i{display:inline-block;vertical-align:-3px;line-height:0}
-.ic-i svg{width:15px;height:15px}
+.ic-i .ic{width:var(--ic-sm);height:var(--ic-sm)}
 
 /* 四个子视图共用一张 .ovl-card。不另开弹层是有原因的：
    ovl() 是单层互斥的，开子层会把典藏册顶掉；而全站 22 处关闭写法都是
@@ -1385,7 +1414,7 @@ body{--shk:4px}
       <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
       <div class="sm-top"><span>星辰宝箱<i id="sm-src"></i></span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
       <div class="bar"><i id="sm-fill"></i></div>
-      <button class="btn primary" id="chest-btn"><span class="ic"></span> 开启星辰宝箱</button>
+      <button class="btn primary" id="chest-btn"><span class="icw"></span> 开启星辰宝箱</button>
     </div>
     <div id="map-grid"></div>
     <div id="map-endless"></div>
@@ -1467,9 +1496,9 @@ body{--shk:4px}
       <button id="ally-fire">执 灯</button>
     </div>
     <div id="toolbar">
-      <button class="tool" data-t="pick"><span class="ic" data-ic="pick"></span>矿镐<i class="cnt">0</i></button>
-      <button class="tool" data-t="swap"><span class="ic" data-ic="swap"></span>换位符<i class="cnt">0</i></button>
-      <button class="tool" data-t="mix"><span class="ic" data-ic="mix"></span>重整令<i class="cnt">0</i></button>
+      <button class="tool" data-t="pick"><span class="icw" data-ic="pick"></span>矿镐<i class="cnt">0</i></button>
+      <button class="tool" data-t="swap"><span class="icw" data-ic="swap"></span>换位符<i class="cnt">0</i></button>
+      <button class="tool" data-t="mix"><span class="icw" data-ic="mix"></span>重整令<i class="cnt">0</i></button>
     </div>
     <div id="tool-hint"></div>
     <div id="game-foot">
@@ -7132,7 +7161,7 @@ function renderAch(){
     d.className='ach'+(SAVE.ach[a.id]?' got':'');
     d.style.animationDelay=(i*.03)+'s';
     d.title=a.tip;
-    d.innerHTML='<div class="ic">'+(ICONS[a.ic]||'')+'</div><div class="nm">'+(SAVE.ach[a.id]?a.nm:'？？？')+'</div>';
+    d.innerHTML='<div class="icw">'+(ICONS[a.ic]||'')+'</div><div class="nm">'+(SAVE.ach[a.id]?a.nm:'？？？')+'</div>';
     g.appendChild(d);
   });
   /* ---- 岁记区 ----
@@ -8873,6 +8902,24 @@ window.__selftest=function(){
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
     }
+    /* 图标体系：`.ic` 只许指 svg 本体，外层容器一律 `.icw`。
+       两者都叫 .ic 的后果是**样式被施加两次**——成就页就踩过：
+       opacity .35 施加在外层 div 和里面的 svg 上相乘成 .1225，
+       对比度从 1.92:1 掉到 1.20:1，未获得的徽记几乎看不见。 */
+    {
+      const bakAch=JSON.stringify(SAVE.ach);
+      SAVE.ach={};renderAch();
+      const cell=$('#ach-grid').querySelector('.ach:not(.got)');
+      const w=cell&&cell.querySelector('.icw'), ic=cell&&cell.querySelector('.ic');
+      const oW=w?+getComputedStyle(w).opacity:-1, oI=ic?+getComputedStyle(ic).opacity:-1;
+      ok('图标：未获得的徽记只压一层透明度，不许父子相乘',
+         Math.abs(oW-0.35)<.02 && Math.abs(oI-1)<.02);
+      /* 没有任何 svg.ic 可以被撑到浏览器默认的 300×150 —— 基线规则就是为这个加的 */
+      const huge=[...document.querySelectorAll('svg.ic')]
+        .filter(e=>e.getBoundingClientRect().width>60).length;
+      ok('图标：全站没有漏写尺寸而被撑成 300×150 的 svg',huge===0);
+      SAVE.ach=JSON.parse(bakAch);renderAch();
+    }
     /* 读 body 时被超时中断 ≠ 服务端发了垃圾数据。
        分不开的后果是双重的：玩家看到「返回格式不对」以为游戏坏了（其实只是网慢），
        而 badPayload 又会触发换入口重试，弱网下把所有候选入口挨个撞一遍。 */
@@ -9047,12 +9094,12 @@ window.__selftest=function(){
    [ 启动 · BOOT ]
    ================================================================== */
 $('#btn-pause').innerHTML=ICONS.pause;
-$('#chest-btn').querySelector('.ic').innerHTML=ICONS.gem;
+$('#chest-btn').querySelector('.icw').innerHTML=ICONS.gem;
 $('#btn-sound').innerHTML=SAVE.mute?ICONS.soundOff:ICONS.soundOn;
 $('#btn-sound').style.opacity=SAVE.mute?.45:1;
 $('#btn-music').innerHTML=SAVE.muteBgm?ICONS.musicOff:ICONS.musicOn;
 $('#btn-music').style.opacity=SAVE.muteBgm?.45:1;
-for(const el of $$('#toolbar .ic[data-ic]'))el.innerHTML=ICONS[el.dataset.ic]||'';
+for(const el of $$('#toolbar .icw[data-ic]'))el.innerHTML=ICONS[el.dataset.ic]||'';
 /* 典藏册状态必须在**任何渲染之前**建好：show('menu') 会调 renderDaily()，
    而每日补给公式里有套组加成 boonLampPow()/boonLampTool()，
    它们要读典藏册。读到空状态抛出的 TypeError 会让下面的 PLAT.raf(loop)
