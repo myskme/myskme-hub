@@ -685,6 +685,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   box-shadow:0 0 10px color-mix(in srgb,var(--gold) 25%,transparent)}
 .yj-seal b{font-size:13px;color:var(--gold2);font-weight:600;line-height:1.1}
 .yj-seal i{font-style:normal;font-size:10px;color:var(--ink2);letter-spacing:.1em}
+/* 年轮：一轮一个实心方点。三轮是满的，一轮也说明那个月你真的来过。 */
+.yj-seal u{text-decoration:none;display:block;margin-top:1px;font-size:8px;
+  color:var(--gold2);letter-spacing:.22em;line-height:1}
 #namecard-box{text-align:center;margin-top:12px}
 #nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
 .cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
@@ -1652,7 +1655,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 三阵营。side = 'light'|'dark'|'grey'，m = 选定/上次换边的月序号。
      每月只能换一次：既有承诺感又不锁死人。 */
   camp:{side:'',m:0},
-  bounty:{w:0,done:0},yj:{m:0,c:{},done:0},yjSeal:{},firstDay:0,
+  bounty:{w:0,done:0},yj:{m:0,c:{},done:0,got:{}},yjSeal:{},firstDay:0,
   /* ---- 累计账（2026-08 加）----
      矿力原来五项全是「历史最高值」：星数、关卡、最佳分、矿灯最佳、最长连锁，
      破纪录才动。今天打十局一局没破纪录，矿力纹丝不动——「只要肝就有回报」
@@ -4108,25 +4111,48 @@ const YJ_POOL=[
   {k:'chain8',nm:'当月打出 8 重连锁 3 次',      need:3},
   {k:'bounty',nm:'当月拿下 3 张周悬赏',         need:3},
 ];
+/* 岁记 · 年轮。
+   原来是全有全无：当月三桩差一桩，整月一无所获。而三桩是**随机抽的**，
+   抽到「当月开 12 个典藏匣」这种硬桩时，玩得少的人从月初就注定空手 ——
+   伤到的恰恰是最该被留住的那批。
+   改成按件计：做成一桩就刻一轮，人人都拿得到当月那枚绝版徽记，
+   **轮数记录你做了多少**，三轮才是满的。
+   匣的产出一分不动（3.5 个月集齐那套节奏是蒙特卡洛调出来的，不能被岁记挤），
+   每桩另给星屑 —— 星屑目前只有升阶和寻卡两个出口，扩容不冲击任何已调好的线。 */
+const YJ_DUST=40;
+function yjRings(m){const s=SAVE.yjSeal[monthKey(m)];return s?(s.n||1):0}
 function yjState(){
   const m=monthNum(), y=SAVE.yj;
-  if(y.m!==m){y.m=m;y.c={};y.done=0;persist()}
+  if(y.m!==m){y.m=m;y.c={};y.done=0;y.got={};persist()}
+  if(!y.got||typeof y.got!=='object')y.got={};
   const r=rngOf('yj|'+m), pool=YJ_POOL.slice(), out=[];
   for(let i=0;i<3&&pool.length;i++)out.push(pool.splice(Math.floor(r()*pool.length),1)[0]);
-  return {m,tasks:out,c:y.c,done:!!y.done};
+  const n=out.filter(t=>(y.c[t.k]||0)>=t.need).length;
+  return {m,tasks:out,c:y.c,n,done:n>=3};
 }
 function yjBump(k,n){
   const st=yjState();
-  if(st.done)return;
   if(!st.tasks.some(t=>t.k===k))return;
-  const y=SAVE.yj;y.c[k]=(y.c[k]||0)+(n||1);persist();
-  if(st.tasks.every(t=>(y.c[t.k]||0)>=t.need)){
-    y.done=1;
-    SAVE.yjSeal[monthKey(st.m)]={d:dayNum()};persist();
-    giveBox(1,'岁记');
-    setTimeout(()=>toast('岁记铸成 · <b>'+monthTag(st.m)+'</b><br>'
-      +'这枚徽记只属于这个月 · 过月不再有',5000),1400);
+  const y=SAVE.yj, was=st.n;
+  if((y.c[k]||0)>=(st.tasks.find(t=>t.k===k).need))return;   // 这一桩早就满了，不再累加
+  y.c[k]=(y.c[k]||0)+(n||1);
+  const now=yjState().n;
+  if(now>was){
+    /* 每做成一桩就当场结算一次：刻一轮 + 一笔星屑。
+       徽记从第一轮起就存在且带日期戳，所以「这个月我来过」这件事永远留得住。 */
+    const key=monthKey(st.m), old=SAVE.yjSeal[key];
+    SAVE.yjSeal[key]={d:(old&&old.d)||dayNum(),n:now};
+    colFix();COLS.dust+=YJ_DUST*(now-was);colSave();
+    if(now>=3&&!y.done){
+      y.done=1;giveBox(1,'岁记');
+      setTimeout(()=>toast('岁记满轮 · <b>'+monthTag(st.m)+'</b><br>'
+        +'三轮齐了 · 这枚只属于这个月，过月不再有',5000),1400);
+    }else{
+      setTimeout(()=>toast('岁记 · <b>'+monthTag(st.m)+'</b> 刻下第 <b>'+now+'</b> 轮<br>'
+        +icTag('dust')+' 星屑 +'+YJ_DUST,3600),1200);
+    }
   }
+  persist();
 }
 function dailyState(){
   const d=dayNum();
@@ -6128,15 +6154,20 @@ function renderQuest(){
     +'</div><button class="btn qs-go" data-go="rush2">点 灯</button></div>';
   /* 岁记 */
   h+='<div class="qs-sec"><div class="qs-hd">岁记 · '+monthTag(yj.m)
-    +'<span class="qs-sub">'+(yj.done?'已铸成':'每月只此一枚')+'</span></div>'
+    +'<span class="qs-sub">'+(yj.n?('已刻 '+yj.n+' / 3 轮'):'每月只此一枚')+'</span></div>'
     +'<div class="qs-bd">'+yj.tasks.map(t=>{
       const got=Math.min(yj.c[t.k]||0,t.need), done=got>=t.need;
       return '<div class="q3r'+(done?' done':'')+'"><span class="q3t">'+esc(t.nm)
         +' '+got+' / '+t.need+'</span><i style="width:'+(got/t.need*100)+'%"></i></div>';
     }).join('')
+    /* 说清楚「做一桩就有一桩的」——原来这里写「三桩全清才铸」，
+       抽到硬桩的人从月初就知道自己没戏，那句话本身就是劝退。 */
     +'<div class="qs-dim" style="margin-top:5px">'+(yj.done
-      ?'本月徽记已挂进成就页的岁记墙'
-      :'三桩全清 → 铸一枚刻着「'+monthTag(yj.m)+'」的绝版徽记，过月不再有')+'</div></div></div>';
+      ?'三轮齐了 · 本月徽记已挂进成就页的岁记墙'
+      :(yj.n
+        ?('已经刻下 '+yj.n+' 轮 · 徽记归你了，再做一桩多一轮')
+        :('做成一桩就刻一轮，铸一枚刻着「'+monthTag(yj.m)+'」的徽记，过月不再有')))
+    +'</div></div></div>';
   B.innerHTML=h;
   for(const btn of $$('#quest-body .qs-go'))btn.onclick=()=>{
     SFX.click();ovl(null);
@@ -6734,12 +6765,18 @@ function renderAch(){
       +' '+got+' / '+t.need+'</span><i style="width:'+(got/t.need*100)+'%"></i></div>';
   }).join('')+'</div>';
   h+='<div class="yj-note">'+(st.done
-    ?'本月徽记<b>已铸成</b> · 下月初换新的三桩'
-    :'三桩全清 → 铸一枚刻着「'+monthTag(st.m)+'」的绝版徽记')+'</div>';
+    ?'本月<b>三轮齐了</b> · 下月初换新的三桩'
+    :(st.n
+      ?('本月已刻下 <b>'+st.n+'</b> 轮 · 徽记已经归你，再做一桩多一轮')
+      :('做成一桩就刻一轮 → 铸一枚刻着「'+monthTag(st.m)+'」的绝版徽记')))+'</div>';
   if(seals.length){
     h+='<div class="yj-wall">'+seals.map(k=>{
       const y=k.slice(0,4),mo=+k.slice(4);
-      return '<div class="yj-seal" title="铸于当月"><b>'+y+'</b><i>'+mo+' 月</i></div>';
+      const n=(SAVE.yjSeal[k]&&SAVE.yjSeal[k].n)||1;
+      /* 轮数是这枚徽记的分量：三轮是满的，一轮也是那个月真的来过。
+         用实心方点画轮（禁 emoji），不写「1/3」——不写分母是店规三。 */
+      return '<div class="yj-seal" title="'+n+' 轮"><b>'+y+'</b><i>'+mo+' 月</i>'
+        +'<u>'+'\u25aa'.repeat(n)+'</u></div>';
     }).join('')+'</div>';
   }
   host.innerHTML=h;
@@ -8067,16 +8104,25 @@ window.__selftest=function(){
     const st=yjState();
     const uniq=new Set(st.tasks.map(t=>t.k)).size===3;
     const same=JSON.stringify(yjState().tasks)===JSON.stringify(st.tasks);
-    for(const t of st.tasks)for(let i=0;i<t.need;i++)yjBump(t.k,1);
-    const sealed=!!SAVE.yjSeal[monthKey(m)]&&SAVE.yj.done===1;
-    const sealDay=sealed?SAVE.yjSeal[monthKey(m)].d:0;
-    for(const t of st.tasks)yjBump(t.k,99);                    // done 之后不许重发
-    const once=Object.keys(SAVE.yjSeal).length===1;
-    SAVE.yj={m:m-1,c:{a:5},done:1};yjState();                  // 跨月重置
+    /* 年轮：做成第一桩就该有徽记，不必等三桩齐 —— 这条盯的就是「差一桩整月空手」那个旧行为 */
+    colFix();const d0=COLS.dust;
+    const t0=st.tasks[0];for(let i=0;i<t0.need;i++)yjBump(t0.k,1);
+    const ring1=yjRings(m)===1&&!!SAVE.yjSeal[monthKey(m)]&&SAVE.yj.done!==1;
+    const dust1=COLS.dust===d0+YJ_DUST;
+    const day1=SAVE.yjSeal[monthKey(m)].d;
+    for(const t of st.tasks.slice(1))for(let i=0;i<t.need;i++)yjBump(t.k,1);
+    const ring3=yjRings(m)===3&&SAVE.yj.done===1;
+    const dayKept=SAVE.yjSeal[monthKey(m)].d===day1;           // 升轮不许改掉首次刻印的日期
+    const boxAfter=COLS.box;
+    for(const t of st.tasks)yjBump(t.k,99);                    // 满轮之后不许重发
+    const once=Object.keys(SAVE.yjSeal).length===1&&COLS.box===boxAfter&&yjRings(m)===3;
+    SAVE.yj={m:m-1,c:{a:5},done:1,got:{}};yjState();           // 跨月重置
     const reset=SAVE.yj.m===m&&SAVE.yj.done===0&&Object.keys(SAVE.yj.c).length===0;
     const rb=JSON.parse(bak);SAVE.yj=rb.yj;SAVE.yjSeal=rb.seal;
-    if(COLS&&rb.box!==null)COLS.box=rb.box;persist();colSave();
-    ok('岁记三桩确定不重复、集齐铸徽不重发、跨月重置',uniq&&same&&sealed&&sealDay>0&&once&&reset);
+    if(COLS&&rb.box!==null)COLS.box=rb.box;COLS.dust=d0;persist();colSave();
+    ok('岁记三桩确定不重复、满轮不重发、跨月重置',uniq&&same&&ring3&&once&&reset);
+    ok('岁记按件计：做成一桩就刻一轮并给星屑，徽记当场就归你（不再差一桩整月空手）',
+       ring1&&dust1&&dayKept);
   }
   {
     /* 续灯与 90 秒的最佳分各记各的，名片才分得开两条线 */
