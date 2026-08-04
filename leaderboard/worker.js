@@ -345,7 +345,7 @@ async function handleAdmin(req, env, origin) {
 /* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
    定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
 const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
-                 runs: 45000, days: 3000, dbest: 3000, mv: 500000 };
+                 runs: 45000, days: 3000, dbest: 3000, mv: 500000, luck: 400 };
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
@@ -428,7 +428,7 @@ async function gfEnsure(env) {
        lv INTEGER DEFAULT 0, stars INTEGER DEFAULT 0, chain INTEGER DEFAULT 0,
        rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
        runs INTEGER DEFAULT 0, days INTEGER DEFAULT 0,
-       dbest INTEGER DEFAULT 0, best_dig INTEGER DEFAULT 0,
+       dbest INTEGER DEFAULT 0, best_dig INTEGER DEFAULT 0, luck INTEGER DEFAULT 0,
        first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
@@ -441,15 +441,26 @@ async function gfEnsure(env) {
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN days INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN dbest INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN best_dig INTEGER DEFAULT 0").run(); } catch (e) {}
+  /* luck = 开匣开出的臻卡张数（3% 掉率，纯手气，不含升阶与寻卡换来的）。
+     「运数首座」吃这一列 —— 它跟投入无关，是刻意留给新人的那扇窗。 */
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN luck INTEGER DEFAULT 0").run(); } catch (e) {}
+  /* luck = 开匣开出的臻卡张数（3% 掉率，纯手气，不含升阶与寻卡换来的）。
+     「运数首座」吃这一列 —— 它跟投入完全无关，是留给新人的那扇窗。 */
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN luck INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
 }
+/* runs/days/dbest/mv 也要给客户端 —— 「三线首座」要在前端算出每个人的
+   深度/技巧/勤勉，缺一项就算不出勤勉那条，而勤勉恰恰是唯一「榜首快不过新人」的线。
+   多这四个整数对响应体的影响可以忽略（50 行 × 4 个数）。 */
 function gfMap(rows) {
   return (rows || []).map((r, i) => ({
     rank: i + 1, alias: r.alias, faction: r.faction || "", power: r.power || 0,
     lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
     chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
+    runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
+    luck: r.luck || 0,
     tag: String(r.id || "").slice(-2),
   }));
 }
@@ -490,6 +501,7 @@ async function gfSubmit(req, env, origin) {
     chain: clampInt(st.chain, 0, GF_CAP.chain),
     runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
     dbest: clampInt(st.dbest, 0, GF_CAP.dbest), mv: clampInt(st.mv, 0, GF_CAP.mv),
+    luck: clampInt(st.luck, 0, GF_CAP.luck),
   };
   /* 下矿天数不可能多于下矿局数——一天至少打一局才算来过。
      连续到场纪录也不可能超过累计到场天数。
@@ -502,8 +514,8 @@ async function gfSubmit(req, env, origin) {
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
     `INSERT INTO gemfall (id,alias,faction,camp,class_tag,power,best_score,best_rush,lv,stars,chain,
-       runs,days,dbest,best_dig,rank_name,badges,season,first_seen,last_write,hidden)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+       runs,days,dbest,best_dig,luck,rank_name,badges,season,first_seen,last_write,hidden)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
        camp=CASE WHEN excluded.camp!='' THEN excluded.camp ELSE gemfall.camp END,
@@ -517,10 +529,11 @@ async function gfSubmit(req, env, origin) {
        days=MAX(COALESCE(gemfall.days,0),excluded.days),
        dbest=MAX(COALESCE(gemfall.dbest,0),excluded.dbest),
        best_dig=MAX(COALESCE(gemfall.best_dig,0),excluded.best_dig),
+       luck=MAX(COALESCE(gemfall.luck,0),excluded.luck),
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
-         s.runs, s.days, s.dbest, s.mv, rname, badges, sea, seen, now).run();
+         s.runs, s.days, s.dbest, s.mv, s.luck, rname, badges, sea, seen, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
@@ -530,13 +543,13 @@ async function gfSubmit(req, env, origin) {
      NaN 一路写进库变成 NULL，玩家的矿力当场归零、段位掉回学徒，而且**没有任何报错**。
      所以下面既对齐了字段，又加了一道 isFinite 兜底：宁可退回本次提交值，绝不写 NaN。 */
   const row = await env.DB.prepare(
-    "SELECT best_score,best_rush,lv,stars,chain,runs,days,dbest,best_dig FROM gemfall WHERE id=?"
+    "SELECT best_score,best_rush,lv,stars,chain,runs,days,dbest,best_dig,luck FROM gemfall WHERE id=?"
   ).bind(id).first();
   const merged = row ? {
     score: row.best_score || 0, rush: row.best_rush || 0,
     lv: row.lv || 0, stars: row.stars || 0, chain: row.chain || 0,
     runs: row.runs || 0, days: row.days || 0,
-    dbest: row.dbest || 0, mv: row.best_dig || 0,
+    dbest: row.dbest || 0, mv: row.best_dig || 0, luck: row.luck || 0,
   } : s;
   let myPower = gfPower(merged);
   if (!Number.isFinite(myPower)) myPower = gfPower(s);      // 回读缺项时退回本次提交
@@ -662,7 +675,10 @@ async function gfBoard(req, env, origin, url) {
   const scope = url.searchParams.get("scope") || "world";
   const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
   let rows;
-  const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges";
+  /* ⚠ 这里加列时别忘了 gfMap 也要跟着加 —— 两边任何一边漏掉，
+     客户端拿到的就是 undefined，而三线首座算的是每个人的三条线，缺一项就整条算错。 */
+  const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges,"
+             + "runs,days,dbest,best_dig,luck";
   /* 不按 season 过滤：gemfall 没有 base_power 基线，赛季语义对它本来就不成立；
      而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
      这里按 season 过滤就会把整个矿脉榜读成空。矿脉榜记的是累计进度（关卡、星数），

@@ -747,6 +747,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .fac-row .ar svg{width:14px;height:14px}
 .fac-wrap.open .fac-row .ar{transform:rotate(90deg)}
 .fac-tip{padding:6px 4px 2px;font-size:11px;color:var(--ink3);letter-spacing:.04em}
+/* 三线首座：三个王座而不是一个。摆在榜单最顶上当公告。 */
+.thr{margin:0 0 12px;padding:9px 11px 8px;border:1px solid var(--gold-line);border-radius:6px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 9%,transparent),transparent);
+  text-align:left}
+.thr-hd{font-size:12px;color:var(--gold2);letter-spacing:.42em;text-align:center;margin-bottom:6px}
+.thr-r{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:13px}
+.thr-n{font-size:11px;color:var(--ink3);letter-spacing:.08em;min-width:64px}
+.thr-r b{color:var(--gold2);letter-spacing:.06em;font-weight:500}
+.thr-r i{font-style:normal;margin-left:auto;font-size:11.5px;color:var(--ink3);
+  font-variant-numeric:tabular-nums}
+/* 虚位：压暗但不隐藏 —— 「这个座还没人坐」是号召，不是缺陷 */
+.thr-r.vac b{color:var(--ink3);font-weight:400}
+.thr-r.vac{opacity:.72}
+.thr-f{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
+  font-size:10.5px;color:var(--ink3);line-height:1.65}
+.thr-f b{color:var(--ink2)}
+/* 坐着座的人，名字前面点一颗 */
+.lb-row .thr-mk{color:var(--gold2);margin-right:3px;font-size:11px}
 /* 贴身对手：端在榜单最上面，只显示你前后各一名和确切差距 */
 .near{margin:0 0 12px;padding:9px 10px 8px;border:1px solid var(--line);border-radius:6px;
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 6%,transparent),transparent)}
@@ -4750,6 +4768,17 @@ const colHas  =(n,t)=>colCnt(n,t)>0;
 const colAny  =n=>colHas(n,0)||colHas(n,1)||colHas(n,2)||colHas(n,3);
 const colTop  =n=>{for(let t=3;t>=0;t--)if(colHas(n,t))return t;return -1};
 const colSpare=(n,t)=>Math.max(0,colCnt(n,t)-1);       // 多出来的份：可赠出
+/* 运数 = **开匣开出来的**臻卡张数。掉率 3%，不含升阶炼成的、也不含星屑寻来的 ——
+   那两条是肝出来的，掺进来这条线就不叫手气了。
+   来历只在第一次拿到时写，所以这个数天然只增不减，跟全站其余成绩同一个性质。 */
+function luckCount(){
+  colFix();let n=0;
+  for(const key in COLS.org){
+    const o=COLS.org[key];
+    if(o&&o.s==='box'&&Number(key.split(':')[1])===T_TOP)n++;
+  }
+  return n;
+}
 function colGain(n,t,k,src,ctx){
   const cur=colCnt(n,t), want=cur+(k||1);
   /* 来历只在**第一次**拿到时写。之后再开出重复的不覆盖——
@@ -5747,7 +5776,7 @@ const LB={
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
     return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0,
             runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
-            mv:(SAVE.dig&&SAVE.dig.best)||0};
+            mv:(SAVE.dig&&SAVE.dig.best)||0,luck:luckCount()};
   },
   /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
      后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
@@ -5818,7 +5847,7 @@ const LB={
   /* 指纹里必须包含 runs/days，否则「只涨天数不涨成绩」的人 pending() 永远为假、
      flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
   sig(){const s=this.stats();
-    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,
+    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,
             (SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
@@ -5920,15 +5949,17 @@ function lbMenuStatus(){
     ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
     : '看看三营谁在领先';
 }
-function lbRowHTML(r,mine){
+function lbRowHTML(r,mine,throne){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
     r.lv?('第 '+r.lv+' 关'):'',r.stars?('★'+r.stars):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'">'
     +'<div class="rk">'+medal+'</div>'
-    +'<div class="who"><div class="nm">'+esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
-    +'<div class="sub">'+esc(sub)+'</div></div>'
+    +'<div class="who"><div class="nm">'
+      +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
+      +esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
+    +'<div class="sub">'+(throne?'<b style="color:var(--gold2)">'+esc(throne)+'</b> · ':'')+esc(sub)+'</div></div>'
     +'<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
     +'</div>';
 }
@@ -6065,8 +6096,9 @@ function drawNameCard(){
   colFix();shopFix();
   x.fillText('矿工号 '+minerTag()+' · 同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
   /* 矿场买的题名。名片是会被导出成图片发到微信群的 —— 这是全站最值钱的展示位，
-     也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。 */
-  const _tt=shopTitle();
+     也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。
+     坐着首座的话，首座压过题名显示 —— 那是争来的，比买来的重。 */
+  const _tt=(THR_MINE&&THR_MINE.length?THR_MINE[0]:'')||shopTitle();
   if(_tt){x.fillStyle=GOLD2;x.font='400 16px serif';x.fillText('· '+_tt+' ·',mid,196);x.fillStyle=INK}
   /* 灯位是名片的主徽 */
   x.fillStyle=GOLD;x.font='400 17px serif';
@@ -6457,14 +6489,22 @@ async function renderLB(){
   }
   msg.textContent='';
   let html='',found=false,myIdx=-1;
+  /* 谁坐着哪个座，一次算好，逐行查表 —— 别在循环里反复算三条线 */
+  const thr=thronesOf(rows), thrBy={};
+  /* 一个人可以坐好几个座，所以这里存数组不存单值 */
+  for(const t of THRONES)if(thr[t.k]){
+    const k=thr[t.k].alias+'|'+(thr[t.k].tag||'');
+    (thrBy[k]=thrBy[k]||[]).push(t.nm);
+  }
   for(let i=0;i<rows.length;i++){
     const r=rows[i];
     /* 同名很常见，光比化名会把两个人都标成「你」。后端给了 tag（设备键末两位），有就一起比 */
     const isMe=r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag);
     if(isMe){found=true;myIdx=i}
-    html+=lbRowHTML(r,isMe);
+    html+=lbRowHTML(r,isMe,(thrBy[(r.alias||'')+'|'+(r.tag||'')]||[]).join(' · '));
   }
-  list.innerHTML=nearHTML(rows,myIdx)+html;
+  throneMine(rows);
+  list.innerHTML=throneHTML(rows)+nearHTML(rows,myIdx)+html;
   const s=LB.stats();
   if(!LB.registered()){
     mine2.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
@@ -6518,6 +6558,71 @@ function pwAdviceHTML(){
   return '矿力看三样：<b>走多远</b>、<b>打多险</b>、<b>来多勤</b>，'
     +'三样里<b>最短的那样算四倍</b>。<br>'
     +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
+}
+/* ────────── 三线首座 ──────────
+   王老师要「积分第一的闪耀称号」，同时要「人人都有机会去争夺」。
+   这两条本来矛盾：一个第一名只能有一个人。
+
+   解法是矿力本来就拆成了三条线，所以设**三个王座**而不是一个：
+     深度首座（走多远）／ 技巧首座（打多险）／ 勤勉首座（来多勤）
+   三个人，三种活法。而**勤勉那条每天封顶**——榜首一天最多也就那么多，
+   结构上快不过一个天天来的新人。它天生就是「人人都能争」的那一条。
+
+   这也是「世界公告」最便宜的形态：不建表、不加路由、不存事件，
+   全部由榜单已有的数据当场算出来，人人看到的是同一份。 */
+/* 四条路，四种活法，**一个人可以全占**。
+   王老师定的调子是阴阳师那种：只要肯肝就一定有回报，愚公移山也算数 ——
+   所以骨灰级玩家把四个座全坐了，那是他该得的，不该被规则拦下来。
+   「人人有机会」靠的不是限座，是**四条路的门槛完全不同**：
+     深度 = 走得远，最吃时间累积
+     技巧 = 打得险，吃真本事，一次高连锁就能顶上去
+     勤勉 = 来得勤，每天封顶，谁也快不过谁，比的是不断
+     运数 = 开匣开出的臻卡，3% 掉率，纯手气，新人第一天就可能撞上
+   最后一条是刻意留的那扇窗：它跟投入完全无关，谁都有份。 */
+const THRONES=[
+  {k:'depth',nm:'深度首座',w:'走得最远的人'},
+  {k:'skill',nm:'技巧首座',w:'打得最险的人'},
+  {k:'grind',nm:'勤勉首座',w:'来得最勤的人'},
+  {k:'luck', nm:'运数首座',w:'手气最好的人'},
+];
+function thronesOf(rows){
+  const out={};
+  for(const t of THRONES){
+    let best=null,bv=0;
+    for(const r of (rows||[])){
+      const v=t.k==='luck'?(r.luck||0)
+        :pwLines({lv:r.lv||0,stars:r.stars||0,chain:r.chain||0,score:r.score||0,
+          rush:r.rush||0,mv:r.mv||0,runs:r.runs||0,days:r.days||0,dbest:r.dbest||0})[t.k];
+      /* 并列时先到者居前（榜单本就按矿力降序）。一个座位就是一个人，含糊反而不激励。 */
+      if(v>bv){bv=v;best=r}
+    }
+    if(best&&bv>0)out[t.k]={alias:best.alias,tag:best.tag||'',v:bv};
+  }
+  return out;
+}
+function throneHTML(rows){
+  const th=thronesOf(rows);
+  if(!THRONES.some(t=>th[t.k]))return '';
+  /* 空座**照样摆出来**，写「虚位以待」。
+     藏起来等于告诉玩家这条路不存在；摆着才是号召 —— 「这个座还没人坐」
+     恰恰是新人最该看到的一句话。 */
+  return '<div class="thr"><div class="thr-hd">四 座</div>'
+    +THRONES.map(t=>'<div class="thr-r'+(th[t.k]?'':' vac')+'"><span class="thr-n">'+t.nm+'</span>'
+      +(th[t.k]
+        ?('<b>'+esc(th[t.k].alias)+'</b><i>'+th[t.k].v.toLocaleString('en-US')
+          +(t.k==='luck'?' 张':'')+'</i>')
+        :('<b>虚位以待</b><i>'+esc(t.w)+'</i>'))+'</div>').join('')
+    +'<div class="thr-f">四条路，四种活法，<b>一个人可以全占</b> —— 肝到了就该拿。<br>'
+    +'「来得最勤」每天有上限，谁也快不过谁；'
+    +'<b>「手气最好」跟投入无关，新人第一天就可能撞上</b>。</div></div>';
+}
+/* 我坐着哪几个座？名片与榜单上都要闪。 */
+let THR_MINE=[];
+function throneMine(rows){
+  const th=thronesOf(rows), me=SAVE.lbAlias||'';
+  THR_MINE=THRONES.filter(t=>th[t.k]&&th[t.k].alias===me
+    &&(!SAVE.lbTag||!th[t.k].tag||th[t.k].tag===SAVE.lbTag)).map(t=>t.nm);
+  return THR_MINE;
 }
 /* ────────── 明牌配速员 ──────────
    作者最初想放「不被玩家发现的虚拟人」来制造竞争感。劝阻的理由不是道德，是它在这里
@@ -6873,6 +6978,13 @@ const GOODS=[
   {id:'ps5',s:7,nm:'题跋 · 灯下无人',cur:'pw',cost:8000,slot:'post', d:'拓片落款'},
   {id:'tt7',s:7,nm:'题名 · 满轮者',  cur:'pw',cost:9000,slot:'title',d:'名片称衔',need:()=>Object.values(SAVE.yjSeal||{}).filter(x=>(x&&x.n)>=3).length>=6,needTxt:'集满 6 个月的三轮岁记'},
   {id:'sl7',s:8,nm:'落印 · 未名',    cur:'pw',cost:20000,slot:'seal',d:'没有人见过这枚印'},
+  /* 全伙伴曜衔：六位同伴各 100 胜。这是全站最长的一条线，
+     刻意放在最高一层且不打折 —— 它该是「争来的」不是「买到的」，
+     价钱只是个形式，真正的门槛是那 600 场胜仗。 */
+  {id:'tt8',s:8,nm:'题名 · 六衔在身',cur:'pw',cost:12000,slot:'title',
+   d:'六位同伴全部打到曜衔才刻得下这一行',
+   need:()=>COMPANIONS.every(c=>csRank((SAVE.cs[c.id]||{}).w||0)==='曜衔'),
+   needTxt:'六位同伴各打到曜衔'},
 ];
 /* 从这一层起未解锁就封样：只露价签，不露名字与说明。
    评审原话是「全案最干净的一条」——无窗口、无名额、无消耗，纯好奇心。
@@ -8396,10 +8508,16 @@ window.__selftest=function(){
     const st=LB.stats(), sg=LB.sig();
     ok('累计账：同一天多局只算一天，断几天回来不清零',sameDay&&afterGap);
     /* sig 的每一项都必须在，少一项那条线就永远传不上去，而且悄无声息 */
-    ok('累计账：runs/days/dbest/mv 都进了 stats() 与 sig()',
+    /* 写死 10 段是个坑：加一项就红，而红的原因看不出来是「漏传」还是「多传了一项」。
+       改成「stats() 里每一个上传项都必须出现在 sig() 里」——加新项时自动覆盖。
+       sig 少一项，那条线就永远触发不了上传，而且悄无声息。 */
+    const SIG_KEYS=['score','rush','lv','stars','chain','runs','days','dbest','mv','luck'];
+    ok('累计账：runs/days/dbest/mv/luck 都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
-       &&typeof st.dbest==='number'&&typeof st.mv==='number'
-       &&sg.split('|').length===10&&sg.indexOf('|'+SAVE.days+'|')>=0);
+       &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
+       &&SIG_KEYS.every(k=>typeof st[k]==='number')
+       &&sg.split('|').length===SIG_KEYS.length+1        // 末位是阵营，不是数字
+       &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
   /* 32. 矿力三线：客户端镜像必须和 worker.js 的 gfDepth/gfSkill/gfGrind 算出同一个数。
@@ -8471,6 +8589,28 @@ window.__selftest=function(){
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
     ok('矿场：称衔一律要先做到，不能纯花钱买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
+    /* 四座：一个人可以全占（肝到了就该拿），四条路的门槛各不相同。
+       运数吃的是开匣开出的臻卡，跟投入无关 —— 那是刻意留给新人的窗。 */
+    {
+      const R=[
+        {alias:'甲',tag:'01',lv:200,stars:192,chain:6, score:20000,rush:10000,runs:10,days:2, dbest:1,luck:1},
+        {alias:'乙',tag:'02',lv:10, stars:20, chain:14,score:90000,rush:99000,runs:10,days:2, dbest:1,luck:0},
+        {alias:'丙',tag:'03',lv:20, stars:40, chain:5, score:10000,rush:5000, runs:300,days:60,dbest:30,luck:2},
+        {alias:'丁',tag:'04',lv:1,  stars:2,  chain:3, score:500,  rush:0,    runs:2,  days:1, dbest:1,luck:9},
+      ];
+      const t=thronesOf(R);
+      ok('四座：四条路各归其人（深度甲·技巧乙·勤勉丙·运数丁）',
+         t.depth&&t.depth.alias==='甲' && t.skill&&t.skill.alias==='乙'
+      && t.grind&&t.grind.alias==='丙' && t.luck &&t.luck.alias ==='丁');
+      /* 一个人全占也必须允许 —— 这条是王老师明确要的：肝到了就该给 */
+      const solo=thronesOf([{alias:'独',tag:'09',lv:300,stars:192,chain:20,score:400000,
+        rush:400000,runs:900,days:200,dbest:100,luck:40}]);
+      ok('四座：一个人可以把四个座全占（不设限座）',
+         THRONES.every(x=>solo[x.k]&&solo[x.k].alias==='独'));
+      /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
+      ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
+         t.luck.v===9 && luckCount()>=0);
+    }
     /* 兑窗月配额：限的是速度不是机会。零竞争（自己的额度）、跨月重置、
        用满之后钱再多也买不动 —— 这是「一个月内解锁不完」唯一的硬保证。 */
     {
