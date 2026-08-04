@@ -48,14 +48,37 @@ document.documentElement.setAttribute('data-theme','dark')}})();</script>
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --mine:#0d0d11;--mine2:#131318;--mine-edge:#2a2820;
 }
+/* ── 浅色主题（羊皮纸）──
+   2026-08-05 重做。旧版王老师的评价是「深色挺融合，浅色一般」，测下来毛病很具体：
+   **文字对比度全部合格（5.5–14），问题根本不在字**，而在表面分层：
+     edge on panel = 1.31（描边需 ≥3.0）→ 边框等于不存在
+     panel on bg   = 1.15（图底分离）  → 卡片和页面粘成一片
+     明度阶梯全挤在 L* 85–96 这 10 个点里
+   所以地图页里锁着的关卡格和背景分不出来、进度条看不见 —— 那已经不是好看不好看，
+   是功能可读性。
+
+   重排后的阶梯（L*）：bg2 78.2 → bg 83.7 → edge 57.8 → panel2 92.5 → panel 97.3，
+   页面是纸、卡片是压上去的更白的纸、描边真的看得见。
+   金色也修了方向：旧版 gold2（强调色）比 gold 还灰，深色主题里它却是最亮的那个 ——
+   同一个变量在两套主题里担任相反的角色，用到它的地方轻重全反。现在统一为
+   「gold 是底色、gold2 是强调」，浅色下强调 = 更深更饱和（L* 36.9 → 27.3）。
+
+   下面每一对都用 WCAG 算过，正文 ≥4.5、描边 ≥3.0，改任何一个值都要重算。 */
 :root[data-theme="light"]{
-  --bg:#ece2cc;--bg2:#e6dabf;--panel:#f8f2e4;--panel2:#efe6cf;--edge:#e2d5b4;
-  --ink:#2a2218;--ink2:#574b37;--ink3:#6b6047;   /* 同上，浅色主题下也要过 AA */
-  --gold:#6f5410;--gold2:#5f470e;--gold-hi:#8a6d1e;--gold-line:#b89a52;
-  --red:#9a271d;--green:#2f6a3e;--blue:#33548c;--purple:#6a3d8c;
-  --line:rgba(120,90,20,.30);--line2:rgba(120,90,20,.13);
-  --glow:0 4px 16px rgba(120,90,20,.20);--glow-soft:0 2px 10px rgba(120,90,20,.15);
-  --paper:#fffdf6;--noise-op:.10;--noise-blend:multiply;
+  --bg:#ddd0ae;--bg2:#d2c096;--panel:#fbf7ec;--panel2:#f2e9d4;--edge:#a4874e;
+  --ink:#221b10;--ink2:#4a3e2a;--ink3:#655840;   /* ink3 承载信息，浅色下同样过 AA（6.49 / 4.53） */
+  --gold:#70520a;--gold2:#563c03;--gold-hi:#96700f;--gold-line:#b59a5e;
+  --red:#93231a;--green:#2a6339;--blue:#2d4d85;--purple:#633586;
+  --line:rgba(112,82,10,.34);--line2:rgba(112,82,10,.15);
+  /* 浅色下没有辉光可言，改成分层暖投影：近处一层压实边缘，远处一层给体积。
+     单层大模糊在米色上什么都看不出来，这是旧版「浮着」的另一半原因。 */
+  --glow:0 1px 2px rgba(90,66,10,.20),0 6px 18px rgba(90,66,10,.16);
+  --glow-soft:0 1px 2px rgba(90,66,10,.14),0 3px 10px rgba(90,66,10,.10);
+  --paper:#fffdf6;--noise-op:.16;--noise-blend:multiply;
+  /* ⚠ 矿坑三色以前**没在浅色里覆盖**，直接继承了深色的近黑 —— 白天开着浅色主题，
+     棋盘却是一块纯黑（实测画布左上角 rgb(0,0,0)），和整页米色割裂得厉害。
+     矿坑本来就该比周围暗（它是坑），但要暗成同一个色系的深棕，不是冷黑。 */
+  --mine:#4a3b22;--mine2:#5a4829;--mine-edge:#7d6636;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* 页面级锁死：不滚动、不回弹、不选字、不长按弹菜单——网页做游戏的通病一次治掉。
@@ -202,6 +225,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lv .n{font-size:22px;color:var(--ink);letter-spacing:.05em}
 .lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:2px;min-height:14px}
 .lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
+/* ── 浅色下「不可用」不能靠降透明度 ──
+   深色主题里半透明 = 融进黑底 = 变暗 = 读作禁用，很自然。
+   浅色主题里面板本来就**比页面亮**，半透明之后仍是一块比背景更亮的斑 ——
+   于是锁着的关卡反而比能点的还抢眼，地图页那一屏就是这么糊成一片的。
+   浅色下改成压到页面之下，读作「凹进去的槽」，这才是纸上表达禁用的方式。 */
+:root[data-theme="light"] .lv.locked,
+:root[data-theme="light"] .ally-opt.lock,
+:root[data-theme="light"] .tool:disabled{
+  opacity:1;filter:none;background:var(--bg2);border-color:var(--line2);
+  box-shadow:inset 0 1px 3px rgba(90,66,10,.13)}
+:root[data-theme="light"] .lv.locked .n,
+:root[data-theme="light"] .lv.locked .st{color:var(--ink3);opacity:.6}
+:root[data-theme="light"] .ach .ic{opacity:.5;filter:grayscale(1) contrast(.75)}
+:root[data-theme="light"] .stars-row s{opacity:.42}
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
 .lv.cur{border-color:var(--gold);animation:curPulse 2.2s ease-in-out infinite}
 @keyframes curPulse{50%{box-shadow:0 0 18px color-mix(in srgb,var(--gold) 38%,transparent)}}
