@@ -774,6 +774,33 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 赛季幽灵：跟上个月的自己比 */
 .pw-ghost{margin-top:5px;font-size:12px;color:var(--ink2);letter-spacing:.04em}
 .pw-ghost b{color:var(--gold2)}
+/* ── 矿场 · 兑 ── */
+.sp-bal{font-size:13px;color:var(--ink2);letter-spacing:.06em;text-align:center}
+.sp-bal b{color:var(--gold2);font-size:16px}
+.sp-note{margin:5px 0 12px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.6}
+.sp-note b{color:var(--ink2)}
+.sp-shelf{margin-bottom:14px;padding-top:8px;border-top:1px solid var(--line)}
+/* 未解锁不隐藏，压暗摆着 —— 看得见够不着才有期待。沿用典藏册缺卡那套观感。 */
+.sp-shelf.lock{opacity:.42}
+.sp-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.sp-nm{font-size:13px;color:var(--ink);letter-spacing:.14em}
+.sp-gate{flex:1;text-align:right;font-size:11px;color:var(--ink3)}
+.sp-empty{padding:10px 0;text-align:center;font-size:11.5px;color:var(--ink3);letter-spacing:.16em}
+/* 弹层整体是居中对齐的，清单必须自己扳回左对齐——居中的商品名读起来像诗不像货架 */
+.sp-shelf,.sp-i,.sp-t,.sp-d{text-align:left}
+.sp-i{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:7px 0;
+  border-bottom:1px solid var(--line)}
+.sp-i:last-child{border-bottom:0}
+.sp-t{flex:1 0 55%;font-size:13px;color:var(--ink);letter-spacing:.05em}
+.sp-i.own .sp-t{color:var(--gold2)}
+.sp-on{font-style:normal;font-size:10px;color:var(--gold2);border:1px solid var(--line2);
+  border-radius:3px;padding:0 4px;margin-left:4px;letter-spacing:.06em}
+.sp-d{flex:1 0 100%;order:3;font-size:11px;color:var(--ink3);line-height:1.6}
+.sp-r{display:flex;align-items:center;gap:8px;margin-left:auto}
+.sp-c{font-size:11.5px;color:var(--ink3);white-space:nowrap}
+.sp-have{font-size:11.5px;color:var(--gold2);letter-spacing:.08em}
+.btn.sp-b{padding:4px 12px;font-size:12px;letter-spacing:.08em}
+.btn.sp-b.off{opacity:.45}
 .near-gap b{color:var(--gold2);font-size:15px}
 
 /* 门派榜行 */
@@ -1342,9 +1369,23 @@ body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
     <div id="col-sets"></div>
     <div id="col-grid"></div>
     <div class="ovl-btns">
+      <button class="btn ghost" id="col-shop">矿 场</button>
       <button class="btn ghost" id="col-ask">矿友互助</button>
       <button class="btn ghost" id="col-recv">收 赠 印</button>
       <button class="btn ghost" id="col-close">合上</button>
+    </div>
+  </section>
+
+  <!-- 矿场 · 兑。做成典藏册的一个视图而不是新弹层：ovl() 是单层互斥的，
+       另开一层会出现「关一个直接回大厅」；而大厅那行按钮每个只剩 67px，也塞不下。
+       兑匣本来就是一次购买，两者同源，摆一起反而顺。 -->
+  <section class="colv" data-v="shop">
+    <div class="ovl-kick">MYSKME EXCHANGE</div>
+    <div class="ovl-title">矿场 · <em>兑</em></div>
+    <div id="shop-mine"></div>
+    <div id="shop-list"></div>
+    <div class="ovl-btns">
+      <button class="btn ghost" id="shop-back">回典藏册</button>
     </div>
   </section>
 
@@ -1629,6 +1670,9 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 赛季幽灵：每月记一次自己的矿力快照，键 'YYYYMM'。
      跟别人比会输，跟上个月的自己比只会赢——这条只用真实数据，不虚构任何东西。 */
   pwHist:{},
+  /* 矿场 · 兑。own = 买过的（永久拥有），worn = 每个槽位正戴着哪件（随时免费换）。
+     买断的是拥有权不是佩戴权，所以换戴不花钱 —— 收集的乐趣在「都有」，不在「都戴着」。 */
+  shop:{own:{},worn:{}},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -5969,8 +6013,12 @@ function drawNameCard(){
   x.fillStyle=GOLD2;x.font='600 44px serif';
   x.fillText(SAVE.lbAlias||'无名矿工',mid,140);
   x.fillStyle=DIM;x.font='400 15px serif';
-  colFix();
+  colFix();shopFix();
   x.fillText('矿工号 '+minerTag()+' · 同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
+  /* 矿场买的题名。名片是会被导出成图片发到微信群的 —— 这是全站最值钱的展示位，
+     也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。 */
+  const _tt=shopTitle();
+  if(_tt){x.fillStyle=GOLD2;x.font='400 16px serif';x.fillText('· '+_tt+' ·',mid,196);x.fillStyle=INK}
   /* 灯位是名片的主徽 */
   x.fillStyle=GOLD;x.font='400 17px serif';
   x.fillText('—— 灯 位 ——',mid,236);
@@ -5989,6 +6037,7 @@ function drawNameCard(){
     /* 「连续下矿」只上名片，**不进任何公式** —— 进了公式就成了「放假会掉分」，
        那是惩罚式设计。这里只是把「我曾经连过多少天」这件事记下来，断了也不掉。 */
     ['下矿',(SAVE.days||0)+' 天 · 连续纪录 '+((SAVE.daily&&SAVE.daily.best)||0)+' 天'],
+    ...(shopOwn('dep')?[['典藏深度',(colGot()*10+(COLS.dust||0)/10|0)+'']]:[]),
     ['最长连锁',(SAVE.chainBest||0)+' 重'],
     ['远征',Math.max(0,(SAVE.lv||1)-1)+' 关 · '+totalStars()+' 星'],
     ['典藏',colGot()+' / '+CARDS.length+' · 徽记 '+ACHS.filter(a=>SAVE.ach[a.id]).length+' / '+ACHS.length],
@@ -6698,6 +6747,143 @@ function renderAch(){
    四个子视图共用一张 .ovl-card，靠 data-v 切换而不是各开一个弹层。
    ================================================================== */
 let colCur=1;
+/* ══════════════ 矿场 · 兑 ══════════════
+   三条店规，改商品前先读这三句：
+
+   一、**店里不卖战力。** 判据是机械的：任何商品**不得改写 pwLines() 读的那九个字段**
+       （lv/stars/chain/mv/score/rush/days/runs/dbest）。会改，就不上架。
+       这比「感觉像不像战力」硬得多，不用每次重新辩论。
+       所以灵器/灯油/续关一件都不卖 —— 它们改 chain/rush/score，全在那九个字段里。
+   二、**绝版的代价只能是「做到」或「在场」，不能是货币。** 岁记那句「过月永不再得」
+       不许被任何商品赎回：补铸一旦存在，别人已经拿到的实铸当场贬值。
+   三、**任何进度只写绝对数**（已拓 12 张），不写百分比、不写分母、不写缺口。
+       成绩只增不减，而百分比会在每次上新内容时集体掉下去。
+
+   矿力是**门槛**不是货币：它是排行榜排名依据，一扣就掉名次，
+   榜单/贴身对手/阵营贡献会一起崩。花的是灵力与星屑。
+   货架层可以一直往上加，矿力无上限 —— 追求天然不封顶。
+
+   门槛用线上真实分布校准过（2026-08-04：3.6k~84k，实测每人每天稳涨约 1264）：
+   保证任何人的下一层都在一周左右够得着，11 人里 10 人在 9 天内。 */
+const SHELF=[
+  {p:0,      nm:'矿口架'},
+  {p:6000,   nm:'浅脉架'},
+  {p:12000,  nm:'中脉架'},
+  {p:20000,  nm:'深脉架'},
+  {p:32000,  nm:'暗河架'},
+  {p:50000,  nm:'断层架'},
+  {p:78000,  nm:'矿心架'},
+  {p:120000, nm:'长夜架'},
+  {p:190000, nm:'未名架'},
+];
+/* 商品。cur: 'pw'=灵力（SAVE.power）／'dust'=星屑（COLS.dust）。
+   slot 非空 = 同槽位只能戴一件，买过的随时免费换戴（买断的是拥有，不是佩戴权）。
+   need = 额外的达成条件，只看「做到」不看钱，对应店规二。 */
+const GOODS=[
+  /* ── 矿口架：人人当天就能买到东西，这是钩子。刻意便宜。 ── */
+  {id:'sl1',s:0,nm:'落印 · 矿镐',   cur:'pw',cost:700, slot:'seal',d:'兑换时盖在票根上的印，也印在矿工名片右下'},
+  {id:'sl2',s:0,nm:'落印 · 方印',   cur:'pw',cost:700, slot:'seal',d:'同上，换一种纹样'},
+  {id:'sl3',s:0,nm:'落印 · 猫爪',   cur:'pw',cost:700, slot:'seal',d:'小黑猫留下的那种',need:c=>colAny(32),needTxt:'先集到「猫铃」'},
+  {id:'tt1',s:0,nm:'题名 · 深堑常客',cur:'pw',cost:900, slot:'title',d:'名片化名底下加一行称衔',need:()=>(LB.stats().lv||0)>=40,needTxt:'通到第 40 关'},
+  {id:'tt2',s:0,nm:'题名 · 十二重',  cur:'pw',cost:900, slot:'title',d:'同上',need:()=>(SAVE.chainBest||0)>=12,needTxt:'打出 12 重连锁'},
+  {id:'tt3',s:0,nm:'题名 · 日日下矿',cur:'pw',cost:900, slot:'title',d:'同上',need:()=>(SAVE.days||0)>=30,needTxt:'累计下矿 30 天'},
+  {id:'ps1',s:0,nm:'题跋 · 矿脉不会跑',cur:'pw',cost:600,slot:'post',d:'拓片与名帖页脚那句落款，发出去别人看得见'},
+  {id:'ps2',s:0,nm:'题跋 · 我在这里挖过',cur:'pw',cost:600,slot:'post',d:'同上'},
+  {id:'dep',s:0,nm:'探深尺',        cur:'pw',cost:3000,d:'名片上多一行「典藏深度」，只增不减'},
+  /* ── 浅脉架 6k ── */
+  {id:'tt4',s:1,nm:'题名 · 执灯人',  cur:'pw',cost:2000,slot:'title',d:'名片称衔',need:()=>(SAVE.daily&&SAVE.daily.best||0)>=30,needTxt:'连续下矿 30 天'},
+  {id:'ps3',s:1,nm:'题跋 · 灯还亮着',cur:'pw',cost:1800,slot:'post',d:'拓片落款'},
+  {id:'sl4',s:1,nm:'落印 · 门派印',  cur:'pw',cost:2400,slot:'seal',d:'把你的门派名刻进印里',need:()=>!!(SAVE.lbFaction||'').trim(),needTxt:'先填一个门派名'},
+  /* ── 中脉架 12k ── */
+  {id:'yj1',s:2,nm:'岁记拓印',      cur:'pw',cost:1500,d:'名片底部一条窄带，把岁记按年月排开；此后每月自动长一格'},
+  {id:'sl5',s:2,nm:'落印 · 长明',   cur:'pw',cost:3000,slot:'seal',d:'一盏不灭的灯'},
+  /* ── 深脉架 20k ── */
+  {id:'tt5',s:3,nm:'题名 · 不用灵器的人',cur:'pw',cost:4000,slot:'title',d:'名片称衔',need:()=>colAny(31),needTxt:'先拿到叶王那张异纹'},
+  /* ── 暗河架 32k ── */
+  {id:'ps4',s:4,nm:'题跋 · 我从暗河来',cur:'pw',cost:5000,slot:'post',d:'拓片落款'},
+  /* ── 断层架 50k ── */
+  {id:'dep2',s:5,nm:'长明碑 · 年号',cur:'pw',cost:15000,d:'一年刻一次名，名片上多一行「长明 · 二〇二六」，年年成序列'},
+];
+const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
+function shopFix(){
+  if(!SAVE.shop||typeof SAVE.shop!=='object')SAVE.shop={own:{},worn:{}};
+  if(!SAVE.shop.own||typeof SAVE.shop.own!=='object')SAVE.shop.own={};
+  if(!SAVE.shop.worn||typeof SAVE.shop.worn!=='object')SAVE.shop.worn={};
+  /* 存档里可能留着已下架商品的 id，清掉，免得渲染时取到 undefined */
+  for(const k in SAVE.shop.own)if(!GOODS_BY[k])delete SAVE.shop.own[k];
+  for(const s in SAVE.shop.worn){const v=SAVE.shop.worn[s];if(v&&!GOODS_BY[v])delete SAVE.shop.worn[s]}
+  return SAVE.shop;
+}
+const shopOwn=id=>!!shopFix().own[id];
+const shopWorn=slot=>shopFix().worn[slot]||'';
+function shopUnlocked(g){return (Number(SAVE.lbPower)||0)>=SHELF[g.s].p}
+function shopCanBuy(g){
+  if(shopOwn(g.id))return '已有';
+  if(!shopUnlocked(g))return '未解锁';
+  if(g.need&&!g.need())return g.needTxt||'条件未达成';
+  const have=g.cur==='dust'?(colFix().dust||0):(SAVE.power||0);
+  if(have<g.cost)return (g.cur==='dust'?'星屑':'灵力')+'不够';
+  return '';
+}
+function shopBuy(id){
+  const g=GOODS_BY[id]; if(!g)return false;
+  const why=shopCanBuy(g);
+  if(why){toast(why==='已有'?'这件已经在你手上了':why,2000);return false}
+  if(g.cur==='dust'){colFix();COLS.dust-=g.cost;colSave()}
+  else SAVE.power=(SAVE.power||0)-g.cost;
+  shopFix().own[id]=1;
+  if(g.slot)SAVE.shop.worn[g.slot]=id;          // 新买的直接戴上，省一步
+  persist();
+  SFX.star(1);
+  toast('取得 <b>'+esc(g.nm)+'</b>'+(g.slot?'　已替你戴上':''),2400);
+  return true;
+}
+function shopWear(id){
+  const g=GOODS_BY[id]; if(!g||!g.slot||!shopOwn(id))return false;
+  shopFix().worn[g.slot]=(SAVE.shop.worn[g.slot]===id?'':id);   // 再点一次＝摘下
+  persist();SFX.click();return true;
+}
+/* 名片与拓片上要显示的那几样，取「正戴着的那件」 */
+function shopTitle(){const id=shopWorn('title');return id?GOODS_BY[id].nm.replace(/^题名 · /,''):''}
+function shopPost(){const id=shopWorn('post');return id?GOODS_BY[id].nm.replace(/^题跋 · /,''):''}
+function shopSeal(){const id=shopWorn('seal');return id?GOODS_BY[id].nm.replace(/^落印 · /,''):''}
+function renderShop(){
+  shopFix();colFix();
+  const pw=Number(SAVE.lbPower)||0;
+  $('#shop-mine').innerHTML='<div class="sp-bal">灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')
+    +'</b>　星屑 <b>'+(COLS.dust||0).toLocaleString('en-US')+'</b></div>'
+    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。</div>';
+  let h='';
+  for(let i=0;i<SHELF.length;i++){
+    const sh=SHELF[i], open=pw>=sh.p, list=GOODS.filter(g=>g.s===i);
+    /* 未解锁的层不藏起来：看得见够不着才有期待。空层也摆出来，那是「还没开凿」。 */
+    h+='<div class="sp-shelf'+(open?'':' lock')+'">'
+      +'<div class="sp-hd"><span class="sp-nm">'+esc(sh.nm)+'</span>'
+      +'<span class="sp-gate">'+(open?'已开':'矿力 '+sh.p.toLocaleString('en-US')
+        +' · 还差 '+(sh.p-pw).toLocaleString('en-US'))+'</span></div>';
+    if(!list.length){h+='<div class="sp-empty">尚未开凿</div></div>';continue}
+    for(const g of list){
+      const own=shopOwn(g.id), why=shopCanBuy(g), worn=g.slot&&shopWorn(g.slot)===g.id;
+      h+='<div class="sp-i'+(own?' own':'')+'">'
+        +'<div class="sp-t">'+esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':'')+'</div>'
+        +'<div class="sp-d">'+esc(g.d)+'</div>'
+        +'<div class="sp-r">'
+        +(own
+          ? (g.slot?'<button class="btn ghost sp-b" data-wear="'+g.id+'">'+(worn?'摘下':'戴上')+'</button>'
+                   :'<span class="sp-have">已有</span>')
+          : '<span class="sp-c">'+(g.cur==='dust'?'星屑 ':'灵力 ')+g.cost.toLocaleString('en-US')+'</span>'
+            +(open?'<button class="btn sp-b'+(why?' off':'')+'" data-buy="'+g.id+'"'+(why?' disabled':'')+'>'
+                   +(why||'兑')+'</button>':''))
+        +'</div></div>';
+    }
+    h+='</div>';
+  }
+  $('#shop-list').innerHTML=h;
+  for(const b of $$('#shop-list [data-buy]'))
+    b.onclick=()=>{if(shopBuy(b.dataset.buy))renderShop()};
+  for(const b of $$('#shop-list [data-wear]'))
+    b.onclick=()=>{if(shopWear(b.dataset.wear))renderShop()};
+}
 function colView(v,arg){
   /* 'box' 是开匣过场，它的世代号和锁由 openBox() 刚设好，这里不能再掐一次；
      切到别的任何视图都表示过场作废，定时器与锁一起放掉。 */
@@ -7229,6 +7415,8 @@ $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
 $('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
 $('#col-ask').addEventListener('click',()=>{SFX.click();colView('ask')});
+$('#col-shop').addEventListener('click',()=>{SFX.click();colView('shop');renderShop()});
+$('#shop-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#dw-again').addEventListener('click',()=>{SFX.click();openBox()});
 $('#dw-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#col-esc').addEventListener('click',()=>{
@@ -8050,7 +8238,43 @@ window.__selftest=function(){
          CAMPS.find(c=>c.id==='light').score(only)===0
          && CAMPS.find(c=>c.id==='dark').score(only)===279);
     }
-    /* 33. 明牌配速员：每个人前面都得有一盏灯，而且必须一眼看出不是真人。
+    /* 34. 矿场 · 兑。三条店规里最要紧的是第一条：**不卖战力**。
+     判据是机械的——商品不得改写 pwLines() 读的九个字段。这里把它写成断言，
+     以后谁想往货架上加一件「买了更好打」的东西，红灯会拦住他。 */
+  {
+    const bakS=JSON.stringify(SAVE.shop||{}), bakP=SAVE.power, bakL=SAVE.lbPower;
+    const before=JSON.stringify(LB.stats());
+    SAVE.shop={own:{},worn:{}};SAVE.power=999999;SAVE.lbPower=999999;
+    for(const g of GOODS)shopBuy(g.id);                    // 把货架上每一件都买下来
+    ok('矿场：买光全部商品也不改动矿力的任何一项输入',JSON.stringify(LB.stats())===before);
+    /* 带 need 的商品在测试档案下条件不满足，买不到才是对的 —— 只断言无条件的那些。
+       同时反过来验一条：有条件的确实被挡住了，钱多也买不到。 */
+    const free=GOODS.filter(g=>!g.need), cond=GOODS.filter(g=>g.need);
+    /* 槽位只断言「无条件商品填得满的那些」——「题名」整类都要先做到什么才能买，
+       这是有意的（称衔该是挣来的，不是买来的），所以它不在这条断言里。 */
+    const freeSlots=[...new Set(free.filter(g=>g.slot).map(g=>g.slot))];
+    ok('矿场：无条件商品全部买到并自动戴上，有条件的挡住了',
+       free.every(g=>shopOwn(g.id))
+       && freeSlots.length>0 && freeSlots.every(s=>!!shopWorn(s))
+       && cond.some(g=>!shopOwn(g.id)));
+    /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
+    ok('矿场：称衔一律要先做到，不能纯花钱买',
+       GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
+    /* 矿力是门槛不是货币：兑换绝不能扣它 */
+    SAVE.lbPower=50000;SAVE.shop={own:{},worn:{}};SAVE.power=999999;
+    shopBuy('dep');
+    ok('矿场：矿力是门槛不是货币，兑换后一分不扣',SAVE.lbPower===50000);
+    /* 未解锁的层买不到；解锁与否只看矿力 */
+    SAVE.lbPower=0;SAVE.shop={own:{},worn:{}};SAVE.power=999999;
+    ok('矿场：矿力不够时高层商品买不动，低层照买',
+       shopCanBuy(GOODS_BY['dep2'])==='未解锁' && shopBuy('ps1')===true);
+    /* 灵力不够就是不够，不许透支 */
+    SAVE.power=10;SAVE.lbPower=999999;SAVE.shop={own:{},worn:{}};
+    ok('矿场：灵力不够时买不动，且不会把余额扣成负数',
+       shopBuy('dep')===false && SAVE.power===10);
+    SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
+  }
+  /* 33. 明牌配速员：每个人前面都得有一盏灯，而且必须一眼看出不是真人。
        线上真实分布 3.6k~84k，三条线要把这个区间铺满，不能有人无灯可追。 */
     {
       const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakH=SAVE.pwHist;
@@ -8101,7 +8325,7 @@ for(const el of $$('#toolbar .ic[data-ic]'))el.innerHTML=ICONS[el.dataset.ic]||'
    它们要读典藏册。读到空状态抛出的 TypeError 会让下面的 PLAT.raf(loop)
    根本执行不到——主循环不启动，整个游戏白屏，玩家没有任何自救手段。
    （colCnt 那边也做了空值防护，这里是第二道。） */
-colFix(); colSync();
+colFix(); shopFix(); colSync();     // 启动路径上的依赖：读之前先消毒，抛了就白屏
 buildBoard(levelDef(1));
 fitCanvas();
 show('menu');
