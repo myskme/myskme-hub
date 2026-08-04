@@ -199,7 +199,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 小黑猫 */
 /* 小黑猫是彩蛋，藏在角落即可——但不能压住页脚的「作品总目」链接 */
 #cat{position:absolute;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));width:52px;height:45px;
-  cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3}
+  cursor:pointer;opacity:.4;transition:opacity .4s,transform .3s;z-index:3;
+  /* 猫身走 currentColor，这样两套主题各给各的黑：深色下是冷近黑，
+     浅色羊皮纸下要用暖深棕，否则一坨冷黑贴在米色上很脏。
+     （这只是贴图没加载出来时的兜底线稿，has-art 之后会被隐藏，但首帧会闪到。） */
+  color:#0c0c0e}
+:root[data-theme="light"] #cat{color:#3a2f1c;opacity:.5}
+:root[data-theme="light"] #cat.found{opacity:.92}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
 #cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
 @keyframes tailFlick{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-16deg)}94%{transform:rotate(6deg)}}
@@ -1244,10 +1250,10 @@ body{--shk:4px}
       <a href="../">← 作品总目</a>　·　<a href="#" id="btn-install">安装 · 换机</a>　·　MYSKME × 英语王老师
     </div>
     <div id="cat" title="……" data-fit="contain">
-      <svg viewBox="0 0 64 56" fill="#0c0c0e" stroke="rgba(201,166,74,.35)" stroke-width="1">
+      <svg viewBox="0 0 64 56" fill="currentColor" stroke="var(--line)" stroke-width="1">
         <path class="tail" d="M8 46 Q-2 40 4 30 Q6 26 10 28 Q6 36 14 42 Z"/>
         <path d="M18 20 L22 8 L30 16 Q36 14 42 16 L50 8 L54 20 Q60 30 56 42 Q54 50 36 50 Q18 50 16 42 Q12 30 18 20 Z"/>
-        <g class="eyes" fill="#c9a64a" stroke="none"><ellipse cx="29" cy="30" rx="2.6" ry="3.4"/><ellipse cx="43" cy="30" rx="2.6" ry="3.4"/></g>
+        <g class="eyes" fill="var(--gold)" stroke="none"><ellipse cx="29" cy="30" rx="2.6" ry="3.4"/><ellipse cx="43" cy="30" rx="2.6" ry="3.4"/></g>
       </svg>
     </div>
   </section>
@@ -2824,10 +2830,22 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   ctx.save();
   ctx.globalAlpha=A;
   if(o.scale&&o.scale!==1){ctx.translate(x,y);ctx.scale(o.scale,o.scale);ctx.translate(-x,-y)}
-  /* 底光（军规四·氛围层） */
-  const amb=ctx.createRadialGradient(x,y,R*.2,x,y,R*1.9);
-  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));amb.addColorStop(1,hexA(G.base,0));
-  ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,R*1.9,0,Math.PI*2);ctx.fill();
+  /* 底光（军规四·氛围层）。
+     ⚠ 深浅两套主题要用**相反的手法**：
+       深底上「加亮」读作发光 —— 光从宝石里透出来；
+       浅底上加亮什么也看不出来，只会糊成一团奶白色雾（大厅那排灵石就是这么脏的）。
+     纸面上表达发光的正确做法是**压暗周围**，即让宝石往纸上投一圈同色系的影。
+     所以浅色下换成压暗版本，且范围收窄（影子比辉光贴身）。 */
+  const ambR=LIGHT?R*1.45:R*1.9;
+  const amb=ctx.createRadialGradient(x,y,R*.2,x,y,ambR);
+  if(LIGHT){
+    amb.addColorStop(0,hexDark(G.base,.55,kind==='n'?.22:.34));
+    amb.addColorStop(1,hexDark(G.base,.55,0));
+  }else{
+    amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
+    amb.addColorStop(1,hexA(G.base,0));
+  }
+  ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,ambR,0,Math.PI*2);ctx.fill();
   /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
   if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){ctx.restore();return}
   if(kind!=='O'&&drawArt(ctx,'gem_'+gi,x,y,size*1.02)){
@@ -2897,6 +2915,17 @@ function hexA(h,a){
   const n=parseInt(h.slice(1),16);
   return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
 }
+/* 把 hex 压暗到 f 倍（0~1）。浅色主题下「发光」要靠压暗周围来表达，
+   所以需要一个同色系的深色版本。 */
+function hexDark(h,f,a){
+  const n=parseInt(h.slice(1),16);
+  return 'rgba('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','
+        +Math.round((n&255)*f)+','+a+')';
+}
+/* 画布绘制要知道当前主题。DOM 属性每帧读一次太浪费（棋盘一帧画几十颗灵石），
+   缓存起来、切主题时刷新。 */
+let LIGHT=document.documentElement.getAttribute('data-theme')==='light';
+function syncTheme(){LIGHT=document.documentElement.getAttribute('data-theme')==='light'}
 /* ---- 机关绘制 ---- */
 /* 墨封铺满整格——灵石会盖住格子中央，画成小墨点等于看不见 */
 function drawInk(ctx,x,y,s,layers,t){
@@ -8038,6 +8067,7 @@ $('#cat').addEventListener('click',()=>{
     只留 深↔浅 两态，不再跟随系统（王老师定）。旧存档里的 auto 一律当深色。 */
  function pref(){try{var v=localStorage.getItem(TLS);return v==='light'?'light':'dark'}catch(e){return 'dark'}}
  function ap(p){var e=document.documentElement;e.setAttribute('data-theme',p);e.setAttribute('data-themepref',p);
+   if(typeof syncTheme==='function')syncTheme();          // 画布那边缓存了主题，切换时要刷
    var b=$('#themeBtn');if(b){b.innerHTML=ICONS[p==='dark'?'moon':'sun'];b.title='主题：'+(p==='dark'?'深色':'浅色')}}
  ap(pref());
  var bb=$('#themeBtn');
