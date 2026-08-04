@@ -6031,9 +6031,19 @@ const LB={
     const to=setTimeout(()=>ctl.abort(),ms||8000);
     try{
       const r=await fetch(url,Object.assign({signal:ctl.signal},opt||{}));
-      let badPayload=false;
-      const d=await r.json().catch(()=>{badPayload=true;return {ok:false,err:'返回格式不对'}});
-      d.status=r.status;
+      let badPayload=false, aborted=false;
+      /* ⚠ 超时可能发生在**拿到响应头之后、读完 body 之前** ——
+         这时 fetch 已经成功返回 r，是 r.json() 抛 AbortError。
+         原来这里一律当成「返回格式不对」，有两层坏处：
+           · 给玩家看的是「服务端发了垃圾数据」，其实只是网慢，是误导；
+           · badPayload=true 会触发 fetchJSON 的**换入口重试**，
+             于是弱网下把所有候选入口挨个撞一遍，越慢越重试、越重试越慢。
+         必须把「中断」和「真解析失败」分开。 */
+      const d=await r.json().catch(err=>{
+        if(err&&err.name==='AbortError'){aborted=true;return {ok:false,err:'连接超时',offline:true}}
+        badPayload=true;return {ok:false,err:'返回格式不对'};
+      });
+      d.status=aborted?0:r.status;
       d.badPayload=badPayload;
       return d;
     }catch(e){
@@ -8862,6 +8872,15 @@ window.__selftest=function(){
       /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
+    }
+    /* 读 body 时被超时中断 ≠ 服务端发了垃圾数据。
+       分不开的后果是双重的：玩家看到「返回格式不对」以为游戏坏了（其实只是网慢），
+       而 badPayload 又会触发换入口重试，弱网下把所有候选入口挨个撞一遍。 */
+    {
+      const src=String(LB.fetchOne);
+      ok('网络：读 body 时中断报「连接超时」，不报「返回格式不对」',
+         /AbortError/.test(src)&&/aborted=true/.test(src)
+         &&src.indexOf('连接超时')<src.lastIndexOf('返回格式不对'));
     }
     /* 粒子：火星与碎屑两类混发，且都要**减速**、**收缩**。
        只降透明度的粒子会原地变淡像雾；只有匀速直线飞出去的像射线，不像爆开。 */
