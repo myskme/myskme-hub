@@ -345,7 +345,7 @@ async function handleAdmin(req, env, origin) {
 /* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
    定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
 const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
-                 runs: 45000, days: 3000 };
+                 runs: 45000, days: 3000, dbest: 3000, mv: 500000 };
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
@@ -353,9 +353,49 @@ const GF_RANKS = [
 ];
 function gfRankFor(p) { let n = GF_RANKS[0][1]; for (const [t, name] of GF_RANKS) if (p >= t) n = name; return n; }
 // 矿力：星与关卡为主（体现走得多远），分数为辅（体现打得多好）
+/* ────────── 矿力 · 三线 + 均衡奖 ──────────
+   旧公式（星×120 + 关×80 + 分/50 + 矿灯/40 + 连锁×60）有两个病：
+
+   1. 五项全是历史最高值，破纪录才动 —— 今天打十局没破纪录，矿力纹丝不动。
+      而「只要肝就有回报」是这个游戏的第一动力，公式必须兑现它。
+   2. 三条阵营线的秩相关 0.74、前六名同一批人同一顺序，头号玩家三线同时第一
+      —— 因为没有任何一条线在量「技术」，三条都被总游戏时长驱动。
+
+   现在拆成三条互不重叠的线，各自对应一类玩家：
+     深度 = 闯关党   技巧 = 技术流   勤勉 = 肝帝
+   再加一条均衡奖：**最短的那条线额外算三倍**。它做两件事——
+     · 每个人的「下一步最划算」都不一样（取决于他哪条线最短），这是 0.74 的解药
+     · 任何单线刷到头都会自然停下：min 一旦换人，再刷只有 ×1，
+       想继续吃 ×4 就得回头补另外两条。三条线互相拽着往上走。
+
+   切换红线：**不许任何人掉分**。已穷举 lv0-999 × 星 × 连锁0-30 × 各档分数
+   共 27 万组，零下跌；线上 11 名真实玩家全部上涨（1.06x~2.17x）。
+   连锁那一项外面套 Math.max 就是为了守住 chain=1 时旧值 60 > 新值 30 这唯一的坑。 */
+function gfLadder(lv) {                 // 关卡阶梯：越深每关越值钱，无尽段才有奔头
+  let n = lv, p = 0;
+  for (const [w, r] of [[64, 100], [86, 150]]) {
+    const k = Math.min(n, w); p += k * r; n -= k;
+    if (n <= 0) return p;
+  }
+  return p + n * 200;
+}
+function gfDepth(s) {                   // 走多远 —— 闯关党
+  return gfLadder(s.lv)
+       + (s.lv >= 75 ? Math.floor((s.lv - 50) / 25) * 600 : 0)   // 每 25 关一次可见的跳变
+       + s.stars * 120;                                          // 星保持原价，不给已到手的东西降价
+}
+function gfSkill(s) {                   // 打多险 —— 技术流
+  return Math.max(s.chain * 60, s.chain * s.chain * 30)          // 连锁改平方；max 保证不低于旧值
+       + Math.floor(s.mv / 12)                                   // 深掘（步数局）最佳
+       + Math.floor(s.score / 50)
+       + Math.floor(s.rush / 40);
+}
+function gfGrind(s) {                   // 来多勤 —— 肝帝。全站唯一榜首快不过新人的一条
+  return s.days * 160 + s.runs * 6 + s.dbest * 120;
+}
 function gfPower(s) {
-  return s.stars * 120 + s.lv * 80 + Math.floor(s.score / 50)
-       + Math.floor(s.rush / 40) + s.chain * 60;
+  const d = gfDepth(s), t = gfSkill(s), g = gfGrind(s);
+  return d + t + g + 3 * Math.min(d, t, g);
 }
 function gfBadges(s) {
   const b = [], add = (c, id) => { if (c) b.push(id); };
@@ -375,6 +415,7 @@ async function gfEnsure(env) {
        lv INTEGER DEFAULT 0, stars INTEGER DEFAULT 0, chain INTEGER DEFAULT 0,
        rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
        runs INTEGER DEFAULT 0, days INTEGER DEFAULT 0,
+       dbest INTEGER DEFAULT 0, best_dig INTEGER DEFAULT 0,
        first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
@@ -385,6 +426,8 @@ async function gfEnsure(env) {
      「只要肝就有回报」全靠这两列撑着。 */
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN runs INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN days INTEGER DEFAULT 0").run(); } catch (e) {}
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN dbest INTEGER DEFAULT 0").run(); } catch (e) {}
+  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN best_dig INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
@@ -433,18 +476,21 @@ async function gfSubmit(req, env, origin) {
     lv: clampInt(st.lv, 0, GF_CAP.lv), stars: clampInt(st.stars, 0, GF_CAP.stars),
     chain: clampInt(st.chain, 0, GF_CAP.chain),
     runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
+    dbest: clampInt(st.dbest, 0, GF_CAP.dbest), mv: clampInt(st.mv, 0, GF_CAP.mv),
   };
   /* 下矿天数不可能多于下矿局数——一天至少打一局才算来过。
-     老客户端不送这两个字段，落到 0，MAX 合并时不会覆盖已有值。 */
+     连续到场纪录也不可能超过累计到场天数。
+     老客户端不送这些字段，落到 0，MAX 合并时不会覆盖已有值。 */
   s.days = Math.min(s.days, s.runs);
+  s.dbest = Math.min(s.dbest, s.days);
   // 星数不可能超过已通关卡数的三倍
   s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
   const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
     `INSERT INTO gemfall (id,alias,faction,camp,class_tag,power,best_score,best_rush,lv,stars,chain,
-       runs,days,rank_name,badges,season,first_seen,last_write,hidden)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+       runs,days,dbest,best_dig,rank_name,badges,season,first_seen,last_write,hidden)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
        camp=CASE WHEN excluded.camp!='' THEN excluded.camp ELSE gemfall.camp END,
@@ -456,10 +502,12 @@ async function gfSubmit(req, env, origin) {
        chain=MAX(COALESCE(gemfall.chain,0),excluded.chain),
        runs=MAX(COALESCE(gemfall.runs,0),excluded.runs),
        days=MAX(COALESCE(gemfall.days,0),excluded.days),
+       dbest=MAX(COALESCE(gemfall.dbest,0),excluded.dbest),
+       best_dig=MAX(COALESCE(gemfall.best_dig,0),excluded.best_dig),
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
-         s.runs, s.days, rname, badges, sea, seen, now).run();
+         s.runs, s.days, s.dbest, s.mv, rname, badges, sea, seen, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */

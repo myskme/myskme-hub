@@ -1576,7 +1576,7 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* ---------- 存档 ---------- */
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
-  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0},chest:0,fails:{},chainBest:0,
+  tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0,best:0},chest:0,fails:{},chainBest:0,
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
@@ -1603,13 +1603,17 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
      runs = 累计下矿局数（任何模式，局**结束**才记，避免开了就退刷数）
      days = 累计下矿天数，**去重不连续**——放假一周回来不清零，那是惩罚
      lastDay = 上次下矿的日序号，给 days 去重用 */
-  runs:0,days:0,lastDay:0,
+  runs:0,days:0,lastDay:0,todayRuns:0,
+  /* 深掘 · 二十四手（每日同盘定量局，替换掉重复的 45 秒续灯）。
+     d=当期日序号，score=当天**首把**的正式成绩（之后重开只当练习），
+     best=生涯最佳（喂矿力技巧线），plays=当天下矿次数，days=累计打过正式局的天数。 */
+  dig:{d:0,score:null,best:0,plays:0,days:0},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
-  out.daily=Object.assign({day:0,streak:0,oil:0},s.daily||{});
+  out.daily=Object.assign({day:0,streak:0,oil:0,best:0},s.daily||{});
   out.fails=s.fails||{};
   /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
@@ -4133,7 +4137,11 @@ function claimDaily(){
   /* 连续满 10 天补一罐，最多存 2 罐。放在算完 nextStreak 之后，
      这样第 10 天当场就能拿到，不用等到第 11 天。 */
   if(nextStreak%OIL_EVERY===0&&oil<OIL_MAX)oil++;
-  SAVE.daily={day:dayNum(),streak:nextStreak,oil:oil};
+  /* best = 连续到场的**历史纪录**，断了也不掉。原来只有 streak 一个数，
+     断 2 天就归 1，「我曾经连过 40 天」查都查不出来。
+     纪录只增不减这一条很要紧：勤勉线要吃它，掉了就等于放假被罚。 */
+  const bestStreak=Math.max(SAVE.daily.best||0,nextStreak);
+  SAVE.daily={day:dayNum(),streak:nextStreak,oil:oil,best:bestStreak};
   const pw=dailyPow(nextStreak);
   SAVE.power=(SAVE.power||0)+pw;
   const got=giveRandomTool(dailyTools(nextStreak));
@@ -4190,11 +4198,18 @@ function q3State(){
   return s;
 }
 /* 累计账：每下完一次矿就记一笔。局**结束**才记，开了就退不算，
-   否则反复开局退出能白刷。天数去重不连续——断几天回来接着往上加，不清零。 */
+   否则反复开局退出能白刷。天数去重不连续——断几天回来接着往上加，不清零。
+   局数每天封顶 12：勤勉线是全站唯一「榜首也快不过新人」的赛道，
+   不封顶的话它就退化成又一条比谁时间多的线，那就白设了。
+   12 局在正常玩法下够宽（一天打十几局已经是重度），够不着的人不会碰到它。 */
+const RUNS_PER_DAY=12;
 function markRun(){
-  SAVE.runs=(SAVE.runs||0)+1;
   const d=dayNum();
-  if(d!==(SAVE.lastDay||0)){SAVE.days=(SAVE.days||0)+1;SAVE.lastDay=d}
+  if(d!==(SAVE.lastDay||0)){SAVE.days=(SAVE.days||0)+1;SAVE.lastDay=d;SAVE.todayRuns=0}
+  if((SAVE.todayRuns||0)<RUNS_PER_DAY){
+    SAVE.runs=(SAVE.runs||0)+1;
+    SAVE.todayRuns=(SAVE.todayRuns||0)+1;
+  }
   persist();
 }
 function q3Bump(k,n){
@@ -5598,10 +5613,12 @@ const LB={
     const stars=totalStars();
     const lv=Math.max(0,(SAVE.lv||1)-1);                       // 已通关卡数
     let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
-    /* runs/days 是仅有的两个**累计**项，其余五项都是历史最高值。
-       没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。 */
+    /* runs/days/dbest 是仅有的三个**累计**项，其余都是历史最高值。
+       没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
+       mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
     return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0,
-            runs:SAVE.runs||0,days:SAVE.days||0};
+            runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
+            mv:(SAVE.dig&&SAVE.dig.best)||0};
   },
   /* 带上 HTTP 状态码返回——否则只能拿中文文案去正则猜 429，
      后端哪天改了措辞就失灵。读 8 秒、写 15 秒（弱网下写操作要给够时间）。 */
@@ -5672,7 +5689,8 @@ const LB={
   /* 指纹里必须包含 runs/days，否则「只涨天数不涨成绩」的人 pending() 永远为假、
      flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
   sig(){const s=this.stats();
-    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,(SAVE.camp&&SAVE.camp.side)||''].join('|')},
+    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,
+            (SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
   plan(ms){
@@ -7844,20 +7862,25 @@ window.__selftest=function(){
      天数必须**去重且不清零**：同一天打多局只算一天，断几天回来接着加，
      断签清零那是惩罚，受众里有学生，不做。 */
   {
-    const bak={r:SAVE.runs,d:SAVE.days,l:SAVE.lastDay};
+    const bak={r:SAVE.runs,d:SAVE.days,l:SAVE.lastDay,t:SAVE.todayRuns};
     const today=dayNum();
-    SAVE.runs=0;SAVE.days=0;SAVE.lastDay=0;
+    SAVE.runs=0;SAVE.days=0;SAVE.lastDay=0;SAVE.todayRuns=0;
     markRun();markRun();markRun();                       // 今天连打三局
     const sameDay=(SAVE.runs===3&&SAVE.days===1);
+    for(let i=0;i<40;i++)markRun();                      // 同一天狂刷四十局
+    const capped=(SAVE.runs===RUNS_PER_DAY);             // 局数每天封顶，刷不动
+    ok('累计账：局数每天封顶 '+RUNS_PER_DAY+'（勤勉线不能退化成比谁时间多）',capped);
     SAVE.lastDay=today-9;                                // 假装上次下矿是九天前
     markRun();
-    const afterGap=(SAVE.runs===4&&SAVE.days===2);        // 断九天，天数继续加而不是清零
+    const afterGap=(SAVE.runs===RUNS_PER_DAY+1&&SAVE.days===2);   // 断九天：天数继续加而不清零，且当日额度重置
     const st=LB.stats(), sg=LB.sig();
     ok('累计账：同一天多局只算一天，断几天回来不清零',sameDay&&afterGap);
-    ok('累计账：runs/days 进了 stats() 与 sig()（否则只涨天数永远不重传）',
+    /* sig 的每一项都必须在，少一项那条线就永远传不上去，而且悄无声息 */
+    ok('累计账：runs/days/dbest/mv 都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
-       &&sg.split('|').length===8&&sg.indexOf('|'+SAVE.days+'|')>=0);
-    SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;
+       &&typeof st.dbest==='number'&&typeof st.mv==='number'
+       &&sg.split('|').length===10&&sg.indexOf('|'+SAVE.days+'|')>=0);
+    SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));
