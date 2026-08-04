@@ -585,10 +585,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lore-link .ld{font-size:12px;color:var(--ink2);letter-spacing:.03em;margin-top:2px;line-height:1.6}
 /* 灵器栏 */
 #toolbar{width:min(520px,100%);display:flex;gap:8px;margin-top:8px}
+/* 灵器是「握在手里的家伙」，要有金属感，而且**有货和没货必须一眼分得开** ——
+   它们是局内唯一的翻盘手段，玩家常常攒了一堆忘了用。 */
 .tool{flex:1;position:relative;display:flex;align-items:center;justify-content:center;gap:7px;
   font-family:var(--serif);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
   color:var(--ink2);padding:9px 4px;font-size:13.5px;letter-spacing:.1em;cursor:pointer;
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 12%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),
+             0 2px 0 rgba(0,0,0,.42),
+             0 4px 12px rgba(0,0,0,.38);
   transition:transform .12s,box-shadow .16s,border-color .2s,color .2s}
+.tool:not(:disabled){border-color:color-mix(in srgb,var(--gold) 34%,var(--line));color:var(--ink)}
+.tool:not(:disabled):active{transform:translateY(2px);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);transition-duration:.05s}
 .tool .ic{line-height:0;color:var(--gold)}
 .tool .ic svg{width:17px;height:17px}
 .tool:hover:not(:disabled){transform:translateY(-2px);border-color:var(--gold);color:var(--ink);box-shadow:var(--glow-soft)}
@@ -869,6 +878,30 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-c,.sp-bal,.sp-si i,.sp-at,.sp-shd i,.sp-have,
 .near-gap,.nr-rk,.pw-tip,.cmem,.pd-row,.yj-seal,
 .qs-sub,.q3r,.thr-n{font-variant-numeric:tabular-nums}
+/* ── 表面材质统一 ──
+   全站有 19 条规则「有边框、有底色，却没有厚度」—— 同一张卡里有的凸起有的纯平，
+   这是最伤统一性的一种不一致：眼睛会一直觉得哪里不对但说不出来。
+   分两档收敛：
+     · 承载信息的方块（统计格、套组、成就、章节块…）→ 浅一档，凸起但不抢戏
+     · 可点的（图标钮、页签、同伴位…）→ 深一档，看得出能按
+   两档都只用同一组变量，改一处全站跟着走。 */
+.wolf-badge,.ins-sec,.qs-sec,.near,.ach,.cbi,.cset,.cbig,.cvt,
+.pt-chip,.pt-dot,.pd-row .dot,.pt-name .tm{
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 9%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.4),
+             0 1px 0 rgba(0,0,0,.3),
+             0 3px 9px rgba(0,0,0,.3)}
+.iconbtn,.ally-opt,.lb-tabs button,.lore-link{
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 13%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),
+             0 2px 0 rgba(0,0,0,.4),
+             0 4px 12px rgba(0,0,0,.38)}
+.iconbtn:active,.ally-opt:active,.lb-tabs button:active,.lore-link:active{
+  transform:translateY(2px);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);transition-duration:.05s}
+/* 输入框反过来：它是「凹进去的槽」，不是凸起的块 —— 能按的和能填的必须一眼分开 */
+.pt-name input,.lb-form input{
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.55),inset 0 -1px 0 color-mix(in srgb,var(--gold) 7%,transparent)}
 /* 矿力该往哪使劲：一句话，不铺明细表 */
 .pw-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
   font-size:11.5px;line-height:1.75;color:var(--ink3);letter-spacing:.03em}
@@ -989,10 +1022,23 @@ body{--shk:4px}
 /* ============ 覆盖层 ============ */
 .ovl{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;
   background:color-mix(in srgb,var(--bg) 62%,transparent)}
-.ovl{background:rgba(4,4,6,.72)}
+/* 遮罩加一点背景模糊：弹层浮起来的感觉一半靠影子，一半靠背后失焦。
+   模糊值刻意很小（3px）——手机上大模糊很吃 GPU，而且会把立绘糊成一团。 */
+.ovl{background:rgba(4,4,6,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 .ovl.on{display:flex}
-.ovl-card{width:min(400px,94vw);max-height:88dvh;overflow-y:auto;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
-  padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+/* 弹层是「从矿脉里取出来的一块牌子」，不是一张飘着的纸：
+   顶沿受矿灯的光、底沿转暗、外面一圈金线封边、下面一片深影托住。
+   ⚠ 这里有 overflow-y:auto，inset 阴影会跟着内容滚（滚起来那道高光会飘），
+     所以受光/背光两道做在 ::before 的固定描边上，不用 inset。 */
+.ovl-card{width:min(400px,94vw);max-height:88dvh;overflow-y:auto;border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;
+  box-shadow:0 0 0 1px rgba(201,166,74,.10),
+             0 4px 0 rgba(0,0,0,.4),
+             0 24px 66px rgba(0,0,0,.62)}
+.ovl-card::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  border-top:1px solid color-mix(in srgb,var(--gold) 22%,transparent);
+  border-bottom:1px solid rgba(0,0,0,.55)}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .ovl-card::before,.ovl-card::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);pointer-events:none}
 .ovl-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
