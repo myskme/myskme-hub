@@ -804,6 +804,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
 .sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
 .sp-i.seal .sp-d{opacity:.7}
+.sp-c s{opacity:.5;margin-right:3px}
+.sp-c b{color:var(--gold2)}
+/* 本期矿口：全服同一份，摆在最上面当门面 */
+.sp-stall{margin:10px 0 4px;padding:8px 10px;border:1px solid var(--gold-line);border-radius:6px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,transparent),transparent);
+  text-align:left}
+.sp-shd{font-size:12px;color:var(--ink2);letter-spacing:.12em;margin-bottom:5px}
+.sp-shd i{font-style:normal;float:right;font-size:10.5px;color:var(--gold2);letter-spacing:.06em}
+.sp-si{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:12.5px;color:var(--ink)}
+.sp-si i{font-style:normal;margin-left:auto;font-size:11.5px;color:var(--gold2)}
+.sp-si.own,.sp-si.own i{color:var(--ink3)}
+.sp-sfoot{margin-top:5px;font-size:10.5px;color:var(--ink3);line-height:1.6}
 .sp-have{font-size:11.5px;color:var(--gold2);letter-spacing:.08em}
 .btn.sp-b{padding:4px 12px;font-size:12px;letter-spacing:.08em}
 .btn.sp-b.off{opacity:.45}
@@ -1680,6 +1692,8 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 矿场 · 兑。own = 买过的（永久拥有），worn = 每个槽位正戴着哪件（随时免费换）。
      买断的是拥有权不是佩戴权，所以换戴不花钱 —— 收集的乐趣在「都有」，不在「都戴着」。 */
   shop:{own:{},worn:{}},
+  /* 今日矿口：w=期号（weekNum），used=本期已折价买过哪些。跨期整块重置。 */
+  stall:{w:0,used:{}},
   lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
@@ -6864,6 +6878,44 @@ const GOODS=[
 const SEAL_FROM=6;
 const SEAL_TAG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 function shopSealed(g){return g.s>=SEAL_FROM&&!shopUnlocked(g)}
+/* ────────── 今日矿口 ──────────
+   每期（一周）摆出三件折价货，**全服同一份**（同种子）——
+   这一条的价值不在折扣，在于所有人这周看到的是同三件，
+   微信群里「这周矿口摆了啥」是免费的话题引擎。
+
+   原设计是「每天三格，用掉才不亏」。评审按一个初三学生的一天逐条打，
+   结论是日频格子会和已有的每日矿灯/今日三桩/今日深挖/匣日限叠成
+   八个每日触点——「焦虑不来自倒计时这个控件，来自『今天还有东西没领』
+   这个状态，而它被同时点亮八次」。学生的真实作息是周末补两天。
+   所以窗口改成**期**：一周内任意时候买都算，周末才有空的人一件不亏。
+
+   而且错过的**只是折扣，不是货**：下期这三件照样在货架上原价买得到。
+   这是「错过就没了」最轻的一种，轻到不会有人为它熬夜。 */
+const STALL_N=3, STALL_OFF=0.3;
+/* 选货按期号纯函数化，别把 weekNum() 埋在里面 ——
+   埋进去的话自检只能反复查「当前这一期」，写出来的断言是同义反复，
+   跨期到底换不换货根本测不到。这个坑本作已经踩过一次（旧自检那条目标数断言）。 */
+function stallPick(w){
+  const r=rngOf('stall|'+w), out=[];
+  /* 第一件必从低层（人人已解锁的那三层）抽，保证**这一期人人都有得挑**。
+     不加这一条的话，三件里抽到两件封样是常事，矿口对多数人就只是摆着看。
+     其余两件从全部商品抽——这样既保住「全服同一份、群里对得上」，
+     又不会出现一整期一件都动不了的空转。 */
+  const low=GOODS.filter(g=>g.s<=2), all=GOODS.slice();
+  const take=(pool)=>{const g=pool.splice(Math.floor(r()*pool.length),1)[0];
+    const i=all.findIndex(x=>x.id===g.id); if(i>=0)all.splice(i,1); return g};
+  if(low.length)out.push(take(low));
+  while(out.length<STALL_N&&all.length)out.push(take(all));
+  return out;
+}
+function stallState(){
+  const w=weekNum();
+  if(!SAVE.stall||SAVE.stall.w!==w){SAVE.stall={w:w,used:{}};persist()}
+  if(!SAVE.stall.used||typeof SAVE.stall.used!=='object')SAVE.stall.used={};
+  return {w,items:stallPick(w),used:SAVE.stall.used};
+}
+function stallPrice(g){return Math.max(1,Math.round(g.cost*(1-STALL_OFF)))}
+function stallHas(id){return stallState().items.some(g=>g.id===id)}
 const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
 function shopFix(){
   if(!SAVE.shop||typeof SAVE.shop!=='object')SAVE.shop={own:{},worn:{}};
@@ -6877,20 +6929,25 @@ function shopFix(){
 const shopOwn=id=>!!shopFix().own[id];
 const shopWorn=slot=>shopFix().worn[slot]||'';
 function shopUnlocked(g){return (Number(SAVE.lbPower)||0)>=SHELF[g.s].p}
+/* 本期矿口摆着且还没买过 → 折价。折扣只影响价格，不影响任何解锁条件。 */
+function shopOnSale(g){return stallHas(g.id)&&!shopOwn(g.id)}
+function shopPrice(g){return shopOnSale(g)?stallPrice(g):g.cost}
 function shopCanBuy(g){
   if(shopOwn(g.id))return '已有';
   if(!shopUnlocked(g))return '未解锁';
   if(g.need&&!g.need())return g.needTxt||'条件未达成';
   const have=g.cur==='dust'?(colFix().dust||0):(SAVE.power||0);
-  if(have<g.cost)return (g.cur==='dust'?'星屑':'灵力')+'不够';
+  if(have<shopPrice(g))return (g.cur==='dust'?'星屑':'灵力')+'不够';
   return '';
 }
 function shopBuy(id){
   const g=GOODS_BY[id]; if(!g)return false;
   const why=shopCanBuy(g);
   if(why){toast(why==='已有'?'这件已经在你手上了':why,2000);return false}
-  if(g.cur==='dust'){colFix();COLS.dust-=g.cost;colSave()}
-  else SAVE.power=(SAVE.power||0)-g.cost;
+  const pay=shopPrice(g), sale=shopOnSale(g);
+  if(g.cur==='dust'){colFix();COLS.dust-=pay;colSave()}
+  else SAVE.power=(SAVE.power||0)-pay;
+  if(sale){stallState().used[id]=1;}
   shopFix().own[id]=1;
   if(g.slot)SAVE.shop.worn[g.slot]=id;          // 新买的直接戴上，省一步
   persist();
@@ -6910,9 +6967,20 @@ function shopSeal(){const id=shopWorn('seal');return id?GOODS_BY[id].nm.replace(
 function renderShop(){
   shopFix();colFix();
   const pw=Number(SAVE.lbPower)||0;
+  const st=stallState();
+  /* 矿口摆在最上面：全服同一份，这周谁进来都看到同三件。
+     封样层的货在这里也必须封着，否则从矿口那一栏就把高层的名字漏出去了。 */
+  const stall='<div class="sp-stall"><div class="sp-shd">本期矿口 <i>第 '+st.w+' 期 · 七折</i></div>'
+    +st.items.map(g=>{
+      const seal=shopSealed(g), own=shopOwn(g.id);
+      return '<div class="sp-si'+(own?' own':'')+'"><span>'+(seal?'封样':esc(g.nm))+'</span>'
+        +'<i>'+(own?'已有':(g.cur==='dust'?'星屑 ':'灵力 ')+stallPrice(g).toLocaleString('en-US'))+'</i></div>';
+    }).join('')
+    +'<div class="sp-sfoot">一周内随时买都算 · 过期只是折扣没了，货照样在架上</div></div>';
   $('#shop-mine').innerHTML='<div class="sp-bal">灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')
     +'</b>　星屑 <b>'+(COLS.dust||0).toLocaleString('en-US')+'</b></div>'
-    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。</div>';
+    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。</div>'
+    +stall;
   let h='';
   for(let i=0;i<SHELF.length;i++){
     const sh=SHELF[i], open=pw>=sh.p, list=GOODS.filter(g=>g.s===i);
@@ -6935,7 +7003,10 @@ function renderShop(){
         +(own
           ? (g.slot?'<button class="btn ghost sp-b" data-wear="'+g.id+'">'+(worn?'摘下':'戴上')+'</button>'
                    :'<span class="sp-have">已有</span>')
-          : '<span class="sp-c">'+(g.cur==='dust'?'星屑 ':'灵力 ')+g.cost.toLocaleString('en-US')+'</span>'
+          : '<span class="sp-c">'+(g.cur==='dust'?'星屑 ':'灵力 ')
+            +(shopOnSale(g)
+              ?('<s>'+g.cost.toLocaleString('en-US')+'</s> <b>'+shopPrice(g).toLocaleString('en-US')+'</b>')
+              :g.cost.toLocaleString('en-US'))+'</span>'
             +(open?'<button class="btn sp-b'+(why?' off':'')+'" data-buy="'+g.id+'"'+(why?' disabled':'')+'>'
                    +(why||'兑')+'</button>':''))
         +'</div></div>';
@@ -8340,6 +8411,36 @@ window.__selftest=function(){
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
     ok('矿场：称衔一律要先做到，不能纯花钱买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
+    /* 今日矿口：全服同期同货（否则群里没法讨论），折扣只动价格不动条件，
+       而且过期只没折扣、货还在架上——「错过就没了」在这里只是最轻的一种。 */
+    {
+      const bakSt=JSON.stringify(SAVE.stall||{});
+      const sig=w=>stallPick(w).map(g=>g.id).join(',');
+      ok('矿口：同一期恒定同三件（全服同种子，群里能对得上）',
+         sig(2952)===sig(2952)&&sig(2952).split(',').length===STALL_N);
+      /* 跨期必须真的换货。这条是补上一个同义反复的坑：
+         旧写法把 weekNum() 埋在 stallState() 里，测试改存档里的期号根本没换期，
+         「连查 60 期」实际是把同一期查了 60 遍，跨期换不换根本测不到。 */
+      let allHaveLow=true, noDup=true, changed=0;
+      let prev=null;
+      for(let w=2900;w<2960;w++){
+        const its=stallPick(w);
+        if(!its.some(g=>g.s<=2))allHaveLow=false;
+        if(new Set(its.map(g=>g.id)).size!==its.length)noDup=false;
+        const s2=its.map(g=>g.id).join(',');
+        if(prev!==null&&s2!==prev)changed++;
+        prev=s2;
+      }
+      ok('矿口：每期至少一件低层货、三件不重复、且跨期真的换货（连查 60 期）',
+         allHaveLow&&noDup&&changed>=45);
+      /* 折扣不许把「没解锁 / 条件没到」变成能买 */
+      SAVE.lbPower=0;SAVE.power=1e9;SAVE.shop={own:{},worn:{}};
+      const g0=GOODS_BY[stallState().items[0].id];
+      ok('矿口：打折不改解锁与达成条件',
+         shopPrice(g0)<g0.cost
+         && (shopUnlocked(g0)?true:shopCanBuy(g0)==='未解锁'));
+      SAVE.stall=JSON.parse(bakSt);SAVE.lbPower=bakL;
+    }
     /* 封样：够不着的高层不许泄露名字。这条同时防两种回归——
        将来做轮换或公开表时，把封样层的真名漏出去，这条会红。 */
     {
