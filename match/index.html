@@ -948,6 +948,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-i.own .sp-ic{color:var(--ink3)}
 .sp-i.seal .sp-ic{color:var(--ink3);opacity:.65}
 /* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
+/* 封样：整条压一层斜向封纹 + 一圈虚线，读作「盖着布、还没揭」。
+   纯文字的「封样 · 甲」看着像占位符（做漏了），有这层纹才像刻意封着的货。
+   纹路用 repeating-linear-gradient，零图片、零请求。 */
+.sp-i.seal{position:relative;border-style:dashed;
+  background-image:repeating-linear-gradient(135deg,
+    color-mix(in srgb,var(--gold) 5%,transparent) 0 6px,
+    transparent 6px 14px)}
 .sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
 .sp-i.seal .sp-d{opacity:.7}
 /* 首兑戳：哪个月头一回兑的。是履历不是内容，所以做得很轻。 */
@@ -3121,11 +3128,18 @@ function roundRect(ctx,x,y,w,h,r){
 
 /* ---- 特效层 ---- */
 const FX={parts:[],beams:[],rings:[],marks:[]};
+/* 灵石炸开时飞出来的东西分两类，混着发才有层次：
+     碎屑（多数）—— 有转动、有重量，走普通混色，像崩下来的石渣
+     火星（约三成）—— 走**加法混色**、亮度叠加，飞得更快、更小、更亮，像迸出的光
+   两类都随生命收缩（p.s 乘 life），而不是只把透明度调低：
+   只降透明度的粒子会「原地变淡」，看着像雾；收缩才像飞远了、烧尽了。 */
 function fxBurst(x,y,color,n,spd){
   for(let i=0;i<(n||14);i++){
-    const a=rnd()*Math.PI*2, v=(spd||1)*(.9+rnd()*2.4);
-    FX.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.1,life:1,dec:.016+rnd()*.02,
-      s:ENG.cs*(.06+rnd()*.09),c:color,sq:rnd()<.4,rot:rnd()*6});
+    const a=rnd()*Math.PI*2, spark=rnd()<.32, v=(spd||1)*(.9+rnd()*2.4)*(spark?1.5:1);
+    FX.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-1.1,life:1,
+      dec:(spark?.024:.016)+rnd()*.02,
+      s:ENG.cs*(spark?.035+rnd()*.045:.06+rnd()*.09),
+      c:color,sq:!spark&&rnd()<.4,rot:rnd()*6,sp:spark});
   }
 }
 function fxBeam(r,c,dir,color){FX.beams.push({r,c,dir,life:1,c2:color||'#e8c768'})}
@@ -3137,7 +3151,12 @@ function stepFX(dt){
      推进的棋子动画脱拍。dt 已在 loop 里钳到 48ms 上限。 */
   const f=dt/16.667;
   for(let i=FX.parts.length-1;i>=0;i--){const p=FX.parts[i];
-    p.vy+=.19*f;p.x+=p.vx*f;p.y+=p.vy*f;p.life-=p.dec*f;p.rot+=.16*f;if(p.life<=0)FX.parts.splice(i,1)}
+    /* 空气阻力：没有阻力的粒子是匀速直线飞出去的，读起来像「射线」不像「爆开」。
+       真实的碎屑一出膛就在减速，火星更轻、减得更快。 */
+    const drag=p.sp?.90:.955;
+    p.vx*=Math.pow(drag,f);p.vy*=Math.pow(drag,f);
+    p.vy+=.19*f;p.x+=p.vx*f;p.y+=p.vy*f;p.life-=p.dec*f;p.rot+=.16*f;
+    if(p.life<=0)FX.parts.splice(i,1)}
   for(let i=FX.beams.length-1;i>=0;i--){FX.beams[i].life-=.055*f;if(FX.beams[i].life<=0)FX.beams.splice(i,1)}
   for(let i=FX.rings.length-1;i>=0;i--){FX.rings[i].life-=.045*f;if(FX.rings[i].life<=0)FX.rings.splice(i,1)}
   for(let i=FX.marks.length-1;i>=0;i--){FX.marks[i].life-=.05*f;if(FX.marks[i].life<=0)FX.marks.splice(i,1)}
@@ -3161,10 +3180,26 @@ function drawFX(t){
     cx.beginPath();cx.arc(rg.x,rg.y,rg.max*Math.pow(e,.6),0,Math.PI*2);cx.stroke();cx.restore();
   }
   for(const p of FX.parts){
-    cx.save();cx.globalAlpha=Math.max(0,p.life);cx.translate(p.x,p.y);cx.rotate(p.rot);
-    cx.fillStyle=p.c;
-    if(p.sq)cx.fillRect(-p.s/2,-p.s/2,p.s,p.s);
-    else {cx.beginPath();cx.arc(0,0,p.s/2,0,Math.PI*2);cx.fill()}
+    const L=Math.max(0,p.life), sz=p.s*(.42+.58*L);      // 随生命收缩，不是原地变淡
+    cx.save();
+    cx.globalAlpha=L;
+    if(p.sp){
+      /* 火星走加法混色：叠在一起会越叠越亮，这是「光」和「颗粒」的分界。
+         飞得快时画成一小段拖尾而不是圆点 —— 静止的圆点在高速运动下会觉得卡顿。 */
+      cx.globalCompositeOperation='lighter';
+      const sp=Math.hypot(p.vx,p.vy);
+      if(sp>2.2){
+        cx.strokeStyle=p.c;cx.lineWidth=sz;cx.lineCap='round';
+        cx.beginPath();cx.moveTo(p.x,p.y);
+        cx.lineTo(p.x-p.vx*1.6,p.y-p.vy*1.6);cx.stroke();
+      }else{
+        cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,sz/2,0,Math.PI*2);cx.fill();
+      }
+    }else{
+      cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;
+      if(p.sq)cx.fillRect(-sz/2,-sz/2,sz,sz);
+      else{cx.beginPath();cx.arc(0,0,sz/2,0,Math.PI*2);cx.fill()}
+    }
     cx.restore();
   }
 }
@@ -8827,6 +8862,21 @@ window.__selftest=function(){
       /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
+    }
+    /* 粒子：火星与碎屑两类混发，且都要**减速**、**收缩**。
+       只降透明度的粒子会原地变淡像雾；只有匀速直线飞出去的像射线，不像爆开。 */
+    {
+      FX.parts.length=0;
+      fxBurst(100,100,'#e8c768',60,1.2);
+      const sp=FX.parts.filter(p=>p.sp).length;
+      ok('粒子：火星与碎屑两类混发（火星约三成）',sp>6&&sp<40&&FX.parts.length===60);
+      const p0=FX.parts.find(p=>p.sp)||FX.parts[0];
+      const v0=Math.hypot(p0.vx,p0.vy), l0=p0.life;
+      let t=performance.now();
+      for(let i=0;i<4;i++){t+=16.7;stepFX(16.7)}
+      ok('粒子：有空气阻力（速度在掉）且随生命收缩',
+         Math.hypot(p0.vx,p0.vy)<v0 && p0.life<l0);
+      FX.parts.length=0;
     }
     /* 连击手感：强度必须**随连锁递进**，且顿帧绝不能冻住限时局的计时。
        后一条是硬红线 —— 冻住就等于连锁越多剩的时间越多，那是作弊。 */
