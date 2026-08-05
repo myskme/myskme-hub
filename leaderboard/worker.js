@@ -479,17 +479,20 @@ const PACER_EPOCH = Date.UTC(2026, 7, 1);          // 计时起点，改它等�
    pace = 每天涨多少矿力；burst = 起伏幅度（0 稳、1 忽快忽慢）；
    rest = 每周休息几天（模拟真人不是天天在线）。 */
 const PACERS = [
-  { alias: "青稞",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2 },
-  { alias: "小满",             seed: 23, base:  5100, pace: 610, burst: .30, rest: 1 },
-  { alias: "灯下黑",           seed: 37, base:  7400, pace: 430, burst: .70, rest: 3 },
-  { alias: "拾穗人",           seed: 41, base: 10800, pace: 700, burst: .40, rest: 1 },
-  { alias: "半盏",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3 },
-  { alias: "老周头",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0 },
-  { alias: "阿蛮",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2 },
-  { alias: "南山采石",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1 },
-  { alias: "云渡",             seed: 97, base: 44800, pace: 640, burst: .50, rest: 2 },
-  { alias: "沈砚",             seed: 103, base: 58200, pace: 750, burst: .45, rest: 1 },
-  { alias: "不问归期",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3 },
+/* hour = 他习惯几点下矿（北京时间），span = 一次玩多久。
+   给每个人不同的作息，是「按整天跳变」和「像真人」之间的全部差别 ——
+   真人的数字不会在同一秒集体往上跳。 */
+  { alias: "青稞",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2, hour: 21, span: 2 },
+  { alias: "小满",             seed: 23, base:  5100, pace: 610, burst: .30, rest: 1, hour:  7, span: 1 },
+  { alias: "灯下黑",           seed: 37, base:  7400, pace: 430, burst: .70, rest: 3, hour: 23, span: 3 },
+  { alias: "拾穗人",           seed: 41, base: 10800, pace: 700, burst: .40, rest: 1, hour: 12, span: 2 },
+  { alias: "半盏",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3, hour: 16, span: 2 },
+  { alias: "老周头",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0, hour:  6, span: 3 },
+  { alias: "阿蛮",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2, hour: 19, span: 2 },
+  { alias: "南山采石",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1, hour: 13, span: 4 },
+  { alias: "云渡",             seed: 97, base: 44800, pace: 640, burst: .50, rest: 2, hour: 22, span: 2 },
+  { alias: "沈砚",             seed: 103, base: 58200, pace: 750, burst: .45, rest: 1, hour: 20, span: 3 },
+  { alias: "不问归期",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3, hour: 10, span: 2 },
 ];
 
 function pacerRnd(seed) {                          // xorshift，纯函数、可复现
@@ -498,20 +501,48 @@ function pacerRnd(seed) {                          // xorshift，纯函数、可
 }
 
 /* 把一个配速员在「第 d 天」的状态算出来。所有字段互相自洽。 */
-function pacerAt(p, d) {
+/* 传入的是「已过的小时数」，不再是整天。
+   为什么要精确到小时：按整天算的话，所有配速员会在 UTC 零点**同时**跳一次数，
+   而白天一整天纹丝不动 —— 这是最容易被看穿的破绽。
+   现在每个人按自己的作息（hour/span，北京时间）在一天里的某个时段涨，
+   玩家下午刷到的和晚上刷到的不一样，跟真人一个样子。 */
+function pacerAt(p, hoursTotal) {
+  const d = Math.floor(hoursTotal / 24);
   const r = pacerRnd(p.seed);
   /* base 代表「他在计时起点之前已经玩了很久」，所以到场天数与局数也必须带上那段历史 ——
      否则会出现「矿力 75,192、第 156 关、到场只有 2 天」这种一眼假的组合。
      按矿力反推：约每 1500 矿力对应一天，每天约 8 局，连续纪录取其中一段。 */
   const histDays = Math.max(1, Math.round(p.base / 1500));
   let power = p.base, days = histDays, runs = histDays * 8, streak = Math.max(2, Math.round(histDays * .35)), cur = 0;
-  for (let i = 0; i < d; i++) {
-    const off = r() < p.rest / 7;                  // 今天休息
-    if (off) { cur = 0; continue; }
-    days++; cur++; if (cur > streak) streak = cur;
-    runs += 3 + Math.floor(r() * 9);
-    const wave = 1 + (r() - .5) * 2 * p.burst;     // 起伏
-    power += Math.max(0, p.pace * wave);
+  let quiet = 0;                                   // 「出远门」剩余天数
+  for (let i = 0; i <= d; i++) {
+    /* 今天这一天他打算涨多少 */
+    let today = 0;
+    if (quiet > 0) { quiet--; cur = 0; }
+    else {
+      const roll = r();
+      if (roll < .02) {                            // 2% 概率：出门几天不上线
+        quiet = 2 + Math.floor(r() * 4); cur = 0;
+      } else if (roll < p.rest / 7 + .02) {        // 今天只是没空
+        cur = 0;
+      } else {
+        days++; cur++; if (cur > streak) streak = cur;
+        runs += 3 + Math.floor(r() * 9);
+        let wave = 1 + (r() - .5) * 2 * p.burst;
+        if (r() < .06) wave *= 2.4;                // 6% 概率：手气爆棚的一天
+        today = Math.max(0, p.pace * wave);
+      }
+    }
+    if (i < d) { power += today; continue; }
+    /* 最后一天只算到「此刻」为止：按他的作息，过了他下矿的时段才算数。
+       这样同一天里不同时刻刷新，看到的数字是不一样的。 */
+    const hNow = (hoursTotal - d * 24 + 8) % 24;   // 北京时间的小时（UTC+8）
+    const from = p.hour, to = p.hour + p.span;
+    let frac = 0;
+    if (hNow >= to % 24 && to <= 24) frac = 1;
+    else if (hNow > from) frac = Math.min(1, (hNow - from) / p.span);
+    if (to > 24 && hNow < (to % 24)) frac = Math.min(1, (hNow + 24 - from) / p.span);
+    power += today * frac;
   }
   power = Math.round(power);
   /* 从矿力反推各项，保证「看起来像同一个人打出来的」：
@@ -526,9 +557,9 @@ function pacerAt(p, d) {
 }
 
 function pacerRows(nowMs) {
-  const d = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 86400000));
+  const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));
   return PACERS.map(p => {
-    const st = pacerAt(p, d);
+    const st = pacerAt(p, h);
     return {
       id: "pacer:" + p.seed, alias: p.alias, faction: "", camp: "",
       power: st.power, best_score: st.score, best_rush: st.rush,
