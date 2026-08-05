@@ -852,6 +852,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .fac-row .ar svg{width:14px;height:14px}
 .fac-wrap.open .fac-row .ar{transform:rotate(90deg)}
 .fac-tip{padding:6px 4px 2px;font-size:11px;color:var(--ink3);letter-spacing:.04em}
+/* ── 矿工名片（点开榜单某一行）── */
+.lb-row{cursor:pointer;transition:background .15s}
+.lb-row:hover,.lb-row:focus-visible{background:color-mix(in srgb,var(--gold) 7%,transparent);outline:none}
+#lb-card{display:none;margin-top:12px}
+#lb-card.on{display:block;animation:cardIn .32s cubic-bezier(.16,1,.3,1) both}
+.lc{border:1px solid var(--gold-line);padding:12px 13px;text-align:left;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,var(--panel2)),var(--panel));
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 18%,transparent),
+             inset 0 -1px 0 rgba(0,0,0,.5),0 3px 0 rgba(0,0,0,.4),0 10px 26px rgba(0,0,0,.45)}
+.lc-hd{text-align:center;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.lc-rk{font-size:10.5px;letter-spacing:.3em;color:var(--ink3)}
+.lc-nm{font-size:20px;color:var(--ink);letter-spacing:.1em;margin:2px 0 1px;
+  word-break:break-all}                              /* 长化名换行显示，不再被挤掉 */
+.lc-tt{font-size:11.5px;color:var(--gold2);letter-spacing:.06em}
+.lc-pw{text-align:center;font-size:26px;color:var(--gold2);letter-spacing:.04em;margin:9px 0 2px;
+  font-variant-numeric:tabular-nums}
+.lc-pw span{display:block;font-size:10px;color:var(--ink3);letter-spacing:.28em;margin-top:-2px}
+.lc-lines{margin:10px 0 4px}
+.lc-l{display:flex;align-items:baseline;font-size:11.5px;color:var(--ink2);margin-top:7px}
+.lc-l span{flex:1}
+.lc-l i{font-style:normal;font-size:10px;color:var(--gold2);letter-spacing:.1em;margin-left:4px}
+.lc-l b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.lc-bar{height:4px;background:rgba(0,0,0,.45);margin-top:3px;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.lc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:11px;
+  padding-top:9px;border-top:1px solid var(--line)}
+.lc-r{display:flex;align-items:baseline;font-size:11.5px;color:var(--ink3)}
+.lc-r span{flex:1}
+.lc-r b{color:var(--ink2);font-weight:400;font-variant-numeric:tabular-nums}
 /* 三线首座：三个王座而不是一个。摆在榜单最顶上当公告。 */
 .thr{margin:0 0 12px;padding:9px 11px 8px;border:1px solid var(--gold-line);border-radius:6px;
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 9%,transparent),transparent);
@@ -1805,6 +1835,7 @@ body{--shk:4px}
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
   <div id="lb-list"></div>
+  <div id="lb-card"></div>
   <div id="lb-mine"></div>
   <div class="lb-form" id="lb-form" hidden>
     <label>化名（2–12 位中英文/数字，别用真名）</label>
@@ -6339,7 +6370,7 @@ function lbRowHTML(r,mine,throne){
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
     r.lv?('第 '+r.lv+' 关'):'',r.stars?('★'+r.stars):''].filter(Boolean).join(' · ');
-  return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'">'
+  return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
       +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
@@ -6347,6 +6378,44 @@ function lbRowHTML(r,mine,throne){
     +'<div class="sub">'+(throne?'<b style="color:var(--gold2)">'+esc(throne)+'</b> · ':'')+esc(sub)+'</div></div>'
     +'<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
     +'</div>';
+}
+/* ────────── 矿工名片（点开榜单某一行）──────────
+   榜单一行要塞下 17 个字段，只显示得下 3 个：化名、段位、矿力。
+   门派、关卡、星数、最佳分、矿灯、连锁、到场天数、局数、手气…全都看不到，
+   长化名还会被挤掉。点开看是最省事的解法 —— 不占列表空间，信息一个不少。
+
+   顺带把**矿力的三条线**摊开：这是全站唯一能看到「别人强在哪」的地方，
+   也是「我该往哪使劲」最有说服力的教具 —— 看到榜首的勤勉是自己的三倍，
+   比任何说明文字都管用。 */
+function lbCardHTML(r){
+  const L=pwLines({lv:r.lv||0,stars:r.stars||0,chain:r.chain||0,score:r.score||0,
+    rush:r.rush||0,mv:r.mv||0,runs:r.runs||0,days:r.days||0,dbest:r.dbest||0});
+  const tot=L.depth+L.skill+L.grind, mn=Math.min(L.depth,L.skill,L.grind);
+  const bar=(k,nm,v)=>{
+    const pc=tot?Math.round(v/Math.max(L.depth,L.skill,L.grind)*100):0;
+    return '<div class="lc-l"><span>'+nm+(v===mn?' <i>短板</i>':'')+'</span>'
+      +'<b>'+v.toLocaleString('en-US')+'</b></div>'
+      +'<div class="lc-bar"><i style="width:'+pc+'%"></i></div>';
+  };
+  const row=(k,v)=>v?('<div class="lc-r"><span>'+k+'</span><b>'+v+'</b></div>'):'';
+  return '<div class="lc">'
+    +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
+      +'<div class="lc-nm">'+esc(r.alias||'')+'</div>'
+      +'<div class="lc-tt">'+esc(r.rankName||'')+(r.faction?(' · 门派 '+esc(r.faction)):'')+'</div></div>'
+    +'<div class="lc-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'<span>矿力</span></div>'
+    +'<div class="lc-lines">'+bar('depth','走多远',L.depth)+bar('skill','打多险',L.skill)
+      +bar('grind','来多勤',L.grind)+'</div>'
+    +'<div class="lc-grid">'
+      +row('关卡',r.lv?('第 '+r.lv+' 关'):'')
+      +row('星数',r.stars?('★ '+r.stars):'')
+      +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
+      +row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):'')
+      +row('最长连锁',r.chain?(r.chain+' 重'):'')
+      +row('到场天数',r.days?(r.days+' 天'):'')
+      +row('累计局数',r.runs?(r.runs+' 局'):'')
+      +row('连续纪录',r.dbest?(r.dbest+' 天'):'')
+      +row('开出臻卡',r.luck?(r.luck+' 张'):'')
+    +'</div></div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 /* ==================================================================
@@ -6889,7 +6958,25 @@ async function renderLB(){
     html+=lbRowHTML(r,isMe,(thrBy[(r.alias||'')+'|'+(r.tag||'')]||[]).join(' · '));
   }
   throneMine(rows);
+  LB_ROWS=rows;                                   // 点开名片时按 rank 查这一份
   list.innerHTML=throneHTML(rows)+nearHTML(rows,myIdx)+html;
+  /* 事件挂在容器上而不是每一行：榜单最多 50 行，逐行绑定既慢又容易在重渲染后漏绑。 */
+  if(!list.__cardWired){
+    list.__cardWired=true;
+    const open=e=>{
+      const row=e.target.closest&&e.target.closest('.lb-row');
+      if(!row)return;
+      const rk=+row.dataset.row;
+      const r=(LB_ROWS||[]).find(x=>Number(x.rank)===rk);
+      if(!r)return;
+      SFX.click();
+      const box=$('#lb-card');
+      box.innerHTML=lbCardHTML(r);
+      box.classList.add('on');
+    };
+    list.addEventListener('click',open);
+    list.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e)}});
+  }
   const s=LB.stats();
   if(!LB.registered()){
     mine2.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
@@ -7298,6 +7385,7 @@ function renderAch(){
    典藏册 · 界面
    四个子视图共用一张 .ovl-card，靠 data-v 切换而不是各开一个弹层。
    ================================================================== */
+let LB_ROWS=[];
 let colCur=1;
 /* ══════════════ 矿场 · 兑 ══════════════
    三条店规，改商品前先读这三句：
