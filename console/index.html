@@ -423,6 +423,7 @@ function renderLbAdmin(){
     +'<button class="btn" id="lbaGem"'+(isGem?' style="border-color:var(--gold);color:var(--gold)"':'')+'>矿脉榜 · 灵石远征</button>'
     +'<button class="btn" id="lbaRefresh">刷新</button>'
     +(isGem?'':'<button class="btn" id="lbaSeal">封榜·开新赛季</button>')
+    +(isGem?'<button class="btn" id="lbaPacer">配速员：读取中…</button>':'')
     +'<button class="btn" id="lbaReset">清空全部</button>'
     +'<span style="font-size:12px;color:var(--ink3)">'
     +(isGem?'化名 / 矿力 / 段位 · 关卡与星数':'化名 / 赛季灵力 / 段位')+' · 隐藏或删除可疑行</span></div>'
@@ -430,6 +431,37 @@ function renderLbAdmin(){
   $('#lbaWord').addEventListener('click',function(){LBA_BOARD='word';renderLbAdmin();});
   $('#lbaGem').addEventListener('click',function(){LBA_BOARD='gem';renderLbAdmin();});
   $('#lbaRefresh').addEventListener('click',lbaLoad);
+  /* ---- 配速员开关 ----
+     11 个按矿力区间铺开的虚拟对手，让每个段位的玩家身边都有人可追。
+     它们不写库、不占四座、不进门派与阵营名单、不拿任何限量奖励 ——
+     纯粹是「前面有人跑着」。关掉之后立刻从所有榜单消失，不留痕迹。
+     状态存在服务端 meta 表，所以在哪台设备上开都一样。 */
+  var pb=$('#lbaPacer');
+  if(pb){
+    var paint=function(on){
+      pb.textContent=on?'配速员：已上线（点此隐退）':'配速员：未上线（点此启用）';
+      pb.style.borderColor=on?'var(--gold)':'';
+      pb.style.color=on?'var(--gold)':'';
+    };
+    /* 读当前状态：世界榜里有没有带 bot 标记的行 */
+    fetch(LB_API+'/gf/board?scope=world&limit=60')
+      .then(function(r){return r.json()})
+      .then(function(d){paint(!!(d&&d.rows||[]).some(function(x){return x.bot})); pb.dataset.ready='1';})
+      .catch(function(){pb.textContent='配速员：读不到状态';});
+    pb.addEventListener('click',function(){
+      if(pb.dataset.ready!=='1')return;
+      var on=pb.textContent.indexOf('已上线')>=0;
+      var next=on?'0':'1';
+      if(!confirm(on
+        ? '让配速员隐退？\n他们会立刻从所有榜单消失，真人的成绩不受任何影响。'
+        : '让配速员上线？\n11 个虚拟对手会出现在世界榜上，按矿力铺开，\n让每个段位的玩家身边都有人可追。\n\n他们不占首座、不进门派与阵营、不拿任何奖励，随时可以再关掉。'))return;
+      pb.textContent='配速员：处理中…';
+      lbaCall('pacers',{on:next}).then(function(r){
+        if(r&&r.ok){paint(next==='1');toast(next==='1'?('配速员已上线 · '+(r.count||0)+' 位'):'配速员已隐退');}
+        else{toast('操作失败：'+((r&&r.err)||''));paint(on);}
+      }).catch(function(){toast('连不上后台');paint(on);});
+    });
+  }
   $('#lbaSeal')&&$('#lbaSeal').addEventListener('click',function(){
     if(!confirm('封榜并开新赛季？\n本赛季世界前 10（及各班前 3）将永久镌刻名人堂；随后所有人「赛季灵力」清零进入下一赛季，「终身灵力」保留。'))return;
     lbaCall('seal',{confirm:'SEAL',top:10}).then(function(r){toast(r&&r.ok?('已封榜 '+(r.sealed||'')+' → 新赛季 '+(r.newSeason||'')):('封榜失败：'+((r&&r.err)||'')));lbaLoad();});
