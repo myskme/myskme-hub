@@ -6810,6 +6810,12 @@ async function renderLB(){
   renderWeekCard();
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
+  /* 名片是 #lb-list 的**兄弟节点**，重写列表不会碰它 ——
+     切榜时不显式收起，它会留在那儿显示上一个榜的人。
+     ⚠ 必须放在**发请求之前**：这函数有好几条提前 return（没注册、读失败、
+       返回 0 行），放在后面的话那几条路径根本跑不到，
+       实测门派榜返回 0 行时名片就一直挂着世界榜的人。 */
+  {const c=$('#lb-card'); if(c){c.classList.remove('on');c.innerHTML=''}}
   const form=$('#lb-form');
   for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
   /* 门派榜是**纯只读的公开榜**，不该被注册闸挡住。
@@ -9184,6 +9190,23 @@ window.__selftest=function(){
          el.textContent==='12,345');
       countTo(el,0);
       ok('结算：零分也照常显示',el.textContent==='0');
+    }
+    /* 切榜时必须收起名片，而且要收在**发请求之前**。
+       renderLB 有好几条提前 return（没注册、读失败、返回 0 行），
+       收在后面的话那几条路径根本跑不到 —— 实测门派榜返回 0 行时，
+       名片就一直挂着世界榜那个人的资料。 */
+    {
+      /* ⚠ 拿源码比位置**必须先剥掉注释**。今晚在这上面栽了四次，都是同一个根因：
+         注释里出现的「提前 return」「findGroups」之类被当成了代码匹配到。
+         剥注释之后再比，锚点才是真的。 */
+      const bare=String(renderLB)
+        .replace(/\/\*[\s\S]*?\*\//g,'')          // 块注释
+        .replace(/(^|[^:])\/\/[^\n]*/g,'$1');     // 行注释（避开 http:// 这类）
+      const clearAt=bare.indexOf("#lb-card");
+      const fetchAt=bare.indexOf('LB.board');
+      const retAt=bare.indexOf('return');
+      ok('榜单：切榜时收起名片，且收在发请求与所有提前 return 之前',
+         clearAt>0 && fetchAt>0 && clearAt<fetchAt && clearAt<retAt);
     }
     /* 图标体系：`.ic` 只许指 svg 本体，外层容器一律 `.icw`。
        两者都叫 .ic 的后果是**样式被施加两次**——成就页就踩过：
