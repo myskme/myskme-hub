@@ -9213,17 +9213,37 @@ window.__selftest=function(){
        opacity .35 施加在外层 div 和里面的 svg 上相乘成 .1225，
        对比度从 1.92:1 掉到 1.20:1，未获得的徽记几乎看不见。 */
     {
+      /* ⚠ CI 跑的是无头 DOM 垫片，它的 getComputedStyle 只给 width/height/fontSize、
+         **没有 opacity**，getBoundingClientRect 又一律返回 clientWidth(390)。
+         直接做真实测量的话这两条在 CI 里必红，而本机没装 node、推上去才会发现。
+         所以先探一次能力：能测就测真值，测不了就退回源码断言，两边都不会漏。 */
+      /* ⚠ 探针必须用**已挂在文档上**的元素。第一版拿 createElement 出来的游离节点探，
+         Chrome 对游离元素的 getComputedStyle 返回空字符串 —— 于是真浏览器里也判成
+         「测不了」，白白退回源码断言，把真正抓到过 bug 的那条测量废掉了。 */
+      const DOM_REAL=(()=>{try{
+        const cs=getComputedStyle(document.body);
+        return typeof cs.opacity==='string'&&cs.opacity!=='';
+      }catch(e){return false}})();
       const bakAch=JSON.stringify(SAVE.ach);
       SAVE.ach={};renderAch();
-      const cell=$('#ach-grid').querySelector('.ach:not(.got)');
-      const w=cell&&cell.querySelector('.icw'), ic=cell&&cell.querySelector('.ic');
-      const oW=w?+getComputedStyle(w).opacity:-1, oI=ic?+getComputedStyle(ic).opacity:-1;
-      ok('图标：未获得的徽记只压一层透明度，不许父子相乘',
-         Math.abs(oW-0.35)<.02 && Math.abs(oI-1)<.02);
-      /* 没有任何 svg.ic 可以被撑到浏览器默认的 300×150 —— 基线规则就是为这个加的 */
-      const huge=[...document.querySelectorAll('svg.ic')]
-        .filter(e=>e.getBoundingClientRect().width>60).length;
-      ok('图标：全站没有漏写尺寸而被撑成 300×150 的 svg',huge===0);
+      if(DOM_REAL){
+        const cell=$('#ach-grid').querySelector('.ach:not(.got)');
+        const w=cell&&cell.querySelector('.icw'), ic=cell&&cell.querySelector('.ic');
+        const oW=w?+getComputedStyle(w).opacity:-1, oI=ic?+getComputedStyle(ic).opacity:-1;
+        ok('图标：未获得的徽记只压一层透明度，不许父子相乘',
+           Math.abs(oW-0.35)<.02 && Math.abs(oI-1)<.02);
+        const huge=[...document.querySelectorAll('svg.ic')]
+          .filter(e=>e.getBoundingClientRect().width>60).length;
+        ok('图标：全站没有漏写尺寸而被撑成 300×150 的 svg',huge===0);
+      }else{
+        /* 垫片下退回源码：`.ic` 只许出现在 svg 上、外层一律 `.icw`，
+           以及基线规则存在（不写尺寸时默认 1 个字高，而不是 300×150）。 */
+        const html=document.documentElement.innerHTML||'';
+        ok('图标：外层容器一律 .icw，不再和 svg 共用 .ic（父子相乘的根因）',
+           !/<(span|div)[^>]*class="ic"/.test(html));
+        ok('图标：存在 .ic 基线规则，漏写尺寸也不会被撑成 300×150',
+           /\.ic\{width:var\(--ic-sm\)/.test(html));
+      }
       SAVE.ach=JSON.parse(bakAch);renderAch();
     }
     /* 读 body 时被超时中断 ≠ 服务端发了垃圾数据。
