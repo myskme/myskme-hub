@@ -4261,11 +4261,16 @@ async function fireUlt(){
     const res=clearCells(ex.cells,4);
     addScore(Math.round(110*res.gems+900),3,3,'#e8c768');
     if(GS.boss)bossHurt(res.gems+18);
-  }else if(c.id==='jun'){                                     // 虎啸：三颗震成爆裂
+  }else if(c.id==='jun'){                                     // 虎啸：两颗震成爆裂
+    /* 从三颗砍到两颗。原因是他的被动把爆裂从 3×3 放大到 5×5 之后，
+       三颗叠在一起实测打出 8,795 分 —— 是狼先生同场景 2,635 的 **3.3 倍**，
+       其余同伴都在 2.6k~3.5k 区间。
+       砍数量而不是砍半径：5×5 是他的身份（「势大力沉」那条被动的全部内容），
+       动半径等于把这个人物又改没了；少一颗只是把音量调下来。 */
     const spots=[];
     for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k==='n')spots.push([r,c2]);
     const made=[];
-    for(let i=0;i<3&&spots.length;i++){
+    for(let i=0;i<2&&spots.length;i++){
       const [r,c2]=spots.splice(Math.floor(rnd()*spots.length),1)[0];
       B[r][c2].k='B';B[r][c2].sc=.25;made.push([r,c2]);
       fxRing(cxOf(c2),cyOf(r),GEMS[1].base,ENG.cs*2);SFX.made();
@@ -9159,6 +9164,15 @@ window.__selftest=function(){
       const needs=COMPANIONS.map(c=>c.need);
       ok('同伴：充能阈值收敛在 36~42（'+Math.min(...needs)+'~'+Math.max(...needs)+'），没有极端值',
          Math.min(...needs)>=36 && Math.max(...needs)<=42);
+      /* 钧的爆裂是 5×5（他的身份），所以「虎啸」造几颗必须跟着收。
+         实测三颗打 8,795 分 = 狼先生同场景 2,635 的 3.3 倍；两颗是 3,388，落回区间。
+         **改半径会把这个人物改没，改数量只是调音量** —— 所以这里钉的是数量。 */
+      /* ⚠ 必须**锚到钧那一段**再找数字：fireUlt 里 `i<N&&spots.length` 出现两次，
+         第一处是狼先生兜底的三颗特殊石。不锚定的话正则会抓到狼先生的 3，
+         代码明明是对的却报红 —— 第一版就这么写红了。 */
+      const uf=String(fireUlt), junAt=uf.indexOf("c.id==='jun'");
+      const junN=(uf.slice(junAt,junAt+900).match(/i<(\d+)&&spots\.length/)||[])[1];
+      ok('同伴：虎啸造 2 颗爆裂（5×5 之下三颗会打出 3.3 倍的分）',junN==='2');
     }
     /* 分数滚动必须**先写终值再滚**：rAF 在后台标签页会被完全冻住（实测一帧不跑），
        玩家结算时切走再回来，动画从没开始过 —— 先写终值最坏只是「没滚动」，
