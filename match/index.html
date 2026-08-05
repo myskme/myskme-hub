@@ -2064,17 +2064,17 @@ const OBST_INFO={
    海与梓同为鹿，重复，保留梓（梅花鹿）。
    title 是本作矿脉题材下的角色定位（由各自大招推出），不主张世界观正典。 */
 const COMPANIONS=[
-  {id:'wolf',g:'狼',name:'狼先生',title:'执灯人', beast:'狼',    col:0,need:42,ult:'执灯',unlock:1,
-   desc:'全盘已炼成的灵石<b>同时引爆</b>。攒一手特殊灵石再放，场面最好看。'},
-  {id:'jun', g:'钧',name:'钧',    title:'开山者', beast:'老虎',  col:1,need:38,ult:'虎啸',unlock:4,
-   desc:'一声吼，把三颗灵石就地震成<b>爆裂灵石</b>。清岩壳、破石笼的快刀。'},
+  {id:'wolf',g:'狼',name:'狼先生',title:'执灯人', beast:'狼',    col:0,need:36,ult:'执灯',unlock:1,
+   desc:'全盘已炼成的灵石<b>同时引爆</b>。攒一手再放最狠，<b>没攒也不白放</b>——他会自己点亮三颗。'},
+  {id:'jun', g:'钧',name:'钧',    title:'开山者', beast:'老虎',  col:1,need:40,ult:'虎啸',unlock:4,
+   desc:'一声吼，把三颗灵石就地震成<b>爆裂灵石</b>。他的爆裂炸 5×5，这一吼是全场最响的。'},
   {id:'qi',  g:'麒',name:'麒',    title:'巡渊者', beast:'鲨鱼',  col:2,need:38,ult:'破浪',unlock:10,
-   desc:'一道横穿，洗净<b>一行一列</b>。猫铃卡住时最好用——底下一空，铃自己就下去了。'},
-  {id:'xi',  g:'晰',name:'晰',    title:'探路者', beast:'兔子',  col:3,need:34,ult:'疾足',unlock:16,
+   desc:'从矿底横穿而过，<b>冲掉最下面两行</b>。上面整盘往下落——猫铃跟着走，卡死的局面也被搅活。'},
+  {id:'xi',  g:'晰',name:'晰',    title:'探路者', beast:'兔子',  col:3,need:38,ult:'疾足',unlock:16,
    desc:'再给你 <b>3 步</b>（限时局则加 <b>8 秒</b>）。差一口气时的救命稻草。'},
-  {id:'xiao',g:'晓',name:'晓',    title:'摘星者', beast:'飞鼠',  col:4,need:46,ult:'掠星',unlock:24,
-   desc:'滑翔而过，摘下一颗<b>万象灵珠</b>。想凑组合技，就靠他。'},
-  {id:'zi',  g:'梓',name:'梓',    title:'解封者', beast:'梅花鹿',col:5,need:40,ult:'破封',unlock:32,
+  {id:'xiao',g:'晓',name:'晓',    title:'摘星者', beast:'飞鼠',  col:4,need:42,ult:'掠星',unlock:24,
+   desc:'滑翔而过，摘下一颗<b>万象灵珠</b>。想凑组合技，就靠他——他本来就比别人多炼爆裂。'},
+  {id:'zi',  g:'梓',name:'梓',    title:'解封者', beast:'梅花鹿',col:5,need:38,ult:'破封',unlock:32,
    desc:'全场<b>墨封 / 岩壳 / 石笼各褪一层</b>。机关关的万能解。'},
 ];
 const compById=id=>COMPANIONS.find(c=>c.id===id)||COMPANIONS[0];
@@ -2084,13 +2084,19 @@ const compUnlocked=c=>SAVE.lv>=c.unlock;
    所以「选谁」不构成决策。每人补一条**全程生效、不用充能**的被动，
    都跟他的大招同源，这样「带谁下矿」才真的要想一想。
    passive() 是唯一的判定入口，别在别处直接比 SAVE.comp。 */
+/* ⚠ 定被动的第一条判据：**它在多少关卡里生效**。
+   2026-08-05 实测 364 关（主线 64 + 无尽 300）：光板关恒定 37~39%，
+   无岩壳的关 67~69%、无墨封的 54~56%。所以旧版里
+   钧「岩壳多褪一层」有三分之二时间等于不存在、麒「墨封多褪一层」一半时间不存在 ——
+   玩家说的「带谁都一样」就是这么来的，不是技能长得像，是**大半时间没有被动**。
+   现在六条全部 100% 生效（梓的机关被动配了光板关兜底）。 */
 const PASSIVE={
-  wolf: '开局盘上先给一颗疾风灵石',
-  jun:  '岩壳与石笼每次多褪一层',
-  qi:   '墨封每次多褪一层',
+  wolf: '开局给一颗疾风；此后每打出 4 连锁，再点亮一颗',
+  jun:  '他的爆裂灵石炸开 5×5，而不是 3×3',
+  qi:   '连锁到 3 时，一道水冲走矿底一颗灵石',
   xi:   '每关多 2 步（限时局多 5 秒）',
-  xiao: '连锁到 4 时，随机一颗灵石炼成疾风',
-  zi:   '开局时全场墨封与岩壳各先褪一层',
+  xiao: '每炼成第 3 颗特殊灵石，直接摘成爆裂',
+  zi:   '开局全场墨封与岩壳各褪一层；没有机关的关卡改送一颗爆裂',
 };
 function passive(id){return GS.compDef&&GS.compDef.id===id}
 /* 开局就生效的两条被动。必须在 buildBoard 之后、玩家看到盘面之前跑，
@@ -2117,6 +2123,20 @@ function applyOpeningPassives(){
     }
     if(ink+cr)setTimeout(()=>toast('<b>梓</b> 抬手一拂——'
       +(ink?'墨封 '+ink+' 处':'')+(ink&&cr?'、':'')+(cr?'岩壳 '+cr+' 处':'')+'各褪一层',2600),1100);
+    else{
+      /* 光板关兜底。实测 364 关里有 37~39% 一块机关都没有 ——
+         没有兜底的话，梓在这些关卡里的被动等于**完全不存在**，
+         玩家会觉得「带他跟没带一样」。机关关他解封，光板关他就送一颗爆裂：
+         都是「开局先给你一手」，同一个人格的两种表达。 */
+      const spots=[];
+      for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+        if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)spots.push([r,c]);
+      if(spots.length){
+        const [r,c]=spots[Math.floor(rnd()*spots.length)];
+        B[r][c].k='B';B[r][c].sc=.4;
+        setTimeout(()=>toast('这一关没有机关——<b>梓</b> 换了颗<b>爆裂灵石</b>给你',2600),1100);
+      }
+    }
   }
 }
 
@@ -2700,7 +2720,14 @@ function expandBlast(seed){
     const hit=(rr,cc)=>{if(blastAdd(out,rr,cc)&&isGem(rr,cc)&&B[rr][cc].k!=='n'&&!fired.has(KEY(rr,cc)))queue.push([rr,cc])};
     if(k==='H'){fx.push({t:'row',r,c});for(let i=0;i<N;i++)hit(r,i)}
     else if(k==='V'){fx.push({t:'col',r,c});for(let i=0;i<N;i++)hit(i,c)}
-    else if(k==='B'){fx.push({t:'bomb',r,c});for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)hit(r+dr,c+dc)}
+    /* 钧·开山者的被动「势大力沉」：他的爆裂炸 5×5 而不是 3×3。
+       为什么换掉原来那条「岩壳每次多褪一层」：实测 364 关里**有 67~69% 的关卡一块岩壳都没有**，
+       那条被动三分之二时间等于不存在 —— 玩家说「带谁都一样」正是这么来的。
+       爆裂在每一关都会出现，所以这条 100% 生效；而且炸得更大照样能多敲岩壳，
+       机关关的收益一点没丢，只是不再**只有**机关关才有收益。 */
+    else if(k==='B'){fx.push({t:'bomb',r,c,big:passive('jun')});
+      const rad=passive('jun')?2:1;
+      for(let dr=-rad;dr<=rad;dr++)for(let dc=-rad;dc<=rad;dc++)hit(r+dr,c+dc)}
     else if(k==='O'){const col=commonColor();fx.push({t:'orb',r,c,col});
       for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(isGem(i,j)&&B[i][j].g===col)hit(i,j)}
   }
@@ -3506,16 +3533,13 @@ function clearCells(cells,chain,noCrateSplash){
     /* 岩壳：被直接命中就受损（且岩壳自身不再向外溅射，否则一炸连片） */
     if(T[r][c].crate>0){crateHits.push([r,c]);continue}
     gemCells.push([r,c]);
-    /* 麒·巡渊者的被动：墨封每次多褪一层 */
-    if(!p)  {if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
-      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()} continue}
+    if(!p)  {if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()} continue}
     if(p.bell)continue;
     if(p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#c9b78a',7,.8)}
     if(p.k!=='n')specials++;
     gems++;colors[p.g]=(colors[p.g]||0)+1;
-    if(T[r][c].ink>0){const d=Math.min(T[r][c].ink,passive('qi')?2:1);
-      T[r][c].ink-=d;bumpGoal('ink',null,d);SFX.ink()}
+    if(T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);SFX.ink()}
     fxBurst(cxOf(c)+p.vx,cyOf(r)+p.vy,GEMS[p.g]?GEMS[p.g].base:'#e8c768',p.k==='n'?7:14,p.k==='n'?1:1.5);
     killPiece(r,c);
   }
@@ -3524,9 +3548,7 @@ function clearCells(cells,chain,noCrateSplash){
   for(const [r,c] of crateHits){
     const k=KEY(r,c); if(done.has(k))continue; done.add(k);
     if(T[r][c].crate>0){
-      /* 钧·开山者的被动：岩壳每次多褪一层 */
-      const d=Math.min(T[r][c].crate,passive('jun')?2:1);
-      T[r][c].crate-=d;bumpGoal('crate',null,d);SFX.crate();
+      T[r][c].crate--;bumpGoal('crate',null,1);SFX.crate();
       fxBurst(cxOf(c),cyOf(r),'#7a705c',10,1.1);
       if(T[r][c].crate===0)fxRing(cxOf(c),cyOf(r),'#9a8c68',ENG.cs*1.6);
     }
@@ -3635,13 +3657,23 @@ async function settleBoard(firstChain){
         bumpGoal('cage',null,1);SFX.crate();
         fxBurst(cxOf(c),cyOf(r),'#c9b78a',8,.9);
       }
-      B[r][c]=newPiece({g:m.g,k:m.k});B[r][c].sc=.2;
-      fxRing(cxOf(c),cyOf(r),m.k==='O'?'#ffffff':GEMS[m.g].base,ENG.cs*2.2);
+      /* 晓·摘星者的被动「摘星」：每炼成第 3 颗特殊石，就把它直接摘成爆裂。
+         换掉原来那条 chain===4 给疾风的（已移交狼先生）——
+         新的这条**诱导玩家去多炼特殊石**，而不是去追某个特定连锁数，
+         正好和他的大招（凭空造一颗万象）同源：他是造物系。
+         计数只在本关内累积，跨关不带。 */
+      let mk=m.k;
+      if(passive('xiao')&&mk!=='O'){
+        GS.xiaoN=(GS.xiaoN||0)+1;
+        if(GS.xiaoN%3===0){mk='B';floatNum(r,c,'摘星','#c199e6')}
+      }
+      B[r][c]=newPiece({g:m.g,k:mk});B[r][c].sc=.2;
+      fxRing(cxOf(c),cyOf(r),mk==='O'?'#ffffff':GEMS[m.g].base,ENG.cs*2.2);
       SFX.made();GS.specials++;
-      addScore(m.k==='O'?900:m.k==='B'?520:320,r,c,'#e8c768');
-      if(m.k==='H'||m.k==='V'){grant('a2');tutOnce('sp1','四连炼成 <b>疾风灵石</b>——点它可横扫整行/整列')}
-      if(m.k==='B'){grant('a3');tutOnce('sp2','L 形炼成 <b>爆裂灵石</b>——炸开周围一圈')}
-      if(m.k==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b>——与任意灵石交换，吞掉全场同色')}
+      addScore(mk==='O'?900:mk==='B'?520:320,r,c,'#e8c768');
+      if(mk==='H'||mk==='V'){grant('a2');tutOnce('sp1','四连炼成 <b>疾风灵石</b>——点它可横扫整行/整列')}
+      if(mk==='B'){grant('a3');tutOnce('sp2','L 形炼成 <b>爆裂灵石</b>——炸开周围一圈')}
+      if(mk==='O'){grant('a4');tutOnce('sp3','五连炼成 <b>万象灵珠</b>——与任意灵石交换，吞掉全场同色')}
     }
     grant('a1');
     GS.lastChain=chain;
@@ -3651,15 +3683,39 @@ async function settleBoard(firstChain){
   /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
      只在这个模式记，别的模式不背这个包袱。 */
   if(GS.weekly&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
-  /* 晓·摘星者的被动：连锁到 4 就顺手摘一颗疾风下来。
+  /* 狼先生·执灯人的被动「灯常亮」：连锁到 4 就点亮一颗疾风。
+     这条原来是晓的，现在移交给狼先生 —— 因为它**正好喂他自己的大招**
+     （「执灯」引爆全盘特殊石），造石与引爆形成自循环：
+     打连锁 → 多一颗特殊石 → 大招更狠 → 更想打连锁。
+     而且新手不需要会任何技巧就吃得到（连锁是自然发生的），
+     符合「初始同伴必须对新手友好」这条。
      只在这一手第一次达到 4 时给，连锁再长也不重复给。 */
-  if(chain===4&&passive('xiao')){
+  if(chain===4&&passive('wolf')){
     const sp=[];
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)
       if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
     if(sp.length){const [r,c]=sp[Math.floor(rnd()*sp.length)];
       B[r][c].k=rnd()<.5?'H':'V';B[r][c].sc=.4;SFX.made();
-      fxRing(cxOf(c),cyOf(r),GEMS[4].base,ENG.cs*2.4);}
+      floatNum(r,c,'灯常亮','#e8c768');
+      fxRing(cxOf(c),cyOf(r),GEMS[0].base,ENG.cs*2.4);}
+  }
+  /* 麒·巡渊者的被动「顺流」：连锁到 3 就冲走最底行的一颗灵石。
+     换掉原来那条「墨封每次多褪一层」—— 实测 364 关里 54~56% 的关卡没有墨封，
+     那条一半时间等于不存在。底行是每一关都有的，所以这条 100% 生效。
+     ⚠ 走 clearCells 而不是直接置 null：机关扣层、目标记账、充能都在它里面，
+        绕过去会让「还差 N 块」和盘面对不上，整关不可能通关（这坑项目里踩过）。
+     ⚠ 猫铃免疫一切消除，选点时排除掉，免得玩家以为铃被冲没了。 */
+  if(chain===3&&passive('qi')){
+    const row=N-1, pick=[];
+    for(let c=0;c<N;c++)if(isGem(row,c)&&!B[row][c].bell)pick.push([row,c]);
+    if(pick.length){
+      const cell=pick[Math.floor(rnd()*pick.length)];
+      fxBeam(row,cell[1],'h',GEMS[2].base);
+      floatNum(row,cell[1],'顺流','#6ba0dd');
+      clearCells([cell],chain);
+      SFX.rocket();
+      await dropAndFill();
+    }
   }
   if(chain>=5)grant('a6');
   if(chain>=7){grant('a7');flash()}
@@ -4152,10 +4208,15 @@ async function fireUlt(){
   if(c.id==='wolf'){                                          // 执灯：全盘特殊灵石同时引爆
     const sp=[];
     for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2)&&B[r][c2].k!=='n')sp.push([r,c2]);
-    if(!sp.length){                                           // 没有特殊灵石时先送两颗，免得白放
+    if(!sp.length){                                           // 没攒到特殊石时的兜底
+      /* 兜底从 2 颗提到 3 颗（1 横 + 1 纵 + 1 爆裂）。
+         「攒特殊石再放更爽」这个策略保留，但**不攒也不至于白放** ——
+         原来只送 2 颗横纵，比钧的 3 颗爆裂差一大截，而狼先生的 need 还更贵，
+         等于「贵、弱、还要求会玩」，这是他一直偏弱的主因之一。 */
       const spots=[];for(let r=0;r<N;r++)for(let c2=0;c2<N;c2++)if(isGem(r,c2))spots.push([r,c2]);
-      for(let i=0;i<2&&spots.length;i++){const [r,c2]=spots.splice(Math.floor(rnd()*spots.length),1)[0];
-        B[r][c2].k=i?'V':'H';B[r][c2].sc=.3;sp.push([r,c2])}
+      const kinds=['H','V','B'];
+      for(let i=0;i<3&&spots.length;i++){const [r,c2]=spots.splice(Math.floor(rnd()*spots.length),1)[0];
+        B[r][c2].k=kinds[i];B[r][c2].sc=.3;sp.push([r,c2])}
       SFX.made();await sleep(200);
     }
     const ex=expandBlast(sp);
@@ -4181,16 +4242,21 @@ async function fireUlt(){
       addScore(Math.round(110*res.gems+700),made[0][0],made[0][1],'#e8c768');
       if(GS.boss)bossHurt(res.gems+14);
     }
-  }else if(c.id==='qi'){                                      // 破浪：一行一列
-    const r=Math.floor(rnd()*N), c2=Math.floor(rnd()*N);
-    fxBeam(r,c2,'h');fxBeam(r,c2,'v');SFX.rocket();SFX.orb();
-    /* 行与列会在 (r,c2) 交叉，重复入列会让该格墨封被扣两层、石笼目标多记一次 */
-    const set=new Set();
-    for(let i=0;i<N;i++){set.add(KEY(r,i));set.add(KEY(i,c2))}
-    const cells=[...set].map(UNKEY);
-    await sleep(REDUCED?20:200);
+  }else if(c.id==='qi'){                                      // 破浪：冲刷最底两行
+    /* 从「随机一行 + 一列」改成「冲掉最底两行」。
+       原来那招和狼/钧一样是「炸掉一片」，三个人挤在同一个定位，玩家换着带感觉不出区别。
+       冲刷是**位移**不是爆破：底下一空，上面整盘往下落 ——
+       猫铃跟着落（这是全游戏唯一能主动推铃的手段）、卡死的盘面被搅活、
+       落下来的新石还常常自己连出三连。定位从「破坏」挪到「盘面流动」，与另外两人彻底分开。
+       也更贴「巡渊」：鲨鱼是从底下横穿过去的。 */
+    const cells=[];
+    for(let r=N-2;r<N;r++)for(let i=0;i<N;i++)cells.push([r,i]);
+    for(let r=N-2;r<N;r++)fxBeam(r,0,'h',GEMS[2].base);
+    SFX.rocket();SFX.orb();
+    await sleep(REDUCED?20:220);
+    /* clearCells 里已经处理了猫铃免疫与机关记账，直接喂给它即可 */
     const res=clearCells(cells,4);
-    addScore(Math.round(110*res.gems+700),r,c2,'#e8c768');
+    addScore(Math.round(110*res.gems+700),N-1,3,'#6ba0dd');
     if(GS.boss)bossHurt(res.gems+14);
   }else if(c.id==='xi'){                                      // 疾足：加步 / 加时
     if(GS.rushOn){GS.rushT+=8000;toast('<b>晰</b> 添了灯油 · +8 秒',2000)}
@@ -5444,7 +5510,7 @@ function openLevel(n,mode){
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
   GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
-  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
   applyOpeningPassives();
   BGM.play(L.boss?'boss':'main');
   show('game');
@@ -5504,7 +5570,7 @@ function renderGoalsTo(host,size){
   });
 }
 function beginPlay(){
-  GS.compDef=compById(SAVE.comp);GS.charge=0;renderAlly();
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
     showTut('把相同的灵石 <b>三个连成一线</b>——点两下，或直接拖动',6000)}
@@ -5526,7 +5592,7 @@ function startRush(blitz){
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
-  GS.compDef=compById(SAVE.comp);GS.charge=0;renderTools();renderAlly();
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;renderTools();renderAlly();
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
@@ -5901,7 +5967,7 @@ function ptStartTurn(){
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.weekly=false;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
-  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
   /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手**——
      只种初盘的话，第一次消除之后的补位就各走各的 Math.random()，
      两个人下同样的步子结果照样分岔，「比手艺不比运气」就站不住。 */
@@ -6585,7 +6651,7 @@ function startWeekly(){
   GS.party=false;GS.weekly=true;GS.paused=false;GS.usedTool=false;GS.wkLog=[];
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
-  GS.compDef=compById(SAVE.comp);GS.charge=0;
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
   /* 种子贯穿整手：建盘一条流，补位与重排另一条但同样由种子派生。
      只种初盘的话，第一次消除之后大家就分岔了，「同盘面比手艺」不成立。 */
   buildBoard(L,sd);
@@ -7889,7 +7955,7 @@ const HOW_HTML=`
 　<b>石笼</b> 被锁住的灵石不能动，连进三连即可破笼。<br><br>
 <b>讨伐战</b>　每消一颗都在削对方的气势，连锁与灵技伤害更高；对方每隔几步会出手捣乱。<br><br>
 <b>同伴助战</b>　出发前挑一位同行。消除<b>他对应颜色</b>的灵石就是在给他充能，满了点头像放大招。<br>
-　狼先生「执灯」引爆全盘特殊灵石 · 钧「虎啸」三颗震成爆裂 · 麒「破浪」洗净一行一列<br>
+　狼先生「执灯」引爆全盘特殊灵石 · 钧「虎啸」三颗震成爆裂 · 麒「破浪」冲掉矿底两行<br>
 　晰「疾足」多给三步 · 晓「掠星」凭空一颗万象 · 梓「破封」全场机关各褪一层<br>
 　<b>带谁出门要看关卡</b>：机关多带梓，猫铃卡住带麒，差一口气带晰。<br><br>
 <b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
@@ -8935,6 +9001,41 @@ window.__selftest=function(){
       /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
       ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
          t.luck.v===9 && luckCount()>=0);
+    }
+    /* 六个同伴：被动必须**每一关都生效**。
+       2026-08-05 实测 364 关：光板关恒定 37~39%、无岩壳 67~69%、无墨封 54~56%，
+       旧版钧/麒/梓 的机关型被动大半时间等于不存在 —— 这才是「带谁都一样」的真因。
+       这一条遍历真实关卡定义，逐个同伴验「有没有一关是他完全吃不到被动的」。 */
+    {
+      const flat=[], noCrate=[], noInk=[];
+      for(let n=1;n<=64;n++){
+        const L=levelDef(n);
+        const ink=(L.ink||[]).length+(L.ink2||[]).length;
+        const cr=(L.crates||[]).length+(L.crates2||[]).length;
+        if(!ink&&!cr)flat.push(n);
+        if(!cr)noCrate.push(n);
+        if(!ink)noInk.push(n);
+      }
+      /* 这三个数字本身要够大，否则这条断言是同义反复（关卡都有机关时当然不失效） */
+      ok('同伴：光板关确实大量存在（'+flat.length+'/64），所以机关型被动必须有兜底',
+         flat.length>=15);
+      /* 钧的被动现在吃「爆裂半径」，麒吃「连锁到 3」，都与机关无关 —— 源码断言 */
+      const eb=String(expandBlast);
+      ok('同伴：钧的被动不再依赖岩壳（改吃爆裂半径，光板关照样生效）',
+         /passive\('jun'\)\?2:1/.test(eb) && !/passive\('jun'\)/.test(String(clearCells)));
+      const sb=String(settleBoard);
+      ok('同伴：麒的被动不再依赖墨封（改吃连锁，光板关照样生效）',
+         /chain===3&&passive\('qi'\)/.test(sb) && !/passive\('qi'\)/.test(String(clearCells)));
+      ok('同伴：狼先生的被动接上了他自己的大招（连锁造特殊石 → 执灯引爆）',
+         /chain===4&&passive\('wolf'\)/.test(sb));
+      /* 梓的机关被动必须带光板关兜底，否则他在 37% 的关里等于没被动 */
+      ok('同伴：梓的机关被动配了光板关兜底',
+         /没有机关的关卡改送一颗爆裂/.test(PASSIVE.zi)
+         && /B\[r\]\[c\]\.k='B'/.test(String(applyOpeningPassives)));
+      /* 六个 need 不许再出现「最贵的那个还最弱」 */
+      const needs=COMPANIONS.map(c=>c.need);
+      ok('同伴：充能阈值收敛在 36~42（'+Math.min(...needs)+'~'+Math.max(...needs)+'），没有极端值',
+         Math.min(...needs)>=36 && Math.max(...needs)<=42);
     }
     /* 分数滚动必须**先写终值再滚**：rAF 在后台标签页会被完全冻住（实测一帧不跑），
        玩家结算时切走再回来，动画从没开始过 —— 先写终值最坏只是「没滚动」，
