@@ -451,6 +451,104 @@ async function gfEnsure(env) {
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
 }
+/* ══════════════════════════════════════════════════════════════
+   配速员 · PACERS
+   ──────────────────────────────────────────────────────────────
+   王老师要「虚拟人，逼真，能让不同段位的活跃玩家都有得追」，并且要能一键开关。
+
+   三条设计约束，是这套东西能不能上的全部理由：
+
+   1) **它们不从真人手里拿走任何东西。** payload 里带 bot:1，客户端据此
+      把它们排除在「四座」之外；它们没有 camp 也没有 faction，所以不进
+      阵营拉锯与门派榜；它们不参与任何限量奖励。
+      配速员的价值是「前面有人跑着」，不是「把奖杯端走」。
+
+   2) **不写库，纯计算。** 它们不是 gemfall 表里的行 —— 是按 seed + 已过天数
+      现场算出来的。好处有三：不占赛季行上限、不会被误当真人删掉、
+      而且**随时间自然增长**（静态不动的榜单条目是最大的破绽）。
+
+   3) **一键开关。** meta 表的 pacers 键，/gf/admin 的 act:'pacers' 翻。
+      关掉之后它们立刻从所有榜单消失，不留痕迹 —— 王老师随时可以让他们隐退。
+
+   逼真度靠三件事：名字像真人起的、**成长曲线各不相同**（有人猛冲一阵就歇、
+   有人细水长流）、以及各项数值之间**互相自洽**（不会出现 200 关却只来过 1 天）。
+   ══════════════════════════════════════════════════════════════ */
+const PACER_EPOCH = Date.UTC(2026, 7, 1);          // 计时起点，改它等于让所有配速员重新长
+
+/* 覆盖 3k~95k 的矿力区间，让每个段位的真人身边都有人。
+   pace = 每天涨多少矿力；burst = 起伏幅度（0 稳、1 忽快忽慢）；
+   rest = 每周休息几天（模拟真人不是天天在线）。 */
+const PACERS = [
+  { alias: "青稞",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2 },
+  { alias: "小满",             seed: 23, base:  5100, pace: 610, burst: .30, rest: 1 },
+  { alias: "灯下黑",           seed: 37, base:  7400, pace: 430, burst: .70, rest: 3 },
+  { alias: "拾穗人",           seed: 41, base: 10800, pace: 700, burst: .40, rest: 1 },
+  { alias: "半盏",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3 },
+  { alias: "老周头",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0 },
+  { alias: "阿蛮",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2 },
+  { alias: "南山采石",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1 },
+  { alias: "云渡",             seed: 97, base: 44800, pace: 640, burst: .50, rest: 2 },
+  { alias: "沈砚",             seed: 103, base: 58200, pace: 750, burst: .45, rest: 1 },
+  { alias: "不问归期",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3 },
+];
+
+function pacerRnd(seed) {                          // xorshift，纯函数、可复现
+  let x = seed | 0 || 1;
+  return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 100000) / 100000; };
+}
+
+/* 把一个配速员在「第 d 天」的状态算出来。所有字段互相自洽。 */
+function pacerAt(p, d) {
+  const r = pacerRnd(p.seed);
+  /* base 代表「他在计时起点之前已经玩了很久」，所以到场天数与局数也必须带上那段历史 ——
+     否则会出现「矿力 75,192、第 156 关、到场只有 2 天」这种一眼假的组合。
+     按矿力反推：约每 1500 矿力对应一天，每天约 8 局，连续纪录取其中一段。 */
+  const histDays = Math.max(1, Math.round(p.base / 1500));
+  let power = p.base, days = histDays, runs = histDays * 8, streak = Math.max(2, Math.round(histDays * .35)), cur = 0;
+  for (let i = 0; i < d; i++) {
+    const off = r() < p.rest / 7;                  // 今天休息
+    if (off) { cur = 0; continue; }
+    days++; cur++; if (cur > streak) streak = cur;
+    runs += 3 + Math.floor(r() * 9);
+    const wave = 1 + (r() - .5) * 2 * p.burst;     // 起伏
+    power += Math.max(0, p.pace * wave);
+  }
+  power = Math.round(power);
+  /* 从矿力反推各项，保证「看起来像同一个人打出来的」：
+     深度约占六成、技巧三成、勤勉一成，再各自换算回关卡/星/分数。 */
+  const depth = power * .58, skill = power * .30;
+  const stars = Math.min(192, Math.round(depth / 260));
+  const lv = Math.max(1, Math.round((depth - stars * 120) / 150));
+  const chain = Math.min(20, 5 + Math.floor(skill / 900));
+  const score = Math.round(skill * 22);
+  const rush = Math.round(skill * 18);
+  return { power, lv, stars, chain, score, rush, days, runs, dbest: streak };
+}
+
+function pacerRows(nowMs) {
+  const d = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 86400000));
+  return PACERS.map(p => {
+    const st = pacerAt(p, d);
+    return {
+      id: "pacer:" + p.seed, alias: p.alias, faction: "", camp: "",
+      power: st.power, best_score: st.score, best_rush: st.rush,
+      lv: st.lv, stars: st.stars, chain: st.chain,
+      runs: st.runs, days: st.days, dbest: st.dbest, best_dig: 0, luck: 0,
+      rank_name: gfRankFor(st.power), badges: gfBadges({
+        lv: st.lv, stars: st.stars, score: st.score, rush: st.rush, chain: st.chain,
+      }).join(","),
+      __bot: 1,
+    };
+  });
+}
+
+async function pacersOn(env) {
+  try {
+    const r = await env.DB.prepare("SELECT v FROM meta WHERE k='pacers'").first();
+    return !!(r && r.v === "1");
+  } catch (e) { return false; }
+}
+
 /* runs/days/dbest/mv 也要给客户端 —— 「三线首座」要在前端算出每个人的
    深度/技巧/勤勉，缺一项就算不出勤勉那条，而勤勉恰恰是唯一「榜首快不过新人」的线。
    多这四个整数对响应体的影响可以忽略（50 行 × 4 个数）。 */
@@ -461,6 +559,10 @@ function gfMap(rows) {
     chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
     luck: r.luck || 0,
+    /* 客户端据此把配速员排除在「四座」之外 —— 它们不占真人的座位。
+       这个标记是**故意可见**的：与其做成查不出来的欺骗，不如做成
+       「你要是好奇翻得到」的游戏机制，对王老师的身份也更稳妥。 */
+    bot: r.__bot ? 1 : 0,
     tag: String(r.id || "").slice(-2),
   }));
 }
@@ -695,7 +797,15 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  return json({ ok: true, season: sea, scope, count: (rows.results || []).length, rows: gfMap(rows.results) }, 200, origin);
+  /* 配速员只并进**世界榜**：门派榜与小队榜是熟人圈，混进陌生名字很突兀，
+     而且它们本来就没有门派/小队归属。开关关掉时这一段整个不执行。 */
+  let merged = rows.results || [];
+  if (scope !== "class" && await pacersOn(env)) {
+    merged = merged.concat(pacerRows(Date.now()))
+      .sort((a, b) => (b.power || 0) - (a.power || 0) || String(a.alias).localeCompare(String(b.alias)))
+      .slice(0, limit);
+  }
+  return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);
 }
 async function gfAdmin(req, env, origin) {
   let body;
@@ -723,6 +833,13 @@ async function gfAdmin(req, env, origin) {
   if (act === "delete") {
     await env.DB.prepare("DELETE FROM gemfall WHERE id=?").bind(String(body.id || "")).run();
     return json({ ok: true }, 200, origin);
+  }
+  if (act === "pacers") {
+    /* 一键让配速员上线 / 隐退。关掉之后它们立刻从所有榜单消失，不留任何痕迹 ——
+       它们本来就不是库里的行，是按 seed 现场算出来的。 */
+    const on = String(body.on || "") === "1" ? "1" : "0";
+    await env.DB.prepare("INSERT INTO meta(k,v) VALUES('pacers',?) ON CONFLICT(k) DO UPDATE SET v=excluded.v").bind(on).run();
+    return json({ ok: true, pacers: on === "1", count: on === "1" ? PACERS.length : 0 }, 200, origin);
   }
   if (act === "reset") {
     /* 与 /admin 一致：清空整张表必须带确认串，避免误点 */

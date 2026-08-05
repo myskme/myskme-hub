@@ -7062,6 +7062,9 @@ function thronesOf(rows){
   for(const t of THRONES){
     let best=null,bv=0;
     for(const r of (rows||[])){
+      /* 配速员不占座。四座是真人争来的东西，让一个算出来的名字坐上去，
+         就等于从真人手里拿走了一样东西 —— 那是这套机制唯一不能碰的红线。 */
+      if(r.bot)continue;
       const v=t.k==='luck'?(r.luck||0)
         :pwLines({lv:r.lv||0,stars:r.stars||0,chain:r.chain||0,score:r.score||0,
           rush:r.rush||0,mv:r.mv||0,runs:r.runs||0,days:r.days||0,dbest:r.dbest||0})[t.k];
