@@ -3649,7 +3649,7 @@ async function bossAct(){
 
 /* ---- 核心回合 ---- */
 async function settleBoard(firstChain){
-  let chain=firstChain||0, total=0;
+  let chain=firstChain||0, total=0, qiDone=false;
   while(true){
     const groups=findGroups();
     if(!groups.length)break;
@@ -3710,6 +3710,30 @@ async function settleBoard(firstChain){
     GS.lastChain=chain;
     await sleep(REDUCED?25:150);
     await dropAndFill();
+    /* 麒·巡渊者的被动「顺流」：连锁到 3 就冲走最底行的一颗灵石。
+       换掉原来那条「墨封每次多褪一层」—— 实测 364 关里 54~56% 的关卡没有墨封，
+       那条一半时间等于不存在。底行是每一关都有的，所以这条 100% 生效。
+
+       ⚠ 必须写在**循环体内**。第一版写在循环之后，冲掉一颗、落石补位，
+         但补下来的新石若连成三连就**没人去消它** —— 盘面会留着一组悬而未决的三连，
+         直到玩家下一手才莫名其妙地炸掉。放进循环里，下一轮 findGroups 自然会接着解。
+       ⚠ 走 clearCells 而不是直接置 null：机关扣层、目标记账、充能都在它里面，
+         绕过去会让「还差 N 块」和盘面对不上，整关不可能通关（这坑项目里踩过）。
+       ⚠ 猫铃免疫一切消除，选点时排除掉，免得玩家以为铃被冲没了。
+       ⚠ 一手只冲一次：不加这个守卫的话，冲下来又连成 3 连会再冲，能连锁到盘底掏空。 */
+    if(chain>=3&&!qiDone&&passive('qi')){
+      const row=N-1, pick=[];
+      for(let c=0;c<N;c++)if(isGem(row,c)&&!B[row][c].bell)pick.push([row,c]);
+      if(pick.length){
+        qiDone=true;
+        const cell=pick[Math.floor(rnd()*pick.length)];
+        fxBeam(row,cell[1],'h',GEMS[2].base);
+        floatNum(row,cell[1],'顺流','#6ba0dd');
+        clearCells([cell],chain);
+        SFX.rocket();
+        await dropAndFill();
+      }
+    }
   }
   /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
      只在这个模式记，别的模式不背这个包袱。 */
@@ -3729,24 +3753,6 @@ async function settleBoard(firstChain){
       B[r][c].k=rnd()<.5?'H':'V';B[r][c].sc=.4;SFX.made();
       floatNum(r,c,'灯常亮','#e8c768');
       fxRing(cxOf(c),cyOf(r),GEMS[0].base,ENG.cs*2.4);}
-  }
-  /* 麒·巡渊者的被动「顺流」：连锁到 3 就冲走最底行的一颗灵石。
-     换掉原来那条「墨封每次多褪一层」—— 实测 364 关里 54~56% 的关卡没有墨封，
-     那条一半时间等于不存在。底行是每一关都有的，所以这条 100% 生效。
-     ⚠ 走 clearCells 而不是直接置 null：机关扣层、目标记账、充能都在它里面，
-        绕过去会让「还差 N 块」和盘面对不上，整关不可能通关（这坑项目里踩过）。
-     ⚠ 猫铃免疫一切消除，选点时排除掉，免得玩家以为铃被冲没了。 */
-  if(chain===3&&passive('qi')){
-    const row=N-1, pick=[];
-    for(let c=0;c<N;c++)if(isGem(row,c)&&!B[row][c].bell)pick.push([row,c]);
-    if(pick.length){
-      const cell=pick[Math.floor(rnd()*pick.length)];
-      fxBeam(row,cell[1],'h',GEMS[2].base);
-      floatNum(row,cell[1],'顺流','#6ba0dd');
-      clearCells([cell],chain);
-      SFX.rocket();
-      await dropAndFill();
-    }
   }
   if(chain>=5)grant('a6');
   if(chain>=7){grant('a7');flash()}
@@ -9132,7 +9138,17 @@ window.__selftest=function(){
          /passive\('jun'\)\?2:1/.test(eb) && !/passive\('jun'\)/.test(String(clearCells)));
       const sb=String(settleBoard);
       ok('同伴：麒的被动不再依赖墨封（改吃连锁，光板关照样生效）',
-         /chain===3&&passive\('qi'\)/.test(sb) && !/passive\('qi'\)/.test(String(clearCells)));
+         /passive\('qi'\)/.test(sb) && !/passive\('qi'\)/.test(String(clearCells)));
+      /* 麒的被动必须在**循环体内**触发，否则它冲下来的新石若连成三连没人去消，
+         盘面会留着一组悬而未决的三连到下一手。这条盯的就是位置：
+         跟「循环结束后的第一条语句」比，在它之前就说明还在循环里。
+         （别拿 findGroups 当锚 —— 它只出现在循环头一处，lastIndexOf 反而落在前面，
+           第一版就是这么写红的。） */
+      const qiAt=sb.indexOf("passive('qi')"), afterLoop=sb.indexOf("chain>=5");
+      ok('同伴：麒的被动写在结算循环体内（冲下来的连锁会被接着解掉）',
+         qiAt>0 && afterLoop>0 && qiAt<afterLoop);
+      ok('同伴：麒的被动一手只冲一次（否则能连锁着把盘底掏空）',
+         /qiDone/.test(sb) && /!qiDone/.test(sb));
       ok('同伴：狼先生的被动接上了他自己的大招（连锁造特殊石 → 执灯引爆）',
          /chain===4&&passive\('wolf'\)/.test(sb));
       /* 梓的机关被动必须带光板关兜底，否则他在 37% 的关里等于没被动 */
