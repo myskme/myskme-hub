@@ -2133,13 +2133,25 @@ function passive(id){return GS.compDef&&GS.compDef.id===id}
 /* 开局就生效的两条被动。必须在 buildBoard 之后、玩家看到盘面之前跑，
    而且**不能碰目标数**——reconcileGoals 已经按实际布上的数量对好账了，
    这里再动机关会让「还差 N 块」和盘面对不上。所以只褪层，不清零。 */
-function applyOpeningPassives(){
+/* opts.gemOnly：只发灵石，不动机关。
+   限时局用这个 —— 它**不建盘**（全文 buildBoard 没有一处在 startRush 里），
+   接着上一关的盘打，去扣那上面残留的墨封/岩壳既没有目标可记，
+   还会弹出「梓 抬手一拂——墨封 N 处」这种驴唇不对马嘴的提示。 */
+function applyOpeningPassives(opts){
+  opts=opts||{};
+  /* ⚠ 随机源。`rnd` 就是 Math.random、**不吃种子** —— 聚会赛与本周矿脉是同种子对局，
+     用它会让两个玩家的盘面从第一颗就分岔。
+     但也**不能靠 ENG.rng**：buildBoard 结束时会把它清成 null（2955 行的 keepRng），
+     等到这里来读永远是空的，照样落回 Math.random。实测同种子两次建盘 + 被动，
+     盘面就是不一样的 —— 这条要是没测，本周矿脉「全服同一盘」会静悄悄地破掉。
+     所以由**调用方显式传种子**：种子局传，冒险关与限时局不传（本来就该随机）。 */
+  const R=opts.rng||rnd;
   if(passive('wolf')){
     /* 执灯人：先照亮一处。找一颗普通灵石变成横向疾风。 */
     const spots=[];
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)
       if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage&&!T[r][c].crate&&!T[r][c].ink)spots.push([r,c]);
-    if(spots.length){const [r,c]=spots[Math.floor(rnd()*spots.length)];B[r][c].k='H';B[r][c].sc=.4}
+    if(spots.length){const [r,c]=spots[Math.floor(R()*spots.length)];B[r][c].k='H';B[r][c].sc=.4}
   }
   if(passive('zi')){
     /* 解封者：开局帮着褪一层，**每种最多 5 处**。
@@ -2148,6 +2160,7 @@ function applyOpeningPassives(){
        走 bumpGoal 记账，目标进度才会跟着走，
        否则玩家看到盘上少了一层、数字却没动。 */
     const CAP=5; let ink=0,cr=0;
+    if(opts.gemOnly){ink=CAP;cr=CAP}          // 限时局：跳过动机关，直接走下面的送灵石兜底
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){
       if(ink<CAP&&T[r][c].ink>0){T[r][c].ink--;bumpGoal('ink',null,1);ink++}
       if(cr<CAP&&T[r][c].crate>0){T[r][c].crate--;bumpGoal('crate',null,1);cr++}
@@ -2163,7 +2176,7 @@ function applyOpeningPassives(){
       for(let r=0;r<N;r++)for(let c=0;c<N;c++)
         if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)spots.push([r,c]);
       if(spots.length){
-        const [r,c]=spots[Math.floor(rnd()*spots.length)];
+        const [r,c]=spots[Math.floor(R()*spots.length)];
         B[r][c].k='B';B[r][c].sc=.4;
         setTimeout(()=>toast('这一关没有机关——<b>梓</b> 换了颗<b>爆裂灵石</b>给你',2600),1100);
       }
@@ -3744,8 +3757,12 @@ async function settleBoard(firstChain){
      打连锁 → 多一颗特殊石 → 大招更狠 → 更想打连锁。
      而且新手不需要会任何技巧就吃得到（连锁是自然发生的），
      符合「初始同伴必须对新手友好」这条。
-     只在这一手第一次达到 4 时给，连锁再长也不重复给。 */
-  if(chain===4&&passive('wolf')){
+     ⚠ 是 **>=4** 不是 ===4。这块在结算循环**之外**，chain 是整手的最终深度 ——
+       写成精确等于的话，打出 5 连、6 连一颗都不给，等于「打得越好越吃不到被动」，
+       而狼先生恰恰是第 1 关就有的初始同伴，新手全程吃这条。
+       （下面紧跟着就是 chain>=5 / >=7 / >=12 的三条庆祝，代码自己承认长连锁很常见。）
+       这块在循环外，一手最多执行一次，所以不需要 qiDone 那样的守卫。 */
+  if(chain>=4&&passive('wolf')){
     const sp=[];
     for(let r=0;r<N;r++)for(let c=0;c<N;c++)
       if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
@@ -4185,8 +4202,17 @@ async function useToolAt(r,c){
    免得他因为关卡配色而白白吃亏。
    另外炼成特殊灵石 +4、清掉机关 +2 —— 让「打得好」比「打得多」更快充满。 */
 const CHG={any:.4,own:.6,spec:4,block:2};
+/* ULTING：放大招的整个过程里不给自己充能。
+   2026-08-06 沙盘 300 局/人查出来的：大招清出来的石头照样走 clearCells → allyChargeFrom，
+   于是形成闭环 —— 钧一次放招回充 38.4，而他的 need 是 40，**等于放完立刻又满**。
+   实测大招次数/关：钧 7.96、晰 5.70、狼 5.31、梓 3.53；分/关钧 67,908 对梓 20,197。
+   而**把「充满就放」关掉、只统计攒能时，钧反而是倒数第二** —— 差距全在这个环里。
+   各人的回充比例：钧 96%、狼 66%、麒 45%、梓 15%、晰与晓 0% ——
+   所以这不是钧一个人的问题，是「谁的大招清得多谁就滚雪球」，统一掐掉才公平。
+   ⚠ 掐的是**充能**不是分数与记账：clearCells 里的 bumpGoal、目标进度、得分全部照常。 */
+let ULTING=false;
 function allyCharge(n){
-  const c=GS.compDef; if(!c||GS.over||!n)return;
+  const c=GS.compDef; if(!c||GS.over||!n||ULTING)return;
   const was=GS.charge>=c.need;
   GS.charge=Math.min(c.need,GS.charge+n);
   renderAlly();
@@ -4232,7 +4258,7 @@ async function fireUlt(){
   const c=GS.compDef;
   if(!c||GS.busy||GS.over||GS.charge<c.need)return;
   GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;hintCell=null;
-  GS.busy=true;renderAlly();renderTools();
+  GS.busy=true;ULTING=true;renderAlly();renderTools();
   SAVE.ach['ult_'+c.id]=1;grant('a13');
   csBump('u',1);
   if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
@@ -4328,6 +4354,9 @@ async function fireUlt(){
   }
   await sleep(REDUCED?30:240);
   await dropAndFill();
+  /* 大招之后的级联**照常充能** —— 那是玩家自己布下的局面在滚，不是大招白送的。
+     所以 ULTING 在 settleBoard 之前就放掉。 */
+  ULTING=false;
   await settleBoard(2);
   if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('无路可走 · <b>矿脉重组</b>')}
   renderAlly();
@@ -5634,7 +5663,11 @@ function startRush(blitz){
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
-  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;renderTools();renderAlly();
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
+  /* 开局被动以前只在 openLevel 跑，于是狼与梓在限时局/聚会赛/本周矿脉里
+     **完全没有被动**，而钧/麒/晓 照常生效 —— 同一个榜上三人有三人没有。 */
+  applyOpeningPassives({gemOnly:true});
+  renderTools();renderAlly();
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
@@ -6014,6 +6047,10 @@ function ptStartTurn(){
      只种初盘的话，第一次消除之后的补位就各走各的 Math.random()，
      两个人下同样的步子结果照样分岔，「比手艺不比运气」就站不住。 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
+  /* 必须在 buildBoard 之后（否则改的是上一手的盘），且**显式传种子** ——
+     buildBoard 结束时会把 ENG.rng 清成 null，靠它读不到东西。
+     这两个模式 L.ink/L.crates 都是空的，所以走的必然是梓的「送一颗爆裂」兜底。 */
+  applyOpeningPassives({rng:rngOf(PARTY.seed+'|r'+PARTY.round+'|op')});
   ENG.rng=rngOf(PARTY.seed+'|play'+PARTY.round);              // 补位/重排也吃同一条随机流
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
@@ -6735,6 +6772,8 @@ function startWeekly(){
   /* 种子贯穿整手：建盘一条流，补位与重排另一条但同样由种子派生。
      只种初盘的话，第一次消除之后大家就分岔了，「同盘面比手艺」不成立。 */
   buildBoard(L,sd);
+  applyOpeningPassives({rng:rngOf(sd+'|op')});   // 同上：种子局，须在建盘之后且显式传种子
+
   ENG.rng=rngOf(sd+'|play');
   BGM.play('main');
   show('game');fitCanvas();
@@ -9160,9 +9199,38 @@ window.__selftest=function(){
          qiAt>0 && afterLoop>0 && qiAt<afterLoop);
       ok('同伴：麒的被动一手只冲一次（否则能连锁着把盘底掏空）',
          /qiDone/.test(sb) && /!qiDone/.test(sb));
+      /* ⚠ 别把 ===4 钉进断言：那条正则正是 115 全绿却没发现「5 连以上一颗不给」的原因。
+         断言要钉的是**意图**（>=4 才对），不是当时恰好写成什么样。 */
       ok('同伴：狼先生的被动接上了他自己的大招（连锁造特殊石 → 执灯引爆）',
-         /chain===4&&passive\('wolf'\)/.test(sb));
+         /chain>=4&&passive\('wolf'\)/.test(sb));
       /* 梓的机关被动必须带光板关兜底，否则他在 37% 的关里等于没被动 */
+      /* 开局被动必须**每个模式都跑**。以前只在 openLevel 调，于是狼与梓在
+         限时局/聚会赛/本周矿脉里完全没有被动，而钧/麒/晓 照常生效 ——
+         同一张榜上三人有三人没有。自测只验函数体内容、从不验它被谁调用，
+         所以 115 条全绿也发现不了，这条专门补上。 */
+      {
+        const paths=[String(openLevel),String(startRush),String(ptStartTurn),String(startWeekly)];
+        ok('同伴：四种模式都调了开局被动（否则狼与梓在限时局与周赛里没有被动）',
+           paths.every(p=>/applyOpeningPassives\(/.test(p)));
+        /* 种子局（聚会赛/本周矿脉）里它必须吃种子流，否则同一期两个人盘面分岔 */
+        /* 种子局必须**逐格可复现**。这条不是读源码，是真的建两次盘比对 ——
+           读源码那版曾经写成「有没有引用 ENG.rng」，而 buildBoard 结束时会把
+           ENG.rng 清成 null，源码里有它也没用，照样落回 Math.random。
+           只有真建两次才测得出来。 */
+        const bakC=SAVE.comp, bakD=GS.compDef, bakB=GS.L;
+        SAVE.comp='wolf';GS.compDef=compById('wolf');
+        const LT=levelDef(3);
+        LT.ink=[];LT.ink2=[];LT.crates=[];LT.crates2=[];LT.cages=[];LT.snakes=[];
+        LT.bells=0;LT.colors=5;
+        const snapB=()=>{const a=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+          const p=B[r][c];a.push(p?(p.g+''+p.k):'_')}return a.join('')};
+        buildBoard(LT,'wk|op');applyOpeningPassives({rng:rngOf('wk|op')});const s1=snapB();
+        buildBoard(LT,'wk|op');applyOpeningPassives({rng:rngOf('wk|op')});const s2=snapB();
+        buildBoard(LT,'wk2');applyOpeningPassives({rng:rngOf('wk2')});const s3=snapB();
+        ok('同伴：种子局的开局被动逐格可复现（本周矿脉「全服同一盘」不会被它破掉）',
+           s1===s2 && s1!==s3);
+        SAVE.comp=bakC;GS.compDef=bakD;GS.L=bakB;
+      }
       ok('同伴：梓的机关被动配了光板关兜底',
          /没有机关的关卡改送一颗爆裂/.test(PASSIVE.zi)
          && /B\[r\]\[c\]\.k='B'/.test(String(applyOpeningPassives)));
