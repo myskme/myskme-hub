@@ -7824,8 +7824,24 @@ function renderDraw(d){
   const a=$('#dw-art');
   a.className='cbig t'+t; a.style.backgroundImage=''; a.classList.remove('has-art');
   /* 正面。卡背那条路走完也回到这里，两处只有这一份「怎么显示正面」的定义。 */
+  /* 揭开那一下的冲击力，按品阶递进。
+     ⚠ 这里有条界线：**在揭开之前吊胃口是赌博式设计，在揭开之后庆祝不是**。
+     所以全部冲击都放在正面已经出现之后，绝不在揭开前加悬念、加减速、加"就快出了"。
+     常卡什么也不给 —— 它是常态，给了反而成噪音，而且会把「臻」那一下的份量稀释掉。 */
+  const punch=()=>{
+    if(t===T_COMMON||REDUCED)return;
+    const lv=t===T_RARE?1:t===T_TOP?2:3;             // 珍 / 臻 / 异纹
+    hitstop(3+lv*2);shakeBy(3+lv);vib(Math.min(38,14+lv*8));
+    /* ⚠ fxBurstDom(i,origin)：第一个参数是**横向位置索引**（0/1/2），不是粒子数；
+       第二个要的是 DOM 元素（它内部调 getBoundingClientRect），不是坐标对象。
+       第一版两个都传错了 —— 索引传了 18~38 会把粒子甩到屏幕外，
+       坐标对象则直接抛异常。品阶越高就多放几束，位置错开。 */
+    for(let i=0;i<lv;i++)setTimeout(()=>fxBurstDom(i,a),i*90);
+    if(lv>=2)flash();                                // 臻与异纹才配得上一记全屏白
+  };
   const face=()=>{a.dataset.fit='cover';a.dataset.pos='center 30%';
-                  a.style.backgroundImage='';a.classList.remove('has-art');applyArt(a,card.a)};
+                  a.style.backgroundImage='';a.classList.remove('has-art');applyArt(a,card.a);
+                  setTimeout(punch,60)};
   /* 卡背翻转：只在从匣子过来时演（d.box 由 renderBoxOpen 标）。
      减弱动效或缺卡背图时直接给正面——结果永远可见，动画只是可选的糖。
      ⚠ 这里绝不能做任何结算：卡在 openBox() 里就已经发了。 */
