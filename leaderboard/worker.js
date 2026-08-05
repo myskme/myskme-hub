@@ -482,17 +482,23 @@ const PACERS = [
 /* hour = 他习惯几点下矿（北京时间），span = 一次玩多久。
    给每个人不同的作息，是「按整天跳变」和「像真人」之间的全部差别 ——
    真人的数字不会在同一秒集体往上跳。 */
-  { alias: "青稞",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2, hour: 21, span: 2 },
-  { alias: "小满",             seed: 23, base:  5100, pace: 610, burst: .30, rest: 1, hour:  7, span: 1 },
-  { alias: "灯下黑",           seed: 37, base:  7400, pace: 430, burst: .70, rest: 3, hour: 23, span: 3 },
-  { alias: "拾穗人",           seed: 41, base: 10800, pace: 700, burst: .40, rest: 1, hour: 12, span: 2 },
-  { alias: "半盏",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3, hour: 16, span: 2 },
-  { alias: "老周头",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0, hour:  6, span: 3 },
-  { alias: "阿蛮",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2, hour: 19, span: 2 },
-  { alias: "南山采石",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1, hour: 13, span: 4 },
-  { alias: "云渡",             seed: 97, base: 44800, pace: 640, burst: .50, rest: 2, hour: 22, span: 2 },
-  { alias: "沈砚",             seed: 103, base: 58200, pace: 750, burst: .45, rest: 1, hour: 20, span: 3 },
-  { alias: "不问归期",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3, hour: 10, span: 2 },
+/* ⚠ 名字要贴**真实玩家**的取名习惯。主要目标群体偏年轻、女生居多，
+   所以「老周头」「南山采石」这种苍老的、匾额式的名字一眼就出戏 ——
+   它们不像一个会来玩三消的人给自己起的。
+   参照真人榜上已有的化名（肖肖 / 白水清新 / 就苹你 / 红鲤鱼绿鲤鱼与驴 / Moon_祺芙），
+   那是叠字、短昵称、生活感的词、少量英文与颜文字气质的混搭。
+   ⚠ seed 不能改：改了等于这个人从头长一遍，历史成绩会跳变。只换 alias。 */
+  { alias: "小圆",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2, hour: 21, span: 2 },
+  { alias: "今天也想睡",       seed: 23, base:  5100, pace: 610, burst: .30, rest: 1, hour:  7, span: 1 },
+  { alias: "夜猫子本猫",       seed: 37, base:  7400, pace: 430, burst: .70, rest: 3, hour: 23, span: 3 },
+  { alias: "阿豆",             seed: 41, base: 10800, pace: 700, burst: .40, rest: 1, hour: 12, span: 2 },
+  { alias: "半糖",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3, hour: 16, span: 2 },
+  { alias: "早八人",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0, hour:  6, span: 3 },
+  { alias: "圆圆",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2, hour: 19, span: 2 },
+  { alias: "午休选手",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1, hour: 13, span: 4 },
+  { alias: "云朵朵",           seed: 97, base: 44800, pace: 640, burst: .50, rest: 2, hour: 22, span: 2 },
+  { alias: "Yuki",            seed: 103, base: 58200, pace: 750, burst: .45, rest: 1, hour: 20, span: 3 },
+  { alias: "一只小鹿",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3, hour: 10, span: 2 },
 ];
 
 function pacerRnd(seed) {                          // xorshift，纯函数、可复现
@@ -550,9 +556,15 @@ function pacerAt(p, hoursTotal) {
   const depth = power * .58, skill = power * .30;
   const stars = Math.min(192, Math.round(depth / 260));
   const lv = Math.max(1, Math.round((depth - stars * 120) / 150));
-  const chain = Math.min(20, 5 + Math.floor(skill / 900));
-  const score = Math.round(skill * 22);
-  const rush = Math.round(skill * 18);
+  /* ⚠ 这三项要**对着真实玩家的量级**标定，不能随便乘。
+     第一版 rush = skill*18，最强配速员打出 405,340 —— 是最强真人（209,320）的两倍，
+     连锁给到 20 而真人上限是 12。结果 90 秒榜前三全被虚拟人占着。
+     而 90 秒榜的全部价值就是「新老玩家都能公平竞争」，榜首被占就没这回事了。
+     现在压到：矿灯上限约 18 万（真人最好成绩之下）、连锁上限 14（略高于真人的 12）。
+     配速员是配速员，不是天花板。 */
+  const chain = Math.min(14, 5 + Math.floor(skill / 2600));
+  const score = Math.round(skill * 9);
+  const rush = Math.round(skill * 8);
   return { power, lv, stars, chain, score, rush, days, runs, dbest: streak };
 }
 
@@ -816,7 +828,15 @@ async function gfBoard(req, env, origin, url) {
      而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
      这里按 season 过滤就会把整个矿脉榜读成空。矿脉榜记的是累计进度（关卡、星数），
      本来就该是长期榜，要清空走 /gf/admin 的 reset。 */
-  if (scope === "class") {
+  /* 90 秒榜：按**单局矿灯最佳**排，不按累计矿力。
+     这是新人唯一能当天上榜的地方 —— 世界榜比累计，老玩家永远压着；
+     矿灯是单局成绩，第一天就能冲。王老师说它最受欢迎、新老玩家都公平，理由正在这里。 */
+  if (scope === "rush") {
+    rows = await env.DB.prepare(
+      `SELECT ${cols} FROM gemfall WHERE hidden=0 AND best_rush>0
+       ORDER BY best_rush DESC, alias ASC LIMIT ?`
+    ).bind(limit).all();
+  } else if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
     if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
     const c = await sha256("class|" + pw + "|" + env.LB_SALT);
@@ -832,8 +852,10 @@ async function gfBoard(req, env, origin, url) {
      而且它们本来就没有门派/小队归属。开关关掉时这一段整个不执行。 */
   let merged = rows.results || [];
   if (scope !== "class" && await pacersOn(env)) {
+    const key = scope === "rush" ? "best_rush" : "power";   // 90 秒榜按矿灯排，不按矿力
     merged = merged.concat(pacerRows(Date.now()))
-      .sort((a, b) => (b.power || 0) - (a.power || 0) || String(a.alias).localeCompare(String(b.alias)))
+      .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
+      .sort((a, b) => (b[key] || 0) - (a[key] || 0) || String(a.alias).localeCompare(String(b.alias)))
       .slice(0, limit);
   }
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);

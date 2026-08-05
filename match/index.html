@@ -668,6 +668,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #daily-card.q3mode .ck{display:none}
 #daily-card.q3mode .cd{font-size:11px;margin-top:0}
 #q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
+/* 今天最大的那份奖励要常驻，不能只在拿到时闪一下 */
+#q3-foot{margin-top:5px;font-size:10.5px;letter-spacing:.04em;color:var(--ink3)}
+#q3-foot b{color:var(--gold2);font-weight:500}
+/* 没完成的那份奖励压暗显示——看得见，但不抢已完成的风头 */
+.q3r .q3p{opacity:.45;transition:opacity .3s}
+.q3r.done .q3p{opacity:1}
 /* 今日深挖那一行。只有打够 4 关才出现，休闲玩家看不到——
    不该让人被一个自己够不着的进度条压着。 */
 #q3-grind{display:none;margin-top:5px;font-size:10.5px;letter-spacing:.04em;
@@ -1429,13 +1435,14 @@ body{--shk:4px}
       <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
            改成同一张卡的第二态：今日三桩。不新增高度。 -->
       <div id="q3-rows"></div>
+      <div id="q3-foot"></div>
       <div id="q3-grind"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
     <div id="menu-stats"></div>
     <div class="menu-foot">
       把灵石三三对齐，沉睡的灵力就会醒来。<br>
-      <a href="../">← 作品总目</a>　·　<a href="#" id="btn-install">安装 · 换机</a>　·　MYSKME × 英语王老师
+      <a href="https://myskme.github.io/myskme-hub/">← 作品总目</a>　·　<a href="#" id="btn-install">安装 · 换机</a>　·　MYSKME × 英语王老师
     </div>
     <div id="cat" title="……" data-fit="contain">
       <svg viewBox="0 0 64 56" fill="currentColor" stroke="var(--line)" stroke-width="1">
@@ -1841,6 +1848,7 @@ body{--shk:4px}
   </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
+    <button data-scope="rush">90 秒</button>
     <button data-scope="camp">阵营</button>
     <button data-scope="faction">门派榜</button>
   </div>
@@ -1905,7 +1913,7 @@ body{--shk:4px}
 </div></div>
 
 <div id="toast"></div>
-<a id="chip-home" href="../">← 作品总目</a>
+<a id="chip-home" href="https://myskme.github.io/myskme-hub/">← 作品总目</a>
 
 
 <script>
@@ -2225,19 +2233,19 @@ const LORE=[
   {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
    t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案——一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页被朱笔圈过的旧纸。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，圈完还得说清楚。」',
-   t:'荣誉殿堂 · 优秀作文墙',d:'手写真迹与王老师点评——被红笔改过、又被夸过的那些。',u:'../wall/'},
+   t:'荣誉殿堂',d:'被红笔圈过、又被夸过的那些手迹，都挂在这面墙上。',u:'https://myskme.github.io/myskme-hub/wall/'},
   {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
    t:'星灵远征',d:'余光之种孵出的小兽 · 你不在时它替你远征，寄回一封封寓言信。',u:'https://myskme.github.io/myskme-starling/'},
   {ch:4,body:'敲开最后一层岩壳，里面是一把锈住的短剑。<br>「笼中剑，」狼先生认出来了，「有人在这儿等过很久。」',
    t:'远征录 · 笼中剑',d:'学院谷地动作肉鸽 · 四章远征直抵区域首领 · 技能连招 · 金叶结晶攒装备。',u:'https://myskme.github.io/myskme-expedition-web/'},
   {ch:5,body:'缠丝断在你手里，散成一地细字。凑近看，每一根都是一个被记错的单词。<br>「还是她，」狼先生认出那手笔迹，「换了个名字，换了样工具——收集的还是同一批东西。」',
-   t:'词灵对决 · 题库训练场',d:'把记错的词一个个夺回来——兑换码即卷号，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
+   t:'词灵对决',d:'把被叶王吞掉的词一个个夺回来 · 对拼、连击、翻盘，扫码即玩。',u:'https://myskme.github.io/myskme-quiz/'},
   {ch:6,body:'双生裂谷的两侧各有一张石桌，棋子还摆着，像是有人刚走开。<br>「他们下到一半吵起来了，」狼先生笑，「棋盘自己会响，你听。」',
    t:'自鸣棋',d:'肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 · 35 位正典角色，扫码即玩。',u:'https://myskme.github.io/myskme-zimingqi/'},
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
-   t:'记分编年史',d:'记分 · 排行榜 · 团队赛 · 赛季管理，单文件离线。',u:'https://myskme.github.io/myskme-scoreboard/'},
+   t:'世界编年史 · 叶王卷',d:'下一层就是他了 · 正典里关于叶王的全部记载，读完再下去。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处——从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>——灵石远征 · 卷一 · 终',
-   t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'../'},
+   t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'https://myskme.github.io/myskme-hub/'},
 ];
 
 /* ---------- 成就 ---------- */
@@ -4757,13 +4765,24 @@ function renderDaily(){
               +(next.dust?('星屑 '+next.dust):(icTag('box')+' 典藏匣')))
             :'　<span style="color:var(--gold2)">今日三档已全数领取</span>');
   }else gd.style.display='none';
+  /* ⚠ 奖励要**做之前就看得见**。原来写的是 `q.done?'+'+def.pow:''` ——
+     完成之后才显示 +180，做之前那一格是空的。
+     「让人忍不住上来做」的前提是他知道做完有什么；藏起来等于没有。
+     没完成时压暗显示，完成后点亮 —— 从「事后通知」变成「事前诱因」。 */
   $('#q3-rows').innerHTML=s.q.map(q=>{
     const def=Q3BY[q.k], pct=Math.min(100,(def.best?q.got:Math.min(q.got,q.need))/q.need*100);
     return '<div class="q3r'+(q.done?' done':'')+'">'
       +'<span class="q3t">'+q3Text(q)+'</span>'
-      +'<span class="q3p">'+(q.done?'+'+def.pow:'')+'</span>'
+      +'<span class="q3p">+'+def.pow+'</span>'
       +'<i style="width:'+pct+'%"></i></div>';
   }).join('');
+  /* 三桩齐那个匣是今天最大的一份，原来只在拿到时弹一次 toast 就没了。
+     现在常驻一行，并且报还差几桩 —— 「还差一桩」是全天最强的那句话。 */
+  const dn=s.q.filter(q=>q.done).length, left=3-dn;
+  const q3f=$('#q3-foot');
+  if(q3f)q3f.innerHTML=left>0
+    ? '三桩齐 → '+icTag('box')+' <b>典藏匣 +1</b>　还差 <b>'+left+'</b> 桩'
+    : '<span style="color:var(--gold2)">今日三桩已齐 · 典藏匣已入册</span>';
 }
 function claimDaily(){
   const st=dailyState(); if(!st.can)return;
@@ -6477,16 +6496,23 @@ function lbRowHTML(r,mine,throne){
        坐着首座 → 只报首座（那是他此刻最值得说的事）
        否则     → 段位 + 走到第几关
      门派与星数进名片。再配 ellipsis，万一还是长，读起来是「省略」不是「被切断」。 */
-  const sub=throne
-    ? throne
-    : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
+  const sub=LB.scope==='rush'
+    /* 90 秒榜上「走到第几关」没意义，换成能说明这一局的：最长连锁 */
+    ? [r.rankName,r.chain?('最长 '+r.chain+' 连'):''].filter(Boolean).join(' · ')
+    : throne
+      ? throne
+      : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
       +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
       +esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
     +'<div class="sub'+(throne?' thr':'')+'">'+esc(sub)+'</div></div>'
-    +'<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
+    /* 90 秒榜比的是单局矿灯，右列就该显示矿灯分 —— 显示矿力的话，
+       玩家会以为榜没排对（第一名的矿力可能比第二名低）。 */
+    +(LB.scope==='rush'
+      ? '<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">矿灯</div></div>'
+      : '<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>')
     +'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
@@ -7085,7 +7111,9 @@ async function renderLB(){
   }
   const rows=d.rows||[];
   if(!rows.length){
-    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。':'榜上还空着——<b>你可以是第一个</b>。';
+    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。'
+      :LB.scope==='rush'?'还没人下过矿灯局——<b>你可以是第一个</b>。'
+      :'榜上还空着——<b>你可以是第一个</b>。';
     return;
   }
   msg.textContent='';
@@ -9366,6 +9394,17 @@ window.__selftest=function(){
       const uf=String(fireUlt), junAt=uf.indexOf("c.id==='jun'");
       const junN=(uf.slice(junAt,junAt+900).match(/i<(\d+)&&spots\.length/)||[])[1];
       ok('同伴：虎啸造 2 颗爆裂（5×5 之下三颗会打出 3.3 倍的分）',junN==='2');
+    }
+    /* 外链不许用 `../` 这类相对路径。
+       游戏在 GitHub Pages 上住在 /myskme-hub/match/，`../` 正好是作品总目；
+       但在**玩家真正用的 play.myskme.com 上，游戏就住在根目录** ——
+       `../` 会绕回游戏自己，`../wall/` 直接 404。实测两条都坏了，
+       而且只在正门上坏，本地和 github.io 测都发现不了。 */
+    {
+      const rel=LORE.filter(x=>/^\.\.?\//.test(x.u||''));
+      const relHref=(document.body.innerHTML.match(/href="\.\.\/[^"]*"/g)||[]);
+      ok('外链：没有相对路径（正门上 ../ 会绕回游戏自己或 404）',
+         rel.length===0 && relHref.length===0);
     }
     /* 分数滚动必须**先写终值再滚**：rAF 在后台标签页会被完全冻住（实测一帧不跑），
        玩家结算时切走再回来，动画从没开始过 —— 先写终值最坏只是「没滚动」，
