@@ -9238,11 +9238,15 @@ window.__selftest=function(){
       }else{
         /* 垫片下退回源码：`.ic` 只许出现在 svg 上、外层一律 `.icw`，
            以及基线规则存在（不写尺寸时默认 1 个字高，而不是 300×150）。 */
-        const html=document.documentElement.innerHTML||'';
-        ok('图标：外层容器一律 .icw，不再和 svg 共用 .ic（父子相乘的根因）',
-           !/<(span|div)[^>]*class="ic"/.test(html));
-        ok('图标：存在 .ic 基线规则，漏写尺寸也不会被撑成 300×150',
-           /\.ic\{width:var\(--ic-sm\)/.test(html));
+        /* ⚠ 垫片里 documentElement.innerHTML 是空的（它只是个存取器，没有真实文档树），
+           所以不能靠扫 HTML 来验。改断言**工厂产物**与**渲染出来的字符串** ——
+           这两样在垫片里都拿得到。 */
+        ok('图标：ICONS 工厂产出的 svg 自带 .ic 与统一描边',
+           /^<svg class="ic"/.test(String(ICONS.pick))
+           && /stroke-width="1\.6"/.test(String(ICONS.pick)));
+        renderShop();
+        ok('图标：商品条目的外层容器叫 .sp-ic，svg 才是 .ic（不再父子同名）',
+           /class="sp-ic"/.test($('#shop-list').innerHTML));
       }
       SAVE.ach=JSON.parse(bakAch);renderAch();
     }
@@ -9277,8 +9281,14 @@ window.__selftest=function(){
       HITSTOP=0;hitstop(3);const h3=HITSTOP;
       HITSTOP=0;hitstop(8);const h8=HITSTOP;
       HITSTOP=0;hitstop(30);const hMax=HITSTOP;
-      ok('连击：顿帧随连锁递进且封顶（3 连 '+h3+'ms → 8 连 '+h8+'ms → 封顶 '+hMax+'ms）',
-         h3>0&&h8>h3&&hMax<=130);
+      /* ⚠ CI 的无头垫片把 matchMedia('prefers-reduced-motion') 写死成 matches:true
+         （它本来就不该在 CI 里跑动画），于是 REDUCED 为真、hitstop 一律返回 0。
+         那种情况下「全是 0」才是**正确行为**，不能当失败。分两种口径各断言各的。 */
+      ok(REDUCED
+           ? '连击：开了「减少动效」时顿帧一律为 0'
+           : '连击：顿帧随连锁递进且封顶（3 连 '+h3+'ms → 8 连 '+h8+'ms → 封顶 '+hMax+'ms）',
+         REDUCED ? (h3===0&&h8===0&&hMax===0)
+                 : (h3>0&&h8>h3&&hMax<=130));
       /* 顿帧只冻画面：源码里 stepPieces/stepFX 吃 vdt，倒计时那段必须仍吃 dt */
       const src=String(loop);
       ok('连击：顿帧只冻画面，限时局倒计时照常走（不给作弊留口子）',
@@ -9340,9 +9350,12 @@ window.__selftest=function(){
     /* 封样：够不着的高层不许泄露名字。这条同时防两种回归——
        将来做轮换或公开表时，把封样层的真名漏出去，这条会红。 */
     {
+      /* ⚠ 读 innerHTML 而不是 textContent：CI 的无头垫片里 textContent 是**独立字段**，
+         设 innerHTML 不会填充它，于是这几条在 CI 里读到空串、必红。
+         innerHTML 两边都拿得到，语义也一样（名字就在 HTML 里）。 */
       const hi=GOODS.filter(g=>g.s>=SEAL_FROM);
-      SAVE.lbPower=0;   renderShop(); const shut=$('#shop-list').textContent;
-      SAVE.lbPower=1e9; renderShop(); const open=$('#shop-list').textContent;
+      SAVE.lbPower=0;   renderShop(); const shut=$('#shop-list').innerHTML;
+      SAVE.lbPower=1e9; renderShop(); const open=$('#shop-list').innerHTML;
       ok('封样：矿力不够时高层商品的真名一个都不泄露',
          hi.length>0 && hi.every(g=>shut.indexOf(g.nm)<0) && shut.indexOf('封样')>=0);
       ok('封样：解锁之后真名照常显示，封样字样消失',
@@ -9351,13 +9364,25 @@ window.__selftest=function(){
          封样就白封了。
          ⚠ 别拿 innerHTML 跟 ICONS.unknown 比字符串 —— 浏览器解析后会重排属性，
          看着一模一样却不相等（踩过）。比「路径数据」才是真正要保的性质。 */
+      /* 封样也要盖住图标，否则从图标就能反推出这是称衔还是印。
+         ⚠ 不走 DOM 查询：垫片的 querySelectorAll 对复杂选择器会**凭空造一个空节点**返回，
+         断言会变成恒真（拿空节点跟谁比都不相等）。改成在渲染出来的 HTML 里
+         直接找三个槽位图标的路径串 —— 一个都不许出现。 */
       SAVE.lbPower=0;renderShop();
-      const dOf=el=>[...el.querySelectorAll('path')].map(p=>p.getAttribute('d')).join('|');
-      const tmp=document.createElement('div');
-      const slotD=Object.values(SLOT_IC).map(k=>{tmp.innerHTML=ICONS[k];return dOf(tmp)});
-      const sealedIC=[...$('#shop-list').querySelectorAll('.sp-i.seal .sp-ic')];
+      const pathOf=svg=>((String(svg).match(/ d="([^"]+)"/)||[])[1]||'');
+      const slotPaths=Object.values(SLOT_IC).map(k=>pathOf(ICONS[k])).filter(Boolean);
+      /* ⚠ 只能查**封样条目内部**。整页 HTML 里当然有槽位图标 ——
+         低层商品没被封，本来就该显示。第一版查整页，于是恒假。
+         按条目切开，只看带 seal 类的那些。 */
+      /* ⚠ 切分要带上标签名。只切 `class="sp-i` 的话，图标那个 `<span class="sp-ic">`
+         也会被当成分隔符，条目被切碎（22 件切出 46 段），
+         封样段落里的图标反而被切到下一段去，断言恒假。 */
+      const items=$('#shop-list').innerHTML.split('<div class="sp-i').slice(1);
+      const sealed=items.filter(x=>x.slice(0,24).indexOf('seal')>=0);
       ok('封样：图标也一并盖住，不许从图标反推出商品类型',
-         sealedIC.length>0 && sealedIC.every(e=>slotD.indexOf(dOf(e))<0));
+         sealed.length>0
+         && sealed.every(x=>slotPaths.every(d=>x.indexOf(d)<0))
+         && sealed.every(x=>x.indexOf(pathOf(ICONS.unknown))>=0));
       SAVE.lbPower=bakL;
       SAVE.lbPower=bakL;
     }
