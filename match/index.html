@@ -577,6 +577,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lb-row .nm{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-row .sub{font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:1px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 坐着首座的人，副行整行走金色 —— 那是这一行唯一值得说的事 */
+.lb-row .sub.thr{color:var(--gold2)}
 .lb-row .pw{flex:none;text-align:right}
 .lb-row .pv{font-size:15px;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.2}
 .lb-row .pl{font-size:10px;color:var(--ink3);letter-spacing:.16em}
@@ -882,6 +884,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lc-r{display:flex;align-items:baseline;font-size:11.5px;color:var(--ink3)}
 .lc-r span{flex:1}
 .lc-r b{color:var(--ink2);font-weight:400;font-variant-numeric:tabular-nums}
+/* 名片里的「跟我比」：这是全站唯一能回答「我该追谁、追得上吗」的地方 */
+.lc-cmp{margin-top:10px;padding-top:9px;border-top:1px solid var(--gold-line);
+  font-size:12px;line-height:1.85;color:var(--ink2);letter-spacing:.03em}
+.lc-cmp b{color:var(--gold2);font-variant-numeric:tabular-nums}
+.lc-x{position:absolute;top:8px;right:8px;background:none;border:1px solid var(--line);
+  color:var(--ink3);font-family:var(--serif);font-size:10.5px;letter-spacing:.14em;
+  padding:3px 8px;cursor:pointer;z-index:2}
+.lc-x:active{transform:translateY(1px)}
+.lc{position:relative}
 /* 三线首座：三个王座而不是一个。摆在榜单最顶上当公告。 */
 .thr{margin:0 0 12px;padding:9px 11px 8px;border:1px solid var(--gold-line);border-radius:6px;
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 9%,transparent),transparent);
@@ -6458,14 +6469,23 @@ function lbMenuStatus(){
 function lbRowHTML(r,mine,throne){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
-  const sub=[r.rankName,r.faction?('门派 '+r.faction):'',
-    r.lv?('第 '+r.lv+' 关'):'',r.stars?('★'+r.stars):''].filter(Boolean).join(' · ');
+  /* ── 副行只放**最有分量的那一样** ──
+     以前一行塞五样（首座·段位·门派·关卡·星数），375px 宽的手机上
+     实测 27 行裁了 7 行，最狠的裁掉 215px —— 玩家看到的是半截话。
+     根子是「行」和「名片」抢活干：行是一眼扫的摘要，名片才是细账，
+     而名片现在点一下就开。所以按分量取一样，其余全部让给名片：
+       坐着首座 → 只报首座（那是他此刻最值得说的事）
+       否则     → 段位 + 走到第几关
+     门派与星数进名片。再配 ellipsis，万一还是长，读起来是「省略」不是「被切断」。 */
+  const sub=throne
+    ? throne
+    : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
       +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
       +esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
-    +'<div class="sub">'+(throne?'<b style="color:var(--gold2)">'+esc(throne)+'</b> · ':'')+esc(sub)+'</div></div>'
+    +'<div class="sub'+(throne?' thr':'')+'">'+esc(sub)+'</div></div>'
     +'<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>'
     +'</div>';
 }
@@ -6488,7 +6508,35 @@ function lbCardHTML(r){
       +'<div class="lc-bar"><i style="width:'+pc+'%"></i></div>';
   };
   const row=(k,v)=>v?('<div class="lc-r"><span>'+k+'</span><b>'+v+'</b></div>'):'';
+  /* ── 跟「我」的对照 ──
+     名片只报数字的话，玩家看完不知道这跟自己有什么关系。
+     最有用的一句是「他强在哪、我差多少、我能不能追」——
+     所以把三条线逐条跟自己比，并把**差距换算成天数**（按实测每天约涨 1264）。
+     看自己的名片时这一段不出现（跟自己比没有意义）。 */
+  const me=LB_ROWS&&LB_ROWS.find(x=>x.alias===SAVE.lbAlias
+    &&(!SAVE.lbTag||!x.tag||x.tag===SAVE.lbTag));
+  let cmp='';
+  if(me&&me!==r&&LB.registered()){
+    const M=pwLines({lv:me.lv||0,stars:me.stars||0,chain:me.chain||0,score:me.score||0,
+      rush:me.rush||0,mv:me.mv||0,runs:me.runs||0,days:me.days||0,dbest:me.dbest||0});
+    const gap=(Number(r.power)||0)-(Number(me.power)||0);
+    const NM={depth:'走多远',skill:'打多险',grind:'来多勤'};
+    /* 找出「我比他强的那条」——哪怕总分落后，也总有一条是自己占优的，
+       这句话比单纯报差距更让人想继续。 */
+    let win='';
+    for(const k of ['depth','skill','grind'])if(M[k]>L[k]){win=NM[k];break}
+    cmp='<div class="lc-cmp">'
+      +(gap>0
+        ? '他比你多 <b>'+gap.toLocaleString('en-US')+'</b> 矿力 · 按你现在的节奏约 <b>'
+          +Math.max(1,Math.ceil(gap/1264))+'</b> 天追平'
+        : gap<0
+          ? '你比他多 <b>'+(-gap).toLocaleString('en-US')+'</b> 矿力'
+          : '你们打平')
+      +(win?'<br>你的「<b>'+win+'</b>」比他强':'')
+      +'</div>';
+  }
   return '<div class="lc">'
+    +'<button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
       +'<div class="lc-nm">'+esc(r.alias||'')+'</div>'
       +'<div class="lc-tt">'+esc(r.rankName||'')+(r.faction?(' · 门派 '+esc(r.faction)):'')+'</div></div>'
@@ -6505,7 +6553,7 @@ function lbCardHTML(r){
       +row('累计局数',r.runs?(r.runs+' 局'):'')
       +row('连续纪录',r.dbest?(r.dbest+' 天'):'')
       +row('开出臻卡',r.luck?(r.luck+' 张'):'')
-    +'</div></div>';
+    +'</div>'+cmp+'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 /* ==================================================================
@@ -7072,6 +7120,11 @@ async function renderLB(){
       const box=$('#lb-card');
       box.innerHTML=lbCardHTML(r);
       box.classList.add('on');
+      /* 名片挂在列表**下面**，榜单长的时候点完什么也看不见 —— 得把它滚进视野。
+         用 nearest 而不是 center：center 会把整个弹层猛地甩一下，很晕。 */
+      box.scrollIntoView({block:'nearest',behavior:REDUCED?'auto':'smooth'});
+      const x=$('#lc-close');
+      if(x)x.onclick=e=>{e.stopPropagation();SFX.click();box.classList.remove('on');box.innerHTML=''};
     };
     list.addEventListener('click',open);
     list.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e)}});
