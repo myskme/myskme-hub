@@ -874,6 +874,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lc-nm{font-size:20px;color:var(--ink);letter-spacing:.1em;margin:2px 0 1px;
   word-break:break-all}                              /* 长化名换行显示，不再被挤掉 */
 .lc-tt{font-size:11.5px;color:var(--gold2);letter-spacing:.06em}
+.lc-comp{margin-top:4px;font-size:11px;color:var(--ink3);letter-spacing:.05em}
+.lc-comp b{color:var(--ink2)}
 .lc-pw{text-align:center;font-size:26px;color:var(--gold2);letter-spacing:.04em;margin:9px 0 2px;
   font-variant-numeric:tabular-nums}
 .lc-pw span{display:block;font-size:10px;color:var(--ink3);letter-spacing:.28em;margin-top:-2px}
@@ -3805,7 +3807,10 @@ async function settleBoard(firstChain){
   }
   /* 本周矿脉记每一手的连锁长度，供结算时拼「矿脉拓片」。
      只在这个模式记，别的模式不背这个包袱。 */
-  if(GS.weekly&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
+  /* 连锁流水：本周矿脉与限时局都记，两者的战报都要用它拼形状。
+     ⚠ 每个模式开局必须清空 —— 不清的话，打完本周矿脉再去打 90 秒，
+     战报上会画出**上一局留下的形状**，比空着更糟（那是在撒谎）。 */
+  if((GS.weekly||GS.mode==='rush')&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
   /* 狼先生·执灯人的被动「灯常亮」：连锁到 4 就点亮一颗疾风。
      这条原来是晓的，现在移交给狼先生 —— 因为它**正好喂他自己的大招**
      （「执灯」引爆全盘特殊石），造石与引爆形成自循环：
@@ -5731,7 +5736,7 @@ function startRush(blitz){
   GS.boss=null;GS.rushOn=true;GS.rushT=baseMs+xiMs;GS.rushMax=baseMs+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
-  GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.wkLog=[];   // 连锁流水每局清空，别把上一局的形状画进战报
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
   /* 开局被动以前只在 openLevel 跑，于是狼与梓在限时局/聚会赛/本周矿脉里
@@ -5759,7 +5764,13 @@ function endRush(){
   yjBump('rushN',1);
   if(GS.chainMax>=8)yjBump('chain8',1);
   bountyCheck();
-  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
+  /* 90 秒局也给分享。它是全站唯一「人人同规则、时长一样、直接可比」的模式 ——
+     「同样 90 秒，你能打多少」这句话成立；关卡各打各的，第 12 关和第 40 关
+     的分数没有可比性，晒出去没人接得住。
+     每局都能分享会让分享变廉价，值得晒的东西必须稀有。 */
+  $('#end-share').style.display='flex';
+  $('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
+  fetchRushRank();                        // 不阻塞：查到名次会自己补进战报
   const b2=GS.rush2;
   const prevBest=b2?SAVE.rush2Best:SAVE.rushBest;
   const best=GS.score>prevBest;
@@ -6105,7 +6116,12 @@ function ptStartTurn(){
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
-  L.colors=5;L.moves=PARTY.pace==='timed'?9999:ptMovesFor(p);
+  /* 晰的「每关 +2 步」在种子局也要给（王老师定：全给）。
+     以前只有冒险关与限时局接了它，钧/麒/晓 的被动却在周赛照常生效 ——
+     同一张榜上有人有、有人没有，那是最不公平的一种。
+     时间制不加（那一档本来就没有步数概念）。 */
+  const xiP=(compById(SAVE.comp).id==='xi')?2:0;
+  L.colors=5;L.moves=PARTY.pace==='timed'?9999:(ptMovesFor(p)+xiP);
   L.goals=[{type:'score',need:999999999,got:0}];
   L.chName='聚会赛';L.era='第 '+(PARTY.round+1)+' 轮';
   L.s1=6000;L.s2=14000;L.s3=26000;
@@ -6353,7 +6369,8 @@ const LB={
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
-      camp:(SAVE.camp&&SAVE.camp.side)||'',pw:SAVE.lbPw||'',stats:this.stats()};
+      camp:(SAVE.camp&&SAVE.camp.side)||'',comp:SAVE.comp||'',
+      pw:SAVE.lbPw||'',stats:this.stats()};
     /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
        正常解析；国内移动网由两次往返变一次，sendBeacon 也与普通提交同口径。 */
     const d=await this.fetchJSON('/gf/submit',
@@ -6384,7 +6401,7 @@ const LB={
      flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
   sig(){const s=this.stats();
     return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,
-            (SAVE.camp&&SAVE.camp.side)||''].join('|')},
+            SAVE.comp||'',(SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
   plan(ms){
@@ -6565,7 +6582,13 @@ function lbCardHTML(r){
     +'<button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
       +'<div class="lc-nm">'+esc(r.alias||'')+'</div>'
-      +'<div class="lc-tt">'+esc(r.rankName||'')+(r.faction?(' · 门派 '+esc(r.faction)):'')+'</div></div>'
+      +'<div class="lc-tt">'+esc(r.rankName||'')+(r.faction?(' · 门派 '+esc(r.faction)):'')+'</div>'
+    /* 同伴摆出来 —— 周赛给了同伴被动之后，「谁强」必须公开，
+       否则就是藏起来的暗亏。摆出来它才会变成群里的战术讨论。 */
+    +(r.comp&&compById(r.comp)
+      ? '<div class="lc-comp">同行 · <b>'+esc(compById(r.comp).name)+'</b> '
+        +esc(compById(r.comp).title)+'</div>'
+      : '')+'</div>'
     +'<div class="lc-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'<span>矿力</span></div>'
     +'<div class="lc-lines">'+bar('depth','走多远',L.depth)+bar('skill','打多险',L.skill)
       +bar('grind','来多勤',L.grind)+'</div>'
@@ -6615,6 +6638,44 @@ const WK_MOVES=25;
       区段，微信、iOS、安卓、桌面都是同一个字形，不会变成彩色小图。
    3. **不泄露走法**。只报每一手打出多长的连锁，别人看得见你打得多漂亮，
       但照着抄不出来——这正是它能当谈资的原因。 */
+/* ---- 矿灯战报：90 秒局的拓片 ----
+   为什么**只给 90 秒**，不给每一关：
+   · 90 秒是全站唯一「人人同规则、时长一样、直接可比」的模式 ——
+     「我 187,923，你能打多少」这句话成立；
+     而关卡各打各的，第 12 关和第 40 关的分数没有可比性，晒出来没人接得住。
+   · 每局都能分享会让分享变廉价，值得晒的东西必须稀有。
+   照拓片那套：纯文本、几何符号（禁 emoji）、不泄露走法。
+   多一样 —— **报名次**。那是竞争的钩子：不是「我打了多少」，是「我第几」。 */
+function rushTablet(){
+  const log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
+  const rows=log.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
+  const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
+    ||location.origin+location.pathname.replace(/index\.html$/,'');
+  const best=GS.rush2?SAVE.rush2Best:SAVE.rushBest;
+  const isNew=GS.score>=best;
+  return '灵石远征 · '+(GS.rush2?'续灯 45 秒':'矿灯将熄 90 秒')+'\n'
+    +(rows||'□')+'\n'
+    +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax
+    +(isNew?' · 新纪录':'')+'\n'
+    +(RUSH_RANK>0?('矿灯榜 第 '+RUSH_RANK+' 名\n'):'')
+    +'同样 '+(GS.rush2?'45':'90')+' 秒，你能打多少？\n'
+    +share;
+}
+/* 结算时顺手查一次自己在矿灯榜上的名次。**不阻塞结算** ——
+   查不到就不报名次，绝不让玩家等在那里看转圈。 */
+let RUSH_RANK=0;
+async function fetchRushRank(){
+  RUSH_RANK=0;
+  if(!LB.registered())return;
+  try{
+    const d=await LB.board('rush');
+    if(!d||!d.ok||!Array.isArray(d.rows))return;
+    const i=d.rows.findIndex(r=>r.alias===SAVE.lbAlias
+      &&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
+    if(i>=0){RUSH_RANK=i+1;const t=$('#wk-tablet');if(t&&t.style.display!=='none')t.textContent=rushTablet()}
+  }catch(e){}
+}
 function wkTablet(){
   const s=wkState(), log=(GS.wkLog||[]).slice();
   /* 只留最精彩的六手，按连锁长度排；六行封顶是为了在群里一屏放得下 */
@@ -6768,6 +6829,9 @@ function showNameCard(){
   box.scrollIntoView({block:'nearest'});
 }
 function showCard(){
+  /* 限时局不出图：名帖画的是「本周第 N 期 + 解法形状」，那套前提在 90 秒局不成立。
+     文字战报够用，而且群里粘贴不吃压缩、打输了也发得出去。 */
+  if(GS.mode==='rush'){copyTablet();return}
   const p=$('#wk-tablet');
   p.style.display='block';
   /* 同一个容器两种形态：文字拓片要等宽带框，图片名帖要素底。
@@ -6777,8 +6841,11 @@ function showCard(){
     +'<div class="cardtip">长按上面这张图 →「保存图片」，发到群里比一比</div>';
   $('#wk-cardimg').src=drawCard();
 }
+/* 分享按模式取对应的战报：本周矿脉走 wkTablet（同一副盘，可以晒解法形状），
+   90 秒走 rushTablet（同规则同时长，晒的是「你能不能打过我」）。 */
+function tabletFor(){return GS.mode==='rush'?rushTablet():wkTablet()}
 async function copyTablet(){
-  const t=wkTablet();
+  const t=tabletFor();
   try{
     await navigator.clipboard.writeText(t);
     toast('拓片已复制 · 粘到群里就行',2600);
@@ -6874,7 +6941,10 @@ function startWeekly(){
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
-  L.colors=5;L.moves=WK_MOVES;
+  /* 同上：本周矿脉也给。同一副盘 + 你自己的配置 = 比纯执行更有嚼头，
+     而且同伴现在是平的（放招节奏极差 14.3%），不存在「选错就废」。
+     配套：榜上要显示每人用的是谁，让「谁强」变成公开讨论而不是暗亏。 */
+  L.colors=5;L.moves=WK_MOVES+((compById(SAVE.comp).id==='xi')?2:0);
   L.goals=[{type:'score',need:NO_SCORE_TARGET*10,got:0}];      // 无目标哨兵，goalText 会只报当前分
   L.chName='本周矿脉';L.era='第 '+w+' 期';
   L.s1=9000;L.s2=20000;L.s3=36000;
@@ -6902,7 +6972,8 @@ function startWeekly(){
   $('#goal-lbl').textContent='本周';
   updHUD();
   const s=wkState();
-  toast('本周矿脉 · 第 <b>'+w+'</b> 期<br>全服同一盘 · '+WK_MOVES+' 步'
+  /* 报**实际步数**，不是常量 —— 带晰的人有 27 步，却看到「25 步」会以为界面错了 */
+  toast('本周矿脉 · 第 <b>'+w+'</b> 期<br>全服同一盘 · '+L.moves+' 步'
     +(s.best?'<br>本周最佳 <b>'+s.best.toLocaleString('en-US')+'</b>':''),3400);
   GS.busy=false;GS.idle=PLAT.now();
 }
@@ -9198,7 +9269,7 @@ window.__selftest=function(){
        st.runs===SAVE.runs&&st.days===SAVE.days
        &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
        &&SIG_KEYS.every(k=>typeof st[k]==='number')
-       &&sg.split('|').length===SIG_KEYS.length+1        // 末位是阵营，不是数字
+       &&sg.split('|').length===SIG_KEYS.length+2        // 末两位是同伴与阵营，不是数字
        &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
@@ -9394,6 +9465,16 @@ window.__selftest=function(){
       const uf=String(fireUlt), junAt=uf.indexOf("c.id==='jun'");
       const junN=(uf.slice(junAt,junAt+900).match(/i<(\d+)&&spots\.length/)||[])[1];
       ok('同伴：虎啸造 2 颗爆裂（5×5 之下三颗会打出 3.3 倍的分）',junN==='2');
+    }
+    /* 战报的连锁形状不许串模式。wkLog 原来只在本周矿脉里记、也只在那里清空 ——
+       给 90 秒也出战报之后，不清的话会把**上一局本周矿脉的形状**画进去，
+       那比空着更糟：它是在撒谎。 */
+    {
+      const src=String(startRush);
+      ok('战报：限时局开局清空连锁流水（不把上一局的形状画进去）',
+         /GS\.wkLog=\[\]/.test(src));
+      ok('战报：限时局也记连锁流水（否则形状永远是空的）',
+         /GS\.weekly\|\|GS\.mode==='rush'/.test(String(settleBoard)));
     }
     /* 外链不许用 `../` 这类相对路径。
        游戏在 GitHub Pages 上住在 /myskme-hub/match/，`../` 正好是作品总目；

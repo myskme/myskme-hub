@@ -429,6 +429,7 @@ async function gfEnsure(env) {
        rank_name TEXT DEFAULT '', badges TEXT DEFAULT '', season TEXT DEFAULT '',
        runs INTEGER DEFAULT 0, days INTEGER DEFAULT 0,
        dbest INTEGER DEFAULT 0, best_dig INTEGER DEFAULT 0, luck INTEGER DEFAULT 0,
+       comp TEXT DEFAULT '',
        first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_world ON gemfall(season,hidden)").run();
@@ -442,11 +443,11 @@ async function gfEnsure(env) {
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN dbest INTEGER DEFAULT 0").run(); } catch (e) {}
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN best_dig INTEGER DEFAULT 0").run(); } catch (e) {}
   /* luck = 开匣开出的臻卡张数（3% 掉率，纯手气，不含升阶与寻卡换来的）。
-     「运数首座」吃这一列 —— 它跟投入无关，是刻意留给新人的那扇窗。 */
-  try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN luck INTEGER DEFAULT 0").run(); } catch (e) {}
-  /* luck = 开匣开出的臻卡张数（3% 掉率，纯手气，不含升阶与寻卡换来的）。
      「运数首座」吃这一列 —— 它跟投入完全无关，是留给新人的那扇窗。 */
   try { await env.DB.prepare("ALTER TABLE gemfall ADD COLUMN luck INTEGER DEFAULT 0").run(); } catch (e) {}
+  /* comp = 上次上传时带的同伴。周赛给了同伴被动之后，「谁强」必须是**公开**的 ——
+     不然就成了藏起来的暗亏。榜上摆出来，它才会变成群里的战术讨论。 */
+  try { await env.DB.prepare(`ALTER TABLE gemfall ADD COLUMN comp TEXT DEFAULT ''`).run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
@@ -605,6 +606,7 @@ function gfMap(rows) {
     /* 客户端据此把配速员排除在「四座」之外 —— 它们不占真人的座位。
        这个标记是**故意可见**的：与其做成查不出来的欺骗，不如做成
        「你要是好奇翻得到」的游戏机制，对王老师的身份也更稳妥。 */
+    comp: r.comp || "",
     bot: r.__bot ? 1 : 0,
     tag: String(r.id || "").slice(-2),
   }));
@@ -633,6 +635,8 @@ async function gfSubmit(req, env, origin) {
   if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
   /* 阵营只认三个固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
   const camp = ["light", "dark", "grey"].includes(String(body.camp || "")) ? String(body.camp) : "";
+  const COMPS = ["wolf", "jun", "qi", "xi", "xiao", "zi"];
+  const comp = COMPS.includes(String(body.comp || "")) ? String(body.comp) : "";
   let classTag = "", classJoined = false;
   if (body.pw && String(body.pw).trim()) {
     classTag = await sha256("class|" + String(body.pw).trim() + "|" + env.LB_SALT);
@@ -659,8 +663,8 @@ async function gfSubmit(req, env, origin) {
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
     `INSERT INTO gemfall (id,alias,faction,camp,class_tag,power,best_score,best_rush,lv,stars,chain,
-       runs,days,dbest,best_dig,luck,rank_name,badges,season,first_seen,last_write,hidden)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
+       runs,days,dbest,best_dig,luck,comp,rank_name,badges,season,first_seen,last_write,hidden)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)
      ON CONFLICT(id) DO UPDATE SET
        alias=excluded.alias, faction=excluded.faction,
        camp=CASE WHEN excluded.camp!='' THEN excluded.camp ELSE gemfall.camp END,
@@ -675,10 +679,12 @@ async function gfSubmit(req, env, origin) {
        dbest=MAX(COALESCE(gemfall.dbest,0),excluded.dbest),
        best_dig=MAX(COALESCE(gemfall.best_dig,0),excluded.best_dig),
        luck=MAX(COALESCE(gemfall.luck,0),excluded.luck),
+       /* 同伴不是成绩，不能 MAX —— 取最近一次带的那个才对 */
+       comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gemfall.comp END,
        rank_name=excluded.rank_name, badges=excluded.badges,
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
-         s.runs, s.days, s.dbest, s.mv, s.luck, rname, badges, sea, seen, now).run();
+         s.runs, s.days, s.dbest, s.mv, s.luck, comp, rname, badges, sea, seen, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
@@ -823,7 +829,7 @@ async function gfBoard(req, env, origin, url) {
   /* ⚠ 这里加列时别忘了 gfMap 也要跟着加 —— 两边任何一边漏掉，
      客户端拿到的就是 undefined，而三线首座算的是每个人的三条线，缺一项就整条算错。 */
   const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges,"
-             + "runs,days,dbest,best_dig,luck";
+             + "runs,days,dbest,best_dig,luck,comp";
   /* 不按 season 过滤：gemfall 没有 base_power 基线，赛季语义对它本来就不成立；
      而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
      这里按 season 过滤就会把整个矿脉榜读成空。矿脉榜记的是累计进度（关卡、星数），
