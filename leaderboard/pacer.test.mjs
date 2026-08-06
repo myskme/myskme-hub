@@ -31,16 +31,25 @@ export function loadFrom(src) {
     fnOf(src, 'gfSkill'), fnOf(src, 'gfGrind'), fnOf(src, 'gfPower'),
     src.match(/const PACER_DECAY_FROM[^\n]*/)[0],
     src.match(/const PACER_CEIL[^\n]*/)[0],
-    fnOf(src, 'pacerAt'), fnOf(src, 'pacerStats'),
+    src.match(/const GAME_EPOCH[^\n]*/)[0],
     src.match(/const PACER_EPOCH[^\n]*/)[0],
-    'return { PACERS, pacerAt, pacerStats, gfPower, PACER_CEIL, PACER_EPOCH };',
+    src.match(/const GAME_DAYS_BEFORE_PACER[^\n]*/)[0],
+    fnOf(src, 'pacerAt'), fnOf(src, 'pacerStats'),
+    'return { PACERS, pacerAt, pacerStats, gfPower, PACER_CEIL, PACER_EPOCH,'
+    + ' GAME_EPOCH, GAME_DAYS_BEFORE_PACER };',
   ].join('\n');
   return new Function(body)();
 }
 
-/* 当前榜上最强真人的量级。配速员**每一项都必须在它之下** ——
-   世界榜与 90 秒榜的榜首必须是人。真人涨了可以往上调，别往下调。 */
+/* 当前榜上最强真人的量级。真人涨了可以往上调，别往下调。 */
 const REAL = { power: 102698, score: 144777, rush: 212792, lv: 335 };
+/* 王老师定的：配速员**可以偶尔越过真人**，越过后停滞一阵再继续 —— 这是刺激点。
+   但「偶尔」要有确切含义，否则又变成虚拟人霸榜。三条量化的规矩： */
+const OVERTAKE = {
+  maxOver: .08,      // 越过榜首最多 8%（打一局就能拿回来的距离）
+  notBefore: 300,    // 前 300 天不许发生 —— 要是开服头一年就被机器压着，那不叫刺激
+  atMost: 1,         // 任何一刻最多只有一个配速员在榜首之上
+};
 
 export function runChecks(M, hoursNow, clientSrc) {
   const { PACERS, pacerAt, PACER_CEIL } = M;
@@ -78,9 +87,34 @@ export function runChecks(M, hoursNow, clientSrc) {
       if (v.score >= PACER_CEIL.score || v.rush >= PACER_CEIL.rush || v.lv >= PACER_CEIL.lv) hit++;
     }
   }
-  const over = Object.keys(peak).filter(k => peak[k] >= REAL[k])
+  /* 单关 / 矿灯 / 关卡 仍旧全部在真人之下 —— 90 秒榜的立身之本是
+     「新老玩家都能公平竞争」，那个榜首被机器占走，这个模式就没意义了。
+     可以越过的只有**世界榜的矿力**，而且要守下面三条。 */
+  const over = ['score', 'rush', 'lv'].filter(k => peak[k] >= REAL[k])
                      .map(k => `${k} ${peak[k]}(${who[k]}) >= 真人 ${REAL[k]}`);
-  ok('十年内四项都在最强真人之下', !over.length, over.join('; '));
+  ok('单关/矿灯/关卡 十年内都在最强真人之下', !over.length, over.join('; '));
+
+  /* 越过世界榜榜首：允许，但要「偶尔」—— 三条都得成立。 */
+  let firstCross = null, maxOver = 0, maxSimul = 0;
+  /* 5 天一格的话这一段要跑 8000 次 pacerAt，而 pacerAt 是 O(天数) —— 十年那头一次 45ms。
+     30 天一格足够判断「有没有越过、越了多少、同时几个」。 */
+  for (let d = 0; d < 3650; d += 30) {
+    const above = PACERS.filter(p => pacerAt(p, hoursNow + d * 24).power > REAL.power);
+    if (!above.length) continue;
+    if (firstCross === null) firstCross = d;
+    if (above.length > maxSimul) maxSimul = above.length;
+    for (const p of above) {
+      const o = pacerAt(p, hoursNow + d * 24).power / REAL.power - 1;
+      if (o > maxOver) maxOver = o;
+    }
+  }
+  ok(`越过榜首不早于第 ${OVERTAKE.notBefore} 天`,
+     firstCross === null || firstCross >= OVERTAKE.notBefore,
+     firstCross === null ? '十年内没越过' : `第 ${firstCross} 天`);
+  ok(`越过榜首的幅度 <= ${OVERTAKE.maxOver * 100}%`, maxOver <= OVERTAKE.maxOver,
+     `最大 ${(maxOver * 100).toFixed(1)}%`);
+  ok(`同一时刻最多 ${OVERTAKE.atMost} 个配速员在榜首之上`, maxSimul <= OVERTAKE.atMost,
+     `实测最多 ${maxSimul} 个`);
   ok('兜底闸十年内没被触发（曲线自己守得住）', hit === 0, hit ? `触发 ${hit} 次` : '');
 
   /* ④ 十年后不许一排人整整齐齐停在整百上 ——「恰好停在 16000」比涨太快还假。 */
@@ -95,6 +129,18 @@ export function runChecks(M, hoursNow, clientSrc) {
     return a.days - b.days > 40 && a.power - b.power < 40;
   }).map(p => p.alias);
   ok('到顶的人连人带号一起停，不是只冻矿力', !zombie.length, zombie.join(','));
+
+  /* ⑤b 到场天数**不得超过「游戏上线到那一天」**。
+        这是名片上最容易露馅的一格：真人到场最多 3 天（中位 1 天），
+        而配速员一度写着「到场 27 天、216 局」—— 在一个上线第 9 天的游戏里。
+        数字再合理，这一格错了就全白搭。 */
+  const impossible = [];
+  for (const p of PACERS) for (const day of [0, 30, 365, 3650]) {
+    const v = pacerAt(p, hoursNow + day * 24);
+    const live = M.GAME_DAYS_BEFORE_PACER + Math.floor((hoursNow + day * 24 + 8) / 24) + 1;
+    if (v.days > live) impossible.push(`${p.alias} 第${day}天 到场 ${v.days} > 游戏存在 ${live}`);
+  }
+  ok('到场天数没超过游戏存在的天数', !impossible.length, impossible.slice(0, 3).join('; '));
 
   /* ⑥ 别挤在同一个数上：真人在同一矿力上下能差一倍
         （矿力 32,751 打 124,274，矿力 33,910 打 187,923）。 */
@@ -121,6 +167,17 @@ export function runChecks(M, hoursNow, clientSrc) {
     }
     ok('名片矿力 == 榜单矿力（跨端同源）', !bad.length, bad.slice(0, 4).join('; '));
   }
+
+  /* ⑧ 性能守卫。pacerAt 要从第 0 天一路模拟到目标日，**开销随天数线性增长**，
+        而 gfLadder 里那个 `for (const [w,r] of [[64,100],[86,150]])` 每次调用
+        都要新建两个数组 —— 它现在每模拟一天就被调一次。
+        线上靠 pacerRows 的按小时缓存摊薄（今天约 1ms/小时），但十年那头是
+        11 × 45ms ≈ 500ms/小时。这条守卫不是要它变快，是**不许它再变慢一个数量级**；
+        真顶到 Workers 的 CPU 上限时，正解是把每月的状态存进 D1 做断点续算。 */
+  const t0 = Date.now();
+  pacerAt(PACERS[PACERS.length - 1], hoursNow + 3650 * 24);
+  const ms = Date.now() - t0;
+  ok('单次 pacerAt（十年那头）< 120ms', ms < 120, `实测 ${ms}ms`);
 
   return out;
 }

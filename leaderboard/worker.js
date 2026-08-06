@@ -558,7 +558,13 @@ async function gfEnsure(env) {
    逼真度靠三件事：名字像真人起的、**成长曲线各不相同**（有人猛冲一阵就歇、
    有人细水长流）、以及各项数值之间**互相自洽**（不会出现 200 关却只来过 1 天）。
    ══════════════════════════════════════════════════════════════ */
-const PACER_EPOCH = Date.UTC(2026, 7, 1);          // 计时起点，改它等于让所有配速员重新长
+/* 游戏上线日。配速员的**到场天数不得超过「上线到今天」** ——
+   这是整张名片上最容易露馅的一格：真人到场最多 3 天（中位 1 天），
+   而配速员一度写着「到场 27 天、216 局」，在一个上线第 9 天的游戏里。
+   数字再合理，这一格错了就全白搭。 */
+const GAME_EPOCH = Date.UTC(2026, 6, 29);
+const PACER_EPOCH = Date.UTC(2026, 7, 1);
+const GAME_DAYS_BEFORE_PACER = Math.round((PACER_EPOCH - GAME_EPOCH) / 86400000);          // 计时起点，改它等于让所有配速员重新长
 
 /* 覆盖 3k~95k 的矿力区间，让每个段位的真人身边都有人。
    pace = 每天涨多少矿力；burst = 起伏幅度（0 稳、1 忽快忽慢）；
@@ -579,20 +585,24 @@ const PACERS = [
    ⚠ ceil = 他这辈子大概能到的矿力。真人不会永远直线上涨，**涨到某个段位就基本停住**，
      配速员也得这样，否则一年后榜首就是虚拟人（实测 48 天后就超过最强真人）。
      ⚠ 单位是**公开矿力**（gfPower 的输出），不是内部的 eff。
-     top = 86,940，低于当前最强真人的 102,698 —— 榜首必须是人。
+   ⚠ **ceil 是平常待的地方，peak 是这辈子的最高处**，只有冲刺期够得到。
+     王老师定的：配速员可以偶尔越过真人，越过之后停滞一阵再继续 —— 这是刺激点。
+     10 个人的 peak 都在最强真人（102,698）之下，只有一只小鹿的 108,000 够得着，
+     而且要冲上四五次台阶、约两年才摸得到，越过的幅度也只有 5%。
+     真人被越过之后打一局就能拿回来 —— 这正是它该有的样子。
      ⚠ 故意不取整：取整的话十年后会有人**正好停在 19000** 上，
      「一排人恰好停在整千」比涨得太快还假（这条自测抓到过一次）。 */
-  { alias: "小圆",             seed: 11, base:    50, pace: 260, burst: .55, rest: 2, hour: 21, span: 2, ceil: 13840 },
-  { alias: "今天也想睡",       seed: 23, base:  1390, pace: 610, burst: .30, rest: 1, hour:  7, span: 1, ceil: 18760 },
-  { alias: "夜猫子本猫",       seed: 37, base:  1340, pace: 430, burst: .70, rest: 3, hour: 21, span: 3, ceil: 22910 },
-  { alias: "阿豆",             seed: 41, base:  1640, pace: 700, burst: .40, rest: 1, hour: 12, span: 2, ceil: 29640 },
-  { alias: "半糖",             seed: 53, base:  4200, pace: 380, burst: .65, rest: 3, hour: 16, span: 2, ceil: 34870 },
-  { alias: "早八人",           seed: 67, base:  6750, pace: 820, burst: .25, rest: 0, hour:  6, span: 3, ceil: 44520 },
-  { alias: "圆圆",             seed: 71, base:  9840, pace: 560, burst: .60, rest: 2, hour: 19, span: 2, ceil: 49380 },
-  { alias: "午休选手",         seed: 83, base: 14240, pace: 900, burst: .35, rest: 1, hour: 13, span: 4, ceil: 59260 },
-  { alias: "云朵朵",           seed: 97, base: 18190, pace: 640, burst: .50, rest: 2, hour: 22, span: 2, ceil: 67410 },
-  { alias: "Yuki",            seed: 103, base: 27750, pace: 750, burst: .45, rest: 1, hour: 20, span: 3, ceil: 77530 },
-  { alias: "一只小鹿",         seed: 113, base: 41060, pace: 480, burst: .70, rest: 3, hour: 10, span: 2, ceil: 86940 },
+  { alias: "小圆",             seed: 11, base:   110, pace: 130, burst: .55, rest: 3, hour: 21, span: 2, ceil: 13840, peak: 17300 },
+  { alias: "今天也想睡",       seed: 23, base:  1614, pace: 300, burst: .30, rest: 4, hour:  7, span: 1, ceil: 18760, peak: 23450 },
+  { alias: "夜猫子本猫",       seed: 37, base:   190, pace: 430, burst: .70, rest: 3, hour: 21, span: 3, ceil: 22910, peak: 28640 },
+  { alias: "阿豆",             seed: 41, base:    20, pace: 700, burst: .40, rest: 1, hour: 12, span: 2, ceil: 29640, peak: 37050 },
+  { alias: "半糖",             seed: 53, base:  4090, pace: 380, burst: .65, rest: 3, hour: 16, span: 2, ceil: 34870, peak: 43590 },
+  { alias: "早八人",           seed: 67, base:  2301, pace: 820, burst: .25, rest: 0, hour:  6, span: 3, ceil: 44520, peak: 55650 },
+  { alias: "圆圆",             seed: 71, base:  9583, pace: 560, burst: .60, rest: 2, hour: 19, span: 2, ceil: 49380, peak: 61730 },
+  { alias: "午休选手",         seed: 83, base: 17275, pace: 900, burst: .35, rest: 1, hour: 13, span: 4, ceil: 59260, peak: 74080 },
+  { alias: "云朵朵",           seed: 97, base: 27357, pace: 640, burst: .50, rest: 2, hour: 22, span: 2, ceil: 67410, peak: 84260 },
+  { alias: "Yuki",            seed: 103, base: 51835, pace: 750, burst: .45, rest: 1, hour: 20, span: 3, ceil: 77530, peak: 96910 },
+  { alias: "一只小鹿",         seed: 113, base: 73454, pace: 480, burst: .70, rest: 3, hour: 10, span: 2, ceil: 86940, peak: 108000 },
 ];
 
 function pacerRnd(seed) {                          // xorshift，纯函数、可复现
@@ -630,7 +640,8 @@ function pacerAt(p, hoursTotal) {
      改动 pace / ceil / 生成公式里的任何一处，都要重新反解一遍，否则会出现一次性跳变。
      否则会出现「矿力 75,192、第 156 关、到场只有 2 天」这种一眼假的组合。
      按矿力反推：约每 1500 矿力对应一天，每天约 8 局，连续纪录取其中一段。 */
-  const histDays = Math.max(1, Math.round(p.base / 1500));
+  /* ⚠ 上限 = 计时起点之前游戏总共存在了几天。base 再大也不能凭空多出到场天数。 */
+  const histDays = Math.max(1, Math.min(GAME_DAYS_BEFORE_PACER, Math.round(p.base / 1500)));
   /* ⚠ eff 是**内部的投入量**，不是矿力。矿力一律走 gfPower() ——
      跟真人同一个公式、同一个来源。
      原来的写法是「先编一个 power，再从它倒推关卡/星/分数」，
@@ -640,13 +651,32 @@ function pacerAt(p, hoursTotal) {
      真人这两处偏差是 0，因为他们本来就只有一个来源。 */
   let eff = p.base, days = histDays, runs = histDays * 8, streak = Math.max(2, Math.round(histDays * .35)), cur = 0;
   let quiet = 0;                                   // 「出远门」剩余天数
+  /* ── 冲刺期 ──
+     真人不是匀速爬的：某个星期忽然连着打，冲上一个台阶，然后好久不见人影。
+     匀速爬看上去最假 —— 一条直线上没有故事。
+     周期 130~199 天（约每四到六个月一次），一次持续 6~14 天；
+     11 个人错开相位，全服平均每 12 天左右有一个人在冲。
+     ⚠ 从第 60 天才开始，好让上线当天的数字不受影响（base 是按今天反解的）。 */
+  const sPeriod = 130 + (p.seed % 70), sLen = 6 + (p.seed % 9), sPhase = (p.seed * 17) % sPeriod;
+
   for (let i = 0; i <= d; i++) {
     /* 今天这一天他打算涨多少 */
     let today = 0;
+    const t = i - 60;
+    const surging = t >= 0 && ((t + sPhase) % sPeriod) < sLen;
+    const step = t < 0 ? 0 : Math.floor((t + sPhase) / sPeriod);   // 已经冲上过几级台阶
+    /* 台阶越往上越难，渐近到 peak —— 不会一级一级无限往上垒。 */
+    const ceilNow = p.peak - (p.peak - p.ceil) * Math.exp(-step * .45);
+    /* 冲刺期把上限临时抬高一截，正好够冲过下一级；平时就是 ceilNow。
+       冲完 ceilNow 才补上来，所以**冲完必然是一段长停滞** —— 王老师要的就是这个。 */
+    const lim = surging ? Math.min(p.peak, ceilNow * 1.22) : ceilNow;
     /* room = 离自己的段位天花板还有多远。1 = 刚起步，0 = 到顶了。
        ⚠ 拿**公开矿力**算，不是拿 eff —— 要压住的是玩家看得见的那个数。 */
+    /* 立方而不是线性：平时照常涨，快撞到自己的台阶才急刹。
+       线性衰减的话只能爬到上限的 93%，台阶等于白设 —— 实测越过榜首要 5.6 年，
+       够不上「偶尔」。 */
     const room = i >= PACER_DECAY_FROM
-      ? Math.max(0, 1 - gfPower(pacerStats(p, eff, days, runs, streak)) / p.ceil) : 1;
+      ? Math.max(0, 1 - Math.pow(gfPower(pacerStats(p, eff, days, runs, streak)) / lim, 3)) : 1;
     if (quiet > 0) { quiet--; cur = 0; }
     else {
       const roll = r();
@@ -666,7 +696,9 @@ function pacerAt(p, hoursTotal) {
         /* 段位天花板：越接近自己的上限涨得越慢，逼近但不越过。
            线性衰减是三种形状里贴顶最慢的（一年后 79~99%，还在动），
            平方与立方一年就贴死了。 */
-        today = Math.max(0, p.pace * wave * room);
+        /* 冲刺期日增翻倍 —— 只抬上限不加速的话，一次冲刺只多涨两三成，
+           在榜上看不出「他这周在拼」。 */
+        today = Math.max(0, p.pace * wave * room * (surging ? 2.2 : 1));
       }
     }
     if (i < d) { eff += today; continue; }
@@ -678,6 +710,11 @@ function pacerAt(p, hoursTotal) {
     const frac = to > from ? Math.min(1, Math.max(0, (hNow - from) / (to - from))) : 1;
     eff += today * frac;
   }
+  /* 再兜一道：到场天数**永远**不超过游戏存在的天数。
+     上面的 histDays 管起点，这里管此后每一天。 */
+  const maxDays = GAME_DAYS_BEFORE_PACER + d + 1;
+  if (days > maxDays) { runs = Math.round(runs * maxDays / days); days = maxDays; }
+  if (streak > days) streak = days;
   const st = pacerStats(p, eff, days, runs, streak);
   return { power: gfPower(st), ...st };
 }
@@ -717,6 +754,10 @@ function pacerStats(p, eff, days, runs, streak) {
      大约是 eff 的 1.9 倍 —— 改生成公式导致 eff 缩水时，这两个 K 必须跟着缩，
      否则低分段会长出「第 3 关、单关只有 3,059」这种明显偏低的组合。 */
   const score = Math.min(PACER_CEIL.score, sat(120000, 14000));
+  /* ⚠ 矿灯的渐近线**别往上抬**。K=4800 意味着 eff 过两万就基本到顶了，
+     所以抬渐近线不是「慢慢长上去」，是**11 个人当场一起跳**（试过 210,000：
+     云朵朵今天就从 155,170 蹦到 190,000）。90 秒榜上配速员已经插在 4/6/7/8 名，
+     中段的反超天天都有；榜首前两名留给人。 */
   const rush  = Math.min(PACER_CEIL.rush,  sat(185000,  4800));
   return { lv, stars, chain, score, rush, mv: 0, days, runs, dbest: streak };
 }
@@ -745,8 +786,11 @@ function pacerCamp(i) { return ["light", "dark"][i % 2]; }
 
 /* 同一小时内所有请求算出来的是同一份，缓存一小时。
    ⚠ 这不是可有可无的优化：pacerAt 要从第 0 天一路模拟到今天，开销**随天数线性增长**。
-   起步时 d=5 无所谓，十年后 d=3650，一次 /gf/board 光配速员就要跑三万多轮，
-   实测约 19ms —— 会实实在在吃掉 Worker 的 CPU 预算。缓存之后每小时只付一次。 */
+   今天 d≈8，一次约 0.1ms；一年后约 5ms，十年后约 45ms —— 乘以 11 个人就是 500ms。
+   缓存之后每小时只付一次，所以近几年都够用。
+   ⚠ 但它会一直涨。真顶到 Workers 的 CPU 上限时（大约两年后），
+   正解是**把每月月初的模拟状态存进 D1 做断点续算**，把每次的模拟长度压到 31 天以内。
+   pacer.test.mjs 有一条守卫盯着它别再慢一个数量级。 */
 let _pacerCache = { h: -1, rows: null };
 
 function pacerRows(nowMs) {
