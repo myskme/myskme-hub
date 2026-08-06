@@ -1,0 +1,147 @@
+/* 配速员的不变量。CI 跑它；本机没 node 时可在浏览器里 import 后调 runChecks。
+ *
+ * 为什么单独有这一份：配速员活在 worker 里，而前端的 window.__selftest() 够不着它 ——
+ * 「125 条全绿」曾经和「11 个人里 10 个每晚成绩倒退」同时成立了好几天。
+ *
+ *     node leaderboard/pacer.test.mjs
+ *
+ * ⚠ 它**从源码里现抽函数**，不另存一份拷贝。拷贝会漂移，
+ *   漂移之后测的就是拷贝，而不是线上真正在跑的那一份。
+ */
+
+/* 按括号配对切出一段声明 —— 比正则可靠，注释里带括号也不会切错。 */
+function slice(src, head, open, close) {
+  const m = src.match(head);
+  if (!m) throw new Error('抽不到：' + head);
+  const i = src.indexOf(m[0]);
+  let depth = 0, k = src.indexOf(open, i);
+  for (;; k++) {
+    if (src[k] === open) depth++;
+    else if (src[k] === close) { depth--; if (!depth) break; }
+  }
+  return src.slice(i, k + 1);
+}
+
+const fnOf = (src, name) => slice(src, new RegExp('function ' + name + '\\s*\\('), '{', '}');
+
+export function loadFrom(src) {
+  const body = [
+    slice(src, /const PACERS\s*=\s*\[/, '[', ']') + ';',
+    fnOf(src, 'pacerRnd'), fnOf(src, 'gfLadder'), fnOf(src, 'gfDepth'),
+    fnOf(src, 'gfSkill'), fnOf(src, 'gfGrind'), fnOf(src, 'gfPower'),
+    src.match(/const PACER_DECAY_FROM[^\n]*/)[0],
+    src.match(/const PACER_CEIL[^\n]*/)[0],
+    fnOf(src, 'pacerAt'), fnOf(src, 'pacerStats'),
+    src.match(/const PACER_EPOCH[^\n]*/)[0],
+    'return { PACERS, pacerAt, pacerStats, gfPower, PACER_CEIL, PACER_EPOCH };',
+  ].join('\n');
+  return new Function(body)();
+}
+
+/* 当前榜上最强真人的量级。配速员**每一项都必须在它之下** ——
+   世界榜与 90 秒榜的榜首必须是人。真人涨了可以往上调，别往下调。 */
+const REAL = { power: 102698, score: 144777, rush: 212792, lv: 335 };
+
+export function runChecks(M, hoursNow, clientSrc) {
+  const { PACERS, pacerAt, PACER_CEIL } = M;
+  const out = [];
+  const ok = (name, pass, detail) => out.push({ name, pass, detail: detail || '' });
+
+  /* ① 只增不减。原来 d 用 UTC 日序、hNow 用北京小时，北京 00:00-07:59 那 8 小时
+        frac 从 1 掉回 0 —— 11 个人里 10 个每晚成绩倒退，早八点又回来。
+        真人的数字不会缩水，这是配速员最容易露馅的地方。 */
+  const fell = [];
+  for (const p of PACERS) {
+    let prev = -1, n = 0, eg = '';
+    for (let h = hoursNow - 48; h < hoursNow + 24 * 120; h++) {
+      const v = pacerAt(p, h).power;
+      if (prev >= 0 && v < prev) { n++; if (!eg) eg = `h=${h} ${prev}→${v}`; }
+      prev = v;
+    }
+    if (n) fell.push(`${p.alias} 跌 ${n} 次 (${eg})`);
+  }
+  ok('矿力逐小时 120 天只增不减', !fell.length, fell.join('; '));
+
+  /* ② 作息不许跨北京日：跨了会被 min(24,·) 压成几十分钟的假窗口，
+        夜猫子本猫原来的 23+3 就是这么被压没的。 */
+  const win = PACERS.filter(p => p.hour + p.span > 24).map(p => `${p.alias} ${p.hour}+${p.span}`);
+  ok('作息窗口不跨北京日', !win.length, win.join('; '));
+
+  /* ③ 十年之内每一项都在最强真人之下；顺带确认兜底闸没被用上 ——
+        闸一旦触发说明饱和曲线标定错了，该回去改曲线，不是靠闸兜。 */
+  const peak = { power: 0, score: 0, rush: 0, lv: 0 }, who = {};
+  let hit = 0;
+  for (const p of PACERS) {
+    for (let d = 0; d < 3650; d += 30) {
+      const v = pacerAt(p, hoursNow + d * 24);
+      for (const k in peak) if (v[k] > peak[k]) { peak[k] = v[k]; who[k] = p.alias; }
+      if (v.score >= PACER_CEIL.score || v.rush >= PACER_CEIL.rush || v.lv >= PACER_CEIL.lv) hit++;
+    }
+  }
+  const over = Object.keys(peak).filter(k => peak[k] >= REAL[k])
+                     .map(k => `${k} ${peak[k]}(${who[k]}) >= 真人 ${REAL[k]}`);
+  ok('十年内四项都在最强真人之下', !over.length, over.join('; '));
+  ok('兜底闸十年内没被触发（曲线自己守得住）', hit === 0, hit ? `触发 ${hit} 次` : '');
+
+  /* ④ 十年后不许一排人整整齐齐停在整百上 ——「恰好停在 16000」比涨太快还假。 */
+  const round = PACERS.map(p => pacerAt(p, hoursNow + 3650 * 24).power).filter(v => v % 100 === 0);
+  ok('十年后没人停在整百', !round.length, round.join(','));
+
+  /* ⑤ 到顶之后是**整个号一起停**，不是只冻矿力。只压矿力不压出勤的话，
+        勤勉 = days*160 + runs*6 还在涨，而勤勉本身就是矿力的一部分 ——
+        公开矿力会越过天花板无限涨（实测过：一年 3.09 倍、十年 13.4 倍）。 */
+  const zombie = PACERS.filter(p => {
+    const a = pacerAt(p, hoursNow + 3650 * 24), b = pacerAt(p, hoursNow + 3285 * 24);
+    return a.days - b.days > 40 && a.power - b.power < 40;
+  }).map(p => p.alias);
+  ok('到顶的人连人带号一起停，不是只冻矿力', !zombie.length, zombie.join(','));
+
+  /* ⑥ 别挤在同一个数上：真人在同一矿力上下能差一倍
+        （矿力 32,751 打 124,274，矿力 33,910 打 187,923）。 */
+  const rs = PACERS.map(p => pacerAt(p, hoursNow + 365 * 24).rush).sort((a, b) => b - a);
+  const spread = (rs[0] - rs[rs.length - 1]) / rs[0];
+  ok('矿灯有真人那样的离散度（极差 > 30%）', spread > .3, `极差 ${(spread * 100).toFixed(0)}%`);
+
+  /* ⑦ 跨端：**名片上的矿力必须等于榜单上的矿力**。
+        真人这两处天生相等（都从三条线算）；配速员曾经是「先编一个 power 再倒推各项」，
+        于是榜上 76,002、点开名片 110,930 —— 差 46%，
+        而且那个名片值已经压过最强真人的 102,698。点开就露馅。
+        这条是唯一一条跨文件断言，也是最值钱的一条：拿 index.html 里**真的**
+        pwTotal 去算，不是抄一份公式过来比 —— 抄的那份会跟着漂移。 */
+  if (clientSrc) {
+    const pwTotal = new Function(
+      fnOf(clientSrc, 'pwLadder') + fnOf(clientSrc, 'pwLines') + fnOf(clientSrc, 'pwTotal')
+      + 'return pwTotal')();
+    const bad = [];
+    for (const p of PACERS) for (const day of [0, 30, 365, 3650]) {
+      const v = pacerAt(p, hoursNow + day * 24);
+      const card = pwTotal({ lv: v.lv, stars: v.stars, chain: v.chain, score: v.score,
+        rush: v.rush, mv: v.mv || 0, runs: v.runs, days: v.days, dbest: v.dbest });
+      if (card !== v.power) bad.push(`${p.alias} 第${day}天 榜单 ${v.power} vs 名片 ${card}`);
+    }
+    ok('名片矿力 == 榜单矿力（跨端同源）', !bad.length, bad.slice(0, 4).join('; '));
+  }
+
+  return out;
+}
+
+/* node 入口。浏览器里 import 本文件只会拿到上面几个函数，不会跑到这儿。 */
+if (typeof process !== 'undefined' && process.argv && process.argv[1]) {
+  const fs = await import('node:fs');
+  const url = await import('node:url');
+  if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
+    const here = import.meta.url;
+    const src = fs.readFileSync(new URL('./worker.js', here), 'utf8');
+    const client = fs.readFileSync(new URL('../match/index.html', here), 'utf8');
+    const M = loadFrom(src);
+    const hoursNow = Math.floor((Date.now() - M.PACER_EPOCH) / 3600000);
+    const res = runChecks(M, hoursNow, client);
+    let failed = 0;
+    for (const r of res) {
+      if (!r.pass) failed++;
+      console.log(`${r.pass ? 'ok  ' : 'FAIL'} ${r.name}${r.detail ? '  —— ' + r.detail : ''}`);
+    }
+    console.log(`\n配速员不变量：${res.length - failed}/${res.length} 通过`);
+    if (failed) process.exit(1);
+  }
+}

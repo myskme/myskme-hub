@@ -42,6 +42,11 @@ jobs:
       - name: 验证 EdgeOne 品牌网关白名单与固定上游
         run: node match/ports/tools/test-edgeone-proxy.mjs
 
+      # 配速员活在 worker 里，前端的 window.__selftest() 够不着 ——
+      # 「125 条全绿」曾经和「11 个人里 10 个每晚成绩倒退」同时成立了好几天。
+      - name: 配速员不变量（只增不减 / 不越过真人 / 名片与榜单同源）
+        run: node leaderboard/pacer.test.mjs
+
       - name: 验证 EdgeOne 可重复发布包
         run: |
           node match/ports/tools/build-edgeone-package.mjs /tmp/gemfall-edgeone-ci.zip

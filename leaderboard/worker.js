@@ -573,17 +573,26 @@ const PACERS = [
    参照真人榜上已有的化名（肖肖 / 白水清新 / 就苹你 / 红鲤鱼绿鲤鱼与驴 / Moon_祺芙），
    那是叠字、短昵称、生活感的词、少量英文与颜文字气质的混搭。
    ⚠ seed 不能改：改了等于这个人从头长一遍，历史成绩会跳变。只换 alias。 */
-  { alias: "小圆",             seed: 11, base:  3200, pace: 520, burst: .55, rest: 2, hour: 21, span: 2 },
-  { alias: "今天也想睡",       seed: 23, base:  5100, pace: 610, burst: .30, rest: 1, hour:  7, span: 1 },
-  { alias: "夜猫子本猫",       seed: 37, base:  7400, pace: 430, burst: .70, rest: 3, hour: 23, span: 3 },
-  { alias: "阿豆",             seed: 41, base: 10800, pace: 700, burst: .40, rest: 1, hour: 12, span: 2 },
-  { alias: "半糖",             seed: 53, base: 14600, pace: 380, burst: .65, rest: 3, hour: 16, span: 2 },
-  { alias: "早八人",           seed: 67, base: 19200, pace: 820, burst: .25, rest: 0, hour:  6, span: 3 },
-  { alias: "圆圆",             seed: 71, base: 25400, pace: 560, burst: .60, rest: 2, hour: 19, span: 2 },
-  { alias: "午休选手",         seed: 83, base: 33100, pace: 900, burst: .35, rest: 1, hour: 13, span: 4 },
-  { alias: "云朵朵",           seed: 97, base: 44800, pace: 640, burst: .50, rest: 2, hour: 22, span: 2 },
-  { alias: "Yuki",            seed: 103, base: 58200, pace: 750, burst: .45, rest: 1, hour: 20, span: 3 },
-  { alias: "一只小鹿",         seed: 113, base: 74500, pace: 480, burst: .70, rest: 3, hour: 10, span: 2 },
+/* ⚠ 作息**不许跨北京日**（hour + span <= 24）。跨日的话最后一天那段 frac 算不干净，
+     而且 to 会被 min(24,·) 压成一个几十分钟的假窗口。夜猫子本猫原来是 23+3，
+     被压成 23:00-24:00 一小时，等于作息设定没生效 —— 改成 21+3。
+   ⚠ ceil = 他这辈子大概能到的矿力。真人不会永远直线上涨，**涨到某个段位就基本停住**，
+     配速员也得这样，否则一年后榜首就是虚拟人（实测 48 天后就超过最强真人）。
+     ⚠ 单位是**公开矿力**（gfPower 的输出），不是内部的 eff。
+     top = 86,940，低于当前最强真人的 102,698 —— 榜首必须是人。
+     ⚠ 故意不取整：取整的话十年后会有人**正好停在 19000** 上，
+     「一排人恰好停在整千」比涨得太快还假（这条自测抓到过一次）。 */
+  { alias: "小圆",             seed: 11, base:    50, pace: 260, burst: .55, rest: 2, hour: 21, span: 2, ceil: 13840 },
+  { alias: "今天也想睡",       seed: 23, base:  1390, pace: 610, burst: .30, rest: 1, hour:  7, span: 1, ceil: 18760 },
+  { alias: "夜猫子本猫",       seed: 37, base:  1340, pace: 430, burst: .70, rest: 3, hour: 21, span: 3, ceil: 22910 },
+  { alias: "阿豆",             seed: 41, base:  1640, pace: 700, burst: .40, rest: 1, hour: 12, span: 2, ceil: 29640 },
+  { alias: "半糖",             seed: 53, base:  4200, pace: 380, burst: .65, rest: 3, hour: 16, span: 2, ceil: 34870 },
+  { alias: "早八人",           seed: 67, base:  6750, pace: 820, burst: .25, rest: 0, hour:  6, span: 3, ceil: 44520 },
+  { alias: "圆圆",             seed: 71, base:  9840, pace: 560, burst: .60, rest: 2, hour: 19, span: 2, ceil: 49380 },
+  { alias: "午休选手",         seed: 83, base: 14240, pace: 900, burst: .35, rest: 1, hour: 13, span: 4, ceil: 59260 },
+  { alias: "云朵朵",           seed: 97, base: 18190, pace: 640, burst: .50, rest: 2, hour: 22, span: 2, ceil: 67410 },
+  { alias: "Yuki",            seed: 103, base: 27750, pace: 750, burst: .45, rest: 1, hour: 20, span: 3, ceil: 77530 },
+  { alias: "一只小鹿",         seed: 113, base: 41060, pace: 480, burst: .70, rest: 3, hour: 10, span: 2, ceil: 86940 },
 ];
 
 function pacerRnd(seed) {                          // xorshift，纯函数、可复现
@@ -597,60 +606,119 @@ function pacerRnd(seed) {                          // xorshift，纯函数、可
    而白天一整天纹丝不动 —— 这是最容易被看穿的破绽。
    现在每个人按自己的作息（hour/span，北京时间）在一天里的某个时段涨，
    玩家下午刷到的和晚上刷到的不一样，跟真人一个样子。 */
+/* 天花板从第 0 天就生效 —— 也就是「他这辈子一直有这个上限」。
+   本来想只管往后不重算历史，但那样 base 与 ceil 是两套单位，
+   量纲对不上；从头生效反而自洽，代价是上线时有一次性校正。 */
+const PACER_DECAY_FROM = 0;
+/* 兜底闸。曲线标定对的话**永远不会触发** —— CI 里有一条断言跑 10 年验证它确实没触发。
+   留着是因为「配速员的成绩超过真人」这件事已经发生过两次（第一版 rush=skill*18，
+   这一版 score=skill*9），不能只靠标定，得有个结构性的保证。 */
+const PACER_CEIL = { score: 130000, rush: 195000, lv: 300 };
+
 function pacerAt(p, hoursTotal) {
-  const d = Math.floor(hoursTotal / 24);
+  /* ⚠ 日序与小时**必须同一个时区**。原来 d 用 UTC 日序、hNow 用北京小时，
+     于是北京 00:00-07:59 这 8 小时里 d 还没进位、hNow 却已经绕回 0，
+     frac 从 1 掉回 0 —— 11 个人里 10 个**每晚成绩倒退**，早八点才回来。
+     真人的数字永远不会缩水，这是配速员最容易露馅的地方。 */
+  const bj = hoursTotal + 8;                       // 北京时区的总小时数
+  const d = Math.floor(bj / 24);                   // 北京日序
+  const hNow = bj - d * 24;                        // 0..23，北京小时
   const r = pacerRnd(p.seed);
   /* base 代表「他在计时起点之前已经玩了很久」，所以到场天数与局数也必须带上那段历史 ——
+     ⚠ 这 11 个数是**反解出来**的：目标是让改版后每个人「今天的公开矿力」
+     正好落回改版前榜单上的那个数，这样榜单排位不动，只有名片上那个虚高的数降下来对齐。
+     改动 pace / ceil / 生成公式里的任何一处，都要重新反解一遍，否则会出现一次性跳变。
      否则会出现「矿力 75,192、第 156 关、到场只有 2 天」这种一眼假的组合。
      按矿力反推：约每 1500 矿力对应一天，每天约 8 局，连续纪录取其中一段。 */
   const histDays = Math.max(1, Math.round(p.base / 1500));
-  let power = p.base, days = histDays, runs = histDays * 8, streak = Math.max(2, Math.round(histDays * .35)), cur = 0;
+  /* ⚠ eff 是**内部的投入量**，不是矿力。矿力一律走 gfPower() ——
+     跟真人同一个公式、同一个来源。
+     原来的写法是「先编一个 power，再从它倒推关卡/星/分数」，
+     而倒推**不是 gfPower 的逆运算**：于是榜单按编出来的 power 排，
+     名片却按各项现算，两个数差 37%~73%（最大 34,928），
+     一只小鹿名片上 110,930 甚至压过最强真人的 102,698 —— 点开就露馅。
+     真人这两处偏差是 0，因为他们本来就只有一个来源。 */
+  let eff = p.base, days = histDays, runs = histDays * 8, streak = Math.max(2, Math.round(histDays * .35)), cur = 0;
   let quiet = 0;                                   // 「出远门」剩余天数
   for (let i = 0; i <= d; i++) {
     /* 今天这一天他打算涨多少 */
     let today = 0;
+    /* room = 离自己的段位天花板还有多远。1 = 刚起步，0 = 到顶了。
+       ⚠ 拿**公开矿力**算，不是拿 eff —— 要压住的是玩家看得见的那个数。 */
+    const room = i >= PACER_DECAY_FROM
+      ? Math.max(0, 1 - gfPower(pacerStats(p, eff, days, runs, streak)) / p.ceil) : 1;
     if (quiet > 0) { quiet--; cur = 0; }
     else {
       const roll = r();
       if (roll < .02) {                            // 2% 概率：出门几天不上线
         quiet = 2 + Math.floor(r() * 4); cur = 0;
-      } else if (roll < p.rest / 7 + .02) {        // 今天只是没空
+      } else if (roll < p.rest / 7 + .02 + (1 - room) * (1 - p.rest / 7 - .02)) {
+        /* 今天没空。⚠ 越接近天花板越常「没空」，到顶那天概率正好是 1（彻底淡出）。
+           这一项必须有，而且必须收到 1：只压矿力不压出勤的话，
+           勤勉 = days*160 + runs*6 还在涨，公开矿力就会**越过天花板无限涨**
+           （实测一年 3.09 倍、十年 13.4 倍）。到顶的人是连人带号一起停的。 */
         cur = 0;
       } else {
         days++; cur++; if (cur > streak) streak = cur;
         runs += 3 + Math.floor(r() * 9);
         let wave = 1 + (r() - .5) * 2 * p.burst;
         if (r() < .06) wave *= 2.4;                // 6% 概率：手气爆棚的一天
-        today = Math.max(0, p.pace * wave);
+        /* 段位天花板：越接近自己的上限涨得越慢，逼近但不越过。
+           线性衰减是三种形状里贴顶最慢的（一年后 79~99%，还在动），
+           平方与立方一年就贴死了。 */
+        today = Math.max(0, p.pace * wave * room);
       }
     }
-    if (i < d) { power += today; continue; }
+    if (i < d) { eff += today; continue; }
     /* 最后一天只算到「此刻」为止：按他的作息，过了他下矿的时段才算数。
        这样同一天里不同时刻刷新，看到的数字是不一样的。 */
-    const hNow = (hoursTotal - d * 24 + 8) % 24;   // 北京时间的小时（UTC+8）
-    const from = p.hour, to = p.hour + p.span;
-    let frac = 0;
-    if (hNow >= to % 24 && to <= 24) frac = 1;
-    else if (hNow > from) frac = Math.min(1, (hNow - from) / p.span);
-    if (to > 24 && hNow < (to % 24)) frac = Math.min(1, (hNow + 24 - from) / p.span);
-    power += today * frac;
+    const from = p.hour, to = Math.min(24, p.hour + p.span);
+    /* frac 在一个北京日内**单调不减**：0 → 1，到 23:59 必然是 1，
+       次日 00:00 新一天的 frac 从 0 起算而昨天的已整份落袋 —— 全程只增不减。 */
+    const frac = to > from ? Math.min(1, Math.max(0, (hNow - from) / (to - from))) : 1;
+    eff += today * frac;
   }
-  power = Math.round(power);
-  /* 从矿力反推各项，保证「看起来像同一个人打出来的」：
-     深度约占六成、技巧三成、勤勉一成，再各自换算回关卡/星/分数。 */
-  const depth = power * .58, skill = power * .30;
-  const stars = Math.min(192, Math.round(depth / 260));
-  const lv = Math.max(1, Math.round((depth - stars * 120) / 150));
-  /* ⚠ 这三项要**对着真实玩家的量级**标定，不能随便乘。
-     第一版 rush = skill*18，最强配速员打出 405,340 —— 是最强真人（209,320）的两倍，
-     连锁给到 20 而真人上限是 12。结果 90 秒榜前三全被虚拟人占着。
-     而 90 秒榜的全部价值就是「新老玩家都能公平竞争」，榜首被占就没这回事了。
-     现在压到：矿灯上限约 18 万（真人最好成绩之下）、连锁上限 14（略高于真人的 12）。
-     配速员是配速员，不是天花板。 */
+  const st = pacerStats(p, eff, days, runs, streak);
+  return { power: gfPower(st), ...st };
+}
+
+/* 从投入量 eff 生成各项。**只有这一个地方造数字**，矿力由 gfPower 从这里算出来。 */
+function pacerStats(p, eff, days, runs, streak) {
+  const depth = eff * .58, skill = eff * .30;
+  /* ⚠ lv 必须对 eff **单调**。原来是 lv = (depth - stars*120)/150 ——
+     stars 进位那一刻会从 lv 的分子里扣掉 120，而深段一级值 150 以上，
+     于是「星 +1、关卡 −1」净值为负，矿力**倒退二三十分**。
+     数值小，但它是 bug 不是噪声：真人的成绩不会倒退。 */
+  const lv = Math.max(1, Math.min(PACER_CEIL.lv, Math.round(depth / 190)));
+  /* ⚠ 星按**每关三星**算，不是另立一条线。看线上真人：
+       关卡  2 星   6      关卡 14 星  42      关卡 45 星 135
+       关卡  5 星  15      关卡 21 星  63      关卡 48 星 144
+     一水儿的 3.0 —— 大家都是三星过了才往下走，到 192 封顶。
+     旧写法让星与关卡各自从 depth 算，比值成了 1.07（每关只拿一颗星），
+     11 个人整整齐齐都这样，这是比数值高低更明显的破绽。
+     grip 让各人差一点，不至于全是精确的 3.0。 */
+  const starRate = 2.5 + (.62 + ((p.seed * 37) % 100) / 100 * .38) * .5;   // 2.81~3.00
+  const stars = Math.min(192, Math.round(lv * starRate));
+  /* ⚠ 单局成绩（单关分、矿灯）**不能拿矿力乘一个固定倍数** —— 那样它会跟着矿力
+     无限涨，而真人的手艺是会到顶的。线上真实散点长这样：
+       矿力  6,507 → 矿灯 145,886       矿力  9,798 → 矿灯 176,500
+       矿力 46,939 → 矿灯 121,830       矿力 102,698 → 矿灯 212,792（最强真人）
+     矿力翻了 15 倍，矿灯只多四成 —— 是一条**很快压平的饱和曲线**，不是直线。
+     这个错犯过两次：第一版 rush=skill*18 让配速员打出 405,340（真人两倍），
+     改成 *8 只是把斜率调小，**没改掉「无限涨」这个性质**；于是 score=skill*9
+     又把「一只小鹿」顶到单关 205,205，比最强真人的 144,777 高出 42%，今天就在榜上。
+     grip 是各人的手感（按 seed 定死，不动随机流否则历史会跳变）。真人在同一矿力
+     上下能差一倍（矿力 32,751 打 124,274，矿力 33,910 打 187,923），
+     没有 grip 这 11 个人会挤在同一个数上 —— 那才是真·一眼假。 */
+  const grip = .62 + ((p.seed * 37) % 100) / 100 * .38;        // 0.62~1.00，按 seed 定死
+  const sat = (asym, k) => Math.round(asym * grip * (1 - Math.exp(-eff / k)));
   const chain = Math.min(14, 5 + Math.floor(skill / 2600));
-  const score = Math.round(skill * 9);
-  const rush = Math.round(skill * 8);
-  return { power, lv, stars, chain, score, rush, days, runs, dbest: streak };
+  /* ⚠ K 是按 **eff** 的量级标的，不是矿力。矿力含 3× 均衡奖，
+     大约是 eff 的 1.9 倍 —— 改生成公式导致 eff 缩水时，这两个 K 必须跟着缩，
+     否则低分段会长出「第 3 关、单关只有 3,059」这种明显偏低的组合。 */
+  const score = Math.min(PACER_CEIL.score, sat(120000, 14000));
+  const rush  = Math.min(PACER_CEIL.rush,  sat(185000,  4800));
+  return { lv, stars, chain, score, rush, mv: 0, days, runs, dbest: streak };
 }
 
 /* 配速员的阵营。**只给阵营，不给门派** —— 这两样性质不同：
@@ -675,9 +743,16 @@ const PACER_FACTION = ["拾光社", "拾光社", "拾光社", "夜航班", "夜�
    按名单次序轮流分，稳稳的 4/4/3。 */
 function pacerCamp(i) { return ["light", "dark"][i % 2]; }
 
+/* 同一小时内所有请求算出来的是同一份，缓存一小时。
+   ⚠ 这不是可有可无的优化：pacerAt 要从第 0 天一路模拟到今天，开销**随天数线性增长**。
+   起步时 d=5 无所谓，十年后 d=3650，一次 /gf/board 光配速员就要跑三万多轮，
+   实测约 19ms —— 会实实在在吃掉 Worker 的 CPU 预算。缓存之后每小时只付一次。 */
+let _pacerCache = { h: -1, rows: null };
+
 function pacerRows(nowMs) {
   const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));
-  return PACERS.map((p, i) => {
+  if (_pacerCache.h === h) return _pacerCache.rows;
+  const rows = PACERS.map((p, i) => {
     const st = pacerAt(p, h);
     return {
       id: "pacer:" + p.seed, alias: p.alias,
@@ -691,6 +766,8 @@ function pacerRows(nowMs) {
       __bot: 1,
     };
   });
+  _pacerCache = { h, rows };
+  return rows;
 }
 
 async function pacersOn(env) {
