@@ -1,7 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<script>(function(){try{var v=localStorage.getItem('myskme-theme');
+document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
@@ -63,6 +65,49 @@
 .ic{width:var(--ic-sm);height:var(--ic-sm);display:inline-block;
   vertical-align:-.15em;flex:none;line-height:0}
 .icw{display:inline-block;line-height:0;vertical-align:-.15em}
+/* ── 浅色主题「晨光」（2026-08-06 按玩家反馈恢复）──
+   上一版浅色是**阅读器的语言**：羊皮纸、低彩度、什么都调亮 ——
+   王老师说「不要像阅读器那样」，症结就在最后那句：**连棋盘也调亮了，整屏没有舞台**。
+
+   这一版的想法是「站在矿口往里看」：外圈是晨光，**井里仍旧是暗的**。
+     · 底色是暖石光（有彩度，不是奶白）—— 纸感来自低彩度，去掉它就不像纸
+     · 面板比底更亮 = 抬起来的面，深色那套材质／内高光／落影**原样保留**
+     · **矿坑三色保持暗**：舞台反差 panel vs mine = 12.74:1
+       （深色主题里这个数只有 1.07 —— 棋盘和面板几乎一样暗，
+        所以「往井里看」的纵深感恰恰是浅色才做得到的）
+     · 金色压深提饱和：浅底上强调 = 更深更浓，不是更亮
+
+   每一对都用 WCAG 算过：正文 ≥4.5、描边 ≥3.0，改任何一个值都要重算。 */
+:root[data-theme="light"]{
+  --bg:#c9b391;--bg2:#b89d76;--panel:#e6d6b4;--panel2:#d9c49c;--edge:#8a6d40;
+  --ink:#241a0e;--ink2:#4a3a22;--ink3:#544326;
+  --gold:#5a3e07;--gold2:#432d02;--gold-hi:#7d5a10;--gold-line:#a8895a;
+  --red:#8e1f16;--green:#25603a;--blue:#28477e;--purple:#5d2f80;
+  --line:rgba(90,62,7,.34);--line2:rgba(90,62,7,.15);
+  --glow:0 1px 2px rgba(60,42,6,.24),0 6px 18px rgba(60,42,6,.18);
+  --glow-soft:0 1px 2px rgba(60,42,6,.16),0 3px 10px rgba(60,42,6,.12);
+  --paper:#f2e6c8;--noise-op:.14;--noise-blend:multiply;
+  /* ⚠ 舞台不跟着变亮 —— 这是这一版与上一版最根本的区别 */
+  --mine:#1a140c;--mine2:#241c11;--mine-edge:#4a3a1e;
+}
+/* 光源与暗角在浅色下要换个方向：黑色暗角压在暖底上会发脏，
+   改成让四周往更深的石色收，中心仍是最亮的地方。 */
+:root[data-theme="light"] body{
+  background-image:
+    radial-gradient(760px 420px at 50% 4%,rgba(255,244,214,.75),transparent 62%),
+    radial-gradient(1200px 900px at 50% 42%,transparent 30%,rgba(120,96,54,.42) 100%)}
+/* 「不可用」在浅底上不能靠降透明度（面板本就比底亮，半透明后仍是更亮的斑）。
+   压到底色之下 + 内阴影，读作凹进去的槽。 */
+:root[data-theme="light"] .lv.locked,
+:root[data-theme="light"] .ally-opt.lock,
+:root[data-theme="light"] .tool:disabled,
+:root[data-theme="light"] .sp-shelf.lock{
+  opacity:1;filter:none;background:var(--bg2);border-color:var(--line2);
+  box-shadow:inset 0 1px 3px rgba(60,42,6,.22)}
+:root[data-theme="light"] .lv.locked .n,
+:root[data-theme="light"] .lv.locked .st{color:var(--ink3);opacity:.62}
+:root[data-theme="light"] .ach .icw{opacity:.5;filter:grayscale(1) contrast(.8)}
+:root[data-theme="light"] .stars-row s{opacity:.4}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* 页面级锁死：不滚动、不回弹、不选字、不长按弹菜单——网页做游戏的通病一次治掉。
    长内容（玩法卷轴/成就/榜单）都在弹窗卡片内部滚，屏幕本身永远定住。 */
@@ -668,9 +713,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #daily-card.q3mode .ck{display:none}
 #daily-card.q3mode .cd{font-size:11px;margin-top:0}
 #q3-rows{margin-top:5px;display:flex;flex-direction:column;gap:3px}
-/* 今天最大的那份奖励要常驻，不能只在拿到时闪一下 */
-#q3-foot{margin-top:5px;font-size:10.5px;letter-spacing:.04em;color:var(--ink3)}
-#q3-foot b{color:var(--gold2);font-weight:500}
 /* 没完成的那份奖励压暗显示——看得见，但不抢已完成的风头 */
 .q3r .q3p{opacity:.45;transition:opacity .3s}
 .q3r.done .q3p{opacity:1}
@@ -863,6 +905,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* ── 矿工名片（点开榜单某一行）── */
 .lb-row{cursor:pointer;transition:background .15s}
 .lb-row:hover,.lb-row:focus-visible{background:color-mix(in srgb,var(--gold) 7%,transparent);outline:none}
+#corner-ctl{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));
+  z-index:85;display:none;gap:8px}
+#corner-ctl.on{display:flex}
+#corner-ctl .iconbtn{width:36px;height:36px;font-size:15px}
 #lb-card{display:none;margin-top:12px}
 #lb-card.on{display:block;animation:cardIn .32s cubic-bezier(.16,1,.3,1) both}
 .lc{border:1px solid var(--gold-line);padding:12px 13px;text-align:left;
@@ -1402,6 +1448,7 @@ body{--shk:4px}
 </head>
 <body>
 <div id="amb"><i></i><i></i></div>
+<div id="corner-ctl"><button class="iconbtn" id="themeBtn" title="主题">◐</button></div>
 <div id="rimlight"></div>
 <div id="flash"></div>
 <div id="app">
@@ -1437,7 +1484,6 @@ body{--shk:4px}
       <!-- 矿灯领完后这张卡原本整块消失，首页空出 134px 又无事可做。
            改成同一张卡的第二态：今日三桩。不新增高度。 -->
       <div id="q3-rows"></div>
-      <div id="q3-foot"></div>
       <div id="q3-grind"></div>
       <button class="btn primary" id="daily-claim">领 取</button>
     </div>
@@ -3108,10 +3154,20 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   /* o.amb 让调用方收窄底光。大厅那排装饰灵石画在一张只有 54px 高的画布上，
      而默认底光半径 R*1.9≈30px、灵石还在上下漂 ±7px —— 光晕上下都被画布边缘
      切平，看起来就是一条硬边的浅色带子，像穿帮的方块。收窄到能装下为止。 */
-  const ambR=R*1.9*(o.amb||1);
+  /* ⚠ 深浅两套要用**相反的手法**：深底上加亮读作发光；
+     浅底上加亮什么也看不出来，只会糊成一团 —— 纸面上表达发光要靠压暗周围。
+     ⚠ 但棋盘里的 --mine 在浅色下**仍是暗的**，所以只有画在亮底上的那些
+     （大厅那排装饰灵石）才需要换手法。用 o.onLight 由调用方指明。 */
+  const onLight=LIGHT&&o.onLight;
+  const ambR=R*(onLight?1.45:1.9)*(o.amb||1);
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,ambR);
-  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
-  amb.addColorStop(1,hexA(G.base,0));
+  if(onLight){
+    amb.addColorStop(0,hexDark(G.base,.55,kind==='n'?.22:.34));
+    amb.addColorStop(1,hexDark(G.base,.55,0));
+  }else{
+    amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
+    amb.addColorStop(1,hexA(G.base,0));
+  }
   ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,ambR,0,Math.PI*2);ctx.fill();
   /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
   if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){ctx.restore();return}
@@ -3182,6 +3238,16 @@ function hexA(h,a){
   const n=parseInt(h.slice(1),16);
   return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
 }
+/* 把 hex 压暗到 f 倍。浅底上「发光」要靠**压暗周围**来表达 —— 加亮在亮底上
+   什么也看不出来，只会糊成一团（上一版浅色那圈奶白色雾就是这么来的）。 */
+function hexDark(h,f,a){
+  const n=parseInt(h.slice(1),16);
+  return 'rgba('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','
+        +Math.round((n&255)*f)+','+a+')';
+}
+/* 画布每帧要画几十颗灵石，不能每颗都去读 DOM 属性 —— 缓存，切主题时刷新。 */
+let LIGHT=document.documentElement.getAttribute('data-theme')==='light';
+function syncTheme(){LIGHT=document.documentElement.getAttribute('data-theme')==='light'}
 
 /* ---- 机关绘制 ---- */
 /* 墨封铺满整格——灵石会盖住格子中央，画成小墨点等于看不见 */
@@ -4757,9 +4823,13 @@ function renderDaily(){
   const s=q3State(), done=s.q.filter(q=>q.done).length;
   $('#daily-ck').textContent='今日三桩 · DAILY THREE';
   $('#daily-title').textContent=done>=3?'三桩已齐':'今日三桩 · '+done+' / 3';
+  /* 「还差 N 桩」并进这一句，别再单开一行 —— 卡头已经有它了，
+     我一度在卡底又加了一条几乎一样的，同一张卡里同一句话说两遍。 */
   $('#daily-desc').innerHTML=done>=3
     ? '明天再来 · 换三桩新的'
-    : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>　<span style="color:var(--ink3)">输了也算数</span>';
+    : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>'
+      +'　<b style="color:var(--gold2)">还差 '+(3-done)+' 桩</b>'
+      +'　<span style="color:var(--ink3)">输了也算数</span>';
   /* 今日深挖：给肝帝看的那一行。没打够 6 关不显示——
      休闲玩家不该被一个自己够不着的进度条压着。 */
   const g=grindState();
@@ -4783,13 +4853,6 @@ function renderDaily(){
       +'<span class="q3p">+'+def.pow+'</span>'
       +'<i style="width:'+pct+'%"></i></div>';
   }).join('');
-  /* 三桩齐那个匣是今天最大的一份，原来只在拿到时弹一次 toast 就没了。
-     现在常驻一行，并且报还差几桩 —— 「还差一桩」是全天最强的那句话。 */
-  const dn=s.q.filter(q=>q.done).length, left=3-dn;
-  const q3f=$('#q3-foot');
-  if(q3f)q3f.innerHTML=left>0
-    ? '三桩齐 → '+icTag('box')+' <b>典藏匣 +1</b>　还差 <b>'+left+'</b> 桩'
-    : '<span style="color:var(--gold2)">今日三桩已齐 · 典藏匣已入册</span>';
 }
 function claimDaily(){
   const st=dailyState(); if(!st.can)return;
@@ -7558,6 +7621,7 @@ function renderMenu(){
   /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
   $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   /* 挑战点：本周矿脉没首挖、或悬赏没拿，就亮一颗——周一自然重亮，绝不闪烁催促 */
+  $('#corner-ctl').classList.add('on');
   $('#quest-dot').innerHTML=(wkState().score===null||!bountyState().done)?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
@@ -8462,7 +8526,7 @@ function drawMenuGems(t){
   for(let i=0;i<n;i++){
     const y=H/2+Math.sin(t*.0016+i*.8)*7;
     const orb=(i===6);
-    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),orb?0:i,orb?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16,amb:.62});
+    drawGem(x,gap*(i+.5),y,Math.min(46,gap*.92),orb?0:i,orb?'O':'n',{t,rot:Math.sin(t*.0009+i)*.16,amb:.62,onLight:true});
   }
 }
 
@@ -8710,7 +8774,27 @@ $('#cat').addEventListener('click',()=>{
    「不可用」用降透明度在浅底上反而更抢眼、灵石底光在浅底糊成奶白雾）——
    每一条都只在另一套里出问题，等于把测试面翻倍换来一个没人真正需要的开关。
    顺手清掉旧存档里的偏好键，免得下次有人再想加回来时读到脏数据。 */
-try{localStorage.removeItem('myskme-theme')}catch(e){}
+/* 主题开关（2026-08-06 按玩家反馈恢复）。
+   深色仍是默认与本色；浅色是「晨光」，不是阅读器 —— 见那段 CSS 注释。
+   只有这两态，不跟随系统（王老师早先定的）。 */
+(function(){
+  var TLS='myskme-theme';
+  function pref(){try{var v=localStorage.getItem(TLS);return v==='light'?'light':'dark'}catch(e){return 'dark'}}
+  function ap(p){
+    var e=document.documentElement;
+    e.setAttribute('data-theme',p);
+    if(typeof syncTheme==='function')syncTheme();     // 画布缓存了主题，切换要刷
+    var b=$('#themeBtn');
+    if(b){b.innerHTML=ICONS[p==='dark'?'moon':'sun'];b.title='主题：'+(p==='dark'?'深色':'晨光');}
+  }
+  ap(pref());
+  var bb=$('#themeBtn');
+  if(bb)bb.addEventListener('click',function(){
+    var nx=pref()==='dark'?'light':'dark';
+    try{localStorage.setItem(TLS,nx)}catch(e){}
+    ap(nx);SFX.click&&SFX.click();
+  });
+})();
 addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCanvas()});
 /* Esc 一律走该弹层自己的按钮，让它跑完自己的收尾逻辑。
    以前直接 ovl(null) 无差别关闭：交接屏/结算页被关掉后 GS.over 与 GS.busy 还是 true，

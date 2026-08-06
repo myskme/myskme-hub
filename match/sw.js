@@ -1,10 +1,10 @@
 /* 此文件由 match/ports/tools/build-service-worker.mjs 生成，请勿手改。
-   版本 626e4cc3968f906b；预缓存 63 项 / 2984983 B。
+   版本 b123df0f26ca8618；预缓存 63 项 / 2990005 B。
    音乐与 iOS 启动图不预缓存：首次打开不应在后台额外下载约 19MB。 */
 'use strict';
 
 const CACHE_PREFIX = 'gemfall-static-';
-const CACHE_NAME = CACHE_PREFIX + '626e4cc3968f906b';
+const CACHE_NAME = CACHE_PREFIX + 'b123df0f26ca8618';
 const PRECACHE = [
   "./index.html",
   "./network-config.js",
