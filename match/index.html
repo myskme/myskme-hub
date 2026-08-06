@@ -552,13 +552,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .pd-row .sc{flex:none;font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
 .pd-row.w1{background:color-mix(in srgb,var(--gold) 10%,transparent)}
 #pt-rounds{margin-top:10px;font-size:11.5px;color:var(--ink3);line-height:1.9;letter-spacing:.03em}
-/* 矿脉榜 */
+/* 矿脉榜：只留荣誉席、榜首和玩家附近三层，不再平铺 50 行。 */
 #ovl-lb .ovl-card{width:min(440px,94vw)}
-.lb-tabs{display:flex;gap:8px;margin:14px 0 10px}
+.lb-tabs{display:flex;gap:8px;margin:10px 0 12px}
 .lb-tabs button{flex:1;font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;padding:8px 4px;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
 .lb-tabs button.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
-#lb-list{max-height:46dvh;overflow-y:auto;text-align:left}
+#lb-list{text-align:left}
+.lb-group{margin-top:12px}
+.lb-group:first-child{margin-top:0}
+.lb-gh{display:flex;align-items:baseline;justify-content:space-between;padding:0 5px 5px;
+  border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.22em;color:var(--ink3)}
+.lb-gh i{font-style:normal;font-size:10px;letter-spacing:.04em;color:var(--ink3)}
 .lb-row{display:flex;align-items:center;gap:9px;padding:8px 6px;border-bottom:1px solid var(--line2)}
 .lb-row:last-child{border-bottom:0}
 .lb-row .rk{width:26px;flex:none;text-align:center;font-size:14px;color:var(--ink3);font-variant-numeric:tabular-nums}
@@ -578,9 +583,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lb-row .pw{flex:none;text-align:right}
 .lb-row .pv{font-size:15px;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.2}
 .lb-row .pl{font-size:10px;color:var(--ink3);letter-spacing:.16em}
-#lb-mine{margin-top:10px;font-size:12.5px;color:var(--ink2);letter-spacing:.06em;line-height:1.9}
+#lb-mine{margin-top:10px;padding:9px 11px;border:1px solid var(--line);font-size:12px;
+  color:var(--ink2);letter-spacing:.04em;line-height:1.75;text-align:left}
+#lb-mine:empty{display:none}
 #lb-mine b{color:var(--gold2);font-weight:500}
 #lb-msg{font-size:13px;color:var(--ink3);padding:22px 6px;line-height:1.9}
+#lb-msg:empty{display:none}
 .lb-form{text-align:left;margin-top:12px}
 .lb-form label{display:block;font-size:11.5px;letter-spacing:.2em;color:var(--ink3);margin:9px 0 3px}
 .lb-form input{width:100%;font-family:var(--serif);font-size:15px;padding:9px 11px;color:var(--ink);
@@ -746,16 +754,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.5;
   white-space:pre;overflow-x:auto;text-align:left;user-select:text;-webkit-user-select:text}
 
-/* 本周矿脉入口卡 */
-#wk-card{border:1px solid var(--gold-line);padding:9px 12px 11px;margin:2px 0 10px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,var(--panel2)),var(--panel));
-  text-align:center}
-#wk-card .wkl{font-size:13px;letter-spacing:.14em;color:var(--gold2)}
-#wk-card .wkl b{color:var(--gold2);font-weight:500}
-#wk-card .wkd{font-size:11.5px;color:var(--ink2);letter-spacing:.05em;margin:2px 0 7px}
-#wk-card .btn{width:100%;padding:7px;font-size:14px}
-#wk-card.done{border-color:var(--line)}
-#wk-card.done .wkl{color:var(--ink2)}
 /* 未打过本周挑战时，菜单「矿脉榜」按钮上点一颗，跟典藏册那颗同一套 */
 #lb-dot .dot,#col-dot .dot{display:inline-block;width:6px;height:6px;margin-left:5px;
   vertical-align:2px;background:var(--gold);border-radius:50%;
@@ -880,38 +878,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   padding:3px 8px;cursor:pointer;z-index:2}
 .lc-x:active{transform:translateY(1px)}
 .lc{position:relative}
-/* 三线首座：三个王座而不是一个。摆在榜单最顶上当公告。 */
-.thr{margin:0 0 12px;padding:9px 11px 8px;border:1px solid var(--gold-line);border-radius:6px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 9%,transparent),transparent);
-  text-align:left}
-.thr-hd{font-size:12px;color:var(--gold2);letter-spacing:.42em;text-align:center;margin-bottom:6px}
-.thr-r{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:13px}
-.thr-n{font-size:11px;color:var(--ink3);letter-spacing:.08em;min-width:64px}
-.thr-r b{color:var(--gold2);letter-spacing:.06em;font-weight:500}
-.thr-r i{font-style:normal;margin-left:auto;font-size:11.5px;color:var(--ink3);
-  font-variant-numeric:tabular-nums}
+/* 四座压成 2×2 荣誉席：保住身份感，不再附一整段机制说明。 */
+.lb-honors{margin:0 0 12px;padding:7px;border:1px solid var(--gold-line);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 8%,transparent),transparent)}
+.thr-hd{font-size:9.5px;color:var(--gold2);letter-spacing:.3em;text-align:center;margin-bottom:5px}
+.thr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.thr-r{min-width:0;padding:5px 3px;border:1px solid var(--line2);background:var(--bg2);text-align:center}
+.thr-n{display:block;font-size:8.5px;color:var(--ink3);letter-spacing:.02em;white-space:nowrap}
+.thr-r b{display:block;margin-top:2px;color:var(--gold2);font-size:10.5px;letter-spacing:.02em;
+  font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 虚位：压暗但不隐藏 —— 「这个座还没人坐」是号召，不是缺陷 */
 .thr-r.vac b{color:var(--ink3);font-weight:400}
 .thr-r.vac{opacity:.72}
-.thr-f{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
-  font-size:10.5px;color:var(--ink3);line-height:1.65}
-.thr-f b{color:var(--ink2)}
 /* 坐着座的人，名字前面点一颗 */
 .lb-row .thr-mk{color:var(--gold2);margin-right:3px;font-size:11px}
-/* 贴身对手：端在榜单最上面，只显示你前后各一名和确切差距 */
-.near{margin:0 0 12px;padding:9px 10px 8px;border:1px solid var(--line);border-radius:6px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 6%,transparent),transparent)}
-.near-hd{font-size:11px;color:var(--ink3);letter-spacing:.06em;margin-bottom:4px}
-.near-r{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:13px;color:var(--ink3)}
-.near-r .nr-rk{width:24px;text-align:right;font-size:12px}
-.near-r .nr-nm{flex:1;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.near-r .nr-pw{font-variant-numeric:tabular-nums}
-.near-r.me{color:var(--ink);font-size:14px}
-.near-r.me .nr-pw{color:var(--gold2);font-weight:500}
-.near-r.up .nr-nm,.near-r.up .nr-pw{color:var(--ink2)}
-.near-gap{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);
-  font-size:12.5px;color:var(--ink2);letter-spacing:.04em}
-.near-gap.only{margin-top:0;padding-top:0;border-top:0}   /* 上面没有名次行时不留那条分隔线 */
 /* ── 数字排版统一 ──
    全站有 64 处 toLocaleString 出来的**会变的数字**（矿力、价格、余额、差距、
    贡献值…），但原来只有 12 处设了 tabular-nums。等宽数字不是审美讲究：
@@ -920,7 +900,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
    （固定不动的数字不用管，比如版本号。） */
 .nb{white-space:nowrap}
 .sp-c,.sp-bal,.sp-si i,.sp-at,.sp-shd i,.sp-have,
-.near-gap,.nr-rk,.pw-tip,.cmem,.pd-row,.yj-seal,
+.cmem,.pd-row,.yj-seal,
 .qs-sub,.q3r,.thr-n{font-variant-numeric:tabular-nums}
 /* ── 表面材质统一 ──
    全站有 19 条规则「有边框、有底色，却没有厚度」—— 同一张卡里有的凸起有的纯平，
@@ -929,7 +909,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
      · 承载信息的方块（统计格、套组、成就、章节块…）→ 浅一档，凸起但不抢戏
      · 可点的（图标钮、页签、同伴位…）→ 深一档，看得出能按
    两档都只用同一组变量，改一处全站跟着走。 */
-.wolf-badge,.ins-sec,.qs-sec,.near,.ach,.cbi,.cset,.cbig,.cvt,
+.wolf-badge,.ins-sec,.qs-sec,.ach,.cbi,.cbig,.cvt,
 .pt-chip,.pt-dot,.pd-row .dot,.pt-name .tm{
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 9%,transparent),
              inset 0 -1px 0 rgba(0,0,0,.4),
@@ -946,22 +926,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 输入框反过来：它是「凹进去的槽」，不是凸起的块 —— 能按的和能填的必须一眼分开 */
 .pt-name input,.lb-form input{
   box-shadow:inset 0 2px 6px rgba(0,0,0,.55),inset 0 -1px 0 color-mix(in srgb,var(--gold) 7%,transparent)}
-/* 矿力该往哪使劲：一句话，不铺明细表 */
-.pw-tip{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
-  font-size:11.5px;line-height:1.75;color:var(--ink3);letter-spacing:.03em}
-.pw-tip b{color:var(--ink2)}
-/* 明牌配速员：必须一眼看出不是真人，所以标签写死在最前面、整块压暗、不进名次序列 */
-.pacer{margin:-6px 0 12px;padding:8px 10px;border:1px dashed var(--line);border-radius:6px;
-  font-size:12.5px;color:var(--ink3);letter-spacing:.04em}
-.pacer b{color:var(--ink2)}
-.pc-tag{display:inline-block;margin-right:7px;padding:1px 6px;border:1px solid var(--line);
-  border-radius:3px;font-size:10px;color:var(--ink3);letter-spacing:.1em;vertical-align:1px}
-.pc-w{margin-top:3px;font-size:11px;color:var(--ink3);opacity:.8}
-.pc-gap{margin-top:5px;font-size:12px;color:var(--ink2)}
-.pc-gap b{color:var(--gold2);font-size:14px}
-/* 赛季幽灵：跟上个月的自己比 */
-.pw-ghost{margin-top:5px;font-size:12px;color:var(--ink2);letter-spacing:.04em}
-.pw-ghost b{color:var(--gold2)}
 /* ── 灵石工坊 ── */
 .sp-bal{font-size:13px;color:var(--ink2);letter-spacing:.06em;text-align:center}
 .sp-bal b{color:var(--gold2);font-size:16px}
@@ -999,8 +963,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-have{font-size:11.5px;color:var(--gold2);letter-spacing:.08em}
 .btn.sp-b{padding:4px 12px;font-size:12px;letter-spacing:.08em}
 .btn.sp-b.off{opacity:.45}
-.near-gap b{color:var(--gold2);font-size:15px}
-
 /* 化名行：输入框 + 换一个 */
 .aliasrow{display:flex;gap:6px;align-items:stretch}
 .aliasrow input{flex:1;min-width:0}
@@ -1136,7 +1098,7 @@ body{--shk:4px}
 /* 提示条里的内嵌小图标（ICONS 的 svg 没有内联尺寸，不套一层会撑到 300×150） */
 .ic-i .ic{width:var(--ic-sm);height:var(--ic-sm)}
 
-/* 四个子视图共用一张 .ovl-card。不另开弹层是有原因的：
+/* 典藏子视图共用一张 .ovl-card。不另开弹层是有原因的：
    ovl() 是单层互斥的，开子层会把典藏册顶掉；而全站 22 处关闭写法都是
    ovl(null)，照抄就变成「开完匣点关闭 → 直接回大厅」。 */
 #ovl-col .ovl-card{width:min(430px,95vw)}
@@ -1146,30 +1108,37 @@ body{--shk:4px}
 #col-warn{display:none;border:1px solid var(--red);background:color-mix(in srgb,var(--red) 12%,transparent);
   color:var(--red);font-size:11px;letter-spacing:.04em;padding:6px 8px;margin:10px 0 0;line-height:1.6}
 #col-warn.on{display:block}
-#col-mine{font-size:11px;color:var(--ink3);letter-spacing:.1em;margin-top:8px}
-#col-mine b{color:var(--gold2);letter-spacing:.28em;font-weight:400}
-
-#col-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 10px}
+#col-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 10px}
 .cbi{border:1px solid var(--line2);background:var(--bg2);padding:7px 2px;text-align:center}
 .cbi b{display:block;font-size:16px;color:var(--gold2);letter-spacing:.04em;font-weight:400}
 .cbi i{display:block;font-style:normal;font-size:10px;color:var(--ink3);letter-spacing:.06em;margin-top:2px}
 
-.col-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.col-acts .btn{padding:10px 6px}
+.col-acts{display:grid;grid-template-columns:1.35fr .65fr;gap:8px}
+.col-acts .btn{padding:9px 6px}
 .colsub{display:block;font-size:10px;color:var(--ink3);letter-spacing:.04em;margin-top:3px}
 
-#col-note{margin:10px 0 2px}
+#col-rules{margin:9px 0 12px;border-bottom:1px solid var(--line2);padding-bottom:7px}
+#col-rules summary{list-style:none;cursor:pointer;font-size:10.5px;color:var(--ink3);letter-spacing:.16em}
+#col-rules summary::-webkit-details-marker{display:none}
+#col-rules summary::after{content:'＋';margin-left:6px;color:var(--gold2)}
+#col-rules[open] summary::after{content:'－'}
+#col-note{margin:7px 0 0}
 #col-note .odds{font-size:11px;color:var(--ink2);letter-spacing:.04em;line-height:1.75}
 #col-note .odds b{color:var(--gold2)}
 #col-note .nofee{font-size:10.5px;color:var(--ink3);letter-spacing:.04em;margin-top:3px;line-height:1.6}
 #col-note .nofee b{color:var(--ink2)}
 
-#col-sets{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:12px 0 2px}
-.cset{border:1px solid var(--line2);background:var(--bg2);padding:4px 8px;font-size:11px;
-  color:var(--ink3);letter-spacing:.06em;display:flex;align-items:center;gap:5px}
-.cset .sn{display:flex;align-items:center;gap:3px}
-.cset.done{border-color:var(--gold);color:var(--gold2)}
-.cset.done .sp{color:var(--gold)}
+#col-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center;margin:10px 0 4px}
+#col-search{min-width:0;width:100%;box-sizing:border-box;border:1px solid var(--line2);background:var(--bg2);
+  color:var(--ink);font-family:var(--serif);font-size:12.5px;padding:7px 9px;outline:none}
+#col-search:focus{border-color:var(--gold)}
+#col-search::-webkit-search-cancel-button{display:none}
+#col-filters{display:flex;gap:4px}
+.colf{border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);font-family:var(--serif);
+  font-size:10.5px;letter-spacing:.06em;padding:7px 8px;cursor:pointer;white-space:nowrap}
+.colf.on{border-color:var(--gold);color:var(--gold2)}
+#col-empty{border:1px solid var(--line2);padding:18px 8px;color:var(--ink3);font-size:12px;
+  letter-spacing:.08em;margin-top:12px;text-align:center}
 
 .cgh{font-size:11px;letter-spacing:.16em;color:var(--ink3);text-align:left;
   margin:14px 0 6px;border-bottom:1px solid var(--line2);padding-bottom:4px;overflow:hidden}
@@ -1191,8 +1160,6 @@ body{--shk:4px}
 .cardc .ct{position:absolute;left:0;right:0;bottom:0;font-size:9px;letter-spacing:.14em;
   padding:1px 0;background:rgba(0,0,0,.62)}
 /* 卡面小字压在半透明黑上，固定使用亮金确保对比度。 */
-.cardc .cdup{position:absolute;top:2px;right:3px;font-size:9px;color:#e8c768;
-  background:rgba(0,0,0,.62);padding:0 3px}
 .cardc.t0 .ct{color:#d8d2c4}
 .cardc.t1{border-color:var(--gold)}   .cardc.t1 .ct{color:#e8c768}
 .cardc.t2{border-color:var(--gold2);box-shadow:0 0 10px color-mix(in srgb,var(--gold) 35%,transparent)}
@@ -1281,23 +1248,6 @@ body{--shk:4px}
 .cvt.on.t3 b{color:var(--red)}
 .cvacts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 
-/* 赠印 */
-#gf-mine{font-size:20px;letter-spacing:.3em;color:var(--gold2);margin:6px 0 2px}
-#gf-tier{display:flex;gap:6px;justify-content:center;margin:12px 0 8px;flex-wrap:wrap}
-#gf-to{width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--line2);
-  color:var(--ink);font-family:inherit;font-size:17px;letter-spacing:.3em;text-align:center;
-  padding:9px 8px;text-transform:uppercase}
-#gf-to:focus{outline:none;border-color:var(--gold)}
-.gfcode{font-size:16px;letter-spacing:.14em;color:var(--gold2);background:var(--bg2);
-  border:1px dashed var(--gold);padding:10px 6px;margin-top:10px;word-break:break-all;
-  -webkit-user-select:text;user-select:text}
-.gfnote{font-size:10.5px;color:var(--ink3);letter-spacing:.04em;line-height:1.75;margin-top:9px;text-align:left}
-.gfnote b{color:var(--ink2)}
-.gfh{font-size:10px;letter-spacing:.2em;color:var(--ink3);margin:14px 0 4px;text-align:left}
-.gfo{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;
-  border-top:1px solid var(--line2);padding:4px 0;text-align:left}
-.gfo b{color:var(--ink2);font-weight:400;letter-spacing:.05em;-webkit-user-select:text;user-select:text}
-.gfo i{font-style:normal;color:var(--ink3);white-space:nowrap}
 /* 通用弹出提示 */
 #toast{position:fixed;left:50%;bottom:calc(74px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:90;
   background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:10px 18px;font-size:13.5px;letter-spacing:.08em;
@@ -1583,7 +1533,7 @@ body{--shk:4px}
   </div>
 </div></div>
 
-<!-- 典藏册。四个子视图共用一张卡片：ovl() 是单层互斥的，
+<!-- 典藏册。多个子视图共用一张卡片：ovl() 是单层互斥的，
      另开弹层会把典藏册顶掉，而全站的关闭惯例 ovl(null) 会一路退回大厅。 -->
 <div class="ovl" id="ovl-col"><div class="ovl-card">
 
@@ -1591,19 +1541,23 @@ body{--shk:4px}
     <div class="ovl-kick">MYSKME COLLECTION</div>
     <div class="ovl-title">典藏 · <em>册</em></div>
     <div id="col-warn"></div>
-    <div id="col-mine"></div>
     <div id="col-bar"></div>
     <div class="col-acts">
       <button class="btn primary" id="col-open"></button>
       <button class="btn" id="col-buy"></button>
     </div>
-    <div id="col-note"></div>
-    <div id="col-sets"></div>
+    <details id="col-rules"><summary>典藏规则</summary><div id="col-note"></div></details>
+    <div id="col-tools">
+      <input type="search" id="col-search" placeholder="找典藏" autocomplete="off" spellcheck="false">
+      <div id="col-filters">
+        <button class="colf on" data-filter="all">全部</button>
+        <button class="colf" data-filter="have">已收</button>
+        <button class="colf" data-filter="miss">未收</button>
+      </div>
+    </div>
     <div id="col-grid"></div>
     <div class="ovl-btns">
       <button class="btn ghost" id="col-shop">工 坊</button>
-      <button class="btn ghost" id="col-ask">矿友互助</button>
-      <button class="btn ghost" id="col-recv">收 赠 印</button>
       <button class="btn ghost" id="col-close">合上</button>
     </div>
   </section>
@@ -1655,22 +1609,6 @@ body{--shk:4px}
       <button class="btn primary" id="dw-again"></button>
       <button class="btn ghost" id="dw-back">收 起</button>
     </div>
-  </section>
-
-  <section class="colv" data-v="gift">
-    <div class="ovl-kick">赠 印</div>
-    <div class="ovl-title" id="gf-title" style="font-size:21px"></div>
-    <div id="gf-body"></div>
-    <div class="ovl-btns" id="gf-btns"></div>
-  </section>
-
-  <!-- 矿友互助：跟赠印同一套骨架，但用途相反（求 vs 送），
-       所以单独一个视图、单独的前缀 GQ，粘错时能立刻认出来。 -->
-  <section class="colv" data-v="ask">
-    <div class="ovl-kick">矿 友 互 助</div>
-    <div class="ovl-title" id="ak-title" style="font-size:21px"></div>
-    <div id="ak-body"></div>
-    <div class="ovl-btns" id="ak-btns"></div>
   </section>
 
   <!-- Esc 的落点。子视图里按 Esc 应该退回册子，而不是像别的弹层那样直接回大厅。 -->
@@ -1774,24 +1712,16 @@ body{--shk:4px}
 <!-- 矿脉榜 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
-  <div class="obanner" id="lb-banner"></div>
   <div class="ovl-title">矿脉 · <em>榜</em></div>
-  <!-- 本周矿脉入口。放在榜单里而不是大厅：一是大厅在 360×640 已经顶到
-       缩放下限、塞不下第五个主按钮，二是「比手艺」这件事本来就属于榜单语境。 -->
-  <div id="wk-card">
-    <div class="wkl">本周矿脉 · 第 <b id="wk-no">—</b> 期</div>
-    <div class="wkd" id="wk-desc">全服同一盘 · 比手艺不比运气</div>
-    <button class="btn primary" id="wk-go">下 矿</button>
-  </div>
   <div class="lb-tabs">
     <button data-scope="world" class="on">世界榜</button>
     <button data-scope="rush">90 秒</button>
     <button data-scope="camp">阵营</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
+  <div id="lb-mine"></div>
   <div id="lb-list"></div>
   <div id="lb-card"></div>
-  <div id="lb-mine"></div>
   <div class="lb-form" id="lb-form" hidden>
     <label>化名（2–12 位中英文/数字，别用真名）</label>
     <div class="aliasrow">
@@ -1896,15 +1826,13 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
      一次存量，而回填链路刚出过 NaN 事故，为一个恒零项冒这个险不划算。
      将来若要接入新的定量玩法，直接往 best 里写即可，公式和管线都是通的。 */
   dig:{d:0,score:null,best:0,plays:0,days:0},
-  /* 赛季幽灵：每月记一次自己的矿力快照，键 'YYYYMM'。
-     跟别人比会输，跟上个月的自己比只会赢——这条只用真实数据，不虚构任何东西。 */
-  pwHist:{},
   /* 灵石工坊。own = 永久拥有，worn = 同槽位当前使用的一件。 */
   shop:{own:{},worn:{},at:{}},
   lbDev:'',lbAlias:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
+  delete out.pwHist;                                         // 排行榜已收束，旧赛季幽灵快照退役
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
   out.daily=Object.assign({day:0,streak:0,oil:0,best:0},s.daily||{});
   out.fails=s.fails||{};
@@ -2542,7 +2470,7 @@ const ART={
      所以 .obanner 不能再加 CSS 边框，否则叠成双框。 */
   end_win:'art/win.webp', end_lose:'art/lose.webp',
   boss_banner:'art/boss-intro.webp',                           // 气氛横幅，不替代 boss_ye/boss_she 头像
-  party_banner:'art/party-banner.webp', lb_banner:'art/lb-banner.webp',
+  party_banner:'art/party-banner.webp',
   /* 风物「卡面版」。与 card_* 同理：ch_* 那 8 张横幅继续给地脉图与编年史用，
      典藏册的风物卡改用这 8 张竖版重构图。两套并存。 */
   vista_1:'art/card-vista-1.webp', vista_2:'art/card-vista-2.webp',
@@ -5006,14 +4934,13 @@ function mercyMoves(n){
      三个半月就集满了，「长期」当场作废。两件事是绑在一起的，别只改一件。
    ================================================================== */
 
-/* 品阶。tier 3「异纹」不进随机池，只能靠做到特定的事拿到，也不能转赠。 */
+/* 品阶。tier 3「异纹」不进随机池，只能靠做到特定的事拿到。 */
 const TIERS=[{k:0,nm:'常',dust:1},{k:1,nm:'珍',dust:5},{k:2,nm:'臻',dust:40},{k:3,nm:'异纹',dust:0}];
 const T_COMMON=0,T_RARE=1,T_TOP=2,T_VAR=3;
 const COL={drop:[.78,.19,.03],pity:20,cost:3000,cap:2,lamp:7,
-  upR:25,upT:200,fill:120,giftCap:3,keep:2};
-/* keep=2：同一张卡最多留 2 份（图鉴里那份 + 可赠的那份），第 3 份起自动熔成星屑。
-   全手动熔炼会把星屑从「系统产出」变成「玩家行为」——不点的人星屑恒为 0，
-   升阶和寻卡等于不存在；一键熔炼又会把可赠的库存一次清空。两头都不好。 */
+  upR:25,upT:200,fill:120,keep:1};
+/* 同卡只留一张；以后再遇到会当场熔成星屑。旧版为赠印保留的第二张在迁移时
+   一次性回铸，不让已经攒下的重复份凭空消失。 */
 
 /* 套组加成刻意都很小——这是收藏系统不是战力系统。
    一旦加成够大，没兴趣收藏的人会被迫来收藏，那就变味了。 */
@@ -5024,9 +4951,8 @@ const CSETS=[
   {id:'gem',  nm:'灵石', boon:'每日矿灯灵力 +200'},
   {id:'relic',nm:'器物', boon:'每日矿灯多 1 件灵器'},
 ];
-/* n = 永不变更的卡号，赠印按它编码。w = 出自哪个作品。
-   ⚠ 只许在末尾追加，绝不可重排或复用旧号——否则流在外面的旧赠印会兑成别的卡。
-   别的作品将来加卡，从 101 起另开号段。 */
+/* n = 永不变更的卡号。w = 出自哪个作品。
+   ⚠ 只许在末尾追加，绝不可重排或复用旧号；别的作品将来加卡，从 101 起另开号段。 */
 /* ---- 图鉴条目 ----
    每张卡一句短文，**只有拿到之后才看得见**。这是收藏系统里最便宜也最保值的东西：
    零美术、零机制风险，但它把「一张图」变成「一件有来历的东西」。
@@ -5150,7 +5076,7 @@ function checkSecrets(){
 /* ---------- 存取层（换后端只动这一段） ---------- */
 const CKEY='myskme-col-v1';
 const COL_DEF={own:{},dust:0,box:0,pity:0,day:0,bought:0,serial:{},seen:0,
-  uid:'',lamp:0,wmAch:0,wmCh:0,wmChest:0,out:{},recv:{},gday:0,gcnt:0,opened:0,
+  lamp:0,wmAch:0,wmCh:0,wmChest:0,opened:0,giftRetired:0,
   /* org = 来历。键同 own（「卡号:品阶」），值 {d:日序号, s:来源, k:上下文}。
      只在**第一次**拿到时写，之后再拿到重复的不覆盖——
      一张卡最有意义的是「我第一次见到它」的那一刻。
@@ -5164,30 +5090,31 @@ function colFix(){
   const c=Object.assign({},COL_DEF,COLS);
   const num=v=>{const n=Math.floor(Number(v));return Number.isFinite(n)&&n>=0?n:0};
   const obj=v=>(v&&typeof v==='object'&&!Array.isArray(v))?v:{};
-  c.serial=obj(c.serial); c.out=obj(c.out); c.recv=obj(c.recv); c.org=obj(c.org);
-  for(const k of ['dust','box','pity','day','bought','gday','gcnt','seen','lamp',
-                  'wmAch','wmCh','wmChest','opened'])c[k]=num(c[k]);
+  c.serial=obj(c.serial); c.org=obj(c.org);
+  for(const k of ['dust','box','pity','day','bought','seen','lamp',
+                  'wmAch','wmCh','wmChest','opened','giftRetired'])c[k]=num(c[k]);
   /* own 的键必须是「卡号:品阶」且卡号真实存在，否则丢弃：
      存档是玩家随手能改的地方，一条脏数据不该让整册崩掉。 */
-  const own={};
+  const own={}, retiring=!c.giftRetired;
+  let refund=0;
   for(const k in obj(c.own)){
     const m=/^(\d+):([0-3])$/.exec(k);
     if(!m||!CARD_BY_N[+m[1]])continue;
     const v=num(c.own[k]);
-    if(v>0)own[k]=Math.min(v,COL.keep);
+    if(v>0){
+      if(retiring&&v>1)refund+=(v-1)*TIERS[+m[2]].dust;
+      own[k]=1;
+    }
   }
   c.own=own;
-  /* 矿工号用**独立**的 uid，不复用 SAVE.lbDev：LB.dev() 只在 registered()
-     （要求填过化名）之后才写 lbDev，没上过矿脉榜的玩家 lbDev 恒为空串——
-     那样所有人矿工号相同，赠印退化成谁都能兑的无记名凭证。
-     而且这是静默失败：作者自己肯定上过榜，本机永远复现不了。 */
-  if(typeof c.uid!=='string'||!c.uid)
-    c.uid=(typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():
-      'gf-'+PLAT.now().toString(36)+Math.random().toString(36).slice(2,12));
-  COLS=c; return c;
+  if(retiring){c.dust+=refund;c.giftRetired=1}
+  /* 旧版求赠码的设备号、寄出记录与日配额退役后不再占存档。 */
+  delete c.uid;delete c.out;delete c.recv;delete c.gday;delete c.gcnt;
+  COLS=c;
+  if(retiring)colSave();                                    // 迁移标记必须落盘，否则重开还会再走一遍
+  return c;
 }
-/* persist() 是空 catch，写失败无人知晓。典藏册是全站第一个「丢了找不回来」
-   的系统（臻卡编号、已收的赠印，而送卡那方的卡已经离手），必须把失败讲出来。 */
+/* persist() 是空 catch，写失败无人知晓。典藏册有臻卡编号与来历，写失败必须讲出来。 */
 function colSave(){
   clearTimeout(colT);
   colT=setTimeout(()=>{
@@ -5211,7 +5138,6 @@ const colCnt  =(n,t)=>((COLS&&COLS.own)||{})[n+':'+t]||0;
 const colHas  =(n,t)=>colCnt(n,t)>0;
 const colAny  =n=>colHas(n,0)||colHas(n,1)||colHas(n,2)||colHas(n,3);
 const colTop  =n=>{for(let t=3;t>=0;t--)if(colHas(n,t))return t;return -1};
-const colSpare=(n,t)=>Math.max(0,colCnt(n,t)-1);       // 多出来的份：可赠出
 /* 运数 = **开匣开出来的**臻卡张数。掉率 3%，不含升阶炼成的、也不含星屑寻来的 ——
    那两条是肝出来的，掺进来这条线就不叫手气了。
    来历只在第一次拿到时写，所以这个数天然只增不减，跟全站其余成绩同一个性质。 */
@@ -5255,8 +5181,6 @@ function colDay(){
   const d=dayNum(),c=COLS;
   if(c.day>d)c.day=0;
   if(c.day!==d){c.day=d;c.bought=0}
-  if(c.gday>d)c.gday=0;
-  if(c.gday!==d){c.gday=d;c.gcnt=0}
   return d;
 }
 /* ---------- 匣：存量派生 + 高水位线 ----------
@@ -5410,144 +5334,6 @@ function grantVariant(n){
   if(colHas(n,T_VAR))return;
   colGain(n,T_VAR,1,'deed'); colSave(); SFX.win();
   toast('异纹显形 · <b>'+CARD_BY_N[n].nm+'</b>',3200);
-}
-
-/* ==================================================================
-   赠印 —— 完全离线，但绑定收件人
-   ------------------------------------------------------------------
-   位宽：卡号 7 + 品阶 2 + 收件人 25 + 流水 16 + 校验 10 = 60 位
-        → base32 12 字符 → GF-XXXX-XXXX-XXXX
-   卡号给 7 位（128 张）而不是刚好够的 5 位，是留给以后加卡的余量：
-   赠印一旦流出去，格式就再也改不了了。
-   收件人那 25 位就是对方界面上的**矿工号**本身（5 个 base32 字符），
-   所以能拿眼睛核对，不是隐藏字段。
-
-   叫「赠印」不叫「口令」是有原因的：矿脉榜已经有一个「小队口令」输入框，
-   同样要粘贴、同样在群里传。两个都叫口令，玩家会互相粘错——
-   把赠印粘进小队口令框不会报错，会静默建一个只有自己的小队，
-   成绩从原来的榜上消失，而且根本不知道发生了什么。
-
-   **能防住**：把赠印甩进群里让人抢（只有那个矿工号的设备能兑）、
-             同一枚兑两次（recv 记整串）、手打错字（校验位实测 100% 拦下）。
-   **防不住**：玩家自己改本地存档。任何单机游戏都一样，
-             而且这里没有市场、没有价格，改了只是骗自己。
-   ================================================================== */
-const B32='0123456789ABCDEFGHJKMNPQRSTVWXYZ';   /* 去掉 I L O U —— 手抄最容易混的四个 */
-const B32I={}; for(let i=0;i<32;i++)B32I[B32[i]]=i;
-B32I.O=0; B32I.I=1; B32I.L=1; B32I.U=B32I.V;    /* 手输时仍会打成 O/I/L/U，等价映射兜一下 */
-function fnv(s){let h=2166136261>>>0;
-  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h>>>0}
-const _bits=(v,n)=>{let s='';for(let i=n-1;i>=0;i--)s+=((v>>>i)&1);return s};
-const _b32=b=>{let s='';for(let i=0;i<b.length;i+=5)s+=B32[parseInt(b.slice(i,i+5),2)];return s};
-const minerId =()=>{colFix();return fnv('miner|'+COLS.uid)&0x1FFFFFF};
-const minerTag=()=>_b32(_bits(minerId(),25));
-function tagToId(tag){
-  const s=String(tag||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
-  if(s.length!==5)return null;
-  let b='';
-  for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return null;b+=_bits(v,5)}
-  return parseInt(b,2)&0x1FFFFFF;
-}
-/* ---- 求卡帖 · 矿友互助 ----
-   赠印只解决「我主动送」，缺的是反过来：**开口求**。
-   收集类玩法最劝退的一刻不是抽不到，是「就差这一张，而且不知道找谁」。
-
-   求卡帖比赠印简单得多，因为它**不转移任何东西**——
-   它只说「我缺哪张、我的矿工号是多少」，所以：
-   · 不需要流水号（没有重放风险，求一百次也只是求）
-   · 不需要防抢（谁看到都能帮，这正是我们要的）
-   · 收到帖的人点一下就跳到赠出流程，矿工号自动填好——
-     少一次手抄矿工号，就少一半送不出去的可能。
-
-   位宽：卡号 7 + 品阶 2 + 求助者 25 + 校验 6 = 40 位 → base32 8 字符。
-   前缀用 GQ 而不是 GF：两种帖长得像但用途相反，
-   粘错时要能立刻认出来，不能默默走进另一条流程。 */
-function askEncode(n,t,who){
-  const body=_bits(n,7)+_bits(t,2)+_bits(who,25);
-  const s=_b32(body+_bits(fnv('GQ1|'+body)%64,6));
-  return 'GQ-'+s.slice(0,4)+'-'+s.slice(4,8);
-}
-function askDecode(code){
-  let s=String(code||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
-  /* 同赠印那条教训：G/Q 本身是合法 base32 字符，
-     只有连前缀正好 10 位时才剥，否则会吃掉正文头两位。 */
-  if(s.length===10&&s.slice(0,2)==='GQ')s=s.slice(2);
-  if(s.length!==8)return {err:'求卡帖应是 8 位 · 检查有没有漏字'};
-  let b='';
-  for(let i=0;i<s.length;i++){const v=B32I[s[i]];if(v===undefined)return {err:'求卡帖里有不认识的字'};b+=_bits(v,5)}
-  const body=b.slice(0,34), sum=parseInt(b.slice(34,40),2);
-  if(fnv('GQ1|'+body)%64!==sum)return {err:'求卡帖打错了字 · 再核对一遍'};
-  const n=parseInt(body.slice(0,7),2), t=parseInt(body.slice(7,9),2), who=parseInt(body.slice(9,34),2);
-  if(!CARD_BY_N[n])return {err:'求卡帖里的卡号不存在'};
-  if(t===T_VAR)return {err:'异纹不能转赠，也就无从求起'};
-  return {n,t,who,tag:_b32(_bits(who,25))};
-}
-/* 我最缺哪张：优先「一张都没有」的，其次「差最高品阶」的。
-   按套组顺序取第一个，让求卡有个合理默认值，不用玩家自己翻。 */
-function askSuggest(){
-  colFix();
-  for(const c of CARDS)if(!colAny(c.n))return {n:c.n,t:T_COMMON};
-  for(const c of CARDS)if(!colHas(c.n,T_TOP))return {n:c.n,t:T_TOP};
-  for(const c of CARDS)if(!colHas(c.n,T_RARE))return {n:c.n,t:T_RARE};
-  return null;
-}
-function giftEncode(n,t,rcpt,seq){
-  const body=_bits(n,7)+_bits(t,2)+_bits(rcpt,25)+_bits(seq,16);
-  const s=_b32(body+_bits(fnv('GF1|'+body)%1024,10));
-  return 'GF-'+s.slice(0,4)+'-'+s.slice(4,8)+'-'+s.slice(8,12);
-}
-function giftDecode(code){
-  let s=String(code||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
-  /* G 和 F 本身就是合法 base32 字符，不能无脑剥前缀——
-     只有连前缀一起正好 14 位时才剥，否则会把正文头两位吃掉。 */
-  if(s.length===14&&s.slice(0,2)==='GF')s=s.slice(2);
-  if(s.length!==12)return {err:'赠印应是 12 位 · 检查有没有漏字'};
-  let b='';
-  for(let i=0;i<s.length;i++){const v=B32I[s[i]];
-    if(v===undefined)return {err:'赠印里有不认识的字符'};b+=_bits(v,5)}
-  const n=parseInt(b.slice(0,7),2), t=parseInt(b.slice(7,9),2);
-  const rcpt=parseInt(b.slice(9,34),2), seq=parseInt(b.slice(34,50),2);
-  if(fnv('GF1|'+b.slice(0,50))%1024!==parseInt(b.slice(50,60),2))
-    return {err:'这串不像赠印 · 检查有没有抄错'};
-  if(!CARD_BY_N[n])return {err:'赠印里的卡不存在'};
-  if(t===T_VAR)return {err:'异纹卡不能转赠'};
-  return {n:n,t:t,rcpt:rcpt,seq:seq,code:s};
-}
-function giftSend(n,t,tag){
-  colFix(); colDay();
-  if(t===T_VAR){toast('异纹卡是自己做到的，不能转赠',2600);return null}
-  if(colSpare(n,t)<=0){toast('这一张没有多余的份 · <b>只能送重复的</b>',2600);return null}
-  if(COLS.gcnt>=COL.giftCap){toast('今日已赠 <b>'+COL.giftCap+'</b> 张 · 明天再来',2400);return null}
-  const rcpt=tagToId(tag);
-  if(rcpt===null){toast('矿工号是 5 位 · 让对方在典藏册顶上看',2800);return null}
-  if(rcpt===minerId()){toast('这是你自己的矿工号',2200);return null}
-  /* 先扣后发：赠印一旦生成，这一份就离手了。不做「撤回」——没有服务器就
-     无法确认对方兑没兑，能撤就能凭空多出一张。取而代之的是「已寄出」列表
-     留着赠印原文，弄丢了照原样再发一次就行。
-
-     流水号用**随机**而不是自增：收件人那边是拿整串赠印去重的，如果各人都从
-     1 开始自增，两个朋友各送同一张卡给同一个人，生成的赠印会一模一样，
-     第二张就被误判成「已经用过了」，而那张卡在发送方那边已经销毁。 */
-  COLS.own[n+':'+t]--; COLS.gcnt++;
-  const code=giftEncode(n,t,rcpt,Math.floor(rnd()*65536));
-  COLS.out[code]={n:n,t:t,tag:String(tag).toUpperCase().replace(/[^0-9A-Z]/g,''),at:dayNum()};
-  colSave(); SFX.star(1);
-  return code;
-}
-function giftRedeem(code){
-  colFix();
-  const d=giftDecode(code);
-  if(d.err){toast(d.err,2800);return false}
-  if(d.rcpt!==minerId()){
-    toast('这枚赠印不是给你的<br>它指定的是矿工号 <b>'+_b32(_bits(d.rcpt,25))+'</b>',3400);return false}
-  /* 去重键 = 整串赠印。用裸流水号做键不行：流水号来自发送方，
-     两个不同的人完全可能撞上同一个号。 */
-  if(COLS.recv[d.code]){toast('这枚赠印已经用过了',2400);return false}
-  COLS.recv[d.code]=1;
-  colGain(d.n,d.t,1,'gift');   // 赠印编码里没有寄件人，只能记「友人所赠」
-  colSave(); SFX.win(); renderMenu();
-  toast('收下 '+TIERS[d.t].nm+' · <b>'+CARD_BY_N[d.n].nm+'</b>',3000);
-  return true;
 }
 
 /* ==================================================================
@@ -6294,7 +6080,7 @@ const LB={
       SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
       campLogParticipation();                                  // 只在服务端确认收到成绩后记当月参与
-      SAVE.lbAt=Date.now();pwGhostTick();persist();
+      SAVE.lbAt=Date.now();persist();
       if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
@@ -6420,26 +6206,22 @@ function lbMenuStatus(){
 function lbRowHTML(r,mine,throne){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
-  /* ── 副行只放**最有分量的那一样** ──
+  /* ── 副行只放段位与本模式最相关的一项 ──
      以前一行塞五样（首座·段位·社交组·关卡·星数），375px 宽的手机上
      实测 27 行裁了 7 行，最狠的裁掉 215px —— 玩家看到的是半截话。
      根子是「行」和「名片」抢活干：行是一眼扫的摘要，名片才是细账，
-     而名片现在点一下就开。所以按分量取一样，其余全部让给名片：
-       坐着首座 → 只报首座（那是他此刻最值得说的事）
-       否则     → 段位 + 走到第几关
-     其余细账进名片。再配 ellipsis，万一还是长，读起来是「省略」不是「被切断」。 */
+     而名片现在点一下就开。首座身份已在上方荣誉席出现，行内只用一颗菱形标记，
+     不再把四个席位名称重复写一遍；其余细账进名片。 */
   const sub=LB.scope==='rush'
     /* 90 秒榜上「走到第几关」没意义，换成能说明这一局的：最长连锁 */
     ? [r.rankName,r.chain?('最长 '+r.chain+' 连'):''].filter(Boolean).join(' · ')
-    : throne
-      ? throne
-      : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
+    : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
       +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
       +esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
-    +'<div class="sub'+(throne?' thr':'')+'">'+esc(sub)+'</div></div>'
+    +'<div class="sub">'+esc(sub)+'</div></div>'
     /* 90 秒榜比的是单局矿灯，右列就该显示矿灯分 —— 显示矿力的话，
        玩家会以为榜没排对（第一名的矿力可能比第二名低）。 */
     +(LB.scope==='rush'
@@ -6689,7 +6471,7 @@ function drawNameCard(){
   x.fillText(SAVE.lbAlias||'无名矿工',mid,140);
   x.fillStyle=DIM;x.font='400 15px serif';
   colFix();shopFix();
-  x.fillText('矿工号 '+minerTag()+' · 同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
+  x.fillText('同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
   /* 工坊刻下的题名会进入可导出的名片，
      也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。
      坐着首座的话，首座压过题名显示 —— 那是争来的，比买来的重。 */
@@ -6827,27 +6609,6 @@ function renderQuest(){
     else if(btn.dataset.go==='rush')startRush();
   };
 }
-function renderWeekCard(){
-  const s=wkState(), c=$('#wk-card'); if(!c)return;
-  $('#wk-no').textContent=s.w;
-  const first=(s.score===null), left=wkDaysLeft();
-  c.classList.toggle('done',!first);
-  $('#wk-desc').innerHTML=first
-    ? '全服同一盘 · 比手艺不比运气<br><span style="color:var(--ink3)">'
-      +'第一把记成绩，之后随便重开当练习 · 本周还剩 '+left+' 天</span>'
-    : '本周成绩 <b style="color:var(--gold2)">'+s.score.toLocaleString('en-US')+'</b>'
-      +(s.best>s.score?'　练习最佳 '+s.best.toLocaleString('en-US'):'')
-      +'<br><span style="color:var(--ink3)">已下矿 '+s.plays+' 次 · 本周还剩 '+left+' 天</span>';
-  $('#wk-go').textContent=first?'下 矿':'再挖一次（练习）';
-  /* 周悬赏挂在周卡脚下：同为周节奏，一眼看全本周的两件事 */
-  const bs=bountyState();
-  let bl=$('#wk-bounty');
-  if(!bl){bl=document.createElement('div');bl.id='wk-bounty';c.appendChild(bl)}
-  bl.innerHTML=bs.done
-    ?'本周悬赏 · <b>已拿下</b>'
-    :'本周悬赏 · '+esc(bs.def.nm)+'　<span style="color:var(--ink3)">'
-      +icTag('box')+' 匣 ×1 + 星屑 10 · 输的局达成也算</span>';
-}
 function startWeekly(){
   const w=weekNum(), sd=weekSeed(w);
   GS.mode='weekly';
@@ -6948,8 +6709,6 @@ function rollAlias(){
 }
 
 async function renderLB(){
-  applyArt($('#lb-banner'),'lb_banner');
-  renderWeekCard();
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
   /* 名片是 #lb-list 的**兄弟节点**，重写列表不会碰它 ——
@@ -7027,25 +6786,17 @@ async function renderLB(){
     return;
   }
   msg.textContent='';
-  let html='',found=false,myIdx=-1;
-  /* 谁坐着哪个座，一次算好，逐行查表 —— 别在循环里反复算三条线 */
-  const thr=thronesOf(rows), thrBy={};
-  /* 一个人可以坐好几个座，所以这里存数组不存单值 */
+  const myIdx=rows.findIndex(lbIsMe);
+  /* 四座只属于世界榜；90 秒榜只谈这一局，不混入累计矿力荣誉。 */
+  const thr=LB.scope==='world'?thronesOf(rows):{}, thrBy={};
   for(const t of THRONES)if(thr[t.k]){
     const k=thr[t.k].alias+'|'+(thr[t.k].tag||'');
     (thrBy[k]=thrBy[k]||[]).push(t.nm);
   }
-  for(let i=0;i<rows.length;i++){
-    const r=rows[i];
-    /* 同名很常见，光比化名会把两个人都标成「你」。后端给了 tag（设备键末两位），有就一起比 */
-    const isMe=r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag);
-    if(isMe){found=true;myIdx=i}
-    html+=lbRowHTML(r,isMe,(thrBy[(r.alias||'')+'|'+(r.tag||'')]||[]).join(' · '));
-  }
-  throneMine(rows);
+  if(LB.scope==='world')throneMine(rows);else THR_MINE=[];
   LB_ROWS=rows;                                   // 点开名片时按 rank 查这一份
-  list.innerHTML=throneHTML(rows)+nearHTML(rows,myIdx)+html;
-  /* 事件挂在容器上而不是每一行：榜单最多 50 行，逐行绑定既慢又容易在重渲染后漏绑。 */
+  list.innerHTML=lbBoardHTML(rows,myIdx,thrBy);
+  /* 事件挂在容器上：紧凑榜重渲染时不用逐行重新接线。 */
   if(!list.__cardWired){
     list.__cardWired=true;
     const open=e=>{
@@ -7067,18 +6818,7 @@ async function renderLB(){
     list.addEventListener('click',open);
     list.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e)}});
   }
-  const s=LB.stats();
-  if(!LB.registered()){
-    mine2.innerHTML='你还没上榜。本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars
-      +'</b> —— 点「<b>起名上榜</b>」就能排进去。';
-    return;
-  }
-  mine2.innerHTML='本机战绩：第 <b>'+s.lv+'</b> 关 · ★<b>'+s.stars+'</b> · 单关最佳 <b>'+s.score.toLocaleString('en-US')
-    +'</b> · 矿灯最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>'
-    +(SAVE.lbPower?('<br>我的矿力 <b>'+SAVE.lbPower.toLocaleString('en-US')+'</b> · <b>'+esc(SAVE.lbRankName||'')+'</b>'
-      +(found?'':' · 未进前 '+LB_LIMIT+'，继续挖')):'')
-    +pwGhostHTML()
-    +'<div class="pw-tip">'+pwAdviceHTML()+'</div>';
+  mine2.innerHTML=lbMineHTML(rows,myIdx);
 }
 /* ────────── 矿力三线（客户端镜像）──────────
    ⚠ 必须与 leaderboard/worker.js 的 gfDepth/gfSkill/gfGrind **逐字一致**。
@@ -7104,22 +6844,6 @@ function pwLines(s){
 function pwTotal(s){
   const L=pwLines(s);
   return L.depth+L.skill+L.grind+3*Math.min(L.depth,L.skill,L.grind);
-}
-/* 玩家反复在问「矿力怎么来的」。不铺一张明细表——王老师要的是「知道大概就行」。
-   均衡奖让每个人最短的那条线不一样，所以这里只说**他自己**该往哪使劲，一句话。 */
-const PW_HINT={
-  depth:{nm:'走多远',do:'往深里挖一关，顺手把星拿满'},
-  skill:{nm:'打多险',do:'去矿灯局冲一次连锁纪录'},
-  grind:{nm:'来多勤',do:'明天再来挖一次，光是来了就算'},
-};
-function pwAdviceHTML(){
-  const L=pwLines();
-  const k=(L.grind<=L.depth&&L.grind<=L.skill)?'grind'
-         :(L.depth<=L.skill?'depth':'skill');
-  const h=PW_HINT[k];
-  return '矿力看三样：<b>走多远</b>、<b>打多险</b>、<b>来多勤</b>，'
-    +'三样里<b>最短的那样算四倍</b>。<br>'
-    +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
 }
 /* ────────── 阵营月结算 ──────────
    服务端只公布胜方，不下发成员、人数或个人轨迹。
@@ -7203,18 +6927,10 @@ function thronesOf(rows){
 function throneHTML(rows){
   const th=thronesOf(rows);
   if(!THRONES.some(t=>th[t.k]))return '';
-  /* 空座**照样摆出来**，写「虚位以待」。
-     藏起来等于告诉玩家这条路不存在；摆着才是号召 —— 「这个座还没人坐」
-     恰恰是新人最该看到的一句话。 */
-  return '<div class="thr"><div class="thr-hd">四 座</div>'
+  return '<div class="lb-honors"><div class="thr-hd">荣 誉 席</div><div class="thr-grid">'
     +THRONES.map(t=>'<div class="thr-r'+(th[t.k]?'':' vac')+'"><span class="thr-n">'+t.nm+'</span>'
-      +(th[t.k]
-        ?('<b>'+esc(th[t.k].alias)+'</b><i>'+th[t.k].v.toLocaleString('en-US')
-          +(t.k==='luck'?' 张':'')+'</i>')
-        :('<b>虚位以待</b><i>'+esc(t.w)+'</i>'))+'</div>').join('')
-    +'<div class="thr-f">四条路，四种活法，<b>一个人可以全占</b> —— 肝到了就该拿。<br>'
-    +'「来得最勤」每天有上限，谁也快不过谁；'
-    +'<b>「手气最好」跟投入无关，新人第一天就可能撞上</b>。</div></div>';
+      +'<b>'+(th[t.k]?esc(th[t.k].alias):'虚位以待')+'</b></div>').join('')
+    +'</div></div>';
 }
 /* 我坐着哪几个座？名片与榜单上都要闪。 */
 let THR_MINE=[];
@@ -7224,81 +6940,44 @@ function throneMine(rows){
     &&(!SAVE.lbTag||!th[t.k].tag||th[t.k].tag===SAVE.lbTag)).map(t=>t.nm);
   return THR_MINE;
 }
-/* ────────── 明牌配速员 ──────────
-   作者最初想放「不被玩家发现的虚拟人」来制造竞争感。劝阻的理由不是道德，是它在这里
-   会失败：十来个人的熟人圈里，一个上榜很积极、从不说话、群里没人认识的名字不是伪装
-   而是靶子；而且作者是老师，穿帮的代价不对称。
-   替代方案是明牌——正典人物的记录**公开标注为传说**，不冒充真人。追赶欲照样在，
-   甚至更干净：谁都知道那是一条线，不会有人事后觉得被骗。
-   数值挑真人榜的空档，保证**每个人前面都有一盏灯**（2026-08-04 线上分布：
-   3.6k/4.5k/6.5k/6.7k/8.4k/12.6k/13.6k/30.3k/39.0k/46.9k/84.0k）。
-   狼先生是作者本人的化身，措辞要庄重：他是最远那盏灯，不是「打败」的对象。 */
-const PACERS=[
-  {p:22000, by:'鹦鹉教授', word:'重复一百遍，直到真理点头'},
-  {p:60000, by:'叶王',     word:'标准答案自有它的重量'},
-  {p:130000,by:'狼先生',   word:'让你们变得有趣一点', rev:true},
-];
-function pacerNext(pw){return PACERS.find(x=>x.p>(Number(pw)||0))||null}
-function pacerHTML(){
-  if(!LB.registered())return '';
-  const mine=Number(SAVE.lbPower)||0, x=pacerNext(mine);
-  if(!x)return '';
-  return '<div class="pacer"><span class="pc-tag">传说记录</span>'
-    +'<b>'+esc(x.by)+'</b> '+x.p.toLocaleString('en-US')
-    +'<div class="pc-w">「'+esc(x.word)+'」</div>'
-    +'<div class="pc-gap">'+(x.rev?'还差 ':'再挖 ')+'<b>'+(x.p-mine).toLocaleString('en-US')+'</b>'
-    +(x.rev?' 就追到那盏灯':' 就越过这条线')+'</div></div>';
-}
-/* ────────── 赛季幽灵 ──────────
-   追自己上个月的成绩。用的是**你自己的真实数据**，明写月份，没有任何虚构。
-   赛车游戏几十年的老办法：跟别人比会输，跟上个月的自己比只会赢。 */
-function pwGhostTick(){
-  const k=monthKey(monthNum()), pw=Number(SAVE.lbPower)||0;
-  if(!SAVE.pwHist)SAVE.pwHist={};
-  if(pw>0&&SAVE.pwHist[k]!==pw){SAVE.pwHist[k]=pw;persist()}
-}
-function pwGhostHTML(){
-  const h=SAVE.pwHist||{}, now=Number(SAVE.lbPower)||0;
-  const prev=monthKey(monthNum()-1), v=Number(h[prev])||0;
-  if(!v||now<=v)return '';
-  const y=prev.slice(0,4), m=prev.slice(4);
-  return '<div class="pw-ghost">比 '+y+' 年 '+Number(m)+' 月的自己多挖了 <b>'
-    +(now-v).toLocaleString('en-US')+'</b></div>';
-}
-/* ────────── 贴身对手 ──────────
-   榜单原来是一次平铺 50 行，谁跟谁咬得紧完全看不出来。而线上真实数据里
-   10 个玩家的 9 组相邻关系中有 4 组差距不到 15%（赫则离白水清新只差 8.2%），
-   紧咬感本来就存在，只是被埋在长列表里 —— 把它端到最上面，不用造任何假人。
-   差距一律写成「再挖多少」这种能行动的数，不写百分比：百分比不指导下一步。 */
-function nearHTML(rows,i){
-  if(i<0){
-    /* 榜没满的时候不存在「挤进去」这回事 —— 一提交就在上面，
-       这时候提示差多少反而是假的。只有榜真的满了才给追赶目标。 */
-    if(rows.length<LB_LIMIT||!LB.registered())return '';
-    const last=rows[rows.length-1];
-    const gap=(Number(last&&last.power)||0)-(Number(SAVE.lbPower)||0);
-    if(gap<=0)return '';
-    return '<div class="near"><div class="near-gap only">再挖 <b>'
-      +gap.toLocaleString('en-US')+'</b> 就能挤进前 '+rows.length+'</div></div>';
+const lbIsMe=r=>!!(r&&r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
+function lbBoardHTML(rows,myIdx,thrBy){
+  const row=r=>lbRowHTML(r,lbIsMe(r),(thrBy[(r.alias||'')+'|'+(r.tag||'')]||[]).join(' · '));
+  const top=rows.slice(0,3);
+  let h=LB.scope==='world'?throneHTML(rows):'';
+  h+='<div class="lb-group"><div class="lb-gh"><span>榜首</span><i>点名字看名片</i></div>'
+    +top.map(row).join('')+'</div>';
+  if(myIdx>=3){
+    const near=rows.slice(Math.max(3,myIdx-1),Math.min(rows.length,myIdx+2));
+    if(near.length)h+='<div class="lb-group"><div class="lb-gh"><span>你附近</span><i>只看相邻名次</i></div>'
+      +near.map(row).join('')+'</div>';
   }
-  const me=rows[i], up=rows[i-1], dn=rows[i+1];
-  const line=(r,tag)=>'<div class="near-r'+(tag?' '+tag:'')+'">'
-    +'<span class="nr-rk">'+(Number(r.rank)||0)+'</span>'
-    +'<span class="nr-nm">'+esc(r.alias||'')+(tag==='me'?' <b>（你）</b>':'')+'</span>'
-    +'<span class="nr-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'</span></div>';
-  let h='<div class="near">';
-  if(up)h+=line(up,'up');
-  h+=line(me,'me');
-  if(dn)h+=line(dn,'dn');
-  if(up){
-    const gap=(Number(up.power)||0)-(Number(me.power)||0)+1;
-    h+='<div class="near-gap">再挖 <b>'+gap.toLocaleString('en-US')+'</b> 就能越过 <b>'+esc(up.alias||'')+'</b></div>';
-  }else{
-    h+='<div class="near-gap">你在最前面'
-      +(dn?(' —— <b>'+esc(dn.alias||'')+'</b> 落后 '
-        +((Number(me.power)||0)-(Number(dn.power)||0)).toLocaleString('en-US')):'')+'</div>';
+  return h;
+}
+function lbMineHTML(rows,myIdx){
+  const s=LB.stats(), rush=LB.scope==='rush';
+  if(!LB.registered())return rush
+    ?'本机 90 秒最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 起个化名就能上榜'
+    :'本机已到第 <b>'+s.lv+'</b> 关 · 起个化名就能上榜';
+  if(myIdx>=0){
+    const me=rows[myIdx], up=rows[myIdx-1], key=rush?'rush':'power';
+    const val=Number(me[key])||0;
+    if(up){
+      const gap=Math.max(1,(Number(up[key])||0)-val+1);
+      return '我的位置 · 第 <b>'+me.rank+'</b> 名　'+(rush?'90 秒 ':'矿力 ')
+        +'<b>'+val.toLocaleString('en-US')+'</b><br>再多 <b>'+gap.toLocaleString('en-US')
+        +'</b> 就能越过 '+esc(up.alias||'上一名');
+    }
+    const dn=rows[1], lead=dn?val-(Number(dn[key])||0):0;
+    return '我的位置 · <b>榜首</b>　'+(rush?'90 秒 ':'矿力 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
+      +(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b>':'');
   }
-  return h+'</div>'+pacerHTML();
+  if(rows.length>=LB_LIMIT){
+    const key=rush?'rush':'power', mine=rush?s.rush:(Number(SAVE.lbPower)||0);
+    const last=Number((rows[rows.length-1]||{})[key])||0, gap=last-mine+1;
+    if(gap>0)return '我的位置 · 榜外<br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 可进前 '+rows.length;
+  }
+  return '我的成绩已记下 · 刷新后会出现在榜上';
 }
 function lbOpenForm(){
   $('#lb-form').hidden=false;
@@ -7505,10 +7184,11 @@ function renderAch(){
 
 /* ==================================================================
    典藏册 · 界面
-   四个子视图共用一张 .ovl-card，靠 data-v 切换而不是各开一个弹层。
+   多个子视图共用一张 .ovl-card，靠 data-v 切换而不是各开一个弹层。
    ================================================================== */
 let LB_ROWS=[];
 let colCur=1;
+let COL_VIEW={filter:'all',q:''};
 /* ══════════════ 灵石工坊 ══════════════
    三条店规：
 
@@ -7649,8 +7329,6 @@ function colView(v,arg){
   else if(v==='card')renderCardView(arg&&arg.n!=null?arg.n:colCur);
   else if(v==='box')renderBoxOpen(arg);
   else if(v==='draw')renderDraw(arg);
-  else if(v==='gift')renderGift(arg);
-  else if(v==='ask')renderAsk(arg);
   ovl('col');
 }
 function openCol(){
@@ -7666,14 +7344,12 @@ function colRender(){
   const c=COLS;
   $('#col-warn').classList.toggle('on',colWFail);
   if(colWFail)$('#col-warn').textContent='进度写不进本机存储（无痕模式或存储已满）——这一册可能保不住。';
-  $('#col-mine').innerHTML='我的矿工号 <b>'+minerTag()+'</b>　别人要按它给你寄赠印';
 
   const pityLeft=Math.max(0,boonPity()-c.pity);
   $('#col-bar').innerHTML=
      '<div class="cbi"><b>'+c.box+'</b><i>典藏匣</i></div>'
     +'<div class="cbi"><b>'+c.dust.toLocaleString('en-US')+'</b><i>星屑</i></div>'
-    +'<div class="cbi"><b>'+colGot()+' / '+CARDS.length+'</b><i>已收</i></div>'
-    +'<div class="cbi"><b>'+pityLeft+'</b><i>距必出臻</i></div>';
+    +'<div class="cbi"><b>'+colGot()+'</b><i>已收</i></div>';
 
   const cost=boonBoxCost(), left=Math.max(0,COL.cap-c.bought);
   const ob=$('#col-open'); ob.disabled=c.box<=0;
@@ -7683,36 +7359,52 @@ function colRender(){
   bb.innerHTML='兑 匣<span class="colsub">'+(left<=0?'今日已满 · 明天再来'
     :'灵力 '+cost.toLocaleString('en-US')+' · 今日还可 '+left+' 次')+'</span>';
 
-  /* 概率与保底摆在明面上，不藏进说明里 */
+  /* 随机规则继续透明，但收进一层说明，不抢卡册本身的视觉中心。 */
   $('#col-note').innerHTML=
      '<div class="odds">出货率　常 <b>'+(COL.drop[0]*100)+'%</b>　珍 <b>'+(COL.drop[1]*100)
-    +'%</b>　臻 <b>'+(COL.drop[2]*100)+'%</b><br>连开 <b>'+boonPity()+'</b> 匣未出臻则必出'
-    +'<br>同一张最多留 2 份，第三份起自动熔成星屑</div>'
+    +'%</b>　臻 <b>'+(COL.drop[2]*100)+'%</b><br>距保底臻品还有 <b>'+pityLeft+'</b> 匣'
+    +'<br>重复卡当场熔成对应星屑，不再囤第二份</div>'
     +'<div class="nofee">典藏匣只能靠矿灯、徽记、地脉与灵力兑换攒 —— '
     +'<b>本作没有任何付费入口</b></div>';
-
-  $('#col-sets').innerHTML=CSETS.map(s=>{
-    const l=CARDS.filter(x=>x.s===s.id), got=l.filter(x=>colAny(x.n)).length, done=got===l.length;
-    return '<div class="cset'+(done?' done':'')+'" title="'+esc(s.boon)+'">'
-      +'<span class="sn">'+(done?icTag('seal'):'')+esc(s.nm)+'</span>'
-      +'<span class="sp">'+got+'/'+l.length+'</span></div>';
-  }).join('');
-
-  let html='';
+  const q=$('#col-search');q.value=COL_VIEW.q;
+  for(const b of $$('#col-filters .colf'))b.classList.toggle('on',b.dataset.filter===COL_VIEW.filter);
+  renderColGrid();
+  if(!q.__wired){
+    q.__wired=true;
+    q.addEventListener('input',()=>{COL_VIEW.q=q.value.trim().toLowerCase();renderColGrid()});
+    for(const b of $$('#col-filters .colf'))b.addEventListener('click',()=>{
+      SFX.click();COL_VIEW.filter=b.dataset.filter;
+      for(const x of $$('#col-filters .colf'))x.classList.toggle('on',x===b);
+      renderColGrid();
+    });
+  }
+}
+function colMatches(cd,filter,q){
+  const have=colAny(cd.n);
+  if(filter==='have'&&!have)return false;
+  if(filter==='miss'&&have)return false;
+  q=String(q||'').trim().toLowerCase();
+  return !q||(cd.nm+' '+cd.sub).toLowerCase().includes(q);
+}
+function renderColGrid(){
+  let html='',shown=0;
   for(const s of CSETS){
-    html+='<div class="cgh">'+esc(s.nm)+'<i>'+esc(s.boon)+'</i></div><div class="cgrid">';
-    for(const cd of CARDS.filter(x=>x.s===s.id)){
-      const top=colTop(cd.n), have=top>=0, sp=colSpare(cd.n,top);
+    const all=CARDS.filter(x=>x.s===s.id), cards=all.filter(cd=>colMatches(cd,COL_VIEW.filter,COL_VIEW.q));
+    if(!cards.length)continue;
+    const got=all.filter(x=>colAny(x.n)).length;
+    html+='<div class="cgh" title="'+esc(s.boon)+'">'+esc(s.nm)+'<i>已收 '+got+' 张</i></div><div class="cgrid">';
+    for(const cd of cards){
+      shown++;
+      const top=colTop(cd.n), have=top>=0;
       html+='<button class="cardc '+(have?'have t'+top:'miss')+'" data-n="'+cd.n+'">'
         +'<span class="ca" data-art="'+cd.a+'"></span>'
         +(have?'':'<span class="cq">'+icTag('unknown')+'</span>')
-        +(sp>0?'<span class="cdup">×'+(sp+1)+'</span>':'')
         +(have?'<span class="cn">'+esc(cd.nm)+'</span><span class="ct">'+TIERS[top].nm+'</span>':'')
         +'</button>';
     }
     html+='</div>';
   }
-  $('#col-grid').innerHTML=html;
+  $('#col-grid').innerHTML=shown?html:'<div id="col-empty">没有符合当前筛选的典藏</div>';
   /* 贴图必须走 applyArt：background-size 得内联写，
      否则 ID 选择器里的 background 简写会把类规则里的 cover 顶掉。 */
   for(const el of $$('#col-grid .ca'))applyArt(el,el.dataset.art);
@@ -7746,7 +7438,7 @@ function renderCardView(n){
     if(t===T_VAR&&!VARIANTS[n]&&!SECRETS[n]&&!colHas(n,t))return '';
     const cnt=colCnt(n,t);
     return '<div class="cvt'+(cnt?' on t'+t:'')+'"><b>'+TIERS[t].nm+'</b><i>'
-      +(cnt?(cnt>1?'多 1 张':'已收'):(t===T_VAR?(SECRETS[n]&&!VARIANTS[n]?'隐藏':'未显形'):'—'))+'</i></div>';
+      +(cnt?'已收':(t===T_VAR?(SECRETS[n]&&!VARIANTS[n]?'隐藏':'未显形'):'—'))+'</i></div>';
   }).join('');
 
   const u=upNext(n); let h='';
@@ -7757,14 +7449,6 @@ function renderCardView(n){
     h+='<button class="btn" id="cv-up"'+(COLS.dust<u.cost?' disabled':'')
       +'>炼成 '+TIERS[u.to].nm+'<span class="colsub">星屑 '+u.cost+'</span></button>';
   }
-  /* 没收到的卡直接给「求这张」——玩家点开一张没有的卡，
-     正是他最想要它的那一刻，这时候给入口最顺。 */
-  if(!have)
-    h+='<button class="btn ghost" id="cv-ask">'+icTag('together')
-      +' 求 这 张<span class="colsub">发个帖到群里，谁有多的就能送你</span></button>';
-  if([0,1,2].some(t=>colSpare(n,t)>0))
-    h+='<button class="btn ghost" id="cv-gift">'+icTag('gift')
-      +' 赠 出<span class="colsub">只能送多出来的那份</span></button>';
   if(VARIANTS[n]&&!colHas(n,T_VAR))
     h+='<div class="colsub" style="margin-top:2px">异纹 · '+esc(VARIANTS[n])+'</div>';
   /* 隐藏款：拿到之前一个字都不提（提了就不叫隐藏），拿到之后才揭晓，
@@ -7778,8 +7462,6 @@ function renderCardView(n){
   $('#cv-acts').innerHTML=h;
   if($('#cv-fill'))$('#cv-fill').onclick=()=>{SFX.click();doFill(n)};
   if($('#cv-up'))  $('#cv-up').onclick  =()=>{SFX.click();doUpgrade(n)};
-  if($('#cv-gift'))$('#cv-gift').onclick=()=>{SFX.click();colView('gift',{n:n})};
-  if($('#cv-ask')) $('#cv-ask').onclick =()=>{SFX.click();colView('ask',{n:n})};
   $('#cv-back').onclick=()=>{SFX.click();colView('list')};
 }
 
@@ -7827,8 +7509,7 @@ function renderDraw(d){
   $('#dw-lore').innerHTML=(dl&&!d.dup)?esc(dl):'';
   $('#dw-lore').style.display=(dl&&!d.dup)?'':'none';
   $('#dw-dup').innerHTML=d.dup
-    ? (colSpare(card.n,t)>0?'手上已有一张 · 多出来的这份可以<b>赠给朋友</b>'
-                          :'第三份起自动熔成星屑 · <b>星屑 +'+TIERS[t].dust+'</b>')
+    ? '手上已有这张 · 已自动熔成星屑 <b>+'+TIERS[t].dust+'</b>'
     : '';
   const more=COLS.box>0;
   const ag=$('#dw-again'); ag.style.display=more?'':'none';
@@ -7844,172 +7525,6 @@ function renderDraw(d){
   if(d.box&&!REDUCED&&ART.card_back)colLater(480,cheer); else cheer();
 }
 
-/* ---- 矿友互助 ----
-   两态：'post'（我发帖求卡）与 'read'（我看到别人的帖）。
-   闭环的关键在 read 那一态——看到帖之后**一键跳到赠出、矿工号自动填好**。
-   少一次手抄矿工号，就少一半送不出去的可能。 */
-function renderAsk(arg){
-  colFix(); colDay();
-  const mode=(arg&&arg.read)?'read':'post';
-  const B=$('#ak-body'), BT=$('#ak-btns');
-  if(mode==='post'){
-    const sug=(arg&&arg.n!=null)?{n:arg.n,t:arg.t!=null?arg.t:T_COMMON}:askSuggest();
-    if(!sug){
-      $('#ak-title').textContent='已经收全了';
-      B.innerHTML='<div class="gfnote">三个品阶都齐了，没有可求的卡。'
-        +'<br>不如去看看谁的帖子里缺的那张你正好有多的。</div>';
-      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
-        +'<button class="btn" id="ak-toread">我收到了一张帖</button>';
-    }else{
-      const cd=CARD_BY_N[sug.n];
-      $('#ak-title').textContent='求 一 张 · '+cd.nm;
-      B.innerHTML='<div class="colsub">你的矿工号 <b>'+minerTag()+'</b></div>'
-        +'<div id="ak-pick"></div>'
-        +'<div class="gfnote">发到群里，谁手上有多的就能送你。'
-        +'<br><b>求卡不消耗任何东西</b>，也不占你每天 3 次的赠出额度。'
-        +'<br>别人点开你的帖，矿工号会自动填好，他不用手抄。</div>'
-        +'<div id="ak-out"></div>';
-      /* 让玩家能改求哪一张：列出还缺的前 8 张，默认选中建议的那张。 */
-      const miss=CARDS.filter(c=>!colAny(c.n)).slice(0,8);
-      const pool=miss.length?miss:CARDS.filter(c=>!colHas(c.n,T_TOP)).slice(0,8);
-      $('#ak-pick').innerHTML=pool.map(c=>'<button class="pt-chip'
-        +(c.n===sug.n?' on':'')+'" data-n="'+c.n+'">'+esc(c.nm)+'</button>').join('');
-      for(const b of $$('#ak-pick .pt-chip'))b.onclick=()=>{
-        for(const x of $$('#ak-pick .pt-chip'))x.classList.remove('on');
-        b.classList.add('on');$('#ak-out').innerHTML='';
-      };
-      BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
-        +'<button class="btn primary" id="ak-make">生成求卡帖</button>';
-      $('#ak-make').onclick=async()=>{
-        SFX.click();
-        const sel=$('#ak-pick .pt-chip.on'); if(!sel)return;
-        const n=+sel.dataset.n;
-        const code=askEncode(n,colAny(n)?T_TOP:T_COMMON,minerId());
-        const txt='灵石远征 · 求一张「'+CARD_BY_N[n].nm+'」\n'
-          +code+'\n手上有多的话点开这个帖，矿工号已经带上了\n'
-          +((window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||location.origin);
-        $('#ak-out').innerHTML='<div class="gfcode">'+esc(code)+'</div>'
-          +'<button class="btn ghost" id="ak-copy" style="width:100%;margin-top:8px">复制整段发群里</button>';
-        $('#ak-copy').onclick=async()=>{
-          SFX.click();
-          try{await navigator.clipboard.writeText(txt);toast('求卡帖已复制 · 发到群里就行',2800)}
-          catch(e){toast('复制被浏览器挡了 · <b>长按上面那串自己选</b>',3200)}
-        };
-      };
-    }
-  }else{
-    $('#ak-title').textContent='收 到 求 卡 帖';
-    B.innerHTML='<input id="ak-in" placeholder="GQ-XXXX-XXXX" autocomplete="off" spellcheck="false">'
-      +'<div class="gfnote">粘上朋友发来的求卡帖，看看他缺什么、你有没有多的。'
-      +'<br>能送的话点一下就跳到赠出，<b>矿工号会自动填好</b>。</div>'
-      +'<div id="ak-out"></div>';
-    BT.innerHTML='<button class="btn ghost" id="ak-cancel">返 回</button>'
-      +'<button class="btn primary" id="ak-check">看看他缺什么</button>';
-    $('#ak-check').onclick=()=>{
-      SFX.click();
-      const d=askDecode($('#ak-in').value);
-      if(d.err){toast(d.err,3000);return}
-      const cd=CARD_BY_N[d.n];
-      /* 关键判断：我有没有**多的**那张。只有多的才能送，
-         这是赠印一开始就定的规矩——不能把自己图鉴送空。 */
-      const spare=[0,1,2].filter(t=>colSpare(d.n,t)>0);
-      const me=d.who===minerId();
-      $('#ak-out').innerHTML='<div class="xfer-diff">矿工 <b>'+esc(d.tag)+'</b> 求一张 <b>'
-        +esc(cd.nm)+'</b>'
-        +(me?'<br><span class="warn">这是你自己发的帖</span>'
-            :(spare.length
-              ? '<br>你手上有多的 <b>'+spare.map(t=>TIERS[t].nm).join(' / ')+'</b> —— 可以送他'
-              : '<br><span class="warn">你手上没有多余的这张</span>'
-                +'<br><span style="color:var(--ink3)">同一张要有 2 份才算多，先去开匣攒攒</span>'))
-        +'</div>'
-        +(!me&&spare.length?'<button class="btn primary" id="ak-give" style="width:100%;margin-top:8px">'
-          +'去赠出（矿工号已带上）</button>':'');
-      const g=$('#ak-give');
-      if(g)g.onclick=()=>{
-        SFX.click();
-        /* 带着矿工号跳进赠印流程——这是整个互助闭环的那一步。 */
-        colView('gift',{n:d.n,prefill:d.tag});
-      };
-    };
-  }
-  $('#ak-cancel').onclick=()=>{SFX.click();colView('list')};
-  const tr=$('#ak-toread'); if(tr)tr.onclick=()=>{SFX.click();colView('ask',{read:true})};
-}
-
-function renderGift(arg){
-  colFix(); colDay();
-  const mode=arg&&arg.recv?'recv':'send';
-  const n=arg&&arg.n!=null?arg.n:colCur;
-  const B=$('#gf-body'), BT=$('#gf-btns');
-  if(mode==='recv'){
-    $('#gf-title').textContent='收 下 赠 印';
-    B.innerHTML='<div id="gf-mine">'+minerTag()+'</div>'
-      +'<div class="colsub">这是你的矿工号 · 先告诉对方，他才能寄给你</div>'
-      +'<input id="gf-to" placeholder="GF-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">'
-      +'<div class="gfnote">赠印认矿工号：别人手里的同一串在你这里兑不了，'
-      +'你的这串在别人那里也兑不了。<br><b>注意别和矿脉榜的「小队口令」弄混</b> —— 那个是队名暗号。</div>';
-    BT.innerHTML='<button class="btn ghost" id="gf-cancel">返 回</button>'
-      +'<button class="btn primary" id="gf-ok">收 下</button>';
-    $('#gf-ok').onclick=()=>{SFX.click();if(giftRedeem($('#gf-to').value))colView('list')};
-  }else{
-    const cd=CARD_BY_N[n];
-    const spT=[0,1,2].filter(t=>colSpare(n,t)>0);
-    $('#gf-title').textContent='赠出 · '+cd.nm;
-    B.innerHTML='<div class="colsub">今日还可赠 '+Math.max(0,COL.giftCap-COLS.gcnt)+' 张</div>'
-      +'<div id="gf-tier">'+spT.map((t,i)=>'<button class="pt-chip'+(i===0?' on':'')
-        +'" data-t="'+t+'">'+TIERS[t].nm+'</button>').join('')+'</div>'
-      +'<input id="gf-to" placeholder="对方的矿工号 · 5 位" maxlength="7" autocomplete="off" spellcheck="false">'
-      +'<div class="gfnote">赠印生成的那一刻，<b>你的这一份就离手了</b>，不能撤回、也催不回来；'
-      +'只有你填的那个矿工号能收下。<br>它只能送多出来的重复卡，每天 3 张。'
-      +'<b>它没有价钱</b> —— 拿它换钱、换东西，都不是它该有的用法。</div>'
-      +'<div id="gf-out"></div>';
-    for(const b of $$('#gf-tier .pt-chip'))b.onclick=()=>{
-      for(const x of $$('#gf-tier .pt-chip'))x.classList.remove('on');b.classList.add('on')};
-    /* 从求卡帖跳进来时矿工号已经带上了——手抄矿工号是整条互助链上
-       最容易断的一环，能省就省。 */
-    if(arg&&arg.prefill){
-      $('#gf-to').value=arg.prefill;
-      B.insertAdjacentHTML('afterbegin','<div class="colsub" style="color:var(--gold2)">'
-        +'来自求卡帖 · 矿工号已自动填好</div>');
-    }
-    BT.innerHTML='<button class="btn ghost" id="gf-cancel">返 回</button>'
-      +'<button class="btn primary" id="gf-ok">生成赠印</button>';
-    $('#gf-ok').onclick=()=>{
-      const sel=$('#gf-tier .pt-chip.on'); if(!sel)return;
-      const t=+sel.dataset.t, tag=$('#gf-to').value;
-      const rc=tagToId(tag);
-      if(rc===null){toast('矿工号是 5 位 · 让对方在典藏册顶上看',2800);return}
-      /* 生成即销毁，且没有撤回。这一步必须让人停一下——
-         一张臻是以周为单位攒出来的，手滑点一下就永久没了。 */
-      SFX.click();
-      $('#gf-out').innerHTML='<div class="gfnote" style="border:1px solid var(--gold);padding:9px 10px">'
-        +'确认把 <b>'+TIERS[t].nm+' · '+esc(CARD_BY_N[n].nm)+'</b> 寄给矿工号 <b>'
-        +esc(String(tag).toUpperCase().replace(/[^0-9A-Z]/g,''))+'</b>？<br>'
-        +'生成后你的这一份<b>立刻消失</b>，不能撤销。</div>';
-      BT.innerHTML='<button class="btn ghost" id="gf-cancel">再想想</button>'
-        +'<button class="btn primary" id="gf-yes">确认赠出</button>';
-      $('#gf-cancel').onclick=()=>{SFX.click();colView('card',{n:n})};
-      $('#gf-yes').onclick=()=>{
-        const code=giftSend(n,t,tag);
-        if(!code)return;
-        $('#gf-out').innerHTML='<div class="gfcode">'+code+'</div>'
-          +'<div class="gfnote">把这串发给对方。弄丢了不要紧 —— '
-          +'原文留在下面的「已寄出」里，照原样再发一次就行。</div>'+giftOutHTML();
-        BT.innerHTML='<button class="btn primary" id="gf-cancel">好 了</button>';
-        $('#gf-cancel').onclick=()=>{SFX.click();colView('list')};
-      };
-    };
-  }
-  $('#gf-cancel').onclick=()=>{SFX.click();colView(mode==='recv'?'list':'card',{n:n})};
-}
-function giftOutHTML(){
-  const ks=Object.keys(COLS.out||{}).reverse().slice(0,6);
-  if(!ks.length)return '';
-  return '<div class="gfh">已寄出</div>'+ks.map(k=>{
-    const o=COLS.out[k];
-    return '<div class="gfo"><b>'+esc(k)+'</b><i>'+esc((CARD_BY_N[o.n]||{}).nm||'')
-      +' · '+TIERS[o.t].nm+' → '+esc(o.tag)+'</i></div>'}).join('');
-}
 const HOW_HTML=`
 <b>怎么玩</b>　点一颗灵石再点相邻的一颗，或者直接拖动——只要能连成三个同色就成立。<br><br>
 <b>炼成灵石</b><br>
@@ -8044,7 +7559,7 @@ const HOW_HTML=`
 　<b>狼先生的悬赏</b>　每周一条，输的局达成也算，赏典藏匣。<br>
 　<b>岁记</b>　每月三桩全清，铸一枚<b>刻着年月的绝版徽记</b>，过月不再有。<br><br>
 <b>攒什么</b>　90 秒模式打出<b>灯位</b>（黑灯到曜灯六档）；带同伴打胜场攒<b>衔位</b>（5/15/40/100 胜）；
-典藏册收 32 张卡，重复卡化星屑、可赠印送朋友、缺卡能发<b>求卡帖</b>；
+典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
@@ -8189,7 +7704,7 @@ function drawMenuGems(t){
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
-/* 典藏册。四个子视图共用一张卡片，所以关闭要看当前在哪一层：
+/* 典藏册。多个子视图共用一张卡片，所以关闭要看当前在哪一层：
    在子视图里退回册子，在册子里才真的合上。全站别处的 ovl(null) 惯例
    照抄过来会变成「开完匣点关闭 → 直接回大厅」。 */
 $('#btn-col').addEventListener('click',()=>{SFX.click();openCol()});
@@ -8198,8 +7713,6 @@ $('#btn-col').addEventListener('click',()=>{SFX.click();openCol()});
 $('#col-close').addEventListener('click',()=>{SFX.click();colStop();ovl(null);renderMenu()});
 $('#col-open').addEventListener('click',()=>{SFX.click();openBox()});
 $('#col-buy').addEventListener('click',()=>{SFX.click();buyBox()});
-$('#col-recv').addEventListener('click',()=>{SFX.click();colView('gift',{recv:true})});
-$('#col-ask').addEventListener('click',()=>{SFX.click();colView('ask')});
 $('#col-shop').addEventListener('click',()=>{SFX.click();colView('shop');shopSeeNews();renderShop()});
 $('#shop-back').addEventListener('click',()=>{SFX.click();colView('list')});
 $('#dw-again').addEventListener('click',()=>{SFX.click();openBox()});
@@ -8293,7 +7806,6 @@ $('#xfer-in').addEventListener('click',()=>{
 $('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
 $('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
 $('#end-card').addEventListener('click',()=>{SFX.click();showCard()});
-$('#wk-go').addEventListener('click',()=>{SFX.click();ovl(null);startWeekly()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
@@ -8810,24 +8322,17 @@ window.__selftest=function(){
     SAVE.camp=bakCamp;MONTHS=bakMonths;COLS.dust=d0;persist();colSave();
     ok('阵营月结：参与 40、胜方 100，同月不重复入账',right);
   }
-  /* 32. 求卡帖：编解码往返一致、错字拦得住、异纹不可求，
-     而且**不能和赠印互相认**——两种帖长得像但用途相反，
-     粘错了要立刻报错，不能默默走进另一条流程。 */
+  /* 32. 退役求赠码：旧存档里为赠送囤下的第二份要回铸一次，
+     旧设备号与寄收记录也一起删掉，之后反复读取不能重复返钱。 */
   {
-    let rt=true, cross=false;
-    for(let i=0;i<40;i++){
-      const c=CARDS[i%CARDS.length], t=i%3, who=(i*7919)&0x1FFFFFF;
-      const d=askDecode(askEncode(c.n,t,who));
-      if(d.err||d.n!==c.n||d.t!==t||d.who!==who){rt=false;break}
-    }
-    /* 交叉喂：赠印喂给求卡解码器、求卡喂给赠印解码器，两边都必须拒绝 */
-    const gf=giftEncode(5,1,minerId(),7), gq=askEncode(5,1,minerId());
-    cross=!!askDecode(gf).err&&!!giftDecode(gq).err;
-    /* 错一位字必须被校验位拦下 */
-    const broke=gq.slice(0,-1)+(gq.slice(-1)==='0'?'1':'0');
-    const caught=!!askDecode(broke).err;
-    const varRej=!!askDecode(askEncode(1,T_VAR,minerId())).err;
-    ok('求卡帖往返一致、与赠印互不误认、错字与异纹均被拒',rt&&cross&&caught&&varRej);
+    const bak=COLS;
+    COLS={own:{'1:0':2,'2:1':3},dust:10,out:{old:1},recv:{old:1},uid:'old',giftRetired:0};
+    colFix();const once=COLS.dust;
+    colFix();
+    ok('求赠码退役：旧重复份只回铸一次，旧寄收字段一并清走',
+       once===21&&COLS.dust===once&&COLS.own['1:0']===1&&COLS.own['2:1']===1
+       &&!('uid' in COLS)&&!('out' in COLS)&&!('recv' in COLS));
+    COLS=bak;
   }
   /* 追求线：灯位/衔位阈值单调；悬赏同周同条、判定可调用；
      岁记同月同组三桩不重复、集齐铸徽且不重发、跨月重置。 */
@@ -8895,76 +8400,55 @@ window.__selftest=function(){
      CARDS.length===32&&new Set(ns).size===32&&CARDS.every(c=>!!ART[c.a])
      &&CSETS.every(s=>CARDS.filter(c=>c.s===s.id).length>0)
      &&CARDS.every(c=>CSETS.some(s=>s.id===c.s)));
-  /* 23. 卡号位宽：赠印只给卡号 7 位，超了就编不进去 */
-  ok('卡号在赠印的 7 位编码范围内',ns.every(n=>n>=1&&n<128));
-  /* 24. 赠印往返：每张卡每个可赠品阶都要能编能解 */
-  let gOK=true;
-  for(const c of CARDS)for(let t=0;t<3;t++){
-    const rc=Math.floor(rnd()*33554432),sq=Math.floor(rnd()*65536);
-    const d=giftDecode(giftEncode(c.n,t,rc,sq));
-    if(d.err||d.n!==c.n||d.t!==t||d.rcpt!==rc||d.seq!==sq)gOK=false;
+  /* 23–26. 典藏只留一份：卡号保持稳定，重复品阶当场按自身价值回铸。 */
+  ok('卡号保持正整数且落在预留号段内',ns.every(n=>Number.isInteger(n)&&n>=1&&n<128));
+  ok('每张每品阶只留一份，不再为求赠码囤第二份',COL.keep===1);
+  {
+    const bak=COLS;
+    COLS={own:{},dust:0,org:{},serial:{},seen:0,giftRetired:1};colFix();
+    colGain(1,T_COMMON,1,'box');colGain(1,T_COMMON,1,'box');
+    ok('重复常品当场熔成 1 星屑，图鉴仍只记一张',colCnt(1,T_COMMON)===1&&COLS.dust===1);
+    colGain(2,T_TOP,1,'box');colGain(2,T_TOP,1,'box');
+    ok('重复臻品按臻品价值回铸，编号与持有量不重复增长',
+       colCnt(2,T_TOP)===1&&COLS.dust===41&&COLS.seen===1);
+    ok('典藏筛选能区分已收、未收并按名字查找',
+       colMatches(CARD_BY_N[1],'have','狼')&&!colMatches(CARD_BY_N[1],'miss','')
+       &&colMatches(CARD_BY_N[3],'miss','巡渊')&&!colMatches(CARD_BY_N[3],'have',''));
+    COLS=bak;
   }
-  ok('赠印 96 组编解码往返一致',gOK);
-  /* 25. 错字要被挡住。
-     ⚠ 这里**不能**断言 100%：10 bit 校验位按设计就会放过约 1/1024 的错字，
-     那是「口令只有 12 位、手打得过来」换来的代价。断言全中的话，
-     这条自检自己会以约 1/3 的概率变红——挂的是断言不是实现。
-     所以：① 用确定性随机数，让结果可复现；② 断言真实性质（≥99%），
-     并单独验证第二道防线——漏网的错字仍然过不了收件人比对。 */
-  const trng=rngOf('gift-typo-v1');
-  let caught=0, tot=0, wrongRcpt=0;
-  for(let k=0;k<2000;k++){
-    const c=CARDS[Math.floor(trng()*32)], t=Math.floor(trng()*3);
-    const rc=Math.floor(trng()*33554432);
-    const raw=giftEncode(c.n,t,rc,Math.floor(trng()*65536)).replace(/-/g,'').slice(2).split('');
-    const i=Math.floor(trng()*12); let ch;
-    do{ch=B32[Math.floor(trng()*32)]}while(ch===raw[i]);
-    raw[i]=ch; tot++;
-    const d=giftDecode(raw.join(''));
-    if(d.err||d.n!==c.n||d.t!==t)caught++;
-    else if(d.rcpt!==rc)wrongRcpt++;              // 校验位放过了，但收件人对不上
-  }
-  ok('赠印错字拦截率不低于 99%',caught/tot>=.99);
-  ok('校验位漏掉的错字仍会被收件人比对挡下',caught+wrongRcpt===tot);
-  /* 26. 异纹不可转赠——编解码两端都要挡 */
-  ok('异纹品阶不能编进赠印',!!giftDecode(giftEncode(7,T_VAR,12345,678)).err);
   /* 27. 掉率与保底自洽 */
   ok('掉率合计为 1 且保底不大于总匣数',
      Math.abs(COL.drop.reduce((a,b)=>a+b,0)-1)<1e-9&&boonPity()>0&&boonPity()<=COL.pity);
   /* 28. 存档消毒：脏数据不许留下来，也不许把整册搞崩 */
-  const bak=COLS; COLS={own:{'1:0':3,'999:0':1,'1:9':1,'x':1},dust:-5,box:'NaN',uid:''};
+  const bak=COLS; COLS={own:{'1:0':3,'999:0':1,'1:9':1,'x':1},dust:-5,box:'NaN',giftRetired:1};
   colFix();
   ok('脏存档被消毒且不崩',
      COLS.own['1:0']===COL.keep&&!COLS.own['999:0']&&!COLS.own['1:9']&&!COLS.own['x']
-     &&COLS.dust===0&&COLS.box===0&&typeof COLS.uid==='string'&&COLS.uid.length>0);
+     &&COLS.dust===0&&COLS.box===0&&!('uid' in COLS));
   COLS=bak;
   /* 29. 空状态下读取不许抛——这条路在启动路径上，抛了就白屏 */
   const bak2=COLS; COLS=null;
   let safe=true; try{colAny(1);colTop(1);setDone('gem');boonLampPow();dailyPow(3)}catch(e){safe=false}
   COLS=bak2;
   ok('典藏册未初始化时读取不抛异常（启动路径）',safe);
-  /* 30. 贴身对手：榜单一次平铺 50 行时，谁跟谁咬得紧完全看不出来，
-     而真实数据里 9 组相邻关系有 4 组差距不到 15%。这块把它端到最上面。
-     四个分支都要盯：中段/榜首/榜没满/榜满够不到——「榜没满」那条尤其容易写错，
-     榜没满时压根不存在「挤进去」这回事（一提交就在上面），提差多少是假的。 */
+  /* 30. 紧凑榜：榜首固定三人，玩家在中段时只追加前后相邻，绝不回退到 50 行平铺。 */
   {
-    const bakA=SAVE.lbAlias,bakP=SAVE.lbPower,bakT=SAVE.lbTag;
+    const bakA=SAVE.lbAlias,bakP=SAVE.lbPower,bakT=SAVE.lbTag,bakS=LB.scope;
     const txt=h=>h.replace(/<[^>]+>/g,'');
-    const R=[{rank:1,alias:'甲',power:1000},{rank:2,alias:'乙',power:800},{rank:3,alias:'丙',power:790}];
-    SAVE.lbAlias='乙乙';SAVE.lbPower=800;SAVE.lbTag='';
-    const mid=txt(nearHTML(R,1)), top=txt(nearHTML(R,0));
-    const shortB=nearHTML(R,-1);
+    LB.scope='world';SAVE.lbAlias='乙乙';SAVE.lbPower=800;SAVE.lbTag='';
+    const R=[];for(let i=0;i<10;i++)R.push({rank:i+1,alias:i===5?'乙乙':'人'+i,power:1000-i*40});
+    const mid=lbBoardHTML(R,5,{}), midRows=(mid.match(/class="lb-row/g)||[]).length;
+    const topOnly=lbBoardHTML(R,1,{}), topRows=(topOnly.match(/class="lb-row/g)||[]).length;
     const full=[];for(let i=0;i<LB_LIMIT;i++)full.push({rank:i+1,alias:'p'+i,power:1000-i*10});
-    SAVE.lbPower=100; const fullB=txt(nearHTML(full,-1));
-    SAVE.lbPower=9999; const over=nearHTML(full,-1);
-    ok('贴身对手：中段显示前后各一名与确切差距',
-       mid.indexOf('甲')>=0&&mid.indexOf('丙')>=0&&mid.indexOf('201')>=0);
-    ok('贴身对手：榜首不写「再挖多少越过」而写身后差距',
-       top.indexOf('你在最前面')>=0&&top.indexOf('200')>=0);
-    ok('贴身对手：榜没满时不提「挤进前 N」（一提交就在上面）',shortB==='');
-    ok('贴身对手：榜满且够不到时给出确切差额',fullB.indexOf('410')>=0);
-    ok('贴身对手：榜满但战力已超末位时不显示',over==='');
-    SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;
+    SAVE.lbPower=100; const outside=txt(lbMineHTML(full,-1));
+    const mine=txt(lbMineHTML(R,5));
+    ok('紧凑榜：中段只显示榜首三人和自己的三个邻位',midRows===6);
+    ok('紧凑榜：身处前三时不再重复一组附近名单',topRows===3);
+    ok('紧凑榜：默认列表不超过六人，不再平铺 50 行',midRows<=6&&topRows<=6);
+    ok('紧凑榜：榜满且人在榜外时给出精确入榜差额',outside.indexOf('411')>=0);
+    ok('紧凑榜：个人摘要只给名次、矿力与上一名差额',
+       mine.indexOf('第 6 名')>=0&&mine.indexOf('41')>=0&&mine.indexOf('人4')>=0);
+    SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;LB.scope=bakS;
   }
   /* 31. 累计账：矿力原来五项全是历史最高值，破纪录才动 —— 打十局没破纪录
      等于什么都没发生。runs/days 是仅有的两个只增项，「只要肝就有回报」全靠它们。
@@ -9020,10 +8504,6 @@ window.__selftest=function(){
     /* 只增不减：连锁 1 是旧公式唯一会掉分的点，靠 max(chain*60,chain²*30) 守着 */
     ok('连锁 1 不掉分（旧 60 vs 新 30，靠 max 守住）',
        pwLines({lv:0,stars:0,chain:1,score:0,rush:0}).skill===60);
-    /* 建议语必须**因人而异**——均衡奖的全部意义就在这。三条线各造一个短板，
-       给出的下一步动作必须是三句不同的话，否则这个功能等于没做。 */
-    const adv=s=>{const L=pwLines(s);
-      return (L.grind<=L.depth&&L.grind<=L.skill)?'grind':(L.depth<=L.skill?'depth':'skill')};
     /* 两营各吃一条线且各有除数，盯住同一份档案在两营得分不同。 */
     {
       const s={lv:111,stars:192,chain:11,score:91905,rush:121830,mv:0,runs:0,days:0,dbest:0};
@@ -9406,34 +8886,27 @@ window.__selftest=function(){
        shopBuy('dep')===false && SAVE.power===10);
     SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
   }
-  /* 33. 明牌配速员：每个人前面都得有一盏灯，而且必须一眼看出不是真人。
-       线上真实分布 3.6k~84k，三条线要把这个区间铺满，不能有人无灯可追。 */
+  /* 33. 排行榜减法：客户端不再额外叠配速员、赛季幽灵与建议卡，
+     荣誉席不报细账；细账仍可点名字进名片看。 */
     {
-      const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakH=SAVE.pwHist;
-      SAVE.lbAlias='测试者';
-      const live=[3643,4458,6507,6710,8375,12630,13575,30319,39002,46939,84043];
-      ok('配速员：线上每一个真实矿力都能找到下一盏灯',live.every(p=>pacerNext(p)));
-      SAVE.lbPower=84043;
-      const h=pacerHTML();
-      ok('配速员明牌：标着「传说记录」，且不混进名次序列',
-         h.indexOf('传说记录')>=0 && h.indexOf('rank')<0 && h.indexOf('130,000')>=0);
-      /* 狼先生是作者本人的化身，措辞必须是「追到」不是「越过／打败」 */
-      ok('配速员：狼先生那条用庄重措辞',
-         h.indexOf('追到那盏灯')>=0 && h.indexOf('打败')<0);
-      /* 赛季幽灵只用真实数据，且只在真的涨了的时候才出现 */
-      SAVE.pwHist={};SAVE.pwHist[monthKey(monthNum()-1)]=50000;
-      SAVE.lbPower=62000;
-      const g1=pwGhostHTML();
-      SAVE.lbPower=40000;
-      const g2=pwGhostHTML();
-      ok('赛季幽灵：涨了才显示，且给的是真实差额',
-         g1.indexOf('12,000')>=0 && g2==='');
-      SAVE.lbPower=bakP;SAVE.lbAlias=bakA;SAVE.pwHist=bakH;
+      const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakS=LB.scope;
+      SAVE.lbAlias='甲甲';SAVE.lbPower=50000;
+      const R=[
+        {rank:1,alias:'甲甲',power:50000,rush:90000,lv:160,stars:192,chain:14,score:120000,days:30,runs:200,dbest:20,luck:4},
+        {rank:2,alias:'乙乙',power:45000,rush:87000,lv:120,stars:160,chain:12,score:90000,days:40,runs:260,dbest:25,luck:2},
+        {rank:3,alias:'丙丙',power:42000,rush:85000,lv:110,stars:150,chain:11,score:80000,days:28,runs:180,dbest:18,luck:5}
+      ];
+      const honor=throneHTML(R), plain=honor.replace(/<[^>]+>/g,'');
+      ok('荣誉席固定四席，保留身份感但不再展开机制长文',(honor.match(/class="thr-r/g)||[]).length===4&&!/四条路|新人第一天/.test(plain));
+      ok('荣誉席只写席位与化名，不重复矿力数字',!/\d/.test(plain));
+      LB.scope='world';const world=lbBoardHTML(R,0,{});
+      LB.scope='rush';const rush=lbBoardHTML(R,0,{});
+      ok('四座只在世界榜出现，90 秒榜不混累计荣誉',world.includes('荣 誉 席')&&!rush.includes('荣 誉 席'));
+      ok('90 秒榜右栏显示矿灯分，不拿矿力冒充排序依据',rush.includes('90,000')&&rush.includes('矿灯'));
+      const mine=lbMineHTML(R,0).replace(/<[^>]+>/g,'');
+      ok('榜首个人摘要只报领先对象与真实差额',mine.includes('榜首')&&mine.includes('3,000')&&mine.includes('乙乙'));
+      SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
     }
-    ok('矿力建议因人而异：三种短板给出三种不同的下一步',
-       adv({lv:200,stars:192,chain:0,score:0,rush:0,days:99,runs:900,dbest:99})==='skill'
-       && adv({lv:0,stars:0,chain:12,score:0,rush:162221,days:99,runs:900,dbest:99})==='depth'
-       && adv({lv:105,stars:192,chain:11,score:91905,rush:121830,days:0,runs:0,dbest:0})==='grind');
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
   const fails=out.filter(s=>s.startsWith('FAIL'));

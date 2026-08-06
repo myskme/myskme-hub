@@ -77,7 +77,7 @@ function categoryFor(file) {
   if (/^card-/.test(name)) return 'collection-card';
   if (/^box-/.test(name)) return 'collection-box';
   if (['win.webp', 'lose.webp'].includes(name)) return 'result-banner';
-  if (['party-banner.webp', 'lb-banner.webp'].includes(name)) return 'mode-banner';
+  if (name === 'party-banner.webp') return 'mode-banner';
   if (['lamp.webp', 'chest.webp'].includes(name)) return 'retention-object';
   if (name === 'hero.webp') return 'hero';
   if (name === 'cat.webp') return 'easter-egg';

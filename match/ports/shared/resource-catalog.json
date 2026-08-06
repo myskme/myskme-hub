@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "MYSKME · 灵石远征 · GEMFALL",
-  "generatedAt": "2026-07-30T21:59:09.501Z",
+  "generatedAt": "2026-08-06T21:55:57.626Z",
   "sourceOfTruth": [
     "match/art",
     "match/audio",
@@ -10,8 +10,8 @@
     "assets/og-gemfall.png"
   ],
   "totals": {
-    "files": 77,
-    "bytes": 22793857,
+    "files": 76,
+    "bytes": 22712915,
     "byCategory": {
       "cover": 1,
       "social-card": 1,
@@ -25,9 +25,9 @@
       "retention-object": 2,
       "gem": 7,
       "hero": 1,
-      "mode-banner": 2,
       "result-banner": 2,
       "obstacle": 6,
+      "mode-banner": 1,
       "license": 1,
       "audio": 3,
       "icon": 5,
@@ -710,20 +710,6 @@
       "height": 512,
       "alpha": true,
       "category": "retention-object",
-      "platforms": [
-        "web",
-        "ios",
-        "wechat"
-      ]
-    },
-    {
-      "path": "match/art/lb-banner.webp",
-      "bytes": 80942,
-      "sha256": "2a0e32fafe9e4cb5abff1135f913cd4d013aef85b9cfa156fc540e07e665602e",
-      "width": 1024,
-      "height": 448,
-      "alpha": false,
-      "category": "mode-banner",
       "platforms": [
         "web",
         "ios",
