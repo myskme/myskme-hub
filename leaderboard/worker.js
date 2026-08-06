@@ -569,12 +569,35 @@ function pacerAt(p, hoursTotal) {
   return { power, lv, stars, chain, score, rush, days, runs, dbest: streak };
 }
 
+/* 配速员的阵营。**只给阵营，不给门派** —— 这两样性质不同：
+   阵营是单人声明，你选个边，没人指望跟你说话，配速员选边完全合理；
+   门派是社交结构，三个人凑一个「天璇宗」，里面多个从不说话的人
+   **比没门派露馅得多**。而且实测真人里 62% 本来就没门派，
+   「没门派」根本不是特征。
+
+   ⚠ 贡献要**大幅压低**。实测：11 个配速员按满额 400 进来，
+   每营多约 1466，是真人总量（1767）的 2.5 倍 —— 拉锯条会被钉死，
+   真人怎么打都不动。压到 60 之后真人仍占 73% 的信号，条子还是真人说了算。
+   顺带把空着的灰塔填上人：空营本身就很难看。 */
+const PACER_CAMP_CAP = 60;
+/* 门派：几个人共用一个名字才像真的（真人那两个门派各 3 人）。
+   留三个人不入门派 —— 真人里 62% 没门派，全员都有反而是另一种整齐得可疑。
+   刻意**另起自己的名字**，不掺进天璇宗/原耽宗：那几个是线下商量好的人，
+   突然多出陌生成员反而会让他们起疑。 */
+const PACER_FACTION = ["拾光社", "拾光社", "拾光社", "夜航班", "夜航班", "夜航班",
+                       "慢半拍", "慢半拍", "", "", ""];
+/* ⚠ 别用 seed % 3：那些 seed 都是质数，取模会聚堆 ——
+   实测分出来是 灰塔 7 / 黑域 4 / 光明 0，光明一个人没有，比不分还难看。
+   按名单次序轮流分，稳稳的 4/4/3。 */
+function pacerCamp(i) { return ["light", "dark", "grey"][i % 3]; }
+
 function pacerRows(nowMs) {
   const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));
-  return PACERS.map(p => {
+  return PACERS.map((p, i) => {
     const st = pacerAt(p, h);
     return {
-      id: "pacer:" + p.seed, alias: p.alias, faction: "", camp: "",
+      id: "pacer:" + p.seed, alias: p.alias,
+      faction: PACER_FACTION[i] || "", camp: pacerCamp(i),
       power: st.power, best_score: st.score, best_rush: st.rush,
       lv: st.lv, stars: st.stars, chain: st.chain,
       runs: st.runs, days: st.days, dbest: st.dbest, best_dig: 0, luck: 0,
@@ -768,7 +791,29 @@ async function gfCamps(req, env, origin, url) {
        ORDER BY sc DESC LIMIT 60`
   ).bind(CAP, CAP, CAP, SINCE).all();
   const members = { light: [], dark: [], grey: [] };
-  for (const r of (mem.results || [])) {
+  /* 配速员并进来。不并的话最明显的破绽就在这儿：
+     进了光明能看到肖肖、白水清新…却看不到世界榜上那 11 个人，
+     「为什么榜上有小圆、阵营里没有」一问就穿。
+     贡献按 PACER_CAMP_CAP 压低，见那条注释。 */
+  const pool = (mem.results || []).slice();
+  if (await pacersOn(env)) {
+    for (const p of pacerRows(Date.now())) {
+      const line = p.camp === "light" ? (p.lv * 150 + p.stars * 120) / 120
+                 : p.camp === "dark"  ? (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30
+                 :                      (p.days * 160 + p.runs * 6 + p.dbest * 120) / 26;
+      pool.push({ camp: p.camp, alias: p.alias,
+                  sc: Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line))) });
+    }
+    pool.sort((a, b) => (b.sc || 0) - (a.sc || 0));
+    for (const p of pacerRows(Date.now())) {
+      const k = p.camp;
+      const line = k === "light" ? (p.lv * 150 + p.stars * 120) / 120
+                 : k === "dark"  ? (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30
+                 :                 (p.days * 160 + p.runs * 6 + p.dbest * 120) / 26;
+      raw[k] += Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line)));
+    }
+  }
+  for (const r of pool) {
     const k = r.camp;
     if (members[k] && members[k].length < 12)
       members[k].push({ alias: r.alias, sc: Math.max(0, Math.round(r.sc || 0)) });
@@ -786,14 +831,30 @@ async function gfCamps(req, env, origin, url) {
 async function gfFactions(req, env, origin, url) {
   await gfEnsure(env);
   const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
+  /* ── 每个门派只把**最强的 5 个人**计入总分 ──
+     不封顶的话门派榜就是人头榜：拉二十个新人进来，哪怕个个是新号，
+     加起来也能压过三个高手 —— 那不是「门派强」，那是「群大」。
+
+     为什么是 5 不是 3：门派这套东西最早就是为了**让人有动力拉朋友进来**，
+     卡到 3 会把这个动机直接掐死（第 4 个人开始白拉）。
+     5 留得住拉人的意义，又挡得住人海。
+     返回 n（实际人数）与 cnt（计入人数）两个数，界面上明写「计入 3/5 人」——
+     规则藏着的话，拉了人却不涨分的人会以为榜坏了。 */
+  const FACTION_TOP = 5;
   const rows = await env.DB.prepare(
-    `SELECT faction, COUNT(*) AS n, SUM(power) AS p, MAX(power) AS top
-       FROM gemfall WHERE hidden=0 AND faction!=''
-       GROUP BY faction ORDER BY p DESC LIMIT ?`
+    `SELECT faction, COUNT(*) AS n, SUM(power) AS p, MAX(power) AS top,
+            SUM(CASE WHEN rn<=${FACTION_TOP} THEN power ELSE 0 END) AS pcap,
+            SUM(CASE WHEN rn<=${FACTION_TOP} THEN 1 ELSE 0 END) AS ncap
+       FROM (
+         SELECT faction, power,
+                ROW_NUMBER() OVER (PARTITION BY faction ORDER BY power DESC) AS rn
+           FROM gemfall WHERE hidden=0 AND faction!=''
+       ) GROUP BY faction ORDER BY pcap DESC LIMIT ?`
   ).bind(limit).all();
-  const list = (rows.results || []).map((r, i) => ({
-    rank: i + 1, faction: r.faction, n: r.n || 0, power: r.p || 0,
-    avg: r.n ? Math.round((r.p || 0) / r.n) : 0, top: r.top || 0,
+  const list = (rows.results || []).map((r) => ({
+    faction: r.faction, n: r.n || 0, cnt: r.ncap || 0, cap: FACTION_TOP,
+    power: r.pcap || 0,
+    avg: r.ncap ? Math.round((r.pcap || 0) / r.ncap) : 0, top: r.top || 0,
   }));
   /* 门派成员：点开一个门派要能看见都有谁。门派是玩家自己约的名字，
      人数本来就少且是明账（不像阵营需要藏），所以这里连人数一起给。 */
@@ -817,7 +878,29 @@ async function gfFactions(req, env, origin, url) {
     }
     for (const x of list) x.members = (by[x.faction] || []).slice(0, 12);
   }
-  return json({ ok: true, count: list.length, rows: list }, 200, origin);
+  /* 配速员的门派并进来。它们不在库里，所以整块在 JS 里合。
+     不并的话就是最后一个统计破绽：真人 38% 有门派、配速员 0%。 */
+  if (await pacersOn(env)) {
+    const ps = pacerRows(Date.now()).filter(p => p.faction);
+    const by = {};
+    for (const p of ps) (by[p.faction] = by[p.faction] || []).push(p);
+    for (const f in by) {
+      const arr = by[f].sort((a, b) => b.power - a.power);
+      const cap = arr.slice(0, 5);
+      let x = list.find(v => v.faction === f);
+      if (!x) { x = { faction: f, n: 0, cnt: 0, cap: 5, power: 0, avg: 0, top: 0, members: [] }; list.push(x); }
+      x.n += arr.length;
+      x.cnt = Math.min(5, x.cnt + cap.length);
+      x.power += cap.reduce((a, b) => a + b.power, 0);
+      x.top = Math.max(x.top, arr[0].power);
+      x.avg = x.cnt ? Math.round(x.power / x.cnt) : 0;
+      x.members = (x.members || []).concat(arr.map(p => ({ alias: p.alias, power: p.power })))
+        .sort((a, b) => b.power - a.power).slice(0, 12);
+    }
+    list.sort((a, b) => (b.power || 0) - (a.power || 0));
+  }
+  list.forEach((x, i) => { x.rank = i + 1; });
+  return json({ ok: true, count: list.length, rows: list.slice(0, limit) }, 200, origin);
 }
 
 async function gfBoard(req, env, origin, url) {
