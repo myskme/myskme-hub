@@ -59,9 +59,8 @@
 
 1. **门派满员的客户端提示**：服务端 gfSubmit 已返回 `factionFull` / `factionMax`，
    客户端还没把「这个门派满了」讲给玩家听。
-2. **`/gf/month` 国内网关生效确认**：白名单已改、正副本已同步，
-   要等下一次合并 main 触发 EdgeOne 直传后，验 `play.myskme.com/api/gf/month` 返回 200。
-   （直连 workers.dev 已通，只差国内这层。）
+2. ~~`/gf/month` 国内网关~~ —— 已了结：本交接单那次推送触发了直传，
+   2026-08-06 实测 `play.myskme.com/api/gf/month` 返回 200。
 3. **化名正则放宽**：服务端化名校验对 30 个真实名字拒了 20 个，放宽要部署 worker，
    **待王老师拍板**后一条 deploy.py 上线。
 4. （远期）**pacerAt 断点续算**：它是 O(天数)，约两年后会顶到 Workers CPU 上限，
