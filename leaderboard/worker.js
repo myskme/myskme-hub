@@ -427,6 +427,74 @@ function gfBadges(s) {
   add(s.chain >= 7, "g9"); add(s.chain >= 12, "g10");
   return b;
 }
+/* ══════════════════════════════════════════════════════════════
+   月末封榜 · 只记名，不发奖
+   ──────────────────────────────────────────────────────────────
+   王老师定的三条：配速员**必须参与**（模拟的是开放式公测，真实感优先）；
+   **不发实物奖励**，只记名或给称号；按月结算。
+
+   不发资源这一条恰好化掉了最大的矛盾：配速员拿第一时，
+   它不是「从真人手里抢走了奖品」，只是公测榜上的一行记录 —— 本来就该是这样。
+   而且输的一方**什么也不失去**，这一条守住了「不做惩罚式设计」。
+
+   结算方式：**懒结算**，不需要定时任务。任何一次 /gf 读请求进来时，
+   若 meta.sealed 还停在上个月之前，就把上月名次冻进 gf_month 再返回。
+   线上每天都有流量，所以实际发生在月初的几小时内。
+   ⚠ 冻的是「结算那一刻的现状」，不是严格的月末 23:59 快照 ——
+     这一点写在这里，别以为它是精确的。
+   ══════════════════════════════════════════════════════════════ */
+function monthKeyOf(d) {
+  const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1;
+  return "" + y + String(m).padStart(2, "0");
+}
+function prevMonthKey(now) {
+  const d = new Date(now);
+  d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() - 1);
+  return monthKeyOf(d);
+}
+async function gfSealMonth(env) {
+  const now = Date.now();
+  const cur = monthKeyOf(new Date(now));
+  let sealed = "";
+  try {
+    const r = await env.DB.prepare("SELECT v FROM meta WHERE k='gf_sealed'").first();
+    sealed = (r && r.v) || "";
+  } catch (e) { return; }
+  if (sealed === cur) return;                        // 本月已经处理过
+  const prev = prevMonthKey(now);
+  /* 先占位再算：两个请求同时进来时，第二个看到 sealed 已是本月就直接退出，
+     不会重复写。写重了的后果是名次被覆盖成第二次算的结果，不是灾难，但没必要。 */
+  try {
+    await env.DB.prepare(
+      "INSERT INTO meta(k,v) VALUES('gf_sealed',?) ON CONFLICT(k) DO UPDATE SET v=excluded.v"
+    ).bind(cur).run();
+  } catch (e) { return; }
+  if (!sealed) return;                               // 第一次上线，没有上个月可封
+
+  const put = [];
+  /* 门派前三。配速员一起参与排名 —— 公测榜上本来就该有他们。 */
+  try {
+    const fr = await gfFactionList(env, 3);
+    fr.forEach((x, i) => put.push({ kind: "faction", rank: i + 1, name: x.faction,
+      power: x.power, members: (x.members || []).map(m => m.alias).join(",") }));
+  } catch (e) {}
+  /* 阵营：只记赢的那一边。 */
+  try {
+    const c = await gfCampRaw(env);
+    const win = (c.light >= c.dark) ? "light" : "dark";
+    put.push({ kind: "camp", rank: 1, name: win,
+      power: Math.round(c[win] || 0), members: (c.members[win] || []).map(m => m.alias).join(",") });
+  } catch (e) {}
+  for (const x of put) {
+    try {
+      await env.DB.prepare(
+        `INSERT INTO gf_month(m,kind,rank,name,power,members) VALUES(?,?,?,?,?,?)
+         ON CONFLICT(m,kind,rank) DO UPDATE SET
+           name=excluded.name, power=excluded.power, members=excluded.members`
+      ).bind(prev, x.kind, x.rank, x.name, x.power, x.members).run();
+    } catch (e) {}
+  }
+}
 let _gfReady = false;
 async function gfEnsure(env) {
   if (_gfReady) return;                 // isolate 重启最多多跑一次，无害；读路径不该每次都写 DDL
@@ -458,6 +526,13 @@ async function gfEnsure(env) {
      不然就成了藏起来的暗亏。榜上摆出来，它才会变成群里的战术讨论。 */
   try { await env.DB.prepare(`ALTER TABLE gemfall ADD COLUMN comp TEXT DEFAULT ''`).run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
+  /* 月末封榜的存档。只存名次与成员化名 —— 不发奖，所以不需要发放状态。 */
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_month (
+       m TEXT NOT NULL, kind TEXT NOT NULL, rank INTEGER NOT NULL,
+       name TEXT DEFAULT '', power INTEGER DEFAULT 0, members TEXT DEFAULT '',
+       PRIMARY KEY (m, kind, rank))`
+  ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
   _gfReady = true;
 }
@@ -771,7 +846,8 @@ async function gfSubmit(req, env, origin) {
    灰塔看下矿的天数与局数），所以不存在「总矿力最高的人决定一切」。
    灰塔那条尤其关键：它每天封顶，榜首一天最多也就那么多，
    「肯天天来的普通玩家能赢过大号」结构上才真的成立。 */
-async function gfCamps(req, env, origin, url) {
+/* 同上：算分抽出来给月末封榜复用 */
+async function gfCampRaw(env) {
   await gfEnsure(env);
   /* 单人封顶：CAP 之上的部分不再计入。
      真实分布里头号玩家的矿力 = 其余 12 人总和的 63%，不封顶的话
@@ -836,18 +912,24 @@ async function gfCamps(req, env, origin, url) {
       members[k].push({ alias: r.alias, sc: Math.max(0, Math.round(r.sc || 0)) });
   }
 
+  return { light: raw.light, dark: raw.dark, members };
+}
+async function gfCamps(req, env, origin, url) {
+  await gfSealMonth(env);
+  const raw = await gfCampRaw(env);
   const tot = raw.light + raw.dark;
-  /* 全空时给等分，界面上就是三段一样长的静止拔河带——
-     比显示三个 0 体面得多，也不算撒谎（确实还没人挖）。 */
+  /* 全空时给等分：界面上是两段一样长的静止拔河带 ——
+     比显示两个 0 体面，也不算撒谎（确实还没人挖）。 */
   const pct = tot > 0
     ? { light: raw.light / tot, dark: raw.dark / tot }
     : { light: .5, dark: .5 };
-  return json({ ok: true, empty: tot === 0, pct, members }, 200, origin);
+  return json({ ok: true, empty: tot === 0, pct, members: raw.members }, 200, origin);
 }
 
-async function gfFactions(req, env, origin, url) {
+/* 算分抽成独立函数：路由与月末封榜共用同一份，避免两处实现慢慢漂移
+   （这个项目在客户端／服务端的矿力公式上已经吃过一次亏）。 */
+async function gfFactionList(env, limit) {
   await gfEnsure(env);
-  const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
   /* ── 每个门派只把**最强的 5 个人**计入总分 ──
      不封顶的话门派榜就是人头榜：拉二十个新人进来，哪怕个个是新号，
      加起来也能压过三个高手 —— 那不是「门派强」，那是「群大」。
@@ -923,11 +1005,17 @@ async function gfFactions(req, env, origin, url) {
     list.sort((a, b) => (b.power || 0) - (a.power || 0));
   }
   list.forEach((x, i) => { x.rank = i + 1; });
-  return json({ ok: true, count: list.length, rows: list.slice(0, limit) }, 200, origin);
+  return list.slice(0, limit);
+}
+async function gfFactions(req, env, origin, url) {
+  await gfSealMonth(env);
+  const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
+  const list = await gfFactionList(env, limit);
+  return json({ ok: true, count: list.length, rows: list }, 200, origin);
 }
 
 async function gfBoard(req, env, origin, url) {
-  await gfEnsure(env);
+  await gfSealMonth(env);   // 访问量最大的入口，靠它把月初那一刻兜住
   const sea = url.searchParams.get("season") || await getSeason(env);
   const scope = url.searchParams.get("scope") || "world";
   const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
@@ -971,6 +1059,20 @@ async function gfBoard(req, env, origin, url) {
       .slice(0, limit);
   }
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);
+}
+/* 月榜：历月封存的名次。客户端拿它做两件事 ——
+   ① 摆一面「月榜墙」；② 用 members 判断自己上个月有没有在赢的那一边，
+   有就在名片上多一行带年月的称号。称号是**记名不是资源**，所以不需要领取。 */
+async function gfMonth(req, env, origin, url) {
+  await gfSealMonth(env);
+  const n = clampInt(url.searchParams.get("limit") || 6, 1, 24);
+  const rows = await env.DB.prepare(
+    "SELECT m,kind,rank,name,power,members FROM gf_month ORDER BY m DESC, kind ASC, rank ASC LIMIT ?"
+  ).bind(n * 4).all();
+  return json({ ok: true, rows: (rows.results || []).map(r => ({
+    m: r.m, kind: r.kind, rank: r.rank, name: r.name || "",
+    power: r.power || 0, members: String(r.members || "").split(",").filter(Boolean),
+  })) }, 200, origin);
 }
 async function gfAdmin(req, env, origin) {
   let body;
@@ -1030,6 +1132,7 @@ export default {
       if (p === "/gf/board" && request.method === "GET") return await gfBoard(request, env, origin, url);
       if (p === "/gf/factions" && request.method === "GET") return await gfFactions(request, env, origin, url);
       if (p === "/gf/camps" && request.method === "GET") return await gfCamps(request, env, origin, url);
+      if (p === "/gf/month" && request.method === "GET") return await gfMonth(request, env, origin, url);
       if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
       if (p === "/gf/admin" && request.method === "POST") return await gfAdmin(request, env, origin);
       if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 4, games: ["wordduel", "gemfall"], season: await getSeason(env) }, 200, origin);

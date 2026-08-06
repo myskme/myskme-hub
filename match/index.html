@@ -921,6 +921,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   word-break:break-all}                              /* 长化名换行显示，不再被挤掉 */
 .lc-tt{font-size:11.5px;color:var(--gold2);letter-spacing:.06em}
 .lc-comp{margin-top:4px;font-size:11px;color:var(--ink3);letter-spacing:.05em}
+/* 月称号：小牌子一排。带年月是它全部的价值 —— 那个月过去就没了。 */
+.lc-ttl{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.lc-ttl i{font-style:normal;font-size:10px;letter-spacing:.05em;color:var(--gold2);
+  border:1px solid var(--gold-line);padding:2px 6px;
+  background:color-mix(in srgb,var(--gold) 8%,transparent)}
 .lc-comp b{color:var(--ink2)}
 .lc-pw{text-align:center;font-size:26px;color:var(--gold2);letter-spacing:.04em;margin:9px 0 2px;
   font-variant-numeric:tabular-nums}
@@ -6658,7 +6663,20 @@ function lbCardHTML(r){
     +(r.comp&&compById(r.comp)
       ? '<div class="lc-comp">同行 · <b>'+esc(compById(r.comp).name)+'</b> '
         +esc(compById(r.comp).title)+'</div>'
-      : '')+'</div>'
+      : '')
+    /* 月称号：带年月、过月不再有 —— 跟岁记同一套逻辑。
+       只记名不发资源，所以不需要「领取」这一步。 */
+    +(()=>{
+      const t=[];
+      for(const x of MONTHS){
+        if(!x.members||x.members.indexOf(r.alias)<0)continue;
+        const y=x.m.slice(0,4), mo=+x.m.slice(4);
+        if(x.kind==='faction')t.push(y+'.'+mo+' '+esc(x.name)+(x.rank===1?' 之首':' 第'+x.rank));
+        else if(x.kind==='camp'){const c=CAMPS.find(v=>v.id===x.name);
+          t.push(y+'.'+mo+' '+(c?c.nm:'阵营')+'胜')}
+      }
+      return t.length?'<div class="lc-ttl">'+t.slice(0,4).map(v=>'<i>'+v+'</i>').join('')+'</div>':'';
+    })()+'</div>'
     +'<div class="lc-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'<span>矿力</span></div>'
     +'<div class="lc-lines">'+bar('depth','走多远',L.depth)+bar('skill','打多险',L.skill)
       +bar('grind','来多勤',L.grind)+'</div>'
@@ -7351,6 +7369,40 @@ function pwAdviceHTML(){
   return '矿力看三样：<b>走多远</b>、<b>打多险</b>、<b>来多勤</b>，'
     +'三样里<b>最短的那样算四倍</b>。<br>'
     +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
+}
+/* ────────── 月榜与月称号 ──────────
+   王老师定的三条：配速员**必须参与**（模拟开放式公测，真实感优先）；
+   **不发实物奖励**，只记名或给称号；按月结算。
+
+   不发资源恰好化掉了最大的矛盾：配速员拿第一时，它不是「从真人手里抢走奖品」，
+   只是公测榜上的一行记录 —— 本来就该是这样。
+   而输的一方**什么也不失去**，这一条守住了「不做惩罚式设计」。
+
+   称号是**记名不是资源**，所以不需要「领取」：服务端封存了当月成员名单，
+   客户端拿自己的化名一比就知道有没有。 */
+let MONTHS=[];
+async function loadMonths(){
+  try{
+    const d=await LB.fetchJSON('/gf/month?limit=8');
+    if(d&&d.ok&&Array.isArray(d.rows))MONTHS=d.rows;
+  }catch(e){}
+}
+/* 我的月称号：上过榜的月份各给一行。带年月、过月不再有 —— 跟岁记同一套逻辑。 */
+function myMonthTitles(){
+  const me=SAVE.lbAlias||'';
+  if(!me)return [];
+  const out=[];
+  for(const r of MONTHS){
+    if(!r.members||r.members.indexOf(me)<0)continue;
+    const y=r.m.slice(0,4), mo=+r.m.slice(4);
+    if(r.kind==='faction'&&r.rank===1)out.push(y+'.'+mo+' · '+r.name+' 之首');
+    else if(r.kind==='faction')out.push(y+'.'+mo+' · '+r.name+' 第'+r.rank);
+    else if(r.kind==='camp'){
+      const c=CAMPS.find(x=>x.id===r.name);
+      out.push(y+'.'+mo+' · '+(c?c.nm:'阵营')+'胜');
+    }
+  }
+  return out;
 }
 /* ────────── 三线首座 ──────────
    王老师要「积分第一的闪耀称号」，同时要「人人都有机会去争夺」。
@@ -8564,7 +8616,7 @@ $('#install-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');
   const s=LB.stats();
   LB.scope=(!(SAVE.camp&&SAVE.camp.side)&&(s.lv>0||s.rush>0))?'camp':'world';
-  LB.flush('open');renderLB()});
+  LB.flush('open');loadMonths();renderLB()});
 /* 唤醒时机：联网恢复 / 切回前台 / 页面即将被回收前用信标补一次 */
 addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
 addEventListener('visibilitychange',()=>{
@@ -9679,12 +9731,14 @@ window.__selftest=function(){
       fxBurst(100,100,'#e8c768',60,1.2);
       const sp=FX.parts.filter(p=>p.sp).length;
       ok('粒子：火星与碎屑两类混发（火星约三成）',sp>6&&sp<40&&FX.parts.length===60);
-      const p0=FX.parts.find(p=>p.sp)||FX.parts[0];
-      const v0=Math.hypot(p0.vx,p0.vy), l0=p0.life;
-      let t=performance.now();
-      for(let i=0;i<4;i++){t+=16.7;stepFX(16.7)}
-      ok('粒子：有空气阻力（速度在掉）且随生命收缩',
-         Math.hypot(p0.vx,p0.vy)<v0 && p0.life<l0);
+      /* ⚠ 别拿**合速度**判阻力：重力每帧给 vy 加 0.19，
+         一个向下飞的粒子合速度会**变大**，这条断言就时绿时红（真踩过一次）。
+         只有 vx 是纯受阻力影响的，用它才稳。 */
+      const p0=FX.parts.find(p=>p.sp&&Math.abs(p.vx)>.5)||FX.parts[0];
+      const vx0=Math.abs(p0.vx), l0=p0.life;
+      for(let i=0;i<4;i++)stepFX(16.7);
+      ok('粒子：有空气阻力（横向速度在掉）且随生命收缩',
+         Math.abs(p0.vx)<vx0 && p0.life<l0);
       FX.parts.length=0;
     }
     /* 连击手感：强度必须**随连锁递进**，且顿帧绝不能冻住限时局的计时。
