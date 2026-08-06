@@ -1,9 +1,7 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<script>(function(){try{var v=localStorage.getItem('myskme-theme');
-document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
@@ -14,7 +12,7 @@ document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <!-- iOS 加到桌面后的启动过渡图。必须逐个屏幕尺寸写死，没有通配。
      只提供与母图宽高比一致（≈19.5:9）的机型，其余机型自动落回
-     manifest 的 background_color（#0a0a0c），也是干净的纯黑，不会闪白。 -->
+     manifest 的 background_color（#171310），与统一的曜石墨金底色一致，不会闪白。 -->
 <link rel="apple-touch-startup-image" href="icons/splash-1320x2868.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
 <link rel="apple-touch-startup-image" href="icons/splash-1290x2796.png" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
 <link rel="apple-touch-startup-image" href="icons/splash-1284x2778.png" media="(device-width:428px) and (device-height:926px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
@@ -27,7 +25,7 @@ document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="theme-color" content="#171310">
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
 <meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
@@ -38,15 +36,16 @@ document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}
 <meta property="og:image" content="https://play.myskme.com/icons/og.png">
 <style>
 :root{
-  --bg:#0a0a0c;--bg2:#111114;--panel:#16161a;--panel2:#1c1c22;--edge:#26262e;
-  --ink:#f0e6d2;--ink2:#a8a090;--ink3:#8a8478;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
+  /* 统一的「曜石墨金」：暖石墨承接深色的舞台感，又避免纯黑压迫。 */
+  --bg:#171310;--bg2:#1d1814;--panel:#231d18;--panel2:#2a221c;--edge:#3b3026;
+  --ink:#f2e8d8;--ink2:#b9ad99;--ink3:#918878;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
   --gold:#c9a64a;--gold2:#e8c768;--gold-hi:#e8c768;--gold-line:#7a6320;
   --red:#d56060;--green:#6aa86a;--blue:#6ba0dd;--purple:#c199e6;
   --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.10);
   --glow:0 0 24px rgba(201,166,74,.4);--glow-soft:0 0 14px rgba(201,166,74,.25);
-  --paper:#14110b;--noise-op:.24;--noise-blend:overlay;
+  --paper:#1b160f;--noise-op:.17;--noise-blend:overlay;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#0d0d11;--mine2:#131318;--mine-edge:#2a2820;
+  --mine:#100e0d;--mine2:#171310;--mine-edge:#3a3024;
 }
 
 /* ── 图标基线 ──
@@ -65,49 +64,6 @@ document.documentElement.setAttribute('data-theme',v==='light'?'light':'dark');}
 .ic{width:var(--ic-sm);height:var(--ic-sm);display:inline-block;
   vertical-align:-.15em;flex:none;line-height:0}
 .icw{display:inline-block;line-height:0;vertical-align:-.15em}
-/* ── 浅色主题「晨光」（2026-08-06 按玩家反馈恢复）──
-   上一版浅色是**阅读器的语言**：羊皮纸、低彩度、什么都调亮 ——
-   王老师说「不要像阅读器那样」，症结就在最后那句：**连棋盘也调亮了，整屏没有舞台**。
-
-   这一版的想法是「站在矿口往里看」：外圈是晨光，**井里仍旧是暗的**。
-     · 底色是暖石光（有彩度，不是奶白）—— 纸感来自低彩度，去掉它就不像纸
-     · 面板比底更亮 = 抬起来的面，深色那套材质／内高光／落影**原样保留**
-     · **矿坑三色保持暗**：舞台反差 panel vs mine = 12.74:1
-       （深色主题里这个数只有 1.07 —— 棋盘和面板几乎一样暗，
-        所以「往井里看」的纵深感恰恰是浅色才做得到的）
-     · 金色压深提饱和：浅底上强调 = 更深更浓，不是更亮
-
-   每一对都用 WCAG 算过：正文 ≥4.5、描边 ≥3.0，改任何一个值都要重算。 */
-:root[data-theme="light"]{
-  --bg:#c9b391;--bg2:#b89d76;--panel:#e6d6b4;--panel2:#d9c49c;--edge:#8a6d40;
-  --ink:#241a0e;--ink2:#4a3a22;--ink3:#544326;
-  --gold:#5a3e07;--gold2:#432d02;--gold-hi:#7d5a10;--gold-line:#a8895a;
-  --red:#8e1f16;--green:#25603a;--blue:#28477e;--purple:#5d2f80;
-  --line:rgba(90,62,7,.34);--line2:rgba(90,62,7,.15);
-  --glow:0 1px 2px rgba(60,42,6,.24),0 6px 18px rgba(60,42,6,.18);
-  --glow-soft:0 1px 2px rgba(60,42,6,.16),0 3px 10px rgba(60,42,6,.12);
-  --paper:#f2e6c8;--noise-op:.14;--noise-blend:multiply;
-  /* ⚠ 舞台不跟着变亮 —— 这是这一版与上一版最根本的区别 */
-  --mine:#1a140c;--mine2:#241c11;--mine-edge:#4a3a1e;
-}
-/* 光源与暗角在浅色下要换个方向：黑色暗角压在暖底上会发脏，
-   改成让四周往更深的石色收，中心仍是最亮的地方。 */
-:root[data-theme="light"] body{
-  background-image:
-    radial-gradient(760px 420px at 50% 4%,rgba(255,244,214,.75),transparent 62%),
-    radial-gradient(1200px 900px at 50% 42%,transparent 30%,rgba(120,96,54,.42) 100%)}
-/* 「不可用」在浅底上不能靠降透明度（面板本就比底亮，半透明后仍是更亮的斑）。
-   压到底色之下 + 内阴影，读作凹进去的槽。 */
-:root[data-theme="light"] .lv.locked,
-:root[data-theme="light"] .ally-opt.lock,
-:root[data-theme="light"] .tool:disabled,
-:root[data-theme="light"] .sp-shelf.lock{
-  opacity:1;filter:none;background:var(--bg2);border-color:var(--line2);
-  box-shadow:inset 0 1px 3px rgba(60,42,6,.22)}
-:root[data-theme="light"] .lv.locked .n,
-:root[data-theme="light"] .lv.locked .st{color:var(--ink3);opacity:.62}
-:root[data-theme="light"] .ach .icw{opacity:.5;filter:grayscale(1) contrast(.8)}
-:root[data-theme="light"] .stars-row s{opacity:.4}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* 页面级锁死：不滚动、不回弹、不选字、不长按弹菜单——网页做游戏的通病一次治掉。
    长内容（玩法卷轴/成就/榜单）都在弹窗卡片内部滚，屏幕本身永远定住。 */
@@ -130,13 +86,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);lin
   -webkit-user-select:none;user-select:none;touch-action:manipulation}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:var(--noise-op);mix-blend-mode:var(--noise-blend);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
-/* 环境光斑：缓慢漂移，永不死寂 */
-#amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-#amb i{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(60px);opacity:.11;
-  background:radial-gradient(circle,var(--gold),transparent 62%);animation:ambDrift 26s ease-in-out infinite alternate}
-#amb i:nth-child(2){left:60%;top:55%;width:38vmax;height:38vmax;opacity:.05;animation-duration:34s;animation-delay:-12s}
-@keyframes ambDrift{0%{transform:translate(-6%,-4%) scale(1)}100%{transform:translate(7%,6%) scale(1.12)}}
-@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+/* 环境光改为静态渐变。旧版用两块 46vmax 的模糊图层长驻漂移，
+   在手机上会持续占用合成与纹理带宽，却几乎看不出差别。 */
+#amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+  background:radial-gradient(55vmax 42vmax at 18% 18%,color-mix(in srgb,var(--gold) 7%,transparent),transparent 72%),
+             radial-gradient(48vmax 40vmax at 82% 76%,color-mix(in srgb,var(--gold2) 4%,transparent),transparent 74%)}
+#amb i{display:none}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 /* ============ 通用 ============ */
 #app{position:relative;z-index:2;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
@@ -192,8 +148,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
              0 4px 0 rgba(0,0,0,.5),
              0 14px 32px rgba(0,0,0,.55),
              0 0 38px color-mix(in srgb,var(--gold) 32%,transparent)}
-/* 次级四连（挑战/成就/典藏/玩法）反过来要退后，别跟主按钮抢 */
-.menu-sub .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 8px rgba(0,0,0,.35)}
+/* 次级入口退后，保持大厅只有一个明确主动作。 */
+.menu-modes .btn,.menu-dock .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 8px rgba(0,0,0,.35)}
 .btn.ghost{background:transparent;border-color:var(--line2);color:var(--ink2);font-size:14px;padding:9px 16px}
 .ornate{position:relative;border:1px solid var(--line)}
 .ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;border:1px solid var(--gold);transition:all .3s;pointer-events:none}
@@ -260,7 +216,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .wolf-badge:hover::before{opacity:.9;transform:rotate(45deg) scale(1.1)}
 .wolf-badge:hover b{transform:scale(1.12)}
 @keyframes spin{to{transform:rotate(360deg)}}
-.menu-btns{display:flex;flex-direction:column;gap:clamp(6px,1.1dvh,12px);margin-top:clamp(6px,1.4dvh,14px);width:min(320px,86vw)}
+.menu-btns{display:flex;flex-direction:column;gap:clamp(6px,1.1dvh,10px);margin-top:clamp(6px,1.4dvh,14px);width:min(360px,90vw)}
 .menu-btns .btn{width:100%;padding-top:clamp(6px,1dvh,11px);padding-bottom:clamp(6px,1dvh,11px);font-size:clamp(15px,2dvh,17px)}
 .menu-btns .btn .sub{margin-top:clamp(1px,.3dvh,3px)}
 .btn .sub{display:block;font-size:11px;letter-spacing:.24em;color:var(--ink3);margin-top:3px}
@@ -269,20 +225,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .btn .sub.warn{color:var(--gold2)}                 /* 有成绩没传上去时描金提醒 */
 .btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
-.menu-sub{display:flex;gap:10px;justify-content:center;margin-top:2px}
-/* 三个按钮三等分后每个内容盒只剩 67px，而「成就」带图标就要 80px、
-   「卷轴 · 玩法」要 125px —— 全部会断行。所以一律二字、去图标、收字距。
-   大厅竖向只剩 61px 余量，fitScreen 的 0.75 下限一旦触底，
-   超出部分会被 .scr{overflow:hidden} 静默裁掉且滚不出来，所以绝不能加新行。 */
-.menu-sub .btn{flex:1;padding:clamp(6px,.9dvh,10px) 8px;font-size:13px;
-  letter-spacing:.06em;white-space:nowrap}
-.menu-sub .btn .dot{display:inline-block;width:5px;height:5px;background:var(--gold);
+.menu-modes,.menu-dock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.menu-modes .btn{padding:clamp(8px,1.2dvh,12px) 4px;font-size:13px;letter-spacing:.04em;white-space:nowrap}
+.menu-modes .btn .ic{display:none}
+.menu-modes .btn .sub{font-size:9px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-dock{margin-top:-1px}
+.menu-dock .btn{padding:clamp(6px,.9dvh,9px) 4px;font-size:12px;letter-spacing:.06em;white-space:nowrap}
+.menu-dock .btn .dot{display:inline-block;width:5px;height:5px;background:var(--gold);
   border-radius:50%;vertical-align:2px;margin-left:4px;
   box-shadow:0 0 6px color-mix(in srgb,var(--gold) 70%,transparent)}
+.menu-help{align-self:center;border:0;background:none;color:var(--ink3);font:inherit;font-size:11px;letter-spacing:.16em;padding:2px 12px;cursor:pointer}
+.menu-help:hover{color:var(--gold2)}
 #menu-stats{margin-top:clamp(4px,1dvh,10px);font-size:13px;color:var(--ink2);letter-spacing:.1em}
 #menu-stats b{color:var(--gold);font-weight:500}
 .menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
-  padding:0 52px;text-align:center}   /* 两侧避开右下角的主题按钮 */
+  padding:0 52px;text-align:center}
 .menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
 .menu-foot a:hover{color:var(--gold)}
 /* 小黑猫 */
@@ -316,11 +273,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lv .n{font-size:22px;color:var(--ink);letter-spacing:.05em}
 .lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:2px;min-height:14px}
 .lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
-/* ── 浅色下「不可用」不能靠降透明度 ──
-   深色主题里半透明 = 融进黑底 = 变暗 = 读作禁用，很自然。
-   浅色主题里面板本来就**比页面亮**，半透明之后仍是一块比背景更亮的斑 ——
-   于是锁着的关卡反而比能点的还抢眼，地图页那一屏就是这么糊成一片的。
-   浅色下改成压到页面之下，读作「凹进去的槽」，这才是纸上表达禁用的方式。 */
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
 .lv.cur{border-color:var(--gold);animation:curPulse 2.2s ease-in-out infinite}
 @keyframes curPulse{50%{box-shadow:0 0 18px color-mix(in srgb,var(--gold) 38%,transparent)}}
@@ -472,8 +424,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   border:1px solid var(--line);background:radial-gradient(ellipse at center,var(--ally-glow,rgba(201,166,74,.16)),transparent 72%)}
 #ally-badge::before{content:'';position:absolute;inset:4px;border:1px solid var(--gold-line);opacity:.4;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .3s}
 #ally.ready #ally-badge::before{opacity:.95;transform:rotate(45deg) scale(1.08)}
-/* 同伴色：深色主题用灵石本色，浅色主题换成同色系的深色版，
-   否则星屑(米白)这类颜色在羊皮纸底上等于隐形 */
+/* 同伴色直接取灵石本色。 */
 #ally,.ally-opt{--ally-c:var(--ally-base,var(--gold))}
 #ally-badge b{font-size:23px;font-weight:300;color:var(--ally-c);font-style:normal;
   text-shadow:0 0 16px var(--ally-glow,rgba(201,166,74,.5));position:relative}
@@ -846,7 +797,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #namecard-box{text-align:center;margin-top:12px}
 #nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
 .cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
-/* 三阵营。三色只用在这一处，别处不铺——颜色一泛滥就不成标识了。 */
+/* 两阵营。两色只用在这一处，别处不铺——颜色一泛滥就不成标识了。 */
 .cs-light{--cc:#e8c768} .cs-dark{--cc:#a2568f}
 .camp-bar{display:flex;height:14px;border:1px solid var(--line2);overflow:hidden;margin:2px 0 7px}
 .camp-bar i{display:block;background:var(--cc);transition:width .8s cubic-bezier(.16,1,.3,1);
@@ -883,32 +834,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .camp-pick-note{margin-top:9px;font-size:11.5px;color:var(--ink3);text-align:center;line-height:1.7}
 .camp-pick-note b{color:var(--gold2)}
 
-/* 成员名单（阵营与门派共用） */
-.camp-mem{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
-.cmem-hd{font-size:11px;letter-spacing:.24em;color:var(--ink3);text-align:center;margin-bottom:5px}
-.cmem{display:flex;justify-content:space-between;align-items:baseline;padding:3px 6px;
-  font-size:12px;color:var(--ink2);letter-spacing:.04em}
-.cmem i{font-style:normal;font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
-.cmem.me{color:var(--gold2)} .cmem.me i{color:var(--gold2)}
-.cmem.me b{color:var(--gold2);font-weight:500}
-.fac-wrap{border-bottom:1px solid var(--line)}
-.fac-wrap .fac-row{border-bottom:0;cursor:pointer}
-.fac-mem{display:none;padding:2px 4px 8px 30px}
-.fac-mem.open{display:block}
-/* 手机上没有 hover，cursor:pointer 等于不存在——可展开这件事必须画出来。
-   而且自己的门派默认是展开的，玩家会以为「只有我这行特殊」，看不到别家有谁。 */
-.fac-row .ar{display:inline-flex;width:14px;height:14px;color:var(--ink3);
-  transition:transform .18s ease;flex:none}
-.fac-row .ar svg{width:14px;height:14px}
-.fac-wrap.open .fac-row .ar{transform:rotate(90deg)}
-.fac-tip{padding:6px 4px 2px;font-size:11px;color:var(--ink3);letter-spacing:.04em}
 /* ── 矿工名片（点开榜单某一行）── */
 .lb-row{cursor:pointer;transition:background .15s}
 .lb-row:hover,.lb-row:focus-visible{background:color-mix(in srgb,var(--gold) 7%,transparent);outline:none}
-#corner-ctl{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));
-  z-index:85;display:none;gap:8px}
-#corner-ctl.on{display:flex}
-#corner-ctl .iconbtn{width:36px;height:36px;font-size:15px}
 #lb-card{display:none;margin-top:12px}
 #lb-card.on{display:block;animation:cardIn .32s cubic-bezier(.16,1,.3,1) both}
 .lc{border:1px solid var(--gold-line);padding:12px 13px;text-align:left;
@@ -1034,22 +962,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 赛季幽灵：跟上个月的自己比 */
 .pw-ghost{margin-top:5px;font-size:12px;color:var(--ink2);letter-spacing:.04em}
 .pw-ghost b{color:var(--gold2)}
-/* ── 矿场 · 兑 ── */
+/* ── 灵石工坊 ── */
 .sp-bal{font-size:13px;color:var(--ink2);letter-spacing:.06em;text-align:center}
 .sp-bal b{color:var(--gold2);font-size:16px}
 .sp-note{margin:5px 0 12px;font-size:11px;color:var(--ink3);text-align:center;line-height:1.6}
 .sp-note b{color:var(--ink2)}
 .sp-shelf{margin-bottom:14px;padding-top:8px;border-top:1px solid var(--line)}
 /* 未解锁不隐藏，压暗摆着 —— 看得见够不着才有期待。沿用典藏册缺卡那套观感。 */
-/* ── 锁着的货架：压表面，不压字 ──
-   原来是整块 opacity:.42。透明度会**乘算**：--ink3 在 --panel 上本来 4.86:1，
-   压完只剩 1.87:1；封样说明再乘 .7 → 1.50:1，封样图标乘 .65 → 1.46:1。
-   正文门槛是 4.5:1、界面元素 3.0:1 —— 也就是说这三样在手机上根本看不见，
-   连**「矿力 78,000 · 还差 41,300」这句全店最有驱动力的话**都是 1.87:1。
-
-   这和浅色主题里那个「不可用不该靠降透明度」是同一个病，当时只修了浅色那边。
-   锁态应该由**表面**表达（压暗底、收掉描边），字该看得见照样看得见 ——
-   尤其「还差多少」根本不是禁用态，它是号召，反而要更醒目。 */
+/* 锁着的货架只压表面，不降文字透明度；名字、用途与门槛都应该读得清。 */
 .sp-shelf.lock{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent);
   border-top-color:var(--line2)}
 .sp-shelf.lock .sp-nm{color:var(--ink2)}
@@ -1074,44 +994,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .sp-ic{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--gold)}
 .sp-ic .ic{width:var(--ic-sm);height:var(--ic-sm)}
 .sp-i.own .sp-ic{color:var(--ink3)}
-.sp-i.seal .sp-ic{color:var(--ink3)}
-/* 封样：名字那行用点线框住，一眼看出「这里有东西但还没揭」 */
-/* 封样：整条压一层斜向封纹 + 一圈虚线，读作「盖着布、还没揭」。
-   纯文字的「封样 · 甲」看着像占位符（做漏了），有这层纹才像刻意封着的货。
-   纹路用 repeating-linear-gradient，零图片、零请求。 */
-.sp-i.seal{position:relative;border-style:dashed;
-  background-image:repeating-linear-gradient(135deg,
-    color-mix(in srgb,var(--gold) 5%,transparent) 0 6px,
-    transparent 6px 14px)}
-.sp-i.seal .sp-t{color:var(--ink3);letter-spacing:.2em}
-.sp-i.seal .sp-d{color:var(--ink3)}
 /* 首兑戳：哪个月头一回兑的。是履历不是内容，所以做得很轻。 */
 .sp-at{font-style:normal;font-size:10px;color:var(--gold2);opacity:.85;letter-spacing:.06em}
-.sp-c s{opacity:.5;margin-right:3px}
-.sp-c b{color:var(--gold2)}
-/* 本期矿口：全服同一份，摆在最上面当门面 */
-.sp-stall{margin:10px 0 4px;padding:8px 10px;border:1px solid var(--gold-line);border-radius:6px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,transparent),transparent);
-  text-align:left}
-.sp-shd{font-size:12px;color:var(--ink2);letter-spacing:.12em;margin-bottom:5px}
-.sp-shd i{font-style:normal;float:right;font-size:10.5px;color:var(--gold2);letter-spacing:.06em}
-.sp-si{display:flex;align-items:baseline;gap:8px;padding:3px 0;font-size:12.5px;color:var(--ink)}
-.sp-si i{font-style:normal;margin-left:auto;font-size:11.5px;color:var(--gold2)}
-.sp-si.own,.sp-si.own i{color:var(--ink3)}
-.sp-sfoot{margin-top:5px;font-size:10.5px;color:var(--ink3);line-height:1.6}
 .sp-have{font-size:11.5px;color:var(--gold2);letter-spacing:.08em}
 .btn.sp-b{padding:4px 12px;font-size:12px;letter-spacing:.08em}
 .btn.sp-b.off{opacity:.45}
 .near-gap b{color:var(--gold2);font-size:15px}
-
-/* 门派榜行 */
-.fac-row{display:flex;align-items:baseline;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line)}
-.fac-row .rk{width:26px;text-align:right;color:var(--ink3);font-size:13px}
-.fac-row .nm{flex:1;color:var(--ink);letter-spacing:.06em}
-.fac-row .cnt{font-size:11px;color:var(--ink3)}
-.fac-row .pw{color:var(--gold2);font-weight:500}
-.fac-row.mine{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--gold) 9%,transparent),transparent)}
-.fac-row.mine .nm{color:var(--gold2)}
 
 /* 化名行：输入框 + 换一个 */
 .aliasrow{display:flex;gap:6px;align-items:stretch}
@@ -1141,7 +1029,7 @@ body{--shk:4px}
   40%,60%{transform:translate(var(--shk),calc(var(--shk) * -.5))}
   50%{transform:translate(calc(var(--shk) * -.75),calc(var(--shk) * .25))}}
 /* 边缘泛光：大连锁时四周透进一层暖光。刻意**不做全屏闪白** ——
-   受众含学生，全屏频闪要避免；四周内收的光既有冲击力又不刺眼。 */
+   全屏频闪会破坏可读性与舒适度；四周内收的光既有冲击力又不刺眼。 */
 #rimlight{position:fixed;inset:0;pointer-events:none;z-index:79;opacity:0;
   background:radial-gradient(ellipse at center,transparent 52%,
     color-mix(in srgb,var(--gold) 70%,transparent) 100%)}
@@ -1234,8 +1122,7 @@ body{--shk:4px}
    两条不能改的约定：
    1. **不加 CSS 边框**。这批横幅画里自带描金双线框与右上小圆（与 chapter-*.webp
       同一套装帧），再加一道就是双框。
-   2. 压字用的暗遮罩写**固定色**，不能用 var(--panel)：浅色主题下那个变量会变成
-      浅色，遮罩反而把图提亮，压在上面的字就糊了。 */
+   2. 压字的暗遮罩写固定色，不随面板色漂移。 */
 .obanner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
   background-repeat:no-repeat;overflow:hidden}
 .obanner.has-art{display:block}
@@ -1303,9 +1190,7 @@ body{--shk:4px}
 .cardc.miss .cn{color:var(--ink3);text-shadow:none}
 .cardc .ct{position:absolute;left:0;right:0;bottom:0;font-size:9px;letter-spacing:.14em;
   padding:1px 0;background:rgba(0,0,0,.62)}
-/* 卡面上这两处压在**半透明黑**上，所以颜色不能跟着主题走：
-   浅色主题的 --gold2 是为羊皮纸底压深的 #5f470e，压在黑条上只有 2.39:1，
-   9px 小字根本看不清。这里一律用深色主题那版亮金（对黑 12.8:1）。 */
+/* 卡面小字压在半透明黑上，固定使用亮金确保对比度。 */
 .cardc .cdup{position:absolute;top:2px;right:3px;font-size:9px;color:#e8c768;
   background:rgba(0,0,0,.62);padding:0 3px}
 .cardc.t0 .ct{color:#d8d2c4}
@@ -1453,7 +1338,6 @@ body{--shk:4px}
 </head>
 <body>
 <div id="amb"><i></i><i></i></div>
-<div id="corner-ctl"><button class="iconbtn" id="themeBtn" title="主题">◐</button></div>
 <div id="rimlight"></div>
 <div id="flash"></div>
 <div id="app">
@@ -1462,7 +1346,7 @@ body{--shk:4px}
   <section id="scr-menu" class="scr">
     <div class="kicker">THE MYSKME CHRONICLES · GEMFALL</div>
     <h1 class="title-hero">灵石<em>远征</em></h1>
-    <div class="subtitle">MYSKME 消消乐 · 狼先生与他的学生们</div>
+    <div class="subtitle">MYSKME 消消乐 · 狼先生与远征者们</div>
     <canvas id="menu-gems" width="10" height="10"></canvas>
     <div class="wolf-badge" id="wolf-badge">
       <svg viewBox="0 0 100 100"><path fill="currentColor" d="M22 78 Q18 54 30 40 Q26 26 34 16 Q44 24 46 32 Q50 30 54 30 Q58 30 62 32 Q64 24 74 16 Q82 26 78 40 Q90 54 86 78 Q70 70 54 71 Q38 70 22 78 Z M54 50 Q60 56 68 56 M54 50 Q48 56 40 56"/></svg>
@@ -1470,15 +1354,17 @@ body{--shk:4px}
     </div>
     <div class="menu-btns">
       <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
-      <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 矿灯将熄 · 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
-      <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">一台机器轮流玩 · 2–6 人</span></button>
-      <button class="btn ornate" id="btn-lb"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5.2a4 4 0 01-8 0z"/><path d="M8 5.2H4.8a3.2 3.2 0 003.4 3.6M16 5.2h3.2a3.2 3.2 0 01-3.4 3.6"/><path d="M12 13.5v2.8M8.8 19.5h6.4M10 16.3h4l.9 3.2H9.1z"/></svg> 矿脉榜<span id="lb-dot"></span><span class="sub" id="lb-sub">看看别人挖到哪了</span></button>
-      <div class="menu-sub">
-        <button class="btn ghost" id="btn-quest">挑战<span id="quest-dot"></span></button>
-        <button class="btn ghost" id="btn-ach">成就</button>
-        <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
-        <button class="btn ghost" id="btn-how">玩法</button>
+      <div class="menu-modes">
+        <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
+        <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人轮流</span></button>
+        <button class="btn ornate" id="btn-quest">挑战<span id="quest-dot"></span><span class="sub">每日三桩</span></button>
       </div>
+      <div class="menu-dock">
+        <button class="btn ghost" id="btn-lb">矿脉榜<span id="lb-dot"></span></button>
+        <button class="btn ghost" id="btn-ach">生涯</button>
+        <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
+      </div>
+      <button class="menu-help" id="btn-how">玩法说明</button>
     </div>
     <div class="claimcard" id="daily-card">
       <div class="orn" id="daily-orn" data-fit="contain" data-pos="center"></div>
@@ -1715,19 +1601,17 @@ body{--shk:4px}
     <div id="col-sets"></div>
     <div id="col-grid"></div>
     <div class="ovl-btns">
-      <button class="btn ghost" id="col-shop">矿 场</button>
+      <button class="btn ghost" id="col-shop">工 坊</button>
       <button class="btn ghost" id="col-ask">矿友互助</button>
       <button class="btn ghost" id="col-recv">收 赠 印</button>
       <button class="btn ghost" id="col-close">合上</button>
     </div>
   </section>
 
-  <!-- 矿场 · 兑。做成典藏册的一个视图而不是新弹层：ovl() 是单层互斥的，
-       另开一层会出现「关一个直接回大厅」；而大厅那行按钮每个只剩 67px，也塞不下。
-       兑匣本来就是一次购买，两者同源，摆一起反而顺。 -->
+  <!-- 灵石工坊与典藏册共用同一张弹层，避免额外堆叠子窗。 -->
   <section class="colv" data-v="shop">
-    <div class="ovl-kick">MYSKME EXCHANGE</div>
-    <div class="ovl-title">矿场 · <em>兑</em></div>
+    <div class="ovl-kick">GEM WORKSHOP</div>
+    <div class="ovl-title">灵石 · <em>工坊</em></div>
     <div id="shop-mine"></div>
     <div id="shop-list"></div>
     <div class="ovl-btns">
@@ -1903,7 +1787,6 @@ body{--shk:4px}
     <button data-scope="world" class="on">世界榜</button>
     <button data-scope="rush">90 秒</button>
     <button data-scope="camp">阵营</button>
-    <button data-scope="faction">门派榜</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
   <div id="lb-list"></div>
@@ -1915,8 +1798,6 @@ body{--shk:4px}
       <input id="lb-alias" maxlength="12" autocapitalize="none" autocorrect="off" placeholder="例：提灯的河狸">
       <button type="button" class="btn ghost" id="lb-roll">换一个</button>
     </div>
-    <label>门派（可留空 · <b>同名即同门</b>，和朋友约好一个名字就行）</label>
-    <input id="lb-faction" maxlength="8" autocapitalize="none" autocorrect="off" placeholder="例：噬词门">
     <div class="tip">榜上只出现化名，不收集真实身份信息。化名、设备标识和成绩会经 play.myskme.com 加密转发到榜单服务；设备标识在服务端加盐哈希，原值不入库。设备换了或清了缓存，成绩要重新上榜。</div>
   </div>
   <div id="lb-diagwrap">
@@ -1949,7 +1830,7 @@ body{--shk:4px}
 <!-- 玩法卷轴 -->
 <!-- 挑战所：本周与本月的事聚在一处。
      入口整理的分工是——**大厅管今天**（今日三桩卡），**这里管本周和本月**：
-     本周矿脉、周悬赏、续灯、岁记。以前它们散在结算页/榜单/成就页深处，
+     本周矿脉、周悬赏、矿灯战绩、岁记。以前它们散在结算页/榜单/成就页深处，
      玩家反馈「找不到新玩法入口」，根源就是没有一个「该干什么」的总台。 -->
 <div class="ovl" id="ovl-quest"><div class="ovl-card">
   <div class="ovl-kick">WEEKLY &amp; MONTHLY</div>
@@ -1991,16 +1872,15 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* ---- 追求线（2026-08 加）----
      streak = 冒险关连胜（cur 当前 / best 生涯纪录）。聚会与周挑战不计。
      cs     = 同伴生涯账（每人 r 出战 / w 胜场 / u 大招次数），炉石职业胜场那套。
-     rush2Best = 「续灯 · 45 秒」新模式的最佳分。
      bounty = 周悬赏（w 周序号 / done 本周是否已领）。
      yj     = 岁记（m 月序号 / c 各项进度 / done 当月徽记是否已领）。
      yjSeal = 拿到过的岁记徽记，键 'YYYYMM'，值 {d:领取日序号}——**绝版**，
               过月永不再得，时间戳就是它的价值。
      firstDay = 第一次打开游戏的日序号（名片上的「入坑日」）。 */
-  streak:{cur:0,best:0},cs:{},rush2Best:0,
-  /* 两阵营。side = 'light'|'dark'（灰塔 2026-08-06 下线），m = 选定/上次换边的月序号。
-     每月只能换一次：既有承诺感又不锁死人。 */
-  camp:{side:'',m:0},
+  streak:{cur:0,best:0},cs:{},
+  /* 两阵营。log 只在本机记「哪个月以哪边成功上传过成绩」，
+     claimed 防止月结算的星屑重复入账。不存成员名单，也不从服务端下发名单。 */
+  camp:{side:'',m:0,log:{},claimed:{}},
   bounty:{w:0,done:0},yj:{m:0,c:{},done:0,got:{}},yjSeal:{},firstDay:0,
   /* ---- 累计账（2026-08 加）----
      矿力原来五项全是「历史最高值」：星数、关卡、最佳分、矿灯最佳、最长连锁，
@@ -2019,12 +1899,9 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 赛季幽灵：每月记一次自己的矿力快照，键 'YYYYMM'。
      跟别人比会输，跟上个月的自己比只会赢——这条只用真实数据，不虚构任何东西。 */
   pwHist:{},
-  /* 矿场 · 兑。own = 买过的（永久拥有），worn = 每个槽位正戴着哪件（随时免费换）。
-     买断的是拥有权不是佩戴权，所以换戴不花钱 —— 收集的乐趣在「都有」，不在「都戴着」。 */
-  shop:{own:{},worn:{},at:{},q:{m:0,n:0},seen:-1},
-  /* 今日矿口：w=期号（weekNum），used=本期已折价买过哪些。跨期整块重置。 */
-  stall:{w:0,used:{}},
-  lbDev:'',lbAlias:'',lbFaction:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
+  /* 灵石工坊。own = 永久拥有，worn = 同槽位当前使用的一件。 */
+  shop:{own:{},worn:{},at:{}},
+  lbDev:'',lbAlias:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -2036,7 +1913,11 @@ function loadSave(){
   out.q3=Object.assign({d:0,q:null},s.q3||{});
   out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
   out.streak=Object.assign({cur:0,best:0},s.streak||{});
-  out.camp=Object.assign({side:'',m:0},s.camp||{});
+  out.camp=Object.assign({side:'',m:0,log:{},claimed:{}},s.camp||{});
+  out.camp.log=(out.camp.log&&typeof out.camp.log==='object')?out.camp.log:{};
+  out.camp.claimed=(out.camp.claimed&&typeof out.camp.claimed==='object')?out.camp.claimed:{};
+  delete out.lbFaction;                                      // 自由文本门派退役，旧存档安全忽略
+  delete out.stall;                                         // 限时折扣矿口退役
   out.cs=(s.cs&&typeof s.cs==='object')?s.cs:{};
   out.bounty=Object.assign({w:0,done:0},s.bounty||{});
   out.yj=Object.assign({m:0,c:{},done:0},s.yj||{});
@@ -2057,14 +1938,13 @@ const rngOf=seed=>mulberry32(xmur3(String(seed))());
 const rnd=Math.random;
 
 /* ---------- 灵石图鉴 ---------- */
-/* dk = 浅色主题专用深色版（羊皮纸底上要过 WCAG 大字 3:1，星屑尤其不能直接用本色） */
 const GEMS=[
-  {name:'金曜',en:'AURUM', base:'#f2c14e',hi:'#ffe9ad',lo:'#9a6f16',dk:'#6f5410',shape:'hex'},
-  {name:'赤晶',en:'EMBER', base:'#e0524f',hi:'#ffb3a8',lo:'#8f2424',dk:'#8f2424',shape:'tri'},
-  {name:'蓝月',en:'LUNA',  base:'#4da3e8',hi:'#bfe4ff',lo:'#1f5a94',dk:'#1f5a94',shape:'orb'},
-  {name:'翠叶',en:'VERDE', base:'#57c26c',hi:'#c0f2c8',lo:'#1f6b36',dk:'#1f6b36',shape:'leaf'},
-  {name:'紫辉',en:'VIOLA', base:'#a97fe8',hi:'#e5d0ff',lo:'#58368f',dk:'#58368f',shape:'dia'},
-  {name:'星屑',en:'STELLA',base:'#ece2c8',hi:'#ffffff',lo:'#8f866c',dk:'#5f5844',shape:'star'},
+  {name:'金曜',en:'AURUM', base:'#f2c14e',hi:'#ffe9ad',lo:'#9a6f16',shape:'hex'},
+  {name:'赤晶',en:'EMBER', base:'#e0524f',hi:'#ffb3a8',lo:'#8f2424',shape:'tri'},
+  {name:'蓝月',en:'LUNA',  base:'#4da3e8',hi:'#bfe4ff',lo:'#1f5a94',shape:'orb'},
+  {name:'翠叶',en:'VERDE', base:'#57c26c',hi:'#c0f2c8',lo:'#1f6b36',shape:'leaf'},
+  {name:'紫辉',en:'VIOLA', base:'#a97fe8',hi:'#e5d0ff',lo:'#58368f',shape:'dia'},
+  {name:'星屑',en:'STELLA',base:'#ece2c8',hi:'#ffffff',lo:'#8f866c',shape:'star'},
 ];
 const KIND={N:'n',H:'H',V:'V',B:'B',O:'O',BELL:'bell'};
 
@@ -2284,7 +2164,7 @@ function applyOpeningPassives(opts){
 /* ---------- 地脉通关 · 与其它 MYSKME 作品的联动片段 ---------- */
 const LORE=[
   {ch:1,body:'第一地脉见了底。矿灯照到岩壁上一行刻痕，是很多年前谁留下的：<em>Make Yourself Special &amp; Kind</em>。<br>狼先生说，这句话在学院谷地到处都是，刻的人早就走远了。',
-   t:'世界编年史 II',d:'狼先生与他的学生们 · 正典叙事与设定档案——一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
+   t:'世界编年史 II',d:'狼先生与远征者们 · 正典叙事与设定档案——一切远征的源头。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:2,body:'墨渊支脉的墨擦掉之后，底下是一页页被朱笔圈过的旧纸。<br>「叶王的红笔从来不是为了难为谁，」狼先生把纸收好，「只是他忘了，圈完还得说清楚。」',
    t:'荣誉殿堂',d:'被红笔圈过、又被夸过的那些手迹，都挂在这面墙上。',u:'https://myskme.github.io/myskme-hub/wall/'},
   {ch:3,body:'铃铛全部归位的那一刻，矿道深处传来一声「喵」。<br>小黑猫从岩缝里钻出来，蹭了蹭你的裤脚，又不见了。它总是这样。',
@@ -2298,7 +2178,7 @@ const LORE=[
   {ch:7,body:'风暴矿心的震动有节奏，一下一下，像有人在远处记分。<br>「那是记分的声音，」狼先生说，「谷地里每一次努力都被记着，一次都没漏。」',
    t:'世界编年史 · 叶王卷',d:'下一层就是他了 · 正典里关于叶王的全部记载，读完再下去。',u:'https://myskme.github.io/myskme-chronicle/'},
   {ch:8,body:'王座熔窟安静下来。断掉的红笔和烧成灰的缠丝落在同一处——从来就是一个人的两只手。<br>狼先生把矿灯递给你：「往后这盏灯你自己提。<em>Make Yourself Special &amp; Kind.</em>」<br>——灵石远征 · 卷一 · 终',
-   t:'MYSKME 作品总目',d:'狼先生与他的学生们 · 全部远征与器物，都在这一卷里。',u:'https://myskme.github.io/myskme-hub/'},
+   t:'MYSKME 作品总目',d:'狼先生与远征者们 · 全部远征与器物，都在这一卷里。',u:'https://myskme.github.io/myskme-hub/'},
 ];
 
 /* ---------- 成就 ---------- */
@@ -2621,7 +2501,8 @@ const PLAT={
   vibrate(ms){try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}},
   now(){return performance.now()},
   raf(fn){return requestAnimationFrame(fn)},
-  dpr(){return Math.min(window.devicePixelRatio||1,2.5)},
+  /* 2x 已足以覆盖手机棋盘的视觉精度；2.5x 多出的 56% 像素只会发热。 */
+  dpr(){return Math.min(window.devicePixelRatio||1,2)},
   canvas(){return $('#board')},
   sfx:SFX,
 };
@@ -3150,34 +3031,20 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   ctx.save();
   ctx.globalAlpha=A;
   if(o.scale&&o.scale!==1){ctx.translate(x,y);ctx.scale(o.scale,o.scale);ctx.translate(-x,-y)}
-  /* 底光（军规四·氛围层）。
-     ⚠ 深浅两套主题要用**相反的手法**：
-       深底上「加亮」读作发光 —— 光从宝石里透出来；
-       浅底上加亮什么也看不出来，只会糊成一团奶白色雾（大厅那排灵石就是这么脏的）。
-     纸面上表达发光的正确做法是**压暗周围**，即让宝石往纸上投一圈同色系的影。
-     所以浅色下换成压暗版本，且范围收窄（影子比辉光贴身）。 */
+  /* 底光：统一的曜石墨金底上只用内透光。 */
   /* o.amb 让调用方收窄底光。大厅那排装饰灵石画在一张只有 54px 高的画布上，
      而默认底光半径 R*1.9≈30px、灵石还在上下漂 ±7px —— 光晕上下都被画布边缘
      切平，看起来就是一条硬边的浅色带子，像穿帮的方块。收窄到能装下为止。 */
-  /* ⚠ 深浅两套要用**相反的手法**：深底上加亮读作发光；
-     浅底上加亮什么也看不出来，只会糊成一团 —— 纸面上表达发光要靠压暗周围。
-     ⚠ 但棋盘里的 --mine 在浅色下**仍是暗的**，所以只有画在亮底上的那些
-     （大厅那排装饰灵石）才需要换手法。用 o.onLight 由调用方指明。 */
-  const onLight=LIGHT&&o.onLight;
-  const ambR=R*(onLight?1.45:1.9)*(o.amb||1);
+  const ambR=R*1.9*(o.amb||1);
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,ambR);
-  if(onLight){
-    amb.addColorStop(0,hexDark(G.base,.55,kind==='n'?.22:.34));
-    amb.addColorStop(1,hexDark(G.base,.55,0));
-  }else{
-    amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
-    amb.addColorStop(1,hexA(G.base,0));
-  }
+  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
+  amb.addColorStop(1,hexA(G.base,0));
   ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,ambR,0,Math.PI*2);ctx.fill();
   /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
-  if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){ctx.restore();return}
+  if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){drawGemSkin(ctx,x,y,R);ctx.restore();return}
   if(kind!=='O'&&drawArt(ctx,'gem_'+gi,x,y,size*1.02)){
     if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
+    drawGemSkin(ctx,x,y,R);
     ctx.restore();return;
   }
   if(kind==='O'){                                              // 万象：虹彩球
@@ -3192,6 +3059,7 @@ function drawGem(ctx,x,y,size,gi,kind,o){
     for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,R*.85,R*.3,i*Math.PI/3,0,Math.PI*2);ctx.stroke()}
     ctx.restore();
     ctx.fillStyle='rgba(255,255,255,.92)';ctx.beginPath();ctx.arc(x-R*.3,y-R*.36,R*.2,0,Math.PI*2);ctx.fill();
+    drawGemSkin(ctx,x,y,R);
     ctx.restore();return;
   }
   /* 主体：渐变 + 描边 + 高光（四层构图） */
@@ -3212,7 +3080,23 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   ctx.globalAlpha=A*.9;ctx.fillStyle='rgba(255,255,255,.75)';
   ctx.beginPath();ctx.ellipse(x-R*.34,y-R*.4,R*.24,R*.15,-.7,0,Math.PI*2);ctx.fill();
   ctx.globalAlpha=A;
+  drawGemSkin(ctx,x,y,R);
   if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
+  ctx.restore();
+}
+/* 工坊辉面只加两三条切光，不用模糊、阴影或新贴图，避免装饰反而增加发热。 */
+function drawGemSkin(ctx,x,y,R){
+  const skin=SAVE.shop&&SAVE.shop.worn&&SAVE.shop.worn.skin;if(!skin)return;
+  ctx.save();ctx.lineCap='round';ctx.lineWidth=Math.max(1,R*.07);
+  if(skin==='sk1'){
+    ctx.strokeStyle='rgba(236,244,255,.8)';ctx.beginPath();ctx.arc(x,y,R*.78,-2.55,-1.05);ctx.stroke();
+  }else if(skin==='sk2'){
+    ctx.strokeStyle='rgba(229,151,238,.78)';ctx.beginPath();
+    ctx.moveTo(x,y-R*.66);ctx.lineTo(x+R*.25,y);ctx.lineTo(x,y+R*.66);ctx.lineTo(x-R*.25,y);ctx.closePath();ctx.stroke();
+  }else if(skin==='sk3'){
+    ctx.strokeStyle='rgba(255,220,126,.82)';ctx.beginPath();ctx.arc(x,y,R*.83,.12,1.34);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,R*.83,3.26,4.46);ctx.stroke();
+  }
   ctx.restore();
 }
 /* 疾风/爆裂的标记单独一支，程序化灵石与插画灵石共用 */
@@ -3243,17 +3127,6 @@ function hexA(h,a){
   const n=parseInt(h.slice(1),16);
   return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')';
 }
-/* 把 hex 压暗到 f 倍。浅底上「发光」要靠**压暗周围**来表达 —— 加亮在亮底上
-   什么也看不出来，只会糊成一团（上一版浅色那圈奶白色雾就是这么来的）。 */
-function hexDark(h,f,a){
-  const n=parseInt(h.slice(1),16);
-  return 'rgba('+Math.round((n>>16&255)*f)+','+Math.round((n>>8&255)*f)+','
-        +Math.round((n&255)*f)+','+a+')';
-}
-/* 画布每帧要画几十颗灵石，不能每颗都去读 DOM 属性 —— 缓存，切主题时刷新。 */
-let LIGHT=document.documentElement.getAttribute('data-theme')==='light';
-function syncTheme(){LIGHT=document.documentElement.getAttribute('data-theme')==='light'}
-
 /* ---- 机关绘制 ---- */
 /* 墨封铺满整格——灵石会盖住格子中央，画成小墨点等于看不见 */
 function drawInk(ctx,x,y,s,layers,t){
@@ -3517,7 +3390,7 @@ function shake(){if(REDUCED)return;document.body.classList.remove('shaking');voi
    2) 强度递进 —— 原来震屏是 chain>=5 的一刀切，3、4 连没有任何体感差别。
       改成 3 连起就有，幅度随连锁涨。
    3) 边缘泛光 —— 大连锁时屏幕四周透进一层暖光，不是全屏闪白
-      （受众含学生，全屏频闪是要避免的，也过不了 reduced-motion 那一关）。 */
+      （全屏频闪会伤舒适度，也过不了 reduced-motion 那一关）。 */
 let HITSTOP=0;
 function hitstop(chain){
   if(REDUCED)return;
@@ -4021,12 +3894,8 @@ async function trySwap(a,b){
      ⚠ 聚会赛时间制不回时间：每人固定秒数是「全场时长可预估」和每人配额的前提。 */
   if(GS.rushOn&&!GS.party){
     const ch=GS.lastChain||0;
-    /* 续灯：门槛降到连锁 2、返还翻倍、封顶放宽到 75 秒——
-       45 秒起步靠手艺往下续，续不动灯就灭，这正是这个模式的题眼。 */
-    const bonus=GS.rush2
-      ?(ch>=5?3.0:ch>=3?1.6:ch>=2?0.8:0)+(gained>6000?1.0:0)
-      :(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
-    const cap=GS.rush2?75000:45000;
+    const bonus=(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
+    const cap=45000;
     if(bonus>0&&GS.rushGiven<cap){
       const add=Math.min(bonus*1000,cap-GS.rushGiven);
       GS.rushT+=add;GS.rushGiven+=add;
@@ -4378,7 +4247,6 @@ function renderAlly(){
   const ready=GS.charge>=c.need&&!GS.over;
   el.classList.toggle('ready',ready);
   el.style.setProperty('--ally-base',GEMS[c.col].base);
-  el.style.setProperty('--ally-dark',GEMS[c.col].dk);
   el.style.setProperty('--ally-glow',hexA(GEMS[c.col].base,.45));
   $('#ally-badge').querySelector('b').textContent=c.g;
   applyArt($('#ally-badge'),'ally_'+c.id);
@@ -4505,7 +4373,6 @@ function renderAllyPick(){
     d.className='ally-opt'+(ul?'':' lock')+(SAVE.comp===c.id?' sel':'');
     d.dataset.u=c.unlock;
     d.style.setProperty('--ally-base',GEMS[c.col].base);
-    d.style.setProperty('--ally-dark',GEMS[c.col].dk);
     d.style.setProperty('--ag',hexA(GEMS[c.col].base,.55));
     const w=(SAVE.cs[c.id]||{}).w||0, rk=csRank(w);
     d.innerHTML='<div class="g">'+c.g+'</div><div class="n">'
@@ -4551,7 +4418,7 @@ const dayNum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86
    一条共同的设计原则：**全是「追求」，没有「惩罚」**——
    断了连胜只是从头再来，错过悬赏下周还有新的，
    唯一真正「过期不候」的是岁记，而它的价值恰恰在于时间刻在上面。
-   受众里有学生，所以不做倒计时轰炸、不做「最后 N 小时」的紧迫视觉。
+   不做倒计时轰炸、不做「最后 N 小时」的紧迫视觉。
    ================================================================== */
 
 /* ---- 灯位：90 秒模式的段位 ----
@@ -4614,35 +4481,13 @@ const monthTag=m=>'<span class="nb">'+monthTagPlain(m)+'</span>';
 const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).padStart(2,'0')};
 
 /* ==================================================================
-   [ 三阵营 · CAMPS ]
+   [ 两阵营 · CAMPS ]
    ------------------------------------------------------------------
-   为什么是三个而不是两个（这条是拿真实数据算出来的，别改回两阵营）：
-   榜上 13 人里，头号玩家的矿力 = 其余 12 人**总和的 63%**。
-   两阵营 + 总量制 → 他在哪边哪边赢，其余人只能围观。
-   这跟人多人少无关，500 人也一样——鲸鱼效应是结构问题。
-
-   三条解法叠在一起：
-   1. **每个阵营考各自的指标**，不比总矿力。实测同一个人在三条线上
-      名次完全不同（有人「来得勤」92% 但「打得险」0%），没有全能碾压者。
-   2. **只报比例不报人头**。三色拔河带在任何人数下都在动；
-      「光明 5 人 / 黑域 4 人」这种数字一露就露怯。
-   3. **每周结算、每周重置**，永远没有永久输家。
-
-   另外，三选一把「善恶题」变成了「你信哪种挖法」——
-   正典里黑域确实是反派，但玩家选的是打法不是道德立场，
-   叶王照旧是终章 BOSS。这对面向学生的品牌很要紧。
+   光明与黑域各考一条矿力线，并用单人封顶抵消头部玩家左右胜负。
+   对外只给两边力量比和月结果：不报活跃人数、不列成员、不暴露个人轨迹。
+   这里需要的是世界的遥远回声，不是另一张通讯录。
    ================================================================== */
-/* 三营各吃矿力的一条线，与 gfDepth/gfSkill/gfGrind 同源 —— 不再另立公式。
-   以前三条线其实在量同一件事（光明×黑域 秩相关 0.815、前六名同一批人同一顺序），
-   根子是没有任何一条在量「勤」：旧灰塔读的是 best_rush，那是单局峰值，
-   一局手气好打到 8 万就永久满格，天天来的人反而追不上，跟教义正好相反。
-
-   三条线量纲差很远（深度上限约 7 万、技巧约 1.2 万、勤勉按天累），所以各有除数，
-   让「打满」所需投入大致相当（都约等于一个月的专注投入）：
-     深度 48000 ≈ 第 150 关满星   技巧 12000 ≈ 15 重连锁加高分   勤勉 10400 ≈ 30 天满勤
-   改后：光明×灰塔 +0.025、黑域×灰塔 −0.277，灰塔彻底独立；
-   光明×黑域 仍有 0.606 —— 技巧线含最佳分与矿灯分，天然跟「玩得多」相关，
-   这条要彻底解耦得靠固定盘定量局，那个玩法 2026-08-04 决定暂不做。 */
+/* 两营各吃矿力的一条线，与 gfDepth/gfSkill 同源，不另立公式。 */
 const CAMP_DIV={light:120,dark:30};
 const CAMPS=[
   {id:'light',nm:'光明',lead:'狼先生',seat:'学院谷地',
@@ -4654,7 +4499,7 @@ const CAMPS=[
    metric:'打多险',how:'连锁与单局高分',col:'#a2568f',
    score:s=>Math.floor(pwLines(s).skill/CAMP_DIV.dark)},
 ];
-/* 2026-08-06 灰塔下线。三营里它一直是 0 真人，而两营对拉更好看、更好懂，
+/* 2026-08-06 灰塔下线。它一直没有真人选择，而两营对拉更好看、更好懂，
    也更贴正典（狼先生 vs 叶王，本来就是一对）。
    勤勉那条线没有消失 —— 它照样喂矿力，也照样有「勤勉首座」，
    只是不再单独占一个阵营。老存档里选了 grey 的会被当作没选，重新问一次。 */
@@ -4674,7 +4519,9 @@ function campPick(id){
   if(SAVE.camp.side===id)return false;
   if(!campCanSwitch())return false;
   const first=!SAVE.camp.side;
-  SAVE.camp={side:id,m:monthNum()};
+  /* 换边只改归属与月份，不能把历月参与凭证和已领记录一起抹掉。 */
+  SAVE.camp=Object.assign({},SAVE.camp,{side:id,m:monthNum(),
+    log:(SAVE.camp&&SAVE.camp.log)||{},claimed:(SAVE.camp&&SAVE.camp.claimed)||{}});
   SAVE.lbSig='';                                   // 阵营变了要重传，否则榜上还是旧的
   persist();
   const c=campById(id);
@@ -4682,10 +4529,17 @@ function campPick(id){
     +'<br><span style="font-size:11.5px">'+esc(c.creed)+'</span>',4000);
   return true;
 }
+/* 只记「本机这个月曾以某阵营成功上传」。它是月奖励的本地凭证，
+   不上传、不含化名、不能反查任何其他玩家。 */
+function campLogParticipation(){
+  const side=SAVE.camp&&SAVE.camp.side;if(!campById(side))return;
+  SAVE.camp.log=SAVE.camp.log||{};
+  SAVE.camp.log[monthKey(monthNum())]=side;
+}
 /* 本机在自己阵营指标上的贡献分。首页只显示这个——
    「我今天为这边挣了多少」比「我们领先几分」更抓人，也不怕人少。 */
-/* 入营选择器。零美术预算，仪式感靠三样：信条原文、首领署名、
-   以及「选了这个月就定了」这句分量。三张并排、不预选不推荐——
+/* 入营选择器。仪式感靠信条原文、首领署名，
+   以及「选了这个月就定了」这句分量。两张不预选不推荐——
    **选边这件事不该被引导**。 */
 function campPickerHTML(){
   const cur=(SAVE.camp&&SAVE.camp.side)||'';
@@ -4700,7 +4554,7 @@ function campPickerHTML(){
       +(c.id===cur?'<div class="cp-cur">当前</div>':'')+'</div>';
   }
   h+='</div><div class="camp-pick-note">'
-    +(can?'选定后<b>本月不再更改</b>，下月初可以改投。三营没有强弱，只有你更认哪一种。'
+    +(can?'选定后<b>本月不再更改</b>，下月初可以改投。两营没有强弱，只有你更认哪一种。'
          :'本月已定 · 下月初可改投')+'</div>';
   return h;
 }
@@ -4718,8 +4572,8 @@ function bindCampPicker(after){
 const CAMP_CAP=400;
 function campMyScore(){
   const c=myCamp(); if(!c)return 0;
-  /* 直接把整份 stats 交给 score()，别再一个字段一个字段地摘 ——
-     以前这里手抄字段，漏了服务端根本收不到的 rush2，还多算进去，两边对不上。 */
+  /* 直接把整份 stats 交给 score()，别再一个字段一个字段地摘，
+     避免客户端和服务端对同一战绩的理解再度分叉。 */
   return Math.min(CAMP_CAP,Math.max(0,c.score(LB.stats())));
 }
 function campCapped(){return campMyScore()>=CAMP_CAP}
@@ -5260,14 +5114,14 @@ const VARIANTS={1:'192 星全满',7:'终章讨伐全程不用灵器',10:'单局�
 /* ---- 隐藏款 ----
    **不预告条件**，撞出来才知道。这是泡泡玛特「隐藏款」那份惊喜的来源，
    但去掉了赌的部分——它不是极低概率抽出来的，是**做到**才有的，
-   所以对学生受众没有开箱赌博的观感（这条是红线）。
+   所以没有开箱赌博的观感（这条是红线）。
    拿到之前界面上只显示「隐藏 · 尚未显形」，不给任何提示；
    拿到之后才把条件说出来，让人有「原来如此」而不是「早说啊」。
    条件都选了「正常玩着玩着就可能撞上」的，不做需要攻略才可能达成的。 */
 const SECRETS={
   11:{nm:'矿灯', when:'开到第 100 匣', test:c=>(c.opened||0)>=100},
   /* 原条件是「在午夜零点到一点之间开匣」（getHours()===0）—— 这是全站唯一一处
-     要求玩家在**某个具体时刻在线**的设计，而且要求的是午夜，受众里有学生。
+     要求玩家在**某个具体时刻在线**的设计，而且要求的是午夜。
      它还和这张表上面那句自述直接矛盾：「条件都选了正常玩着玩着就可能撞上的」。
      换成星屑本身的累计量：照常玩就会路过，不用熬夜，也不用挑时辰。 */
   25:{nm:'星屑', when:'星屑攒到 150', test:c=>(c.dust||0)>=150},
@@ -5791,18 +5645,15 @@ function beginPlay(){
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
     showTut('把相同的灵石 <b>三个连成一线</b>——点两下，或直接拖动',6000)}
 }
-function startRush(blitz){
+function startRush(){
   GS.mode='rush';
-  /* blitz = 「续灯 · 45 秒」：45 秒起步，连锁是唯一的灯油。
-     90 秒考的是稳，续灯考的是不停手——同一套引擎，两种心跳。 */
-  GS.rush2=!!blitz;
   const L=levelDef(3);L.moves=999;L.colors=5;L.goals=[{type:'score',need:99999999,got:0}];
-  L.chName=blitz?'续灯 · 45 秒':'矿灯将熄 · 90 秒';L.era='LAMPLIGHT';
-  if(blitz){L.s1=15000;L.s2=35000;L.s3=65000}else{L.s1=20000;L.s2=45000;L.s3=80000}
+  L.chName='矿灯将熄 · 90 秒';L.era='LAMPLIGHT';
+  L.s1=20000;L.s2=45000;L.s3=80000;
   GS.L=L;GS.goals=[];GS.moves=0;GS.score=0;GS.over=false;GS.chainMax=0;GS.specials=0;
   /* 晰·探路者的被动在限时局折算成 +5 秒（冒险关是 +2 步） */
   const xiMs=(compById(SAVE.comp).id==='xi')?5000:0;
-  const baseMs=blitz?45000:90000;
+  const baseMs=90000;
   GS.boss=null;GS.rushOn=true;GS.rushT=baseMs+xiMs;GS.rushMax=baseMs+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
@@ -5817,15 +5668,15 @@ function startRush(blitz){
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
-  const bst=GS.rush2?SAVE.rush2Best:SAVE.rushBest;
+  const bst=SAVE.rushBest;
   $('#rush-best').textContent='最佳 '+(bst?bst.toLocaleString('en-US'):'—');
   $('#score-stars').innerHTML='<s style="left:25%">★</s><s style="left:56%">★</s><s style="left:97%">★</s>';
   $('#goal-row').innerHTML='<div style="font-size:12px;letter-spacing:.16em;color:var(--ink2)">'
-    +(GS.rush2?'连锁 2 起就回灯油 · 断了灯就灭':'连锁越长 · 时间越多')+'</div>';
+    +'连锁越长 · 时间越多</div>';
   $('#goal-lbl').textContent='灯油';
-  $('#quip-line').innerHTML='<b>狼先生：</b>'+(GS.rush2?'四十五秒。手别停。':'九十秒，别客气。');
+  $('#quip-line').innerHTML='<b>狼先生：</b>九十秒，别客气。';
   updHUD();GS.busy=false;GS.idle=PLAT.now();
-  showTut(GS.rush2?'只有 45 秒 · <b>连锁 2 起就回时间，回得更多</b>':'限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
+  showTut('限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
 }
 function endRush(){
   GS.over=true;GS.busy=true;GS.rushOn=false;
@@ -5841,35 +5692,29 @@ function endRush(){
   $('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   fetchRushRank();                        // 不阻塞：查到名次会自己补进战报
-  const b2=GS.rush2;
-  const prevBest=b2?SAVE.rush2Best:SAVE.rushBest;
+  const prevBest=SAVE.rushBest;
   const best=GS.score>prevBest;
   /* ⚠ 战报要用**这一局之前**的最佳来判「新纪录」。
      下一行就把 SAVE.rushBest 改成本局分数了，rushTablet 再去读它的话
      `GS.score>=best` 永远为真 —— 每一份战报都写「新纪录」，打得再烂也写。
      分享写谎话比不分享更糟，所以把判定结果在这里存下来给它用。 */
   GS.wasRecord=best;
-  if(best){if(b2)SAVE.rush2Best=GS.score;else SAVE.rushBest=GS.score;persist()}
-  /* 续灯的成绩不上传：后端 stats 没这个字段，LB.stats() 也只读 rushBest，
-     所以它天然只活在本机与名片上——本地荣誉，正好。 */
-  if(!b2)setTimeout(()=>LB.flush('clear'),600);
+  if(best){SAVE.rushBest=GS.score;persist()}
+  setTimeout(()=>LB.flush('clear'),600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
   /* 限时局天然以「灯熄」收场，所以默认用 lose 的将熄意象；
      破了纪录才换成 win——那一下确实值得庆祝。 */
   applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent=b2?'续灯 · BLITZ 45':'矿灯将熄 · LAMPLIGHT 90';
+  $('#end-kick').textContent='矿灯将熄 · LAMPLIGHT 90';
   $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'灯 · <em>灭</em>';
   countTo($('#end-score'),GS.score);
   /* 灯位段位：只挂在 90 秒正赛上。升位那一下在这里揭晓——
      离下一位还差多少也写明白，这就是「再点一盏」的理由。 */
-  const nowBest=b2?SAVE.rush2Best:SAVE.rushBest;
-  let rankLine='';
-  if(!b2){
-    const r=lampRank(SAVE.rushBest), nx=lampNext(SAVE.rushBest);
-    rankLine='<br>灯位 <b>'+r+'</b>'+(nx?'　距 '+nx.nm+' 还差 <b>'
-      +(nx.need-SAVE.rushBest).toLocaleString('en-US')+'</b>':'　已是最高');
-  }
+  const nowBest=SAVE.rushBest;
+  const r=lampRank(SAVE.rushBest), nx=lampNext(SAVE.rushBest);
+  const rankLine='<br>灯位 <b>'+r+'</b>'+(nx?'　距 '+nx.nm+' 还差 <b>'
+    +(nx.need-SAVE.rushBest).toLocaleString('en-US')+'</b>':'　已是最高');
   $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials
     +'</b><br>历史最佳 <b>'+nowBest.toLocaleString('en-US')+'</b>'+rankLine;
   const stars=$('#end-stars').children;
@@ -5878,12 +5723,9 @@ function endRush(){
   setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
   $('#end-quip').textContent=pick2(Q_RUSH_END);
   $('#end-next').textContent='再点一盏';
-  $('#end-next').dataset.act=b2?'rush2':'rush';
-  /* 互跳：90 秒结算页给「续灯」的门，续灯结算页给回 90 秒的门。
-     玩完最兴奋的那一刻是换口味的最好时机。 */
-  $('#end-retry').style.display='';
-  $('#end-retry').textContent=b2?'矿灯将熄 · 90 秒':'试试续灯 · 45 秒';
-  $('#end-retry').dataset.act=b2?'rush':'rush2';
+  $('#end-next').dataset.act='rush';
+  $('#end-retry').style.display='none';
+  $('#end-retry').dataset.act='';
   $('#end-continue').style.display='none';   // 不复位会把冒险关的续挖状态漏进限时赛结算屏
   ovl('end');
 }
@@ -5956,8 +5798,8 @@ function endLevel(win){
     $('#end-quip').textContent=pick2(Q_WIN);
     $('#end-next').textContent=L.endless?'再深一层 →':'下一关 →';
     $('#end-next').dataset.act='next';
-    /* end-retry 在限时结算页被借去当「换模式」的门，act 会残留——
-       不复位的话，冒险关的「再挖一次」点下去会开出一局续灯。 */
+    /* end-retry 在限时结算页会被隐藏，回到冒险结算时
+       必须同时复位显示、文案和 act，不让旧状态串场。 */
     $('#end-retry').style.display='';
     $('#end-retry').textContent='再挖一次';
     $('#end-retry').dataset.act='retry';
@@ -6052,12 +5894,10 @@ function ptEstimate(){
 }
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
 function ptColor(i){return GEMS[i%6]}
-/* 两个变量都写上，让 CSS 按当前主题挑——直接烤死 --pc 的话，
-   「跟随系统」在傍晚自动转深色时，为浅色底选的暗色会留在深色背景上，几乎看不见 */
+/* 玩家色统一走曜石底色，不再为两套主题维护重复变量。 */
 function ptStyle(el,i){
   const g=ptColor(i);
   el.style.setProperty('--pc-base',g.base);
-  el.style.setProperty('--pc-dark',g.dk);
   el.style.setProperty('--pg',hexA(g.base,.24));
 }
 /* 一屏定版：内容比视口高时整屏等比微缩（zoom），任何机型不再上下滑动。
@@ -6268,7 +6108,7 @@ function ptRoundBreak(){
     const g=ptColor(q.idx);
     return '<div class="pd-row'+(i===0?' w1':'')+'">'
       +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
-      +'<div class="dot" style="--pc-base:'+g.base+';--pc-dark:'+g.dk+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[q.idx]+'</div>'
+      +'<div class="dot" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[q.idx]+'</div>'
       +'<div class="nm">'+esc(q.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(q.team?'蓝队':'红队')+'</span>':'')+'</div>'
       +'<div class="sc">'+q.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
@@ -6318,7 +6158,7 @@ function ptFinish(){
     const g=ptColor(p.idx);
     return '<div class="pd-row'+(i===0&&PARTY.mode!=='relay'?' w1':'')+'">'
       +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
-      +'<div class="dot" style="--pc-base:'+g.base+';--pc-dark:'+g.dk+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
+      +'<div class="dot" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
       +'<div class="nm">'+esc(p.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(p.team?'蓝队':'红队')+'</span>':'')+'</div>'
       +'<div class="sc">'+p.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
@@ -6443,7 +6283,7 @@ const LB={
   },
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
-    const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
+    const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,
       camp:(SAVE.camp&&SAVE.camp.side==='grey'?'':(SAVE.camp&&SAVE.camp.side))||'',comp:SAVE.comp||'',
       pw:SAVE.lbPw||'',stats:this.stats()};
     /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
@@ -6453,12 +6293,13 @@ const LB={
     if(d.ok){
       SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
+      campLogParticipation();                                  // 只在服务端确认收到成绩后记当月参与
       SAVE.lbAt=Date.now();pwGhostTick();persist();
       if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
   },
-  /* 小队（口令私榜）已下线，与门派功能重复且 77% 的人从没填过。
+  /* 小队（口令私榜）已下线，与旧社交分组重复且 77% 的人从没填过。
      后端 /gf/board?scope=class 与 class_tag 列保留不动，存量数据不丢。 */
   async board(scope){
     return await this.fetchJSON('/gf/board?scope='+scope+'&limit='+LB_LIMIT);
@@ -6514,7 +6355,7 @@ const LB={
            `stop=true` 之后整个会话再也不上传，玩家只看到「上传不了」。
            只有玩家改得动的那几种（化名违规/保留词）才值得停下来等他改；
            其余一律照常退避重试。 */
-        const perm=/化名|保留词|门派/.test(String(d.err||''));
+        const perm=/化名|保留词/.test(String(d.err||''));
         SAVE.lbErr=(d&&d.err)||'上传被拒绝';
         if(perm){this.stop=true;clearTimeout(this.timer);this.timer=0}
         else this.plan();
@@ -6541,8 +6382,7 @@ const LB={
       /* camp 必须带上，字段要和 submit() 完全一致：
          换边那一发若正卡在弱网退避里，玩家一关页面就走 beacon，
          漏了 camp 换边就白换了（服务端 camp='' 时保留旧值）。 */
-      const body=JSON.stringify({deviceUUID:this.dev(),alias:SAVE.lbAlias,
-        faction:SAVE.lbFaction||'',pw:SAVE.lbPw||'',
+      const body=JSON.stringify({deviceUUID:this.dev(),alias:SAVE.lbAlias,pw:SAVE.lbPw||'',
         camp:(SAVE.camp&&SAVE.camp.side)||'',stats:this.stats()});
       return navigator.sendBeacon(this.api+'/gf/submit',new Blob([body],{type:'text/plain'}));
     }catch(e){return false}
@@ -6575,19 +6415,19 @@ function lbMenuStatus(){
   }
   el.textContent=SAVE.lbPower
     ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
-    : '看看三营谁在领先';
+    : '听听两营的月下回声';
 }
 function lbRowHTML(r,mine,throne){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   /* ── 副行只放**最有分量的那一样** ──
-     以前一行塞五样（首座·段位·门派·关卡·星数），375px 宽的手机上
+     以前一行塞五样（首座·段位·社交组·关卡·星数），375px 宽的手机上
      实测 27 行裁了 7 行，最狠的裁掉 215px —— 玩家看到的是半截话。
      根子是「行」和「名片」抢活干：行是一眼扫的摘要，名片才是细账，
      而名片现在点一下就开。所以按分量取一样，其余全部让给名片：
        坐着首座 → 只报首座（那是他此刻最值得说的事）
        否则     → 段位 + 走到第几关
-     门派与星数进名片。再配 ellipsis，万一还是长，读起来是「省略」不是「被切断」。 */
+     其余细账进名片。再配 ellipsis，万一还是长，读起来是「省略」不是「被切断」。 */
   const sub=LB.scope==='rush'
     /* 90 秒榜上「走到第几关」没意义，换成能说明这一局的：最长连锁 */
     ? [r.rankName,r.chain?('最长 '+r.chain+' 连'):''].filter(Boolean).join(' · ')
@@ -6609,7 +6449,7 @@ function lbRowHTML(r,mine,throne){
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
    榜单一行要塞下 17 个字段，只显示得下 3 个：化名、段位、矿力。
-   门派、关卡、星数、最佳分、矿灯、连锁、到场天数、局数、手气…全都看不到，
+   关卡、星数、最佳分、矿灯、连锁、到场天数、局数、手气…全都看不到，
    长化名还会被挤掉。点开看是最省事的解法 —— 不占列表空间，信息一个不少。
 
    顺带把**矿力的三条线**摊开：这是全站唯一能看到「别人强在哪」的地方，
@@ -6657,26 +6497,14 @@ function lbCardHTML(r){
     +'<button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
       +'<div class="lc-nm">'+esc(r.alias||'')+'</div>'
-      +'<div class="lc-tt">'+esc(r.rankName||'')+(r.faction?(' · 门派 '+esc(r.faction)):'')+'</div>'
+      +'<div class="lc-tt">'+esc(r.rankName||'')+'</div>'
     /* 同伴摆出来 —— 周赛给了同伴被动之后，「谁强」必须公开，
        否则就是藏起来的暗亏。摆出来它才会变成群里的战术讨论。 */
     +(r.comp&&compById(r.comp)
       ? '<div class="lc-comp">同行 · <b>'+esc(compById(r.comp).name)+'</b> '
         +esc(compById(r.comp).title)+'</div>'
       : '')
-    /* 月称号：带年月、过月不再有 —— 跟岁记同一套逻辑。
-       只记名不发资源，所以不需要「领取」这一步。 */
-    +(()=>{
-      const t=[];
-      for(const x of MONTHS){
-        if(!x.members||x.members.indexOf(r.alias)<0)continue;
-        const y=x.m.slice(0,4), mo=+x.m.slice(4);
-        if(x.kind==='faction')t.push(y+'.'+mo+' '+esc(x.name)+(x.rank===1?' 之首':' 第'+x.rank));
-        else if(x.kind==='camp'){const c=CAMPS.find(v=>v.id===x.name);
-          t.push(y+'.'+mo+' '+(c?c.nm:'阵营')+'胜')}
-      }
-      return t.length?'<div class="lc-ttl">'+t.slice(0,4).map(v=>'<i>'+v+'</i>').join('')+'</div>':'';
-    })()+'</div>'
+    +'</div>'
     +'<div class="lc-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'<span>矿力</span></div>'
     +'<div class="lc-lines">'+bar('depth','走多远',L.depth)+bar('skill','打多险',L.skill)
       +bar('grind','来多勤',L.grind)+'</div>'
@@ -6715,7 +6543,7 @@ function wkState(){
   return s;
 }
 /* 本周还剩几天。**不做跳动的红色倒计时**——那是制造焦虑的手法，
-   本作受众里有学生，不用它。就静静写一句「还剩 N 天」。 */
+   它会制造不必要的时间压力，不用。就静静写一句「还剩 N 天」。 */
 const wkDaysLeft=()=>7-((dayNum()-4)%7);
 const WK_MOVES=25;
 /* ---- 矿脉拓片：无剧透的纯文本战报 ----
@@ -6742,12 +6570,12 @@ function rushTablet(){
     ||location.origin+location.pathname.replace(/index\.html$/,'');
   /* 用 endRush 存下来的判定，不要现算 —— 现算的话 SAVE.rushBest 已经被更新过了 */
   const isNew=!!GS.wasRecord;
-  return '灵石远征 · '+(GS.rush2?'续灯 45 秒':'矿灯将熄 90 秒')+'\n'
+  return '灵石远征 · 矿灯将熄 90 秒\n'
     +(rows||'□')+'\n'
     +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax
     +(isNew?' · 新纪录':'')+'\n'
     +(RUSH_RANK>0?('矿灯榜 第 '+RUSH_RANK+' 名\n'):'')
-    +'同样 '+(GS.rush2?'45':'90')+' 秒，你能打多少？\n'
+    +'同样 90 秒，你能打多少？\n'
     +share;
 }
 /* 结算时顺手查一次自己在矿灯榜上的名次。**不阻塞结算** ——
@@ -6835,7 +6663,7 @@ function drawCard(){
   x.fillStyle=INK;x.font='500 17px serif';
   x.fillText('play.myskme.com',mid,H-82);
   x.fillStyle='#5a564c';x.font='400 13px serif';
-  x.fillText('狼先生与他的学生们 · 学院谷地',mid,H-52);
+  x.fillText('狼先生与远征者们 · 学院谷地',mid,H-52);
   /* jpeg 而不是 png：部分安卓机对 png 的长按识别有问题 */
   return cv.toDataURL('image/jpeg',0.92);
 }
@@ -6862,7 +6690,7 @@ function drawNameCard(){
   x.fillStyle=DIM;x.font='400 15px serif';
   colFix();shopFix();
   x.fillText('矿工号 '+minerTag()+' · 同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
-  /* 矿场买的题名。名片是会被导出成图片发到微信群的 —— 这是全站最值钱的展示位，
+  /* 工坊刻下的题名会进入可导出的名片，
      也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。
      坐着首座的话，首座压过题名显示 —— 那是争来的，比买来的重。 */
   const _tt=(THR_MINE&&THR_MINE.length?THR_MINE[0]:'')||shopTitle();
@@ -6873,8 +6701,7 @@ function drawNameCard(){
   x.fillStyle=GOLD2;x.font='700 46px serif';
   x.fillText(lampRank(SAVE.rushBest),mid,292);
   x.fillStyle=INK;x.font='400 15px serif';
-  x.fillText('矿灯将熄最佳 '+(SAVE.rushBest||0).toLocaleString('en-US')
-    +(SAVE.rush2Best?' · 续灯 '+SAVE.rush2Best.toLocaleString('en-US'):''),mid,322);
+  x.fillText('矿灯将熄最佳 '+(SAVE.rushBest||0).toLocaleString('en-US'),mid,322);
   /* 最爱同伴：出战最多的那位 */
   let fav=null,fr=-1;
   for(const c of COMPANIONS){const r=(SAVE.cs[c.id]||{}).r||0;if(r>fr){fr=r;fav=c}}
@@ -6905,7 +6732,7 @@ function drawNameCard(){
   x.fillStyle=INK;x.font='500 16px serif';
   x.fillText('play.myskme.com',mid,H-80);
   x.fillStyle=DIM;x.font='400 13px serif';
-  x.fillText('狼先生与他的学生们 · 学院谷地',mid,H-52);
+  x.fillText('狼先生与远征者们 · 学院谷地',mid,H-52);
   return cv.toDataURL('image/jpeg',0.92);
 }
 function showNameCard(){
@@ -6971,12 +6798,12 @@ function renderQuest(){
       ?'<b>'+esc(bs.def.nm)+'</b> —— 赏金已入账，下周一换新的'
       :esc(bs.def.nm)+'　<span class="qs-dim">'+icTag('box')+' 匣 ×1 + 星屑 10 · 输的局达成也算</span>')
     +'</div></div>';
-  /* 续灯 */
-  h+='<div class="qs-sec"><div class="qs-hd">续灯 · 45 秒'
-    +'<span class="qs-sub">'+(SAVE.rush2Best?('最佳 '+SAVE.rush2Best.toLocaleString('en-US')):'还没试过')+'</span></div>'
-    +'<div class="qs-bd">45 秒起步，连锁 2 起就回灯油——考的不是稳，是不停手'
-    +(nx?'<br><span class="qs-dim">顺带：矿灯将熄距 '+nx.nm+' 还差 '+(nx.need-SAVE.rushBest).toLocaleString('en-US')+' 分</span>':'')
-    +'</div><button class="btn qs-go" data-go="rush2">点 灯</button></div>';
+  /* 90 秒矿灯：保留唯一限时玩法，不再另开一条重复成绩线。 */
+  h+='<div class="qs-sec"><div class="qs-hd">矿灯将熄 · 90 秒'
+    +'<span class="qs-sub">'+(SAVE.rushBest?('最佳 '+SAVE.rushBest.toLocaleString('en-US')):'还没试过')+'</span></div>'
+    +'<div class="qs-bd">同一时长，连锁越长，灯油续得越久'
+    +(nx?'<br><span class="qs-dim">距 '+nx.nm+' 还差 '+(nx.need-SAVE.rushBest).toLocaleString('en-US')+' 分</span>':'')
+    +'</div><button class="btn qs-go" data-go="rush">点 灯</button></div>';
   /* 岁记 */
   h+='<div class="qs-sec"><div class="qs-hd">岁记 · '+monthTag(yj.m)
     +'<span class="qs-sub">'+(yj.n?('已刻 '+yj.n+' / 3 轮'):'每月只此一枚')+'</span></div>'
@@ -6997,7 +6824,7 @@ function renderQuest(){
   for(const btn of $$('#quest-body .qs-go'))btn.onclick=()=>{
     SFX.click();ovl(null);
     if(btn.dataset.go==='weekly')startWeekly();
-    else if(btn.dataset.go==='rush2')startRush(true);
+    else if(btn.dataset.go==='rush')startRush();
   };
 }
 function renderWeekCard(){
@@ -7127,36 +6954,19 @@ async function renderLB(){
   const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
   /* 名片是 #lb-list 的**兄弟节点**，重写列表不会碰它 ——
      切榜时不显式收起，它会留在那儿显示上一个榜的人。
-     ⚠ 必须放在**发请求之前**：这函数有好几条提前 return（没注册、读失败、
-       返回 0 行），放在后面的话那几条路径根本跑不到，
-       实测门派榜返回 0 行时名片就一直挂着世界榜的人。 */
+     ⚠ 必须放在**发请求之前**：读失败或返回 0 行都会提前 return，
+       不先收起就会残留上一个榜单的人。 */
   {const c=$('#lb-card'); if(c){c.classList.remove('on');c.innerHTML=''}}
   const form=$('#lb-form');
   for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
-  /* 门派榜是**纯只读的公开榜**，不该被注册闸挡住。
-     线上实测发现：没起过化名的浏览器点门派榜是空的——而新人最该看到的
-     恰恰是「已经有帮派在玩」，看到了才有加入的念头。世界榜同理：
-     先给看，看完想上榜再起名，别拿一道表单堵在门口。
-     （小队榜曾是例外——它要口令才有内容；小队已随三阵营下线。） */
-  if(!LB.registered()&&LB.scope!=='class'){
+  /* 世界榜与阵营战况都先给看；想把自己记上去时再起化名。 */
+  if(!LB.registered()){
     form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='起名上榜';
-  }else if(!LB.registered()){
-    form.hidden=false;list.innerHTML='';mine2.innerHTML='';
-    /* 输入框与存档同步，避免显示上一次残留的值 */
-    $('#lb-alias').value=SAVE.lbAlias||'';
-    $('#lb-faction').value=SAVE.lbFaction||'';
-    msg.innerHTML='起个化名就能上榜——<b>不要用真名</b>。';
-    $('#lb-submit').textContent='起名上榜';$('#lb-edit').style.display='none';
-    return;
   }
   form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
   msg.textContent='正在连接矿脉…';list.innerHTML='';mine2.innerHTML='';
-  /* ---- 门派榜 ----
-     按门派聚合总矿力。拉一个活人进帮，帮派立刻涨分——
-     这一榜存在的意义就是给「叫上朋友」一个看得见的理由。 */
   /* ---- 阵营 ----
-     只画三色拔河带与「我的贡献」，**绝不显示人头数**。
-     「光明 5 人」这种数字一露就露怯；而比例条在任何人数下都在动。 */
+     只画两色实力带与「我的贡献」；不显示人头数，也不下发成员名单。 */
   if(LB.scope==='camp'){
     const mine=myCamp();
     if(!mine){
@@ -7169,7 +6979,7 @@ async function renderLB(){
     const d=await LB.fetchJSON('/gf/camps');
     if(tok!==LB._tok)return;
     msg.textContent='';
-    /* 读不到就退回等分三段的静止带，**下面自己的营和贡献照常显示**。
+    /* 读不到就退回等分两段的静止带，**下面自己的营和贡献照常显示**。
        离线/后端没跟上时整块空白，玩家会以为功能坏了——而这一屏最核心的
        「我属于哪一营、我挣了多少」本来就是纯本地算得出来的。 */
     const okNet=!!(d&&d.ok&&d.pct);
@@ -7180,19 +6990,9 @@ async function renderLB(){
     for(const c of CAMPS)h+='<span class="cl'+(c.id===mine.id?' me':'')+'">'
       +'<b class="dot cs-'+c.id+'"></b>'+esc(c.nm)+' '+Math.round(pct[c.id]*100)+'%</span>';
     h+='</div>';
-    if(!okNet)h+='<div class="camp-note">三营战况暂时读不到 —— <b>不影响你继续挖</b>，联网后自动刷新。</div>';
-    else if(d.empty)h+='<div class="camp-note">本周还没人开挖 —— <b>你挖的第一铲就会让这条带子动起来</b>。</div>';
-    /* 本营同伴名单。看得见队友才有归属感——但**不写人数**，
-       列表有多长玩家自己看得到，那是「有谁」不是「才几个」。 */
-    const ms=((d&&d.members)||{})[mine.id]||[];
-    if(ms.length){
-      h+='<div class="camp-mem"><div class="cmem-hd">本营同伴</div>'
-        +ms.map(x=>{
-          const me=x.alias===SAVE.lbAlias;
-          return '<div class="cmem'+(me?' me':'')+'"><span>'+esc(x.alias)
-            +(me?' <b>（你）</b>':'')+'</span><i>'+x.sc.toLocaleString('en-US')+'</i></div>';
-        }).join('')+'</div>';
-    }
+    if(!okNet)h+='<div class="camp-note">两营战况暂时读不到 —— <b>不影响你继续挖</b>，联网后自动刷新。</div>';
+    else if(d.empty)h+='<div class="camp-note">矿脉尚未留下明显偏向。</div>';
+    h+=campEchoHTML();
     h+='<div class="camp-me"><div class="cm-hd">'+esc(mine.nm)+' · '+esc(mine.lead)+'</div>'
       +'<div class="cm-creed">「'+esc(mine.creed)+'」</div>'
       +'<div class="cm-metric">本营看 <b>'+esc(mine.metric)+'</b>（'+esc(mine.how)+'）</div>'
@@ -7200,65 +7000,16 @@ async function renderLB(){
         ? '我的贡献 <b>起名上榜后开始计入</b>'          // 没化名时 flush 直接 return，先给数字是骗人
         : '我的贡献 <b>'+campMyScore().toLocaleString('en-US')+'</b> / '+CAMP_CAP
           +(campCapped()?' · <b>这条线你已经做满</b>':''))+'</div>'
-      +'<div class="cm-cap">每人计入上限 '+CAMP_CAP+'，做满的部分不再计入 —— 让人少的一营也追得动。</div>'
+      +'<div class="cm-cap">单人计入上限 '+CAMP_CAP+'，让一个强者无法独自决定月胜负。</div>'
       +'<div class="cm-sw">'+(campCanSwitch()
         ?'<button class="btn ghost" id="camp-switch">改投他营</button>'
         :'<span class="qs-dim">本月已定 · 下月初可改投</span>')+'</div></div>';
     list.innerHTML=h;
     const sw=$('#camp-switch');
     if(sw)sw.onclick=()=>{SFX.click();list.innerHTML=campPickerHTML();bindCampPicker(()=>renderLB())};
-    /* 门派那栏对「没起化名」有明确提示，阵营这栏以前没有——
-       同一个面板里两个标签行为不一致，新玩家走完整套入营仪式却一分没算。 */
     mine2.innerHTML=!LB.registered()
       ?'你还没上榜——点「<b>起名上榜</b>」起个化名，这份贡献才会算进本营。'
-      :'三营各看各的本事 —— 走得远、打得险、来得勤，各有各的算法。';
-    return;
-  }
-  if(LB.scope==='faction'){
-    const f=await LB.fetchJSON('/gf/factions?limit=20');
-    if(tok!==LB._tok)return;
-    if(!f.ok){
-      msg.innerHTML=(f.offline?'连不上矿脉榜——<b>不影响你继续挖</b>。'
-        :esc(f.err||'门派榜暂时读不到'));
-      return;
-    }
-    const rows=f.rows||[];
-    if(!rows.length){
-      msg.innerHTML='还没有门派上榜。<br><b>点「改化名」填个门派名</b>——同名即同门，和朋友约好一个名字就行。';
-      return;
-    }
-    msg.textContent='';
-    const mineF=(SAVE.lbFaction||'').trim();
-    /* 门派行可展开看成员——「同名即同门」，得让人确认朋友真的进来了 */
-    list.innerHTML=rows.map(r=>{
-      const isMine=mineF&&r.faction===mineF;
-      const mem=(r.members||[]).map(x=>{
-        const me=x.alias===SAVE.lbAlias;
-        return '<div class="cmem'+(me?' me':'')+'"><span>'+esc(x.alias)
-          +(me?' <b>（你）</b>':'')+'</span><i>'+(x.power||0).toLocaleString('en-US')+'</i></div>';
-      }).join('');
-      /* 成员为空也要渲染出一块，否则点了没反应，看上去就是按钮坏了 */
-      return '<div class="fac-wrap'+(isMine?' open':'')+'">'
-        +'<div class="fac-row'+(isMine?' mine':'')+'" data-f="'+esc(r.faction)+'">'
-        +'<span class="rk">'+r.rank+'</span>'
-        +'<span class="ar">'+ICONS.chev+'</span>'
-        +'<span class="nm">'+esc(r.faction)+(isMine?' · 我的门派':'')+'</span>'
-        +'<span class="cnt">'+r.n+' 人 · 人均 '+r.avg.toLocaleString('en-US')+'</span>'
-        +'<span class="pw">'+r.power.toLocaleString('en-US')+'</span></div>'
-        +'<div class="fac-mem'+(isMine?' open':'')+'">'
-        +(mem||'<div class="cmem"><span class="qs-dim">这一派的名单还没读到</span></div>')
-        +'</div></div>';
-    }).join('');
-    list.insertAdjacentHTML('afterbegin','<div class="fac-tip">点门派名看都有谁</div>');
-    for(const row of $$('#lb-list .fac-row'))row.onclick=()=>{
-      const w=row.parentNode, m=w.querySelector('.fac-mem');
-      if(m){SFX.click();m.classList.toggle('open');w.classList.toggle('open')}
-    };
-    mine2.innerHTML=!LB.registered()
-      ?'你还没上榜。点「<b>起名上榜</b>」起个化名、填个门派——<b>同名即同门</b>，和朋友约好名字就行。'
-      :(mineF
-        ?'我的门派 <b>'+esc(mineF)+'</b> · 每拉一位朋友入门，总矿力立刻多一份'
-        :'还没有门派。点「改化名」填一个——<b>同名即同门</b>，和朋友约好名字就行。');
+      :'光明看深度，黑域看技巧。两边月末封存一次。';
     return;
   }
   const d=await LB.board(LB.scope);
@@ -7370,39 +7121,40 @@ function pwAdviceHTML(){
     +'三样里<b>最短的那样算四倍</b>。<br>'
     +'你现在最短的是「<b>'+h.nm+'</b>」——'+h.do+'。';
 }
-/* ────────── 月榜与月称号 ──────────
-   王老师定的三条：配速员**必须参与**（模拟开放式公测，真实感优先）；
-   **不发实物奖励**，只记名或给称号；按月结算。
-
-   不发资源恰好化掉了最大的矛盾：配速员拿第一时，它不是「从真人手里抢走奖品」，
-   只是公测榜上的一行记录 —— 本来就该是这样。
-   而输的一方**什么也不失去**，这一条守住了「不做惩罚式设计」。
-
-   称号是**记名不是资源**，所以不需要「领取」：服务端封存了当月成员名单，
-   客户端拿自己的化名一比就知道有没有。 */
+/* ────────── 阵营月结算 ──────────
+   服务端只公布胜方，不下发成员、人数或个人轨迹。
+   本机只有在该月成功上传过阵营成绩才可入账：参与得 40 星屑，
+   胜方得 100 星屑。输的一方仍有回报，且星屑不进竞技矿力。 */
 let MONTHS=[];
 async function loadMonths(){
   try{
     const d=await LB.fetchJSON('/gf/month?limit=8');
-    if(d&&d.ok&&Array.isArray(d.rows))MONTHS=d.rows;
+    if(d&&d.ok&&Array.isArray(d.rows)){
+      MONTHS=d.rows.filter(r=>r.kind==='camp');
+      const got=campClaimMonthly();
+      if(got)toast('阵营月结·星屑 <b>+'+got+'</b>',3200);
+    }
   }catch(e){}
 }
-/* 我的月称号：上过榜的月份各给一行。带年月、过月不再有 —— 跟岁记同一套逻辑。 */
-function myMonthTitles(){
-  const me=SAVE.lbAlias||'';
-  if(!me)return [];
-  const out=[];
+function campClaimMonthly(){
+  const log=(SAVE.camp&&SAVE.camp.log)||{}, claimed=(SAVE.camp&&SAVE.camp.claimed)||{};
+  let got=0;
   for(const r of MONTHS){
-    if(!r.members||r.members.indexOf(me)<0)continue;
-    const y=r.m.slice(0,4), mo=+r.m.slice(4);
-    if(r.kind==='faction'&&r.rank===1)out.push(y+'.'+mo+' · '+r.name+' 之首');
-    else if(r.kind==='faction')out.push(y+'.'+mo+' · '+r.name+' 第'+r.rank);
-    else if(r.kind==='camp'){
-      const c=CAMPS.find(x=>x.id===r.name);
-      out.push(y+'.'+mo+' · '+(c?c.nm:'阵营')+'胜');
-    }
+    const side=log[r.m];if(!side||claimed[r.m])continue;
+    const add=side===r.name?100:40;
+    colFix();COLS.dust+=add;got+=add;claimed[r.m]=add;
   }
-  return out;
+  if(got){SAVE.camp.claimed=claimed;persist();colSave()}
+  return got;
+}
+function campEchoHTML(){
+  const r=MONTHS[0];
+  if(!r)return '<div class="camp-note">月末封存两营实力，下月在这里留下胜方回声。</div>';
+  const c=campById(r.name), side=((SAVE.camp&&SAVE.camp.log)||{})[r.m];
+  const add=((SAVE.camp&&SAVE.camp.claimed)||{})[r.m];
+  return '<div class="camp-note">上月回声 · <b>'+esc(c?c.nm:'未知')+'胜</b>'
+    +(side?(' · 你以 '+esc((campById(side)||{}).nm||'')+' 参与'+(add?(' · 星屑 +'+add):'')):'')
+    +'<br>月内成功上榜即算参与：参与 40，胜方 100。</div>';
 }
 /* ────────── 三线首座 ──────────
    王老师要「积分第一的闪耀称号」，同时要「人人都有机会去争夺」。
@@ -7551,7 +7303,6 @@ function nearHTML(rows,i){
 function lbOpenForm(){
   $('#lb-form').hidden=false;
   $('#lb-alias').value=SAVE.lbAlias||'';
-  $('#lb-faction').value=SAVE.lbFaction||'';
   $('#lb-msg').innerHTML='改完点「上榜」保存。';
   $('#lb-list').innerHTML='';$('#lb-mine').innerHTML='';
   $('#lb-submit').textContent='保存并上榜';
@@ -7619,10 +7370,7 @@ async function lbSave(){
     if(a.length<2||a.length>12){toast('化名要 <b>2–12 位</b>');return}
     if(!/^[一-龥A-Za-z0-9·\-_ ]{2,12}$/.test(a)){toast('化名只能用中英文、数字和 ·-_');return}
     if(lbBlocked(a)){toast('这个化名是保留词——<b>换一个</b>');return}
-    const f=$('#lb-faction').value.trim().slice(0,8);
-    if(f&&lbBlocked(f)){toast('门派名是保留词——<b>换一个</b>');return}
     SAVE.lbAlias=a;
-    SAVE.lbFaction=$('#lb-faction').value.trim().slice(0,8);
     SAVE.lbSig='';persist();
   }
   $('#lb-msg').textContent='上传中…';
@@ -7666,14 +7414,11 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'　典藏 <b>'+colGot()+'</b> / '+CARDS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
-  /* 有没开的匣、或矿场有新解锁/买得起的折价货，就点一颗金点。
-     矿场藏在典藏册里（大厅竖向只剩 61px，塞不下第五个按钮），
-     不点这一颗的话，整套货架门槛的情绪回报——「我又开了一层」——没有任何地方告诉他。 */
-  $('#col-dot').innerHTML=(COLS.box>0||shopNews())?'<i class="dot"></i>':'';
+  /* 只有真正已拥有但未开的匣才点亮典藏入口。 */
+  $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
   /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
   $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   /* 挑战点：本周矿脉没首挖、或悬赏没拿，就亮一颗——周一自然重亮，绝不闪烁催促 */
-  $('#corner-ctl').classList.add('on');
   $('#quest-dot').innerHTML=(wkState().score===null||!bountyState().done)?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
@@ -7764,8 +7509,8 @@ function renderAch(){
    ================================================================== */
 let LB_ROWS=[];
 let colCur=1;
-/* ══════════════ 矿场 · 兑 ══════════════
-   三条店规，改商品前先读这三句：
+/* ══════════════ 灵石工坊 ══════════════
+   三条店规：
 
    一、**店里不卖战力。** 判据是机械的：任何商品**不得改写 pwLines() 读的那九个字段**
        （lv/stars/chain/mv/score/rush/days/runs/dbest）。会改，就不上架。
@@ -7776,200 +7521,63 @@ let colCur=1;
    三、**任何进度只写绝对数**（已拓 12 张），不写百分比、不写分母、不写缺口。
        成绩只增不减，而百分比会在每次上新内容时集体掉下去。
 
-   矿力是**门槛**不是货币：它是排行榜排名依据，一扣就掉名次，
-   榜单/贴身对手/阵营贡献会一起崩。花的是灵力与星屑。
-   货架层可以一直往上加，矿力无上限 —— 追求天然不封顶。
-
-   门槛用线上真实分布校准过（2026-08-04：3.6k~84k，实测每人每天稳涨约 1264）：
-   保证任何人的下一层都在一周左右够得着，11 人里 10 人在 9 天内。 */
+   矿力是**门槛**不是货币：它是排行榜排名依据，一扣就掉名次。
+   所以只花灵力，且工坊固定三层八件，不再叠限时折扣、月配额与封样。 */
 const SHELF=[
-  {p:0,      nm:'矿口架'},
-  {p:6000,   nm:'浅脉架'},
-  {p:12000,  nm:'中脉架'},
-  {p:20000,  nm:'深脉架'},
-  {p:32000,  nm:'暗河架'},
-  {p:50000,  nm:'断层架'},
-  {p:78000,  nm:'矿心架'},
-  {p:120000, nm:'长夜架'},
-  {p:190000, nm:'未名架'},
+  {p:0,     nm:'初火'},
+  {p:6000,  nm:'深纹'},
+  {p:18000, nm:'矿心'},
 ];
 /* 商品。cur: 'pw'=灵力（SAVE.power）／'dust'=星屑（COLS.dust）。
    slot 非空 = 同槽位只能戴一件，买过的随时免费换戴（买断的是拥有，不是佩戴权）。
    need = 额外的达成条件，只看「做到」不看钱，对应店规二。 */
 const GOODS=[
-  /* ── 矿口架：人人当天就能买到东西，这是钩子。刻意便宜。 ── */
-  {id:'sl1',s:0,nm:'落印 · 矿镐',   cur:'pw',cost:700, slot:'seal',d:'兑换时盖在票根上的印，也印在矿工名片右下'},
-  {id:'sl2',s:0,nm:'落印 · 方印',   cur:'pw',cost:700, slot:'seal',d:'同上，换一种纹样'},
-  {id:'sl3',s:0,nm:'落印 · 猫爪',   cur:'pw',cost:700, slot:'seal',d:'小黑猫留下的那种',need:c=>colAny(32),needTxt:'先集到「猫铃」'},
-  {id:'tt1',s:0,nm:'题名 · 深堑常客',cur:'pw',cost:900, slot:'title',d:'名片化名底下加一行称衔',need:()=>(LB.stats().lv||0)>=40,needTxt:'通到第 40 关'},
-  {id:'tt2',s:0,nm:'题名 · 十二重',  cur:'pw',cost:900, slot:'title',d:'同上',need:()=>(SAVE.chainBest||0)>=12,needTxt:'打出 12 重连锁'},
-  {id:'tt3',s:0,nm:'题名 · 日日下矿',cur:'pw',cost:900, slot:'title',d:'同上',need:()=>(SAVE.days||0)>=30,needTxt:'累计下矿 30 天'},
-  {id:'ps1',s:0,nm:'题跋 · 矿脉不会跑',cur:'pw',cost:600,slot:'post',d:'拓片与名帖页脚那句落款，发出去别人看得见'},
-  {id:'ps2',s:0,nm:'题跋 · 我在这里挖过',cur:'pw',cost:600,slot:'post',d:'同上'},
-  {id:'dep',s:0,nm:'探深尺',        cur:'pw',cost:3000,d:'名片上多一行「典藏深度」，只增不减'},
-  /* ── 浅脉架 6k ── */
-  {id:'tt4',s:1,nm:'题名 · 执灯人',  cur:'pw',cost:2000,slot:'title',d:'名片称衔',need:()=>(SAVE.daily&&SAVE.daily.best||0)>=30,needTxt:'连续下矿 30 天'},
-  {id:'ps3',s:1,nm:'题跋 · 灯还亮着',cur:'pw',cost:1800,slot:'post',d:'拓片落款'},
-  {id:'sl4',s:1,nm:'落印 · 门派印',  cur:'pw',cost:2400,slot:'seal',d:'把你的门派名刻进印里',need:()=>!!(SAVE.lbFaction||'').trim(),needTxt:'先填一个门派名'},
-  /* ── 中脉架 12k ── */
-  {id:'yj1',s:2,nm:'岁记拓印',      cur:'pw',cost:1500,d:'名片底部一条窄带，把岁记按年月排开；此后每月自动长一格'},
-  {id:'sl5',s:2,nm:'落印 · 长明',   cur:'pw',cost:3000,slot:'seal',d:'一盏不灭的灯'},
-  /* ── 深脉架 20k ── */
-  {id:'tt5',s:3,nm:'题名 · 不用灵器的人',cur:'pw',cost:4000,slot:'title',d:'名片称衔',need:()=>colAny(31),needTxt:'先拿到叶王那张异纹'},
-  /* ── 暗河架 32k ── */
-  {id:'ps4',s:4,nm:'题跋 · 我从暗河来',cur:'pw',cost:5000,slot:'post',d:'拓片落款'},
-  /* ── 断层架 50k ── */
-  {id:'dep2',s:5,nm:'长明碑 · 年号',cur:'pw',cost:15000,d:'一年刻一次名，名片上多一行「长明 · 二〇二六」，年年成序列'},
-  /* ── 矿心架 78k 起：这三层是**封样**层，未解锁时只露价签不露名。
-       上面三层刻意只放「已经接好线的」槽位商品（题名/题跋/落印），
-       不放需要另做一整套表现的东西 —— 摆一件点了没反应的货比空货架更伤。 ── */
-  {id:'tt6',s:6,nm:'题名 · 长夜行者',cur:'pw',cost:6000,slot:'title',d:'名片称衔',need:()=>(SAVE.days||0)>=100,needTxt:'累计下矿 100 天'},
-  {id:'sl6',s:6,nm:'落印 · 长明灯',  cur:'pw',cost:5000,slot:'seal', d:'一盏点了很久的灯'},
-  {id:'ps5',s:7,nm:'题跋 · 灯下无人',cur:'pw',cost:8000,slot:'post', d:'拓片落款'},
-  {id:'tt7',s:7,nm:'题名 · 满轮者',  cur:'pw',cost:9000,slot:'title',d:'名片称衔',need:()=>Object.values(SAVE.yjSeal||{}).filter(x=>(x&&x.n)>=3).length>=6,needTxt:'集满 6 个月的三轮岁记'},
-  {id:'sl7',s:8,nm:'落印 · 未名',    cur:'pw',cost:20000,slot:'seal',d:'没有人见过这枚印'},
-  /* 全伙伴曜衔：六位同伴各 100 胜。这是全站最长的一条线，
-     刻意放在最高一层且不打折 —— 它该是「争来的」不是「买到的」，
-     价钱只是个形式，真正的门槛是那 600 场胜仗。 */
-  {id:'tt8',s:8,nm:'题名 · 六衔在身',cur:'pw',cost:12000,slot:'title',
-   d:'六位同伴全部打到曜衔才刻得下这一行',
-   need:()=>COMPANIONS.every(c=>csRank((SAVE.cs[c.id]||{}).w||0)==='曜衔'),
-   needTxt:'六位同伴各打到曜衔'},
+  {id:'sk1',s:0,nm:'辉面 · 月白',cur:'pw',cost:800,slot:'skin',d:'棋盘灵石多一道冷白切光'},
+  {id:'sl1',s:0,nm:'落印 · 矿镐',cur:'pw',cost:700,slot:'seal',d:'盖在名帖与拓片右下'},
+  {id:'ps1',s:0,nm:'题跋 · 矿脉不会跑',cur:'pw',cost:600,slot:'post',d:'收在拓片与名帖页脚'},
+  {id:'sk2',s:1,nm:'辉面 · 绛紫',cur:'pw',cost:1800,slot:'skin',d:'棋盘灵石多一道紫晶内纹'},
+  {id:'tt1',s:1,nm:'题名 · 深堑常客',cur:'pw',cost:1400,slot:'title',d:'名片化名下的称衔',need:()=>(LB.stats().lv||0)>=40,needTxt:'通到第 40 关'},
+  {id:'tt2',s:1,nm:'题名 · 十二重',cur:'pw',cost:1400,slot:'title',d:'名片化名下的称衔',need:()=>(SAVE.chainBest||0)>=12,needTxt:'打出 12 重连锁'},
+  {id:'sk3',s:2,nm:'辉面 · 曜金',cur:'pw',cost:3600,slot:'skin',d:'棋盘灵石多一道暖金环切'},
+  {id:'dep',s:2,nm:'探深尺',cur:'pw',cost:3000,d:'名片上多一行典藏深度，只增不减'},
 ];
-/* 从这一层起未解锁就封样：只露价签，不露名字与说明。
-   评审原话是「全案最干净的一条」——无窗口、无名额、无消耗，纯好奇心。
-   它同时是「永远不知道接下来有什么惊喜」最便宜的实现：什么都不用新建。
-   ⚠ 将来做「今日矿口」轮换时，抽到封样层的商品必须也走封样文案，
-     否则当场穿帮；「公开轮换表」那条同理，只能公开已解锁层。 */
-/* 商品的槽位图标。全部复用现成的 ICONS 线稿，零新美术：
-     题名 medal（挂在名字旁的衔）／题跋 scroll（拓片上的落款）／落印 seal（印章）。
-   商店原来是 22 行纯文字，同一层里三类商品混在一起看不出区别 ——
-   一眼分类是这一条的全部目的，不是为了好看。
-   ⚠ 封样的图标必须**跟真名一样被盖住**，否则从图标就能反推出这是称衔还是印，
-   封样就白封了。所以封样统一用 unknown。 */
-const SLOT_IC={title:'medal',post:'scroll',seal:'seal'};
-const SEAL_FROM=6;
-const SEAL_TAG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-function shopSealed(g){return g.s>=SEAL_FROM&&!shopUnlocked(g)}
-/* ────────── 今日矿口 ──────────
-   每期（一周）摆出三件折价货，**全服同一份**（同种子）——
-   这一条的价值不在折扣，在于所有人这周看到的是同三件，
-   微信群里「这周矿口摆了啥」是免费的话题引擎。
-
-   原设计是「每天三格，用掉才不亏」。评审按一个初三学生的一天逐条打，
-   结论是日频格子会和已有的每日矿灯/今日三桩/今日深挖/匣日限叠成
-   八个每日触点——「焦虑不来自倒计时这个控件，来自『今天还有东西没领』
-   这个状态，而它被同时点亮八次」。学生的真实作息是周末补两天。
-   所以窗口改成**期**：一周内任意时候买都算，周末才有空的人一件不亏。
-
-   而且错过的**只是折扣，不是货**：下期这三件照样在货架上原价买得到。
-   这是「错过就没了」最轻的一种，轻到不会有人为它熬夜。 */
-const STALL_N=3, STALL_OFF=0.3;
-/* 选货按期号纯函数化，别把 weekNum() 埋在里面 ——
-   埋进去的话自检只能反复查「当前这一期」，写出来的断言是同义反复，
-   跨期到底换不换货根本测不到。这个坑本作已经踩过一次（旧自检那条目标数断言）。 */
-function stallPick(w){
-  const r=rngOf('stall|'+w), out=[];
-  /* 第一件必从低层（人人已解锁的那三层）抽，保证**这一期人人都有得挑**。
-     不加这一条的话，三件里抽到两件封样是常事，矿口对多数人就只是摆着看。
-     其余两件从全部商品抽——这样既保住「全服同一份、群里对得上」，
-     又不会出现一整期一件都动不了的空转。 */
-  const low=GOODS.filter(g=>g.s<=2), all=GOODS.slice();
-  const take=(pool)=>{const g=pool.splice(Math.floor(r()*pool.length),1)[0];
-    const i=all.findIndex(x=>x.id===g.id); if(i>=0)all.splice(i,1); return g};
-  if(low.length)out.push(take(low));
-  while(out.length<STALL_N&&all.length)out.push(take(all));
-  return out;
-}
-function stallState(){
-  const w=weekNum();
-  if(!SAVE.stall||SAVE.stall.w!==w){SAVE.stall={w:w,used:{}};persist()}
-  if(!SAVE.stall.used||typeof SAVE.stall.used!=='object')SAVE.stall.used={};
-  return {w,items:stallPick(w),used:SAVE.stall.used};
-}
-function stallPrice(g){return Math.max(1,Math.round(g.cost*(1-STALL_OFF)))}
-function stallHas(id){return stallState().items.some(g=>g.id===id)}
-/* ────────── 新解锁提示 ──────────
-   矿力跨过一层门槛是整套货架唯一的高光时刻，可它发生在后台、无声无息。
-   这里记住「已经看过第几层」，跨过新层就在大厅点一颗金点、进店时说一声。
-   看过就熄，不重复骚扰；也绝不闪烁、不倒计时。 */
-function shopTopShelf(){
-  const pw=Number(SAVE.lbPower)||0;
-  let i=-1; for(let k=0;k<SHELF.length;k++)if(pw>=SHELF[k].p)i=k;
-  return i;
-}
-function shopNews(){
-  shopFix();
-  if(shopTopShelf()>(SAVE.shop.seen==null?-1:SAVE.shop.seen))return true;
-  /* 本期矿口里有买得起、还没买、且已解锁的货 —— 那是真的「今天可以去看一眼」 */
-  return stallState().items.some(g=>!shopOwn(g.id)&&!shopCanBuy(g));
-}
-function shopSeeNews(){
-  shopFix();
-  const t=shopTopShelf(), was=(SAVE.shop.seen==null?-1:SAVE.shop.seen);
-  if(t>was){
-    SAVE.shop.seen=t;persist();
-    const nm=SHELF[t].nm;
-    setTimeout(()=>toast('矿场开了新一层 · <b>'+esc(nm)+'</b>'
-      +(t>=SEAL_FROM?'<br>封样揭开了':''),3800),400);
-    return true;
-  }
-  return false;
-}
+/* 只留四种看得见的改变：棋盘辉面、称衔、落款与落印。 */
+const SLOT_IC={skin:'gem',title:'medal',post:'scroll',seal:'seal'};
+const shopNews=()=>false;
+const shopSeeNews=()=>false;
 const GOODS_BY=Object.fromEntries(GOODS.map(g=>[g.id,g]));
-/* ────────── 兑窗 · 月配额 ──────────
-   每月只开这么多扇窗。它是「一个月内解锁不完」唯一的硬保证 ——
-   光靠矿力门槛挡不住有钱人一周清空货架，靠涨价又会把新人挡在外面。
-
-   刻意做成**纯限购、零竞争**：这是你自己的额度，不跟任何人抢，
-   没有名额、没有先到先得、没有排名。用不完的不结转，但用不完也不损失什么
-   （货一直在架上，下个月接着买）—— 所以它限的是速度，不是机会。 */
-const SHOP_QUOTA=6;
-function shopQuota(){
-  const m=monthNum(), q=SAVE.shop.q;
-  if(!q||q.m!==m){SAVE.shop.q={m:m,n:0};persist()}
-  return SAVE.shop.q;
-}
-const shopQuotaLeft=()=>Math.max(0,SHOP_QUOTA-(shopQuota().n||0));
 function shopFix(){
   if(!SAVE.shop||typeof SAVE.shop!=='object')SAVE.shop={own:{},worn:{}};
   if(!SAVE.shop.own||typeof SAVE.shop.own!=='object')SAVE.shop.own={};
   if(!SAVE.shop.worn||typeof SAVE.shop.worn!=='object')SAVE.shop.worn={};
-  /* at = 首兑戳：这件是你哪个月头一回兑的。**是履历不是内容** ——
-     错过的只是「我是八月拿的」这件事，物件本身永远还在架上。
-     评审判定这是全案最轻的一种「错过」，所以它可以放心做。 */
+  /* at = 首兑戳，只记这件物品第一次归属自己的月份。 */
   if(!SAVE.shop.at||typeof SAVE.shop.at!=='object')SAVE.shop.at={};
-  /* 存档里可能留着已下架商品的 id，清掉，免得渲染时取到 undefined */
-  for(const k in SAVE.shop.own)if(!GOODS_BY[k])delete SAVE.shop.own[k];
+  delete SAVE.shop.q;delete SAVE.shop.seen;
+  /* 旧货架下架的收藏按每件 80 星屑一次性回铸，不让老存档白买。 */
+  const retired=Object.keys(SAVE.shop.own).filter(k=>!GOODS_BY[k]);
+  if(retired.length){colFix();COLS.dust+=retired.length*80;for(const k of retired)delete SAVE.shop.own[k];colSave()}
   for(const s in SAVE.shop.worn){const v=SAVE.shop.worn[s];if(v&&!GOODS_BY[v])delete SAVE.shop.worn[s]}
   return SAVE.shop;
 }
 const shopOwn=id=>!!shopFix().own[id];
 const shopWorn=slot=>shopFix().worn[slot]||'';
 function shopUnlocked(g){return (Number(SAVE.lbPower)||0)>=SHELF[g.s].p}
-/* 本期矿口摆着且还没买过 → 折价。折扣只影响价格，不影响任何解锁条件。 */
-function shopOnSale(g){return stallHas(g.id)&&!shopOwn(g.id)}
-function shopPrice(g){return shopOnSale(g)?stallPrice(g):g.cost}
+const shopPrice=g=>g.cost;
 function shopCanBuy(g){
   if(shopOwn(g.id))return '已有';
   if(!shopUnlocked(g))return '未解锁';
   if(g.need&&!g.need())return g.needTxt||'条件未达成';
   const have=g.cur==='dust'?(colFix().dust||0):(SAVE.power||0);
   if(have<shopPrice(g))return (g.cur==='dust'?'星屑':'灵力')+'不够';
-  /* 配额放在最后判：先让玩家看到「买得起」，再告诉他这个月窗满了。
-     顺序反过来的话，钱不够的人会看到「兑窗已满」，把两件事搞混。 */
-  if(shopQuotaLeft()<=0)return '本月兑窗已满';
   return '';
 }
 function shopBuy(id){
   const g=GOODS_BY[id]; if(!g)return false;
   const why=shopCanBuy(g);
   if(why){toast(why==='已有'?'这件已经在你手上了':why,2000);return false}
-  const pay=shopPrice(g), sale=shopOnSale(g);
+  const pay=shopPrice(g);
   if(g.cur==='dust'){colFix();COLS.dust-=pay;colSave()}
   else SAVE.power=(SAVE.power||0)-pay;
-  if(sale){stallState().used[id]=1;}
-  shopQuota().n=(shopQuota().n||0)+1;
   shopFix().own[id]=1;
   SAVE.shop.at[id]=monthKey(monthNum());        // 首兑戳：哪个月头一回兑的
   if(g.slot)SAVE.shop.worn[g.slot]=id;          // 新买的直接戴上，省一步
@@ -7990,41 +7598,26 @@ function shopSeal(){const id=shopWorn('seal');return id?GOODS_BY[id].nm.replace(
 function renderShop(){
   shopFix();colFix();
   const pw=Number(SAVE.lbPower)||0;
-  const st=stallState();
-  /* 矿口摆在最上面：全服同一份，这周谁进来都看到同三件。
-     封样层的货在这里也必须封着，否则从矿口那一栏就把高层的名字漏出去了。 */
-  const stall='<div class="sp-stall"><div class="sp-shd">本期矿口 <i>第 '+st.w+' 期 · 七折</i></div>'
-    +st.items.map(g=>{
-      const seal=shopSealed(g), own=shopOwn(g.id);
-      return '<div class="sp-si'+(own?' own':'')+'"><span>'+(seal?'封样':esc(g.nm))+'</span>'
-        +'<i>'+(own?'已有':(g.cur==='dust'?'星屑 ':'灵力 ')+stallPrice(g).toLocaleString('en-US'))+'</i></div>';
-    }).join('')
-    +'<div class="sp-sfoot">一周内随时买都算 · 过期只是折扣没了，货照样在架上</div></div>';
   $('#shop-mine').innerHTML='<div class="sp-bal">灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')
     +'</b>　星屑 <b>'+(COLS.dust||0).toLocaleString('en-US')+'</b></div>'
-    +'<div class="sp-note">矿力只是<b>门槛</b>，兑换不扣矿力 —— 名次一分都不会掉。<br>'
-      +'本月兑窗 <b>'+shopQuotaLeft()+' / '+SHOP_QUOTA+'</b> 扇 · 用不完不结转，但货一直在架上</div>'
-    +stall;
+    +'<div class="sp-note">三层、八件，没有限时折扣、月配额或随机轮换。<br>'
+      +'矿力只是<b>门槛</b>，兑换不扣矿力；辉面只改棋盘外观，不改成绩。</div>';
   let h='';
   for(let i=0;i<SHELF.length;i++){
     const sh=SHELF[i], open=pw>=sh.p, list=GOODS.filter(g=>g.s===i);
-    /* 未解锁的层不藏起来：看得见够不着才有期待。空层也摆出来，那是「还没开凿」。 */
+    /* 只设三个清晰门槛，未解锁层照常显示真名与作用。 */
     h+='<div class="sp-shelf'+(open?'':' lock')+'">'
       +'<div class="sp-hd"><span class="sp-nm">'+esc(sh.nm)+'</span>'
       +'<span class="sp-gate">'+(open?'已开':'矿力 '+sh.p.toLocaleString('en-US')
         +' · 还差 '+(sh.p-pw).toLocaleString('en-US'))+'</span></div>';
-    if(!list.length){h+='<div class="sp-empty">尚未开凿</div></div>';continue}
-    let si=0;
+    if(!list.length){h+='</div>';continue}
     for(const g of list){
       const own=shopOwn(g.id), why=shopCanBuy(g), worn=g.slot&&shopWorn(g.slot)===g.id;
-      /* 封样：够不着的高层只露价签。名字与说明都不给，连是不是称衔都看不出来。
-         解锁那一刻自己揭开，那一下就是这条机制的全部收益。 */
-      const seal=shopSealed(g), tag=SEAL_TAG[si++]||'？';
-      const gic=ICONS[seal?'unknown':(SLOT_IC[g.slot]||'gem')]||'';
-      h+='<div class="sp-i'+(own?' own':'')+(seal?' seal':'')+'">'
+      const gic=ICONS[SLOT_IC[g.slot]||'gem']||'';
+      h+='<div class="sp-i'+(own?' own':'')+'">'
         +'<div class="sp-t"><span class="sp-ic">'+gic+'</span>'
-          +(seal?'封样 · '+tag:esc(g.nm)+(worn?' <i class="sp-on">戴着</i>':''))+'</div>'
-        +'<div class="sp-d">'+(seal?'解开这一层才揭样':esc(g.d))
+          +esc(g.nm)+(worn?' <i class="sp-on">正在使用</i>':'')+'</div>'
+        +'<div class="sp-d">'+esc(g.d)
           +(own&&SAVE.shop.at[g.id]
             ?'　<em class="sp-at">'+SAVE.shop.at[g.id].slice(0,4)+'.'+SAVE.shop.at[g.id].slice(4)+' 兑</em>':'')
           +'</div>'
@@ -8033,9 +7626,7 @@ function renderShop(){
           ? (g.slot?'<button class="btn ghost sp-b" data-wear="'+g.id+'">'+(worn?'摘下':'戴上')+'</button>'
                    :'<span class="sp-have">已有</span>')
           : '<span class="sp-c">'+(g.cur==='dust'?'星屑 ':'灵力 ')
-            +(shopOnSale(g)
-              ?('<s>'+g.cost.toLocaleString('en-US')+'</s> <b>'+shopPrice(g).toLocaleString('en-US')+'</b>')
-              :g.cost.toLocaleString('en-US'))+'</span>'
+            +g.cost.toLocaleString('en-US')+'</span>'
             +(open?'<button class="btn sp-b'+(why?' off':'')+'" data-buy="'+g.id+'"'+(why?' disabled':'')+'>'
                    +(why||'兑')+'</button>':''))
         +'</div></div>';
@@ -8448,7 +8039,7 @@ const HOW_HTML=`
 （时间 30–90 秒、步数 10–18 步，档位差距刻意不大）——谁拿哪一档由你们场下商定，游戏只照配额发。<br>
 每一轮打完会停下来看积分，下一轮开始前还能再调配额；想收就随时点<b>终结比赛</b>，当场出名次。<br><br>
 <b>矿上的挑战</b>（大厅「挑战」一键直达）<br>
-　<b>续灯 · 45 秒</b>　45 秒起步，连锁 2 起就回灯油——手不能停。<br>
+　<b>矿灯将熄 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
 　<b>本周矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
 　<b>狼先生的悬赏</b>　每周一条，输的局达成也算，赏典藏匣。<br>
 　<b>岁记</b>　每月三桩全清，铸一枚<b>刻着年月的绝版徽记</b>，过月不再有。<br><br>
@@ -8458,7 +8049,7 @@ const HOW_HTML=`
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
 <b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
-还可以选一条你信的<b>挖法</b>——持灯的光明、冒险的黑域、勤勉的灰塔，三营各看各的本事，每月可改投一次。
+还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
 
 /* ==================================================================
@@ -8506,7 +8097,7 @@ cv.addEventListener('contextmenu',e=>e.preventDefault());
 /* ==================================================================
    [ 主循环 · LOOP ]
    ================================================================== */
-let lastT=0, menuT=0;
+let lastT=0, menuT=0, paintT=0;
 function stepPieces(dt){
   const k=1-Math.exp(-dt*.014);
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
@@ -8535,11 +8126,21 @@ function drawDying(t){
 }
 function loop(now){
   PLAT.raf(loop);
-  const dt=Math.min(48,now-(lastT||now));lastT=now;
-  if($('#scr-game').classList.contains('on')){
+  if(document.hidden){lastT=now;return}
+  const gameOn=$('#scr-game').classList.contains('on');
+  const menuOn=$('#scr-menu').classList.contains('on');
+  /* 合成动画时保持顺滑；限时局闲置时只刷新数字；普通棋盘待机降到 5fps。
+     大厅的七颗灵石不再为几像素浮动每帧重绘。 */
+  if(!gameOn&&!menuOn)return;
+  const active=gameOn&&(GS.busy||HITSTOP>0||ULTING||DYING.length||
+    FX.parts.length||FX.beams.length||FX.rings.length||FX.marks.length);
+  const gap=menuOn?1000:(active?16:(GS.rushOn?80:200));
+  if(paintT&&now-paintT<gap)return;
+  const dt=Math.min(250,now-(lastT||now));lastT=now;paintT=now;
+  if(gameOn){
     /* 顿帧：这几十毫秒里棋子与特效不推进，读作「打到了」。
        ⚠ 只冻画面 —— 下面限时局的倒计时照常走 dt，否则连锁越多剩的时间越多，那是作弊。 */
-    let vdt=dt;
+    let vdt=Math.min(48,dt);
     if(HITSTOP>0){HITSTOP-=dt;vdt=0;if(HITSTOP<0)HITSTOP=0}
     stepPieces(vdt);stepFX(vdt);
     if(GS.rushOn&&!GS.over&&!GS.paused){
@@ -8562,14 +8163,14 @@ function loop(now){
       if(mv)hintCell=mv;
       GS.idle=now-3000;
     }
-    draw(now);drawDying(now);
-  }else if($('#scr-menu').classList.contains('on')){
-    drawMenuGems(now);
+    draw(REDUCED?0:now);drawDying(REDUCED?0:now);
+  }else if(menuOn){
+    drawMenuGems(REDUCED?0:now);
   }
 }
 function drawMenuGems(t){
   const c=$('#menu-gems');if(!c)return;
-  const W=Math.min(340,$('#scr-menu').clientWidth-40), H=64, d=Math.min(devicePixelRatio||1,2.5);
+  const W=Math.min(340,$('#scr-menu').clientWidth-40), H=64, d=Math.min(devicePixelRatio||1,2);
   if(c.width!==Math.round(W*d)){c.width=Math.round(W*d);c.height=Math.round(H*d);c.style.width=W+'px';c.style.height=H+'px'}
   const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
   /* 六色全露 + 万象珠压轴。之前只画 6 个且把第 6 个当成万象珠，
@@ -8769,14 +8370,12 @@ $('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=
 $('#end-retry').addEventListener('click',e=>{SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
-  if(act==='rush2'){startRush(true);return}
   openLevel(GS.L.n);
 });
 $('#end-next').addEventListener('click',e=>{
   SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
-  if(act==='rush2'){startRush(true);return}
   if(act==='weekly'){startWeekly();return}
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
@@ -8820,33 +8419,8 @@ $('#cat').addEventListener('click',()=>{
   if(!SAVE.cat){SAVE.cat=1;persist();grant('a12');renderMenu()}
   else toast('小黑猫：<b>……喵。</b>',1500);
 });
-/* 2026-08-05：**只有一套配色**，主题开关整个拆掉。
-   王老师定的：「人家世界一流游戏也没有两种模式切换」。
-   两套主题的实际代价是今晚现修的一串 bug（矿坑在浅色下是纯黑、小黑猫是一坨黑块、
-   「不可用」用降透明度在浅底上反而更抢眼、灵石底光在浅底糊成奶白雾）——
-   每一条都只在另一套里出问题，等于把测试面翻倍换来一个没人真正需要的开关。
-   顺手清掉旧存档里的偏好键，免得下次有人再想加回来时读到脏数据。 */
-/* 主题开关（2026-08-06 按玩家反馈恢复）。
-   深色仍是默认与本色；浅色是「晨光」，不是阅读器 —— 见那段 CSS 注释。
-   只有这两态，不跟随系统（王老师早先定的）。 */
-(function(){
-  var TLS='myskme-theme';
-  function pref(){try{var v=localStorage.getItem(TLS);return v==='light'?'light':'dark'}catch(e){return 'dark'}}
-  function ap(p){
-    var e=document.documentElement;
-    e.setAttribute('data-theme',p);
-    if(typeof syncTheme==='function')syncTheme();     // 画布缓存了主题，切换要刷
-    var b=$('#themeBtn');
-    if(b){b.innerHTML=ICONS[p==='dark'?'moon':'sun'];b.title='主题：'+(p==='dark'?'深色':'晨光');}
-  }
-  ap(pref());
-  var bb=$('#themeBtn');
-  if(bb)bb.addEventListener('click',function(){
-    var nx=pref()==='dark'?'light':'dark';
-    try{localStorage.setItem(TLS,nx)}catch(e){}
-    ap(nx);SFX.click&&SFX.click();
-  });
-})();
+/* 只保留统一的「曜石墨金」，清掉历史主题偏好。 */
+try{localStorage.removeItem('myskme-theme')}catch(e){}
 addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCanvas()});
 /* Esc 一律走该弹层自己的按钮，让它跑完自己的收尾逻辑。
    以前直接 ovl(null) 无差别关闭：交接屏/结算页被关掉后 GS.over 与 GS.busy 还是 true，
@@ -9202,34 +8776,39 @@ window.__selftest=function(){
     const okDpr=/devicePixelRatio/.test(src);
     ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
   }
-  /* 32c. 三阵营：三营各有独立指标（不能都看总矿力，否则鲸鱼一人定胜负——
-     实测头号玩家矿力 = 其余 12 人总和的 63%）；换边每月一次；
-     且**阵营视图绝不渲染人头数**——「光明 5 人」一露就露怯。 */
+  /* 32c. 两营各有独立指标；换边每月一次；
+     阵营视图不能重新混入成员、人数或退役门派接口。 */
   {
     const ids=CAMPS.map(c=>c.id);
     const uniq=new Set(ids).size===2&&ids.join()==='light,dark';
-    const st={lv:20,stars:40,chain:8,score:30000,rush:20000,rush2:9000};
+    const st={lv:20,stars:40,chain:8,score:30000,rush:20000};
     const scores=CAMPS.map(c=>c.score(st));
     const indep=new Set(scores).size===2;              // 同一份数据在两营算出两个不同分
     const src=String(renderLB);
-    const noHead=!/人</.test(src.slice(src.indexOf("scope==='camp'"),src.indexOf("scope==='faction'")));
-    const bak=JSON.parse(JSON.stringify(SAVE.camp));
+    const campSrc=src.slice(src.indexOf("scope==='camp'"),src.indexOf('const d=await LB.board'));
+    const privateByDesign=!/\.members|cmem|faction|gf\/factions|人数/.test(campSrc);
+    const bak=JSON.parse(JSON.stringify(SAVE.camp)),bakSig=SAVE.lbSig;
     SAVE.camp={side:'light',m:monthNum()};
     const locked=!campCanSwitch();                    // 本月已选 → 不能再换
-    SAVE.camp={side:'light',m:monthNum()-1};
+    SAVE.camp={side:'light',m:monthNum()-1,log:{202601:'light'},claimed:{202601:40}};
     const open=campCanSwitch();                       // 上月选的 → 可以换
-    SAVE.camp=bak;
-    ok('两营指标各自独立、换边每月一次、阵营视图不露人头数',
-       uniq&&indep&&noHead&&locked&&open);
+    const switched=campPick('dark');
+    const kept=switched&&SAVE.camp.log[202601]==='light'&&SAVE.camp.claimed[202601]===40;
+    SAVE.camp=bak;SAVE.lbSig=bakSig;persist();
+    ok('两营指标独立、换边每月一次、阵营不下发成员与人数',
+       uniq&&indep&&privateByDesign&&locked&&open&&kept);
   }
-  /* 32b. 公开榜（世界/门派）不该被注册闸挡住——线上实测过：
-     没起过化名的浏览器点门派榜是空的，而新人最该看到的恰恰是
-     「已经有帮派在玩」。 */
+  /* 32b. 月奖励只需本机参与凭证与公开胜方，无需成员名单。
+     参与 40、胜方 100，且同一月不能重复入账。 */
   {
-    const src=String(renderLB);
-    const openGate=/!LB\.registered\(\)&&LB\.scope!=='class'/.test(src);
-    const guide=/起名上榜/.test(src)&&/同名即同门/.test(src);
-    ok('世界榜与门派榜未注册也可浏览，且给出上榜引导',openGate&&guide);
+    const bakCamp=JSON.parse(JSON.stringify(SAVE.camp)),bakMonths=MONTHS.slice();
+    colFix();const d0=COLS.dust;
+    SAVE.camp={side:'light',m:monthNum(),log:{202601:'light',202602:'light'},claimed:{}};
+    MONTHS=[{m:'202601',kind:'camp',name:'light'},{m:'202602',kind:'camp',name:'dark'}];
+    const first=campClaimMonthly(),second=campClaimMonthly();
+    const right=first===140&&second===0&&COLS.dust===d0+140;
+    SAVE.camp=bakCamp;MONTHS=bakMonths;COLS.dust=d0;persist();colSave();
+    ok('阵营月结：参与 40、胜方 100，同月不重复入账',right);
   }
   /* 32. 求卡帖：编解码往返一致、错字拦得住、异纹不可求，
      而且**不能和赠印互相认**——两种帖长得像但用途相反，
@@ -9293,11 +8872,13 @@ window.__selftest=function(){
        ring1&&dust1&&dayKept);
   }
   {
-    /* 续灯与 90 秒的最佳分各记各的，名片才分得开两条线 */
-    const sep=('rush2Best' in SAVE)&&SAVE.rush2Best!==undefined;
-    const src=String(drawNameCard);
-    const nc=/toDataURL\(\s*['"]image\/jpeg['"]/.test(src)&&/lampRank/.test(src)&&/yjSeal/.test(src);
-    ok('续灯成绩独立存放、名片含灯位与岁记且走 jpeg',sep&&nc);
+    /* 限时玩法只留 90 秒一条线；删入口时也要把存档、战报与名片分支一起拔干净。 */
+    const timed=[startRush,endRush,rushTablet,renderQuest,drawNameCard].map(String).join('\n');
+    const nc=/toDataURL\(\s*['"]image\/jpeg['"]/.test(String(drawNameCard))
+      &&/lampRank/.test(String(drawNameCard))&&/yjSeal/.test(String(drawNameCard));
+    const oneMode=startRush.length===0&&/const baseMs=90000/.test(String(startRush));
+    ok('限时玩法只留 90 秒，名片仍含灯位与岁记且走 jpeg',
+       oneMode&&timed.length>0&&nc);
   }
   /* 33. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
@@ -9388,7 +8969,7 @@ window.__selftest=function(){
   /* 31. 累计账：矿力原来五项全是历史最高值，破纪录才动 —— 打十局没破纪录
      等于什么都没发生。runs/days 是仅有的两个只增项，「只要肝就有回报」全靠它们。
      天数必须**去重且不清零**：同一天打多局只算一天，断几天回来接着加，
-     断签清零那是惩罚，受众里有学生，不做。 */
+     断签清零是惩罚式设计，不做。 */
   {
     const bak={r:SAVE.runs,d:SAVE.days,l:SAVE.lastDay,t:SAVE.todayRuns};
     const today=dayNum();
@@ -9443,8 +9024,7 @@ window.__selftest=function(){
        给出的下一步动作必须是三句不同的话，否则这个功能等于没做。 */
     const adv=s=>{const L=pwLines(s);
       return (L.grind<=L.depth&&L.grind<=L.skill)?'grind':(L.depth<=L.skill?'depth':'skill')};
-    /* 三营各吃一条线且各有除数。以前三营另立公式，光明与黑域在量同一件事；
-       这条盯住「同一份档案在三营得分不同」，也盯住除数没被人顺手改掉。 */
+    /* 两营各吃一条线且各有除数，盯住同一份档案在两营得分不同。 */
     {
       const s={lv:111,stars:192,chain:11,score:91905,rush:121830,mv:0,runs:0,days:0,dbest:0};
       const byId=id=>CAMPS.find(c=>c.id===id).score(s);
@@ -9460,29 +9040,27 @@ window.__selftest=function(){
          CAMPS.find(c=>c.id==='light').score(only)===0
          && CAMPS.find(c=>c.id==='dark').score(only)===279);
     }
-    /* 34. 矿场 · 兑。三条店规里最要紧的是第一条：**不卖战力**。
+    /* 34. 灵石工坊。最要紧的店规是**不卖战力**。
      判据是机械的——商品不得改写 pwLines() 读的九个字段。这里把它写成断言，
      以后谁想往货架上加一件「买了更好打」的东西，红灯会拦住他。 */
   {
     const bakS=JSON.stringify(SAVE.shop||{}), bakP=SAVE.power, bakL=SAVE.lbPower;
     const before=JSON.stringify(LB.stats());
     SAVE.shop={own:{},worn:{}};SAVE.power=999999;SAVE.lbPower=999999;
-    /* 这一条要把货架买光才能验「九项输入一个不变」，所以要绕开月配额：
-       每买一件就把窗口清零。配额本身另有专门的一条盯着。 */
-    for(const g of GOODS){shopBuy(g.id);if(SAVE.shop.q)SAVE.shop.q.n=0}
-    ok('矿场：买光全部商品也不改动矿力的任何一项输入',JSON.stringify(LB.stats())===before);
+    for(const g of GOODS)shopBuy(g.id);
+    ok('工坊：买光全部商品也不改动矿力的任何一项输入',JSON.stringify(LB.stats())===before);
     /* 带 need 的商品在测试档案下条件不满足，买不到才是对的 —— 只断言无条件的那些。
        同时反过来验一条：有条件的确实被挡住了，钱多也买不到。 */
     const free=GOODS.filter(g=>!g.need), cond=GOODS.filter(g=>g.need);
     /* 槽位只断言「无条件商品填得满的那些」——「题名」整类都要先做到什么才能买，
        这是有意的（称衔该是挣来的，不是买来的），所以它不在这条断言里。 */
     const freeSlots=[...new Set(free.filter(g=>g.slot).map(g=>g.slot))];
-    ok('矿场：无条件商品全部买到并自动戴上，有条件的挡住了',
+    ok('工坊：无条件物品全部刻成并自动使用，有条件的挡住了',
        free.every(g=>shopOwn(g.id))
        && freeSlots.length>0 && freeSlots.every(s=>!!shopWorn(s))
        && cond.some(g=>!shopOwn(g.id)));
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
-    ok('矿场：称衔一律要先做到，不能纯花钱买',
+    ok('工坊：称衔一律要先做到，不能纯花灵力买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
     /* 四座：一个人可以全占（肝到了就该拿），四条路的门槛各不相同。
        运数吃的是开匣开出的臻卡，跟投入无关 —— 那是刻意留给新人的窗。 */
@@ -9622,7 +9200,7 @@ window.__selftest=function(){
          /GS\.wasRecord=best/.test(e)
          && /const best=GS\.score>prevBest/.test(e)
          && /GS\.wasRecord/.test(t)
-         && !/SAVE\.rush2?Best/.test(t));
+         && !/SAVE\.rushBest/.test(t));
     }
     /* 战报的连锁形状不许串模式。wkLog 原来只在本周矿脉里记、也只在那里清空 ——
        给 90 秒也出战报之后，不清的话会把**上一局本周矿脉的形状**画进去，
@@ -9657,9 +9235,8 @@ window.__selftest=function(){
       ok('结算：零分也照常显示',el.textContent==='0');
     }
     /* 切榜时必须收起名片，而且要收在**发请求之前**。
-       renderLB 有好几条提前 return（没注册、读失败、返回 0 行），
-       收在后面的话那几条路径根本跑不到 —— 实测门派榜返回 0 行时，
-       名片就一直挂着世界榜那个人的资料。 */
+       renderLB 有好几条提前 return（读失败、返回 0 行），
+       收在后面就会一直挂着上一个榜单的人。 */
     {
       /* ⚠ 拿源码比位置**必须先剥掉注释**。今晚在这上面栽了四次，都是同一个根因：
          注释里出现的「提前 return」「findGroups」之类被当成了代码匹配到。
@@ -9767,108 +9344,65 @@ window.__selftest=function(){
         &&/if\(REDUCED\)return/.test(String(rimFlash));
       ok('连击：开了「减少动效」时顿帧/震屏/泛光全部让路',quiet);
     }
-    /* 兑窗月配额：限的是速度不是机会。零竞争（自己的额度）、跨月重置、
-       用满之后钱再多也买不动 —— 这是「一个月内解锁不完」唯一的硬保证。 */
+    /* 工坊骨架必须守住「三层八件」，不再慢慢长回九层二十三件。 */
     {
       const m=monthNum();
-      SAVE.shop={own:{},worn:{},at:{},q:{m:m,n:0}};SAVE.power=1e9;SAVE.lbPower=1e9;
+      SAVE.shop={own:{},worn:{},at:{}};SAVE.power=1e9;SAVE.lbPower=1e9;
       let bought=0;
       for(const g of GOODS.filter(x=>!x.need))if(shopBuy(g.id))bought++;
-      ok('兑窗：一个月最多兑 '+SHOP_QUOTA+' 件，钱再多也买不动第 '+(SHOP_QUOTA+1)+' 件',
-         bought===SHOP_QUOTA && shopQuotaLeft()===0);
-      /* 首兑戳记的是「哪个月头一回兑的」，是履历不是内容 */
-      const stamped=Object.keys(SAVE.shop.at).length===SHOP_QUOTA
+      ok('工坊：固定三层八件，商品 id 不重复',
+         SHELF.length===3&&GOODS.length===8&&new Set(GOODS.map(g=>g.id)).size===8);
+      const stamped=Object.keys(SAVE.shop.at).length===bought
         && Object.values(SAVE.shop.at).every(v=>v===monthKey(m));
-      ok('兑窗：每件都盖了首兑戳（记月份，不是记内容）',stamped);
-      SAVE.shop.q={m:m-1,n:SHOP_QUOTA};                       // 跨月
-      ok('兑窗：跨月重置，新的一月重新开窗',shopQuotaLeft()===SHOP_QUOTA);
+      ok('工坊：刻成物仍保留首兑月戳',stamped);
+      const simple=String(renderShop)+String(shopCanBuy)+String(shopBuy);
+      ok('工坊：没有限时折扣、月配额、随机轮换与封样',
+         !/stall|quota|sale|sealed|weekNum/.test(simple));
       SAVE.lbPower=bakL;
     }
-    /* 今日矿口：全服同期同货（否则群里没法讨论），折扣只动价格不动条件，
-       而且过期只没折扣、货还在架上——「错过就没了」在这里只是最轻的一种。 */
+    /* 三种辉面是工坊新的主角：同槽互斥、可随时换，只加廉价线稿。 */
     {
-      const bakSt=JSON.stringify(SAVE.stall||{});
-      const sig=w=>stallPick(w).map(g=>g.id).join(',');
-      ok('矿口：同一期恒定同三件（全服同种子，群里能对得上）',
-         sig(2952)===sig(2952)&&sig(2952).split(',').length===STALL_N);
-      /* 跨期必须真的换货。这条是补上一个同义反复的坑：
-         旧写法把 weekNum() 埋在 stallState() 里，测试改存档里的期号根本没换期，
-         「连查 60 期」实际是把同一期查了 60 遍，跨期换不换根本测不到。 */
-      let allHaveLow=true, noDup=true, changed=0;
-      let prev=null;
-      for(let w=2900;w<2960;w++){
-        const its=stallPick(w);
-        if(!its.some(g=>g.s<=2))allHaveLow=false;
-        if(new Set(its.map(g=>g.id)).size!==its.length)noDup=false;
-        const s2=its.map(g=>g.id).join(',');
-        if(prev!==null&&s2!==prev)changed++;
-        prev=s2;
-      }
-      ok('矿口：每期至少一件低层货、三件不重复、且跨期真的换货（连查 60 期）',
-         allHaveLow&&noDup&&changed>=45);
-      /* 折扣不许把「没解锁 / 条件没到」变成能买 */
-      SAVE.lbPower=0;SAVE.power=1e9;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};
-      const g0=GOODS_BY[stallState().items[0].id];
-      ok('矿口：打折不改解锁与达成条件',
-         shopPrice(g0)<g0.cost
-         && (shopUnlocked(g0)?true:shopCanBuy(g0)==='未解锁'));
-      SAVE.stall=JSON.parse(bakSt);SAVE.lbPower=bakL;
+      const skins=GOODS.filter(g=>g.slot==='skin');
+      ok('辉面：月白、绛紫、曜金三种全部上架',
+         skins.map(g=>g.id).join(',')==='sk1,sk2,sk3');
+      SAVE.shop={own:{sk1:1,sk2:1},worn:{skin:'sk1'},at:{}};
+      shopWear('sk2');
+      ok('辉面：同槽只使用一件，已有的可免费换用',
+         shopWorn('skin')==='sk2'&&shopOwn('sk1')&&shopOwn('sk2'));
+      const fx=String(drawGemSkin);
+      ok('辉面：只用线稿切光，不增加模糊、阴影或新贴图',
+         /sk1/.test(fx)&&/sk2/.test(fx)&&/sk3/.test(fx)&&!/blur|shadow|drawImage/.test(fx));
+      SAVE.lbPower=bakL;
     }
-    /* 封样：够不着的高层不许泄露名字。这条同时防两种回归——
-       将来做轮换或公开表时，把封样层的真名漏出去，这条会红。 */
+    /* 废除封样后，未解锁层也把真实用途说清；老货则一次性回铸。 */
     {
-      /* ⚠ 读 innerHTML 而不是 textContent：CI 的无头垫片里 textContent 是**独立字段**，
-         设 innerHTML 不会填充它，于是这几条在 CI 里读到空串、必红。
-         innerHTML 两边都拿得到，语义也一样（名字就在 HTML 里）。 */
-      const hi=GOODS.filter(g=>g.s>=SEAL_FROM);
       SAVE.lbPower=0;   renderShop(); const shut=$('#shop-list').innerHTML;
       SAVE.lbPower=1e9; renderShop(); const open=$('#shop-list').innerHTML;
-      ok('封样：矿力不够时高层商品的真名一个都不泄露',
-         hi.length>0 && hi.every(g=>shut.indexOf(g.nm)<0) && shut.indexOf('封样')>=0);
-      ok('封样：解锁之后真名照常显示，封样字样消失',
-         hi.every(g=>open.indexOf(g.nm)>=0) && open.indexOf('封样')<0);
-      /* 封样连**图标**也必须盖住：留着 medal/scroll/seal 就能反推出这是称衔还是印，
-         封样就白封了。
-         ⚠ 别拿 innerHTML 跟 ICONS.unknown 比字符串 —— 浏览器解析后会重排属性，
-         看着一模一样却不相等（踩过）。比「路径数据」才是真正要保的性质。 */
-      /* 封样也要盖住图标，否则从图标就能反推出这是称衔还是印。
-         ⚠ 不走 DOM 查询：垫片的 querySelectorAll 对复杂选择器会**凭空造一个空节点**返回，
-         断言会变成恒真（拿空节点跟谁比都不相等）。改成在渲染出来的 HTML 里
-         直接找三个槽位图标的路径串 —— 一个都不许出现。 */
-      SAVE.lbPower=0;renderShop();
-      const pathOf=svg=>((String(svg).match(/ d="([^"]+)"/)||[])[1]||'');
-      const slotPaths=Object.values(SLOT_IC).map(k=>pathOf(ICONS[k])).filter(Boolean);
-      /* ⚠ 只能查**封样条目内部**。整页 HTML 里当然有槽位图标 ——
-         低层商品没被封，本来就该显示。第一版查整页，于是恒假。
-         按条目切开，只看带 seal 类的那些。 */
-      /* ⚠ 切分要带上标签名。只切 `class="sp-i` 的话，图标那个 `<span class="sp-ic">`
-         也会被当成分隔符，条目被切碎（22 件切出 46 段），
-         封样段落里的图标反而被切到下一段去，断言恒假。 */
-      const items=$('#shop-list').innerHTML.split('<div class="sp-i').slice(1);
-      const sealed=items.filter(x=>x.slice(0,24).indexOf('seal')>=0);
-      ok('封样：图标也一并盖住，不许从图标反推出商品类型',
-         sealed.length>0
-         && sealed.every(x=>slotPaths.every(d=>x.indexOf(d)<0))
-         && sealed.every(x=>x.indexOf(pathOf(ICONS.unknown))>=0));
-      SAVE.lbPower=bakL;
-      SAVE.lbPower=bakL;
+      ok('工坊：未解锁层也说清真名与用途，不再封样',
+         GOODS.every(g=>shut.indexOf(g.nm)>=0)&&shut.indexOf('封样')<0&&open.indexOf('封样')<0);
+      colFix();const d0=COLS.dust;
+      SAVE.shop={own:{sl2:1,ps5:1},worn:{seal:'sl2'},at:{}};shopFix();const d1=COLS.dust;
+      shopFix();
+      ok('工坊：下架旧收藏每件回铸 80 星屑，且只入账一次',
+         d1===d0+160&&COLS.dust===d1&&!shopOwn('sl2'));
+      ok('工坊：八件都有明确作用，没有重复占位文案',
+         GOODS.every(g=>g.d&&g.d!=='同上')&&new Set(GOODS.map(g=>g.nm)).size===GOODS.length);
+      COLS.dust=d0;SAVE.lbPower=bakL;colSave();
     }
-    /* 全站不许再出现「要求玩家在某个具体时刻在线」的条件。
-       隐藏卡 25 原来要求午夜零点开匣，受众里有学生，已改掉。
-       这条断言把它钉死：任何 SECRETS 条件都不许读小时。 */
+    /* 全站不许出现「要求玩家在某个具体时刻在线」的条件。 */
     ok('全站没有任何条件要求在某个时刻在线（隐藏卡不许读小时）',
        Object.keys(SECRETS).every(k=>!/getHours|getMinutes/.test(String(SECRETS[k].test))));
     /* 矿力是门槛不是货币：兑换绝不能扣它 */
-    SAVE.lbPower=50000;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};SAVE.power=999999;
+    SAVE.lbPower=50000;SAVE.shop={own:{},worn:{},at:{}};SAVE.power=999999;
     shopBuy('dep');
-    ok('矿场：矿力是门槛不是货币，兑换后一分不扣',SAVE.lbPower===50000);
+    ok('工坊：矿力是门槛不是货币，刻成后一分不扣',SAVE.lbPower===50000);
     /* 未解锁的层买不到；解锁与否只看矿力 */
-    SAVE.lbPower=0;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};SAVE.power=999999;
-    ok('矿场：矿力不够时高层商品买不动，低层照买',
-       shopCanBuy(GOODS_BY['dep2'])==='未解锁' && shopBuy('ps1')===true);
+    SAVE.lbPower=0;SAVE.shop={own:{},worn:{},at:{}};SAVE.power=999999;
+    ok('工坊：矿力不够时高层辉面刻不动，初层物品照常可得',
+       shopCanBuy(GOODS_BY['sk3'])==='未解锁' && shopBuy('ps1')===true);
     /* 灵力不够就是不够，不许透支 */
-    SAVE.power=10;SAVE.lbPower=999999;SAVE.shop={own:{},worn:{},at:{},q:{m:monthNum(),n:0}};
-    ok('矿场：灵力不够时买不动，且不会把余额扣成负数',
+    SAVE.power=10;SAVE.lbPower=999999;SAVE.shop={own:{},worn:{},at:{}};
+    ok('工坊：灵力不够时刻不动，且不会把余额扣成负数',
        shopBuy('dep')===false && SAVE.power===10);
     SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
   }

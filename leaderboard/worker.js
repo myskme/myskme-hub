@@ -105,13 +105,6 @@ async function getSeason(env) {
   return s;
 }
 
-/* 门派满员 6 人，**上限与计入是同一个数** ——
-   「不限人数只算前 5」会出现「我拉进来了但他不算数」的尴尬，
-   规则得一句话说得清：满员 6 人，6 个全算。
-   6 是朋友小圈子的自然大小，比 5 宽一点，但仍挡得住「拉二十个新号靠人头碾压」。
-   满了之后新人不是被静默丢弃 —— gfSubmit 会告诉他「这个门派满了」。 */
-const FACTION_MAX = 6;
-
 const SEASON_ROW_CAP = 5000; // 每赛季去重行上限（防无界灌水/成本失控；老师可清空）
 
 async function handleSubmit(req, env, origin) {
@@ -404,11 +397,11 @@ function gfPower(s) {
   const d = gfDepth(s), t = gfSkill(s), g = gfGrind(s);
   return d + t + g + 3 * Math.min(d, t, g);
 }
-/* 三阵营各吃矿力的一条线，和上面三个函数**同源**——以前三营另立公式，
+/* 两阵营各吃矿力的一条线，和上面函数**同源**——旧版曾另立公式，
    结果光明与黑域在量同一件事（秩相关 0.815、前六名同一批人同一顺序），
    而灰塔号称「来多勤」却读 best_rush（单局峰值），跟教义正好相反。
-   除数让三边「打满 400」所需投入大致相当，各约一个月的专注投入：
-     深度 48000 ≈ 第 150 关满星   技巧 12000 ≈ 15 重连锁加高分   勤勉 10400 ≈ 30 天满勤
+   除数让两边「打满 400」所需投入大致相当，各约一个月的专注投入：
+     深度 48000 ≈ 第 150 关满星   技巧 12000 ≈ 15 重连锁加高分
    ⚠ 必须与 match/index.html 的 CAMP_DIV 和 pwLines 保持一致，改一边就要改另一边。
    SQLite 的整数除法向零取整，与客户端 Math.floor 在非负区间等价。 */
 const GF_LINE = {
@@ -472,18 +465,12 @@ async function gfSealMonth(env) {
   if (!sealed) return;                               // 第一次上线，没有上个月可封
 
   const put = [];
-  /* 门派前三。配速员一起参与排名 —— 公测榜上本来就该有他们。 */
-  try {
-    const fr = await gfFactionList(env, 3);
-    fr.forEach((x, i) => put.push({ kind: "faction", rank: i + 1, name: x.faction,
-      power: x.power, members: (x.members || []).map(m => m.alias).join(",") }));
-  } catch (e) {}
-  /* 阵营：只记赢的那一边。 */
+  /* 阵营：只记赢的那一边，不封存成员名单。 */
   try {
     const c = await gfCampRaw(env);
     const win = (c.light >= c.dark) ? "light" : "dark";
     put.push({ kind: "camp", rank: 1, name: win,
-      power: Math.round(c[win] || 0), members: (c.members[win] || []).map(m => m.alias).join(",") });
+      power: Math.round(c[win] || 0), members: "" });
   } catch (e) {}
   for (const x of put) {
     try {
@@ -526,7 +513,7 @@ async function gfEnsure(env) {
      不然就成了藏起来的暗亏。榜上摆出来，它才会变成群里的战术讨论。 */
   try { await env.DB.prepare(`ALTER TABLE gemfall ADD COLUMN comp TEXT DEFAULT ''`).run(); } catch (e) {}
   try { await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_camp ON gemfall(camp)").run(); } catch (e) {}
-  /* 月末封榜的存档。只存名次与成员化名 —— 不发奖，所以不需要发放状态。 */
+  /* 月末封存表沿用旧结构；当前只写阵营胜方，members 保留为空以兼容旧库。 */
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gf_month (
        m TEXT NOT NULL, kind TEXT NOT NULL, rank INTEGER NOT NULL,
@@ -544,8 +531,8 @@ async function gfEnsure(env) {
    三条设计约束，是这套东西能不能上的全部理由：
 
    1) **它们不从真人手里拿走任何东西。** payload 里带 bot:1，客户端据此
-      把它们排除在「四座」之外；它们没有 camp 也没有 faction，所以不进
-      阵营拉锯与门派榜；它们不参与任何限量奖励。
+      把它们排除在「四座」之外；它们不进入任何成员名单，只以低封顶的聚合量
+      参与阵营实力带，也不参与任何限量奖励。
       配速员的价值是「前面有人跑着」，不是「把奖杯端走」。
 
    2) **不写库，纯计算。** 它们不是 gemfall 表里的行 —— 是按 seed + 已过天数
@@ -762,26 +749,12 @@ function pacerStats(p, eff, days, runs, streak) {
   return { lv, stars, chain, score, rush, mv: 0, days, runs, dbest: streak };
 }
 
-/* 配速员的阵营。**只给阵营，不给门派** —— 这两样性质不同：
-   阵营是单人声明，你选个边，没人指望跟你说话，配速员选边完全合理；
-   门派是社交结构，三个人凑一个「天璇宗」，里面多个从不说话的人
-   **比没门派露馅得多**。而且实测真人里 62% 本来就没门派，
-   「没门派」根本不是特征。
-
+/* 配速员只以匿名聚合量进入阵营比例，接口绝不下发其阵营归属或成员记录。
    ⚠ 贡献要**大幅压低**。实测：11 个配速员按满额 400 进来，
    每营多约 1466，是真人总量（1767）的 2.5 倍 —— 拉锯条会被钉死，
-   真人怎么打都不动。压到 60 之后真人仍占 73% 的信号，条子还是真人说了算。
-   顺带把空着的灰塔填上人：空营本身就很难看。 */
+   真人怎么打都不动。压到 60 之后真人仍占 73% 的信号，条子还是真人说了算。 */
 const PACER_CAMP_CAP = 60;
-/* 门派：几个人共用一个名字才像真的（真人那两个门派各 3 人）。
-   留三个人不入门派 —— 真人里 62% 没门派，全员都有反而是另一种整齐得可疑。
-   刻意**另起自己的名字**，不掺进天璇宗/原耽宗：那几个是线下商量好的人，
-   突然多出陌生成员反而会让他们起疑。 */
-const PACER_FACTION = ["拾光社", "拾光社", "拾光社", "夜航班", "夜航班", "夜航班",
-                       "慢半拍", "慢半拍", "", "", ""];
-/* ⚠ 别用 seed % 3：那些 seed 都是质数，取模会聚堆 ——
-   实测分出来是 灰塔 7 / 黑域 4 / 光明 0，光明一个人没有，比不分还难看。
-   按名单次序轮流分，稳稳的 4/4/3。 */
+/* 两营按名单次序交错；只用于服务端求和，不随榜单响应下发。 */
 function pacerCamp(i) { return ["light", "dark"][i % 2]; }
 
 /* 同一小时内所有请求算出来的是同一份，缓存一小时。
@@ -800,7 +773,7 @@ function pacerRows(nowMs) {
     const st = pacerAt(p, h);
     return {
       id: "pacer:" + p.seed, alias: p.alias,
-      faction: PACER_FACTION[i] || "", camp: pacerCamp(i),
+      camp: pacerCamp(i),
       power: st.power, best_score: st.score, best_rush: st.rush,
       lv: st.lv, stars: st.stars, chain: st.chain,
       runs: st.runs, days: st.days, dbest: st.dbest, best_dig: 0, luck: 0,
@@ -826,7 +799,7 @@ async function pacersOn(env) {
    多这四个整数对响应体的影响可以忽略（50 行 × 4 个数）。 */
 function gfMap(rows) {
   return (rows || []).map((r, i) => ({
-    rank: i + 1, alias: r.alias, faction: r.faction || "", power: r.power || 0,
+    rank: i + 1, alias: r.alias, power: r.power || 0,
     lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
     chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
@@ -859,18 +832,8 @@ async function gfSubmit(req, env, origin) {
   let alias = String(body.alias || "").trim().slice(0, 12);
   if (!ALIAS_RE.test(alias)) return json({ ok: false, err: "化名需 2-12 位中英文/数字" }, 400, origin);
   if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
-  let faction = String(body.faction || "").trim().slice(0, 8);
-  if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
-  /* 门派满员挡在这里。**要排除自己** —— 老玩家重复提交时不能把自己算成第 7 个人。
-     满了就把 faction 清空并在返回里说明，不静默丢弃：
-     玩家敲了名字却没进去、还不知道为什么，那比拒绝更糟。 */
-  let factionFull = false;
-  if (faction) {
-    const c = await env.DB.prepare(
-      "SELECT COUNT(*) AS n FROM gemfall WHERE hidden=0 AND faction=? AND id!=?"
-    ).bind(faction, id).first();
-    if (c && (c.n || 0) >= FACTION_MAX) { factionFull = true; faction = ""; }
-  }
+  /* 自由文本门派已退役。列保留用于旧数据兼容，新提交统一清空。 */
+  const faction = "";
   /* 阵营只认固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
   /* 2026-08-06：灰塔下线，只剩光明与黑域。两营对拉比三营好看，也更贴正典
      （狼先生 vs 叶王）。老存档里选了 grey 的一律当作没选，会被重新问一次。 */
@@ -954,25 +917,16 @@ async function gfSubmit(req, env, origin) {
   ).bind(myPower).first();
   return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
-    factionFull, factionMax: FACTION_MAX,                    // 满员时客户端要能说明白
     classJoined, season: sea }, 200, origin);
 }
-/* 门派榜：faction 是玩家自由填的帮派名，按名字聚合。
-   排序用**总矿力**——拉一个活人进帮，帮派立刻涨分，这正是要的社交动力；
-   人均和人数一并返回，小而精的帮也有自己的看点。
-   只统计非空门派；聚合上限 200 行足够（自由文本门派不会太多）。 */
-/* 三阵营拔河。**刻意不返回人数**——「光明 5 人」这种数字一露就露怯，
-   而比例条在任何人数下都在动。前端拿到的就是三个占比。
-   每个阵营用**各自的指标**算分（光明看关卡深度、黑域看连锁与高分、
-   灰塔看下矿的天数与局数），所以不存在「总矿力最高的人决定一切」。
-   灰塔那条尤其关键：它每天封顶，榜首一天最多也就那么多，
-   「肯天天来的普通玩家能赢过大号」结构上才真的成立。 */
+/* 两阵营实力比。只返回占比：不返回人数、化名或个人贡献。
+   光明看关卡深度，黑域看连锁与高分，并用单人封顶避免头部玩家决定一切。 */
 /* 同上：算分抽出来给月末封榜复用 */
 async function gfCampRaw(env) {
   await gfEnsure(env);
   /* 单人封顶：CAP 之上的部分不再计入。
      真实分布里头号玩家的矿力 = 其余 12 人总和的 63%，不封顶的话
-     他一个人就替自己阵营把条子拉满，另外两营再怎么努力都不动——
+     他一个人就替自己阵营把条子拉满，另一营再怎么努力都不动——
      那才是「看起来没人玩」的真正原因（跟人数无关）。
      取各营中位数×3 太重（要两次查询），这里用固定量级封顶，
      数量级与当前中位数（5,560 矿力 ≈ 各指标百来分）对齐。 */
@@ -981,7 +935,7 @@ async function gfCampRaw(env) {
      于是贡献一旦进池就永不衰减：设计注释里承诺的「每周结算、永远没有永久输家」
      从来没实现过——落后的一营没法靠「这周打得比你好」翻盘，只能靠拉新人。
      用滚动 7 天而不是自然周：自然周会在周一零点造成一次断崖式清零，
-     那对受众里的学生是惩罚感；滚动窗口没有那一刻，不玩就慢慢淡出，回来就慢慢回来。 */
+     而滚动窗口没有那一刻，不活跃就慢慢淡出，回来就慢慢回来。 */
   const SINCE = Date.now() - 7 * 86400000;
   const rows = await env.DB.prepare(
     `SELECT camp,
@@ -994,32 +948,8 @@ async function gfCampRaw(env) {
     if (r.camp === "light") raw.light = Math.max(0, Math.round(r.light || 0));
     else if (r.camp === "dark") raw.dark = Math.max(0, Math.round(r.dark || 0));
   }
-  /* 各营成员名单：只出化名与本营指标分，**不出人数总计**。
-     看得见队友是归属感的来源；但「本营 4 人」这种总数一露就露怯，
-     所以给名单不给计数——列表长度玩家自己看得到，那是「有谁」不是「才几个」。
-     每营最多 12 人，按本营指标降序。 */
-  const mem = await env.DB.prepare(
-    `SELECT camp, alias,
-            CASE camp
-              WHEN 'light' THEN MIN(${GF_LINE.light}, ?)
-              ELSE MIN(${GF_LINE.dark},  ?) END AS sc
-       FROM gemfall WHERE hidden=0 AND camp!='' AND last_write > ?
-       ORDER BY sc DESC LIMIT 60`
-  ).bind(CAP, CAP, SINCE).all();
-  const members = { light: [], dark: [] };
-  /* 配速员并进来。不并的话最明显的破绽就在这儿：
-     进了光明能看到肖肖、白水清新…却看不到世界榜上那 11 个人，
-     「为什么榜上有小圆、阵营里没有」一问就穿。
-     贡献按 PACER_CAMP_CAP 压低，见那条注释。 */
-  const pool = (mem.results || []).slice();
+  /* 配速员只以封顶后的聚合分参与，不下发任何个人记录。 */
   if (await pacersOn(env)) {
-    for (const p of pacerRows(Date.now())) {
-      const line = p.camp === "light" ? (p.lv * 150 + p.stars * 120) / 120
-                 :                        (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30;
-      pool.push({ camp: p.camp, alias: p.alias,
-                  sc: Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line))) });
-    }
-    pool.sort((a, b) => (b.sc || 0) - (a.sc || 0));
     for (const p of pacerRows(Date.now())) {
       const k = p.camp;
       const line = k === "light" ? (p.lv * 150 + p.stars * 120) / 120
@@ -1027,13 +957,7 @@ async function gfCampRaw(env) {
       raw[k] += Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line)));
     }
   }
-  for (const r of pool) {
-    const k = r.camp;
-    if (members[k] && members[k].length < 12)
-      members[k].push({ alias: r.alias, sc: Math.max(0, Math.round(r.sc || 0)) });
-  }
-
-  return { light: raw.light, dark: raw.dark, members };
+  return { light: raw.light, dark: raw.dark };
 }
 async function gfCamps(req, env, origin, url) {
   await gfSealMonth(env);
@@ -1044,95 +968,7 @@ async function gfCamps(req, env, origin, url) {
   const pct = tot > 0
     ? { light: raw.light / tot, dark: raw.dark / tot }
     : { light: .5, dark: .5 };
-  return json({ ok: true, empty: tot === 0, pct, members: raw.members }, 200, origin);
-}
-
-/* 算分抽成独立函数：路由与月末封榜共用同一份，避免两处实现慢慢漂移
-   （这个项目在客户端／服务端的矿力公式上已经吃过一次亏）。 */
-async function gfFactionList(env, limit) {
-  await gfEnsure(env);
-  /* ── 每个门派只把**最强的 5 个人**计入总分 ──
-     不封顶的话门派榜就是人头榜：拉二十个新人进来，哪怕个个是新号，
-     加起来也能压过三个高手 —— 那不是「门派强」，那是「群大」。
-
-     为什么是 5 不是 3：门派这套东西最早就是为了**让人有动力拉朋友进来**，
-     卡到 3 会把这个动机直接掐死（第 4 个人开始白拉）。
-     5 留得住拉人的意义，又挡得住人海。
-     返回 n（实际人数）与 cnt（计入人数）两个数，界面上明写「计入 3/5 人」——
-     规则藏着的话，拉了人却不涨分的人会以为榜坏了。 */
-  const FACTION_TOP = FACTION_MAX;   // 上限与计入是同一个数，见 FACTION_MAX 那条注释
-  const rows = await env.DB.prepare(
-    `SELECT faction, COUNT(*) AS n, SUM(power) AS p, MAX(power) AS top,
-            SUM(CASE WHEN rn<=${FACTION_TOP} THEN power ELSE 0 END) AS pcap,
-            SUM(CASE WHEN rn<=${FACTION_TOP} THEN 1 ELSE 0 END) AS ncap
-       FROM (
-         SELECT faction, power,
-                ROW_NUMBER() OVER (PARTITION BY faction ORDER BY power DESC) AS rn
-           FROM gemfall WHERE hidden=0 AND faction!=''
-       ) GROUP BY faction ORDER BY pcap DESC LIMIT ?`
-  ).bind(limit).all();
-  const list = (rows.results || []).map((r) => ({
-    faction: r.faction, n: r.n || 0, cnt: r.ncap || 0, cap: FACTION_TOP,
-    power: r.pcap || 0,
-    avg: r.ncap ? Math.round((r.pcap || 0) / r.ncap) : 0, top: r.top || 0,
-  }));
-  /* 门派成员：点开一个门派要能看见都有谁。门派是玩家自己约的名字，
-     人数本来就少且是明账（不像阵营需要藏），所以这里连人数一起给。 */
-  const names = list.map((x) => x.faction);
-  if (names.length) {
-    const ph = names.map(() => "?").join(",");
-    /* 必须按门派各取前 N，不能全局 ORDER BY + LIMIT：
-       全局截断时人一多，排在后面的小门派会一个成员都分不到，
-       点开是空的——而「拉朋友进门后要能确认他真进来了」恰恰是小门派最需要的。
-       D1(SQLite) 支持窗口函数，已在线上库验过。 */
-    const mem = await env.DB.prepare(
-      `SELECT faction, alias, power FROM (
-         SELECT faction, alias, power,
-                ROW_NUMBER() OVER (PARTITION BY faction ORDER BY power DESC) AS rn
-           FROM gemfall WHERE hidden=0 AND faction IN (${ph})
-       ) WHERE rn<=12`
-    ).bind(...names).all();
-    const by = {};
-    for (const r of (mem.results || [])) {
-      (by[r.faction] = by[r.faction] || []).push({ alias: r.alias, power: r.power || 0 });
-    }
-    for (const x of list) x.members = (by[x.faction] || []).slice(0, 12);
-  }
-  /* 配速员的门派并进来。它们不在库里，所以整块在 JS 里合。
-     不并的话就是最后一个统计破绽：真人 38% 有门派、配速员 0%。 */
-  if (await pacersOn(env)) {
-    const ps = pacerRows(Date.now()).filter(p => p.faction);
-    const by = {};
-    for (const p of ps) (by[p.faction] = by[p.faction] || []).push(p);
-    for (const f in by) {
-      const arr = by[f].map(p => ({ alias: p.alias, power: p.power }));
-      let x = list.find(v => v.faction === f);
-      if (!x) { x = { faction: f, n: 0, cnt: 0, cap: FACTION_TOP, power: 0, avg: 0, top: 0, members: [] }; list.push(x); }
-      /* ⚠ 必须**先并再取前 5**，不能「真人前 5 + 配速前 5 相加」——
-         那样一个门派会被算进最多 10 个人的分，而 cnt 还显示 5。
-         实测：真人 [100,90,80,70] + 配速 [60,50,40]，
-         错的算法给 490（7 个人），对的是 400（前 5：100+90+80+70+60）。
-         现在没爆是因为配速员用的是自己的门派名，但只要有真人敲了「拾光社」立刻就中。
-         members 里已经是各门派前 12 的明细，直接拿它重算。 */
-      const merged = (x.members || []).concat(arr).sort((a, b) => b.power - a.power);
-      const capped = merged.slice(0, FACTION_TOP);
-      x.n += arr.length;
-      x.cnt = capped.length;
-      x.power = capped.reduce((a, b) => a + b.power, 0);
-      x.top = merged.length ? merged[0].power : 0;
-      x.avg = x.cnt ? Math.round(x.power / x.cnt) : 0;
-      x.members = merged.slice(0, 12);
-    }
-    list.sort((a, b) => (b.power || 0) - (a.power || 0));
-  }
-  list.forEach((x, i) => { x.rank = i + 1; });
-  return list.slice(0, limit);
-}
-async function gfFactions(req, env, origin, url) {
-  await gfSealMonth(env);
-  const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
-  const list = await gfFactionList(env, limit);
-  return json({ ok: true, count: list.length, rows: list }, 200, origin);
+  return json({ ok: true, empty: tot === 0, pct }, 200, origin);
 }
 
 async function gfBoard(req, env, origin, url) {
@@ -1143,7 +979,7 @@ async function gfBoard(req, env, origin, url) {
   let rows;
   /* ⚠ 这里加列时别忘了 gfMap 也要跟着加 —— 两边任何一边漏掉，
      客户端拿到的就是 undefined，而三线首座算的是每个人的三条线，缺一项就整条算错。 */
-  const cols = "id,alias,faction,power,best_score,best_rush,lv,stars,chain,rank_name,badges,"
+  const cols = "id,alias,power,best_score,best_rush,lv,stars,chain,rank_name,badges,"
              + "runs,days,dbest,best_dig,luck,comp";
   /* 不按 season 过滤：gemfall 没有 base_power 基线，赛季语义对它本来就不成立；
      而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
@@ -1169,8 +1005,7 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  /* 配速员只并进**世界榜**：门派榜与小队榜是熟人圈，混进陌生名字很突兀，
-     而且它们本来就没有门派/小队归属。开关关掉时这一段整个不执行。 */
+  /* 配速员只并进公开榜，不进带口令的历史私榜。 */
   let merged = rows.results || [];
   if (scope !== "class" && await pacersOn(env)) {
     const key = scope === "rush" ? "best_rush" : "power";   // 90 秒榜按矿灯排，不按矿力
@@ -1181,18 +1016,16 @@ async function gfBoard(req, env, origin, url) {
   }
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);
 }
-/* 月榜：历月封存的名次。客户端拿它做两件事 ——
-   ① 摆一面「月榜墙」；② 用 members 判断自己上个月有没有在赢的那一边，
-   有就在名片上多一行带年月的称号。称号是**记名不是资源**，所以不需要领取。 */
+/* 月结算只返回阵营胜方与实力，不返回旧表中的 members 或旧门派记录。 */
 async function gfMonth(req, env, origin, url) {
   await gfSealMonth(env);
   const n = clampInt(url.searchParams.get("limit") || 6, 1, 24);
   const rows = await env.DB.prepare(
-    "SELECT m,kind,rank,name,power,members FROM gf_month ORDER BY m DESC, kind ASC, rank ASC LIMIT ?"
-  ).bind(n * 4).all();
+    "SELECT m,kind,rank,name,power FROM gf_month WHERE kind='camp' ORDER BY m DESC, rank ASC LIMIT ?"
+  ).bind(n).all();
   return json({ ok: true, rows: (rows.results || []).map(r => ({
     m: r.m, kind: r.kind, rank: r.rank, name: r.name || "",
-    power: r.power || 0, members: String(r.members || "").split(",").filter(Boolean),
+    power: r.power || 0,
   })) }, 200, origin);
 }
 async function gfAdmin(req, env, origin) {
@@ -1251,7 +1084,6 @@ export default {
       if (p === "/submit" && request.method === "POST") return await handleSubmit(request, env, origin);
       if (p === "/admin" && request.method === "POST") return await handleAdmin(request, env, origin);
       if (p === "/gf/board" && request.method === "GET") return await gfBoard(request, env, origin, url);
-      if (p === "/gf/factions" && request.method === "GET") return await gfFactions(request, env, origin, url);
       if (p === "/gf/camps" && request.method === "GET") return await gfCamps(request, env, origin, url);
       if (p === "/gf/month" && request.method === "GET") return await gfMonth(request, env, origin, url);
       if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
