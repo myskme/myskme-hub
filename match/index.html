@@ -5774,6 +5774,11 @@ function endRush(){
   const b2=GS.rush2;
   const prevBest=b2?SAVE.rush2Best:SAVE.rushBest;
   const best=GS.score>prevBest;
+  /* ⚠ 战报要用**这一局之前**的最佳来判「新纪录」。
+     下一行就把 SAVE.rushBest 改成本局分数了，rushTablet 再去读它的话
+     `GS.score>=best` 永远为真 —— 每一份战报都写「新纪录」，打得再烂也写。
+     分享写谎话比不分享更糟，所以把判定结果在这里存下来给它用。 */
+  GS.wasRecord=best;
   if(best){if(b2)SAVE.rush2Best=GS.score;else SAVE.rushBest=GS.score;persist()}
   /* 续灯的成绩不上传：后端 stats 没这个字段，LB.stats() 也只读 rushBest，
      所以它天然只活在本机与名片上——本地荣誉，正好。 */
@@ -6652,8 +6657,8 @@ function rushTablet(){
   const rows=log.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
   const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
     ||location.origin+location.pathname.replace(/index\.html$/,'');
-  const best=GS.rush2?SAVE.rush2Best:SAVE.rushBest;
-  const isNew=GS.score>=best;
+  /* 用 endRush 存下来的判定，不要现算 —— 现算的话 SAVE.rushBest 已经被更新过了 */
+  const isNew=!!GS.wasRecord;
   return '灵石远征 · '+(GS.rush2?'续灯 45 秒':'矿灯将熄 90 秒')+'\n'
     +(rows||'□')+'\n'
     +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax
@@ -9465,6 +9470,22 @@ window.__selftest=function(){
       const uf=String(fireUlt), junAt=uf.indexOf("c.id==='jun'");
       const junN=(uf.slice(junAt,junAt+900).match(/i<(\d+)&&spots\.length/)||[])[1];
       ok('同伴：虎啸造 2 颗爆裂（5×5 之下三颗会打出 3.3 倍的分）',junN==='2');
+    }
+    /* 「新纪录」不许每局都说。endRush 会先把 SAVE.rushBest 更新成本局分数，
+       战报若再去读它现算，判定永远为真 —— 打得再烂也写「新纪录」。
+       分享写谎话比不分享更糟。 */
+    {
+      /* ⚠ 拿源码做断言时**必须先剥注释**。这一条第一版就栽在这：
+         我在注释里写了「SAVE.rushBest 已经被更新过了」，
+         而断言查的是「rushTablet 里不许出现 SAVE.rushBest」—— 注释把它匹配上了，
+         代码明明是对的却报红。今天已经栽过第二次，所以抽成工具。 */
+      const bare=f=>String(f).replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
+      const e=bare(endRush), t=bare(rushTablet);
+      ok('战报：新纪录判定用的是**这一局之前**的最佳（不是每局都说新纪录）',
+         /GS\.wasRecord=best/.test(e)
+         && /const best=GS\.score>prevBest/.test(e)
+         && /GS\.wasRecord/.test(t)
+         && !/SAVE\.rush2?Best/.test(t));
     }
     /* 战报的连锁形状不许串模式。wkLog 原来只在本周矿脉里记、也只在那里清空 ——
        给 90 秒也出战报之后，不清的话会把**上一局本周矿脉的形状**画进去，
