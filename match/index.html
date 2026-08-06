@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-07-rank-collection">
+<meta name="gemfall-release" content="2026-08-07-party-recast">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -469,41 +469,49 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   vertical-align:-4px;margin:0 2px}
 .ins-note{font-size:12px;color:var(--ink3);line-height:1.8;margin-top:7px;border-top:1px dashed var(--line2);padding-top:7px}
 /* 聚会赛 */
-/* 底部留出左下角「作品总目」浮标的高度，别压住最后一个输入框 */
-#scr-party{gap:6px;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+/* 只留赛制、局长、选手三步；不再让主持人在四层开关里做表格。 */
+#scr-party{gap:6px;padding-bottom:calc(72px + env(safe-area-inset-bottom));overflow-y:auto}
 .pt-head{text-align:center;margin-top:0}
 .pt-head h2{font-size:25px;font-weight:300;letter-spacing:.26em;margin:2px 0}
 .pt-head h2 em{font-style:normal;color:var(--gold)}
-.pt-sec{width:min(420px,94vw);margin-top:14px}
+.pt-sec{width:min(430px,94vw);margin-top:14px}
 .pt-lbl{font-size:11px;letter-spacing:.34em;color:var(--ink3);margin-bottom:7px;text-align:center}
 .pt-chips{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
-.pt-chip{font-family:var(--serif);font-size:14px;letter-spacing:.1em;padding:9px 15px;cursor:pointer;
+.pt-chip{font-family:var(--serif);font-size:14px;letter-spacing:.1em;padding:9px 14px;cursor:pointer;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);transition:all .2s}
+.pt-chip.wide{flex:1;min-width:150px;text-align:left;padding:10px 12px}
+.pt-chip b{display:block;color:inherit;font-weight:500;letter-spacing:.16em}
 .pt-chip:hover{border-color:var(--gold);color:var(--ink)}
 .pt-chip.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 13%,var(--bg2));box-shadow:var(--glow-soft)}
 .pt-chip .d{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--ink3);margin-top:2px}
-@media (max-height:900px){.pt-chip .d{display:none}}   /* 描述行进了「怎么比」弹窗，竖向紧时不重复占地 */
 .pt-chip.on .d{color:color-mix(in srgb,var(--gold) 60%,var(--ink3))}
 #pt-names{display:flex;flex-direction:column;gap:7px;margin-top:4px}
-.pt-name{display:flex;align-items:center;gap:9px}
-.pt-dot{width:30px;height:30px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
-  font-size:15px;color:var(--pc);background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
+.pt-name{display:flex;align-items:center;gap:8px}
+.pt-dot,.pt-avatar{width:38px;height:38px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:15px;color:var(--pc);background-color:var(--bg2);cursor:pointer}
+.pt-dot.has-art,.pt-avatar.has-art,#hand-dot.has-art,.pd-row .dot.has-art{color:transparent}
 .pt-name input{flex:1;min-width:0;font-family:var(--serif);font-size:15px;padding:8px 11px;color:var(--ink);
   background:var(--bg2);border:1px solid var(--line);outline:none;transition:border-color .2s}
 .pt-name input:focus{border-color:var(--gold)}
-.pt-name .tm{flex:none;font-family:var(--serif);font-size:12px;letter-spacing:.1em;padding:7px 10px;cursor:pointer;
-  border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);transition:all .2s;min-width:56px}
-.pt-name .tm.a{border-color:var(--red);color:var(--red)}
-.pt-name .tm.b{border-color:var(--blue);color:var(--blue)}
-/* （旧灯油样式已由 .quota 取代，保留占位注释防止选择器悬空） */
-/* 配额按钮：改动过默认档才描金，一眼看出谁被单独调过 */
-.pt-name .tm.quota{min-width:72px;white-space:nowrap}
-.pt-name .tm.quota .ic{margin-right:2px}
-.pt-name .tm.quota.hi{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
+.pt-role{width:82px;flex:none;border:1px solid var(--line2);background:var(--bg2);padding:5px 7px;cursor:pointer;
+  font-family:var(--serif);text-align:left;color:var(--ink2);transition:border-color .2s}
+.pt-role:hover{border-color:var(--gold)}
+.pt-role b{display:block;color:var(--gold2);font-size:12px;font-weight:500;white-space:nowrap}
+.pt-role i{display:block;font-style:normal;color:var(--ink3);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pt-role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0 4px}
+.pt-role-card{min-width:0;border:1px solid var(--line2);background:var(--bg2);padding:7px 5px 8px;cursor:pointer;
+  font-family:var(--serif);color:var(--ink2);text-align:center;transition:border-color .2s,transform .2s}
+.pt-role-card:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px)}
+.pt-role-card.sel{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-soft)}
+.pt-role-card:disabled{opacity:.28;cursor:default}
+.pt-role-face{width:58px;height:58px;margin:0 auto 5px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:22px;background-color:var(--panel)}
+.pt-role-face.has-art{color:transparent}
+.pt-role-card b{display:block;font-size:13px;font-weight:500;white-space:nowrap}
+.pt-role-card i{display:block;font-style:normal;font-size:9.5px;color:var(--ink3);white-space:nowrap}
+#pt-role-desc{min-height:48px;margin-top:10px;font-size:12px;line-height:1.65;color:var(--ink2);text-align:left}
+#pt-role-desc b{color:var(--gold2);font-weight:500}
 #ptr-board{margin-top:8px;text-align:left}
-#ptr-quota{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-#ptr-quota .ptr-nm{flex:1;min-width:0;text-align:left;font-size:14px;color:var(--ink);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pt-hint-line{font-size:12.5px;color:var(--ink3);letter-spacing:.04em;text-align:center;margin-top:clamp(6px,1dvh,12px)}
 #pt-hint-line a{color:var(--gold2);text-decoration:none;border-bottom:1px solid var(--gold-line)}
 #pt-hint{font-size:13.5px;color:var(--ink2);letter-spacing:.05em;text-align:left;line-height:2}
@@ -512,15 +520,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .pt-lbl{margin-bottom:clamp(3px,.7dvh,7px)}
 .pt-chip{padding:clamp(6px,1dvh,9px) 13px}
 .pt-name input{padding:clamp(5px,.9dvh,8px) 11px;font-size:14px}
-.pt-dot{width:clamp(24px,3.4dvh,30px);height:clamp(24px,3.4dvh,30px)}
+.pt-dot,.pt-avatar{width:clamp(32px,4.5dvh,38px);height:clamp(32px,4.5dvh,38px)}
 #pt-names{gap:clamp(4px,.7dvh,7px)}
 .pt-head h2{font-size:clamp(20px,2.8dvh,25px);margin:0}
 #scr-party .ovl-btns{margin-top:clamp(8px,1.4dvh,16px);margin-bottom:0}
 /* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了 */
-#ovl-hand{background:var(--bg)}
 #ovl-hand{background:#07070a}
 #ovl-hand .ovl-card{text-align:center}
-#hand-dot{width:88px;height:88px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+#hand-dot{width:96px;height:96px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:40px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg,rgba(201,166,74,.16)),transparent 72%);
   position:relative;animation:curPulse 2.2s ease-in-out infinite}
 #hand-dot::before{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 22s linear infinite}
@@ -533,7 +540,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #pt-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 11px}
 #pt-bar.on{display:flex}
-#pt-bar .dot{width:30px;height:30px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+#pt-bar .dot{width:34px;height:34px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:15px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg),transparent 72%)}
 /* 选手色随主题走，不烤死在内联样式里 */
 [style*="--pc-base"]{--pc:var(--pc-base)}
@@ -911,7 +918,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
      · 可点的（图标钮、页签、同伴位…）→ 深一档，看得出能按
    两档都只用同一组变量，改一处全站跟着走。 */
 .wolf-badge,.ins-sec,.qs-sec,.ach,.cbi,.cbig,.cvt,
-.pt-chip,.pt-dot,.pd-row .dot,.pt-name .tm{
+.pt-chip,.pt-dot,.pt-avatar,.pt-role,.pt-role-card,.pd-row .dot{
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 9%,transparent),
              inset 0 -1px 0 rgba(0,0,0,.4),
              0 1px 0 rgba(0,0,0,.3),
@@ -1374,33 +1381,23 @@ body{--shk:4px}
       <div class="kicker">PARTY · PASS &amp; PLAY</div>
       <h2>聚会 · <em>赛</em></h2>
     </div>
-    <!-- 聚会赛设置必须一屏能操作完，所以这条横幅在矮屏由 .obanner 的媒体查询自行退场 -->
-    <div class="obanner" id="party-banner"></div>
     <div class="pt-sec">
       <div class="pt-lbl">几个人</div>
       <div class="pt-chips" id="pt-count"></div>
     </div>
     <div class="pt-sec">
-      <div class="pt-lbl">打几轮</div>
-      <div class="pt-chips" id="pt-rounds-pick"></div>
+      <div class="pt-lbl">选赛制</div>
+      <div class="pt-chips" id="pt-rules"></div>
     </div>
     <div class="pt-sec">
-      <div class="pt-lbl">怎么比</div>
-      <div class="pt-chips" id="pt-pace"></div>
+      <div class="pt-lbl">选局长</div>
+      <div class="pt-chips" id="pt-format"></div>
     </div>
     <div class="pt-sec">
-      <div class="pt-lbl">怎么算</div>
-      <div class="pt-chips" id="pt-mode">
-        <div class="pt-chip on" data-m="ffa">各打各的<span class="d">总分最高者胜</span></div>
-        <div class="pt-chip" data-m="team">两队对抗<span class="d">红队 vs 蓝队</span></div>
-        <div class="pt-chip" data-m="relay">合力接龙<span class="d">大家凑一个总分</span></div>
-      </div>
-    </div>
-    <div class="pt-sec">
-      <div class="pt-lbl">名字（可改）</div>
+      <div class="pt-lbl">选手与人物</div>
       <div id="pt-names"></div>
     </div>
-    <div id="pt-hint-line">同一轮所有人拿到一模一样的盘面 · <a href="#" id="pt-hint-open">怎么比、时长怎么估 →</a></div>
+    <div id="pt-hint-line">一台机器轮流递 · <a href="#" id="pt-hint-open">规则与时长 →</a></div>
     <div class="ovl-btns" style="margin-bottom:20px">
       <button class="btn ghost" id="pt-back">← 回大厅</button>
       <button class="btn primary big" id="pt-go">开 局</button>
@@ -1636,12 +1633,20 @@ body{--shk:4px}
   <div class="ovl-title" id="ptr-title">第 1 轮 · <em>战罢</em></div>
   <div class="ovl-sub" id="ptr-sub"></div>
   <div id="ptr-board"></div>
-  <div class="pt-lbl" style="margin-top:14px">下一轮每人的配额（可调）</div>
-  <div id="ptr-quota"></div>
   <div class="ovl-btns">
     <button class="btn ghost" id="ptr-end">终结比赛</button>
     <button class="btn primary big" id="ptr-next">开始下一轮</button>
   </div>
+</div></div>
+
+<!-- 聚会赛 · 人物挑选。复用六张同伴头像，不为聚会赛再添一套素材。 -->
+<div class="ovl" id="ovl-pt-role"><div class="ovl-card">
+  <div class="ovl-kick">CHOOSE YOUR COMPANION</div>
+  <div class="ovl-title" id="pt-role-title">挑选 · <em>人物</em></div>
+  <div class="ovl-sub" id="pt-role-sub"></div>
+  <div id="pt-role-grid"></div>
+  <div id="pt-role-desc"></div>
+  <div class="ovl-btns"><button class="btn ghost" id="pt-role-close">返 回</button></div>
 </div></div>
 
 <!-- 聚会赛 · 战果 -->
@@ -2471,7 +2476,6 @@ const ART={
      所以 .obanner 不能再加 CSS 边框，否则叠成双框。 */
   end_win:'art/win.webp', end_lose:'art/lose.webp',
   boss_banner:'art/boss-intro.webp',                           // 气氛横幅，不替代 boss_ye/boss_she 头像
-  party_banner:'art/party-banner.webp',
   /* 风物「卡面版」。与 card_* 同理：ch_* 那 8 张横幅继续给地脉图与编年史用，
      典藏册的风物卡改用这 8 张竖版重构图。两套并存。 */
   vista_1:'art/card-vista-1.webp', vista_2:'art/card-vista-2.webp',
@@ -3820,8 +3824,8 @@ async function trySwap(a,b){
   /* 矿灯将熄：这一手打得好才回灯油。
      ⚠ 以前用的是 GS.chainMax（整局历史最大连锁），意味着只要全局打出过一次 3 连锁，
      此后每一步都无条件 +1.2 秒——90 秒的局能拖成好几分钟，榜单彻底失真。
-     ⚠ 聚会赛时间制不回时间：每人固定秒数是「全场时长可预估」和每人配额的前提。 */
-  if(GS.rushOn&&!GS.party){
+     这条只属于 90 秒模式；聚会赛已不再复用计时玩法。 */
+  if(GS.rushOn){
     const ch=GS.lastChain||0;
     const bonus=(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
     const cap=45000;
@@ -4190,10 +4194,12 @@ async function fireUlt(){
   if(!c||GS.busy||GS.over||GS.charge<c.need)return;
   GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;hintCell=null;
   GS.busy=true;ULTING=true;renderAlly();renderTools();
-  SAVE.ach['ult_'+c.id]=1;grant('a13');
-  csBump('u',1);
-  if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
-  persist();
+  /* 聚会赛是来宾局，不把客人的人物使用写进机主成就与衔位。 */
+  if(!GS.party){
+    SAVE.ach['ult_'+c.id]=1;grant('a13');csBump('u',1);
+    if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
+    persist();
+  }
   comboBanner(0,c.ult);
   flash();shake();vib(40);
   fxRing(CSS_W/2,CSS_W/2,GEMS[c.col].base,ENG.cs*8);
@@ -4269,7 +4275,7 @@ async function fireUlt(){
       B[r][c2].k='O';B[r][c2].sc=.2;
       fxRing(cxOf(c2),cyOf(r),'#ffffff',ENG.cs*4);SFX.orb();SFX.made();
       floatNum(r,c2,'万象','#ffffff');
-      grant('a4');
+      if(!GS.party)grant('a4');
     }
   }else if(c.id==='zi'){                                      // 破封：机关各褪一层（梓）
     let n=0;
@@ -4280,8 +4286,19 @@ async function fireUlt(){
       if(p&&p.cage>0){p.cage=0;p.snake=false;bumpGoal('cage',null,1);n++;fxBurst(cxOf(c2),cyOf(r),'#c9b78a',6,.9)}
     }
     SFX.crate();SFX.ink();SFX.crush();
-    addScore(n*160,3,3,'#c199e6');
-    if(!n)toast('这一关没有机关——<b>梓替你把灰扫了</b>',2000);
+    if(!n&&GS.party){
+      /* 聚会盘刻意不铺机关；给梓一条只在来宾局生效的破阵兜底，
+         否则六选一里唯独她的大招必定空放。 */
+      const rr=Math.floor(pasR()*N),cells=[];
+      for(let c2=0;c2<N;c2++)cells.push([rr,c2]);
+      fxBeam(rr,0,'h',GEMS[5].base);
+      const res=clearCells(cells,4);
+      addScore(Math.round(110*res.gems+600),rr,3,'#c199e6');
+      toast('<b>梓</b> 破开一条矿路',1800);
+    }else{
+      addScore(n*160,3,3,'#c199e6');
+      if(!n)toast('这一关没有机关——<b>梓替你把灰扫了</b>',2000);
+    }
   }
   await sleep(REDUCED?30:240);
   await dropAndFill();
@@ -5655,37 +5672,74 @@ function fxBurstDom(i,origin){
 
 /* ==================================================================
    [ 聚会赛 · PARTY（一台机器轮流玩） ]
-   同一轮里所有人拿到**完全相同的初始棋盘**（同种子），比的是手艺不是运气。
-   无倍率——得多少记多少；每人配额可单独调（时间 30–90 秒 / 步数 10–18 步）。
-   轮与轮之间停下来看积分、可再调配额；比赛随时可以终结并出名次。
-   全程不带任何相关敏感字眼，纯聚会玩法。
+   旧版有四层设置：步数/计时、三种记分、每人配额、1–5 轮。组合很多，
+   实质仍是同一块盘反复计分。现在收成两条真正不同的规则：
+   · 镜盘赛：人物只作身份，所有人同盘同规则，纯比手艺；
+   · 灵契赛：同一张基础盘，各选一位不重复同伴，被动与灵技生效。
+   再只留快局 / 标准局两档。计时、组队、接龙、逐人配额整套退役。
    ================================================================== */
 const PT_GLYPH=['一','二','三','四','五','六'];
-/* 每人独立配额，档位差距刻意压小（成倍就失衡了）。由裁判/大家商定谁拿哪一档。 */
-const PT_SEC_TIERS=[30,45,60,75,90];                           // 时间制：每手秒数
-const PT_MOVE_TIERS=[10,12,14,16,18];                          // 步数制：每手步数
-const PT_SEC_DEF=45, PT_MOVE_DEF=14;
-function ptSecsFor(p){return (p&&p.secs)||PT_SEC_DEF}
-function ptMovesFor(p){return (p&&p.moves)||PT_MOVE_DEF}
-/* pace:'moves' 步数制 | 'timed' 时间制 */
-const PARTY={on:false,players:[],n:3,rounds:3,mode:'ffa',pace:'moves',round:0,cur:0,seed:''};
+const PT_FORMATS={
+  quick:{id:'quick',name:'快局',rounds:1,moves:12,note:'一轮定胜负'},
+  standard:{id:'standard',name:'标准局',rounds:2,moves:10,note:'两轮总分'},
+};
+const PT_ROLE_DESC={
+  wolf:'开局一颗疾风；打出 4 连锁再点亮一颗。灵技「执灯」引爆全盘特殊石。',
+  jun:'爆裂范围扩大到 5×5。灵技「虎啸」震出两颗大爆裂。',
+  qi:'连锁到 3 时冲走矿底一颗。灵技「破浪」掀掉矿底两行。',
+  xi:'每手多 2 步。灵技「疾足」再添 3 步。',
+  xiao:'每炼成第 3 颗特殊石，直接摘成爆裂。灵技「掠星」唤来万象。',
+  zi:'开局送一颗爆裂。灵技「破封」横开一整条矿路。',
+};
+const PARTY={on:false,players:[],n:3,rules:'mirror',format:'quick',round:0,cur:0,seed:'',pick:-1};
+function ptFmt(){return PT_FORMATS[PARTY.format]||PT_FORMATS.quick}
+function ptComp(p){return compById(p&&p.comp)}
 /* 预计总时长：每手时间 + 交接停顿，用于设置页提前告知，免得一局拖太久 */
 function ptEstimate(){
-  const hand=8;                                                // 每次交接的停顿
-  let per=0;
-  for(let i=0;i<PARTY.n;i++){
-    const p=PARTY.players[i];
-    per+=(PARTY.pace==='timed'?ptSecsFor(p):Math.round(ptMovesFor(p)*5.4))+hand;   // 步数制按每步约 5.4 秒估
-  }
-  return Math.max(1,Math.round(per*PARTY.rounds/60));
+  const f=ptFmt(), per=Math.round(f.moves*5.1)+8;
+  return Math.max(1,Math.round(per*PARTY.n*f.rounds/60));
 }
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
-function ptColor(i){return GEMS[i%6]}
+function ptColor(i){
+  const p=PARTY.players[i], c=p&&p.comp?ptComp(p):COMPANIONS[i%COMPANIONS.length];
+  return GEMS[c.col];
+}
 /* 玩家色统一走曜石底色，不再为两套主题维护重复变量。 */
 function ptStyle(el,i){
   const g=ptColor(i);
   el.style.setProperty('--pc-base',g.base);
   el.style.setProperty('--pg',hexA(g.base,.24));
+}
+function ptPaintRole(el,p){
+  if(!el||!p)return;
+  const c=ptComp(p);el.textContent=c.g;el.title=c.name+' · '+c.title;
+  el.dataset.role=c.id;ptStyle(el,p.idx==null?PARTY.players.indexOf(p):p.idx);
+  applyArt(el,'ally_'+c.id);
+}
+function ptPaintRoles(root){
+  for(const el of (root||document).querySelectorAll('[data-role]')){
+    const c=compById(el.dataset.role);el.textContent=c.g;applyArt(el,'ally_'+c.id);
+  }
+}
+function ptEnsurePlayers(){
+  while(PARTY.players.length<6){
+    const i=PARTY.players.length;
+    PARTY.players.push({name:'',comp:COMPANIONS[i].id,idx:i});
+  }
+  PARTY.players.forEach((p,i)=>{p.idx=i;if(!COMPANIONS.some(c=>c.id===p.comp))p.comp=COMPANIONS[i].id});
+  /* 减少人数后可占用场外人物；再次加人时自动把重复者补到空位。 */
+  const used=new Set();
+  for(const p of PARTY.players.slice(0,PARTY.n)){
+    if(used.has(p.comp))p.comp=COMPANIONS.find(c=>!used.has(c.id)).id;
+    used.add(p.comp);
+  }
+}
+function ptRoleFree(i,id){
+  return !PARTY.players.slice(0,PARTY.n).some((p,j)=>j!==i&&p.comp===id);
+}
+function ptChooseRole(i,id){
+  if(i<0||i>=PARTY.n||!COMPANIONS.some(c=>c.id===id)||!ptRoleFree(i,id))return false;
+  PARTY.players[i].comp=id;return true;
 }
 /* 一屏定版：内容比视口高时整屏等比微缩（zoom），任何机型不再上下滑动。
    地脉图/游戏屏本来收得进，缩放实际只作用于大厅与聚会设置这类信息密的屏。 */
@@ -5703,7 +5757,7 @@ function fitScreen(id){
 }
 addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
 function renderPartySetup(){
-  applyArt($('#party-banner'),'party_banner');
+  ptEnsurePlayers();
   const cnt=$('#pt-count');cnt.innerHTML='';
   for(let n=2;n<=6;n++){
     const d=document.createElement('div');
@@ -5711,119 +5765,110 @@ function renderPartySetup(){
     d.addEventListener('click',()=>{PARTY.n=n;renderPartySetup()});
     cnt.appendChild(d);
   }
-  const rp=$('#pt-rounds-pick');rp.innerHTML='';
-  for(let r=1;r<=5;r++){
+  const rules=$('#pt-rules');rules.innerHTML='';
+  for(const r of [
+    {id:'mirror',name:'镜盘赛',note:'同盘同规则 · 纯比手艺'},
+    {id:'pact',name:'灵契赛',note:'人物能力生效 · 各显所长'},
+  ]){
     const d=document.createElement('div');
-    d.className='pt-chip'+(PARTY.rounds===r?' on':'');
-    d.textContent=r+' 轮';
-    d.addEventListener('click',()=>{PARTY.rounds=r;renderPartySetup()});
-    rp.appendChild(d);
+    d.className='pt-chip wide'+(PARTY.rules===r.id?' on':'');
+    d.innerHTML='<b>'+r.name+'</b><span class="d">'+r.note+'</span>';
+    d.addEventListener('click',()=>{SFX.click();PARTY.rules=r.id;renderPartySetup()});
+    rules.appendChild(d);
   }
-  /* 怎么比：只有两种 —— 步数制 / 时间制。每个人的配额在名字右边单独调。 */
-  const pc=$('#pt-pace');pc.innerHTML='';
-  const mk=(on,html,fn)=>{const d=document.createElement('div');
-    d.className='pt-chip'+(on?' on':'');d.innerHTML=html;
-    d.addEventListener('click',()=>{SFX.click();fn();renderPartySetup()});pc.appendChild(d)};
-  mk(PARTY.pace==='moves','步数制<span class="d">走完交棒</span>',()=>{PARTY.pace='moves'});
-  mk(PARTY.pace==='timed','时间制<span class="d">到点交棒</span>',()=>{PARTY.pace='timed'});
-  for(const c of $$('#pt-mode .pt-chip'))c.classList.toggle('on',c.dataset.m===PARTY.mode);
-  /* 名字与队伍 */
-  while(PARTY.players.length<6)PARTY.players.push({name:'',team:PARTY.players.length%2});
+  const fm=$('#pt-format');fm.innerHTML='';
+  for(const f of Object.values(PT_FORMATS)){
+    const d=document.createElement('div');
+    d.className='pt-chip'+(PARTY.format===f.id?' on':'');
+    d.innerHTML=f.name+'<span class="d">'+f.note+' · 每手 '+f.moves+' 步</span>';
+    d.addEventListener('click',()=>{SFX.click();PARTY.format=f.id;renderPartySetup()});
+    fm.appendChild(d);
+  }
+  /* 每位选手只填名字和挑人物。六人六角，不重复选角。 */
   const host=$('#pt-names');host.innerHTML='';
   for(let i=0;i<PARTY.n;i++){
     const p=PARTY.players[i];
     const row=document.createElement('div');row.className='pt-name';
-    const dot=document.createElement('div');dot.className='pt-dot';dot.textContent=PT_GLYPH[i];ptStyle(dot,i);
+    const face=document.createElement('button');face.type='button';face.className='pt-avatar';
+    ptPaintRole(face,p);face.addEventListener('click',()=>ptOpenRole(i));
     const inp=document.createElement('input');
     inp.maxLength=8;inp.placeholder=ptDefaultName(i);inp.value=p.name||'';
     inp.setAttribute('autocapitalize','none');inp.setAttribute('autocorrect','off');
     inp.addEventListener('input',()=>{p.name=inp.value.slice(0,8)});
-    row.appendChild(dot);row.appendChild(inp);
-    if(PARTY.mode==='team'){
-      const tm=document.createElement('button');
-      tm.className='tm '+(p.team?'b':'a');tm.textContent=p.team?'蓝队':'红队';
-      tm.addEventListener('click',()=>{p.team=p.team?0:1;SFX.click();renderPartySetup()});
-      row.appendChild(tm);
-    }
-    row.appendChild(ptQuotaBtn(p,()=>renderPartySetup()));
+    const role=document.createElement('button');role.type='button';role.className='pt-role';
+    const c=ptComp(p);role.innerHTML='<b>'+c.name+'</b><i>'+c.title+'</i>';
+    role.addEventListener('click',()=>ptOpenRole(i));
+    row.appendChild(face);row.appendChild(inp);row.appendChild(role);
     host.appendChild(row);
   }
   const est=ptEstimate();
   $('#pt-hint').innerHTML=
-    (PARTY.mode==='ffa'?'各打各的，<b>总分最高的人赢</b>。':
-     PARTY.mode==='team'?'两队各自把分数加起来，<b>总分高的队赢</b>。':
-     '所有人的分数<b>加在一起</b>，一起冲一个总分。')
-    +'<br>点名字右边的<b>配额</b>可以给每个人单独定'
-    +(PARTY.pace==='timed'?'秒数（30–90 秒）':'步数（10–18 步）')
-    +'——谁拿哪一档由你们场下商定，游戏只照配额发。'
-    +'<br>同一轮大家拿到<b>一模一样的盘面</b>；每轮之间会停下来看积分，也可以再调配额。'
+    (PARTY.rules==='mirror'
+      ?'<b>镜盘赛</b>里人物只作身份：同一轮盘面、步数与规则完全相同，纯比消除手艺。'
+      :'<b>灵契赛</b>里六位人物不可重复：同一张基础盘开局，但各人的被动与灵技会把局面带向不同方向。灵技从半充能起步，一手通常能放出一次。')
+    +'<br><b>'+ptFmt().name+'</b>：'+ptFmt().note+'，每人每轮 '+ptFmt().moves+' 步；总分最高者胜。'
+    +'<br>递机前会遮住棋盘，下一位看不到上一位的走法。'
     +'<br><span style="color:var(--gold2)">预计全场约 <b>'+est+' 分钟</b></span>'
-    +'（'+PARTY.n+' 人 × '+PARTY.rounds+' 轮 = '+(PARTY.n*PARTY.rounds)+' 手）';
+    +'（'+PARTY.n+' 人 × '+ptFmt().rounds+' 轮 = '+(PARTY.n*ptFmt().rounds)+' 手）';
   fitScreen('party');
 }
-/* 配额按钮：时间制循环 30/45/60/75/90 秒，步数制循环 10/12/14/16/18 步 */
-function ptQuotaBtn(p,after){
-  const q=document.createElement('button');
-  const timed=PARTY.pace==='timed';
-  const cur=timed?ptSecsFor(p):ptMovesFor(p);
-  const def=timed?PT_SEC_DEF:PT_MOVE_DEF;
-  q.className='tm quota'+(cur!==def?' hi':'');
-  q.innerHTML=ICONS[timed?'clock':'steps']+' '+cur+(timed?' 秒':' 步');
-  q.title='配额——点一下换档';
-  q.addEventListener('click',()=>{
-    const T=timed?PT_SEC_TIERS:PT_MOVE_TIERS;
-    const key=timed?'secs':'moves';
-    const k=T.indexOf(timed?ptSecsFor(p):ptMovesFor(p));
-    p[key]=T[(k+1)%T.length];
-    SFX.click();after&&after();
-  });
-  return q;
+function ptOpenRole(i){
+  PARTY.pick=i;SFX.click();renderPTRole();ovl('pt-role');
+}
+function renderPTRole(){
+  const i=PARTY.pick,p=PARTY.players[i];if(!p)return;
+  $('#pt-role-title').innerHTML=esc((p.name||'').trim()||ptDefaultName(i))+' · <em>人物</em>';
+  $('#pt-role-sub').textContent=PARTY.rules==='pact'?'灵契赛中能力生效，人物不可重复':'镜盘赛中人物只作身份，人物不可重复';
+  const host=$('#pt-role-grid');host.innerHTML='';
+  for(const c of COMPANIONS){
+    const b=document.createElement('button');b.type='button';
+    const free=ptRoleFree(i,c.id);b.className='pt-role-card'+(p.comp===c.id?' sel':'');b.disabled=!free;
+    const face=document.createElement('div');face.className='pt-role-face';face.textContent=c.g;applyArt(face,'ally_'+c.id);
+    b.appendChild(face);
+    const nm=document.createElement('b');nm.textContent=c.name;b.appendChild(nm);
+    const ti=document.createElement('i');ti.textContent=c.title;b.appendChild(ti);
+    b.addEventListener('click',()=>{if(ptChooseRole(i,c.id)){SFX.click();ovl(null);renderPartySetup()}});
+    b.addEventListener('focus',()=>ptRoleDesc(c));b.addEventListener('pointerenter',()=>ptRoleDesc(c));
+    host.appendChild(b);
+  }
+  ptRoleDesc(ptComp(p));
+}
+function ptRoleDesc(c){
+  $('#pt-role-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b><br>'
+    +(PARTY.rules==='pact'?PT_ROLE_DESC[c.id]:'镜盘赛中能力封存，只保留人物身份。');
 }
 function startParty(){
+  ptEnsurePlayers();
   PARTY.on=true;PARTY.round=0;PARTY.cur=0;
   PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
     name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),
-    team:p.team||0, secs:p.secs||PT_SEC_DEF, moves:p.moves||PT_MOVE_DEF, scores:[], total:0, idx:i,
+    comp:p.comp||COMPANIONS[i].id,scores:[],total:0,idx:i,
   }));
   ptHandoff();
 }
 function ptHandoff(){
-  const p=PARTY.players[PARTY.cur];
-  const dot=$('#hand-dot');dot.textContent=PT_GLYPH[p.idx];ptStyle(dot,p.idx);
+  const p=PARTY.players[PARTY.cur], c=ptComp(p), f=ptFmt();
+  const dot=$('#hand-dot');ptPaintRole(dot,p);
   $('#hand-kick').textContent=(PARTY.round===0&&PARTY.cur===0)?'第一位，开始':'把机器递给下一位';
-  $('#hand-who').textContent=p.name+(PARTY.mode==='team'?(p.team?' · 蓝队':' · 红队'):'');
-  $('#hand-meta').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
-  $('#hand-mult').textContent='这一手 · '
-    +(PARTY.pace==='timed'?(ptSecsFor(p)+' 秒'):(ptMovesFor(p)+' 步'));
+  $('#hand-who').textContent=p.name+' · '+c.name;
+  $('#hand-meta').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
+  $('#hand-mult').textContent=(PARTY.rules==='pact'?'灵契生效':'镜盘同规')+' · '+f.moves+' 步';
   $('#hand-scores').innerHTML=ptScoreLines();
   show('game');ovl('hand');
 }
 function ptScoreLines(){
   if(!PARTY.players.some(p=>p.total>0))return '';
-  if(PARTY.mode==='relay'){
-    const tot=PARTY.players.reduce((a,p)=>a+p.total,0);
-    return '目前合计 <b>'+tot.toLocaleString('en-US')+'</b>';
-  }
-  if(PARTY.mode==='team'){
-    const a=PARTY.players.filter(p=>!p.team).reduce((x,p)=>x+p.total,0);
-    const b=PARTY.players.filter(p=>p.team).reduce((x,p)=>x+p.total,0);
-    return '红队 <b>'+a.toLocaleString('en-US')+'</b> ｜ 蓝队 <b>'+b.toLocaleString('en-US')+'</b>';
-  }
   return PARTY.players.slice().sort((x,y)=>y.total-x.total).slice(0,3)
     .map((p,i)=>(i+1)+'. '+esc(p.name)+' <b>'+p.total.toLocaleString('en-US')+'</b>').join('　');
 }
 function ptStartTurn(){
-  const p=PARTY.players[PARTY.cur];
+  const p=PARTY.players[PARTY.cur], c=ptComp(p), f=ptFmt(), pact=PARTY.rules==='pact';
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
-  /* 晰的「每关 +2 步」在种子局也要给（王老师定：全给）。
-     以前只有冒险关与限时局接了它，钧/麒/晓 的被动却在周赛照常生效 ——
-     同一张榜上有人有、有人没有，那是最不公平的一种。
-     时间制不加（那一档本来就没有步数概念）。 */
-  const xiP=(compById(SAVE.comp).id==='xi')?2:0;
-  L.colors=5;L.moves=PARTY.pace==='timed'?9999:(ptMovesFor(p)+xiP);
+  const xiP=(pact&&c.id==='xi')?2:0;
+  L.colors=5;L.moves=f.moves+xiP;
   L.goals=[{type:'score',need:999999999,got:0}];
   L.chName='聚会赛';L.era='第 '+(PARTY.round+1)+' 轮';
   L.s1=6000;L.s2=14000;L.s3=26000;
@@ -5831,40 +5876,31 @@ function ptStartTurn(){
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.party=true;GS.weekly=false;GS.paused=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
-  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
+  GS.compDef=pact?c:null;GS.charge=pact?c.need*.45:0;GS.xiaoN=0;
   /* 同一轮 = 同一颗种子。种子不只铺初盘，还要**贯穿整手**——
      只种初盘的话，第一次消除之后的补位就各走各的 Math.random()，
      两个人下同样的步子结果照样分岔，「比手艺不比运气」就站不住。 */
   buildBoard(L,PARTY.seed+'|r'+PARTY.round);
-  /* 必须在 buildBoard 之后（否则改的是上一手的盘），且**显式传种子** ——
-     buildBoard 结束时会把 ENG.rng 清成 null，靠它读不到东西。
-     这两个模式 L.ink/L.crates 都是空的，所以走的必然是梓的「送一颗爆裂」兜底。 */
-  GS.pasRng=rngOf(PARTY.seed+'|r'+PARTY.round+'|pas');
-  applyOpeningPassives();
+  /* 灵契赛先保证基础盘相同，再按人物走各自确定性的开局被动。 */
+  GS.pasRng=rngOf(PARTY.seed+'|r'+PARTY.round+'|pas|'+c.id);
+  if(pact)applyOpeningPassives();
   ENG.rng=rngOf(PARTY.seed+'|play'+PARTY.round);              // 补位/重排也吃同一条随机流
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
-  if(PARTY.pace==='timed'){                                    // 快赛：复用限时条做倒计时
-    const ms=ptSecsFor(p)*1000;
-    GS.rushOn=true;GS.rushT=ms;GS.rushMax=ms;
-    $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
-    $('#rush-top').firstElementChild.textContent='时间制 · '+ptSecsFor(p)+' 秒';
-    $('#rush-best').textContent='第 '+(PARTY.round+1)+' 轮';
-    /* 步数格由 updHUD 按 rushOn 自动切成「最长连锁」，这里不用管 */
-  }else{
-    GS.rushOn=false;$('#rush-bar').classList.remove('on');
-  }
+  GS.rushOn=false;$('#rush-bar').classList.remove('on');
   $('#toolbar').style.display='none';                          // 聚会赛不用灵器，人人同起点
   $('#tool-hint').classList.remove('on');
   const bar=$('#pt-bar');bar.classList.add('on');
-  const dot=$('#ptb-dot');dot.textContent=PT_GLYPH[p.idx];ptStyle(dot,p.idx);ptStyle(bar,p.idx);
-  $('#ptb-name').textContent=p.name+(PARTY.mode==='team'?(p.team?' · 蓝队':' · 红队'):'');
-  $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
-  $('#ptb-mult').textContent=PARTY.pace==='timed'?(ptSecsFor(p)+'s'):(ptMovesFor(p)+'步');
+  const dot=$('#ptb-dot');ptPaintRole(dot,p);ptStyle(bar,p.idx);
+  $('#ptb-name').textContent=p.name+' · '+c.name;
+  $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
+  $('#ptb-mult').textContent=(pact?'灵契':'镜盘')+' · '+L.moves+'步';
   $('#score-stars').innerHTML='<s style="left:23%">★</s><s style="left:54%">★</s><s style="left:97%">★</s>';
   renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent='本轮得分';
-  $('#quip-line').innerHTML='<b>狼先生：</b>'+pick2(Q_INTRO);
+  $('#quip-line').innerHTML=pact
+    ?'<b>'+c.name+'：</b>'+PT_ROLE_DESC[c.id]
+    :'<b>镜盘赛：</b>同一张盘，同样步数，各凭手艺。';
   updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
 }
@@ -5879,35 +5915,28 @@ function ptTurnEnd(){
   PARTY.cur++;
   if(PARTY.cur>=PARTY.players.length){
     PARTY.cur=0;PARTY.round++;
-    if(PARTY.round>=PARTY.rounds){ptFinish();return}
-    ptRoundBreak();                                          // 轮与轮之间停下来：看积分、调配额，不急着连轴转
+    if(PARTY.round>=ptFmt().rounds){ptFinish();return}
+    ptRoundBreak();
     return;
   }
   ptHandoff();
 }
-/* 轮间小结：本轮打完先看积分，下一轮开始前还能给每个人重新调配额。
-   （场下这段时间大家干什么由你们定——游戏只管把台子搭好。） */
-function ptRoundBreak(){
-  $('#ptr-title').innerHTML='第 '+PARTY.round+' 轮 · <em>战罢</em>';
-  $('#ptr-sub').textContent='下一轮：第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮';
-  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
-  $('#ptr-board').innerHTML=ranked.map((q,i)=>{
-    const g=ptColor(q.idx);
+function ptRankHTML(players){
+  return players.map((q,i)=>{
+    const g=GEMS[ptComp(q).col],c=ptComp(q);
     return '<div class="pd-row'+(i===0?' w1':'')+'">'
-      +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
-      +'<div class="dot" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[q.idx]+'</div>'
-      +'<div class="nm">'+esc(q.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(q.team?'蓝队':'红队')+'</span>':'')+'</div>'
+      +'<div class="rk">'+(i+1)+'</div>'
+      +'<div class="dot" data-role="'+c.id+'" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+c.g+'</div>'
+      +'<div class="nm">'+esc(q.name)+'<span style="color:var(--ink3);font-size:11px">　'+c.name+'</span></div>'
       +'<div class="sc">'+q.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
-  const host=$('#ptr-quota');host.innerHTML='';
-  for(const q of PARTY.players){
-    const row=document.createElement('div');row.className='pt-name';
-    const dot=document.createElement('div');dot.className='pt-dot';dot.textContent=PT_GLYPH[q.idx];ptStyle(dot,q.idx);
-    const nm=document.createElement('span');nm.className='ptr-nm';nm.textContent=q.name;
-    row.appendChild(dot);row.appendChild(nm);
-    row.appendChild(ptQuotaBtn(q,()=>ptRoundBreak()));
-    host.appendChild(row);
-  }
+}
+/* 标准局只在两轮之间停一次：看积分，然后直接进入下一轮。 */
+function ptRoundBreak(){
+  $('#ptr-title').innerHTML='第 '+PARTY.round+' 轮 · <em>战罢</em>';
+  $('#ptr-sub').textContent='下一轮：第 '+(PARTY.round+1)+' 轮 / 共 '+ptFmt().rounds+' 轮';
+  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  $('#ptr-board').innerHTML=ptRankHTML(ranked);ptPaintRoles($('#ptr-board'));
   show('game');ovl('ptround');
 }
 /* 「终结比赛」的统一入口：有人打完过一手就当场出名次，一手都没打完就散伙。
@@ -5928,27 +5957,9 @@ function ptFinish(){
   $('#pt-bar').classList.remove('on');
   const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
   const T=$('#pte-title'), S=$('#pte-sub'), P=$('#pt-podium');
-  if(PARTY.mode==='relay'){
-    const tot=PARTY.players.reduce((a,p)=>a+p.total,0);
-    T.innerHTML='合力 · <em>达成</em>';
-    S.textContent=PARTY.players.length+' 人 · '+PARTY.rounds+' 轮 · 合计 '+tot.toLocaleString('en-US');
-  }else if(PARTY.mode==='team'){
-    const a=PARTY.players.filter(p=>!p.team).reduce((x,p)=>x+p.total,0);
-    const b=PARTY.players.filter(p=>p.team).reduce((x,p)=>x+p.total,0);
-    T.innerHTML=a===b?'握手 · <em>言和</em>':(a>b?'红队 · <em>胜</em>':'蓝队 · <em>胜</em>');
-    S.textContent='红队 '+a.toLocaleString('en-US')+' ｜ 蓝队 '+b.toLocaleString('en-US');
-  }else{
-    T.innerHTML='冠 · <em>军</em>';
-    S.textContent=ranked[0].name+' · '+ranked[0].total.toLocaleString('en-US');
-  }
-  P.innerHTML=ranked.map((p,i)=>{
-    const g=ptColor(p.idx);
-    return '<div class="pd-row'+(i===0&&PARTY.mode!=='relay'?' w1':'')+'">'
-      +'<div class="rk">'+(i<3?['①','②','③'][i]:(i+1))+'</div>'
-      +'<div class="dot" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+PT_GLYPH[p.idx]+'</div>'
-      +'<div class="nm">'+esc(p.name)+(PARTY.mode==='team'?'<span style="color:var(--ink3);font-size:11px">　'+(p.team?'蓝队':'红队')+'</span>':'')+'</div>'
-      +'<div class="sc">'+p.total.toLocaleString('en-US')+'</div></div>';
-  }).join('');
+  T.innerHTML='冠 · <em>军</em>';
+  S.textContent=ranked[0].name+' · '+ptComp(ranked[0]).name+' · '+ranked[0].total.toLocaleString('en-US');
+  P.innerHTML=ptRankHTML(ranked);ptPaintRoles(P);
   /* 中途终结时，还没轮到的人一手都没打过。以前这里会输出「选手二：」后面空着，
      像是文案没写完；给他一句明话。 */
   $('#pt-rounds').innerHTML=ranked.map(p=>esc(p.name)+'：'+(p.scores.length
@@ -7549,11 +7560,10 @@ const HOW_HTML=`
 <b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
 <b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆——别急着刚好走完。<br><br>
 <b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。<br><br>
-<b>聚会赛</b>　一台机器 2–6 人轮流玩，打 1–5 轮。<b>同一轮里所有人拿到一模一样的盘面</b>，比的是手艺不是运气；
-可选各打各的、两队对抗、或合力凑一个总分。<br>
-怎么比只有两种：<b>步数制</b>走完交棒，<b>时间制</b>到点交棒。每个人的<b>配额</b>都可以单独调
-（时间 30–90 秒、步数 10–18 步，档位差距刻意不大）——谁拿哪一档由你们场下商定，游戏只照配额发。<br>
-每一轮打完会停下来看积分，下一轮开始前还能再调配额；想收就随时点<b>终结比赛</b>，当场出名次。<br><br>
+<b>聚会赛</b>　一台机器 2–6 人轮流玩，每位选手先从六位人物中挑一位，人物不重复。<br>
+　<b>镜盘赛</b>：人物只作身份，同一轮的盘面、步数和规则完全相同，纯比手艺。<br>
+　<b>灵契赛</b>：同一张基础盘开局，所选人物的被动与灵技生效；灵技从半充能起步，一手通常能放一次。<br>
+只留两档局长：<b>快局</b>一轮 12 步，<b>标准局</b>两轮、每轮 10 步。递机时棋盘会完全遮住；总分最高者胜，想收就随时终结比赛。<br><br>
 <b>矿上的挑战</b>（大厅「挑战」一键直达）<br>
 　<b>矿灯将熄 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
 　<b>本周矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
@@ -7668,10 +7678,7 @@ function loop(now){
       if(s<=10&&Math.floor(s*2)!==GS.__tick){GS.__tick=Math.floor(s*2);if(s>0)SFX.tick(s<=3)}
       /* 结算链还在跑就先别收——否则玩家最后一手打出的连锁分数会被静默丢弃，
          上传到榜单的也是截断值。等 busy 落下来再定分。 */
-      if(GS.rushT<=0&&!GS.busy){
-        if(GS.party){GS.rushOn=false;GS.over=true;GS.busy=true;ptTurnEnd()}   // 快赛：时间到就交棒
-        else endRush();
-      }
+      if(GS.rushT<=0&&!GS.busy)endRush();
     }
     /* 闲置久了给个提示 */
     if(!GS.busy&&!GS.over&&GS.idle&&now-GS.idle>5200){
@@ -7744,7 +7751,7 @@ $('#pt-hint-open').addEventListener('click',e=>{e.preventDefault();SFX.click();o
 $('#pt-hint-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
-for(const c of $$('#pt-mode .pt-chip'))c.addEventListener('click',()=>{SFX.click();PARTY.mode=c.dataset.m;renderPartySetup()});
+$('#pt-role-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#hand-go').addEventListener('click',()=>{SFX.click();ptStartTurn()});
 $('#hand-quit').addEventListener('click',()=>{SFX.click();ovl(null);ptQuit()});
 $('#ptr-next').addEventListener('click',()=>{SFX.click();ovl(null);ptHandoff()});
@@ -7940,7 +7947,7 @@ addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCan
    暂停键因 GS.over 失效、屏内没有别的可点控件，整局报废只能刷新；
    暂停层被关掉则 GS.paused 不复位，限时赛倒计时永久冻结可以无限刷分。 */
 const ESC_ACT={'ovl-pause':'#pause-resume','ovl-hand':'#hand-go','ovl-ptround':'#ptr-next','ovl-end':'#end-menu',
-  'ovl-pt-end':'#pte-menu','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
+  'ovl-pt-end':'#pte-menu','ovl-pt-role':'#pt-role-close','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
   'ovl-pt-hint':'#pt-hint-close','ovl-install':'#install-close','ovl-ach':'#ach-close','ovl-how':'#how-close',
   'ovl-lb':'#lb-close','ovl-col':'#col-esc'};
 addEventListener('keydown',e=>{
@@ -8393,6 +8400,30 @@ window.__selftest=function(){
   const realTxt=goalText({type:'score',need:6000,got:180});
   ok('无目标的分数只报当前分，不漏哨兵值',
      !/\d{7}/.test(noTargetTxt)&&noTargetTxt.replace(/,/g,'')==='180'&&realTxt==='180/6000');
+
+  /* 聚会赛的减法必须锁住：只有两种赛制、两档局长，不再把 90 秒玩法换皮搬回来。 */
+  {
+    const src=[renderPartySetup,ptStartTurn,ptRoundBreak,ptFinish].map(String).join('\n');
+    ok('聚会赛只留镜盘/灵契与快局/标准局，不再藏计时、组队、接龙分支',
+       Object.keys(PT_FORMATS).length===2&&PT_FORMATS.quick.rounds===1&&PT_FORMATS.quick.moves===12
+       &&PT_FORMATS.standard.rounds===2&&PT_FORMATS.standard.moves===10
+       &&!/timed|team|relay|PT_SEC|ptQuota/.test(src));
+  }
+  {
+    const bak={players:PARTY.players,n:PARTY.n,rules:PARTY.rules,format:PARTY.format};
+    PARTY.players=[];PARTY.n=3;ptEnsurePlayers();
+    const unique=new Set(PARTY.players.slice(0,3).map(p=>p.comp)).size===3;
+    const rejectsTaken=!ptChooseRole(1,PARTY.players[0].comp);
+    const acceptsFree=ptChooseRole(1,'xiao')&&PARTY.players[1].comp==='xiao';
+    Object.assign(PARTY,bak);
+    ok('人物挑选不依赖机主解锁，并阻止同场重复人物',unique&&rejectsTaken&&acceptsFree);
+  }
+  {
+    const start=String(ptStartTurn),ult=String(fireUlt);
+    ok('灵契赛才接人物能力且来宾使用不写进机主成就',
+       /GS\.compDef=pact\?c:null/.test(start)&&/c\.need\*\.45/.test(start)
+       &&/if\(!GS\.party\)/.test(ult));
+  }
 
   /* ---- 典藏册 ---- */
   /* 22. 卡池完整：卡号唯一、贴图键都在 ART 里、套组张数对得上 */
