@@ -105,6 +105,13 @@ async function getSeason(env) {
   return s;
 }
 
+/* 门派满员 6 人，**上限与计入是同一个数** ——
+   「不限人数只算前 5」会出现「我拉进来了但他不算数」的尴尬，
+   规则得一句话说得清：满员 6 人，6 个全算。
+   6 是朋友小圈子的自然大小，比 5 宽一点，但仍挡得住「拉二十个新号靠人头碾压」。
+   满了之后新人不是被静默丢弃 —— gfSubmit 会告诉他「这个门派满了」。 */
+const FACTION_MAX = 6;
+
 const SEASON_ROW_CAP = 5000; // 每赛季去重行上限（防无界灌水/成本失控；老师可清空）
 
 async function handleSubmit(req, env, origin) {
@@ -408,6 +415,8 @@ const GF_LINE = {
   light: `((MIN(lv,64)*100 + MAX(0,MIN(lv-64,86))*150 + MAX(0,lv-150)*200
             + (CASE WHEN lv>=75 THEN ((lv-50)/25)*600 ELSE 0 END) + stars*120) / 120)`,
   dark:  `((MAX(chain*60, chain*chain*30) + best_dig/12 + best_score/50 + best_rush/40) / 30)`,
+  /* grey 这条 2026-08-06 起不再喂阵营（灰塔已下线），
+     但**别删** —— 勤勉线照样喂矿力与「勤勉首座」，这里留着给那两处用。 */
   grey:  `((days*160 + runs*6 + dbest*120) / 26)`,
 };
 function gfBadges(s) {
@@ -589,7 +598,7 @@ const PACER_FACTION = ["拾光社", "拾光社", "拾光社", "夜航班", "夜�
 /* ⚠ 别用 seed % 3：那些 seed 都是质数，取模会聚堆 ——
    实测分出来是 灰塔 7 / 黑域 4 / 光明 0，光明一个人没有，比不分还难看。
    按名单次序轮流分，稳稳的 4/4/3。 */
-function pacerCamp(i) { return ["light", "dark", "grey"][i % 3]; }
+function pacerCamp(i) { return ["light", "dark"][i % 2]; }
 
 function pacerRows(nowMs) {
   const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));
@@ -656,8 +665,20 @@ async function gfSubmit(req, env, origin) {
   if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
   let faction = String(body.faction || "").trim().slice(0, 8);
   if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
-  /* 阵营只认三个固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
-  const camp = ["light", "dark", "grey"].includes(String(body.camp || "")) ? String(body.camp) : "";
+  /* 门派满员挡在这里。**要排除自己** —— 老玩家重复提交时不能把自己算成第 7 个人。
+     满了就把 faction 清空并在返回里说明，不静默丢弃：
+     玩家敲了名字却没进去、还不知道为什么，那比拒绝更糟。 */
+  let factionFull = false;
+  if (faction) {
+    const c = await env.DB.prepare(
+      "SELECT COUNT(*) AS n FROM gemfall WHERE hidden=0 AND faction=? AND id!=?"
+    ).bind(faction, id).first();
+    if (c && (c.n || 0) >= FACTION_MAX) { factionFull = true; faction = ""; }
+  }
+  /* 阵营只认固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
+  /* 2026-08-06：灰塔下线，只剩光明与黑域。两营对拉比三营好看，也更贴正典
+     （狼先生 vs 叶王）。老存档里选了 grey 的一律当作没选，会被重新问一次。 */
+  const camp = ["light", "dark"].includes(String(body.camp || "")) ? String(body.camp) : "";
   const COMPS = ["wolf", "jun", "qi", "xi", "xiao", "zi"];
   const comp = COMPS.includes(String(body.comp || "")) ? String(body.comp) : "";
   let classTag = "", classJoined = false;
@@ -737,6 +758,7 @@ async function gfSubmit(req, env, origin) {
   ).bind(myPower).first();
   return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
+    factionFull, factionMax: FACTION_MAX,                    // 满员时客户端要能说明白
     classJoined, season: sea }, 200, origin);
 }
 /* 门派榜：faction 是玩家自由填的帮派名，按名字聚合。
@@ -767,15 +789,13 @@ async function gfCamps(req, env, origin, url) {
   const rows = await env.DB.prepare(
     `SELECT camp,
             SUM(MIN(${GF_LINE.light}, ?)) AS light,
-            SUM(MIN(${GF_LINE.dark},  ?)) AS dark,
-            SUM(MIN(${GF_LINE.grey},  ?)) AS grey
+            SUM(MIN(${GF_LINE.dark},  ?)) AS dark
        FROM gemfall WHERE hidden=0 AND camp!='' AND last_write > ? GROUP BY camp`
-  ).bind(CAP, CAP, CAP, SINCE).all();
-  const raw = { light: 0, dark: 0, grey: 0 };
+  ).bind(CAP, CAP, SINCE).all();
+  const raw = { light: 0, dark: 0 };
   for (const r of (rows.results || [])) {
     if (r.camp === "light") raw.light = Math.max(0, Math.round(r.light || 0));
     else if (r.camp === "dark") raw.dark = Math.max(0, Math.round(r.dark || 0));
-    else if (r.camp === "grey") raw.grey = Math.max(0, Math.round(r.grey || 0));
   }
   /* 各营成员名单：只出化名与本营指标分，**不出人数总计**。
      看得见队友是归属感的来源；但「本营 4 人」这种总数一露就露怯，
@@ -785,12 +805,11 @@ async function gfCamps(req, env, origin, url) {
     `SELECT camp, alias,
             CASE camp
               WHEN 'light' THEN MIN(${GF_LINE.light}, ?)
-              WHEN 'dark'  THEN MIN(${GF_LINE.dark},  ?)
-              ELSE MIN(${GF_LINE.grey},  ?) END AS sc
+              ELSE MIN(${GF_LINE.dark},  ?) END AS sc
        FROM gemfall WHERE hidden=0 AND camp!='' AND last_write > ?
        ORDER BY sc DESC LIMIT 60`
-  ).bind(CAP, CAP, CAP, SINCE).all();
-  const members = { light: [], dark: [], grey: [] };
+  ).bind(CAP, CAP, SINCE).all();
+  const members = { light: [], dark: [] };
   /* 配速员并进来。不并的话最明显的破绽就在这儿：
      进了光明能看到肖肖、白水清新…却看不到世界榜上那 11 个人，
      「为什么榜上有小圆、阵营里没有」一问就穿。
@@ -799,8 +818,7 @@ async function gfCamps(req, env, origin, url) {
   if (await pacersOn(env)) {
     for (const p of pacerRows(Date.now())) {
       const line = p.camp === "light" ? (p.lv * 150 + p.stars * 120) / 120
-                 : p.camp === "dark"  ? (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30
-                 :                      (p.days * 160 + p.runs * 6 + p.dbest * 120) / 26;
+                 :                        (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30;
       pool.push({ camp: p.camp, alias: p.alias,
                   sc: Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line))) });
     }
@@ -808,8 +826,7 @@ async function gfCamps(req, env, origin, url) {
     for (const p of pacerRows(Date.now())) {
       const k = p.camp;
       const line = k === "light" ? (p.lv * 150 + p.stars * 120) / 120
-                 : k === "dark"  ? (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30
-                 :                 (p.days * 160 + p.runs * 6 + p.dbest * 120) / 26;
+                 :                    (p.chain * 60 + p.best_score / 50 + p.best_rush / 40) / 30;
       raw[k] += Math.min(PACER_CAMP_CAP, Math.max(0, Math.round(line)));
     }
   }
@@ -819,12 +836,12 @@ async function gfCamps(req, env, origin, url) {
       members[k].push({ alias: r.alias, sc: Math.max(0, Math.round(r.sc || 0)) });
   }
 
-  const tot = raw.light + raw.dark + raw.grey;
+  const tot = raw.light + raw.dark;
   /* 全空时给等分，界面上就是三段一样长的静止拔河带——
      比显示三个 0 体面得多，也不算撒谎（确实还没人挖）。 */
   const pct = tot > 0
-    ? { light: raw.light / tot, dark: raw.dark / tot, grey: raw.grey / tot }
-    : { light: 1 / 3, dark: 1 / 3, grey: 1 / 3 };
+    ? { light: raw.light / tot, dark: raw.dark / tot }
+    : { light: .5, dark: .5 };
   return json({ ok: true, empty: tot === 0, pct, members }, 200, origin);
 }
 
@@ -840,7 +857,7 @@ async function gfFactions(req, env, origin, url) {
      5 留得住拉人的意义，又挡得住人海。
      返回 n（实际人数）与 cnt（计入人数）两个数，界面上明写「计入 3/5 人」——
      规则藏着的话，拉了人却不涨分的人会以为榜坏了。 */
-  const FACTION_TOP = 5;
+  const FACTION_TOP = FACTION_MAX;   // 上限与计入是同一个数，见 FACTION_MAX 那条注释
   const rows = await env.DB.prepare(
     `SELECT faction, COUNT(*) AS n, SUM(power) AS p, MAX(power) AS top,
             SUM(CASE WHEN rn<=${FACTION_TOP} THEN power ELSE 0 END) AS pcap,
@@ -885,17 +902,23 @@ async function gfFactions(req, env, origin, url) {
     const by = {};
     for (const p of ps) (by[p.faction] = by[p.faction] || []).push(p);
     for (const f in by) {
-      const arr = by[f].sort((a, b) => b.power - a.power);
-      const cap = arr.slice(0, 5);
+      const arr = by[f].map(p => ({ alias: p.alias, power: p.power }));
       let x = list.find(v => v.faction === f);
-      if (!x) { x = { faction: f, n: 0, cnt: 0, cap: 5, power: 0, avg: 0, top: 0, members: [] }; list.push(x); }
+      if (!x) { x = { faction: f, n: 0, cnt: 0, cap: FACTION_TOP, power: 0, avg: 0, top: 0, members: [] }; list.push(x); }
+      /* ⚠ 必须**先并再取前 5**，不能「真人前 5 + 配速前 5 相加」——
+         那样一个门派会被算进最多 10 个人的分，而 cnt 还显示 5。
+         实测：真人 [100,90,80,70] + 配速 [60,50,40]，
+         错的算法给 490（7 个人），对的是 400（前 5：100+90+80+70+60）。
+         现在没爆是因为配速员用的是自己的门派名，但只要有真人敲了「拾光社」立刻就中。
+         members 里已经是各门派前 12 的明细，直接拿它重算。 */
+      const merged = (x.members || []).concat(arr).sort((a, b) => b.power - a.power);
+      const capped = merged.slice(0, FACTION_TOP);
       x.n += arr.length;
-      x.cnt = Math.min(5, x.cnt + cap.length);
-      x.power += cap.reduce((a, b) => a + b.power, 0);
-      x.top = Math.max(x.top, arr[0].power);
+      x.cnt = capped.length;
+      x.power = capped.reduce((a, b) => a + b.power, 0);
+      x.top = merged.length ? merged[0].power : 0;
       x.avg = x.cnt ? Math.round(x.power / x.cnt) : 0;
-      x.members = (x.members || []).concat(arr.map(p => ({ alias: p.alias, power: p.power })))
-        .sort((a, b) => b.power - a.power).slice(0, 12);
+      x.members = merged.slice(0, 12);
     }
     list.sort((a, b) => (b.power || 0) - (a.power || 0));
   }

@@ -805,7 +805,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
 .cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
 /* 三阵营。三色只用在这一处，别处不铺——颜色一泛滥就不成标识了。 */
-.cs-light{--cc:#e8c768} .cs-dark{--cc:#a2568f} .cs-grey{--cc:#8fa3b0}
+.cs-light{--cc:#e8c768} .cs-dark{--cc:#a2568f}
 .camp-bar{display:flex;height:14px;border:1px solid var(--line2);overflow:hidden;margin:2px 0 7px}
 .camp-bar i{display:block;background:var(--cc);transition:width .8s cubic-bezier(.16,1,.3,1);
   box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
@@ -1947,7 +1947,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
               过月永不再得，时间戳就是它的价值。
      firstDay = 第一次打开游戏的日序号（名片上的「入坑日」）。 */
   streak:{cur:0,best:0},cs:{},rush2Best:0,
-  /* 三阵营。side = 'light'|'dark'|'grey'，m = 选定/上次换边的月序号。
+  /* 两阵营。side = 'light'|'dark'（灰塔 2026-08-06 下线），m = 选定/上次换边的月序号。
      每月只能换一次：既有承诺感又不锁死人。 */
   camp:{side:'',m:0},
   bounty:{w:0,done:0},yj:{m:0,c:{},done:0,got:{}},yjSeal:{},firstDay:0,
@@ -4572,7 +4572,7 @@ const monthKey=m=>{const y=Math.floor(m/12),mo=m%12+1;return ''+y+String(mo).pad
    改后：光明×灰塔 +0.025、黑域×灰塔 −0.277，灰塔彻底独立；
    光明×黑域 仍有 0.606 —— 技巧线含最佳分与矿灯分，天然跟「玩得多」相关，
    这条要彻底解耦得靠固定盘定量局，那个玩法 2026-08-04 决定暂不做。 */
-const CAMP_DIV={light:120,dark:30,grey:26};
+const CAMP_DIV={light:120,dark:30};
 const CAMPS=[
   {id:'light',nm:'光明',lead:'狼先生',seat:'学院谷地',
    creed:'让你们变得有趣一点',
@@ -4582,17 +4582,19 @@ const CAMPS=[
    creed:'标准答案自有它的重量',
    metric:'打多险',how:'连锁与单局高分',col:'#a2568f',
    score:s=>Math.floor(pwLines(s).skill/CAMP_DIV.dark)},
-  {id:'grey', nm:'灰塔',lead:'鹦鹉教授',seat:'复读灰塔',
-   creed:'重复一百遍，直到真理点头',
-   metric:'来多勤',how:'下矿的天数与局数',col:'#8fa3b0',
-   /* 勤勉派：肯天天来的普通玩家在这条线上能赢过大号 —— 这是三阵营最大的价值。
-      现在它真的成立了：勤勉每天封顶，榜首一天最多也就那么多，结构上快不过新人。 */
-   score:s=>Math.floor(pwLines(s).grind/CAMP_DIV.grey)},
 ];
+/* 2026-08-06 灰塔下线。三营里它一直是 0 真人，而两营对拉更好看、更好懂，
+   也更贴正典（狼先生 vs 叶王，本来就是一对）。
+   勤勉那条线没有消失 —— 它照样喂矿力，也照样有「勤勉首座」，
+   只是不再单独占一个阵营。老存档里选了 grey 的会被当作没选，重新问一次。 */
 const campById=id=>CAMPS.find(c=>c.id===id)||null;
 const myCamp=()=>campById(SAVE.camp&&SAVE.camp.side);
 /* 换边：每月一次。没选过的随时可选（第一次不算换）。 */
+/* 老存档里选了灰塔的，一律当作没选 —— 让他重新在光明/黑域之间挑一次。
+   不静默改成某一营：那等于替玩家做了他没做过的决定。 */
+function campFix(){if(SAVE.camp&&SAVE.camp.side==='grey'){SAVE.camp.side='';persist()}}
 function campCanSwitch(){
+  campFix();
   if(!SAVE.camp.side)return true;
   return monthNum()>(SAVE.camp.m||0);
 }
@@ -6374,7 +6376,7 @@ const LB={
   async submit(silent){
     if(!this.registered())return {ok:false,err:'还没起化名'};
     const body={deviceUUID:this.dev(),alias:SAVE.lbAlias,faction:SAVE.lbFaction||'',
-      camp:(SAVE.camp&&SAVE.camp.side)||'',comp:SAVE.comp||'',
+      camp:(SAVE.camp&&SAVE.camp.side==='grey'?'':(SAVE.camp&&SAVE.camp.side))||'',comp:SAVE.comp||'',
       pw:SAVE.lbPw||'',stats:this.stats()};
     /* text/plain 是 CORS simple request，不先发 OPTIONS。Worker 的 req.json() 仍会
        正常解析；国内移动网由两次往返变一次，sendBeacon 也与普通提交同口径。 */
@@ -7090,7 +7092,7 @@ async function renderLB(){
        离线/后端没跟上时整块空白，玩家会以为功能坏了——而这一屏最核心的
        「我属于哪一营、我挣了多少」本来就是纯本地算得出来的。 */
     const okNet=!!(d&&d.ok&&d.pct);
-    const pct=okNet?d.pct:{light:1/3,dark:1/3,grey:1/3};
+    const pct=okNet?d.pct:{light:.5,dark:.5};
     let h='<div class="camp-bar">';
     for(const c of CAMPS)h+='<i class="cs-'+c.id+'" style="width:'+(pct[c.id]*100).toFixed(1)+'%"></i>';
     h+='</div><div class="camp-legend">';
@@ -9069,10 +9071,10 @@ window.__selftest=function(){
      且**阵营视图绝不渲染人头数**——「光明 5 人」一露就露怯。 */
   {
     const ids=CAMPS.map(c=>c.id);
-    const uniq=new Set(ids).size===3&&ids.join()==='light,dark,grey';
+    const uniq=new Set(ids).size===2&&ids.join()==='light,dark';
     const st={lv:20,stars:40,chain:8,score:30000,rush:20000,rush2:9000};
     const scores=CAMPS.map(c=>c.score(st));
-    const indep=new Set(scores).size===3;              // 同一份数据在三营算出三个不同分
+    const indep=new Set(scores).size===2;              // 同一份数据在两营算出两个不同分
     const src=String(renderLB);
     const noHead=!/人</.test(src.slice(src.indexOf("scope==='camp'"),src.indexOf("scope==='faction'")));
     const bak=JSON.parse(JSON.stringify(SAVE.camp));
@@ -9081,7 +9083,7 @@ window.__selftest=function(){
     SAVE.camp={side:'light',m:monthNum()-1};
     const open=campCanSwitch();                       // 上月选的 → 可以换
     SAVE.camp=bak;
-    ok('三营指标各自独立、换边每月一次、阵营视图不露人头数',
+    ok('两营指标各自独立、换边每月一次、阵营视图不露人头数',
        uniq&&indep&&noHead&&locked&&open);
   }
   /* 32b. 公开榜（世界/门派）不该被注册闸挡住——线上实测过：
@@ -9311,10 +9313,9 @@ window.__selftest=function(){
       const s={lv:111,stars:192,chain:11,score:91905,rush:121830,mv:0,runs:0,days:0,dbest:0};
       const byId=id=>CAMPS.find(c=>c.id===id).score(s);
       const L=pwLines(s);
-      ok('三阵营各吃一条线，且除数与服务端一致',
+      ok('两阵营各吃一条线，且除数与服务端一致',
          byId('light')===Math.floor(L.depth/120)
          && byId('dark')===Math.floor(L.skill/30)
-         && byId('grey')===Math.floor(L.grind/26)
          && byId('light')===314 && byId('dark')===283);
       /* 纯限时局玩家（一关没通）在光明必须是 0 —— 旧公式下他靠一次连锁就把黑域打满，
          那正是「一关没通的人把阵营贡献拉满」那个事故。 */
