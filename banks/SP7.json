@@ -1,0 +1,157 @@
+{
+  "name": "半枚棋子 · 人物传 VOL.6（陷阱猎人版）",
+  "code": "SP7",
+  "desc": "2026 暑假特辑 SP7《半枚棋子》陷阱猎人版语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的看图命门（13–18）、传记阅读（19–22）、对白填空、时间线排序依赖纸面漫画分镜页，未进题库。",
+  "tier": "free",
+  "level": "炼狱",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "Yu ___ back last Tuesday, after seventy days away.",
+        "ops": [
+          "has come",
+          "comes",
+          "will come",
+          "came"
+        ],
+        "ans": 3,
+        "why": "last Tuesday 是明确的过去时间点，用一般过去时 came。",
+        "lv": 1
+      },
+      {
+        "q": "Let's start the game before the bell, ___?",
+        "ops": [
+          "shall we",
+          "will you",
+          "do we",
+          "shan't we"
+        ],
+        "ans": 0,
+        "why": "Let's 开头的祈使句，反意疑问固定用 shall we。",
+        "lv": 1
+      },
+      {
+        "q": "The question of ___ Yue is still alive has no answer yet.",
+        "ops": [
+          "whether",
+          "if",
+          "that",
+          "what"
+        ],
+        "ans": 0,
+        "why": "介词 of 后面接从句只能用 whether，不能用 if。",
+        "lv": 2
+      },
+      {
+        "q": "Jin saw Yu ___ the half piece out of his pocket and press it onto the board.",
+        "ops": [
+          "to take",
+          "taking",
+          "take",
+          "took"
+        ],
+        "ans": 2,
+        "why": "see sb do 表示看见整个动作完成；后面的 press 是原形，两个动作并列，只能同为原形。",
+        "lv": 2
+      },
+      {
+        "q": "Duo is the only player ___ opening no one in the school has seen before.",
+        "ops": [
+          "that",
+          "which",
+          "whose",
+          "whom"
+        ],
+        "ans": 2,
+        "why": "横线后面是名词 opening，缺的是“他的”，用关系代词 whose。",
+        "lv": 2
+      },
+      {
+        "q": "Duo ___ the first move until Yu sat down opposite him.",
+        "ops": [
+          "made",
+          "hasn't made",
+          "doesn't make",
+          "didn't make"
+        ],
+        "ans": 3,
+        "why": "not…until 表示“直到……才”，主句必须是否定式；全句是过去的事，用 didn't make。",
+        "lv": 2
+      },
+      {
+        "q": "Duo often wishes Yue ___ here to see this game.",
+        "ops": [
+          "is",
+          "were",
+          "will be",
+          "has been"
+        ],
+        "ans": 1,
+        "why": "wish 后面的从句用虚拟语气；与现在事实相反，be 动词一律用 were。",
+        "lv": 2
+      },
+      {
+        "q": "It was kind ___ Xi to keep Yu's seat for two whole months.",
+        "ops": [
+          "for",
+          "to",
+          "with",
+          "of"
+        ],
+        "ans": 3,
+        "why": "kind 是评价人品的形容词，用 It is + adj + of sb + to do。",
+        "lv": 2
+      },
+      {
+        "q": "The board ___ before the bell, or the match doesn't count.",
+        "ops": [
+          "must be cleared",
+          "must clear",
+          "must be clearing",
+          "must cleared"
+        ],
+        "ans": 0,
+        "why": "棋盘是被人收的，主语是物，用情态动词被动式 must be + 过去分词。",
+        "lv": 2
+      },
+      {
+        "q": "___ longer he waited, ___ quieter he became.",
+        "ops": [
+          "A; the",
+          "The; the",
+          "The; a",
+          "More; more"
+        ],
+        "ans": 1,
+        "why": "“越……越……”用 the + 比较级, the + 比较级，两个 the 都不能省。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "It took Yu seventy days to find the other half.",
+          "The boy sat by the window kept his face in the dark.",
+          "Every piece on the board has its own place.",
+          "The girls' seats were kept for two whole months."
+        ],
+        "ans": 1,
+        "why": "要表示“坐在窗边的那个男孩”，作定语要用现在分词 sitting → The boy sitting by the window…；写成 sat 就成了两个谓语。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "The coat had hung on that chair for two months.",
+          "Not a single word was said about Yue that afternoon.",
+          "By the time Yu came back, the game has already started.",
+          "Xi keeps three lollipops in her pocket, as she always does."
+        ],
+        "ans": 2,
+        "why": "by the time + 过去时，主句要用过去完成 → had already started。",
+        "lv": 2
+      }
+    ]
+  }
+}
