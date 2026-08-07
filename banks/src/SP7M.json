@@ -1,0 +1,158 @@
+{
+ "date": "2026-08-07",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "进阶",
+ "tier": "free",
+ "name": "半枚棋子 · 学徒版 VOL.6",
+ "code": "SP7M",
+ "desc": "2026 暑假特辑 SP7M《半枚棋子·学徒版》语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的看图命门（13–17）、传记阅读（18–20）、对白填空、时间线排序依赖纸面漫画分镜页，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "When the two ___ of the piece came together, they fitted exactly.",
+    "ops": [
+     "halfs",
+     "half",
+     "half's",
+     "halves"
+    ],
+    "ans": 3,
+    "why": "half 以 -f 结尾，变复数把 f 改成 v 再加 -es → halves；two 后面必须用复数。",
+    "lv": 1
+   },
+   {
+    "q": "Duo ___ already set the board when Yu walked in.",
+    "ops": [
+     "have",
+     "had",
+     "has",
+     "is"
+    ],
+    "ans": 1,
+    "why": "摆好棋在“他走进来”之前就完成了，用过去完成时 had + 过去分词。",
+    "lv": 1
+   },
+   {
+    "q": "He found the half piece ___ the bottom of a dry well.",
+    "ops": [
+     "in",
+     "on",
+     "to",
+     "at"
+    ],
+    "ans": 3,
+    "why": "at the bottom of 是固定搭配，表示“在……的底部”。",
+    "lv": 1
+   },
+   {
+    "q": "___ quietly Duo waited for those two months!",
+    "ops": [
+     "What",
+     "How",
+     "What a",
+     "How a"
+    ],
+    "ans": 1,
+    "why": "感叹的中心是副词 quietly（修饰 waited），用 How + 副词。",
+    "lv": 2
+   },
+   {
+    "q": "Nobody in the school knows ___ Yue is now — in the north, in the sea, nobody can say.",
+    "ops": [
+     "what",
+     "that",
+     "where",
+     "when"
+    ],
+    "ans": 2,
+    "why": "从句缺的是地点（她现在在哪儿），用 where 引导宾语从句。",
+    "lv": 2
+   },
+   {
+    "q": "The well was ___ deeper than he had thought.",
+    "ops": [
+     "very",
+     "too",
+     "quite",
+     "much"
+    ],
+    "ans": 3,
+    "why": "much 可以修饰比较级，表示“……得多”。同类的还有 far / a lot / even。",
+    "lv": 2
+   },
+   {
+    "q": "Yu reached into his pocket ___ the other half of the piece.",
+    "ops": [
+     "took out",
+     "taking out",
+     "to take out",
+     "for take out"
+    ],
+    "ans": 2,
+    "why": "表示目的用动词不定式 to do。",
+    "lv": 2
+   },
+   {
+    "q": "___ he had waited for two whole months, Duo did not say a word about it.",
+    "ops": [
+     "Though",
+     "But",
+     "So",
+     "Because"
+    ],
+    "ans": 0,
+    "why": "前后是让步关系（虽然等了两个月，却一个字没提），用 Though 引导让步状语从句。",
+    "lv": 2
+   },
+   {
+    "q": "Nobody helped him. He dug at the wet floor and found it ___.",
+    "ops": [
+     "himself",
+     "him",
+     "his",
+     "he"
+    ],
+    "ans": 0,
+    "why": "强调“他自己缈亲自）”找到的，用反身代词 himself。",
+    "lv": 2
+   },
+   {
+    "q": "Yu ___ such an opening before — this is the first time he has met it.",
+    "ops": [
+     "never saw",
+     "does not see",
+     "has never seen",
+     "had never seen"
+    ],
+    "ans": 2,
+    "why": "never…before 讲的是“到现在为止从未”，用现在完成时。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "Though he had waited two months, but he said nothing.",
+     "The two halves of the piece fitted together.",
+     "He counted the days by the light above him.",
+     "Nobody has ever explained how she went."
+    ],
+    "ans": 0,
+    "why": "though 与 but 不能同时出现，去掉 but → Though he had waited two months, he said nothing.",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "He reached into his pocket to take something out.",
+     "The board was set up by Duo every afternoon, isn't it?",
+     "The well was much deeper than it looked.",
+     "She has been gone for two months."
+    ],
+    "ans": 1,
+    "why": "前半句是一般过去时的被动 was set up，反意疑问要跟着用 wasn't it。",
+    "lv": 2
+   }
+  ]
+ }
+}
