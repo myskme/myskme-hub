@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-07-party-recast">
+<meta name="gemfall-release" content="2026-08-08-waystone-party-desk">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -26,7 +26,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
-<meta name="theme-color" content="#171310">
+<meta name="theme-color" content="#111018">
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
 <meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
@@ -37,16 +37,18 @@
 <meta property="og:image" content="https://play.myskme.com/icons/og.png">
 <style>
 :root{
-  /* 统一的「曜石墨金」：暖石墨承接深色的舞台感，又避免纯黑压迫。 */
-  --bg:#171310;--bg2:#1d1814;--panel:#231d18;--panel2:#2a221c;--edge:#3b3026;
-  --ink:#f2e8d8;--ink2:#b9ad99;--ink3:#918878;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
-  --gold:#c9a64a;--gold2:#e8c768;--gold-hi:#e8c768;--gold-line:#7a6320;
+  /* 「夜曜琉金」：墨蓝黑做底、暖金定主次、少量紫蓝作矿彩折光。
+     全部是静态色与渐变，不靠模糊和常驻动画换气氛。 */
+  --bg:#111018;--bg2:#171620;--panel:#1c1a25;--panel2:#24212e;--edge:#383346;
+  --ink:#f5eddf;--ink2:#c4b9aa;--ink3:#9c9388;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
+  --gold:#c9a657;--gold2:#f0d07b;--gold-hi:#f5dda0;--gold-line:#7f692d;
+  --prism:#8e7bd8;--prism2:#6fa6c9;
   --red:#d56060;--green:#6aa86a;--blue:#6ba0dd;--purple:#c199e6;
   --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.10);
   --glow:0 0 24px rgba(201,166,74,.4);--glow-soft:0 0 14px rgba(201,166,74,.25);
-  --paper:#1b160f;--noise-op:.17;--noise-blend:overlay;
+  --paper:#17151d;--noise-op:.12;--noise-blend:overlay;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#100e0d;--mine2:#171310;--mine-edge:#3a3024;
+  --mine:#0c0d13;--mine2:#12121a;--mine-edge:#343044;
 }
 
 /* ── 图标基线 ──
@@ -79,10 +81,11 @@ input,textarea{-webkit-user-select:text;user-select:text}
    现在把光坐实成两层：上方偏暖的灯光（更强、落点更靠近立绘），
    四周压暗的暗角（vignette）。暗角是「像游戏」这件事上性价比最高的一步 ——
    它让屏幕有了中心与边界，视线自然被收进画面里。 */
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;color-scheme:dark;
   background-image:
-    radial-gradient(760px 420px at 50% 4%,color-mix(in srgb,var(--gold) 22%,transparent),transparent 62%),
-    radial-gradient(1200px 900px at 50% 40%,transparent 34%,rgba(0,0,0,.55) 100%);
+    radial-gradient(720px 400px at 48% 1%,color-mix(in srgb,var(--gold) 19%,transparent),transparent 62%),
+    radial-gradient(680px 540px at 92% 58%,color-mix(in srgb,var(--prism) 8%,transparent),transparent 70%),
+    radial-gradient(1200px 900px at 50% 40%,transparent 32%,rgba(0,0,0,.58) 100%);
   transition:background-color .35s,color .35s;
   -webkit-user-select:none;user-select:none;touch-action:manipulation}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:var(--noise-op);mix-blend-mode:var(--noise-blend);
@@ -90,8 +93,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 环境光改为静态渐变。旧版用两块 46vmax 的模糊图层长驻漂移，
    在手机上会持续占用合成与纹理带宽，却几乎看不出差别。 */
 #amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
-  background:radial-gradient(55vmax 42vmax at 18% 18%,color-mix(in srgb,var(--gold) 7%,transparent),transparent 72%),
-             radial-gradient(48vmax 40vmax at 82% 76%,color-mix(in srgb,var(--gold2) 4%,transparent),transparent 74%)}
+  background:radial-gradient(55vmax 42vmax at 18% 18%,color-mix(in srgb,var(--gold) 6%,transparent),transparent 72%),
+             radial-gradient(48vmax 40vmax at 82% 76%,color-mix(in srgb,var(--prism2) 5%,transparent),transparent 74%)}
 #amb i{display:none}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
@@ -112,6 +115,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
              0 2px 0 rgba(0,0,0,.45),
              0 6px 16px rgba(0,0,0,.42);
   transition:transform .12s,box-shadow .12s,border-color .2s}
+.btn::after{content:'';position:absolute;inset:2px;pointer-events:none;border:1px solid rgba(255,255,255,.025)}
+.btn:focus-visible,.iconbtn:focus-visible,.pt-chip:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
 .btn:hover{transform:translateY(-2px);border-color:var(--gold);
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 24%,transparent),
              inset 0 -1px 0 rgba(0,0,0,.55),
@@ -211,7 +216,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   .title-hero{margin-top:0}
 }
 .wolf-badge::before{content:'';position:absolute;inset:6px;border:1px solid var(--gold-line);opacity:.45;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s}
-.wolf-badge::after{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 24s linear infinite}
+.wolf-badge::after{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2)}
 .wolf-badge svg{position:absolute;width:70%;height:70%;opacity:.16}
 .wolf-badge b{font-size:44px;font-weight:300;color:var(--gold);text-shadow:0 0 24px color-mix(in srgb,var(--gold) 40%,transparent);transition:transform .6s,text-shadow .4s;position:relative}
 .wolf-badge:hover::before{opacity:.9;transform:rotate(45deg) scale(1.1)}
@@ -250,10 +255,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   /* 猫身走 currentColor（贴图没加载出来时的兜底线稿，has-art 之后会被隐藏） */
   color:#0c0c0e}
 #cat:hover{opacity:.95;transform:translateY(-3px)}
-#cat .tail{transform-origin:6px 46px;animation:tailFlick 5.5s ease-in-out infinite}
+#cat .tail{transform-origin:6px 46px}
 @keyframes tailFlick{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-16deg)}94%{transform:rotate(6deg)}}
 #cat.found{opacity:.9}
-#cat .eyes{animation:catBlink 6s infinite}
+#cat .eyes{opacity:1}
 @keyframes catBlink{0%,92%,100%{opacity:1}95%,97%{opacity:0}}
 
 /* ============ 地脉图（选关） ============ */
@@ -275,7 +280,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:2px;min-height:14px}
 .lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
-.lv.cur{border-color:var(--gold);animation:curPulse 2.2s ease-in-out infinite}
+.lv.cur{border-color:var(--gold);box-shadow:0 0 16px color-mix(in srgb,var(--gold) 28%,transparent)}
 @keyframes curPulse{50%{box-shadow:0 0 18px color-mix(in srgb,var(--gold) 38%,transparent)}}
 .lv.boss .n{color:var(--red)}
 .lv .bosscrown{position:absolute;top:4px;right:6px;line-height:0;color:var(--red)}
@@ -303,7 +308,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
              0 5px 14px rgba(0,0,0,.4)}
 #hud-moves{min-width:74px;display:flex;flex-direction:column;justify-content:center}
 #hud-moves .num{font-size:30px;line-height:1.1;color:var(--ink);font-weight:500;transition:color .3s}
-#hud-moves.low .num{color:var(--red);animation:lowPulse 1s ease-in-out infinite}
+#hud-moves.low .num{color:var(--red);text-shadow:0 0 10px color-mix(in srgb,var(--red) 34%,transparent)}
 @keyframes lowPulse{50%{transform:scale(1.12);text-shadow:0 0 14px color-mix(in srgb,var(--red) 60%,transparent)}}
 #hud-moves .lbl,#hud-goals .lbl{font-size:10px;letter-spacing:.3em;color:var(--ink3)}
 #hud-goals{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px}
@@ -320,7 +325,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #score-num{font-size:17px;color:var(--gold2);letter-spacing:.05em;line-height:1;font-variant-numeric:tabular-nums}
 .sbar{height:7px;background:var(--bg2);overflow:hidden;position:relative;border:1px solid var(--edge)}
 .sbar i{display:block;height:100%;width:0%;transition:width .45s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,var(--gold-line),var(--gold))}
-.sbar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:sheen 2.4s ease-in-out infinite;transform:translateX(-100%)}
+.sbar i::after{display:none}
 @keyframes sheen{60%,100%{transform:translateX(100%)}}
 .sbar .stars{position:absolute;inset:0;pointer-events:none}
 .sbar .stars s{position:absolute;top:50%;transform:translate(-50%,-54%);font-size:9px;color:var(--ink3);text-decoration:none;transition:color .3s,text-shadow .3s}
@@ -337,7 +342,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #boss-name{font-size:13px;letter-spacing:.2em;color:var(--red);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #boss-hpbar{height:9px;background:var(--bg2);border:1px solid var(--edge);position:relative;overflow:hidden;margin-top:3px}
 #boss-hpbar i{display:block;height:100%;width:100%;transition:width .4s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,#7a1f1f,var(--red))}
-#boss-hpbar.low i{animation:hpWarn 1s ease-in-out infinite}
+#boss-hpbar.low i{filter:brightness(1.35)}
 @keyframes hpWarn{50%{filter:brightness(1.6)}}
 #boss-hp-num{font-size:11px;color:var(--ink2);min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
 #boss-say{position:absolute;left:56px;top:-30px;background:var(--panel);border:1px solid var(--line);padding:3px 10px;font-size:12px;color:var(--ink2);
@@ -357,11 +362,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #board{display:block;width:100%;touch-action:none;
   border:1px solid var(--mine-edge);background:var(--mine);
   box-shadow:
-    0 0 0 1px rgba(201,166,74,.16),
-    0 0 0 5px color-mix(in srgb,var(--mine-edge) 70%,#000),
-    0 0 0 6px rgba(201,166,74,.10),
+    0 0 0 1px color-mix(in srgb,var(--prism) 16%,var(--gold)),
+    0 0 0 5px color-mix(in srgb,var(--mine-edge) 78%,#000),
+    0 0 0 6px color-mix(in srgb,var(--prism2) 16%,transparent),
     inset 0 0 60px rgba(0,0,0,.72),
-    inset 0 2px 0 rgba(201,166,74,.09),
+    inset 0 2px 0 color-mix(in srgb,var(--prism2) 14%,var(--gold)),
     inset 0 -3px 12px rgba(0,0,0,.6),
     0 10px 34px rgba(0,0,0,.55)}
 #board-wrap::before,#board-wrap::after{content:'';position:absolute;width:20px;height:20px;border:2px solid var(--gold);opacity:.75;pointer-events:none;z-index:3}
@@ -396,7 +401,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #rush-track{height:9px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden}
 #rush-track i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold))}
 #rush-bar.crit #rush-track i{background:linear-gradient(90deg,#7a1f1f,var(--red))}
-#rush-bar.crit #rush-time{color:var(--red);animation:lowPulse 1s infinite}
+#rush-bar.crit #rush-time{color:var(--red);text-shadow:0 0 10px color-mix(in srgb,var(--red) 36%,transparent)}
 /* 插画到位后盖住字形徽章；缺图时这条规则不生效，一切照旧 */
 .has-art{background-size:cover;background-position:center top;background-repeat:no-repeat}
 #ally-badge.has-art b,.ally-opt.has-art .g,.wolf-badge.has-art b,.wolf-badge.has-art svg{opacity:0}
@@ -420,7 +425,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #ally{width:min(520px,100%);display:flex;align-items:center;gap:10px;margin-top:8px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:7px 10px;
   cursor:default;transition:border-color .25s,box-shadow .3s}
-#ally.ready{border-color:var(--gold);box-shadow:var(--glow);cursor:pointer;animation:armedPulse 1.8s ease-in-out infinite}
+#ally.ready{border-color:var(--gold);box-shadow:var(--glow-soft);cursor:pointer}
 #ally-badge{width:44px;height:44px;flex:none;position:relative;display:flex;align-items:center;justify-content:center;
   border:1px solid var(--line);background:radial-gradient(ellipse at center,var(--ally-glow,rgba(201,166,74,.16)),transparent 72%)}
 #ally-badge::before{content:'';position:absolute;inset:4px;border:1px solid var(--gold-line);opacity:.4;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .3s}
@@ -436,9 +441,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #ally-track{height:7px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;margin-top:4px;position:relative}
 #ally-track i{display:block;height:100%;width:0%;transition:width .4s cubic-bezier(.16,1,.3,1);
   background:linear-gradient(90deg,var(--gold-line),var(--ally-c))}
-#ally.ready #ally-track i::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
-  animation:sheen 1.6s ease-in-out infinite;transform:translateX(-100%)}
+#ally.ready #ally-track i::after{display:none}
 #ally-fire{flex:none;font-family:var(--serif);font-size:13px;letter-spacing:.16em;padding:8px 12px;
   border:1px solid var(--line2);background:transparent;color:var(--ink3);cursor:default;transition:all .2s}
 #ally.ready #ally-fire{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 14%,transparent);cursor:pointer}
@@ -529,8 +532,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #ovl-hand .ovl-card{text-align:center}
 #hand-dot{width:96px;height:96px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:40px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg,rgba(201,166,74,.16)),transparent 72%);
-  position:relative;animation:curPulse 2.2s ease-in-out infinite}
-#hand-dot::before{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2);animation:spin 22s linear infinite}
+  position:relative;box-shadow:0 0 20px color-mix(in srgb,var(--gold) 18%,transparent)}
+#hand-dot::before{content:'';position:absolute;inset:-7px;border:1px dashed var(--line2)}
 #hand-who{font-size:27px;font-weight:300;letter-spacing:.2em;margin-top:8px;color:var(--ink)}
 #hand-meta{font-size:12.5px;color:var(--ink3);letter-spacing:.16em;margin-top:4px}
 #hand-mult{font-size:15px;color:var(--gold2);letter-spacing:.14em;margin-top:8px}
@@ -560,6 +563,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .pd-row .sc{flex:none;font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
 .pd-row.w1{background:color-mix(in srgb,var(--gold) 10%,transparent)}
 #pt-rounds{margin-top:10px;font-size:11.5px;color:var(--ink3);line-height:1.9;letter-spacing:.03em}
+.pt-config{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pt-stepper{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line2);background:var(--bg2);padding:7px}
+.pt-stepper button{width:34px;height:34px;border:1px solid var(--line);background:var(--panel);color:var(--gold2);font:18px var(--serif);cursor:pointer}
+.pt-stepper output{min-width:72px;text-align:center;color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.pt-stepper output b{display:block;color:var(--gold2);font-size:18px;font-weight:500;line-height:1.1}
+.pt-desk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:5px}
+.pt-toolbox{min-width:0;border:1px solid var(--line2);background:linear-gradient(145deg,var(--bg2),color-mix(in srgb,var(--prism) 5%,var(--panel)));padding:9px}
+.pt-toolbox .ttl{display:flex;align-items:center;gap:6px;color:var(--ink2);font-size:12px;letter-spacing:.12em}
+.pt-toolbox .ttl .ic{color:var(--gold)}
+.pt-toolbox .read{min-height:28px;margin:6px 0;color:var(--gold2);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-toolbox .btn{width:100%;font-size:12px;padding:7px 4px}
+.pt-timer-row{display:flex;gap:5px}
+.pt-timer-row select{width:58px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:12px var(--serif);padding:4px}
+.pt-timer-row .btn{flex:1}
+.pt-nextmoves{margin:10px auto 4px;max-width:260px}
+.pt-live-btn{width:38px;height:38px;border:1px solid var(--line);background:var(--bg2);color:var(--gold2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pt-live-btn .ic{width:18px;height:18px}
+#pt-live-note{font-size:11.5px;color:var(--ink3);line-height:1.65;margin-top:8px;text-align:left}
+#pt-cardimg{display:block;width:min(310px,78vw);height:auto;margin:10px auto 0;border:1px solid var(--gold-line)}
+@media(max-width:360px){.pt-desk{grid-template-columns:1fr}.pt-config{gap:5px}.pt-stepper{gap:4px}}
+#end-waystone{display:none;margin:10px 0 2px;border:1px solid color-mix(in srgb,var(--prism) 46%,var(--gold-line));
+  background:linear-gradient(135deg,color-mix(in srgb,var(--prism) 10%,var(--bg2)),var(--bg2));padding:10px;text-align:left}
+#end-waystone.on{display:flex;align-items:center;gap:10px}
+#end-waystone .mark{width:42px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--gold2);
+  border:1px solid var(--gold-line);background:color-mix(in srgb,var(--prism) 10%,var(--panel))}
+#end-waystone .mark .ic{width:25px;height:25px}
+#end-waystone .copy{flex:1;min-width:0;font-size:11.5px;line-height:1.55;color:var(--ink3)}
+#end-waystone .copy b{display:block;color:var(--gold2);font-size:14px;font-weight:500}
+#end-guide{flex:none;padding:8px 10px;font-size:12px}
 /* 矿脉榜：只留荣誉席、榜首和玩家附近三层，不再平铺 50 行。 */
 #ovl-lb .ovl-card{width:min(440px,94vw)}
 .lb-tabs{display:flex;gap:8px;margin:10px 0 12px}
@@ -637,7 +669,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   font-variant-numeric:tabular-nums;text-align:center}
 .tool:disabled{opacity:.34;cursor:default}
 .tool:disabled .icw{color:var(--ink3)}
-.tool.armed{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);animation:armedPulse 1.5s ease-in-out infinite}
+.tool.armed{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-soft)}
 @keyframes armedPulse{50%{box-shadow:0 0 32px color-mix(in srgb,var(--gold) 55%,transparent)}}
 #tool-hint{width:min(520px,100%);margin-top:6px;font-size:12.5px;color:var(--gold2);letter-spacing:.08em;
   text-align:center;min-height:0;height:0;overflow:hidden;transition:height .25s,margin .25s}
@@ -987,7 +1019,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 #star-meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold));transition:width .5s cubic-bezier(.16,1,.3,1)}
 #chest-btn .icw .ic{width:var(--ic-sm);height:var(--ic-sm)}
 #chest-btn{margin-top:8px;display:none}
-#chest-btn.on{display:inline-block;animation:curPulse 2s ease-in-out infinite}
+#chest-btn.on{display:inline-block;box-shadow:var(--glow-soft)}
 body.shaking #board-wrap{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
 /* 幅度改成变量：3 连轻轻一顿，8 连才真的晃。原来是 chain>=5 的一刀切，
    3、4 连和不连一模一样，中段完全没有体感递进。--shk 由 shakeBy() 按连锁设。 */
@@ -1014,9 +1046,9 @@ body{--shk:4px}
 /* ============ 覆盖层 ============ */
 .ovl{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;
   background:color-mix(in srgb,var(--bg) 62%,transparent)}
-/* 遮罩加一点背景模糊：弹层浮起来的感觉一半靠影子，一半靠背后失焦。
-   模糊值刻意很小（3px）——手机上大模糊很吃 GPU，而且会把立绘糊成一团。 */
-.ovl{background:rgba(4,4,6,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+/* 弹层用更深的静态遮罩分层。移除 backdrop-filter：手机上每一帧重算背后像素，
+   成本高于这点视觉收益，尤其聚会赛频繁开合弹层时更没必要。 */
+.ovl{background:rgba(4,4,8,.84)}
 .ovl.on{display:flex}
 /* 弹层是「从矿脉里取出来的一块牌子」，不是一张飘着的纸：
    顶沿受矿灯的光、底沿转暗、外面一圈金线封边、下面一片深影托住。
@@ -1185,8 +1217,7 @@ body{--shk:4px}
 /* 臻卡流光——整套系统的高光时刻，值得一点额外的排面 */
 @keyframes topSheen{0%{background-position:-140% 0}100%{background-position:240% 0}}
 .cardc.t2::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(105deg,transparent 38%,rgba(255,240,190,.28) 50%,transparent 62%);
-  background-size:220% 100%;animation:topSheen 3.6s linear infinite}
+  background:linear-gradient(105deg,transparent 38%,rgba(255,240,190,.12) 50%,transparent 62%)}
 @media (prefers-reduced-motion:reduce){.cardc.t2::after{animation:none;opacity:.1}}
 
 /* 开匣过场。两张匣图都是 512 见方、匣体已对齐，所以舞台必须是**正方形**、
@@ -1390,12 +1421,41 @@ body{--shk:4px}
       <div class="pt-chips" id="pt-rules"></div>
     </div>
     <div class="pt-sec">
-      <div class="pt-lbl">选局长</div>
-      <div class="pt-chips" id="pt-format"></div>
+      <div class="pt-lbl">赛长与每手步数</div>
+      <div class="pt-config">
+        <div class="pt-stepper">
+          <button type="button" id="pt-round-dec" aria-label="减少轮数">−</button>
+          <output id="pt-round-out"><b>3</b>轮</output>
+          <button type="button" id="pt-round-inc" aria-label="增加轮数">＋</button>
+        </div>
+        <div class="pt-stepper">
+          <button type="button" id="pt-move-dec" aria-label="减少步数">−</button>
+          <output id="pt-move-out"><b>12</b>步</output>
+          <button type="button" id="pt-move-inc" aria-label="增加步数">＋</button>
+        </div>
+      </div>
     </div>
     <div class="pt-sec">
       <div class="pt-lbl">选手与人物</div>
       <div id="pt-names"></div>
+    </div>
+    <div class="pt-sec">
+      <div class="pt-lbl">聚会台</div>
+      <div class="pt-desk">
+        <div class="pt-toolbox">
+          <div class="ttl"><span id="pt-random-ic"></span>随机点名</div>
+          <div class="read" id="pt-random-read">尚未抽取</div>
+          <button class="btn ghost" type="button" id="pt-random">抽一位先手</button>
+        </div>
+        <div class="pt-toolbox">
+          <div class="ttl"><span id="pt-timer-ic"></span>思考计时</div>
+          <div class="read" id="pt-timer-read">30 秒</div>
+          <div class="pt-timer-row">
+            <select id="pt-timer-seconds" aria-label="思考秒数"><option>15</option><option selected>30</option><option>45</option><option>60</option></select>
+            <button class="btn ghost" type="button" id="pt-timer">开始</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="pt-hint-line">一台机器轮流递 · <a href="#" id="pt-hint-open">规则与时长 →</a></div>
     <div class="ovl-btns" style="margin-bottom:20px">
@@ -1410,6 +1470,7 @@ body{--shk:4px}
       <div class="dot" id="ptb-dot">一</div>
       <div class="mid"><div class="nm" id="ptb-name">选手一</div><div class="sub" id="ptb-sub">第 1 轮 / 共 3 轮</div></div>
       <div class="mu" id="ptb-mult">×1</div>
+      <button class="pt-live-btn" id="ptb-live" aria-label="查看并保存实时战绩"></button>
     </div>
     <div id="rush-bar"><div id="rush-top"><span>矿灯将熄 · LAMPLIGHT</span><span id="rush-time">90.0</span><span id="rush-best">最佳 —</span></div><div id="rush-track"><i></i></div></div>
     <div id="boss-bar">
@@ -1490,10 +1551,15 @@ body{--shk:4px}
   <div class="obanner" id="end-banner"></div>
   <div class="ovl-title" id="end-title">脉 · <em>通</em></div>
   <div class="stars-row" id="end-stars"><s></s><s></s><s></s></div>
-  <div id="end-score">0</div>
-  <div id="end-detail"></div>
-  <div class="quip" id="end-quip"></div>
-  <pre id="wk-tablet"></pre>
+    <div id="end-score">0</div>
+    <div id="end-detail"></div>
+    <div class="quip" id="end-quip"></div>
+    <div id="end-waystone">
+      <div class="mark" id="guide-mark"></div>
+      <div class="copy"><b>引路晶 · 一枚</b>只开下一段路；本关仍是未通，零星、零分、零奖励。</div>
+      <button class="btn primary" id="end-guide">借道</button>
+    </div>
+    <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
     <div id="end-share" style="display:none;gap:8px">
       <button class="btn ghost" id="end-tablet">拓 片 · 文字</button>
@@ -1622,6 +1688,7 @@ body{--shk:4px}
   <div id="hand-mult">本轮得分 ×1</div>
   <div id="hand-scores"></div>
   <div class="ovl-btns">
+    <button class="btn ghost" id="hand-save">保存战绩</button>
     <button class="btn ghost" id="hand-quit">终结比赛</button>
     <button class="btn primary big" id="hand-go">我准备好了</button>
   </div>
@@ -1633,7 +1700,16 @@ body{--shk:4px}
   <div class="ovl-title" id="ptr-title">第 1 轮 · <em>战罢</em></div>
   <div class="ovl-sub" id="ptr-sub"></div>
   <div id="ptr-board"></div>
+  <div class="pt-nextmoves">
+    <div class="pt-lbl">下一轮每人步数</div>
+    <div class="pt-stepper">
+      <button type="button" id="ptr-move-dec" aria-label="减少下一轮步数">−</button>
+      <output id="ptr-move-out"><b>12</b>步</output>
+      <button type="button" id="ptr-move-inc" aria-label="增加下一轮步数">＋</button>
+    </div>
+  </div>
   <div class="ovl-btns">
+    <button class="btn ghost" id="ptr-save">保存战绩</button>
     <button class="btn ghost" id="ptr-end">终结比赛</button>
     <button class="btn primary big" id="ptr-next">开始下一轮</button>
   </div>
@@ -1659,7 +1735,23 @@ body{--shk:4px}
   <div class="quip" id="pte-quip"></div>
   <div class="ovl-btns">
     <button class="btn ghost" id="pte-menu">回大厅</button>
+    <button class="btn" id="pte-save">保存战绩</button>
     <button class="btn primary" id="pte-again">再来一局</button>
+  </div>
+</div></div>
+
+<!-- 聚会赛 · 随时战绩台 -->
+<div class="ovl" id="ovl-pt-live"><div class="ovl-card">
+  <div class="ovl-kick">LIVE RESULT</div>
+  <div class="ovl-title">聚会 · <em>战绩</em></div>
+  <div class="ovl-sub" id="pt-live-sub"></div>
+  <div id="pt-live-board"></div>
+  <div id="pt-live-note"></div>
+  <img id="pt-cardimg" alt="聚会赛战绩图" style="display:none">
+  <div class="ovl-btns">
+    <button class="btn ghost" id="pt-live-close">继续比赛</button>
+    <button class="btn" id="pt-live-save">保存到相册</button>
+    <button class="btn primary" id="pt-live-end">立即结算</button>
   </div>
 </div></div>
 
@@ -1800,6 +1892,9 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0,best:0},chest:0,fails:{},chainBest:0,
+  /* 引路晶：同一关完整失利 4 次后、每章至多唤醒 1 枚，背包上限 1。
+     bypass 只记借道的关卡：它们不算通关、不进矿力深度，之后仍可回来补。 */
+  guide:{n:0,earned:{},bypass:{}},
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
@@ -1842,6 +1937,10 @@ function loadSave(){
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
   out.daily=Object.assign({day:0,streak:0,oil:0,best:0},s.daily||{});
   out.fails=s.fails||{};
+  out.guide=Object.assign({n:0,earned:{},bypass:{}},s.guide||{});
+  out.guide.n=clamp(Math.floor(+out.guide.n||0),0,1);
+  out.guide.earned=(out.guide.earned&&typeof out.guide.earned==='object')?out.guide.earned:{};
+  out.guide.bypass=(out.guide.bypass&&typeof out.guide.bypass==='object')?out.guide.bypass:{};
   /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
@@ -3988,6 +4087,7 @@ const ICONS={
   clock:_IC('<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>'),
   steps:_IC('<path d="M4 18h4v-4h4v-4h4V6h4"/>'),
   album:_IC('<path d="M6 4.6h9a2.6 2.6 0 012.6 2.6v12.2H8.6A2.6 2.6 0 016 16.8z"/><path d="M9.4 8.6h5.2M9.4 11.6h5.2"/><path d="M19.4 6.6v12.8"/>'),
+  waystone:_IC('<path d="M12 2.8 18.2 9 12 21.2 5.8 9z"/><path d="M5.8 9h12.4M9.2 9 12 2.8 14.8 9M12 9v12.2"/>'),
   box:_IC('<path d="M4.2 9.6h15.6v9.2a1 1 0 01-1 1H5.2a1 1 0 01-1-1z"/><path d="M3.4 6.4h17.2v3.2H3.4z"/><path d="M12 6.4v13.4"/><path d="M10.3 12.8h3.4"/>'),
   dust:_IC('<path d="M12 3.4l1.1 4L17 8.5l-3.9 1.1L12 13.5l-1.1-3.9L7 8.5l3.9-1.1z"/><path d="M18 14.4l.55 1.95 1.95.55-1.95.55-.55 1.95-.55-1.95-1.95-.55 1.95-.55z"/><path d="M5.9 15.6l.42 1.5 1.5.42-1.5.42-.42 1.5-.42-1.5-1.5-.42 1.5-.42z"/>'),
   seal:_IC('<rect x="4.8" y="4.8" width="14.4" height="14.4" rx="2.2"/><path d="M8.8 12h6.4M12 8.8v6.4"/>'),
@@ -4836,7 +4936,8 @@ function xferSummary(d){
   const s=d.s||{}, c=d.c||{};
   const stars=Object.values(s.stars||{}).reduce((a,b)=>a+(+b||0),0);
   const cards=Object.keys(c.own||{}).length;
-  return {lv:Math.max(0,(s.lv||1)-1),stars,rush:s.rushBest||0,
+  const bypass=Object.keys((s.guide&&s.guide.bypass)||{}).filter(k=>+k<(s.lv||1)&&!(s.stars&&s.stars[k])).length;
+  return {lv:Math.max(0,(s.lv||1)-1-bypass),stars,rush:s.rushBest||0,
     power:s.power||0,cards,box:c.box||0,
     when:d.t?new Date(d.t).toLocaleString('zh-CN'):'未知时间'};
 }
@@ -5483,6 +5584,7 @@ function startRush(){
   showTut('限时 90 秒 · <b>连锁 3 以上会回时间</b>',4200);
 }
 function endRush(){
+  $('#end-waystone').classList.remove('on');
   GS.over=true;GS.busy=true;GS.rushOn=false;
   markRun();
   csBump('r',1);
@@ -5533,6 +5635,35 @@ function endRush(){
   $('#end-continue').style.display='none';   // 不复位会把冒险关的续挖状态漏进限时赛结算屏
   ovl('end');
 }
+/* ---------- 引路晶 · 卡关兜底 ----------
+   只解锁下一关，不改当前关的星、分数、奖励与失败记录；借道关从榜单深度里扣除。
+   四次是完整结算后的失利，不看连点重开；每章一次、最多持有一枚，避免变成常规捷径。 */
+function guideChapter(n){return Math.ceil(clamp(+n||1,1,64)/8)}
+function guideEarnAfterFail(n){
+  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{}}), ch=guideChapter(n);
+  if(GS.mode!=='adv'||GS.L.endless||n>=64||n!==SAVE.lv||(SAVE.fails[n]||0)<4||g.earned[ch])return false;
+  g.earned[ch]=1;
+  if(g.n<1){g.n=1;return true}
+  return false;
+}
+function guideCanUse(n){
+  const g=SAVE.guide||{};
+  return GS.mode==='adv'&&!GS.L.endless&&n>=1&&n<64&&n===SAVE.lv&&(g.n||0)>0;
+}
+function guideRender(n,gained){
+  const el=$('#end-waystone'), can=guideCanUse(n);
+  el.classList.toggle('on',can);
+  $('#end-guide').disabled=!can;
+  if(can)el.querySelector('.copy b').textContent=gained?'引路晶 · 此刻苏醒':'引路晶 · 一枚在手';
+}
+function guideUse(){
+  const n=GS.L&&GS.L.n,g=SAVE.guide;
+  if(!guideCanUse(n)||!g)return false;
+  g.n=0;g.bypass[n]=1;SAVE.lv=Math.max(SAVE.lv,n+1);persist();
+  ovl(null);show('map');
+  toast(icTag('waystone')+' 引路晶已开路 · <b>第 '+(n+1)+' 关可进入</b><br>第 '+n+' 关仍可随时回来补通',3600);
+  return true;
+}
 function endLevel(win){
   const L=GS.L, n=L.n;
   $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
@@ -5554,6 +5685,7 @@ function endLevel(win){
      悬赏与岁记的判定**不看胜负**（输的那局打出 7 连锁也算数），
      连胜只认冒险关的真胜负。 */
   csBump('r',1);
+  let guideGained=false;
   if(win){
     csBump('w',1);
     SAVE.streak.cur++;
@@ -5573,6 +5705,7 @@ function endLevel(win){
     if(!L.endless){
       SAVE.stars[n]=Math.max(SAVE.stars[n]||0,st);
       SAVE.best[n]=Math.max(SAVE.best[n]||0,GS.score);
+      if(SAVE.guide&&SAVE.guide.bypass)delete SAVE.guide.bypass[n];
       if(n>=SAVE.lv)SAVE.lv=Math.min(999,n+1);
       if(SAVE.lv>64&&Object.keys(SAVE.stars).filter(k=>+k<=64).length>=64)grant('a11');
       /* 异纹：只能「做到」，不掉落也不能转赠 */
@@ -5611,6 +5744,7 @@ function endLevel(win){
     SFX.lose();
     applyArt($('#end-banner'),'end_lose');
     SAVE.fails[n]=(SAVE.fails[n]||0)+1;
+    guideGained=guideEarnAfterFail(n);
     /* 输了也要有回报。头部三消刻意让失败页一无所获——因为那是它们卖复活的地方；
        本作没有付费口，那套包袱不必背。按完成度给，是胜利的三分之一上下：
        够让「这一局没白打」成立，又不至于让输赢没区别。 */
@@ -5644,6 +5778,7 @@ function endLevel(win){
     ? '最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>　灵器 <b>'+toolGot+'</b>'
     : '还差 <b>'+(short||left+' 项')+'</b>　已完成 <b>'+Math.round(prog*100)+'%</b>'
       +(emberShown>0?'　余烬 灵力 <b style="color:var(--gold2)">+'+emberShown+'</b>':'');
+  guideRender(n,!win&&guideGained);
   renderTools();
   ovl('end');
 }
@@ -5672,17 +5807,14 @@ function fxBurstDom(i,origin){
 
 /* ==================================================================
    [ 聚会赛 · PARTY（一台机器轮流玩） ]
-   旧版有四层设置：步数/计时、三种记分、每人配额、1–5 轮。组合很多，
-   实质仍是同一块盘反复计分。现在收成两条真正不同的规则：
+   两条真正不同的规则：
    · 镜盘赛：人物只作身份，所有人同盘同规则，纯比手艺；
    · 灵契赛：同一张基础盘，各选一位不重复同伴，被动与灵技生效。
-   再只留快局 / 标准局两档。计时、组队、接龙、逐人配额整套退役。
+   赛长固定在合理的 2–4 轮内，每轮由主持人统一定 5–30 步；轮间可以改下一轮。
+   计时只作聚会台的思考辅助，不截断回合、不改分。组队、接龙、逐人配额整套退役。
    ================================================================== */
 const PT_GLYPH=['一','二','三','四','五','六'];
-const PT_FORMATS={
-  quick:{id:'quick',name:'快局',rounds:1,moves:12,note:'一轮定胜负'},
-  standard:{id:'standard',name:'标准局',rounds:2,moves:10,note:'两轮总分'},
-};
+const PT_MIN_MOVES=5,PT_MAX_MOVES=30;
 const PT_ROLE_DESC={
   wolf:'开局一颗疾风；打出 4 连锁再点亮一颗。灵技「执灯」引爆全盘特殊石。',
   jun:'爆裂范围扩大到 5×5。灵技「虎啸」震出两颗大爆裂。',
@@ -5691,13 +5823,15 @@ const PT_ROLE_DESC={
   xiao:'每炼成第 3 颗特殊石，直接摘成爆裂。灵技「掠星」唤来万象。',
   zi:'开局送一颗爆裂。灵技「破封」横开一整条矿路。',
 };
-const PARTY={on:false,players:[],n:3,rules:'mirror',format:'quick',round:0,cur:0,seed:'',pick:-1};
-function ptFmt(){return PT_FORMATS[PARTY.format]||PT_FORMATS.quick}
+const PARTY={on:false,players:[],n:3,rules:'mirror',rounds:3,moves:12,roundMoves:[],round:0,cur:0,
+  seed:'',pick:-1,randomFirst:-1,liveBack:null};
+function ptMovesAt(r){return clamp(Math.round(+(PARTY.roundMoves[r]||PARTY.moves)||12),PT_MIN_MOVES,PT_MAX_MOVES)}
+function ptFmt(){return {rounds:clamp(Math.round(+PARTY.rounds||3),2,4),moves:ptMovesAt(PARTY.round)}}
 function ptComp(p){return compById(p&&p.comp)}
 /* 预计总时长：每手时间 + 交接停顿，用于设置页提前告知，免得一局拖太久 */
 function ptEstimate(){
-  const f=ptFmt(), per=Math.round(f.moves*5.1)+8;
-  return Math.max(1,Math.round(per*PARTY.n*f.rounds/60));
+  const per=Math.round(PARTY.moves*5.1)+8;
+  return Math.max(1,Math.round(per*PARTY.n*PARTY.rounds/60));
 }
 function ptDefaultName(i){return '选手'+PT_GLYPH[i]}
 function ptColor(i){
@@ -5758,6 +5892,9 @@ function fitScreen(id){
 addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
 function renderPartySetup(){
   ptEnsurePlayers();
+  PARTY.rounds=clamp(Math.round(+PARTY.rounds||3),2,4);
+  PARTY.moves=clamp(Math.round(+PARTY.moves||12),PT_MIN_MOVES,PT_MAX_MOVES);
+  if(PARTY.randomFirst>=PARTY.n)PARTY.randomFirst=-1;
   const cnt=$('#pt-count');cnt.innerHTML='';
   for(let n=2;n<=6;n++){
     const d=document.createElement('div');
@@ -5776,14 +5913,8 @@ function renderPartySetup(){
     d.addEventListener('click',()=>{SFX.click();PARTY.rules=r.id;renderPartySetup()});
     rules.appendChild(d);
   }
-  const fm=$('#pt-format');fm.innerHTML='';
-  for(const f of Object.values(PT_FORMATS)){
-    const d=document.createElement('div');
-    d.className='pt-chip'+(PARTY.format===f.id?' on':'');
-    d.innerHTML=f.name+'<span class="d">'+f.note+' · 每手 '+f.moves+' 步</span>';
-    d.addEventListener('click',()=>{SFX.click();PARTY.format=f.id;renderPartySetup()});
-    fm.appendChild(d);
-  }
+  $('#pt-round-out').innerHTML='<b>'+PARTY.rounds+'</b>轮';
+  $('#pt-move-out').innerHTML='<b>'+PARTY.moves+'</b>步';
   /* 每位选手只填名字和挑人物。六人六角，不重复选角。 */
   const host=$('#pt-names');host.innerHTML='';
   for(let i=0;i<PARTY.n;i++){
@@ -5806,11 +5937,47 @@ function renderPartySetup(){
     (PARTY.rules==='mirror'
       ?'<b>镜盘赛</b>里人物只作身份：同一轮盘面、步数与规则完全相同，纯比消除手艺。'
       :'<b>灵契赛</b>里六位人物不可重复：同一张基础盘开局，但各人的被动与灵技会把局面带向不同方向。灵技从半充能起步，一手通常能放出一次。')
-    +'<br><b>'+ptFmt().name+'</b>：'+ptFmt().note+'，每人每轮 '+ptFmt().moves+' 步；总分最高者胜。'
+    +'<br><b>自定赛长</b>：'+PARTY.rounds+' 轮，每人首轮 '+PARTY.moves+' 步；轮间可统一改下一轮步数，总分最高者胜。'
     +'<br>递机前会遮住棋盘，下一位看不到上一位的走法。'
     +'<br><span style="color:var(--gold2)">预计全场约 <b>'+est+' 分钟</b></span>'
-    +'（'+PARTY.n+' 人 × '+ptFmt().rounds+' 轮 = '+(PARTY.n*ptFmt().rounds)+' 手）';
+    +'（'+PARTY.n+' 人 × '+PARTY.rounds+' 轮 = '+(PARTY.n*PARTY.rounds)+' 手）';
+  $('#pt-random-read').textContent=PARTY.randomFirst>=0
+    ?((PARTY.players[PARTY.randomFirst].name||'').trim()||ptDefaultName(PARTY.randomFirst))+' 先手'
+    :'尚未抽取';
   fitScreen('party');
+}
+
+function ptAdjust(kind,delta){
+  SFX.click();
+  if(kind==='rounds')PARTY.rounds=clamp(PARTY.rounds+delta,2,4);
+  else PARTY.moves=clamp(PARTY.moves+delta,PT_MIN_MOVES,PT_MAX_MOVES);
+  renderPartySetup();
+}
+function ptRandomFirst(){
+  ptEnsurePlayers();SFX.click();
+  PARTY.randomFirst=Math.floor(rnd()*PARTY.n);
+  renderPartySetup();
+}
+const PT_TIMER={id:0,full:30,left:30,until:0,running:false};
+function ptTimerRender(){
+  const n=Math.max(0,Math.ceil(PT_TIMER.left));
+  $('#pt-timer-read').textContent=n?n+' 秒':'时间到 · 从容落子';
+  $('#pt-timer').textContent=PT_TIMER.running?'暂停':(n===0?'重置':'开始');
+}
+function ptTimerStop(reset){
+  clearInterval(PT_TIMER.id);PT_TIMER.id=0;PT_TIMER.running=false;
+  if(reset){PT_TIMER.full=clamp(+(($('#pt-timer-seconds')||{}).value)||30,15,60);PT_TIMER.left=PT_TIMER.full}
+  ptTimerRender();
+}
+function ptTimerToggle(){
+  SFX.click();
+  if(PT_TIMER.running){PT_TIMER.left=Math.max(0,(PT_TIMER.until-Date.now())/1000);ptTimerStop(false);return}
+  if(PT_TIMER.left<=0)PT_TIMER.left=PT_TIMER.full;
+  PT_TIMER.until=Date.now()+PT_TIMER.left*1000;PT_TIMER.running=true;ptTimerRender();
+  clearInterval(PT_TIMER.id);PT_TIMER.id=setInterval(()=>{
+    PT_TIMER.left=Math.max(0,(PT_TIMER.until-Date.now())/1000);ptTimerRender();
+    if(PT_TIMER.left<=0){ptTimerStop(false);SFX.star(0)}
+  },250);
 }
 function ptOpenRole(i){
   PARTY.pick=i;SFX.click();renderPTRole();ovl('pt-role');
@@ -5840,11 +6007,15 @@ function ptRoleDesc(c){
 function startParty(){
   ptEnsurePlayers();
   PARTY.on=true;PARTY.round=0;PARTY.cur=0;
+  PARTY.roundMoves=[PARTY.moves];
   PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-  PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
+  let chosen=PARTY.players.slice(0,PARTY.n).map((p,i)=>({p,i}));
+  if(PARTY.randomFirst>=0){const k=clamp(PARTY.randomFirst,0,chosen.length-1);chosen=chosen.slice(k).concat(chosen.slice(0,k))}
+  PARTY.players=chosen.map(({p,i})=>({
     name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),
     comp:p.comp||COMPANIONS[i].id,scores:[],total:0,idx:i,
   }));
+  ptTimerStop(true);
   ptHandoff();
 }
 function ptHandoff(){
@@ -5858,7 +6029,7 @@ function ptHandoff(){
   show('game');ovl('hand');
 }
 function ptScoreLines(){
-  if(!PARTY.players.some(p=>p.total>0))return '';
+  if(!PARTY.players.some(p=>p.scores.length))return '';
   return PARTY.players.slice().sort((x,y)=>y.total-x.total).slice(0,3)
     .map((p,i)=>(i+1)+'. '+esc(p.name)+' <b>'+p.total.toLocaleString('en-US')+'</b>').join('　');
 }
@@ -5895,7 +6066,7 @@ function ptStartTurn(){
   $('#ptb-name').textContent=p.name+' · '+c.name;
   $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
   $('#ptb-mult').textContent=(pact?'灵契':'镜盘')+' · '+L.moves+'步';
-  $('#score-stars').innerHTML='<s style="left:23%">★</s><s style="left:54%">★</s><s style="left:97%">★</s>';
+  $('#score-stars').innerHTML='<s style="left:23%">'+ICONS.star+'</s><s style="left:54%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent='本轮得分';
   $('#quip-line').innerHTML=pact
@@ -5931,13 +6102,20 @@ function ptRankHTML(players){
       +'<div class="sc">'+q.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
 }
-/* 标准局只在两轮之间停一次：看积分，然后直接进入下一轮。 */
+/* 每轮停一次：看积分，并由主持人统一写下下一轮的步数。 */
 function ptRoundBreak(){
+  if(!PARTY.roundMoves[PARTY.round])PARTY.roundMoves[PARTY.round]=PARTY.moves;
   $('#ptr-title').innerHTML='第 '+PARTY.round+' 轮 · <em>战罢</em>';
   $('#ptr-sub').textContent='下一轮：第 '+(PARTY.round+1)+' 轮 / 共 '+ptFmt().rounds+' 轮';
+  $('#ptr-move-out').innerHTML='<b>'+ptMovesAt(PARTY.round)+'</b>步';
   const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
   $('#ptr-board').innerHTML=ptRankHTML(ranked);ptPaintRoles($('#ptr-board'));
   show('game');ovl('ptround');
+}
+function ptRoundMove(delta){
+  SFX.click();PARTY.roundMoves[PARTY.round]=clamp(ptMovesAt(PARTY.round)+delta,PT_MIN_MOVES,PT_MAX_MOVES);
+  $('#ptr-move-out').innerHTML='<b>'+ptMovesAt(PARTY.round)+'</b>步';
+  $('#ptr-sub').textContent='下一轮：第 '+(PARTY.round+1)+' 轮 / 共 '+PARTY.rounds+' 轮 · 每人 '+ptMovesAt(PARTY.round)+' 步';
 }
 /* 「终结比赛」的统一入口：有人打完过一手就当场出名次，一手都没打完就散伙。
    打到一半的那一手不计——它只用掉了部分配额，跟打满的一手不能同台比。
@@ -5952,7 +6130,7 @@ function ptQuit(){
   toast('还没有人打完一手 · 本场不计名次',2800);
 }
 function ptFinish(){
-  PARTY.on=false;GS.party=false;
+  PARTY.on=false;GS.party=false;GS.over=true;ENG.rng=null;
   $('#toolbar').style.display='';
   $('#pt-bar').classList.remove('on');
   const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
@@ -5963,11 +6141,82 @@ function ptFinish(){
   /* 中途终结时，还没轮到的人一手都没打过。以前这里会输出「选手二：」后面空着，
      像是文案没写完；给他一句明话。 */
   $('#pt-rounds').innerHTML=ranked.map(p=>esc(p.name)+'：'+(p.scores.length
-    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')).join(' · ')
+    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')+'（'+ptMovesAt(i)+'步）').join(' · ')
     : '<span style="color:var(--ink3)">未出手</span>')).join('<br>');
   $('#pte-quip').textContent=pick2(Q_WIN);
   fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
   ovl('pt-end');
+}
+
+/* ---- 聚会台 · 实时战绩与相册图 ---- */
+function ptOpenLive(back){
+  PARTY.liveBack=back||null;
+  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  $('#pt-live-board').innerHTML=ptRankHTML(ranked);ptPaintRoles($('#pt-live-board'));
+  const hands=PARTY.players.reduce((n,p)=>n+p.scores.length,0), all=PARTY.players.length*PARTY.rounds;
+  $('#pt-live-sub').textContent=hands+' / '+all+' 手已完成 · '+(PARTY.rules==='pact'?'灵契赛':'镜盘赛');
+  $('#pt-live-note').textContent=(GS.party&&GS.moves>0?'当前选手尚未走完的这一手不计入图中。':'')
+    +' 战绩图保存在本机；支持系统分享时，可在分享页选择“存储图像”。';
+  $('#pt-cardimg').style.display='none';
+  $('#pt-live-close').textContent=back==='pt-end'?'返回战果':back==='ptround'?'返回轮间小结':'继续比赛';
+  $('#pt-live-end').style.display=PARTY.on?'':'none';
+  ovl('pt-live');
+}
+function ptLiveClose(){
+  const back=PARTY.liveBack;PARTY.liveBack=null;
+  ovl(back||null);
+}
+function ptCardData(){
+  const cv=document.createElement('canvas');cv.width=1080;cv.height=1350;
+  const c=cv.getContext('2d'),grad=c.createLinearGradient(0,0,1080,1350);
+  grad.addColorStop(0,'#111018');grad.addColorStop(.58,'#1c1a25');grad.addColorStop(1,'#15131e');
+  c.fillStyle=grad;c.fillRect(0,0,1080,1350);
+  c.strokeStyle='#7f692d';c.lineWidth=3;c.strokeRect(52,52,976,1246);
+  c.strokeStyle='#8e7bd8';c.globalAlpha=.28;c.strokeRect(66,66,948,1218);c.globalAlpha=1;
+  c.textAlign='center';c.fillStyle='#9c9388';c.font='30px serif';c.fillText('GEMFALL · PARTY RESULT',540,132);
+  c.fillStyle='#f0d07b';c.font='72px serif';c.fillText('灵 石 远 征',540,228);
+  c.fillStyle='#f5eddf';c.font='38px serif';
+  c.fillText((PARTY.rules==='pact'?'灵契赛':'镜盘赛')+' · '+PARTY.rounds+' 轮综合战绩',540,292);
+  c.strokeStyle='#7f692d';c.lineWidth=2;c.beginPath();c.moveTo(130,330);c.lineTo(950,330);c.stroke();
+  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  ranked.forEach((p,i)=>{
+    const y=390+i*105,co=ptComp(p);
+    c.fillStyle=i===0?'rgba(201,166,87,.10)':'rgba(255,255,255,.018)';c.fillRect(112,y-52,856,84);
+    c.textAlign='left';c.fillStyle=i===0?'#f0d07b':'#9c9388';c.font='34px serif';c.fillText(String(i+1).padStart(2,'0'),142,y);
+    c.fillStyle='#f5eddf';c.font='39px serif';c.fillText(p.name,235,y-8);
+    c.fillStyle='#9c9388';c.font='24px serif';c.fillText(co.name+' · '+p.scores.length+' 手',235,y+26);
+    c.textAlign='right';c.fillStyle=i===0?'#f0d07b':'#c4b9aa';c.font='44px serif';c.fillText(p.total.toLocaleString('en-US'),922,y+4);
+  });
+  const base=390+ranked.length*105+20;
+  c.textAlign='left';c.fillStyle='#9c9388';c.font='25px serif';c.fillText('分轮记录',130,base);
+  c.font='24px serif';
+  ranked.slice(0,4).forEach((p,i)=>{
+    c.fillStyle=i===0?'#f0d07b':'#c4b9aa';
+    const line=p.name+'　'+(p.scores.length?p.scores.map((s,j)=>'R'+(j+1)+' '+s.toLocaleString('en-US')).join('　'):'尚未完成');
+    c.fillText(line.slice(0,48),130,base+48+i*38);
+  });
+  c.textAlign='center';c.fillStyle='#7f756c';c.font='23px serif';
+  c.fillText(new Date().toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),540,1260);
+  c.fillStyle='#c9a657';c.font='25px serif';c.fillText('play.myskme.com',540,1302);
+  return cv.toDataURL('image/jpeg',.92);
+}
+async function ptSaveCard(back){
+  const data=ptCardData();
+  if(typeof navigator.share==='function'&&typeof File!=='undefined'){
+    try{
+      const blob=await (await fetch(data)).blob();
+      const file=new File([blob],'gemfall-party-'+Date.now()+'.jpg',{type:'image/jpeg'});
+      if(!navigator.canShare||navigator.canShare({files:[file]})){
+        await navigator.share({title:'灵石远征 · 聚会赛战绩',files:[file]});return true;
+      }
+    }catch(e){if(e&&e.name==='AbortError')return false}
+  }
+  if($('#ovl-pt-live').classList.contains('on'))back=PARTY.liveBack;
+  ptOpenLive(back||null);
+  const img=$('#pt-cardimg');img.src=data;img.style.display='block';
+  $('#pt-live-note').innerHTML='战绩图已生成。<b style="color:var(--gold2)">长按图片</b>，选择保存图像；电脑端可右键保存。';
+  toast(icTag('album')+' 战绩图已生成 · <b>长按图片保存</b>',2800);
+  return true;
 }
 
 /* ==================================================================
@@ -6024,7 +6273,10 @@ const LB={
   registered(){return !!(SAVE.lbAlias&&SAVE.lbAlias.length>=2)},
   stats(){
     const stars=totalStars();
-    const lv=Math.max(0,(SAVE.lv||1)-1);                       // 已通关卡数
+    /* 引路晶只开路，不伪造深度：尚未补通的借道关从上传深度里扣除。 */
+    const bypass=Object.keys((SAVE.guide&&SAVE.guide.bypass)||{})
+      .filter(k=>+k<(SAVE.lv||1)&&!(SAVE.stars&&SAVE.stars[k])).length;
+    const lv=Math.max(0,(SAVE.lv||1)-1-bypass);                // 已真实通关卡数
     let best=0;for(const k in SAVE.best)best=Math.max(best,SAVE.best[k]||0);
     /* runs/days/dbest 是仅有的三个**累计**项，其余都是历史最高值。
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
@@ -6666,6 +6918,7 @@ function startWeekly(){
   GS.busy=false;GS.idle=PLAT.now();
 }
 function endWeekly(){
+  $('#end-waystone').classList.remove('on');
   GS.over=true;GS.busy=true;
   markRun();
   const s=wkState();
@@ -7559,11 +7812,11 @@ const HOW_HTML=`
 　<b>带谁出门要看关卡</b>：机关多带梓，猫铃卡住带麒，差一口气带晰。<br><br>
 <b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
 <b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆——别急着刚好走完。<br><br>
-<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。<br><br>
+<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。前沿关完整失利 4 次后，本章可苏醒一枚<b>引路晶</b>：只开下一关，本关仍是未通，之后随时回来补。<br><br>
 <b>聚会赛</b>　一台机器 2–6 人轮流玩，每位选手先从六位人物中挑一位，人物不重复。<br>
 　<b>镜盘赛</b>：人物只作身份，同一轮的盘面、步数和规则完全相同，纯比手艺。<br>
 　<b>灵契赛</b>：同一张基础盘开局，所选人物的被动与灵技生效；灵技从半充能起步，一手通常能放一次。<br>
-只留两档局长：<b>快局</b>一轮 12 步，<b>标准局</b>两轮、每轮 10 步。递机时棋盘会完全遮住；总分最高者胜，想收就随时终结比赛。<br><br>
+自定 <b>2–4 轮</b>、每轮统一 <b>5–30 步</b>；一轮战罢可再写下一轮步数。聚会台可随机抽先手、开一段不强制落子的思考计时。递机时棋盘会完全遮住；随时能看总分、保存战绩图或当场结算。<br><br>
 <b>矿上的挑战</b>（大厅「挑战」一键直达）<br>
 　<b>矿灯将熄 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
 　<b>本周矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
@@ -7747,6 +8000,13 @@ addEventListener('visibilitychange',()=>{
 });
 addEventListener('pagehide',()=>LB.beacon());
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
+$('#pt-round-dec').addEventListener('click',()=>ptAdjust('rounds',-1));
+$('#pt-round-inc').addEventListener('click',()=>ptAdjust('rounds',1));
+$('#pt-move-dec').addEventListener('click',()=>ptAdjust('moves',-1));
+$('#pt-move-inc').addEventListener('click',()=>ptAdjust('moves',1));
+$('#pt-random').addEventListener('click',()=>ptRandomFirst());
+$('#pt-timer').addEventListener('click',()=>ptTimerToggle());
+$('#pt-timer-seconds').addEventListener('change',()=>ptTimerStop(true));
 $('#pt-hint-open').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('pt-hint')});
 $('#pt-hint-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#pt-back').addEventListener('click',()=>{SFX.click();show('menu')});
@@ -7754,10 +8014,22 @@ $('#pt-go').addEventListener('click',()=>{SFX.click();startParty()});
 $('#pt-role-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#hand-go').addEventListener('click',()=>{SFX.click();ptStartTurn()});
 $('#hand-quit').addEventListener('click',()=>{SFX.click();ovl(null);ptQuit()});
+$('#hand-save').addEventListener('click',()=>{SFX.click();ptSaveCard('hand')});
 $('#ptr-next').addEventListener('click',()=>{SFX.click();ovl(null);ptHandoff()});
 $('#ptr-end').addEventListener('click',()=>{SFX.click();ovl(null);ptFinish()});
+$('#ptr-move-dec').addEventListener('click',()=>ptRoundMove(-1));
+$('#ptr-move-inc').addEventListener('click',()=>ptRoundMove(1));
+$('#ptr-save').addEventListener('click',()=>{SFX.click();ptSaveCard('ptround')});
 $('#pte-menu').addEventListener('click',()=>{SFX.click();ovl(null);show('menu')});
 $('#pte-again').addEventListener('click',()=>{SFX.click();ovl(null);show('party')});
+$('#pte-save').addEventListener('click',()=>{SFX.click();ptSaveCard('pt-end')});
+$('#ptb-live').addEventListener('click',()=>{
+  if(GS.busy){toast('等这一手落定再看战绩');return}
+  SFX.click();ptOpenLive(null);
+});
+$('#pt-live-close').addEventListener('click',()=>{SFX.click();ptLiveClose()});
+$('#pt-live-save').addEventListener('click',()=>{SFX.click();ptSaveCard(PARTY.liveBack)});
+$('#pt-live-end').addEventListener('click',()=>{SFX.click();ovl(null);ptQuit()});
 $('#lb-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
 $('#lb-edit').addEventListener('click',()=>{SFX.click();lbOpenForm()});
 /* ---- 存档搬家的接线 ---- */
@@ -7912,6 +8184,7 @@ $('#end-continue').addEventListener('click',e=>{
   toast('矿灯又亮了 · <b>+5 步</b>',2200);
   floatNum(2,4,'+5 步','#e8c768');
 });
+$('#end-guide').addEventListener('click',()=>{SFX.click();guideUse()});
 /* 同伴大招 */
 $('#ally-fire').addEventListener('click',()=>fireUlt());
 $('#ally').addEventListener('click',e=>{if(e.target.id!=='ally-fire')fireUlt()});
@@ -7948,6 +8221,7 @@ addEventListener('resize',()=>{if($('#scr-game').classList.contains('on'))fitCan
    暂停层被关掉则 GS.paused 不复位，限时赛倒计时永久冻结可以无限刷分。 */
 const ESC_ACT={'ovl-pause':'#pause-resume','ovl-hand':'#hand-go','ovl-ptround':'#ptr-next','ovl-end':'#end-menu',
   'ovl-pt-end':'#pte-menu','ovl-pt-role':'#pt-role-close','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
+  'ovl-pt-live':'#pt-live-close',
   'ovl-pt-hint':'#pt-hint-close','ovl-install':'#install-close','ovl-ach':'#ach-close','ovl-how':'#how-close',
   'ovl-lb':'#lb-close','ovl-col':'#col-esc'};
 addEventListener('keydown',e=>{
@@ -8401,16 +8675,23 @@ window.__selftest=function(){
   ok('无目标的分数只报当前分，不漏哨兵值',
      !/\d{7}/.test(noTargetTxt)&&noTargetTxt.replace(/,/g,'')==='180'&&realTxt==='180/6000');
 
-  /* 聚会赛的减法必须锁住：只有两种赛制、两档局长，不再把 90 秒玩法换皮搬回来。 */
+  /* 聚会赛的减法必须锁住：两种赛制、2–4 轮、5–30 步；思考钟不许接进回合判定。 */
   {
-    const src=[renderPartySetup,ptStartTurn,ptRoundBreak,ptFinish].map(String).join('\n');
-    ok('聚会赛只留镜盘/灵契与快局/标准局，不再藏计时、组队、接龙分支',
-       Object.keys(PT_FORMATS).length===2&&PT_FORMATS.quick.rounds===1&&PT_FORMATS.quick.moves===12
-       &&PT_FORMATS.standard.rounds===2&&PT_FORMATS.standard.moves===10
-       &&!/timed|team|relay|PT_SEC|ptQuota/.test(src));
+    const src=[ptStartTurn,ptTurnEnd,ptFinish].map(String).join('\n');
+    const bak={rounds:PARTY.rounds,moves:PARTY.moves,roundMoves:PARTY.roundMoves,round:PARTY.round};
+    PARTY.rounds=4;PARTY.moves=12;PARTY.roundMoves=[12,9,17,6];PARTY.round=2;
+    const custom=ptFmt().rounds===4&&ptFmt().moves===17&&ptMovesAt(20)===12;
+    Object.assign(PARTY,bak);
+    ok('聚会赛只留镜盘/灵契，自定 2–4 轮与每轮 5–30 步，不长回组队/接龙分支',
+       PT_MIN_MOVES===5&&PT_MAX_MOVES===30&&custom&&!/team|relay|PT_SEC|ptQuota/.test(src));
+    ok('思考计时只在聚会台运行，不截断回合也不参与计分',
+       !/PT_TIMER|setInterval|until/.test(src)&&/不强制落子/.test(HOW_HTML));
+    ok('实时战绩可随时结算并生成 jpeg 相册图',
+       /toDataURL\(['"]image\/jpeg['"]/.test(String(ptCardData))
+       &&/navigator\.share/.test(String(ptSaveCard))&&/ptFinish/.test(String(ptQuit)));
   }
   {
-    const bak={players:PARTY.players,n:PARTY.n,rules:PARTY.rules,format:PARTY.format};
+    const bak={players:PARTY.players,n:PARTY.n,rules:PARTY.rules};
     PARTY.players=[];PARTY.n=3;ptEnsurePlayers();
     const unique=new Set(PARTY.players.slice(0,3).map(p=>p.comp)).size===3;
     const rejectsTaken=!ptChooseRole(1,PARTY.players[0].comp);
@@ -8423,6 +8704,23 @@ window.__selftest=function(){
     ok('灵契赛才接人物能力且来宾使用不写进机主成就',
        /GS\.compDef=pact\?c:null/.test(start)&&/c\.need\*\.45/.test(start)
        &&/if\(!GS\.party\)/.test(ult));
+  }
+  {
+    const bak={guide:SAVE.guide,lv:SAVE.lv,fails:SAVE.fails,stars:SAVE.stars,mode:GS.mode,L:GS.L};
+    SAVE.guide={n:0,earned:{},bypass:{}};SAVE.lv=12;SAVE.fails={12:4};SAVE.stars={};
+    GS.mode='adv';GS.L={n:12,endless:false};
+    const earned=guideEarnAfterFail(12),can=guideCanUse(12),again=guideEarnAfterFail(12);
+    SAVE.guide.bypass[12]=1;SAVE.lv=13;
+    const bypassDepth=LB.stats().lv===11;
+    SAVE.stars[12]=1;
+    const restoredDepth=LB.stats().lv===12;
+    SAVE.guide=bak.guide;SAVE.lv=bak.lv;SAVE.fails=bak.fails;SAVE.stars=bak.stars;GS.mode=bak.mode;GS.L=bak.L;
+    ok('引路晶：四次完整失利后每章只醒一枚，背包封顶且只给前沿关',
+       earned&&can&&!again&&guideChapter(12)===2);
+    ok('引路晶：借道关不算榜单深度，补通后才恢复真实深度',bypassDepth&&restoredDepth);
+    ok('引路晶：使用只开下一关，不发星、分数或奖励',
+       /g\.bypass\[n\]=1/.test(String(guideUse))&&/SAVE\.lv=Math\.max/.test(String(guideUse))
+       &&!/SAVE\.(stars|best|power)/.test(String(guideUse)));
   }
 
   /* ---- 典藏册 ---- */
@@ -8951,6 +9249,10 @@ window.__selftest=function(){
    [ 启动 · BOOT ]
    ================================================================== */
 $('#btn-pause').innerHTML=ICONS.pause;
+$('#ptb-live').innerHTML=ICONS.trophy;
+$('#pt-random-ic').innerHTML=ICONS.dice;
+$('#pt-timer-ic').innerHTML=ICONS.clock;
+$('#guide-mark').innerHTML=ICONS.waystone;
 $('#chest-btn').querySelector('.icw').innerHTML=ICONS.gem;
 for(const el of $$('#end-stars s'))el.innerHTML=ICONS.star;
 $('#btn-sound').innerHTML=SAVE.mute?ICONS.soundOff:ICONS.soundOn;
