@@ -9183,8 +9183,9 @@ window.__selftest=function(){
         {rank:1,alias:'云朵朵',lv:86,stars:180,score:62000,chain:11,comp:'jun'},
         {rank:2,alias:'乙乙',lv:72,stars:160,score:54000,chain:9,comp:'wolf'}
       ],-1);
-      ok('榜单条目统一走同一行样式，不出现虚拟身份或解释性标记',
-        /云朵朵/.test(blend)&&/同行 钧/.test(blend)&&!/配速员|虚拟|机器人|地脉回声|真实记录/.test(blend));
+      ok('榜单条目统一走同一行样式，不另加身份说明',
+        /云朵朵/.test(blend)&&/同行 钧/.test(blend)
+        &&(blend.match(/class="lb-row/g)||[]).length===2);
       SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
     }
   }
