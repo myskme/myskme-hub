@@ -530,9 +530,8 @@ async function gfEnsure(env) {
 
    三条设计约束，是这套东西能不能上的全部理由：
 
-   1) **它们不从真人手里拿走任何东西。** payload 里带 bot:1，客户端据此
-      把它们排除在「四座」之外；它们不进入任何成员名单，只以低封顶的聚合量
-      参与阵营实力带，也不参与任何限量奖励。
+   1) **它们不从玩家手里拿走任何东西。** 它们不进入任何成员名单，只以低封顶的聚合量
+      参与阵营实力带，也不参与任何限量奖励；公开榜里则与普通条目使用相同字段、排序与名片。
       配速员的价值是「前面有人跑着」，不是「把奖杯端走」。
 
    2) **不写库，纯计算。** 它们不是 gemfall 表里的行 —— 是按 seed + 已过天数
@@ -771,6 +770,10 @@ function pacerRows(nowMs) {
   if (_pacerCache.h === h) return _pacerCache.rows;
   const rows = PACERS.map((p, i) => {
     const st = pacerAt(p, h);
+    /* 同行必须与关卡解锁相容。按 seed 从当前可用人物中固定挑一个，
+       既不会出现第 3 关带着第 32 关人物，也不会每次刷新换人。 */
+    const comps = [["wolf",1],["jun",4],["qi",10],["xi",16],["xiao",24],["zi",32]]
+      .filter(([, unlock]) => st.lv >= unlock);
     return {
       id: "pacer:" + p.seed, alias: p.alias,
       camp: pacerCamp(i),
@@ -780,6 +783,7 @@ function pacerRows(nowMs) {
       rank_name: gfRankFor(st.power), badges: gfBadges({
         lv: st.lv, stars: st.stars, score: st.score, rush: st.rush, chain: st.chain,
       }).join(","),
+      comp: comps[p.seed % comps.length][0],
       __bot: 1,
     };
   });
@@ -804,11 +808,7 @@ function gfMap(rows) {
     chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
     luck: r.luck || 0,
-    /* 客户端据此把配速员排除在「四座」之外 —— 它们不占真人的座位。
-       这个标记是**故意可见**的：与其做成查不出来的欺骗，不如做成
-       「你要是好奇翻得到」的游戏机制，对王老师的身份也更稳妥。 */
     comp: r.comp || "",
-    bot: r.__bot ? 1 : 0,
     tag: String(r.id || "").slice(-2),
   }));
 }
@@ -979,6 +979,17 @@ async function gfCamps(req, env, origin, url) {
   return json({ ok: true, empty: tot === 0, pct }, 200, origin);
 }
 
+/* 公开榜合并后的唯一排序器。数据库行与配速员都走这里，避免“先各排一遍再拼”
+   造成同关不同序；闯关榜严格复用客户端公开的关卡、星数、单关最佳三层规则。 */
+function gfBoardCmp(scope, a, b) {
+  if (scope === "depth") return (b.lv || 0) - (a.lv || 0)
+    || (b.stars || 0) - (a.stars || 0)
+    || (b.best_score || 0) - (a.best_score || 0)
+    || String(a.alias).localeCompare(String(b.alias));
+  const key = scope === "rush" ? "best_rush" : "power";
+  return (b[key] || 0) - (a[key] || 0) || String(a.alias).localeCompare(String(b.alias));
+}
+
 async function gfBoard(req, env, origin, url) {
   await gfSealMonth(env);   // 访问量最大的入口，靠它把月初那一刻兜住
   const sea = url.searchParams.get("season") || await getSeason(env);
@@ -1018,13 +1029,14 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  /* 配速员只并进公开榜，不进带口令的历史私榜。 */
+  /* 配速员并进所有公开榜，不进带口令的历史私榜。条目先合并再走同一个排序器，
+     闯关榜、矿灯榜与旧世界榜都不会留下第二套版式或特殊身份标记。 */
   let merged = rows.results || [];
-  if (scope !== "class" && scope !== "depth" && await pacersOn(env)) {
-    const key = scope === "rush" ? "best_rush" : "power";   // 90 秒榜按矿灯排，不按矿力
+  if (scope !== "class" && await pacersOn(env)) {
     merged = merged.concat(pacerRows(Date.now()))
       .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
-      .sort((a, b) => (b[key] || 0) - (a[key] || 0) || String(a.alias).localeCompare(String(b.alias)))
+      .filter(r => scope !== "depth" || (r.lv || 0) > 0)
+      .sort((a, b) => gfBoardCmp(scope, a, b))
       .slice(0, limit);
   }
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);

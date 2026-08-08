@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-08-parchment-real-echo">
+<meta name="gemfall-release" content="2026-08-08-warm-board-pacer-blend">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -48,7 +48,7 @@
   --glow:0 0 22px rgba(168,102,37,.22);--glow-soft:0 0 12px rgba(168,102,37,.16);
   --paper:#f0e2c8;--noise-op:0;--noise-blend:multiply;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#312b33;--mine2:#3c343e;--mine-edge:#856f6a;
+  --mine:#786057;--mine2:#876d5f;--mine-edge:#b78e61;
 }
 
 /* ── 图标基线 ──
@@ -249,19 +249,19 @@ body::before{display:none}
 #menu-stats b{color:var(--gold);font-weight:500}
 .pack-grid{margin-top:14px;text-align:left}
 .pack-guide{padding:14px;border:1px solid color-mix(in srgb,var(--prism2) 48%,var(--line));border-radius:15px;
-  background:linear-gradient(135deg,rgba(120,201,230,.12),rgba(178,152,241,.10))}
+  background:linear-gradient(135deg,color-mix(in srgb,var(--prism2) 8%,var(--panel)),color-mix(in srgb,var(--prism) 7%,var(--panel)))}
 .pack-guide-hd{display:flex;align-items:center;gap:11px}
 .pack-guide-mark{width:46px;height:46px;display:flex;align-items:center;justify-content:center;flex:none;border-radius:14px;
-  color:var(--gold2);background:rgba(255,255,255,.08);border:1px solid var(--line)}
+  color:var(--gold2);background:rgba(255,250,237,.56);border:1px solid var(--line)}
 .pack-guide-mark .ic{width:27px;height:27px}
 .pack-guide-copy{flex:1;min-width:0}.pack-guide-copy b{display:block;color:var(--ink);font-size:16px;font-weight:500}
 .pack-guide-copy span{display:block;color:var(--ink3);font-size:11.5px;line-height:1.6;margin-top:2px}
-.pack-progress{height:7px;margin-top:11px;border-radius:8px;background:rgba(25,26,48,.38);overflow:hidden}
+.pack-progress{height:7px;margin-top:11px;border-radius:8px;background:rgba(83,57,43,.16);overflow:hidden}
 .pack-progress i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--prism2),var(--gold2))}
 .pack-note{font-size:11px;line-height:1.7;color:var(--ink3);margin-top:8px}
 .pack-items{margin-top:12px;border-top:1px solid var(--line)}
 .pack-row{display:grid;grid-template-columns:32px 1fr auto;gap:9px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line2)}
-.pack-ic{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
+.pack-ic{width:32px;height:32px;border-radius:10px;background:rgba(255,250,237,.58);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
 .pack-ic .ic{width:18px;height:18px}.pack-copy b{display:block;font-size:13px;font-weight:500;color:var(--ink)}
 .pack-copy span{display:block;font-size:10.5px;color:var(--ink3);line-height:1.55}.pack-count{font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
 .menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
@@ -322,10 +322,10 @@ body::before{display:none}
 #hud{width:min(520px,100%);display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
 /* HUD 与棋盘是一家人：同样给厚度，不然三块平板浮在一口有厚度的井上面很割裂 */
 .hud-box{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 10px;text-align:center;
-  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 12%,transparent),
-             inset 0 -1px 0 rgba(0,0,0,.5),
-             0 2px 0 rgba(0,0,0,.4),
-             0 5px 14px rgba(0,0,0,.4)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.66),
+             inset 0 -1px 0 rgba(87,58,42,.17),
+             0 2px 0 rgba(87,58,42,.17),
+             0 5px 12px rgba(87,58,42,.13)}
 #hud-moves{min-width:74px;display:flex;flex-direction:column;justify-content:center}
 #hud-moves .num{font-size:30px;line-height:1.1;color:var(--ink);font-weight:500;transition:color .3s}
 #hud-moves.low .num{color:var(--red);text-shadow:0 0 10px color-mix(in srgb,var(--red) 34%,transparent)}
@@ -370,25 +370,18 @@ body::before{display:none}
 #boss-say.on{opacity:1;transform:translateY(0)}
 /* 棋盘 */
 #board-wrap{position:relative;width:min(94vw,520px);margin:0 auto;flex:none}
-/* ── 棋盘要像凿进岩壁的一口井，不是一片平铺的格子 ──
-   原来只有一圈 1px 边和一层内阴影，边缘直接切断，读作「贴在页面上的图」。
-   现在压五层，从外到内：
-     1) 一圈金线（矿脉的封边）
-     2) 一圈岩色厚边（凿出来的石壁断面，比金线粗）
-     3) 深内阴影（往里凹，这是「井」的关键）
-     4) 顶部一道细内高光（上沿受矿灯的光）
-     5) 外部落影（整块从页面上浮起来）
-   顺带把角落那两个金色折角加粗一点，压住这圈更厚的边。 */
+/* 棋盘改成暖胡桃矿盘：仍要给亮色灵石足够对比，但不再是一块突兀的黑洞。
+   外圈取纸面的铜线与暖岩色，内侧只压一层柔和深度，不使用黑色厚边。 */
 #board{display:block;width:100%;touch-action:none;
   border:1px solid var(--mine-edge);background:var(--mine);
   box-shadow:
-    0 0 0 1px color-mix(in srgb,var(--prism) 16%,var(--gold)),
-    0 0 0 5px color-mix(in srgb,var(--mine-edge) 78%,#000),
-    0 0 0 6px color-mix(in srgb,var(--prism2) 16%,transparent),
-    inset 0 0 60px rgba(0,0,0,.72),
-    inset 0 2px 0 color-mix(in srgb,var(--prism2) 14%,var(--gold)),
-    inset 0 -3px 12px rgba(0,0,0,.6),
-    0 10px 34px rgba(0,0,0,.55)}
+    0 0 0 1px color-mix(in srgb,var(--gold) 56%,var(--mine-edge)),
+    0 0 0 5px color-mix(in srgb,var(--mine-edge) 74%,var(--bg2)),
+    0 0 0 6px color-mix(in srgb,var(--gold) 24%,transparent),
+    inset 0 0 34px rgba(59,39,34,.30),
+    inset 0 2px 0 rgba(255,238,207,.28),
+    inset 0 -3px 10px rgba(59,39,34,.24),
+    0 9px 24px rgba(87,58,42,.22)}
 #board-wrap::before,#board-wrap::after{content:'';position:absolute;width:20px;height:20px;border:2px solid var(--gold);opacity:.75;pointer-events:none;z-index:3}
 #board-wrap::before{top:-6px;left:-6px;border-right:0;border-bottom:0}
 #board-wrap::after{bottom:-6px;right:-6px;border-left:0;border-top:0}
@@ -548,7 +541,7 @@ body::before{display:none}
 .pt-head h2{font-size:clamp(20px,2.8dvh,25px);margin:0}
 #scr-party .ovl-btns{margin-top:clamp(8px,1.4dvh,16px);margin-bottom:0}
 /* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了 */
-#ovl-hand{background:#07070a}
+#ovl-hand{background:#3d2d26}
 #ovl-hand .ovl-card{text-align:center}
 #hand-dot{width:96px;height:96px;margin:12px auto 4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
   font-size:40px;color:var(--pc,var(--gold));background:radial-gradient(ellipse at center,var(--pg,rgba(201,166,74,.16)),transparent 72%);
@@ -618,13 +611,6 @@ body::before{display:none}
 .lb-tabs button{flex:1;font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;padding:8px 4px;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
 .lb-tabs button.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
-#lb-echo:empty{display:none}
-.vein-echo{margin:2px 0 11px;padding:10px 12px;text-align:left;border:1px solid color-mix(in srgb,var(--prism2) 38%,var(--line));
-  border-radius:10px;background:linear-gradient(110deg,color-mix(in srgb,var(--prism2) 7%,var(--panel)),var(--panel));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
-.vein-echo .ek{display:flex;align-items:center;gap:6px;font-size:9.5px;letter-spacing:.25em;color:var(--prism2)}
-.vein-echo .ek .ic{width:13px;height:13px}.vein-echo .et{margin-top:4px;font-size:12px;line-height:1.72;color:var(--ink2);letter-spacing:.035em}
-.vein-echo .et b{color:var(--gold2);font-weight:500}.vein-echo .ef{margin-top:3px;font-size:9.5px;color:var(--ink3);letter-spacing:.08em}
 #lb-list{text-align:left}
 .lb-group{margin-top:12px}
 .lb-group:first-child{margin-top:0}
@@ -770,8 +756,8 @@ body::before{display:none}
 /* 同伴的两条技能：大招要充能，随身是全程生效。分开标才看得出区别。 */
 .skl{display:inline-block;font-size:12px;line-height:1.65;color:var(--ink2)}
 .skl i{display:inline-block;font-style:normal;font-size:10px;letter-spacing:.16em;
-  color:var(--bg);background:var(--gold-line);padding:1px 5px;margin-right:6px;vertical-align:1px}
-.skl.psv i{background:var(--line2);color:var(--ink2)}
+  color:#fff8e9;background:var(--gold2);padding:1px 5px;margin-right:6px;vertical-align:1px;border:1px solid var(--gold2)}
+.skl.psv i{background:color-mix(in srgb,var(--prism2) 10%,var(--panel));color:var(--ink);border-color:var(--line)}
 .skl b{color:var(--gold2)}
 
 /* 分享：拓片（文字）与名帖（图片）两颗并排 */
@@ -838,7 +824,8 @@ body::before{display:none}
 /* 追求线：同伴衔位角标 / 百胜描金 / 岁记 / 名片 */
 .ally-opt{position:relative}
 .ally-opt .csrk{position:absolute;top:3px;right:4px;font-size:9.5px;letter-spacing:.1em;
-  color:var(--gold2);background:rgba(10,10,12,.72);padding:1px 4px;border:1px solid var(--gold-line)}
+  color:var(--gold2);background:rgba(247,232,203,.94);padding:1px 4px;border:1px solid var(--gold-line);
+  box-shadow:0 1px 4px rgba(70,45,34,.18)}
 .ally-opt.vet{box-shadow:0 0 0 1.5px var(--gold),0 0 14px color-mix(in srgb,var(--gold) 40%,transparent)}
 #wk-bounty{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);
   font-size:11.5px;letter-spacing:.05em;color:var(--ink2);text-align:center}
@@ -861,7 +848,7 @@ body::before{display:none}
 #nc-img,#wk-cardimg{max-width:min(300px,82vw);border:1px solid var(--gold-line);display:block;margin:0 auto}
 .cardtip{margin-top:6px;font-size:11.5px;color:var(--ink3);letter-spacing:.05em;text-align:center}
 /* 两阵营。两色只用在这一处，别处不铺——颜色一泛滥就不成标识了。 */
-.cs-light{--cc:#e8c768} .cs-dark{--cc:#a2568f}
+.cs-light{--cc:#b8782b} .cs-dark{--cc:#8d526f}
 .camp-bar{display:flex;height:14px;border:1px solid var(--line2);overflow:hidden;margin:2px 0 7px}
 .camp-bar i{display:block;background:var(--cc);transition:width .8s cubic-bezier(.16,1,.3,1);
   box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
@@ -904,8 +891,8 @@ body::before{display:none}
 #lb-card.on{display:block;animation:cardIn .32s cubic-bezier(.16,1,.3,1) both}
 .lc{border:1px solid var(--gold-line);padding:12px 13px;text-align:left;
   background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 7%,var(--panel2)),var(--panel));
-  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 18%,transparent),
-             inset 0 -1px 0 rgba(0,0,0,.5),0 3px 0 rgba(0,0,0,.4),0 10px 26px rgba(0,0,0,.45)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58),
+             inset 0 -1px 0 rgba(87,58,42,.16),0 2px 0 rgba(87,58,42,.15),0 9px 22px rgba(87,58,42,.15)}
 .lc-hd{text-align:center;padding-bottom:8px;border-bottom:1px solid var(--line)}
 .lc-rk{font-size:10.5px;letter-spacing:.3em;color:var(--ink3)}
 .lc-nm{font-size:20px;color:var(--ink);letter-spacing:.1em;margin:2px 0 1px;
@@ -926,8 +913,8 @@ body::before{display:none}
 .lc-l span{flex:1}
 .lc-l i{font-style:normal;font-size:10px;color:var(--gold2);letter-spacing:.1em;margin-left:4px}
 .lc-l b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
-.lc-bar{height:4px;background:rgba(0,0,0,.45);margin-top:3px;overflow:hidden;
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.lc-bar{height:4px;background:rgba(83,57,43,.16);margin-top:3px;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(83,57,43,.18)}
 .lc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
 .lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin-top:11px;
   padding-top:9px;border-top:1px solid var(--line)}
@@ -962,21 +949,21 @@ body::before{display:none}
    两档都只用同一组变量，改一处全站跟着走。 */
 .wolf-badge,.ins-sec,.qs-sec,.ach,.cbi,.cbig,.cvt,
 .pt-chip,.pt-dot,.pt-avatar,.pt-role,.pt-role-card,.pd-row .dot{
-  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 9%,transparent),
-             inset 0 -1px 0 rgba(0,0,0,.4),
-             0 1px 0 rgba(0,0,0,.3),
-             0 3px 9px rgba(0,0,0,.3)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.54),
+             inset 0 -1px 0 rgba(87,58,42,.15),
+             0 1px 0 rgba(87,58,42,.14),
+             0 3px 8px rgba(87,58,42,.11)}
 .iconbtn,.ally-opt,.lb-tabs button,.lore-link{
-  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 13%,transparent),
-             inset 0 -1px 0 rgba(0,0,0,.5),
-             0 2px 0 rgba(0,0,0,.4),
-             0 4px 12px rgba(0,0,0,.38)}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.62),
+             inset 0 -1px 0 rgba(87,58,42,.18),
+             0 2px 0 rgba(87,58,42,.16),
+             0 4px 10px rgba(87,58,42,.12)}
 .iconbtn:active,.ally-opt:active,.lb-tabs button:active,.lore-link:active{
   transform:translateY(2px);
-  box-shadow:inset 0 2px 5px rgba(0,0,0,.6);transition-duration:.05s}
+  box-shadow:inset 0 2px 5px rgba(87,58,42,.24);transition-duration:.05s}
 /* 输入框反过来：它是「凹进去的槽」，不是凸起的块 —— 能按的和能填的必须一眼分开 */
 .pt-name input,.lb-form input{
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.55),inset 0 -1px 0 color-mix(in srgb,var(--gold) 7%,transparent)}
+  box-shadow:inset 0 2px 5px rgba(87,58,42,.16),inset 0 -1px 0 rgba(255,255,255,.42)}
 /* ── 灵石工坊 ── */
 .sp-bal{font-size:13px;color:var(--ink2);letter-spacing:.06em;text-align:center}
 .sp-bal b{color:var(--gold2);font-size:16px}
@@ -985,7 +972,7 @@ body::before{display:none}
 .sp-shelf{margin-bottom:14px;padding-top:8px;border-top:1px solid var(--line)}
 /* 未解锁不隐藏，压暗摆着 —— 看得见够不着才有期待。沿用典藏册缺卡那套观感。 */
 /* 锁着的货架只压表面，不降文字透明度；名字、用途与门槛都应该读得清。 */
-.sp-shelf.lock{background:linear-gradient(180deg,rgba(0,0,0,.28),transparent);
+.sp-shelf.lock{background:linear-gradient(180deg,rgba(83,57,43,.08),transparent);
   border-top-color:var(--line2)}
 .sp-shelf.lock .sp-nm{color:var(--ink2)}
 .sp-shelf.lock .sp-gate{color:var(--gold2)}          /* 「还差多少」要抢眼，不要退让 */
@@ -1073,7 +1060,7 @@ body{--shk:4px}
              0 22px 58px rgba(61,45,38,.32)}
 .ovl-card::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
   border-top:1px solid color-mix(in srgb,var(--gold) 22%,transparent);
-  border-bottom:1px solid rgba(0,0,0,.55)}
+  border-bottom:1px solid rgba(87,58,42,.22)}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .ovl-card::before,.ovl-card::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);pointer-events:none}
 .ovl-card::before,.ovl-card::after{display:none}
@@ -1211,7 +1198,7 @@ body{--shk:4px}
   padding:1px 0;background:rgba(0,0,0,.62)}
 /* 卡面小字压在半透明黑上，固定使用亮金确保对比度。 */
 .cardc.t0 .ct{color:#d8d2c4}
-.cardc.t1{border-color:var(--gold)}   .cardc.t1 .ct{color:var(--gold2)}
+.cardc.t1{border-color:var(--gold)}   .cardc.t1 .ct{color:#efd19a}
 .cardc.t2{border-color:var(--gold2);box-shadow:0 0 10px color-mix(in srgb,var(--gold) 35%,transparent)}
 .cardc.t2 .ct{color:#f2d98a}
 .cardc.t3{border-color:var(--red)}    .cardc.t3 .ct{color:#f08a80}
@@ -1300,7 +1287,7 @@ body{--shk:4px}
 /* 通用弹出提示 */
 #toast{position:fixed;left:50%;bottom:calc(74px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:90;
   background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:10px 18px;font-size:13.5px;letter-spacing:.08em;
-  opacity:0;transition:all .35s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:86vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  opacity:0;transition:all .35s cubic-bezier(.16,1,.3,1);pointer-events:none;max-width:86vw;text-align:center;box-shadow:0 8px 26px rgba(87,58,42,.22)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast b{color:var(--gold2);font-weight:500}
 /* 数字与日期不许断行。窄屏上「2026年8月」会在「8」和「月」之间折断，
@@ -1839,7 +1826,6 @@ body{--shk:4px}
     <button data-scope="rush">90 秒</button>
     <button data-scope="camp">阵营</button>
   </div>
-  <div id="lb-echo"></div>
   <div id="lb-msg">正在连接矿脉…</div>
   <div id="lb-mine"></div>
   <div id="lb-list"></div>
@@ -3369,13 +3355,13 @@ let selCell=null, hintCell=null, dragTo=null;
 function draw(t){
   const s=ENG.cs;
   cx.clearRect(0,0,CSS_W,CSS_W);
-  /* 矿底：格纹 + 暗角 */
+  /* 暖胡桃矿底：用同一组纸面棕色做轻格纹，不再叠黑紫棋盘。 */
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const x=c*s,y=r*s;
-    cx.fillStyle=(r+c)%2?'rgba(255,255,255,.022)':'rgba(0,0,0,.16)';
+    cx.fillStyle=(r+c)%2?'rgba(255,245,224,.055)':'rgba(74,49,42,.10)';
     cx.fillRect(x,y,s,s);
   }
-  cx.strokeStyle='rgba(201,166,74,.055)';cx.lineWidth=1;
+  cx.strokeStyle='rgba(239,211,168,.10)';cx.lineWidth=1;
   for(let i=1;i<N;i++){cx.beginPath();cx.moveTo(i*s,0);cx.lineTo(i*s,CSS_W);cx.stroke();
     cx.beginPath();cx.moveTo(0,i*s);cx.lineTo(CSS_W,i*s);cx.stroke()}
   /* 墨封（在灵石之下） */
@@ -6540,28 +6526,6 @@ function lbRowHTML(r,mine){
       : '<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')
     +'</div>';
 }
-/* 地脉回声不是虚拟玩家，也不参与排序：每天只从当次返回的真实榜单里取一条
-   已发生的里程碑，隐去化名与人数。这样世界里有“别人走过”的痕迹，
-   却不会把配速员伪装成真人，也不会泄露稀疏榜单到底有多少人。 */
-function lbEchoHTML(rows){
-  const real=(rows||[]).filter(r=>r&&!r.bot);
-  if(!real.length)return '';
-  const best=(key)=>real.reduce((a,r)=>(Number(r[key])||0)>(Number(a[key])||0)?r:a,real[0]);
-  const deep=best('lv'), chain=best('chain'), score=best('score');
-  const withComp=real.filter(r=>r.comp&&compById(r.comp));
-  const traces=[
-    '最深处的灯停在第 <b>'+Math.max(1,Number(deep.lv)||0)+'</b> 关。名字被岩层藏住，只剩下仍亮着的光。',
-    '一道 <b>'+Math.max(1,Number(chain.chain)||0)+' 重连锁</b> 的光痕留在矿壁上，今天仍没有散。',
-    '第 <b>'+Math.max(1,Number(deep.lv)||0)+'</b> 关附近传来短促回响——那里刚有人走过。',
-    withComp.length
-      ? '有人带着 <b>'+esc(compById(withComp[dayNum()%withComp.length].comp).name)+'</b> 经过第 '
-        +Math.max(1,Number(withComp[dayNum()%withComp.length].lv)||0)+' 关，脚印到这里忽然断了。'
-      : '矿壁记下了一次 <b>'+Math.max(1,Number(score.score)||0).toLocaleString('en-US')+'</b> 的闪光，来处没有留下姓名。'
-  ];
-  return '<div class="vein-echo"><div class="ek">'+icTag('resonance')+'地脉回声</div>'
-    +'<div class="et">'+traces[dayNum()%traces.length]+'</div>'
-    +'<div class="ef">来自真实远征记录 · 不参与排名</div></div>';
-}
 /* ────────── 矿工名片（点开榜单某一行）──────────
    榜单一行要塞下 17 个字段，只显示得下 3 个：化名、段位、矿力。
    关卡、星数、最佳分、矿灯、连锁、到场天数、局数、手气…全都看不到，
@@ -6592,7 +6556,7 @@ function lbCardHTML(r){
       ? '<div class="lc-comp">同行 · <b>'+esc(c.name)+'</b> '+esc(c.title)+'</div>'
       : '')
     +'</div>'
-    +'<div class="lc-pw">第 '+(Number(r.lv)||0)+' 关<span>真实闯关进度</span></div>'
+    +'<div class="lc-pw">第 '+(Number(r.lv)||0)+' 关<span>远征位置</span></div>'
     +'<div class="lc-grid">'
       +row('星数',r.stars?('★ '+r.stars):'')
       +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
@@ -7010,7 +6974,7 @@ function rollAlias(){
 
 async function renderLB(){
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
-  const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine'), echo=$('#lb-echo');
+  const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
   /* 名片是 #lb-list 的**兄弟节点**，重写列表不会碰它 ——
      切榜时不显式收起，它会留在那儿显示上一个榜的人。
      ⚠ 必须放在**发请求之前**：读失败或返回 0 行都会提前 return，
@@ -7023,7 +6987,7 @@ async function renderLB(){
     form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='起名上榜';
   }
   form.hidden=true;$('#lb-edit').style.display='';$('#lb-submit').textContent='刷新上榜';
-  msg.textContent='正在连接矿脉…';list.innerHTML='';mine2.innerHTML='';echo.innerHTML='';
+  msg.textContent='正在连接矿脉…';list.innerHTML='';mine2.innerHTML='';
   /* ---- 阵营 ----
      只画两色实力带与「我的贡献」；不显示人头数，也不下发成员名单。 */
   if(LB.scope==='camp'){
@@ -7086,7 +7050,6 @@ async function renderLB(){
     return;
   }
   msg.textContent='';
-  if(LB.scope==='depth')echo.innerHTML=lbEchoHTML(rows);
   const myIdx=rows.findIndex(lbIsMe);
   LB_ROWS=rows;                                   // 点开名片时按 rank 查这一份
   list.innerHTML=lbBoardHTML(rows,myIdx);
@@ -7822,7 +7785,7 @@ const HOW_HTML=`
 典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
-<b>远征榜</b>　起个化名就能比较真实闯关进度：先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
+<b>远征榜</b>　起个化名就能比较闯关进度：先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
@@ -8235,8 +8198,8 @@ addEventListener('keydown',e=>{
    ================================================================== */
 window.__selftest=function(){
   const out=[],ok=(n,c)=>out.push((c?'PASS ':'FAIL ')+n);
-  const save={B,T,ENG_c:ENG.colors,cs:ENG.cs};
-  ENG.cs=40;ENG.colors=5;
+  const save={B,T,ENG_c:ENG.colors,cs:ENG.cs,compDef:GS.compDef};
+  ENG.cs=40;ENG.colors=5;GS.compDef=null;       // 基础引擎断言不继承玩家当前同行的被动
   /* (r*2+c*3)%5：左右相差 3、上下相差 2，模 5 都不为 0 → 空盘保证零三连 */
   const blank=()=>{T=[];B=[];for(let r=0;r<N;r++){const tr=[],br=[];for(let c=0;c<N;c++){tr.push({ink:0,crate:0});br.push(newPiece({g:(r*2+c*3)%5}))}T.push(tr);B.push(br)}};
   const settle=()=>{let n=0;while(gravityPass()&&n++<40);return n};
@@ -9198,7 +9161,7 @@ window.__selftest=function(){
        shopBuy('dep')===false && SAVE.power===10);
     SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
   }
-  /* 33. 排行榜减法：公开主榜只比真实闯关进度，不再把复合矿力与四座压给玩家。 */
+  /* 33. 排行榜减法：公开主榜只比闯关进度，不再把复合矿力与四座压给玩家。 */
     {
       const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakS=LB.scope;
       SAVE.lbAlias='甲甲';SAVE.lbPower=50000;
@@ -9210,24 +9173,22 @@ window.__selftest=function(){
       LB.scope='depth';const depth=lbBoardHTML(R,0,{});
       LB.scope='rush';const rush=lbBoardHTML(R,0,{});
       ok('闯关榜不再显示矿力荣誉席',!depth.includes('荣 誉 席')&&!depth.includes('矿力'));
-      ok('闯关榜右栏直接显示真实关卡',depth.includes('第 160 关')&&depth.includes('闯关'));
+      ok('闯关榜右栏直接显示关卡',depth.includes('第 160 关')&&depth.includes('闯关'));
       ok('90 秒榜不混入闯关与累计矿力',!rush.includes('闯关')&&!rush.includes('矿力'));
       ok('90 秒榜右栏显示矿灯分，不拿矿力冒充排序依据',rush.includes('90,000')&&rush.includes('矿灯'));
       LB.scope='depth';
       const mine=lbMineHTML(R,0).replace(/<[^>]+>/g,'');
       ok('榜首个人摘要只报领先对象与真实关数差额',mine.includes('榜首')&&mine.includes('40')&&mine.includes('乙乙'));
-      const echo=lbEchoHTML([
-        {alias:'真人甲',lv:86,chain:11,score:62000,comp:'jun'},
-        {alias:'真人乙',lv:72,chain:9,score:54000},
-        {alias:'伪装配速员',lv:999,chain:999,score:99999999,bot:true}
-      ]);
-      ok('地脉回声只取真实记录，隐去化名与人数且不参与排名',
-        /地脉回声/.test(echo)&&/真实远征记录/.test(echo)&&/不参与排名/.test(echo)
-        &&!/真人甲|真人乙|伪装配速员|999/.test(echo)&&!/人数/.test(echo));
+      const blend=lbBoardHTML([
+        {rank:1,alias:'云朵朵',lv:86,stars:180,score:62000,chain:11,comp:'jun'},
+        {rank:2,alias:'乙乙',lv:72,stars:160,score:54000,chain:9,comp:'wolf'}
+      ],-1);
+      ok('榜单条目统一走同一行样式，不出现虚拟身份或解释性标记',
+        /云朵朵/.test(blend)&&/同行 钧/.test(blend)&&!/配速员|虚拟|机器人|地脉回声|真实记录/.test(blend));
       SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
     }
   }
-  B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;
+  B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;GS.compDef=save.compDef;
   const fails=out.filter(s=>s.startsWith('FAIL'));
   console.log(out.join('\n'));
   console.log(fails.length?('FAIL x'+fails.length+' 项未通过'):('PASS 全部 '+out.length+' 项通过'));

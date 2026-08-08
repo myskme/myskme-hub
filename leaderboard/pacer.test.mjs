@@ -29,13 +29,14 @@ export function loadFrom(src) {
     slice(src, /const PACERS\s*=\s*\[/, '[', ']') + ';',
     fnOf(src, 'pacerRnd'), fnOf(src, 'gfLadder'), fnOf(src, 'gfDepth'),
     fnOf(src, 'gfSkill'), fnOf(src, 'gfGrind'), fnOf(src, 'gfPower'),
+    fnOf(src, 'gfBoardCmp'),
     src.match(/const PACER_DECAY_FROM[^\n]*/)[0],
     src.match(/const PACER_CEIL[^\n]*/)[0],
     src.match(/const GAME_EPOCH[^\n]*/)[0],
     src.match(/const PACER_EPOCH[^\n]*/)[0],
     src.match(/const GAME_DAYS_BEFORE_PACER[^\n]*/)[0],
     fnOf(src, 'pacerAt'), fnOf(src, 'pacerStats'),
-    'return { PACERS, pacerAt, pacerStats, gfPower, PACER_CEIL, PACER_EPOCH,'
+    'return { PACERS, pacerAt, pacerStats, gfPower, gfBoardCmp, PACER_CEIL, PACER_EPOCH,'
     + ' GAME_EPOCH, GAME_DAYS_BEFORE_PACER };',
   ].join('\n');
   return new Function(body)();
@@ -51,7 +52,7 @@ const OVERTAKE = {
   atMost: 1,         // 任何一刻最多只有一个配速员在榜首之上
 };
 
-export function runChecks(M, hoursNow, clientSrc) {
+export function runChecks(M, hoursNow, clientSrc, workerSrc) {
   const { PACERS, pacerAt, PACER_CEIL } = M;
   const out = [];
   const ok = (name, pass, detail) => out.push({ name, pass, detail: detail || '' });
@@ -179,6 +180,23 @@ export function runChecks(M, hoursNow, clientSrc) {
   const ms = Date.now() - t0;
   ok('单次 pacerAt（十年那头）< 120ms', ms < 120, `实测 ${ms}ms`);
 
+  /* ⑨ 新闯关榜也必须真正并入配速员，而且真人与配速员共用关卡→星数→单关最佳
+        这一套排序。只测比较器不够：还要盯住 gfBoard 的公开榜合并条件，
+        防止又写回 scope !== "depth"，导致服务端悄悄把它们排除。 */
+  if (workerSrc) {
+    const mixed = [
+      { alias: '普通条目', lv: 20, stars: 60, best_score: 50000 },
+      { alias: '成长条目', lv: 21, stars: 57, best_score: 42000, __bot: 1 },
+      { alias: '同关高星', lv: 20, stars: 61, best_score: 30000, __bot: 1 },
+    ].sort((a, b) => M.gfBoardCmp('depth', a, b));
+    const boardSrc = fnOf(workerSrc, 'gfBoard');
+    const merged = /scope\s*!==\s*["']class["']\s*&&\s*await pacersOn/.test(boardSrc)
+      && /concat\(pacerRows/.test(boardSrc)
+      && /gfBoardCmp\(scope/.test(boardSrc);
+    ok('闯关榜并入配速员并共用关卡排序',
+       merged && mixed.map(x => x.alias).join(',') === '成长条目,同关高星,普通条目');
+  }
+
   return out;
 }
 
@@ -192,7 +210,7 @@ if (typeof process !== 'undefined' && process.argv && process.argv[1]) {
     const client = fs.readFileSync(new URL('../match/index.html', here), 'utf8');
     const M = loadFrom(src);
     const hoursNow = Math.floor((Date.now() - M.PACER_EPOCH) / 3600000);
-    const res = runChecks(M, hoursNow, client);
+    const res = runChecks(M, hoursNow, client, src);
     let failed = 0;
     for (const r of res) {
       if (!r.pass) failed++;
