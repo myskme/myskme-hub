@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "MYSKME · 灵石远征 · GEMFALL",
-  "generatedAt": "2026-08-06T22:29:09.747Z",
+  "generatedAt": "2026-08-08T14:11:23.202Z",
   "sourceOfTruth": [
     "match/art",
     "match/audio",
@@ -11,7 +11,7 @@
   ],
   "totals": {
     "files": 76,
-    "bytes": 22653969,
+    "bytes": 15466330,
     "byCategory": {
       "cover": 1,
       "social-card": 1,
@@ -948,8 +948,8 @@
     },
     {
       "path": "match/icons/splash-1125x2436.png",
-      "bytes": 1490378,
-      "sha256": "8eab92f01dc8194a3f31c825e799bb0320451406c7dc6b14d3e1b4e1829be864",
+      "bytes": 612523,
+      "sha256": "86311ffa87d0ccb5ef07d2299da85b155fd24e74ba27401a088e8fac4205d6ea",
       "width": 1125,
       "height": 2436,
       "alpha": false,
@@ -961,8 +961,8 @@
     },
     {
       "path": "match/icons/splash-1170x2532.png",
-      "bytes": 1497676,
-      "sha256": "62fd894a7f91fe36b9c12e77af24c0d5f93beadca2023d347e4c0ff826438faf",
+      "bytes": 652730,
+      "sha256": "bbb9c961585cdb360a4110ba28d98d85311929094c041bb559e2d91a61dc894a",
       "width": 1170,
       "height": 2532,
       "alpha": false,
@@ -974,8 +974,8 @@
     },
     {
       "path": "match/icons/splash-1179x2556.png",
-      "bytes": 1209846,
-      "sha256": "91625fb53950aa0afc91798aa75f15da5e799336183af32bc1aa9c102cbe007c",
+      "bytes": 661611,
+      "sha256": "24641eca7dc1a9d34d2e52fb133f5cca7e30cd5afafb79cf7322cad5b9e328ec",
       "width": 1179,
       "height": 2556,
       "alpha": false,
@@ -987,8 +987,8 @@
     },
     {
       "path": "match/icons/splash-1206x2622.png",
-      "bytes": 1572046,
-      "sha256": "b26aad9a772fa115c9c97f41cd57a1da50012f76d07f072017f9e2f184fbc4b3",
+      "bytes": 697956,
+      "sha256": "b2c4221c738b6f6027a6e26d864c02152a84dd62300da676537e17a60ead1521",
       "width": 1206,
       "height": 2622,
       "alpha": false,
@@ -1000,8 +1000,8 @@
     },
     {
       "path": "match/icons/splash-1242x2688.png",
-      "bytes": 1630961,
-      "sha256": "515624586db79b514fdccc3786aaa43ada944a0ba1a5e55d8fbabe90a7a6b76f",
+      "bytes": 736550,
+      "sha256": "7e3dc89bd05c7a1725ff524e7a5f7f245e57746c32322a22d1d444cceb9ac4ad",
       "width": 1242,
       "height": 2688,
       "alpha": false,
@@ -1013,8 +1013,8 @@
     },
     {
       "path": "match/icons/splash-1284x2778.png",
-      "bytes": 1801728,
-      "sha256": "9a49872d6a56d71cbf4f2447556ec6a5d7120ef36d69f75d083a3e9f881c4692",
+      "bytes": 772849,
+      "sha256": "b04e8eb475f92509225318945adf64d85dad94b75344d252272baf79092329e1",
       "width": 1284,
       "height": 2778,
       "alpha": false,
@@ -1026,8 +1026,8 @@
     },
     {
       "path": "match/icons/splash-1290x2796.png",
-      "bytes": 1312088,
-      "sha256": "74a8d935ba28c775d42deedd80e7d67cbc952e8e0ee80f54757c66b058518646",
+      "bytes": 784722,
+      "sha256": "d1fc9ad59f375f8caf5882d64efbbb1ce44eccca6022060e540b2eeee6bdd301",
       "width": 1290,
       "height": 2796,
       "alpha": false,
@@ -1039,8 +1039,8 @@
     },
     {
       "path": "match/icons/splash-1320x2868.png",
-      "bytes": 1827316,
-      "sha256": "793a77824ab9da50250bbd2486abab7cc9ae14a73f3d1cb46df13ce17eba483c",
+      "bytes": 817911,
+      "sha256": "7b06e0f2e029796ca55c4ed605b77d8f288dd21488547e2d6fec1d0dccb24483",
       "width": 1320,
       "height": 2868,
       "alpha": false,
@@ -1052,8 +1052,8 @@
     },
     {
       "path": "match/icons/splash-828x1792.png",
-      "bytes": 939673,
-      "sha256": "41411cdc13e6e2234568705753cfcdf2b7542e713ac019be858c561d36cba463",
+      "bytes": 357221,
+      "sha256": "90fdee5dd95808bc3816fb45076b6ed5f8ce2a82213bcee5fed95089fb4179e5",
       "width": 828,
       "height": 1792,
       "alpha": false,

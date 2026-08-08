@@ -60,17 +60,24 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
   /* ① 只增不减。原来 d 用 UTC 日序、hNow 用北京小时，北京 00:00-07:59 那 8 小时
         frac 从 1 掉回 0 —— 11 个人里 10 个每晚成绩倒退，早八点又回来。
         真人的数字不会缩水，这是配速员最容易露馅的地方。 */
-  const fell = [];
+  const fell = [], rushFell = [], rushMovers = [];
   for (const p of PACERS) {
-    let prev = -1, n = 0, eg = '';
+    let prev = -1, prevRush = -1, n = 0, nr = 0, moved = 0, eg = '', egRush = '';
     for (let h = hoursNow - 48; h < hoursNow + 24 * 120; h++) {
-      const v = pacerAt(p, h).power;
-      if (prev >= 0 && v < prev) { n++; if (!eg) eg = `h=${h} ${prev}→${v}`; }
-      prev = v;
+      const v = pacerAt(p, h);
+      if (prev >= 0 && v.power < prev) { n++; if (!eg) eg = `h=${h} ${prev}→${v.power}`; }
+      if (prevRush >= 0 && v.rush < prevRush) { nr++; if (!egRush) egRush = `h=${h} ${prevRush}→${v.rush}`; }
+      if (prevRush >= 0 && v.rush > prevRush) moved++;
+      prev = v.power; prevRush = v.rush;
     }
     if (n) fell.push(`${p.alias} 跌 ${n} 次 (${eg})`);
+    if (nr) rushFell.push(`${p.alias} 跌 ${nr} 次 (${egRush})`);
+    if (moved) rushMovers.push(p.alias);
   }
   ok('矿力逐小时 120 天只增不减', !fell.length, fell.join('; '));
+  ok('90 秒成绩逐小时不回退且仍会随作息更新',
+     !rushFell.length && rushMovers.length >= 6,
+     rushFell.length ? rushFell.join('; ') : `${rushMovers.length}/${PACERS.length} 人继续推进`);
 
   /* ② 作息不许跨北京日：跨了会被 min(24,·) 压成几十分钟的假窗口，
         夜猫子本猫原来的 23+3 就是这么被压没的。 */
