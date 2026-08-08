@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-09-endless-support">
+<meta name="gemfall-release" content="2026-08-09-final-visual-polish">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -40,7 +40,7 @@
   /* 「暖纸矿彩」：温润的平整细纸承住鲜亮灵石，矿脉与测绘刻度只在边缘留下轻痕。
      不做褶皱、破边和泛黄相框；深褐负责文字，铜金、灰玫与鼠尾草绿负责层级。 */
   --bg:#ead9b9;--bg2:#dfcaaa;--panel:#f3e5cc;--panel2:#ead6b7;--edge:#a98a67;
-  --ink:#352d2a;--ink2:#62534d;--ink3:#7d6c63;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
+  --ink:#352d2a;--ink2:#62534d;--ink3:#6d5c54;   /* ink3 在 panel/bg 上均过 AA 4.5:1 */
   --gold:#a86625;--gold2:#744116;--gold-hi:#d79d55;--gold-line:#b37f46;
   --prism:#8c5d72;--prism2:#4f786d;
   --red:#a84949;--green:#47755a;--blue:#3f6f96;--purple:#775184;
@@ -253,7 +253,7 @@ body::before{display:none}
 .menu-help{align-self:center;border:0;background:none;color:var(--ink3);font:inherit;font-size:11px;letter-spacing:.16em;padding:2px 12px;cursor:pointer}
 .menu-help:hover{color:var(--gold2)}
 #menu-stats{margin-top:clamp(4px,1dvh,10px);font-size:13px;color:var(--ink2);letter-spacing:.1em}
-#menu-stats b{color:var(--gold);font-weight:500}
+#menu-stats b{color:var(--gold2);font-weight:500}
 .pack-grid{margin-top:14px;text-align:left}
 .pack-guide{padding:14px;border:1px solid color-mix(in srgb,var(--prism2) 48%,var(--line));border-radius:15px;
   background:linear-gradient(135deg,color-mix(in srgb,var(--prism2) 8%,var(--panel)),color-mix(in srgb,var(--prism) 7%,var(--panel)))}
@@ -270,14 +270,14 @@ body::before{display:none}
 .pack-row{display:grid;grid-template-columns:32px 1fr auto;gap:9px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line2)}
 .pack-ic{width:32px;height:32px;border-radius:10px;background:rgba(255,250,237,.58);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
 .pack-ic .ic{width:18px;height:18px}.pack-copy b{display:block;font-size:13px;font-weight:500;color:var(--ink)}
-.pack-copy span{display:block;font-size:10.5px;color:var(--ink3);line-height:1.55}.pack-count{font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
+.pack-copy span{display:block;font-size:11px;color:var(--ink3);line-height:1.55}.pack-count{font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
 .pack-curio-hd{display:flex;align-items:end;justify-content:space-between;gap:8px;margin:15px 0 7px}
-.pack-curio-hd b{font-size:13px;color:var(--ink);font-weight:500}.pack-curio-hd span{font-size:10.5px;color:var(--ink3)}
+.pack-curio-hd b{font-size:13px;color:var(--ink);font-weight:500}.pack-curio-hd span{font-size:11px;color:var(--ink3)}
 .pack-curios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.pack-curio{min-width:0;border:1px solid var(--line2);background:var(--bg2);padding:9px 6px;text-align:center;border-radius:12px}
+.pack-curio{min-width:0;border:1px solid transparent;background:color-mix(in srgb,var(--bg2) 62%,transparent);padding:9px 6px;text-align:center;border-radius:12px}
 .pack-curio.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--panel));box-shadow:var(--glow-soft)}
 .pack-curio .pack-ic{margin:0 auto 5px}.pack-curio b{display:block;font-size:12px;font-weight:500;color:var(--ink)}
-.pack-curio .d{display:block;min-height:48px;font-size:9.5px;line-height:1.55;color:var(--ink3);margin:3px 0 7px}
+.pack-curio .d{display:block;min-height:36px;font-size:10.5px;line-height:1.5;color:var(--ink3);margin:3px 0 7px}
 .pack-curio .n{font-size:11px;color:var(--gold2);margin-bottom:5px}.pack-curio button{width:100%;padding:6px 2px;font-size:10.5px;letter-spacing:0;white-space:nowrap}
 .menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
   padding:0 52px;text-align:center}
@@ -312,7 +312,7 @@ body::before{display:none}
 .lv:hover{transform:translateY(-3px);box-shadow:var(--glow-soft);border-color:var(--gold)}
 .lv:active{transform:scale(.96)}
 .lv .n{font-size:22px;color:var(--ink);letter-spacing:.05em}
-.lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold);margin-top:2px;min-height:14px}
+.lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold2);margin-top:2px;min-height:14px}
 .lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
 .lv.cur{border-color:var(--gold);box-shadow:0 0 16px color-mix(in srgb,var(--gold) 28%,transparent)}
@@ -519,7 +519,7 @@ body::before{display:none}
 .pt-chip b{display:block;color:inherit;font-weight:500;letter-spacing:.16em}
 .pt-chip:hover{border-color:var(--gold);color:var(--ink)}
 .pt-chip.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 13%,var(--bg2));box-shadow:var(--glow-soft)}
-.pt-chip .d{display:block;font-size:10.5px;letter-spacing:.06em;color:var(--ink3);margin-top:2px}
+.pt-chip .d{display:block;font-size:11px;letter-spacing:.04em;color:var(--ink3);margin-top:2px}
 .pt-chip.on .d{color:color-mix(in srgb,var(--gold) 60%,var(--ink3))}
 #pt-names{display:flex;flex-direction:column;gap:7px;margin-top:4px}
 .pt-name{display:grid;grid-template-columns:auto minmax(68px,1fr) 76px 86px;align-items:center;gap:7px}
@@ -533,7 +533,7 @@ body::before{display:none}
   font-family:var(--serif);text-align:left;color:var(--ink2);transition:border-color .2s}
 .pt-role:hover{border-color:var(--gold)}
 .pt-role b{display:block;color:var(--gold2);font-size:12px;font-weight:500;white-space:nowrap}
-.pt-role i{display:block;font-style:normal;color:var(--ink3);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-role i{display:block;font-style:normal;color:var(--ink3);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pt-pmoves{height:38px;display:grid;grid-template-columns:23px 1fr 23px;align-items:center;border:1px solid var(--line2);background:var(--bg2)}
 .pt-pmoves button{height:100%;border:0;background:transparent;color:var(--gold2);font:16px var(--serif);cursor:pointer;padding:0}
 .pt-pmoves output{text-align:center;color:var(--ink2);font-size:11px;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -555,7 +555,7 @@ body::before{display:none}
   font-size:22px;background-color:var(--panel)}
 .pt-role-face.has-art{color:transparent}
 .pt-role-card b{display:block;font-size:13px;font-weight:500;white-space:nowrap}
-.pt-role-card i{display:block;font-style:normal;font-size:9.5px;color:var(--ink3);white-space:nowrap}
+.pt-role-card i{display:block;font-style:normal;font-size:10.5px;color:var(--ink3);white-space:nowrap}
 #pt-role-desc{min-height:48px;margin-top:10px;font-size:12px;line-height:1.65;color:var(--ink2);text-align:left}
 #pt-role-desc b{color:var(--gold2);font-weight:500}
 #ptr-board{margin-top:8px;text-align:left}
@@ -571,6 +571,16 @@ body::before{display:none}
 #pt-names{gap:clamp(4px,.7dvh,7px)}
 .pt-head h2{font-size:clamp(20px,2.8dvh,25px);margin:0}
 #scr-party .ovl-btns{margin-top:clamp(8px,1.4dvh,16px);margin-bottom:0}
+/* 聚会台只给当前选择完整描边。未选项用纸面明暗与分隔线区分，减少“表格套表格”的压迫感。 */
+#scr-party .pt-chip:not(.on){border-color:transparent;background:color-mix(in srgb,var(--bg2) 58%,transparent);
+  box-shadow:inset 0 -1px 0 var(--line2)}
+#scr-party .pt-name{padding:2px 0 5px;border-bottom:1px solid var(--line2)}
+#scr-party .pt-name:last-child{border-bottom:0}
+#scr-party .pt-role{border-color:transparent;background:transparent;box-shadow:none}
+#scr-party .pt-pmoves{border-color:transparent;background:color-mix(in srgb,var(--bg2) 58%,transparent)}
+#scr-party .pt-stepper{border-color:transparent;background:transparent;padding-block:4px}
+#pt-role-grid .pt-role-card:not(.sel){border-color:transparent;box-shadow:none;background:color-mix(in srgb,var(--bg2) 58%,transparent)}
+.pt-rmove{border-left:0;border-right:0;border-top:0;background:transparent}
 /* 交接屏：必须完全挡住上一位的棋盘，否则传机就没有意义了。
    旧版用整屏黑色，和暖纸启动图之间会硬闪一次；现在沿用同一套暖纸底。 */
 #ovl-hand{background:#ead9b9}
@@ -1097,6 +1107,14 @@ body{--shk:4px}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .ovl-card::before,.ovl-card::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);pointer-events:none}
 .ovl-card::before,.ovl-card::after{display:none}
+.ovl-top-close{position:sticky;top:0;z-index:22;width:36px;height:36px;margin:-14px -10px -36px auto;
+  display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;cursor:pointer;
+  color:var(--ink2);background:color-mix(in srgb,var(--panel) 95%,transparent);
+  box-shadow:0 2px 0 rgba(87,58,42,.12),0 5px 14px rgba(87,58,42,.14);touch-action:manipulation}
+.ovl-top-close:hover{color:var(--gold2);border-color:var(--gold-line)}
+.ovl-top-close:active{transform:translateY(1px);box-shadow:inset 0 2px 4px rgba(87,58,42,.18)}
+.ovl-top-close:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.ovl-top-close .ic{width:18px;height:18px}
 .ovl-kick{font-size:11px;letter-spacing:.4em;color:var(--ink3)}
 .ovl-title{font-size:27px;font-weight:300;letter-spacing:.2em;margin:8px 0 2px}
 .ovl-title em{font-style:normal;color:var(--gold)}
@@ -1155,11 +1173,12 @@ body{--shk:4px}
    1. **不加 CSS 边框**。这批横幅画里自带描金双线框与右上小圆（与 chapter-*.webp
       同一套装帧），再加一道就是双框。
    2. 压字的暗遮罩写固定色，不随面板色漂移。 */
-.obanner{width:100%;aspect-ratio:16/7;margin:12px 0 4px;display:none;position:relative;
-  background-repeat:no-repeat;overflow:hidden}
+.obanner{width:100%;aspect-ratio:16/7;margin:12px 0 8px;display:none;position:relative;
+  background-repeat:no-repeat;overflow:hidden;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 9%,var(--panel2)),0 7px 16px rgba(87,58,42,.16)}
 .obanner.has-art{display:block}
 .obanner::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,transparent 52%,rgba(6,6,9,.62) 82%,rgba(6,6,9,.92) 100%)}
+  background:linear-gradient(180deg,transparent 56%,rgba(53,35,27,.40) 82%,rgba(53,35,27,.76) 100%)}
 /* 矮屏把横幅压扁，优先保住下面的按钮与数字 */
 @media (max-height:720px){.obanner{aspect-ratio:20/6;margin:8px 0 2px}}
 @media (max-height:600px){.obanner{display:none!important}}
@@ -1181,21 +1200,21 @@ body{--shk:4px}
 #col-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 10px}
 .cbi{border:1px solid var(--line2);background:var(--bg2);padding:7px 2px;text-align:center}
 .cbi b{display:block;font-size:16px;color:var(--gold2);letter-spacing:.04em;font-weight:400}
-.cbi i{display:block;font-style:normal;font-size:10px;color:var(--ink3);letter-spacing:.06em;margin-top:2px}
+.cbi i{display:block;font-style:normal;font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:2px}
 
 .col-acts{display:grid;grid-template-columns:1.35fr .65fr;gap:8px}
 .col-acts .btn{padding:9px 6px}
-.colsub{display:block;font-size:10px;color:var(--ink3);letter-spacing:.04em;margin-top:3px}
+.colsub{display:block;font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:3px}
 
 #col-rules{margin:9px 0 12px;border-bottom:1px solid var(--line2);padding-bottom:7px}
-#col-rules summary{list-style:none;cursor:pointer;font-size:10.5px;color:var(--ink3);letter-spacing:.16em}
+#col-rules summary{list-style:none;cursor:pointer;font-size:11px;color:var(--ink3);letter-spacing:.14em}
 #col-rules summary::-webkit-details-marker{display:none}
 #col-rules summary::after{content:'＋';margin-left:6px;color:var(--gold2)}
 #col-rules[open] summary::after{content:'－'}
 #col-note{margin:7px 0 0}
 #col-note .odds{font-size:11px;color:var(--ink2);letter-spacing:.04em;line-height:1.75}
 #col-note .odds b{color:var(--gold2)}
-#col-note .nofee{font-size:10.5px;color:var(--ink3);letter-spacing:.04em;margin-top:3px;line-height:1.6}
+#col-note .nofee{font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:3px;line-height:1.6}
 #col-note .nofee b{color:var(--ink2)}
 
 #col-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center;margin:10px 0 4px}
@@ -1205,7 +1224,7 @@ body{--shk:4px}
 #col-search::-webkit-search-cancel-button{display:none}
 #col-filters{display:flex;gap:4px}
 .colf{border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);font-family:var(--serif);
-  font-size:10.5px;letter-spacing:.06em;padding:7px 8px;cursor:pointer;white-space:nowrap}
+  font-size:11px;letter-spacing:.04em;padding:7px 8px;cursor:pointer;white-space:nowrap}
 .colf.on{border-color:var(--gold);color:var(--gold2)}
 #col-empty{border:1px solid var(--line2);padding:18px 8px;color:var(--ink3);font-size:12px;
   letter-spacing:.08em;margin-top:12px;text-align:center}
@@ -1600,6 +1619,7 @@ body{--shk:4px}
 
 <!-- 成就 -->
 <div class="ovl" id="ovl-ach"><div class="ovl-card">
+  <button class="ovl-top-close" id="ach-top-close" data-close-target="#ach-close" aria-label="合上成就"></button>
   <div class="ovl-kick">HONOR BADGES</div>
   <div class="ovl-title">成就 · <em>徽记</em></div>
   <div id="ach-grid"></div>
@@ -1614,6 +1634,7 @@ body{--shk:4px}
 <!-- 典藏册。多个子视图共用一张卡片：ovl() 是单层互斥的，
      另开弹层会把典藏册顶掉，而全站的关闭惯例 ovl(null) 会一路退回大厅。 -->
 <div class="ovl" id="ovl-col"><div class="ovl-card">
+  <button class="ovl-top-close" id="col-top-close" data-close-target="#col-close" aria-label="合上典藏册"></button>
 
   <section class="colv on" data-v="list">
     <div class="ovl-kick">MYSKME COLLECTION</div>
@@ -1819,6 +1840,7 @@ body{--shk:4px}
 
 <!-- 行囊：资源、引路晶与三件远征道具；主线三星、无尽下潜都能稳定补给。 -->
 <div class="ovl" id="ovl-pack"><div class="ovl-card">
+  <button class="ovl-top-close" id="pack-top-close" data-close-target="#pack-close" aria-label="收好行囊"></button>
   <div class="ovl-kick">EXPEDITION PACK</div>
   <div class="ovl-title">远征 · <em>行囊</em></div>
   <div id="pack-body"></div>
@@ -1830,6 +1852,7 @@ body{--shk:4px}
 
 <!-- 远征榜 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
+  <button class="ovl-top-close" id="lb-top-close" data-close-target="#lb-close" aria-label="合上远征榜"></button>
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
   <div class="ovl-title">远征 · <em>榜</em></div>
   <div class="lb-tabs">
@@ -1882,6 +1905,7 @@ body{--shk:4px}
      本周矿脉、周悬赏、矿灯战绩、岁记。以前它们散在结算页/榜单/成就页深处，
      玩家反馈「找不到新玩法入口」，根源就是没有一个「该干什么」的总台。 -->
 <div class="ovl" id="ovl-quest"><div class="ovl-card">
+  <button class="ovl-top-close" id="quest-top-close" data-close-target="#quest-close" aria-label="合上挑战"></button>
   <div class="ovl-kick">WEEKLY &amp; MONTHLY</div>
   <div class="ovl-title">矿上 · <em>挑战</em></div>
   <div id="quest-body"></div>
@@ -1889,6 +1913,7 @@ body{--shk:4px}
 </div></div>
 
 <div class="ovl" id="ovl-how"><div class="ovl-card" style="text-align:left">
+  <button class="ovl-top-close" id="how-top-close" data-close-target="#how-close" aria-label="合上手册"></button>
   <div class="ovl-kick" style="text-align:center">SCROLL OF RULES</div>
   <div class="ovl-title" style="text-align:center">矿脉 · <em>手册</em></div>
   <div class="obst-notes" style="max-width:none" id="how-body"></div>
@@ -4123,6 +4148,7 @@ const ICONS={
   dust:_IC('<path d="M12 3.4l1.1 4L17 8.5l-3.9 1.1L12 13.5l-1.1-3.9L7 8.5l3.9-1.1z"/><path d="M18 14.4l.55 1.95 1.95.55-1.95.55-.55 1.95-.55-1.95-1.95-.55 1.95-.55z"/><path d="M5.9 15.6l.42 1.5 1.5.42-1.5.42-.42 1.5-.42-1.5-1.5-.42 1.5-.42z"/>'),
   seal:_IC('<rect x="4.8" y="4.8" width="14.4" height="14.4" rx="2.2"/><path d="M8.8 12h6.4M12 8.8v6.4"/>'),
   gift:_IC('<rect x="3.6" y="6.2" width="16.8" height="11.6" rx="1.6"/><path d="M3.6 7.4 12 13l8.4-5.6"/>'),
+  close:_IC('<path d="M6 6l12 12M18 6 6 18"/>'),
 /* 结算屏那三颗星。用 SVG 而不是 ★ 字形：44px 下字形的形状随平台字体变，
      有的瘦有的胖，还可能被 emoji 字体接管变成彩色 —— 那是全站禁 emoji 的红线。
      这一枚是实心的，靠 fill:currentColor 跟着状态走。 */
@@ -4140,9 +4166,9 @@ const TOOLS={
 };
 const TOOLKEYS=['pick','swap','mix'];
 const PREPS={
-  needle:{ic:'resonance',nm:'指路针',tip:'下一次主线或无尽挑战，持续标出一组可行走法。'},
-  core:{ic:'orb',nm:'充能石',tip:'下一次主线或无尽挑战，伙伴能力从 70% 开始。'},
-  wedge:{ic:'burst',nm:'爆裂石',tip:'下一次主线或无尽挑战，棋盘自带一颗爆裂灵石。'},
+  needle:{ic:'resonance',nm:'指路针',tip:'持续标出一组可行走法。'},
+  core:{ic:'orb',nm:'充能石',tip:'伙伴能力从 70% 开始。'},
+  wedge:{ic:'burst',nm:'爆裂石',tip:'棋盘自带一颗爆裂灵石。'},
 };
 const PREP_KEYS=Object.keys(PREPS),PREP_CAP=5;
 function prepCount(k){return Math.max(0,(SAVE.prep&&SAVE.prep[k])||0)}
@@ -9408,6 +9434,15 @@ window.__selftest=function(){
         &&(blend.match(/class="lb-row/g)||[]).length===2);
       SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
     }
+    /* 长内容不再要求玩家滚到底才能退出；每个悬浮关闭键必须落到已有的安全关闭流程。 */
+    {
+      const pairs=[
+        ['ach-top-close','#ach-close'],['col-top-close','#col-close'],['pack-top-close','#pack-close'],
+        ['lb-top-close','#lb-close'],['quest-top-close','#quest-close'],['how-top-close','#how-close']
+      ];
+      ok('长页：六个常驻线稿关闭键都复用原有关闭流程',
+        pairs.every(([id,target])=>{const b=$('#'+id);return b&&b.dataset.closeTarget===target&&$(target)}));
+    }
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;GS.compDef=save.compDef;
   const fails=out.filter(s=>s.startsWith('FAIL'));
@@ -9424,6 +9459,10 @@ $('#ptb-live').innerHTML=ICONS.trophy;
 $('#guide-mark').innerHTML=ICONS.waystone;
 $('#chest-btn').querySelector('.icw').innerHTML=ICONS.gem;
 for(const el of $$('#end-stars s'))el.innerHTML=ICONS.star;
+for(const el of $$('.ovl-top-close')){
+  el.innerHTML=ICONS.close;
+  el.addEventListener('click',()=>{const target=$(el.dataset.closeTarget);if(target)target.click()});
+}
 $('#btn-sound').innerHTML=SAVE.mute?ICONS.soundOff:ICONS.soundOn;
 $('#btn-sound').style.opacity=SAVE.mute?.45:1;
 $('#btn-music').innerHTML=SAVE.muteBgm?ICONS.musicOff:ICONS.musicOn;
