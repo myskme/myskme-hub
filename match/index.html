@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-08-final-party-curios">
+<meta name="gemfall-release" content="2026-08-09-endless-support">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -278,7 +278,7 @@ body::before{display:none}
 .pack-curio.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--panel));box-shadow:var(--glow-soft)}
 .pack-curio .pack-ic{margin:0 auto 5px}.pack-curio b{display:block;font-size:12px;font-weight:500;color:var(--ink)}
 .pack-curio .d{display:block;min-height:48px;font-size:9.5px;line-height:1.55;color:var(--ink3);margin:3px 0 7px}
-.pack-curio .n{font-size:11px;color:var(--gold2);margin-bottom:5px}.pack-curio button{width:100%;padding:6px 2px;font-size:10.5px;letter-spacing:.04em}
+.pack-curio .n{font-size:11px;color:var(--gold2);margin-bottom:5px}.pack-curio button{width:100%;padding:6px 2px;font-size:10.5px;letter-spacing:0;white-space:nowrap}
 .menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
   padding:0 52px;text-align:center}
 .menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
@@ -1516,8 +1516,8 @@ body{--shk:4px}
     </div>
     <div id="toolbar">
       <button class="tool" data-t="pick"><span class="icw" data-ic="pick"></span>矿镐<i class="cnt">0</i></button>
-      <button class="tool" data-t="swap"><span class="icw" data-ic="swap"></span>换位符<i class="cnt">0</i></button>
-      <button class="tool" data-t="mix"><span class="icw" data-ic="mix"></span>重整令<i class="cnt">0</i></button>
+      <button class="tool" data-t="swap"><span class="icw" data-ic="swap"></span>换位器<i class="cnt">0</i></button>
+      <button class="tool" data-t="mix"><span class="icw" data-ic="mix"></span>洗牌器<i class="cnt">0</i></button>
     </div>
     <div id="tool-hint"></div>
     <div id="game-foot">
@@ -1570,7 +1570,7 @@ body{--shk:4px}
     <div class="quip" id="end-quip"></div>
     <div id="end-waystone">
       <div class="mark" id="guide-mark"></div>
-      <div class="copy"><b>引路晶 · 一枚</b>只开下一段路；本关仍是未通，零星、零分、零奖励。</div>
+      <div class="copy"><b>引路晶 · 一枚</b>主线用于借道；无尽用于支援当前深度的下一次挑战。</div>
       <button class="btn primary" id="end-guide">借道</button>
     </div>
     <pre id="wk-tablet"></pre>
@@ -1817,7 +1817,7 @@ body{--shk:4px}
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
 </div></div>
 
-<!-- 行囊：资源、引路晶与三件下一局奇物；奇物只靠新三星关确定获得。 -->
+<!-- 行囊：资源、引路晶与三件远征道具；主线三星、无尽下潜都能稳定补给。 -->
 <div class="ovl" id="ovl-pack"><div class="ovl-card">
   <div class="ovl-kick">EXPEDITION PACK</div>
   <div class="ovl-title">远征 · <em>行囊</em></div>
@@ -1913,12 +1913,12 @@ const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SKEY='myskme-match-v1';
 const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:false,tut:{},
   tools:{pick:3,swap:2,mix:2},daily:{day:0,streak:0,oil:0,best:0},chest:0,fails:{},chainBest:0,
-  /* 探脉奇物：每种上限 5，只能备好一件用于下一次主线远征。
-     初始各送一件让玩家先尝到差异；此后每个新三星关按关号确定产出，不随机抽。 */
-  prep:{needle:1,core:1,wedge:1,armed:''},
-  /* 引路晶：同一关完整失利 4 次后、每章至多唤醒 1 枚，背包上限 1。
-     bypass 只记借道的关卡：它们不算通关、不进矿力深度，之后仍可回来补。 */
-  guide:{n:0,earned:{},bypass:{}},
+  /* 远征道具：每种上限 5，只能备好一件用于下一次主线或无尽挑战。
+     初始各送一件；此后由主线新三星关与无尽下潜确定产出，不随机抽。 */
+  prep:{needle:1,core:1,wedge:1,armed:'',deep:0},
+  /* 引路晶：主线每章至多 1 枚；无尽当前深度每完整失利 4 次可再次获得。
+     bypass 只记主线借道；assist 记下一次无尽同层支援，二者都不虚增榜单。 */
+  guide:{n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0},
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
@@ -1959,15 +1959,21 @@ function loadSave(){
   const out=Object.assign({},SAVE_DEF,s);
   delete out.pwHist;                                         // 排行榜已收束，旧赛季幽灵快照退役
   out.tools=Object.assign({},SAVE_DEF.tools,s.tools||{});
-  out.prep=Object.assign({needle:1,core:1,wedge:1,armed:''},s.prep||{});
+  out.prep=Object.assign({needle:1,core:1,wedge:1,armed:'',deep:0},s.prep||{});
   for(const k of ['needle','core','wedge'])out.prep[k]=clamp(Math.floor(+out.prep[k]||0),0,5);
   if(!['needle','core','wedge'].includes(out.prep.armed)||!out.prep[out.prep.armed])out.prep.armed='';
+  if(out.prep.deep&&typeof out.prep.deep==='object')out.prep.deep=Object.keys(out.prep.deep)
+    .reduce((m,k)=>out.prep.deep[k]?Math.max(m,Math.floor(+k||0)):m,0);
+  out.prep.deep=Math.max(0,Math.floor(+out.prep.deep||0));
   out.daily=Object.assign({day:0,streak:0,oil:0,best:0},s.daily||{});
   out.fails=s.fails||{};
-  out.guide=Object.assign({n:0,earned:{},bypass:{}},s.guide||{});
+  out.guide=Object.assign({n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0},s.guide||{});
   out.guide.n=clamp(Math.floor(+out.guide.n||0),0,1);
   out.guide.earned=(out.guide.earned&&typeof out.guide.earned==='object')?out.guide.earned:{};
   out.guide.bypass=(out.guide.bypass&&typeof out.guide.bypass==='object')?out.guide.bypass:{};
+  out.guide.assist=Math.max(0,Math.floor(+out.guide.assist||0));
+  out.guide.deepN=Math.max(0,Math.floor(+out.guide.deepN||0));
+  out.guide.deepCycle=Math.max(0,Math.floor(+out.guide.deepCycle||0));
   /* 老存档没有 q3。不能只靠 Object.assign 的默认值——那样所有老玩家会共用
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
@@ -4020,7 +4026,7 @@ function toolNudge(){
   const have=TOOLKEYS.filter(t=>toolCount(t)>0);
   if(!have.length)return;
   GS.toldTool=true;
-  const t=have.includes('mix')&&prog<.45?'mix':have[0];       // 差得远就先建议重整令
+  const t=have.includes('mix')&&prog<.45?'mix':have[0];       // 差得远就先建议洗牌器
   setTimeout(()=>{
     if(GS.over)return;
     toast('只剩 <b>'+GS.moves+'</b> 步了 · 试试 '+icTag(TOOLS[t].ic)+' <b>'+TOOLS[t].nm+'</b>（还有 '
@@ -4129,14 +4135,14 @@ const icTag=k=>ICONS[k]?'<span class="ic-i">'+ICONS[k]+'</span>':'';
 
 const TOOLS={
   pick:{ic:'pick',nm:'矿镐',hint:'点任意一格——一镐下去，灵石、墨封、岩壳、石笼都算数'},
-  swap:{ic:'swap',nm:'换位符',hint:'点两个相邻格——不管连不连得成，强行换位'},
-  mix:{ic:'mix',nm:'重整令',hint:'整盘灵石重新排布，不扣步数'},
+  swap:{ic:'swap',nm:'换位器',hint:'点两个相邻格——不管连不连得成，直接换位'},
+  mix:{ic:'mix',nm:'洗牌器',hint:'整盘灵石重新排布，不扣步数'},
 };
 const TOOLKEYS=['pick','swap','mix'];
 const PREPS={
-  needle:{ic:'resonance',nm:'寻脉针',tip:'下一次远征开局，持续亮出一组可行走法。'},
-  core:{ic:'orb',nm:'共鸣芯',tip:'下一次远征，同伴灵技从七成充能起步。'},
-  wedge:{ic:'burst',nm:'裂晶楔',tip:'下一次远征开局，先炼成一颗爆裂灵石。'},
+  needle:{ic:'resonance',nm:'指路针',tip:'下一次主线或无尽挑战，持续标出一组可行走法。'},
+  core:{ic:'orb',nm:'充能石',tip:'下一次主线或无尽挑战，伙伴能力从 70% 开始。'},
+  wedge:{ic:'burst',nm:'爆裂石',tip:'下一次主线或无尽挑战，棋盘自带一颗爆裂灵石。'},
 };
 const PREP_KEYS=Object.keys(PREPS),PREP_CAP=5;
 function prepCount(k){return Math.max(0,(SAVE.prep&&SAVE.prep[k])||0)}
@@ -4146,6 +4152,13 @@ function prepGive(k,n){
   SAVE.prep[k]=Math.min(PREP_CAP,want);
   if(over)SAVE.power=(SAVE.power||0)+over*180;
   return over?PREPS[k].nm+'已满 · 灵力 +'+(over*180):icTag(PREPS[k].ic)+' '+PREPS[k].nm+' +'+(n||1);
+}
+function prepGiveEndless(depth){
+  depth=Math.max(0,Math.floor(+depth||0));
+  const last=Math.max(0,Math.floor(+SAVE.prep.deep||0));
+  if(!depth||depth%2||depth<=last)return '';
+  SAVE.prep.deep=depth;
+  return prepGive(PREP_KEYS[(Math.floor(depth/2)-1)%PREP_KEYS.length],1);
 }
 function prepArm(k){
   if(!PREPS[k]||prepCount(k)<=0)return false;
@@ -4210,7 +4223,7 @@ async function useToolAt(r,c){
   const t=GS.tool;
   if(t==='mix'){
     spendTool('mix');GS.busy=true;
-    if(!shuffleBoard())buildBoard(GS.L);SFX.made();toast('重整令 · <b>矿脉焕然一新</b>');
+    if(!shuffleBoard())buildBoard(GS.L);SFX.made();toast('洗牌器 · <b>棋盘已重新排列</b>');
     for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(B[i][j]){B[i][j].sc=.4;B[i][j].vy=-8+rnd()*16}
     await sleep(340);await settleBoard(0);GS.busy=false;await checkEnd();return;
   }
@@ -5525,6 +5538,7 @@ function openLevel(n,mode){
   buildBoard(L);                                    // 先建盘——reconcileGoals 会按实际布上的数量校准 need
   GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   const mercy=mercyMoves(n);
+  const guideAssist=!!(L.endless&&SAVE.guide&&SAVE.guide.assist===n);
   /* 补偿原本是完全静默的（注释写着「悄悄多给两步」）。但玩家不知道就等于没给——
      白白浪费一次善意。关键是**措辞不能像施舍**：说成同伴递工具，
      而不是「因为你老输所以补偿你」。 */
@@ -5532,10 +5546,11 @@ function openLevel(n,mode){
   /* 晰·探路者的被动：每关多 2 步。必须在 GS.compDef 定好之后判定，
      所以这里先取一次——openLevel 里 compDef 是下面才赋的。 */
   const xiBonus=(compById(SAVE.comp).id==='xi')?2:0;
-  GS.moves=L.moves+mercy+xiBonus;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
+  GS.moves=L.moves+mercy+xiBonus+(guideAssist?GUIDE_ENDLESS_MOVES:0);GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
   GS.boss=L.boss||null;GS.hp=L.bossHP||0;GS.hpMax=L.bossHP||0;GS.bossTick=0;
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
   GS.prep=(SAVE.prep&&PREPS[SAVE.prep.armed]&&prepCount(SAVE.prep.armed)>0)?SAVE.prep.armed:'';
+  GS.guideAssist=guideAssist;
   GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
@@ -5563,8 +5578,8 @@ function openLevel(n,mode){
   /* 开场卡 */
   $('#intro-kick').textContent=L.era+' · '+L.chName;
   $('#intro-title').innerHTML=L.endless?'深度 <em>'+L.depth+'</em>':'第 <em>'+n+'</em> 关';
-  $('#intro-sub').textContent=(L.boss?('讨伐战 · 步数 '+L.moves):('步数 '+L.moves))
-    +(GS.prep?' · 已备 '+PREPS[GS.prep].nm:'');
+  $('#intro-sub').textContent=(L.boss?('讨伐战 · 步数 '+GS.moves):('步数 '+GS.moves))
+    +(GS.prep?' · 已备 '+PREPS[GS.prep].nm:'')+(guideAssist?' · 引路晶支援':'');
   renderGoalsTo($('#intro-goals'),38);
   const notes=[];
   const seen={};
@@ -5576,7 +5591,8 @@ function openLevel(n,mode){
   if(L.boss)seen.boss=1;
   for(const k in seen){const o=OBST_INFO[k];if(o)notes.push('<b>'+o.nm+'</b>　'+o.tip)}
   $('#intro-notes').innerHTML=notes.join('<br>');
-  $('#intro-quip').textContent=mercy?('这一关不好啃——矿灯替你多撑 '+mercy+' 步。'):pick2(Q_INTRO);
+  $('#intro-quip').textContent=guideAssist?'引路晶已经准备好：多 '+GUIDE_ENDLESS_MOVES+' 步，另带一颗爆裂灵石。'
+    :(mercy?('这一关不好啃——矿灯替你多撑 '+mercy+' 步。'):pick2(Q_INTRO));
   renderAllyPick();renderTools();renderAlly();
   if(L.boss){
     const bo=BOSSES[L.boss];
@@ -5606,10 +5622,18 @@ function beginPlay(){
   const q=GS.prep;
   if(q==='core')GS.charge=GS.compDef.need*.7;
   if(q==='wedge')prepWedge();
+  const guideAssist=!!GS.guideAssist;
+  if(guideAssist){
+    prepWedge();
+    if(SAVE.guide)SAVE.guide.assist=0;
+    persist();
+  }
   renderGoals($('#goal-row'),30);updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=q==='needle'?hintMove():null;selCell=null;
   if(q&&prepTake(q))setTimeout(()=>toast(icTag(PREPS[q].ic)+' <b>'+PREPS[q].nm+'</b> 已生效',2400),180);
+  if(guideAssist)setTimeout(()=>toast(icTag('waystone')+' <b>引路晶支援</b> · 多 '+GUIDE_ENDLESS_MOVES+' 步并带一颗爆裂灵石',2800),460);
   GS.prep='';
+  GS.guideAssist=false;
   if(GS.L.n===1&&!SAVE.tut.first){SAVE.tut.first=1;persist();
     showTut('把相同的灵石 <b>三个连成一线</b>——点两下，或直接拖动',6000)}
 }
@@ -5699,27 +5723,47 @@ function endRush(){
   ovl('end');
 }
 /* ---------- 引路晶 · 卡关兜底 ----------
-   只解锁下一关，不改当前关的星、分数、奖励与失败记录；借道关从榜单深度里扣除。
-   四次是完整结算后的失利，不看连点重开；每章一次、最多持有一枚，避免变成常规捷径。 */
+   主线仍只借道、不伪造通关；无尽不跳层，改为下一次同层 +5 步和一颗爆裂。
+   四次必须是完整结算后的失利。行囊最多一枚，不能靠反复点重开刷取。 */
+const GUIDE_FAILS=4,GUIDE_ENDLESS_MOVES=5;
 function guideChapter(n){return Math.ceil(clamp(+n||1,1,64)/8)}
 function guideEarnAfterFail(n){
-  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{}}), ch=guideChapter(n);
-  if(GS.mode!=='adv'||GS.L.endless||n>=64||n!==SAVE.lv||(SAVE.fails[n]||0)<4||g.earned[ch])return false;
+  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0}), fails=SAVE.fails[n]||0;
+  if(GS.mode!=='adv'||n!==SAVE.lv||fails<GUIDE_FAILS)return false;
+  if(GS.L.endless){
+    const cycle=Math.floor(fails/GUIDE_FAILS);
+    if(g.deepN!==n){g.deepN=n;g.deepCycle=0}
+    if(!cycle||cycle<=g.deepCycle)return false;
+    g.deepCycle=cycle;
+    if(g.n<1){g.n=1;return true}
+    return false;
+  }
+  const ch=guideChapter(n);
+  if(n>=64||g.earned[ch])return false;
   g.earned[ch]=1;
   if(g.n<1){g.n=1;return true}
   return false;
 }
 function guideCanUse(n){
-  const g=SAVE.guide||{};
-  return GS.mode==='adv'&&!GS.L.endless&&n>=1&&n<64&&n===SAVE.lv&&(g.n||0)>0;
+  const g=SAVE.guide||{},L=GS.L||{};
+  return GS.mode==='adv'&&n===SAVE.lv&&(g.n||0)>0
+    &&(L.endless?n>64:(n>=1&&n<64));
 }
 function guideState(n){
-  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{}}), lv=SAVE.lv||1;
+  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0}), lv=SAVE.lv||1;
+  n=Math.max(1,+n||lv);
+  if(n>64||lv>64){
+    n=Math.max(65,n,lv);
+    const total=SAVE.fails[n]||0,fails=total%GUIDE_FAILS;
+    if(g.assist===n)return {mode:'armed',endless:true,n,fails:GUIDE_FAILS,title:'引路晶支援已准备',desc:'进入当前深度时自动增加 '+GUIDE_ENDLESS_MOVES+' 步，并带一颗爆裂灵石。',pct:100};
+    if((g.n||0)>0)return {mode:'ready',endless:true,n,fails:GUIDE_FAILS,title:'引路晶可以使用',desc:'无尽下一次挑战增加 '+GUIDE_ENDLESS_MOVES+' 步，并带一颗爆裂灵石。',pct:100};
+    return {mode:'progress',endless:true,n,fails,title:'引路晶进度 '+fails+' / '+GUIDE_FAILS,
+      desc:fails?'当前深度再完整挑战 '+(GUIDE_FAILS-fails)+' 次仍未通过，即可获得一枚。':'当前深度连续受阻时，它会提供直接支援。',pct:fails/GUIDE_FAILS*100};
+  }
   n=clamp(+n||Math.min(lv,64),1,64);
   const ch=guideChapter(n), fails=Math.min(4,SAVE.fails[n]||0);
   if((g.n||0)>0)return {mode:'ready',n,ch,fails:4,title:'引路晶已苏醒',desc:'下次在卡关结算页可直接借道下一关。',pct:100};
-  if(lv>64)return {mode:'done',n:64,ch:8,fails:4,title:'主线已经贯通',desc:'引路晶完成了它的使命。',pct:100};
-  if(g.earned&&g.earned[ch])return {mode:'used',n,ch,fails:4,title:'本章晶光已用',desc:'补通借道关后，闯关记录会自动恢复完整。',pct:100};
+  if(g.earned&&g.earned[ch])return {mode:'used',n,ch,fails:4,title:'本章已经使用',desc:'补通借道关后，闯关记录会自动恢复完整。',pct:100};
   return {mode:'progress',n,ch,fails,title:'引路晶共鸣 '+fails+' / 4',
     desc:fails?'再完整挑战 '+(4-fails)+' 次仍未通过，它会自动苏醒。':'卡住时它会悄悄记录完整挑战，不必手动激活。',pct:fails*25};
 }
@@ -5727,11 +5771,20 @@ function guideRender(n,gained){
   const el=$('#end-waystone'), can=guideCanUse(n);
   el.classList.toggle('on',can);
   $('#end-guide').disabled=!can;
-  if(can)el.querySelector('.copy b').textContent=gained?'引路晶 · 此刻苏醒':'引路晶 · 一枚在手';
+  if(can&&GS.L.endless){
+    el.querySelector('.copy').innerHTML='<b>'+(gained?'引路晶 · 已获得':'引路晶 · 可以使用')+'</b>下一次挑战增加 '+GUIDE_ENDLESS_MOVES+' 步，并带一颗爆裂灵石。';
+    $('#end-guide').textContent='支援下一次';
+  }else if(can){
+    el.querySelector('.copy').innerHTML='<b>'+(gained?'引路晶 · 已获得':'引路晶 · 可以使用')+'</b>只开下一关；本关仍是未通，零星、零分、零奖励。';
+    $('#end-guide').textContent='借道';
+  }
 }
 function renderPack(){
   colFix();
-  const st=guideState(Math.min(SAVE.lv||1,64));
+  const st=guideState(SAVE.lv||1);
+  const guideNote=st.endless
+    ?'无尽当前深度每完整失败 4 次可再次获得；只支援同层，不跳层、不改变榜单。'
+    :'主线每章最多获得一枚；只借道，不补星、不加分，也不计入闯关榜。';
   const row=(ic,nm,tip,n)=>'<div class="pack-row"><div class="pack-ic">'+icTag(ic)+'</div>'
     +'<div class="pack-copy"><b>'+nm+'</b><span>'+tip+'</span></div><div class="pack-count">'+n+'</div></div>';
   const curios=PREP_KEYS.map(k=>{const q=PREPS[k],on=SAVE.prep.armed===k,n=prepCount(k);
@@ -5742,22 +5795,33 @@ function renderPack(){
   $('#pack-body').innerHTML='<div class="pack-grid"><div class="pack-guide"><div class="pack-guide-hd">'
     +'<div class="pack-guide-mark">'+icTag('waystone')+'</div><div class="pack-guide-copy"><b>'+st.title+'</b><span>'+st.desc+'</span></div></div>'
     +'<div class="pack-progress"><i style="width:'+st.pct+'%"></i></div>'
-    +'<div class="pack-note">每章最多苏醒一枚，行囊最多一枚；只借道，不补星、不加分，也不计入闯关榜。</div></div>'
-    +'<div class="pack-curio-hd"><b>探脉奇物 · 只备一件</b><span>新三星关按关号确定获得</span></div>'
+    +'<div class="pack-note">'+guideNote+' 行囊最多一枚。</div></div>'
+    +'<div class="pack-curio-hd"><b>远征道具 · 只备一件</b><span>主线三星与无尽下潜稳定获得</span></div>'
     +'<div class="pack-curios">'+curios+'</div>'
     +'<div class="pack-items">'
     +row('pick','矿镐','点掉一枚灵石或一层机关',toolCount('pick'))
-    +row('swap','换位符','交换任意两枚相邻灵石',toolCount('swap'))
-    +row('mix','重整令','重排棋盘，保留本局进度',toolCount('mix'))
+    +row('swap','换位器','交换任意两枚相邻灵石',toolCount('swap'))
+    +row('mix','洗牌器','重排棋盘，保留本局进度',toolCount('mix'))
     +row('lamp','备用灯油','漏领一天时自动护住连续记录',(SAVE.daily&&SAVE.daily.oil)||0)
     +row('box','典藏匣','打开可得角色、风物与器物典藏',COLS.box||0)
     +row('dust','星屑','月结与典藏重复转化所得',COLS.dust||0)
     +'</div></div>';
 }
+function guideSpend(n){
+  const g=SAVE.guide;
+  if(!guideCanUse(n)||!g)return '';
+  g.n=0;
+  if(GS.L.endless){g.assist=n;persist();return 'assist'}
+  g.bypass[n]=1;SAVE.lv=Math.max(SAVE.lv,n+1);persist();return 'bypass';
+}
 function guideUse(){
   const n=GS.L&&GS.L.n,g=SAVE.guide;
-  if(!guideCanUse(n)||!g)return false;
-  g.n=0;g.bypass[n]=1;SAVE.lv=Math.max(SAVE.lv,n+1);persist();
+  const kind=guideSpend(n);
+  if(kind==='assist'){
+    ovl(null);openLevel(n);
+    return true;
+  }
+  if(kind!=='bypass'||!g)return false;
   ovl(null);show('map');
   toast(icTag('waystone')+' 引路晶已开路 · <b>第 '+(n+1)+' 关可进入</b><br>第 '+n+' 关仍可随时回来补通',3600);
   return true;
@@ -5818,6 +5882,9 @@ function endLevel(win){
     }else{
       SAVE.best['e'+L.depth]=Math.max(SAVE.best['e'+L.depth]||0,GS.score);
       SAVE.lv=Math.max(SAVE.lv,n+1);
+      /* 主线三星负责前期补给；进入无尽后，每首次完成两个深度稳定补一件。
+         deep 只记最深已领位置，既防重领，也不让无限模式把存档撑成无限键表。 */
+      curioGot=prepGiveEndless(L.depth);
     }
     SAVE.fails[n]=Math.floor((SAVE.fails[n]||0)/2);   // 减半而非清零：回头刷三星时补偿还在
     SAVE.power=(SAVE.power||0)+Math.round(GS.score/100);
@@ -5883,11 +5950,11 @@ function endLevel(win){
   guideRender(n,!win&&guideGained);
   renderTools();
   ovl('end');
-  if(!win&&GS.mode==='adv'&&!L.endless&&n===SAVE.lv&&n<64){
+  if(!win&&GS.mode==='adv'&&n===SAVE.lv&&(L.endless||n<64)){
     const st=guideState(n);
     setTimeout(()=>toast(icTag('waystone')+' '+(guideGained
-      ?'<b>引路晶已苏醒</b> · 现在可借道下一关'
-      :'引路晶共鸣 <b>'+st.fails+' / 4</b> · 可在行囊查看'),3000),420);
+      ?(L.endless?'<b>引路晶已获得</b> · 可支援下一次挑战':'<b>引路晶已苏醒</b> · 现在可借道下一关')
+      :(L.endless?'引路晶进度 <b>'+st.fails+' / '+GUIDE_FAILS+'</b> · 可在行囊查看':'引路晶共鸣 <b>'+st.fails+' / 4</b> · 可在行囊查看')),3000),420);
   }
 }
 /* 原点以前写死 #ovl-end .ovl-card。那个弹层没开时 display:none，
@@ -7428,7 +7495,7 @@ function renderMenu(){
     +'　典藏 <b>'+colGot()+'</b> / '+CARDS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   renderMenuCast();
-  const gst=guideState(Math.min(SAVE.lv||1,64));
+  const gst=guideState(SAVE.lv||1);
   $('#pack-dot').innerHTML=gst.mode==='ready'?'<i class="dot"></i>':'';
   /* 只有真正已拥有但未开的匣才点亮典藏入口。 */
   $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
@@ -7882,9 +7949,10 @@ const HOW_HTML=`
 　狼先生「执灯」引爆全盘特殊灵石 · 钧「虎啸」两颗震成爆裂 · 麒「破浪」冲掉矿底两行<br>
 　晰「疾足」多给三步 · 晓「掠星」凭空一颗万象 · 梓「破封」全场机关各褪一层<br>
 　<b>带谁出门要看关卡</b>：机关多带梓，猫铃卡住带麒，差一口气带晰。<br><br>
-<b>灵器</b>　矿镐点哪炸哪 · 换位符强行换两格 · 重整令重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
+<b>局中工具</b>　矿镐点哪清哪 · 换位器直接交换两格 · 洗牌器重排全盘。用完通关还能再得，每天领矿灯也送。<br><br>
+<b>远征道具</b>　指路针标出走法 · 充能石让伙伴能力从 70% 开始 · 爆裂石让棋盘自带一颗爆裂灵石。每次只备一件，主线新三星与无尽每下潜两层都会稳定补给。<br><br>
 <b>达标之后</b>　剩下的步数会全部化作灵技在全场引爆——别急着刚好走完。<br><br>
-<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。前沿关完整失利 4 次后，本章可苏醒一枚<b>引路晶</b>：只开下一关，本关仍是未通，之后随时回来补。<br><br>
+<b>输了别急</b>　结算页可以花灵力<b>续挖 5 步</b>；同一关连输几次，矿灯会悄悄多给你两步。主线前沿关完整失利 4 次后，本章可获得一枚<b>引路晶</b>用于借道；无尽当前深度每完整失败 4 次可再次获得，用于下一次同层挑战增加 5 步并带一颗爆裂灵石。<br><br>
 <b>聚会赛</b>　一台机器 2–6 人轮流玩，每位选手先从六位人物中挑一位，人物不重复。<br>
 　<b>镜盘赛</b>：人物只作身份，同一轮的盘面、步数和规则完全相同，纯比手艺。<br>
 　<b>灵契赛</b>：同一张基础盘开局，所选人物的被动与灵技生效；开局会明确提示被动，灵技从七成充能起步。<br>
@@ -8786,36 +8854,56 @@ window.__selftest=function(){
   }
   {
     const bak={guide:SAVE.guide,lv:SAVE.lv,fails:SAVE.fails,stars:SAVE.stars,mode:GS.mode,L:GS.L};
-    SAVE.guide={n:0,earned:{},bypass:{}};SAVE.lv=12;SAVE.fails={12:4};SAVE.stars={};
+    SAVE.guide={n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0};SAVE.lv=12;SAVE.fails={12:4};SAVE.stars={};
     GS.mode='adv';GS.L={n:12,endless:false};
     const earned=guideEarnAfterFail(12),can=guideCanUse(12),again=guideEarnAfterFail(12);
     const readyState=guideState(12);renderPack();const packHTML=$('#pack-body').innerHTML;
-    SAVE.guide.bypass[12]=1;SAVE.lv=13;
+    const powerBefore=SAVE.power,mainKind=guideSpend(12);
     const bypassDepth=LB.stats().lv===11;
     SAVE.stars[12]=1;
     const restoredDepth=LB.stats().lv===12;
+    SAVE.guide={n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0};SAVE.lv=72;SAVE.fails={72:4};SAVE.stars={};
+    GS.mode='adv';GS.L={n:72,endless:true};
+    const endlessEarned=guideEarnAfterFail(72),endlessCan=guideCanUse(72),endlessReady=guideState(72);
+    const endlessKind=guideSpend(72),endlessNoSkip=SAVE.lv===72&&SAVE.guide.assist===72;
+    SAVE.guide.assist=0;SAVE.fails[72]=8;
+    const endlessRepeat=guideEarnAfterFail(72);
     SAVE.guide=bak.guide;SAVE.lv=bak.lv;SAVE.fails=bak.fails;SAVE.stars=bak.stars;GS.mode=bak.mode;GS.L=bak.L;
+    persist();
     ok('引路晶：四次完整失利后每章只醒一枚，背包封顶且只给前沿关',
        earned&&can&&!again&&guideChapter(12)===2);
     ok('引路晶：持有状态在行囊永久可见，不必等失败页',
        readyState.mode==='ready'&&/引路晶已苏醒/.test(packHTML));
-    ok('行囊：引路晶、三件确定获得的探脉奇物与原有资源全部可见',
-       ['寻脉针','共鸣芯','裂晶楔','矿镐','换位符','重整令','备用灯油','典藏匣','星屑'].every(x=>packHTML.includes(x)));
+    ok('行囊：引路晶、三件远征道具与原有资源全部可见且名称直白',
+       ['指路针','充能石','爆裂石','矿镐','换位器','洗牌器','备用灯油','典藏匣','星屑'].every(x=>packHTML.includes(x)));
     ok('引路晶：借道关不算榜单深度，补通后才恢复真实深度',bypassDepth&&restoredDepth);
     ok('引路晶：使用只开下一关，不发星、分数或奖励',
-       /g\.bypass\[n\]=1/.test(String(guideUse))&&/SAVE\.lv=Math\.max/.test(String(guideUse))
-       &&!/SAVE\.(stars|best|power)/.test(String(guideUse)));
+       mainKind==='bypass'&&SAVE.power===powerBefore
+       &&!/SAVE\.(stars|best|power)/.test(String(guideSpend)));
+    ok('引路晶：无尽每完整失败四次可重复支援同层，不跳层、不虚增榜单',
+       endlessEarned&&endlessCan&&endlessReady.endless&&endlessKind==='assist'
+       &&endlessNoSkip&&endlessRepeat&&GUIDE_ENDLESS_MOVES===5);
   }
   {
     const bak=JSON.parse(JSON.stringify(SAVE.prep)),pow=SAVE.power;
-    SAVE.prep={needle:1,core:1,wedge:5,armed:''};
+    SAVE.prep={needle:1,core:1,wedge:5,armed:'',deep:0};
     const armed=prepArm('core')&&SAVE.prep.armed==='core';
     const full=prepGive('wedge',1),powered=SAVE.power===pow+180;renderPack();
     const html=$('#pack-body').innerHTML;
     SAVE.prep=bak;SAVE.power=pow;persist();
-    ok('探脉奇物：三选一备战、上限五件、满仓转灵力且不随机',
-       armed&&powered&&/裂晶楔已满/.test(full)&&PREP_KEYS.join(',')==='needle,core,wedge'
+    ok('远征道具：三选一备战、上限五件、满仓转灵力且不随机',
+       armed&&powered&&/爆裂石已满/.test(full)&&PREP_KEYS.join(',')==='needle,core,wedge'
        &&(html.match(/data-prep=/g)||[]).length===3);
+  }
+  {
+    const bak=JSON.parse(JSON.stringify(SAVE.prep));
+    SAVE.prep={needle:0,core:0,wedge:0,armed:'',deep:0};
+    const odd=!prepGiveEndless(1),first=/指路针/.test(prepGiveEndless(2));
+    const repeat=!prepGiveEndless(2),second=/充能石/.test(prepGiveEndless(4));
+    const counts=SAVE.prep.needle===1&&SAVE.prep.core===1&&SAVE.prep.wedge===0;
+    SAVE.prep=bak;persist();
+    ok('远征道具：无尽每两层确定轮换补给，同一深度不能重复领取',
+       odd&&first&&repeat&&second&&counts);
   }
 
   /* ---- 典藏册 ---- */
