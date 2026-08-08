@@ -912,10 +912,18 @@ async function gfSubmit(req, env, origin) {
   const myBadges = gfBadges(merged);
   await env.DB.prepare("UPDATE gemfall SET power=?, rank_name=?, badges=? WHERE id=?")
     .bind(myPower, myRank, myBadges.join(","), id).run();
-  const ahead = await env.DB.prepare(
+  /* 客户端主榜已改为闯关榜：真实通关数优先，其次星数、单关最佳。
+     power 仍保留给阵营聚合和旧客户端，但不再拿累计复合值制造追榜挫败。 */
+  const aheadDepth = await env.DB.prepare(
+    `SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND (
+       lv>? OR (lv=? AND stars>?) OR (lv=? AND stars=? AND best_score>?)
+     )`
+  ).bind(merged.lv, merged.lv, merged.stars, merged.lv, merged.stars, merged.score).first();
+  const aheadPower = await env.DB.prepare(
     "SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND power>?"
   ).bind(myPower).first();
-  return json({ ok: true, power: myPower, rank: ((ahead && ahead.c) || 0) + 1,
+  return json({ ok: true, power: myPower, rank: ((aheadPower && aheadPower.c) || 0) + 1,
+    depthRank: ((aheadDepth && aheadDepth.c) || 0) + 1,
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
     classJoined, season: sea }, 200, origin);
 }
@@ -993,6 +1001,11 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 AND best_rush>0
        ORDER BY best_rush DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
+  } else if (scope === "depth") {
+    rows = await env.DB.prepare(
+      `SELECT ${cols} FROM gemfall WHERE hidden=0 AND lv>0
+       ORDER BY lv DESC, stars DESC, best_score DESC, alias ASC LIMIT ?`
+    ).bind(limit).all();
   } else if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
     if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
@@ -1007,7 +1020,7 @@ async function gfBoard(req, env, origin, url) {
   }
   /* 配速员只并进公开榜，不进带口令的历史私榜。 */
   let merged = rows.results || [];
-  if (scope !== "class" && await pacersOn(env)) {
+  if (scope !== "class" && scope !== "depth" && await pacersOn(env)) {
     const key = scope === "rush" ? "best_rush" : "power";   // 90 秒榜按矿灯排，不按矿力
     merged = merged.concat(pacerRows(Date.now()))
       .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)

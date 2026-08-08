@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-08-waystone-party-desk">
+<meta name="gemfall-release" content="2026-08-08-bright-pack-depth">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <!-- iOS 加到桌面后的启动过渡图。必须逐个屏幕尺寸写死，没有通配。
      只提供与母图宽高比一致（≈19.5:9）的机型，其余机型自动落回
-     manifest 的 background_color（#171310），与统一的曜石墨金底色一致，不会闪白。 -->
+     manifest 的 background_color（#4b4d78），与「晴岩琉彩」底色一致，不会闪白。 -->
 <link rel="apple-touch-startup-image" href="icons/splash-1320x2868.png" media="(device-width:440px) and (device-height:956px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
 <link rel="apple-touch-startup-image" href="icons/splash-1290x2796.png" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
 <link rel="apple-touch-startup-image" href="icons/splash-1284x2778.png" media="(device-width:428px) and (device-height:926px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
@@ -26,7 +26,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
-<meta name="theme-color" content="#111018">
+<meta name="theme-color" content="#4b4d78">
 <meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征 + 无尽矿脉 + 90 秒限时。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
 <meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯将熄限时局——一上手就停不下来。">
@@ -37,18 +37,18 @@
 <meta property="og:image" content="https://play.myskme.com/icons/og.png">
 <style>
 :root{
-  /* 「夜曜琉金」：墨蓝黑做底、暖金定主次、少量紫蓝作矿彩折光。
-     全部是静态色与渐变，不靠模糊和常驻动画换气氛。 */
-  --bg:#111018;--bg2:#171620;--panel:#1c1a25;--panel2:#24212e;--edge:#383346;
-  --ink:#f5eddf;--ink2:#c4b9aa;--ink3:#9c9388;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
-  --gold:#c9a657;--gold2:#f0d07b;--gold-hi:#f5dda0;--gold-line:#7f692d;
-  --prism:#8e7bd8;--prism2:#6fa6c9;
-  --red:#d56060;--green:#6aa86a;--blue:#6ba0dd;--purple:#c199e6;
-  --line:rgba(201,166,74,.22);--line2:rgba(201,166,74,.10);
-  --glow:0 0 24px rgba(201,166,74,.4);--glow-soft:0 0 14px rgba(201,166,74,.25);
-  --paper:#17151d;--noise-op:.12;--noise-blend:overlay;
+  /* 「晴岩琉彩」：用明亮的蓝紫岩层承接世界观，不再把整款三消压成黑夜。
+     暖金只负责主次，珊瑚与湖蓝负责亲和；仍只用静态渐变，照顾发热与续航。 */
+  --bg:#4b4d78;--bg2:#555883;--panel:#5d608c;--panel2:#696c99;--edge:#9192b9;
+  --ink:#fff9ef;--ink2:#e4deec;--ink3:#c1bdd2;   /* ink3 承载信息(轮次/段位/关卡数)，需过 AA 4.5:1 */
+  --gold:#edbd61;--gold2:#ffe3a0;--gold-hi:#fff0be;--gold-line:#a98038;
+  --prism:#b298f1;--prism2:#78c9e6;
+  --red:#f27f82;--green:#83c99a;--blue:#78bdf2;--purple:#c6a3f2;
+  --line:rgba(255,225,163,.30);--line2:rgba(255,255,255,.13);
+  --glow:0 0 24px rgba(237,189,97,.34);--glow-soft:0 0 14px rgba(237,189,97,.22);
+  --paper:#3b3c61;--noise-op:.055;--noise-blend:soft-light;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#0c0d13;--mine2:#12121a;--mine-edge:#343044;
+  --mine:#292b49;--mine2:#303252;--mine-edge:#676994;
 }
 
 /* ── 图标基线 ──
@@ -83,9 +83,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
    它让屏幕有了中心与边界，视线自然被收进画面里。 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;color-scheme:dark;
   background-image:
-    radial-gradient(720px 400px at 48% 1%,color-mix(in srgb,var(--gold) 19%,transparent),transparent 62%),
-    radial-gradient(680px 540px at 92% 58%,color-mix(in srgb,var(--prism) 8%,transparent),transparent 70%),
-    radial-gradient(1200px 900px at 50% 40%,transparent 32%,rgba(0,0,0,.58) 100%);
+    radial-gradient(720px 420px at 48% 0%,rgba(255,208,146,.24),transparent 64%),
+    radial-gradient(620px 520px at 100% 60%,rgba(120,201,230,.15),transparent 72%),
+    radial-gradient(560px 480px at 0% 72%,rgba(242,127,130,.11),transparent 72%),
+    linear-gradient(160deg,#66688f 0%,var(--bg) 48%,#41436d 100%);
   transition:background-color .35s,color .35s;
   -webkit-user-select:none;user-select:none;touch-action:manipulation}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:var(--noise-op);mix-blend-mode:var(--noise-blend);
@@ -93,8 +94,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 /* 环境光改为静态渐变。旧版用两块 46vmax 的模糊图层长驻漂移，
    在手机上会持续占用合成与纹理带宽，却几乎看不出差别。 */
 #amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
-  background:radial-gradient(55vmax 42vmax at 18% 18%,color-mix(in srgb,var(--gold) 6%,transparent),transparent 72%),
-             radial-gradient(48vmax 40vmax at 82% 76%,color-mix(in srgb,var(--prism2) 5%,transparent),transparent 74%)}
+  background:radial-gradient(55vmax 42vmax at 18% 18%,rgba(255,227,160,.09),transparent 72%),
+             radial-gradient(48vmax 40vmax at 82% 76%,rgba(120,201,230,.09),transparent 74%)}
 #amb i{display:none}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
@@ -110,12 +111,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
    一片软落影（离地）。这四层是「金属片」和「印刷框」的全部区别。 */
 .btn{font-family:var(--serif);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));
   color:var(--ink);padding:12px 22px;font-size:17px;letter-spacing:.14em;cursor:pointer;position:relative;
+  border-radius:12px;
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 14%,transparent),
              inset 0 -1px 0 rgba(0,0,0,.55),
              0 2px 0 rgba(0,0,0,.45),
              0 6px 16px rgba(0,0,0,.42);
   transition:transform .12s,box-shadow .12s,border-color .2s}
-.btn::after{content:'';position:absolute;inset:2px;pointer-events:none;border:1px solid rgba(255,255,255,.025)}
+.btn::after{content:'';position:absolute;inset:2px;pointer-events:none;border:1px solid rgba(255,255,255,.04);border-radius:9px}
 .btn:focus-visible,.iconbtn:focus-visible,.pt-chip:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
 .btn:hover{transform:translateY(-2px);border-color:var(--gold);
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--gold) 24%,transparent),
@@ -158,7 +160,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-modes .btn,.menu-dock .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 8px rgba(0,0,0,.35)}
 .btn.ghost{background:transparent;border-color:var(--line2);color:var(--ink2);font-size:14px;padding:9px 16px}
 .ornate{position:relative;border:1px solid var(--line)}
-.ornate::before,.ornate::after{content:'';position:absolute;width:14px;height:14px;border:1px solid var(--gold);transition:all .3s;pointer-events:none}
+.ornate::before,.ornate::after{display:none}
 .ornate::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
 .ornate::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
 .ornate:hover::before,.ornate:hover::after{width:24px;height:24px}
@@ -204,7 +206,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .wolf-badge{width:92px;height:92px;margin:4px auto 0;border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;
   transition:width .5s cubic-bezier(.16,1,.3,1),height .5s cubic-bezier(.16,1,.3,1);
   background:radial-gradient(ellipse at center,color-mix(in srgb,var(--gold) 14%,transparent),transparent 70%)}
-.wolf-badge.has-art{flex:none;width:min(150px,40vw,16dvh);height:min(170px,45vw,18.5dvh);border-color:var(--gold-line)}
+.wolf-badge.has-art{flex:none;width:min(126px,34vw,14dvh);height:min(138px,38vw,15.5dvh);border-color:var(--gold-line);border-radius:22px}
 .wolf-badge.has-art::before{inset:8px}
 .wolf-badge.has-art::after{inset:-9px}
 /* 底部渐隐，让立绘和背景融进去，不至于是一块硬边的方图 */
@@ -222,6 +224,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .wolf-badge:hover::before{opacity:.9;transform:rotate(45deg) scale(1.1)}
 .wolf-badge:hover b{transform:scale(1.12)}
 @keyframes spin{to{transform:rotate(360deg)}}
+.menu-cast{display:flex;justify-content:center;gap:7px;margin:0 auto 1px;min-height:38px}
+.menu-cast button{width:38px;height:38px;padding:0;border:1px solid var(--line2);border-radius:50%;overflow:hidden;
+  background:var(--panel);color:var(--ink3);position:relative;cursor:pointer;box-shadow:0 2px 7px rgba(28,28,55,.24)}
+.menu-cast button.has-art{background-size:cover;background-position:center 18%}
+.menu-cast button.sel{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(255,227,160,.18),0 3px 9px rgba(28,28,55,.28)}
+.menu-cast button.locked{opacity:.74;filter:saturate(.72)}
+.menu-cast button span{position:absolute;right:0;bottom:0;left:0;font-size:8px;line-height:13px;color:var(--ink);
+  background:rgba(41,43,73,.76)}
 .menu-btns{display:flex;flex-direction:column;gap:clamp(6px,1.1dvh,10px);margin-top:clamp(6px,1.4dvh,14px);width:min(360px,90vw)}
 .menu-btns .btn{width:100%;padding-top:clamp(6px,1dvh,11px);padding-bottom:clamp(6px,1dvh,11px);font-size:clamp(15px,2dvh,17px)}
 .menu-btns .btn .sub{margin-top:clamp(1px,.3dvh,3px)}
@@ -231,7 +241,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .btn .sub.warn{color:var(--gold2)}                 /* 有成绩没传上去时描金提醒 */
 .btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
-.menu-modes,.menu-dock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.menu-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.menu-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
 .menu-modes .btn{padding:clamp(8px,1.2dvh,12px) 4px;font-size:13px;letter-spacing:.04em;white-space:nowrap}
 .menu-modes .btn .ic{display:none}
 .menu-modes .btn .sub{font-size:9px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -244,6 +255,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .menu-help:hover{color:var(--gold2)}
 #menu-stats{margin-top:clamp(4px,1dvh,10px);font-size:13px;color:var(--ink2);letter-spacing:.1em}
 #menu-stats b{color:var(--gold);font-weight:500}
+.pack-grid{margin-top:14px;text-align:left}
+.pack-guide{padding:14px;border:1px solid color-mix(in srgb,var(--prism2) 48%,var(--line));border-radius:15px;
+  background:linear-gradient(135deg,rgba(120,201,230,.12),rgba(178,152,241,.10))}
+.pack-guide-hd{display:flex;align-items:center;gap:11px}
+.pack-guide-mark{width:46px;height:46px;display:flex;align-items:center;justify-content:center;flex:none;border-radius:14px;
+  color:var(--gold2);background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.pack-guide-mark .ic{width:27px;height:27px}
+.pack-guide-copy{flex:1;min-width:0}.pack-guide-copy b{display:block;color:var(--ink);font-size:16px;font-weight:500}
+.pack-guide-copy span{display:block;color:var(--ink3);font-size:11.5px;line-height:1.6;margin-top:2px}
+.pack-progress{height:7px;margin-top:11px;border-radius:8px;background:rgba(25,26,48,.38);overflow:hidden}
+.pack-progress i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--prism2),var(--gold2))}
+.pack-note{font-size:11px;line-height:1.7;color:var(--ink3);margin-top:8px}
+.pack-items{margin-top:12px;border-top:1px solid var(--line)}
+.pack-row{display:grid;grid-template-columns:32px 1fr auto;gap:9px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line2)}
+.pack-ic{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
+.pack-ic .ic{width:18px;height:18px}.pack-copy b{display:block;font-size:13px;font-weight:500;color:var(--ink)}
+.pack-copy span{display:block;font-size:10.5px;color:var(--ink3);line-height:1.55}.pack-count{font-size:16px;color:var(--gold2);font-variant-numeric:tabular-nums}
 .menu-foot{margin-top:clamp(3px,.8dvh,10px);font-size:12px;color:var(--ink3);letter-spacing:.1em;line-height:1.65;
   padding:0 52px;text-align:center}
 .menu-foot a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
@@ -618,8 +646,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .lb-row .nm{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-row .sub{font-size:11px;color:var(--ink3);letter-spacing:.04em;margin-top:1px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* 坐着首座的人，副行整行走金色 —— 那是这一行唯一值得说的事 */
-.lb-row .sub.thr{color:var(--gold2)}
 .lb-row .pw{flex:none;text-align:right}
 .lb-row .pv{font-size:15px;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.2}
 .lb-row .pl{font-size:10px;color:var(--ink3);letter-spacing:.16em}
@@ -918,20 +944,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opa
   padding:3px 8px;cursor:pointer;z-index:2}
 .lc-x:active{transform:translateY(1px)}
 .lc{position:relative}
-/* 四座压成 2×2 荣誉席：保住身份感，不再附一整段机制说明。 */
-.lb-honors{margin:0 0 12px;padding:7px;border:1px solid var(--gold-line);
-  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 8%,transparent),transparent)}
-.thr-hd{font-size:9.5px;color:var(--gold2);letter-spacing:.3em;text-align:center;margin-bottom:5px}
-.thr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.thr-r{min-width:0;padding:5px 3px;border:1px solid var(--line2);background:var(--bg2);text-align:center}
-.thr-n{display:block;font-size:8.5px;color:var(--ink3);letter-spacing:.02em;white-space:nowrap}
-.thr-r b{display:block;margin-top:2px;color:var(--gold2);font-size:10.5px;letter-spacing:.02em;
-  font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* 虚位：压暗但不隐藏 —— 「这个座还没人坐」是号召，不是缺陷 */
-.thr-r.vac b{color:var(--ink3);font-weight:400}
-.thr-r.vac{opacity:.72}
-/* 坐着座的人，名字前面点一颗 */
-.lb-row .thr-mk{color:var(--gold2);margin-right:3px;font-size:11px}
 /* ── 数字排版统一 ──
    全站有 64 处 toLocaleString 出来的**会变的数字**（矿力、价格、余额、差距、
    贡献值…），但原来只有 12 处设了 tabular-nums。等宽数字不是审美讲究：
@@ -1048,7 +1060,7 @@ body{--shk:4px}
   background:color-mix(in srgb,var(--bg) 62%,transparent)}
 /* 弹层用更深的静态遮罩分层。移除 backdrop-filter：手机上每一帧重算背后像素，
    成本高于这点视觉收益，尤其聚会赛频繁开合弹层时更没必要。 */
-.ovl{background:rgba(4,4,8,.84)}
+.ovl{background:rgba(31,32,62,.80)}
 .ovl.on{display:flex}
 /* 弹层是「从矿脉里取出来的一块牌子」，不是一张飘着的纸：
    顶沿受矿灯的光、底沿转暗、外面一圈金线封边、下面一片深影托住。
@@ -1056,7 +1068,7 @@ body{--shk:4px}
      所以受光/背光两道做在 ::before 的固定描边上，不用 inset。 */
 .ovl-card{width:min(400px,94vw);max-height:88dvh;overflow-y:auto;border:1px solid var(--line);
   background:linear-gradient(180deg,var(--panel2),var(--panel));
-  padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;
+  padding:26px 22px;text-align:center;position:relative;animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;border-radius:18px;
   box-shadow:0 0 0 1px rgba(201,166,74,.10),
              0 4px 0 rgba(0,0,0,.4),
              0 24px 66px rgba(0,0,0,.62)}
@@ -1065,8 +1077,7 @@ body{--shk:4px}
   border-bottom:1px solid rgba(0,0,0,.55)}
 @keyframes cardIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .ovl-card::before,.ovl-card::after{content:'';position:absolute;width:16px;height:16px;border:1px solid var(--gold);pointer-events:none}
-.ovl-card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
-.ovl-card::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.ovl-card::before,.ovl-card::after{display:none}
 .ovl-kick{font-size:11px;letter-spacing:.4em;color:var(--ink3)}
 .ovl-title{font-size:27px;font-weight:300;letter-spacing:.2em;margin:8px 0 2px}
 .ovl-title em{font-style:normal;color:var(--gold)}
@@ -1341,6 +1352,7 @@ body{--shk:4px}
       <svg viewBox="0 0 100 100"><path fill="currentColor" d="M22 78 Q18 54 30 40 Q26 26 34 16 Q44 24 46 32 Q50 30 54 30 Q58 30 62 32 Q64 24 74 16 Q82 26 78 40 Q90 54 86 78 Q70 70 54 71 Q38 70 22 78 Z M54 50 Q60 56 68 56 M54 50 Q48 56 40 56"/></svg>
       <b>狼</b>
     </div>
+    <div class="menu-cast" id="menu-cast" aria-label="远征同行"></div>
     <div class="menu-btns">
       <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
       <div class="menu-modes">
@@ -1349,7 +1361,8 @@ body{--shk:4px}
         <button class="btn ornate" id="btn-quest">挑战<span id="quest-dot"></span><span class="sub">每日三桩</span></button>
       </div>
       <div class="menu-dock">
-        <button class="btn ghost" id="btn-lb">矿脉榜<span id="lb-dot"></span></button>
+        <button class="btn ghost" id="btn-pack">行囊<span id="pack-dot"></span></button>
+        <button class="btn ghost" id="btn-lb">远征榜<span id="lb-dot"></span></button>
         <button class="btn ghost" id="btn-ach">生涯</button>
         <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
       </div>
@@ -1807,12 +1820,23 @@ body{--shk:4px}
   <div class="ovl-btns"><button class="btn primary" id="install-close">明 白 了</button></div>
 </div></div>
 
-<!-- 矿脉榜 -->
+<!-- 行囊：只归拢已有资源与引路晶进度，不再造一套平行货币。 -->
+<div class="ovl" id="ovl-pack"><div class="ovl-card">
+  <div class="ovl-kick">EXPEDITION PACK</div>
+  <div class="ovl-title">远征 · <em>行囊</em></div>
+  <div id="pack-body"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="pack-col">查看典藏</button>
+    <button class="btn primary" id="pack-close">收好</button>
+  </div>
+</div></div>
+
+<!-- 远征榜 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
   <div class="ovl-kick">GEMFALL LEADERBOARD</div>
-  <div class="ovl-title">矿脉 · <em>榜</em></div>
+  <div class="ovl-title">远征 · <em>榜</em></div>
   <div class="lb-tabs">
-    <button data-scope="world" class="on">世界榜</button>
+    <button data-scope="depth" class="on">闯关</button>
     <button data-scope="rush">90 秒</button>
     <button data-scope="camp">阵营</button>
   </div>
@@ -5650,11 +5674,39 @@ function guideCanUse(n){
   const g=SAVE.guide||{};
   return GS.mode==='adv'&&!GS.L.endless&&n>=1&&n<64&&n===SAVE.lv&&(g.n||0)>0;
 }
+function guideState(n){
+  const g=SAVE.guide||(SAVE.guide={n:0,earned:{},bypass:{}}), lv=SAVE.lv||1;
+  n=clamp(+n||Math.min(lv,64),1,64);
+  const ch=guideChapter(n), fails=Math.min(4,SAVE.fails[n]||0);
+  if((g.n||0)>0)return {mode:'ready',n,ch,fails:4,title:'引路晶已苏醒',desc:'下次在卡关结算页可直接借道下一关。',pct:100};
+  if(lv>64)return {mode:'done',n:64,ch:8,fails:4,title:'主线已经贯通',desc:'引路晶完成了它的使命。',pct:100};
+  if(g.earned&&g.earned[ch])return {mode:'used',n,ch,fails:4,title:'本章晶光已用',desc:'补通借道关后，闯关记录会自动恢复完整。',pct:100};
+  return {mode:'progress',n,ch,fails,title:'引路晶共鸣 '+fails+' / 4',
+    desc:fails?'再完整挑战 '+(4-fails)+' 次仍未通过，它会自动苏醒。':'卡住时它会悄悄记录完整挑战，不必手动激活。',pct:fails*25};
+}
 function guideRender(n,gained){
   const el=$('#end-waystone'), can=guideCanUse(n);
   el.classList.toggle('on',can);
   $('#end-guide').disabled=!can;
   if(can)el.querySelector('.copy b').textContent=gained?'引路晶 · 此刻苏醒':'引路晶 · 一枚在手';
+}
+function renderPack(){
+  colFix();
+  const st=guideState(Math.min(SAVE.lv||1,64));
+  const row=(ic,nm,tip,n)=>'<div class="pack-row"><div class="pack-ic">'+icTag(ic)+'</div>'
+    +'<div class="pack-copy"><b>'+nm+'</b><span>'+tip+'</span></div><div class="pack-count">'+n+'</div></div>';
+  $('#pack-body').innerHTML='<div class="pack-grid"><div class="pack-guide"><div class="pack-guide-hd">'
+    +'<div class="pack-guide-mark">'+icTag('waystone')+'</div><div class="pack-guide-copy"><b>'+st.title+'</b><span>'+st.desc+'</span></div></div>'
+    +'<div class="pack-progress"><i style="width:'+st.pct+'%"></i></div>'
+    +'<div class="pack-note">每章最多苏醒一枚，行囊最多一枚；只借道，不补星、不加分，也不计入闯关榜。</div></div>'
+    +'<div class="pack-items">'
+    +row('pick','矿镐','点掉一枚灵石或一层机关',toolCount('pick'))
+    +row('swap','换位符','交换任意两枚相邻灵石',toolCount('swap'))
+    +row('mix','重整令','重排棋盘，保留本局进度',toolCount('mix'))
+    +row('lamp','备用灯油','漏领一天时自动护住连续记录',(SAVE.daily&&SAVE.daily.oil)||0)
+    +row('box','典藏匣','打开可得角色、风物与器物典藏',COLS.box||0)
+    +row('dust','星屑','月结与典藏重复转化所得',COLS.dust||0)
+    +'</div></div>';
 }
 function guideUse(){
   const n=GS.L&&GS.L.n,g=SAVE.guide;
@@ -5781,6 +5833,12 @@ function endLevel(win){
   guideRender(n,!win&&guideGained);
   renderTools();
   ovl('end');
+  if(!win&&GS.mode==='adv'&&!L.endless&&n===SAVE.lv&&n<64){
+    const st=guideState(n);
+    setTimeout(()=>toast(icTag('waystone')+' '+(guideGained
+      ?'<b>引路晶已苏醒</b> · 现在可借道下一关'
+      :'引路晶共鸣 <b>'+st.fails+' / 4</b> · 可在行囊查看'),3000),420);
+  }
 }
 /* 原点以前写死 #ovl-end .ovl-card。那个弹层没开时 display:none，
    rect 全是 0，18 颗碎屑就从屏幕左上角喷出去——领每日矿灯、开星辰宝箱
@@ -6247,7 +6305,7 @@ const LB_NET=(()=>{
 const LB_LIMIT=50;              // 榜单一次取多少行；贴身对手判断「榜满没满」也要用它
 const LB={
   bases:LB_NET.bases,
-  scope:'world',
+  scope:'depth',
   baseOrder(){
     const xs=this.bases.slice(), h=SAVE.lbApiHint;
     if(h&&xs.includes(h)&&Date.now()-(SAVE.lbApiAt||0)<LB_NET.hintMs){
@@ -6341,11 +6399,11 @@ const LB={
     const d=await this.fetchJSON('/gf/submit',
       {method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify(body)},15000);
     if(d.ok){
-      SAVE.lbPower=d.power;SAVE.lbRank=d.rank;SAVE.lbRankName=d.rankName;
+      SAVE.lbPower=d.power;SAVE.lbRank=d.depthRank||d.rank;SAVE.lbRankName=d.rankName;
       if(d.tag)SAVE.lbTag=d.tag;                               // 同名区分用
       campLogParticipation();                                  // 只在服务端确认收到成绩后记当月参与
       SAVE.lbAt=Date.now();persist();
-      if(!silent)toast('已上榜 · <b>'+d.rankName+'</b> 世界第 <b>'+d.rank+'</b>',2600);
+      if(!silent)toast('远征成绩已同步 · 闯关榜第 <b>'+(d.depthRank||d.rank)+'</b>',2600);
     }else if(!silent&&d.err&&!d.offline)toast(d.err);
     return d;
   },
@@ -6459,38 +6517,27 @@ function lbMenuStatus(){
   el.classList.remove('warn');
   /* 没选边就一直挂着这句，直到他选了为止——这是全站第二处提及阵营 */
   if(!(SAVE.camp&&SAVE.camp.side)){
-    el.innerHTML=(SAVE.lbPower?('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '):'')
-      +'<b>还没选挖法</b>';
+    el.innerHTML='闯关成绩已同步 · <b>还没选阵营</b>';
     el.classList.add('warn');return;
   }
-  el.textContent=SAVE.lbPower
-    ? ('矿力 '+SAVE.lbPower.toLocaleString('en-US')+' · '+(SAVE.lbRankName||'')+' · 已同步')
-    : '听听两营的月下回声';
+  el.textContent='第 '+LB.stats().lv+' 关 · 远征成绩已同步';
 }
-function lbRowHTML(r,mine,throne){
+function lbRowHTML(r,mine){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
-  /* ── 副行只放段位与本模式最相关的一项 ──
-     以前一行塞五样（首座·段位·社交组·关卡·星数），375px 宽的手机上
-     实测 27 行裁了 7 行，最狠的裁掉 215px —— 玩家看到的是半截话。
-     根子是「行」和「名片」抢活干：行是一眼扫的摘要，名片才是细账，
-     而名片现在点一下就开。首座身份已在上方荣誉席出现，行内只用一颗菱形标记，
-     不再把四个席位名称重复写一遍；其余细账进名片。 */
-  const sub=LB.scope==='rush'
-    /* 90 秒榜上「走到第几关」没意义，换成能说明这一局的：最长连锁 */
-    ? [r.rankName,r.chain?('最长 '+r.chain+' 连'):''].filter(Boolean).join(' · ')
-    : [r.rankName,r.lv?('第 '+r.lv+' 关'):''].filter(Boolean).join(' · ');
+  const rush=LB.scope==='rush';
+  const c=r.comp&&compById(r.comp);
+  const sub=rush
+    ? [r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+    : ['★ '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
-      +(throne?'<span class="thr-mk" title="'+esc(throne)+'">\u25c6</span>':'')
       +esc(r.alias)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
     +'<div class="sub">'+esc(sub)+'</div></div>'
-    /* 90 秒榜比的是单局矿灯，右列就该显示矿灯分 —— 显示矿力的话，
-       玩家会以为榜没排对（第一名的矿力可能比第二名低）。 */
-    +(LB.scope==='rush'
+    +(rush
       ? '<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">矿灯</div></div>'
-      : '<div class="pw"><div class="pv">'+(Number(r.power)||0).toLocaleString('en-US')+'</div><div class="pl">矿力</div></div>')
+      : '<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')
     +'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
@@ -6502,68 +6549,36 @@ function lbRowHTML(r,mine,throne){
    也是「我该往哪使劲」最有说服力的教具 —— 看到榜首的勤勉是自己的三倍，
    比任何说明文字都管用。 */
 function lbCardHTML(r){
-  const L=pwLines({lv:r.lv||0,stars:r.stars||0,chain:r.chain||0,score:r.score||0,
-    rush:r.rush||0,mv:r.mv||0,runs:r.runs||0,days:r.days||0,dbest:r.dbest||0});
-  const tot=L.depth+L.skill+L.grind, mn=Math.min(L.depth,L.skill,L.grind);
-  const bar=(k,nm,v)=>{
-    const pc=tot?Math.round(v/Math.max(L.depth,L.skill,L.grind)*100):0;
-    return '<div class="lc-l"><span>'+nm+(v===mn?' <i>短板</i>':'')+'</span>'
-      +'<b>'+v.toLocaleString('en-US')+'</b></div>'
-      +'<div class="lc-bar"><i style="width:'+pc+'%"></i></div>';
-  };
   const row=(k,v)=>v?('<div class="lc-r"><span>'+k+'</span><b>'+v+'</b></div>'):'';
-  /* ── 跟「我」的对照 ──
-     名片只报数字的话，玩家看完不知道这跟自己有什么关系。
-     最有用的一句是「他强在哪、我差多少、我能不能追」——
-     所以把三条线逐条跟自己比，并把**差距换算成天数**（按实测每天约涨 1264）。
-     看自己的名片时这一段不出现（跟自己比没有意义）。 */
   const me=LB_ROWS&&LB_ROWS.find(x=>x.alias===SAVE.lbAlias
     &&(!SAVE.lbTag||!x.tag||x.tag===SAVE.lbTag));
   let cmp='';
   if(me&&me!==r&&LB.registered()){
-    const M=pwLines({lv:me.lv||0,stars:me.stars||0,chain:me.chain||0,score:me.score||0,
-      rush:me.rush||0,mv:me.mv||0,runs:me.runs||0,days:me.days||0,dbest:me.dbest||0});
-    const gap=(Number(r.power)||0)-(Number(me.power)||0);
-    const NM={depth:'走多远',skill:'打多险',grind:'来多勤'};
-    /* 找出「我比他强的那条」——哪怕总分落后，也总有一条是自己占优的，
-       这句话比单纯报差距更让人想继续。 */
-    let win='';
-    for(const k of ['depth','skill','grind'])if(M[k]>L[k]){win=NM[k];break}
-    cmp='<div class="lc-cmp">'
-      +(gap>0
-        ? '他比你多 <b>'+gap.toLocaleString('en-US')+'</b> 矿力 · 按你现在的节奏约 <b>'
-          +Math.max(1,Math.ceil(gap/1264))+'</b> 天追平'
-        : gap<0
-          ? '你比他多 <b>'+(-gap).toLocaleString('en-US')+'</b> 矿力'
-          : '你们打平')
-      +(win?'<br>你的「<b>'+win+'</b>」比他强':'')
-      +'</div>';
+    const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0), starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
+    cmp='<div class="lc-cmp">'+(lvGap>0
+      ? '再通 <b>'+lvGap+'</b> 关，就到他的远征位置'
+      : lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关'
+      : starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
   }
+  const c=r.comp&&compById(r.comp);
   return '<div class="lc">'
     +'<button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
       +'<div class="lc-nm">'+esc(r.alias||'')+'</div>'
-      +'<div class="lc-tt">'+esc(r.rankName||'')+'</div>'
-    /* 同伴摆出来 —— 周赛给了同伴被动之后，「谁强」必须公开，
-       否则就是藏起来的暗亏。摆出来它才会变成群里的战术讨论。 */
-    +(r.comp&&compById(r.comp)
-      ? '<div class="lc-comp">同行 · <b>'+esc(compById(r.comp).name)+'</b> '
-        +esc(compById(r.comp).title)+'</div>'
+      +'<div class="lc-tt">远征记录</div>'
+    +(c
+      ? '<div class="lc-comp">同行 · <b>'+esc(c.name)+'</b> '+esc(c.title)+'</div>'
       : '')
     +'</div>'
-    +'<div class="lc-pw">'+(Number(r.power)||0).toLocaleString('en-US')+'<span>矿力</span></div>'
-    +'<div class="lc-lines">'+bar('depth','走多远',L.depth)+bar('skill','打多险',L.skill)
-      +bar('grind','来多勤',L.grind)+'</div>'
+    +'<div class="lc-pw">第 '+(Number(r.lv)||0)+' 关<span>真实闯关进度</span></div>'
     +'<div class="lc-grid">'
-      +row('关卡',r.lv?('第 '+r.lv+' 关'):'')
       +row('星数',r.stars?('★ '+r.stars):'')
       +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
       +row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):'')
       +row('最长连锁',r.chain?(r.chain+' 重'):'')
       +row('到场天数',r.days?(r.days+' 天'):'')
       +row('累计局数',r.runs?(r.runs+' 局'):'')
-      +row('连续纪录',r.dbest?(r.dbest+' 天'):'')
-      +row('开出臻卡',r.luck?(r.luck+' 张'):'')
+      +row('连续记录',r.dbest?(r.dbest+' 天'):'')
     +'</div>'+cmp+'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -6736,10 +6751,8 @@ function drawNameCard(){
   x.fillStyle=DIM;x.font='400 15px serif';
   colFix();shopFix();
   x.fillText('同行第 '+Math.max(1,dayNum()-(SAVE.firstDay||dayNum())+1)+' 天',mid,172);
-  /* 工坊刻下的题名会进入可导出的名片，
-     也是「花了钱别人看得见」这件事唯一不需要动服务端就能成立的地方。
-     坐着首座的话，首座压过题名显示 —— 那是争来的，比买来的重。 */
-  const _tt=(THR_MINE&&THR_MINE.length?THR_MINE[0]:'')||shopTitle();
+  /* 工坊刻下的题名会进入可导出的名片。排行榜四座退役后，名片只显示玩家自己选的题名。 */
+  const _tt=shopTitle();
   if(_tt){x.fillStyle=GOLD2;x.font='400 16px serif';x.fillText('· '+_tt+' ·',mid,196);x.fillStyle=INK}
   /* 灯位是名片的主徽 */
   x.fillStyle=GOLD;x.font='400 17px serif';
@@ -7052,15 +7065,8 @@ async function renderLB(){
   }
   msg.textContent='';
   const myIdx=rows.findIndex(lbIsMe);
-  /* 四座只属于世界榜；90 秒榜只谈这一局，不混入累计矿力荣誉。 */
-  const thr=LB.scope==='world'?thronesOf(rows):{}, thrBy={};
-  for(const t of THRONES)if(thr[t.k]){
-    const k=thr[t.k].alias+'|'+(thr[t.k].tag||'');
-    (thrBy[k]=thrBy[k]||[]).push(t.nm);
-  }
-  if(LB.scope==='world')throneMine(rows);else THR_MINE=[];
   LB_ROWS=rows;                                   // 点开名片时按 rank 查这一份
-  list.innerHTML=lbBoardHTML(rows,myIdx,thrBy);
+  list.innerHTML=lbBoardHTML(rows,myIdx);
   /* 事件挂在容器上：紧凑榜重渲染时不用逐行重新接线。 */
   if(!list.__cardWired){
     list.__cardWired=true;
@@ -7145,72 +7151,11 @@ function campEchoHTML(){
     +(side?(' · 你以 '+esc((campById(side)||{}).nm||'')+' 参与'+(add?(' · 星屑 +'+add):'')):'')
     +'<br>月内成功上榜即算参与：参与 40，胜方 100。</div>';
 }
-/* ────────── 三线首座 ──────────
-   王老师要「积分第一的闪耀称号」，同时要「人人都有机会去争夺」。
-   这两条本来矛盾：一个第一名只能有一个人。
-
-   解法是矿力本来就拆成了三条线，所以设**三个王座**而不是一个：
-     深度首座（走多远）／ 技巧首座（打多险）／ 勤勉首座（来多勤）
-   三个人，三种活法。而**勤勉那条每天封顶**——榜首一天最多也就那么多，
-   结构上快不过一个天天来的新人。它天生就是「人人都能争」的那一条。
-
-   这也是「世界公告」最便宜的形态：不建表、不加路由、不存事件，
-   全部由榜单已有的数据当场算出来，人人看到的是同一份。 */
-/* 四条路，四种活法，**一个人可以全占**。
-   王老师定的调子是阴阳师那种：只要肯肝就一定有回报，愚公移山也算数 ——
-   所以骨灰级玩家把四个座全坐了，那是他该得的，不该被规则拦下来。
-   「人人有机会」靠的不是限座，是**四条路的门槛完全不同**：
-     深度 = 走得远，最吃时间累积
-     技巧 = 打得险，吃真本事，一次高连锁就能顶上去
-     勤勉 = 来得勤，每天封顶，谁也快不过谁，比的是不断
-     运数 = 开匣开出的臻卡，3% 掉率，纯手气，新人第一天就可能撞上
-   最后一条是刻意留的那扇窗：它跟投入完全无关，谁都有份。 */
-const THRONES=[
-  {k:'depth',nm:'深度首座',w:'走得最远的人'},
-  {k:'skill',nm:'技巧首座',w:'打得最险的人'},
-  {k:'grind',nm:'勤勉首座',w:'来得最勤的人'},
-  {k:'luck', nm:'运数首座',w:'手气最好的人'},
-];
-function thronesOf(rows){
-  const out={};
-  for(const t of THRONES){
-    let best=null,bv=0;
-    for(const r of (rows||[])){
-      /* 配速员不占座。四座是真人争来的东西，让一个算出来的名字坐上去，
-         就等于从真人手里拿走了一样东西 —— 那是这套机制唯一不能碰的红线。 */
-      if(r.bot)continue;
-      const v=t.k==='luck'?(r.luck||0)
-        :pwLines({lv:r.lv||0,stars:r.stars||0,chain:r.chain||0,score:r.score||0,
-          rush:r.rush||0,mv:r.mv||0,runs:r.runs||0,days:r.days||0,dbest:r.dbest||0})[t.k];
-      /* 并列时先到者居前（榜单本就按矿力降序）。一个座位就是一个人，含糊反而不激励。 */
-      if(v>bv){bv=v;best=r}
-    }
-    if(best&&bv>0)out[t.k]={alias:best.alias,tag:best.tag||'',v:bv};
-  }
-  return out;
-}
-function throneHTML(rows){
-  const th=thronesOf(rows);
-  if(!THRONES.some(t=>th[t.k]))return '';
-  return '<div class="lb-honors"><div class="thr-hd">荣 誉 席</div><div class="thr-grid">'
-    +THRONES.map(t=>'<div class="thr-r'+(th[t.k]?'':' vac')+'"><span class="thr-n">'+t.nm+'</span>'
-      +'<b>'+(th[t.k]?esc(th[t.k].alias):'虚位以待')+'</b></div>').join('')
-    +'</div></div>';
-}
-/* 我坐着哪几个座？名片与榜单上都要闪。 */
-let THR_MINE=[];
-function throneMine(rows){
-  const th=thronesOf(rows), me=SAVE.lbAlias||'';
-  THR_MINE=THRONES.filter(t=>th[t.k]&&th[t.k].alias===me
-    &&(!SAVE.lbTag||!th[t.k].tag||th[t.k].tag===SAVE.lbTag)).map(t=>t.nm);
-  return THR_MINE;
-}
 const lbIsMe=r=>!!(r&&r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
-function lbBoardHTML(rows,myIdx,thrBy){
-  const row=r=>lbRowHTML(r,lbIsMe(r),(thrBy[(r.alias||'')+'|'+(r.tag||'')]||[]).join(' · '));
+function lbBoardHTML(rows,myIdx){
+  const row=r=>lbRowHTML(r,lbIsMe(r),'');
   const top=rows.slice(0,3);
-  let h=LB.scope==='world'?throneHTML(rows):'';
-  h+='<div class="lb-group"><div class="lb-gh"><span>榜首</span><i>点名字看名片</i></div>'
+  let h='<div class="lb-group"><div class="lb-gh"><span>榜首</span><i>点名字看名片</i></div>'
     +top.map(row).join('')+'</div>';
   if(myIdx>=3){
     const near=rows.slice(Math.max(3,myIdx-1),Math.min(rows.length,myIdx+2));
@@ -7225,20 +7170,26 @@ function lbMineHTML(rows,myIdx){
     ?'本机 90 秒最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 起个化名就能上榜'
     :'本机已到第 <b>'+s.lv+'</b> 关 · 起个化名就能上榜';
   if(myIdx>=0){
-    const me=rows[myIdx], up=rows[myIdx-1], key=rush?'rush':'power';
+    const me=rows[myIdx], up=rows[myIdx-1], key=rush?'rush':'lv';
     const val=Number(me[key])||0;
     if(up){
-      const gap=Math.max(1,(Number(up[key])||0)-val+1);
-      return '我的位置 · 第 <b>'+me.rank+'</b> 名　'+(rush?'90 秒 ':'矿力 ')
-        +'<b>'+val.toLocaleString('en-US')+'</b><br>再多 <b>'+gap.toLocaleString('en-US')
-        +'</b> 就能越过 '+esc(up.alias||'上一名');
+      if(rush){
+        const gap=Math.max(1,(Number(up.rush)||0)-val+1);
+        return '我的位置 · 第 <b>'+me.rank+'</b> 名　90 秒 <b>'+val.toLocaleString('en-US')
+          +'</b><br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 就能越过 '+esc(up.alias||'上一名');
+      }
+      const lvGap=(Number(up.lv)||0)-val, starGap=(Number(up.stars)||0)-(Number(me.stars)||0);
+      return '我的位置 · 第 <b>'+me.rank+'</b> 名　已到第 <b>'+val+'</b> 关<br>'
+        +(lvGap>0?'再通 <b>'+lvGap+'</b> 关可追到 '+esc(up.alias||'上一名')
+          :starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平 '+esc(up.alias||'上一名')
+          :'下一次通关就有机会前进');
     }
     const dn=rows[1], lead=dn?val-(Number(dn[key])||0):0;
-    return '我的位置 · <b>榜首</b>　'+(rush?'90 秒 ':'矿力 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
-      +(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b>':'');
+    return '我的位置 · <b>榜首</b>　'+(rush?'90 秒 ':'第 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
+      +(rush?'':' 关')+(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b> '+(rush?'分':'关'):'');
   }
   if(rows.length>=LB_LIMIT){
-    const key=rush?'rush':'power', mine=rush?s.rush:(Number(SAVE.lbPower)||0);
+    const key=rush?'rush':'lv', mine=rush?s.rush:s.lv;
     const last=Number((rows[rows.length-1]||{})[key])||0, gap=last-mine+1;
     if(gap>0)return '我的位置 · 榜外<br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 可进前 '+rows.length;
   }
@@ -7346,6 +7297,25 @@ function show(id){
 function ovl(id){
   for(const o of $$('.ovl'))o.classList.toggle('on',o.id==='ovl-'+id);
 }
+function renderMenuCast(){
+  const box=$('#menu-cast');if(!box)return;
+  box.innerHTML='';
+  for(const c of COMPANIONS){
+    const b=document.createElement('button'), unlocked=compUnlocked(c);
+    b.type='button';b.dataset.comp=c.id;b.title=unlocked?(c.name+' · '+c.title):('第 '+c.unlock+' 关解锁');
+    b.className=(SAVE.comp===c.id?'sel ':'')+(unlocked?'':'locked');
+    b.textContent=c.g;
+    const nm=document.createElement('span');nm.textContent=c.name;b.appendChild(nm);
+    applyArt(b,'ally_'+c.id);
+    b.onclick=()=>{
+      SFX.click();
+      if(!unlocked){toast('第 <b>'+c.unlock+'</b> 关后可与 '+esc(c.name)+' 同行');return}
+      SAVE.comp=c.id;persist();renderMenuCast();
+      toast('已请 <b>'+esc(c.name)+'</b> 同行 · '+esc(c.title),1900);
+    };
+    box.appendChild(b);
+  }
+}
 function renderMenu(){
   const n=Math.min(SAVE.lv,65);
   const L=n>64?null:levelDef(n);
@@ -7358,6 +7328,9 @@ function renderMenu(){
   $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'　典藏 <b>'+colGot()+'</b> / '+CARDS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
+  renderMenuCast();
+  const gst=guideState(Math.min(SAVE.lv||1,64));
+  $('#pack-dot').innerHTML=gst.mode==='ready'?'<i class="dot"></i>':'';
   /* 只有真正已拥有但未开的匣才点亮典藏入口。 */
   $('#col-dot').innerHTML=COLS.box>0?'<i class="dot"></i>':'';
   /* 本周还没下过矿就点一颗，提醒有新一期。打过之后熄掉，不做持续骚扰。 */
@@ -7546,14 +7519,14 @@ function renderShop(){
   $('#shop-mine').innerHTML='<div class="sp-bal">灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')
     +'</b>　星屑 <b>'+(COLS.dust||0).toLocaleString('en-US')+'</b></div>'
     +'<div class="sp-note">三层、八件，没有限时折扣、月配额或随机轮换。<br>'
-      +'矿力只是<b>门槛</b>，兑换不扣矿力；辉面只改棋盘外观，不改成绩。</div>';
+      +'远征资历只是<b>门槛</b>，兑换不会扣减；辉面只改棋盘外观，不改成绩。</div>';
   let h='';
   for(let i=0;i<SHELF.length;i++){
     const sh=SHELF[i], open=pw>=sh.p, list=GOODS.filter(g=>g.s===i);
     /* 只设三个清晰门槛，未解锁层照常显示真名与作用。 */
     h+='<div class="sp-shelf'+(open?'':' lock')+'">'
       +'<div class="sp-hd"><span class="sp-nm">'+esc(sh.nm)+'</span>'
-      +'<span class="sp-gate">'+(open?'已开':'矿力 '+sh.p.toLocaleString('en-US')
+      +'<span class="sp-gate">'+(open?'已开':'资历 '+sh.p.toLocaleString('en-US')
         +' · 还差 '+(sh.p-pw).toLocaleString('en-US'))+'</span></div>';
     if(!list.length){h+='</div>';continue}
     for(const g of list){
@@ -7826,7 +7799,7 @@ const HOW_HTML=`
 典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
-<b>矿脉榜</b>　起个化名就能和别人比矿力。矿力看的是<b>走了多远</b>（星数与关卡）加上<b>打得多好</b>（最佳分数与最长连锁）。
+<b>远征榜</b>　起个化名就能比较真实闯关进度：先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
@@ -7985,12 +7958,15 @@ $('#col-esc').addEventListener('click',()=>{
 });
 $('#btn-install').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('install')});
 $('#install-close').addEventListener('click',()=>{SFX.click();ovl(null)});
+$('#btn-pack').addEventListener('click',()=>{SFX.click();renderPack();ovl('pack')});
+$('#pack-close').addEventListener('click',()=>{SFX.click();ovl(null);renderMenu()});
+$('#pack-col').addEventListener('click',()=>{SFX.click();openCol()});
 /* 还没选边的人直接落在阵营页。以前永远开在世界榜，选边要走三步
    （点矿脉榜 → 意识到顶上三个标签能点 → 点中间那个），全站再无第二处提及，
    结果线上 17 人有 15 人没选过边——他们连入营选择器长什么样都没见过。 */
 $('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');
   const s=LB.stats();
-  LB.scope=(!(SAVE.camp&&SAVE.camp.side)&&(s.lv>0||s.rush>0))?'camp':'world';
+  LB.scope=(!(SAVE.camp&&SAVE.camp.side)&&(s.lv>0||s.rush>0))?'camp':'depth';
   LB.flush('open');loadMonths();renderLB()});
 /* 唤醒时机：联网恢复 / 切回前台 / 页面即将被回收前用信标补一次 */
 addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
@@ -8710,6 +8686,7 @@ window.__selftest=function(){
     SAVE.guide={n:0,earned:{},bypass:{}};SAVE.lv=12;SAVE.fails={12:4};SAVE.stars={};
     GS.mode='adv';GS.L={n:12,endless:false};
     const earned=guideEarnAfterFail(12),can=guideCanUse(12),again=guideEarnAfterFail(12);
+    const readyState=guideState(12);renderPack();const packHTML=$('#pack-body').innerHTML;
     SAVE.guide.bypass[12]=1;SAVE.lv=13;
     const bypassDepth=LB.stats().lv===11;
     SAVE.stars[12]=1;
@@ -8717,6 +8694,10 @@ window.__selftest=function(){
     SAVE.guide=bak.guide;SAVE.lv=bak.lv;SAVE.fails=bak.fails;SAVE.stars=bak.stars;GS.mode=bak.mode;GS.L=bak.L;
     ok('引路晶：四次完整失利后每章只醒一枚，背包封顶且只给前沿关',
        earned&&can&&!again&&guideChapter(12)===2);
+    ok('引路晶：持有状态在行囊永久可见，不必等失败页',
+       readyState.mode==='ready'&&/引路晶已苏醒/.test(packHTML));
+    ok('行囊：只归拢引路晶、三件灵器、灯油、典藏匣与星屑',
+       ['矿镐','换位符','重整令','备用灯油','典藏匣','星屑'].every(x=>packHTML.includes(x)));
     ok('引路晶：借道关不算榜单深度，补通后才恢复真实深度',bypassDepth&&restoredDepth);
     ok('引路晶：使用只开下一关，不发星、分数或奖励',
        /g\.bypass\[n\]=1/.test(String(guideUse))&&/SAVE\.lv=Math\.max/.test(String(guideUse))
@@ -8763,22 +8744,22 @@ window.__selftest=function(){
   ok('典藏册未初始化时读取不抛异常（启动路径）',safe);
   /* 30. 紧凑榜：榜首固定三人，玩家在中段时只追加前后相邻，绝不回退到 50 行平铺。 */
   {
-    const bakA=SAVE.lbAlias,bakP=SAVE.lbPower,bakT=SAVE.lbTag,bakS=LB.scope;
+    const bakA=SAVE.lbAlias,bakP=SAVE.lbPower,bakT=SAVE.lbTag,bakS=LB.scope,bakLv=SAVE.lv,bakG=SAVE.guide;
     const txt=h=>h.replace(/<[^>]+>/g,'');
-    LB.scope='world';SAVE.lbAlias='乙乙';SAVE.lbPower=800;SAVE.lbTag='';
-    const R=[];for(let i=0;i<10;i++)R.push({rank:i+1,alias:i===5?'乙乙':'人'+i,power:1000-i*40});
+    LB.scope='depth';SAVE.lbAlias='乙乙';SAVE.lbPower=800;SAVE.lbTag='';SAVE.lv=50;SAVE.guide={n:0,earned:{},bypass:{}};
+    const R=[];for(let i=0;i<10;i++)R.push({rank:i+1,alias:i===5?'乙乙':'人'+i,lv:60-i,stars:150-i});
     const mid=lbBoardHTML(R,5,{}), midRows=(mid.match(/class="lb-row/g)||[]).length;
     const topOnly=lbBoardHTML(R,1,{}), topRows=(topOnly.match(/class="lb-row/g)||[]).length;
-    const full=[];for(let i=0;i<LB_LIMIT;i++)full.push({rank:i+1,alias:'p'+i,power:1000-i*10});
-    SAVE.lbPower=100; const outside=txt(lbMineHTML(full,-1));
+    const full=[];for(let i=0;i<LB_LIMIT;i++)full.push({rank:i+1,alias:'p'+i,lv:100-i,stars:180-i});
+    const outside=txt(lbMineHTML(full,-1));
     const mine=txt(lbMineHTML(R,5));
     ok('紧凑榜：中段只显示榜首三人和自己的三个邻位',midRows===6);
     ok('紧凑榜：身处前三时不再重复一组附近名单',topRows===3);
     ok('紧凑榜：默认列表不超过六人，不再平铺 50 行',midRows<=6&&topRows<=6);
-    ok('紧凑榜：榜满且人在榜外时给出精确入榜差额',outside.indexOf('411')>=0);
-    ok('紧凑榜：个人摘要只给名次、矿力与上一名差额',
-       mine.indexOf('第 6 名')>=0&&mine.indexOf('41')>=0&&mine.indexOf('人4')>=0);
-    SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;LB.scope=bakS;
+    ok('闯关榜：榜满且人在榜外时给出精确入榜关数',outside.indexOf('3')>=0&&outside.indexOf('前 50')>=0);
+    ok('闯关榜：个人摘要只给名次、关数与上一名差距',
+       mine.indexOf('第 6 名')>=0&&mine.indexOf('再通 1 关')>=0&&mine.indexOf('人4')>=0);
+    SAVE.lbAlias=bakA;SAVE.lbPower=bakP;SAVE.lbTag=bakT;LB.scope=bakS;SAVE.lv=bakLv;SAVE.guide=bakG;
   }
   /* 31. 累计账：矿力原来五项全是历史最高值，破纪录才动 —— 打十局没破纪录
      等于什么都没发生。runs/days 是仅有的两个只增项，「只要肝就有回报」全靠它们。
@@ -8872,28 +8853,6 @@ window.__selftest=function(){
     /* 「题名」整类必须都带条件 —— 一旦有一件能纯花钱买到，称衔就贬值了 */
     ok('工坊：称衔一律要先做到，不能纯花灵力买',
        GOODS.filter(g=>g.slot==='title').every(g=>typeof g.need==='function'));
-    /* 四座：一个人可以全占（肝到了就该拿），四条路的门槛各不相同。
-       运数吃的是开匣开出的臻卡，跟投入无关 —— 那是刻意留给新人的窗。 */
-    {
-      const R=[
-        {alias:'甲',tag:'01',lv:200,stars:192,chain:6, score:20000,rush:10000,runs:10,days:2, dbest:1,luck:1},
-        {alias:'乙',tag:'02',lv:10, stars:20, chain:14,score:90000,rush:99000,runs:10,days:2, dbest:1,luck:0},
-        {alias:'丙',tag:'03',lv:20, stars:40, chain:5, score:10000,rush:5000, runs:300,days:60,dbest:30,luck:2},
-        {alias:'丁',tag:'04',lv:1,  stars:2,  chain:3, score:500,  rush:0,    runs:2,  days:1, dbest:1,luck:9},
-      ];
-      const t=thronesOf(R);
-      ok('四座：四条路各归其人（深度甲·技巧乙·勤勉丙·运数丁）',
-         t.depth&&t.depth.alias==='甲' && t.skill&&t.skill.alias==='乙'
-      && t.grind&&t.grind.alias==='丙' && t.luck &&t.luck.alias ==='丁');
-      /* 一个人全占也必须允许 —— 这条是王老师明确要的：肝到了就该给 */
-      const solo=thronesOf([{alias:'独',tag:'09',lv:300,stars:192,chain:20,score:400000,
-        rush:400000,runs:900,days:200,dbest:100,luck:40}]);
-      ok('四座：一个人可以把四个座全占（不设限座）',
-         THRONES.every(x=>solo[x.k]&&solo[x.k].alias==='独'));
-      /* 运数完全不吃投入：丁只玩了一天，却因为手气拿下运数首座 */
-      ok('运数：只吃开匣开出的臻卡，跟关卡/分数/天数都无关',
-         t.luck.v===9 && luckCount()>=0);
-    }
     /* 六个同伴：被动必须**每一关都生效**。
        2026-08-05 实测 364 关：光板关恒定 37~39%、无岩壳 67~69%、无墨封 54~56%，
        旧版钧/麒/梓 的机关型被动大半时间等于不存在 —— 这才是「带谁都一样」的真因。
@@ -9216,8 +9175,7 @@ window.__selftest=function(){
        shopBuy('dep')===false && SAVE.power===10);
     SAVE.shop=JSON.parse(bakS);SAVE.power=bakP;SAVE.lbPower=bakL;shopFix();
   }
-  /* 33. 排行榜减法：客户端不再额外叠配速员、赛季幽灵与建议卡，
-     荣誉席不报细账；细账仍可点名字进名片看。 */
+  /* 33. 排行榜减法：公开主榜只比真实闯关进度，不再把复合矿力与四座压给玩家。 */
     {
       const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakS=LB.scope;
       SAVE.lbAlias='甲甲';SAVE.lbPower=50000;
@@ -9226,15 +9184,15 @@ window.__selftest=function(){
         {rank:2,alias:'乙乙',power:45000,rush:87000,lv:120,stars:160,chain:12,score:90000,days:40,runs:260,dbest:25,luck:2},
         {rank:3,alias:'丙丙',power:42000,rush:85000,lv:110,stars:150,chain:11,score:80000,days:28,runs:180,dbest:18,luck:5}
       ];
-      const honor=throneHTML(R), plain=honor.replace(/<[^>]+>/g,'');
-      ok('荣誉席固定四席，保留身份感但不再展开机制长文',(honor.match(/class="thr-r/g)||[]).length===4&&!/四条路|新人第一天/.test(plain));
-      ok('荣誉席只写席位与化名，不重复矿力数字',!/\d/.test(plain));
-      LB.scope='world';const world=lbBoardHTML(R,0,{});
+      LB.scope='depth';const depth=lbBoardHTML(R,0,{});
       LB.scope='rush';const rush=lbBoardHTML(R,0,{});
-      ok('四座只在世界榜出现，90 秒榜不混累计荣誉',world.includes('荣 誉 席')&&!rush.includes('荣 誉 席'));
+      ok('闯关榜不再显示矿力荣誉席',!depth.includes('荣 誉 席')&&!depth.includes('矿力'));
+      ok('闯关榜右栏直接显示真实关卡',depth.includes('第 160 关')&&depth.includes('闯关'));
+      ok('90 秒榜不混入闯关与累计矿力',!rush.includes('闯关')&&!rush.includes('矿力'));
       ok('90 秒榜右栏显示矿灯分，不拿矿力冒充排序依据',rush.includes('90,000')&&rush.includes('矿灯'));
+      LB.scope='depth';
       const mine=lbMineHTML(R,0).replace(/<[^>]+>/g,'');
-      ok('榜首个人摘要只报领先对象与真实差额',mine.includes('榜首')&&mine.includes('3,000')&&mine.includes('乙乙'));
+      ok('榜首个人摘要只报领先对象与真实关数差额',mine.includes('榜首')&&mine.includes('40')&&mine.includes('乙乙'));
       SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
     }
   }

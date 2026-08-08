@@ -1,14 +1,14 @@
 {
   "name": "灵石远征 · GEMFALL",
   "short_name": "灵石远征",
-  "description": "MYSKME 消消乐 · 狼先生与远征者们 —— 64 关远征、90 秒挑战、聚会赛与矿脉榜",
+  "description": "MYSKME 消消乐 · 狼先生与远征者们 —— 64 关远征、90 秒挑战、聚会赛与远征榜",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#171310",
-  "theme_color": "#171310",
+  "background_color": "#4b4d78",
+  "theme_color": "#4b4d78",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
