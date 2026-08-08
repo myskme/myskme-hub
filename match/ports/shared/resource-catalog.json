@@ -10,12 +10,12 @@
     "assets/og-gemfall.png"
   ],
   "totals": {
-    "files": 75,
-    "bytes": 22637189,
+    "files": 76,
+    "bytes": 22653969,
     "byCategory": {
       "cover": 1,
       "social-card": 1,
-      "art": 1,
+      "art": 2,
       "ally": 6,
       "boss": 4,
       "collection-box": 2,
@@ -807,6 +807,20 @@
       "height": 256,
       "alpha": true,
       "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/ui-parchment.webp",
+      "bytes": 16780,
+      "sha256": "b6d32eeb3679d3cefd1720c4d4518869ad5cdaeb3dc0f927731c8a04003052eb",
+      "width": 720,
+      "height": 1279,
+      "alpha": false,
+      "category": "art",
       "platforms": [
         "web",
         "ios",
