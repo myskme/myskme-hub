@@ -348,7 +348,7 @@ async function handleAdmin(req, env, origin) {
 /* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
    定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
 const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
-                 runs: 45000, days: 3000, dbest: 3000, mv: 500000, luck: 400 };
+                 runs: 45000, days: 3000, dbest: 3000, mv: 500000, luck: 400, mastery: 6 };
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
@@ -421,6 +421,7 @@ function gfBadges(s) {
   add(s.stars >= 96, "g5"); add(s.stars >= 192, "g6");
   add(s.score >= 100000, "g7"); add(s.rush >= 50000, "g8");
   add(s.chain >= 7, "g9"); add(s.chain >= 12, "g10");
+  add(s.mastery >= 6, "g11");                                  // 六位同行全部曜衔 · 虹彩矿名
   return b;
 }
 /* ══════════════════════════════════════════════════════════════
@@ -442,6 +443,13 @@ function gfBadges(s) {
 function monthKeyOf(d) {
   const y = d.getUTCFullYear(), m = d.getUTCMonth() + 1;
   return "" + y + String(m).padStart(2, "0");
+}
+function gfRenameMonth(now) {
+  return monthKeyOf(new Date(now + 8 * 3600000));               // 自然月按北京时间重置
+}
+function gfRenamePolicy(prevAlias, nextAlias, usedMonth, now) {
+  const month = gfRenameMonth(now), changed = !prevAlias || prevAlias !== nextAlias;
+  return { changed, month, allowed: !changed || usedMonth !== month };
 }
 function prevMonthKey(now) {
   const d = new Date(now);
@@ -524,6 +532,11 @@ async function gfEnsure(env) {
        PRIMARY KEY (m, kind, rank))`
   ).run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_gf_class ON gemfall(class_tag,season,hidden)").run();
+  /* 化名首定与改名共用自然月额度。独立小表避免给事故敏感的 gemfall 主表加第八条同步链。 */
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gemfall_alias_month (
+       id TEXT PRIMARY KEY, changed_month TEXT NOT NULL DEFAULT '')`
+  ).run();
   _gfReady = true;
 }
 /* ══════════════════════════════════════════════════════════════
@@ -826,7 +839,7 @@ async function gfSubmit(req, env, origin) {
   await gfEnsure(env);
   const id = await sha256(dev + "|" + env.LB_SALT);
   const now = Date.now();
-  const prev = await env.DB.prepare("SELECT last_write, first_seen FROM gemfall WHERE id=?").bind(id).first();
+  const prev = await env.DB.prepare("SELECT alias,badges,last_write,first_seen FROM gemfall WHERE id=?").bind(id).first();
   if (prev && prev.last_write && now - prev.last_write < 15000)
     return json({ ok: false, err: "太频繁，请稍后再上榜" }, 429, origin);
   const sea = await getSeason(env);
@@ -837,6 +850,13 @@ async function gfSubmit(req, env, origin) {
   let alias = String(body.alias || "").trim().slice(0, 12);
   if (!ALIAS_RE.test(alias)) return json({ ok: false, err: "化名需 2-12 位中英文/数字" }, 400, origin);
   if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
+  const aliasLog = await env.DB.prepare(
+    "SELECT changed_month FROM gemfall_alias_month WHERE id=?"
+  ).bind(id).first();
+  const rename = gfRenamePolicy((prev && prev.alias) || "", alias,
+    (aliasLog && aliasLog.changed_month) || "", now);
+  if (!rename.allowed) return json({ ok: false, code: "rename_month",
+    err: "本月化名已经确定，下月可再改", aliasMonth: rename.month }, 409, origin);
   /* 自由文本门派已退役。列保留用于旧数据兼容，新提交统一清空。 */
   const faction = "";
   /* 阵营只认固定值，别的一律当没填——它进 SQL 聚合，不能是自由文本 */
@@ -858,7 +878,7 @@ async function gfSubmit(req, env, origin) {
     chain: clampInt(st.chain, 0, GF_CAP.chain),
     runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
     dbest: clampInt(st.dbest, 0, GF_CAP.dbest), mv: clampInt(st.mv, 0, GF_CAP.mv),
-    luck: clampInt(st.luck, 0, GF_CAP.luck),
+    luck: clampInt(st.luck, 0, GF_CAP.luck), mastery: clampInt(st.mastery, 0, GF_CAP.mastery),
   };
   /* 下矿天数不可能多于下矿局数——一天至少打一局才算来过。
      连续到场纪录也不可能超过累计到场天数。
@@ -893,6 +913,10 @@ async function gfSubmit(req, env, origin) {
        season=excluded.season, last_write=excluded.last_write`
   ).bind(id, alias, faction, camp, classTag, power, s.score, s.rush, s.lv, s.stars, s.chain,
          s.runs, s.days, s.dbest, s.mv, s.luck, comp, rname, badges, sea, seen, now).run();
+  if (rename.changed) await env.DB.prepare(
+    `INSERT INTO gemfall_alias_month(id,changed_month) VALUES(?,?)
+     ON CONFLICT(id) DO UPDATE SET changed_month=excluded.changed_month`
+  ).bind(id, rename.month).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
@@ -910,6 +934,8 @@ async function gfSubmit(req, env, origin) {
     runs: row.runs || 0, days: row.days || 0,
     dbest: row.dbest || 0, mv: row.best_dig || 0, luck: row.luck || 0,
   } : s;
+  /* 虹彩资格只增不减：旧客户端不送 mastery，也不能把已取得的终身奖励冲掉。 */
+  merged.mastery=Math.max(s.mastery||0,String((prev&&prev.badges)||'').split(',').includes('g11')?6:0);
   let myPower = gfPower(merged);
   if (!Number.isFinite(myPower)) myPower = gfPower(s);      // 回读缺项时退回本次提交
   if (!Number.isFinite(myPower)) myPower = 0;               // 再不行也不能把 NaN 写进库
@@ -930,6 +956,7 @@ async function gfSubmit(req, env, origin) {
   return json({ ok: true, power: myPower, rank: ((aheadPower && aheadPower.c) || 0) + 1,
     depthRank: ((aheadDepth && aheadDepth.c) || 0) + 1,
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
+    aliasMonth: rename.changed ? rename.month : ((aliasLog && aliasLog.changed_month) || ""),
     classJoined, season: sea }, 200, origin);
 }
 /* 两阵营实力比。只返回占比：不返回人数、化名或个人贡献。
@@ -1082,7 +1109,11 @@ async function gfAdmin(req, env, origin) {
     return json({ ok: true }, 200, origin);
   }
   if (act === "delete") {
-    await env.DB.prepare("DELETE FROM gemfall WHERE id=?").bind(String(body.id || "")).run();
+    const id = String(body.id || "");
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM gemfall WHERE id=?").bind(id),
+      env.DB.prepare("DELETE FROM gemfall_alias_month WHERE id=?").bind(id),
+    ]);
     return json({ ok: true }, 200, origin);
   }
   if (act === "pacers") {
@@ -1095,7 +1126,10 @@ async function gfAdmin(req, env, origin) {
   if (act === "reset") {
     /* 与 /admin 一致：清空整张表必须带确认串，避免误点 */
     if (String(body.confirm || "") !== "RESET") return json({ ok: false, err: "需要 confirm:RESET" }, 400, origin);
-    await env.DB.prepare("DELETE FROM gemfall").run();
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM gemfall"),
+      env.DB.prepare("DELETE FROM gemfall_alias_month"),
+    ]);
     return json({ ok: true }, 200, origin);
   }
   return json({ ok: false, err: "unknown act" }, 400, origin);

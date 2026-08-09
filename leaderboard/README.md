@@ -69,7 +69,7 @@ MYSKME 题库工坊 / MYSKME × 英语王老师
 | 路由 | 方法 | 说明 |
 |---|---|---|
 | `/gf/board?scope=world\|class&pw=&limit=` | GET | 读榜。class 需班级口令（服务端加盐哈希） |
-| `/gf/submit` | POST | 上榜。body: `{deviceUUID, alias, faction, pw, stats:{score,rush,lv,stars,chain}}` |
+| `/gf/submit` | POST | 上榜。body 含化名、阵营、同行及成绩／累计／六人熟练度摘要；服务端重算矿力与徽记 |
 | `/gf/admin` | POST | 老师：list / hide / show / delete / reset（pw 用管理员口令，与 `/admin` 同一个 `LB_ADMIN_HASH`） |
 
 ### 矿力公式
@@ -93,6 +93,10 @@ MYSKME 题库工坊 / MYSKME × 英语王老师
 
 `gemfall` 表由 `gfEnsure()` 在每次请求时 `CREATE TABLE IF NOT EXISTS` 自动建，
 **不需要单独跑 migration**。字段见 worker.js。
+
+化名首次确定也占用当月机会，此后按北京时间自然月重置一次更名机会；月份单独记在
+`gemfall_alias_month`，不向事故敏感的 `gemfall` 主表追加列。六位同行均达到最高曜衔时，
+服务端把终身资格记为现有 `badges` 字段中的 `g11`，公开榜单据此显示静态虹彩矿名。
 
 ### 部署
 
