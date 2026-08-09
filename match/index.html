@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-10-party-rounds-prism">
+<meta name="gemfall-release" content="2026-08-10-android-touch-safe">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -74,6 +74,7 @@ html,body{height:100%;position:fixed;inset:0;width:100%;overflow:hidden;
   overscroll-behavior:none;touch-action:manipulation;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   -webkit-tap-highlight-color:transparent}
+html.android-touch,html.android-touch body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 input,textarea{-webkit-user-select:text;user-select:text}
 /* 全站底纹不再使用旧花叶纸图；静态 CSS 测绘纹既与狼先生一致，也少一次图片解码。 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;color-scheme:light;
@@ -105,6 +106,9 @@ body::before{display:none}
   overscroll-behavior:contain;scrollbar-width:none}
 .scr::-webkit-scrollbar{display:none}
 .scr.on{display:flex}
+/* 少数安卓平板 / WebView 会把 CSS zoom 后的画面与触控命中留在两套坐标里。
+   这些设备完全不缩放整屏：内容放不下就用原生纵向滚动，命中区始终与视觉位置一致。 */
+.scr.touch-native{overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 /* 按钮要有厚度。原来是「1px 发丝线 + 平渐变」，读作纸上印的框；
    现在压四层：顶内高光（受光面）、底内暗边（背光面）、一道硬落影（厚度）、
    一片软落影（离地）。这四层是「金属片」和「印刷框」的全部区别。 */
@@ -2607,6 +2611,13 @@ const vib=ms=>{try{if(navigator.vibrate)navigator.vibrate(ms)}catch(e){}};
    只需重写下面这个 PLAT 对象，其余引擎与渲染代码一行不用改。
    详见同目录 PORTING.md。
    ================================================================== */
+function needsNativeTouchLayout(ua,platform,points){
+  const sig=String(ua||'')+' '+String(platform||'');
+  return /Android|Silk|Kindle|HarmonyOS/i.test(sig);
+}
+const TOUCH_NATIVE_LAYOUT=needsNativeTouchLayout(
+  navigator.userAgent,(navigator.userAgentData&&navigator.userAgentData.platform)||'',navigator.maxTouchPoints);
+document.documentElement.classList.toggle('android-touch',TOUCH_NATIVE_LAYOUT);
 const PLAT={
   name:'web',
   store:{
@@ -6173,21 +6184,31 @@ function ptBindTierButtons(root,after){
     ptSetMoveTier(+b.dataset.i,+b.dataset.r,+b.dataset.m);if(after)after();
   };
 }
-/* 一屏定版：内容比视口高时整屏等比微缩（zoom），任何机型不再上下滑动。
-   地脉图/游戏屏本来收得进，缩放实际只作用于大厅与聚会设置这类信息密的屏。 */
-function fitScreen(id){
+/* 苹果端沿用一屏定版。安卓触屏端不用 CSS zoom：部分平板 WebView 会在缩放后留下
+   视觉坐标 / 命中坐标偏差；内容超高时改走原生纵向滚动，手指落点不再被重映射。 */
+function fitScreen(id,resetScroll){
   const pass=()=>{
     const el=$('#scr-'+id); if(!el||!el.classList.contains('on'))return;
+    const oldTop=el.scrollTop;
     el.style.zoom='';
     const need=el.scrollHeight, have=el.clientHeight;
-    if(need>have+2)el.style.zoom=Math.max(.75,have/need);
-    el.scrollTop=0;
+    el.classList.toggle('touch-native',TOUCH_NATIVE_LAYOUT&&need>have+2);
+    if(!TOUCH_NATIVE_LAYOUT&&need>have+2)el.style.zoom=Math.max(.75,have/need);
+    if(resetScroll!==false)el.scrollTop=0;
+    else if(el.classList.contains('touch-native'))el.scrollTop=oldTop;
   };
   /* 量两次：插画（如大厅立绘）是异步加载的，首帧测量时还没撑开高度 */
   requestAnimationFrame(pass);
   setTimeout(pass,650);
 }
-addEventListener('resize',()=>{const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''))});
+function refitActiveScreen(){
+  const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''),false);
+}
+addEventListener('resize',refitActiveScreen);
+addEventListener('orientationchange',()=>setTimeout(refitActiveScreen,120));
+/* Android WebView 同时有 layout / visual viewport；地址栏、分屏或软键盘只改后者时也重测。 */
+if(TOUCH_NATIVE_LAYOUT&&window.visualViewport)
+  window.visualViewport.addEventListener('resize',refitActiveScreen);
 function renderPartySetup(){
   ptEnsurePlayers();
   PARTY.rounds=clamp(Math.round(+PARTY.rounds||3),2,4);
@@ -8098,12 +8119,16 @@ const HOW_HTML=`
    [ 输入 · INPUT ]
    ================================================================== */
 let ptr={on:false,id:null,sr:0,sc:0,x0:0,y0:0};
+function boardPointFromClient(clientX,clientY,r){
+  return [(clientX-r.left)/Math.max(1,r.width)*CSS_W,
+          (clientY-r.top)/Math.max(1,r.height)*CSS_W];
+}
 function cellFromEvent(e){
-  const r=cv.getBoundingClientRect();
-  const x=(e.clientX-r.left)/r.width*CSS_W, y=(e.clientY-r.top)/r.height*CSS_W;
+  const [x,y]=boardPointFromClient(e.clientX,e.clientY,cv.getBoundingClientRect());
   return [Math.floor(y/ENG.cs),Math.floor(x/ENG.cs),x,y];
 }
 cv.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='touch')e.preventDefault();
   if(GS.busy||GS.over||GS.paused)return;
   AU.ensure();
   const [r,c,x,y]=cellFromEvent(e);
@@ -8121,6 +8146,7 @@ cv.addEventListener('pointerdown',e=>{
   else {selCell=null;if(T[r][c].crate>0||has(r,c))SFX.fail()}
 });
 cv.addEventListener('pointermove',e=>{
+  if(e.pointerType==='touch')e.preventDefault();
   if(!ptr.on||GS.busy||e.pointerId!==ptr.id)return;
   const [,,x,y]=cellFromEvent(e);
   const dx=x-ptr.x0, dy=y-ptr.y0, th=ENG.cs*.34;
@@ -9574,6 +9600,20 @@ window.__selftest=function(){
         mapCells.length===8&&mapCells.every(cell=>cell.querySelector('.st svg.ic'))
         &&mapCells.every(cell=>!/[★✕]/.test(cell.textContent||'')));
       mapCh=oldCh;SAVE.lv=oldLv;SAVE.stars=oldStars;
+    }
+    /* 安卓平板的触控坐标不能经过整屏 zoom；同时锁住棋盘按实时边界换算坐标。 */
+    {
+      const android=needsNativeTouchLayout(
+        'Mozilla/5.0 (Linux; Android 15; Pixel Tablet) AppleWebKit/537.36','Android',5);
+      const fire=needsNativeTouchLayout('Mozilla/5.0 (Linux; U; en-US) Silk/126.4','Linux',10);
+      const iphone=needsNativeTouchLayout('Mozilla/5.0 (iPhone; CPU iPhone OS 18_6)','iOS',5);
+      const desktop=needsNativeTouchLayout('Mozilla/5.0 (Macintosh; Intel Mac OS X)','macOS',0);
+      const p=boardPointFromClient(150,275,{left:50,top:75,width:400,height:400});
+      const fitSrc=String(fitScreen);
+      ok('安卓触屏禁用整屏 zoom，并按实时棋盘边界换算落点',
+         android&&fire&&!iphone&&!desktop
+         &&Math.abs(p[0]-CSS_W*.25)<.01&&Math.abs(p[1]-CSS_W*.5)<.01
+         &&/!TOUCH_NATIVE_LAYOUT/.test(fitSrc)&&/touch-native/.test(fitSrc));
     }
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;GS.compDef=save.compDef;
