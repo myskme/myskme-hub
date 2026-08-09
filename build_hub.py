@@ -41,7 +41,7 @@ DEFAULT_DATA = {
              "url": "https://play.myskme.com/"},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 35 位正典角色，扫码即玩。",
+             "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 41 位正典学员，扫码即玩。",
              "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
