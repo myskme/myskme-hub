@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-09-final-visual-polish">
+<meta name="gemfall-release" content="2026-08-09-final-network-cleanup">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -304,7 +304,11 @@ body::before{display:none}
 .map-era{font-size:12px;color:var(--ink3);letter-spacing:.3em}
 .map-epi{font-size:13px;color:var(--ink2);margin-top:6px;letter-spacing:.08em}
 .map-nav{display:flex;align-items:center;gap:14px;margin:8px 0 4px}
-.map-nav .btn{padding:8px 16px;font-size:15px}
+.map-nav .btn{width:44px;height:40px;padding:0;display:grid;place-items:center}
+.map-nav .btn .ic{width:18px;height:18px}
+.nav-back .ic{transform:rotate(180deg)}
+.nav-inline{display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.nav-inline .ic{width:13px;height:13px;vertical-align:0}
 .map-nav .chname{min-width:150px;text-align:center;font-size:15px;letter-spacing:.2em;color:var(--gold2)}
 #map-grid{display:grid;grid-template-columns:repeat(4,minmax(64px,84px));gap:14px;margin:10px 0 4px}
 .lv{aspect-ratio:1;border:1px solid var(--line);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -313,6 +317,7 @@ body::before{display:none}
 .lv:active{transform:scale(.96)}
 .lv .n{font-size:22px;color:var(--ink);letter-spacing:.05em}
 .lv .st{font-size:11px;letter-spacing:.14em;color:var(--gold2);margin-top:2px;min-height:14px}
+.lv .st .ic{width:11px;height:11px;vertical-align:0;margin:0 1px}
 .lv.locked{opacity:.38;cursor:default;filter:grayscale(.6)}
 .lv.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
 .lv.cur{border-color:var(--gold);box-shadow:0 0 16px color-mix(in srgb,var(--gold) 28%,transparent)}
@@ -352,7 +357,8 @@ body::before{display:none}
 .goal canvas{width:30px;height:30px;display:block}
 .goal .cnt{font-size:12px;color:var(--ink);letter-spacing:.04em;line-height:1}
 .goal.done .cnt{color:var(--green)}
-.goal .tick{position:absolute;top:-2px;right:-8px;font-size:13px;color:var(--green);opacity:0;transform:scale(.4)}
+.goal .tick{position:absolute;top:-2px;right:-8px;color:var(--green);opacity:0;transform:scale(.4)}
+.goal .tick .ic{width:13px;height:13px}
 .goal.done .tick{opacity:1;transform:scale(1);transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .goal.bump canvas{animation:goalBump .3s ease}
 @keyframes goalBump{40%{transform:scale(1.35)}}
@@ -364,6 +370,7 @@ body::before{display:none}
 @keyframes sheen{60%,100%{transform:translateX(100%)}}
 .sbar .stars{position:absolute;inset:0;pointer-events:none}
 .sbar .stars s{position:absolute;top:50%;transform:translate(-50%,-54%);font-size:9px;color:var(--ink3);text-decoration:none;transition:color .3s,text-shadow .3s}
+.sbar .stars s .ic{display:block;width:9px;height:9px}
 .sbar .stars s.lit{color:var(--gold2);text-shadow:0 0 8px color-mix(in srgb,var(--gold) 70%,transparent)}
 /* Boss 条 */
 #boss-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));
@@ -1056,6 +1063,7 @@ body::before{display:none}
 #star-meter{width:min(340px,90vw);margin:4px auto 0;position:relative}
 #star-meter .sm-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.1em;margin-bottom:4px}
 #star-meter .sm-top b{color:var(--gold2);font-weight:500}
+#star-meter .sm-top .ic{width:12px;height:12px;color:var(--gold2);vertical-align:-1px}
 #star-meter .bar{height:8px;background:var(--bg2);border:1px solid var(--edge);overflow:hidden;position:relative}
 #star-meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-line),var(--gold));transition:width .5s cubic-bezier(.16,1,.3,1)}
 #chest-btn .icw .ic{width:var(--ic-sm);height:var(--ic-sm)}
@@ -1422,7 +1430,7 @@ body{--shk:4px}
     <div id="menu-stats"></div>
     <div class="menu-foot">
       把灵石三三对齐，沉睡的灵力就会醒来。<br>
-      <a href="https://myskme.github.io/myskme-hub/">← 作品总目</a>　·　<a href="#" id="btn-install">安装 · 换机</a>　·　MYSKME × 英语王老师
+      <a class="nav-inline" href="https://myskme.github.io/myskme-hub/"><span class="icw nav-back" data-ic="chev"></span>作品总目</a>　·　<a href="#" id="btn-install">安装 · 换机</a>　·　MYSKME × 英语王老师
     </div>
     <div id="cat" title="……" data-fit="contain">
       <svg viewBox="0 0 64 56" fill="currentColor" stroke="var(--line)" stroke-width="1">
@@ -1443,19 +1451,19 @@ body{--shk:4px}
     </div>
     <div id="map-banner" data-pos="center"></div>
     <div class="map-nav">
-      <button class="btn ghost" id="map-prev">◀</button>
+      <button class="btn ghost" id="map-prev" aria-label="上一地脉"><span class="icw nav-back" data-ic="chev"></span></button>
       <div class="chname" id="map-chip"></div>
-      <button class="btn ghost" id="map-next">▶</button>
+      <button class="btn ghost" id="map-next" aria-label="下一地脉"><span class="icw" data-ic="chev"></span></button>
     </div>
     <div id="star-meter">
       <div class="orn" id="chest-orn" data-fit="contain" data-pos="center"></div>
-      <div class="sm-top"><span>星辰宝箱<i id="sm-src"></i></span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> ★</span></div>
+      <div class="sm-top"><span>星辰宝箱<i id="sm-src"></i></span><span><b id="sm-cur">0</b> / <span id="sm-need">15</span> <span class="icw" data-ic="star"></span></span></div>
       <div class="bar"><i id="sm-fill"></i></div>
       <button class="btn primary" id="chest-btn"><span class="icw"></span> 开启星辰宝箱</button>
     </div>
     <div id="map-grid"></div>
     <div id="map-endless"></div>
-    <div class="ovl-btns"><button class="btn ghost" id="map-back">← 回大厅</button></div>
+    <div class="ovl-btns"><button class="btn ghost nav-inline" id="map-back"><span class="icw nav-back" data-ic="chev"></span>回大厅</button></div>
   </section>
 
   <!-- 聚会赛 · 设置 -->
@@ -1490,9 +1498,9 @@ body{--shk:4px}
       <div class="pt-lbl">选手 · 人物 · 各自步数</div>
       <div id="pt-names"></div>
     </div>
-    <div id="pt-hint-line">一台机器轮流递 · <a href="#" id="pt-hint-open">规则与时长 →</a></div>
+    <div id="pt-hint-line">一台机器轮流递 · <a class="nav-inline" href="#" id="pt-hint-open">规则与时长<span class="icw" data-ic="chev"></span></a></div>
     <div class="ovl-btns" style="margin-bottom:20px">
-      <button class="btn ghost" id="pt-back">← 回大厅</button>
+      <button class="btn ghost nav-inline" id="pt-back"><span class="icw nav-back" data-ic="chev"></span>回大厅</button>
       <button class="btn primary big" id="pt-go">开 局</button>
     </div>
   </section>
@@ -1601,7 +1609,7 @@ body{--shk:4px}
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
     <button class="btn" id="end-retry">再来</button>
-    <button class="btn primary" id="end-next">下一关 →</button>
+    <button class="btn primary nav-inline" id="end-next"><span class="nav-label">下一关</span><span class="icw nav-next" data-ic="chev"></span></button>
   </div>
 </div></div>
 
@@ -1896,7 +1904,7 @@ body{--shk:4px}
     <div class="lt"></div>
     <div class="ld"></div>
   </a>
-  <div class="ovl-btns"><button class="btn primary" id="lore-close">继续下潜 →</button></div>
+  <div class="ovl-btns"><button class="btn primary nav-inline" id="lore-close"><span class="nav-label">继续下潜</span><span class="icw nav-next" data-ic="chev"></span></button></div>
 </div></div>
 
 <!-- 玩法卷轴 -->
@@ -1921,7 +1929,7 @@ body{--shk:4px}
 </div></div>
 
 <div id="toast"></div>
-<a id="chip-home" href="https://myskme.github.io/myskme-hub/">← 作品总目</a>
+<a class="nav-inline" id="chip-home" href="https://myskme.github.io/myskme-hub/"><span class="icw nav-back" data-ic="chev"></span>作品总目</a>
 
 
 <script>
@@ -3571,7 +3579,7 @@ function renderGoals(host,size){
     d.appendChild(goalIcon(g,size));
     const n=document.createElement('div');n.className='cnt';n.textContent=goalText(g);
     d.appendChild(n);
-    const tk=document.createElement('div');tk.className='tick';tk.textContent='✓';d.appendChild(tk);
+    const tk=document.createElement('div');tk.className='tick';tk.innerHTML=ICONS.check;d.appendChild(tk);
     if(g.got>=g.need)d.classList.add('done');
     host.appendChild(d);
   });
@@ -4149,6 +4157,8 @@ const ICONS={
   seal:_IC('<rect x="4.8" y="4.8" width="14.4" height="14.4" rx="2.2"/><path d="M8.8 12h6.4M12 8.8v6.4"/>'),
   gift:_IC('<rect x="3.6" y="6.2" width="16.8" height="11.6" rx="1.6"/><path d="M3.6 7.4 12 13l8.4-5.6"/>'),
   close:_IC('<path d="M6 6l12 12M18 6 6 18"/>'),
+  check:_IC('<path d="m5 12.5 4.2 4.2L19 7"/>'),
+  lock:_IC('<rect x="5.5" y="10" width="13" height="10" rx="2"/><path d="M8.5 10V7.5a3.5 3.5 0 017 0V10"/>'),
 /* 结算屏那三颗星。用 SVG 而不是 ★ 字形：44px 下字形的形状随平台字体变，
      有的瘦有的胖，还可能被 emoji 字体接管变成彩色 —— 那是全站禁 emoji 的红线。
      这一枚是实心的，靠 fill:currentColor 跟着状态走。 */
@@ -4818,7 +4828,7 @@ function renderDaily(){
      我一度在卡底又加了一条几乎一样的，同一张卡里同一句话说两遍。 */
   $('#daily-desc').innerHTML=done>=3
     ? '明天再来 · 换三桩新的'
-    : '三桩齐 → '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>'
+    : '三桩齐，可得 '+icTag('box')+' <b style="color:var(--gold2)">典藏匣 ×1</b>'
       +'　<b style="color:var(--gold2)">还差 '+(3-done)+' 桩</b>'
       +'　<span style="color:var(--ink3)">输了也算数</span>';
   /* 今日深挖：给肝帝看的那一行。没打够 6 关不显示——
@@ -4829,7 +4839,7 @@ function renderDaily(){
     const next=GRIND.find(x=>x.n>g.n);
     gd.style.display='';
     gd.innerHTML='今日深挖 <b>'+g.n+'</b> 关'
-      +(next?('　距 '+next.n+' 关还差 <b>'+(next.n-g.n)+'</b> → '
+      +(next?('　距 '+next.n+' 关还差 <b>'+(next.n-g.n)+'</b>，可得 '
               +(next.dust?('星屑 '+next.dust):(icTag('box')+' 典藏匣')))
             :'　<span style="color:var(--gold2)">今日三档已全数领取</span>');
   }else gd.style.display='none';
@@ -5585,7 +5595,7 @@ function openLevel(n,mode){
   show('game');
   fitCanvas();
   $('#rush-bar').classList.remove('on');
-  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">★</s><s style="left:'+(L.s2/L.s3*100)+'%">★</s><s style="left:97%">★</s>';
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:'+(L.s2/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent=L.boss?'讨伐':'目标';
   updHUD();
@@ -5688,7 +5698,7 @@ function startRush(){
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
   const bst=SAVE.rushBest;
   $('#rush-best').textContent='最佳 '+(bst?bst.toLocaleString('en-US'):'—');
-  $('#score-stars').innerHTML='<s style="left:25%">★</s><s style="left:56%">★</s><s style="left:97%">★</s>';
+  $('#score-stars').innerHTML='<s style="left:25%">'+ICONS.star+'</s><s style="left:56%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   $('#goal-row').innerHTML='<div style="font-size:12px;letter-spacing:.16em;color:var(--ink2)">'
     +'连锁越长 · 时间越多</div>';
   $('#goal-lbl').textContent='灯油';
@@ -5928,7 +5938,7 @@ function endLevel(win){
     setTimeout(()=>{for(let i=0;i<st;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i);
       fxBurstDom(i)},i*300)},260);
     $('#end-quip').textContent=pick2(Q_WIN);
-    $('#end-next').textContent=L.endless?'再深一层 →':'下一关 →';
+    $('#end-next .nav-label').textContent=L.endless?'再深一层':'下一关';
     $('#end-next').dataset.act='next';
     /* end-retry 在限时结算页会被隐藏，回到冒险结算时
        必须同时复位显示、文案和 act，不让旧状态串场。 */
@@ -6719,7 +6729,7 @@ function lbRowHTML(r,mine){
   const c=r.comp&&compById(r.comp);
   const sub=rush
     ? [r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
-    : ['★ '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
+    : ['星数 '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
     +'<div class="who"><div class="nm">'
@@ -6762,7 +6772,7 @@ function lbCardHTML(r){
     +'</div>'
     +'<div class="lc-pw">第 '+(Number(r.lv)||0)+' 关<span>远征位置</span></div>'
     +'<div class="lc-grid">'
-      +row('星数',r.stars?('★ '+r.stars):'')
+      +row('星数',r.stars?String(r.stars):'')
       +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
       +row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):'')
       +row('最长连锁',r.chain?(r.chain+' 重'):'')
@@ -7002,7 +7012,7 @@ function showCard(){
      加类切换，别让 <pre> 的等宽与边框套在图片上。 */
   p.classList.add('asimg');
   p.innerHTML='<img id="wk-cardimg" alt="本周矿脉成绩卡">'
-    +'<div class="cardtip">长按上面这张图 →「保存图片」，发到群里比一比</div>';
+    +'<div class="cardtip">长按上面这张图，选择「保存图片」，发到群里比一比</div>';
   $('#wk-cardimg').src=drawCard();
 }
 /* 分享按模式取对应的战报：本周矿脉走 wkTablet（同一副盘，可以晒解法形状），
@@ -7109,8 +7119,8 @@ function startWeekly(){
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.remove('on');
-  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">★</s><s style="left:'
-    +(L.s2/L.s3*100)+'%">★</s><s style="left:97%">★</s>';
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:'
+    +(L.s2/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderTools();renderAlly();renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent='本周';
   updHUD();
@@ -7412,14 +7422,14 @@ async function lbDiagnose(){
   line('联网状态',navigator.onLine?'在线':'系统报离线');
   const s=LB.stats();
   line('本机成绩','通关 '+s.lv+' 关 · '+s.stars+' 星 · 单关最高 '+s.score+' · 限时 '+s.rush+' · 连锁 '+s.chain);
-  line('化名',SAVE.lbAlias?('已起「'+SAVE.lbAlias+'」'):'✗ 还没起 —— 这就是没上榜的原因');
+  line('化名',SAVE.lbAlias?('已起「'+SAVE.lbAlias+'」'):'还没起 —— 这就是没上榜的原因');
   /* pending() 里含 registered()，没起名时恒为 false——直接写「已是最新」是骗人的，
      那种情况根本没开始上传过。分开讲。 */
   line('待上传',!LB.registered()?'—— 起名后才会开始上传'
     :(LB.pending()?('有（本机 '+LB.sig()+' / 已上传 '+(SAVE.lbSig||'无')+'）'):'无，已是最新'));
   line('上次错误',SAVE.lbErr||'无');
   line('重试已停',LB.stop?'是（需改化名）':'否');
-  line('候选入口',LB.baseOrder().join(' → ')||'无');
+  line('候选入口',LB.baseOrder().join('；')||'无');
   /* 三段连通性分开测：能连上但读不到 = 后端问题；连都连不上 = 网络问题 */
   for(const base of LB.baseOrder()){
     let host=base;try{host=new URL(base).host}catch(e){}
@@ -7432,7 +7442,7 @@ async function lbDiagnose(){
         const r=await Promise.race([fetch(url,opt||{}),
           new Promise((_,j)=>setTimeout(()=>j(new Error('超时')),12000))]);
         line(nm,'HTTP '+r.status+' · '+Math.round(t()-t0)+'ms');
-      }catch(e){line(nm,'✗ 失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
+      }catch(e){line(nm,'失败（'+(e.message||e.name)+'） · '+Math.round(t()-t0)+'ms')}
     }
   }
   if(!LB.registered()){
@@ -7442,7 +7452,7 @@ async function lbDiagnose(){
     const d=await LB.flush('diag',true);
     LB.stop=before&&!(d&&d.ok);
     line('提交测试',(d&&d.ok)?('成功 · 世界第 '+d.rank+' · '+Math.round(t()-t0)+'ms')
-      :('✗ '+((d&&d.err)||'未知')+((d&&d.status)?(' · HTTP '+d.status):'')+' · '+Math.round(t()-t0)+'ms'));
+      :('失败：'+((d&&d.err)||'未知')+((d&&d.status)?(' · HTTP '+d.status):'')+' · '+Math.round(t()-t0)+'ms'));
   }
   line('浏览器',(navigator.userAgent||'').slice(0,90));
   L.push('——— 把以上整段发给王老师 ———');out.textContent=L.join('\n');
@@ -7517,7 +7527,7 @@ function renderMenu(){
   const got=ACHS.filter(a=>SAVE.ach[a.id]).length;
   const tools=TOOLKEYS.reduce((a,t)=>a+toolCount(t),0);
   colFix();
-  $('#menu-stats').innerHTML='★ <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
+  $('#menu-stats').innerHTML=icTag('star')+' <b>'+totStars+'</b> / 192 　徽记 <b>'+got+'</b> / '+ACHS.length
     +'　典藏 <b>'+colGot()+'</b> / '+CARDS.length
     +'<br>灵力 <b>'+(SAVE.power||0).toLocaleString('en-US')+'</b> 　灵器 <b>'+tools+'</b> 件';
   renderMenuCast();
@@ -7554,7 +7564,7 @@ function renderMap(){
     const d=document.createElement('div');
     d.className='lv'+(unlocked?'':' locked')+(n===SAVE.lv?' cur':'')+(st?' done':'')+(i===8?' boss':'');
     d.style.animationDelay=(i*.045)+'s';
-    d.innerHTML='<div class="n">'+n+'</div><div class="st">'+(st?'★'.repeat(st):(unlocked?'':'✕'))+'</div>'+(i===8?'<div class="bosscrown">'+ICONS.crown+'</div>':'');
+    d.innerHTML='<div class="n">'+n+'</div><div class="st">'+(st?Array.from({length:st},()=>ICONS.star).join(''):(unlocked?'':ICONS.lock))+'</div>'+(i===8?'<div class="bosscrown">'+ICONS.crown+'</div>':'');
     if(unlocked)d.addEventListener('click',()=>{SFX.click();openLevel(n)});
     grid.appendChild(d);
   }
@@ -7598,7 +7608,7 @@ function renderAch(){
     ?'本月<b>三轮齐了</b> · 下月初换新的三桩'
     :(st.n
       ?('本月已刻下 <b>'+st.n+'</b> 轮 · 徽记已经归你，再做一桩多一轮')
-      :('做成一桩就刻一轮 → 铸一枚刻着「'+monthTag(st.m)+'」的绝版徽记')))+'</div>';
+      :('做成一桩就刻一轮，铸一枚刻着「'+monthTag(st.m)+'」的绝版徽记')))+'</div>';
   if(seals.length){
     h+='<div class="yj-wall">'+seals.map(k=>{
       const y=k.slice(0,4),mo=+k.slice(4);
@@ -7958,13 +7968,13 @@ function renderDraw(d){
 const HOW_HTML=`
 <b>怎么玩</b>　点一颗灵石再点相邻的一颗，或者直接拖动——只要能连成三个同色就成立。<br><br>
 <b>炼成灵石</b><br>
-　四连成一线 → <b>疾风灵石</b>（横扫整行 / 整列）<br>
-　L 形或 T 形 → <b>爆裂灵石</b>（炸开周围一圈）<br>
-　五连成一线 → <b>万象灵珠</b>（与任意灵石交换，吞掉全场同色）<br><br>
+　四连成一线，可炼成 <b>疾风灵石</b>（横扫整行 / 整列）<br>
+　L 形或 T 形，可炼成 <b>爆裂灵石</b>（炸开周围一圈）<br>
+　五连成一线，可炼成 <b>万象灵珠</b>（与任意灵石交换，吞掉全场同色）<br><br>
 <b>组合技</b>（两颗特殊灵石直接交换）<br>
-　疾风 × 疾风 → 十字贯通　　疾风 × 爆裂 → 巨风碾压<br>
-　爆裂 × 爆裂 → 双星巨爆　　万象 × 疾风 → 万象疾风<br>
-　万象 × 爆裂 → 万象天崩　　万象 × 万象 → <b>清空全场</b><br><br>
+　疾风 × 疾风：十字贯通　　疾风 × 爆裂：巨风碾压<br>
+　爆裂 × 爆裂：双星巨爆　　万象 × 疾风：万象疾风<br>
+　万象 × 爆裂：万象天崩　　万象 × 万象：<b>清空全场</b><br><br>
 <b>矿脉机关</b><br>
 　<b>墨封</b> 在墨渍上消除即揭一层，深墨要两层。<br>
 　<b>猫铃</b> 不能消除，只能交换——把它一路送到最底行。<b>诀窍：在铃那一列炼一颗竖向疾风，一炸到底。</b><br>
@@ -8206,7 +8216,7 @@ $('#xfer-out').addEventListener('click',async()=>{
   p.innerHTML='<textarea id="xfer-text" readonly spellcheck="false"></textarea>'
     +'<div class="xrow"><button class="btn ghost" id="xfer-copy">复制口令</button></div>'
     +'<div class="xfer-note" style="margin-top:8px">粘到微信「文件传输助手」发给自己，'
-    +'在新设备上打开本页 →「安装到手机」→「粘贴口令导入」。</div>';
+    +'在新设备上打开本页，依次选择「安装到手机」和「粘贴口令导入」。</div>';
   $('#xfer-text').value=code;
   $('#xfer-copy').onclick=async()=>{
     SFX.click();
@@ -8320,7 +8330,8 @@ function maybeLore(after){
   lk.href=lo.u;
   lk.querySelector('.lt').textContent=lo.t;
   lk.querySelector('.ld').textContent=lo.d;
-  $('#lore-close').textContent=lo.ch>=8?'合上此卷':'继续下潜 →';
+  $('#lore-close .nav-label').textContent=lo.ch>=8?'合上此卷':'继续下潜';
+  $('#lore-close .nav-next').style.display=lo.ch>=8?'none':'';
   $('#lore-close').onclick=()=>{SFX.click();ovl(null);after()};
   SFX.win();ovl('lore');
 }
@@ -9443,6 +9454,20 @@ window.__selftest=function(){
       ok('长页：六个常驻线稿关闭键都复用原有关闭流程',
         pairs.every(([id,target])=>{const b=$('#'+id);return b&&b.dataset.closeTarget===target&&$(target)}));
     }
+    /* 导航与地图状态不再依赖平台字体里的箭头、星形、叉号，统一由线稿 SVG 绘制。 */
+    {
+      const oldCh=mapCh,oldLv=SAVE.lv,oldStars=SAVE.stars;
+      mapCh=1;SAVE.lv=1;SAVE.stars={1:3};renderMap();
+      const nav=['map-prev','map-next','map-back','pt-back','end-next','lore-close'];
+      ok('图标：翻页、返回与继续操作全部使用线稿 SVG，不留字符箭头',
+        nav.every(id=>$('#'+id)&&$('#'+id).querySelector('svg.ic'))
+        &&nav.every(id=>!/[◀▶←→]/.test($('#'+id).textContent||'')));
+      const mapCells=[...$('#map-grid').children];
+      ok('图标：地图星级与锁定状态使用 SVG，不留星形或叉号字符',
+        mapCells.length===8&&mapCells.every(cell=>cell.querySelector('.st svg.ic'))
+        &&mapCells.every(cell=>!/[★✕]/.test(cell.textContent||'')));
+      mapCh=oldCh;SAVE.lv=oldLv;SAVE.stars=oldStars;
+    }
   }
   B=save.B;T=save.T;ENG.colors=save.ENG_c;ENG.cs=save.cs;GS.compDef=save.compDef;
   const fails=out.filter(s=>s.startsWith('FAIL'));
@@ -9467,7 +9492,7 @@ $('#btn-sound').innerHTML=SAVE.mute?ICONS.soundOff:ICONS.soundOn;
 $('#btn-sound').style.opacity=SAVE.mute?.45:1;
 $('#btn-music').innerHTML=SAVE.muteBgm?ICONS.musicOff:ICONS.musicOn;
 $('#btn-music').style.opacity=SAVE.muteBgm?.45:1;
-for(const el of $$('#toolbar .icw[data-ic]'))el.innerHTML=ICONS[el.dataset.ic]||'';
+for(const el of $$('[data-ic]'))el.innerHTML=ICONS[el.dataset.ic]||'';
 /* 典藏册状态必须在**任何渲染之前**建好：show('menu') 会调 renderDaily()，
    而每日补给公式里有套组加成 boonLampPow()/boonLampTool()，
    它们要读典藏册。读到空状态抛出的 TypeError 会让下面的 PLAT.raf(loop)

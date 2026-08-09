@@ -39,6 +39,9 @@ jobs:
       - name: 验证排行榜网络切换与免预检提交
         run: node match/ports/tools/test-network-layer.mjs
 
+      - name: 验证离线缓存限流与网络配置取新
+        run: node match/ports/tools/test-service-worker.mjs
+
       - name: 验证 EdgeOne 品牌网关白名单与固定上游
         run: node match/ports/tools/test-edgeone-proxy.mjs
 

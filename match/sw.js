@@ -1,10 +1,10 @@
 /* 此文件由 match/ports/tools/build-service-worker.mjs 生成，请勿手改。
-   版本 85a37b8918b515c5；预缓存 61 项 / 2806366 B。
+   版本 5fc1e6f7581d9305；预缓存 61 项 / 2808818 B。
    音乐与 iOS 启动图不预缓存：首次打开不应在后台额外下载约 19MB。 */
 'use strict';
 
 const CACHE_PREFIX = 'gemfall-static-';
-const CACHE_NAME = CACHE_PREFIX + '85a37b8918b515c5';
+const CACHE_NAME = CACHE_PREFIX + '5fc1e6f7581d9305';
 const PRECACHE = [
   "./index.html",
   "./network-config.js",
@@ -68,11 +68,29 @@ const PRECACHE = [
   "./art/ob-ink2.webp",
   "./art/win.webp"
 ];
+const PRECACHE_CONCURRENCY = 2;
+
+/* 旧版 cache.addAll 会把 61 个请求同时推上移动网络。每次发版换缓存指纹时，
+   它恰好与开局榜单同步争带宽，弱网下就表现成“更新后榜单连不上”。
+   两路受控预取仍保持完整离线包，但不再用一阵请求淹没 API。 */
+async function precacheAll(cache) {
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < PRECACHE.length) {
+      const url = PRECACHE[cursor++];
+      const response = await fetch(url, { cache: 'reload' });
+      if (!response || !response.ok) throw new Error('Precache failed: ' + url);
+      await cache.put(url, response);
+    }
+  };
+  const count = Math.min(PRECACHE_CONCURRENCY, PRECACHE.length);
+  await Promise.all(Array.from({ length: count }, () => worker()));
+}
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE))
+      .then(cache => precacheAll(cache))
       .then(() => self.skipWaiting())
   );
 });
@@ -111,6 +129,19 @@ async function staticAsset(request) {
   return response;
 }
 
+/* network-config.js 决定榜单入口，不能像普通静态脚本一样永久 cache-first。
+   EdgeOne 会给静态文件很长的 immutable 缓存；这里强制取最新，断网才退回离线副本。 */
+async function networkConfig(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request, { cache: 'no-store' });
+    if (response && response.ok) await cache.put(request, response.clone());
+    return response;
+  } catch (error) {
+    return (await cache.match(request, { ignoreSearch: true })) || Response.error();
+  }
+}
+
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
@@ -119,6 +150,10 @@ self.addEventListener('fetch', event => {
 
   /* fetch()/排行榜请求的 destination 为空：永远直连，绝不能把榜单 JSON 缓存下来。 */
   if (request.destination === '') return;
+  if (url.pathname.endsWith('/network-config.js')) {
+    event.respondWith(networkConfig(request));
+    return;
+  }
   if (request.mode === 'navigate') {
     event.respondWith(navigation(request));
     return;
