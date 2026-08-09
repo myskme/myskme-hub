@@ -81,7 +81,7 @@ DEFAULT_DATA = {
              "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
              "coverLegacy": "assets/cover-wall.webp",
              "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
-             "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
+             "desc": "优秀英语作文公开展示墙 · 手写真迹 · 王老师点评。打开即可浏览。",
              "url": "https://myskme.com/wall/"},
             {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-scoreboard-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
@@ -664,6 +664,8 @@ body.admin .admin-add{display:block;}
 .stage-qr{position:absolute;right:18px;bottom:18px;z-index:8;display:none;align-items:center;gap:10px;padding:10px;border:1px solid var(--gold3);border-radius:13px;
   background:var(--bg3);box-shadow:0 18px 50px rgba(0,0,0,.5);}.stage-qr.show{display:flex;animation:fade .2s both;}.stage-qr .qr-box,.stage-qr .qr{width:104px;height:104px;}
 .stage-qr-copy{display:flex;flex-direction:column;gap:4px;max-width:150px;}.stage-qr-copy b{font-size:12px;color:var(--gold2);}.stage-qr-copy span{font-size:10px;color:var(--ink3);line-height:1.5;}
+.stage-qr-close{position:absolute;right:5px;top:5px;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:var(--ink3);cursor:pointer;}
+.stage-qr-close:hover{background:var(--bg4);color:var(--gold2)}.stage-qr-close:focus-visible{outline:none;box-shadow:var(--focus)}.stage-qr-close .icon{width:17px;height:17px}
 .card-admin.stage-admin{display:none;margin-top:0;padding-top:9px;}.stage-admin button{border-radius:7px;}body.admin .stage-admin{display:flex;}
 
 .mobile-tabs{display:none;}.print-catalog{display:none;}
@@ -819,7 +821,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>',
     prev:'<path d="M15 5l-7 7 7 7"/>',
     next:'<path d="M9 5l7 7-7 7"/>',
-    more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'};
+    more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+    close:'<path d="M6 6l12 12M18 6L6 18"/>'};
   var CAT_NAME={game:'游戏',lore:'世界观',tool:'学习工具'};
   function iconSVG(path,extra){return '<svg class="icon'+(extra?' '+extra:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';}
   function uiIcon(name){return iconSVG(UI_PATH[name]||UI_PATH.external);}
@@ -874,7 +877,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     var it=entry.it,key=it.key||('x'+entry.si+'-'+entry.ii),rar=esc(it.rarity||'N');
     var path=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
     return '<article class="stage-card card" data-sec="'+entry.si+'" data-idx="'+entry.ii+'">'
-      +'<div class="stage-visual">'+itemCover(it,'stage-cover')+'<div class="stage-badges"><span class="stage-badge">'+esc(it.tag||CAT_NAME[it.cat]||'原创作品')+'</span><span class="stage-badge rarity">'+rar+'</span></div>'
+      +'<div class="stage-visual">'+itemCover(it,'stage-cover')+'<div class="stage-badges"><span class="stage-badge" data-bind="tag">'+esc(it.tag||CAT_NAME[it.cat]||'原创作品')+'</span><span class="stage-badge rarity">'+rar+'</span></div>'
       +'<span class="stage-index">'+String(absoluteIndex+1).padStart(2,'0')+' / '+String(total).padStart(2,'0')+'</span></div>'
       +'<div class="stage-content"><div class="stage-titleline"><span class="stage-mark"><svg viewBox="0 0 24 24">'+path+'</svg></span><div class="stage-titles">'
       +'<h2 data-bind="title">'+esc(it.title)+'</h2><span class="stage-en" data-bind="en">'+esc(it.en||'MYSKME ORIGINAL')+'</span></div></div>'
@@ -883,7 +886,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       +'<button class="btn btn-qr btn-icon" title="显示二维码">'+uiIcon('scan')+'<span>扫码</span></button>'
       +'<button class="btn btn-copy btn-icon" data-url="'+esc(it.url)+'" title="复制链接">'+uiIcon('copy')+'<span>复制</span></button></div>'
       +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
-      +'<div class="qr-plate stage-qr" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><div class="stage-qr-copy"><b>扫码直接出发</b><span>手机浏览器打开，无需下载或安装。</span></div></div>'
+      +'<div class="qr-plate stage-qr" role="dialog" aria-label="作品二维码"><button class="stage-qr-close" aria-label="关闭二维码">'+uiIcon('close')+'</button><div class="qr-box">'+qrSVG(it.url)+'</div><div class="stage-qr-copy"><b>扫码直接出发</b><span>手机浏览器打开，无需下载或安装。</span></div></div>'
       +'<div class="card-admin stage-admin"><button data-op="up">上移</button><button data-op="down">下移</button><button data-op="move">换区</button><button data-op="feat">主推</button><button data-op="del" class="danger">删除</button></div>'
       +'</div></article>';
   }
@@ -961,6 +964,10 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       var tl=card.querySelector('.title-link'); if(tl)tl.href=txt;
       var th=card.querySelector('a.thumb'); if(th)th.href=txt;
       var cp=card.querySelector('.btn-copy'); if(cp)cp.setAttribute('data-url',txt);
+    }
+    if(key==='title'||key==='en'||key==='tag'){
+      var chosen=Array.prototype.find.call(content.querySelectorAll('[data-select]'),function(b){return b.getAttribute('data-select')===selectedKey;});
+      if(chosen){var preview=chosen.querySelector(key==='title'?'strong':key==='en'?'small':'.tile-kicker');if(preview)preview.textContent=txt;}
     }
     dsave();
   }
@@ -1106,6 +1113,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   }
 
   // ---- 事件绑定 ----
+  function closeStageQr(){document.querySelectorAll('.stage-qr.show').forEach(function(el){el.classList.remove('show');});}
+  function closeTools(){var tools=document.querySelector('.tools-menu');if(tools)tools.open=false;}
   content.addEventListener('input',onEdit);
   header.addEventListener('input',onEdit);
   content.addEventListener('keydown',onKey,true);
@@ -1114,6 +1123,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   header.addEventListener('paste',onPaste);
 
   document.addEventListener('click',function(e){
+    var qx=e.target.closest('.stage-qr-close');if(qx){var plate=qx.closest('.stage-qr');if(plate)plate.classList.remove('show');return;}
     var nav=e.target.closest('[data-view]');if(nav){setView(nav.getAttribute('data-view'));return;}
     var tile=e.target.closest('[data-select]');if(tile){selectEntry(tile.getAttribute('data-select'));return;}
     if(e.target.closest('#pagePrev')){setPage(-1);return;}if(e.target.closest('#pageNext')){setPage(1);return;}
@@ -1121,16 +1131,24 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     var op=e.target.closest('[data-op]'); if(op){doOp(op);return;}
     var add=e.target.closest('[data-addsec]'); if(add){addWork(+add.getAttribute('data-addsec'));return;}
     var cp=e.target.closest('.btn-copy'); if(cp){copyLink(cp);return;}
-    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card');var qp=qc&&qc.querySelector('.qr-plate');if(qp)qp.classList.toggle('show');return;}
+    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card'),qp=qc&&qc.querySelector('.qr-plate'),was=qp&&qp.classList.contains('show');closeStageQr();if(qp&&!was){qp.classList.add('show');var qclose=qp.querySelector('.stage-qr-close');if(qclose)setTimeout(function(){qclose.focus();},0);}return;}
     var launch=e.target.closest('[data-launch]');if(launch){recordRecent(launch.getAttribute('data-launch'));if(isAdmin())e.preventDefault();return;}
     if(isAdmin()){var a=e.target.closest('a');if(a)e.preventDefault();}  // 编辑时不跳转
   });
 
   var searchInput=document.getElementById('hubSearch');
   if(searchInput)searchInput.addEventListener('input',function(){query=this.value||'';viewPage=0;selectedKey='';render();if(document.activeElement!==this)this.focus();});
+  document.addEventListener('click',function(e){
+    var tools=document.querySelector('.tools-menu');if(tools&&tools.open&&!tools.contains(e.target))tools.open=false;
+    if(!e.target.closest('.stage-qr')&&!e.target.closest('.btn-qr'))closeStageQr();
+  });
   document.addEventListener('keydown',function(e){
     if(e.key==='/'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&document.activeElement!==searchInput){e.preventDefault();searchInput&&searchInput.focus();return;}
-    if(e.key==='Escape'&&query){query='';if(searchInput)searchInput.value='';render();return;}
+    if(e.key==='Escape'){
+      if(document.querySelector('.stage-qr.show')){e.preventDefault();closeStageQr();return;}
+      var tools=document.querySelector('.tools-menu');if(tools&&tools.open){e.preventDefault();tools.open=false;return;}
+      if(query){query='';if(searchInput)searchInput.value='';render();return;}
+    }
     if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.key)<0||/INPUT|TEXTAREA/.test((document.activeElement&&document.activeElement.tagName)||''))return;
     var buttons=Array.prototype.slice.call(content.querySelectorAll('[data-select]'));if(!buttons.length)return;
     var current=buttons.findIndex(function(b){return b.getAttribute('data-select')===selectedKey;}),cols=2,step=(e.key==='ArrowUp'?-cols:e.key==='ArrowDown'?cols:e.key==='ArrowLeft'?-1:1);
@@ -1138,7 +1156,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   });
   var resizeTimer;window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(render,120);});
 
-  document.getElementById('adminFab').addEventListener('click',openPw);
+  document.getElementById('adminFab').addEventListener('click',function(){closeTools();openPw();});
   document.getElementById('pwOk').addEventListener('click',tryPw);
   document.getElementById('pwCancel').addEventListener('click',closePw);
   pwInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tryPw();}if(e.key==='Escape')closePw();});
@@ -1178,8 +1196,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   document.getElementById('themeBtn').addEventListener('click',cycleTheme);
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
   document.getElementById('shareBtn').addEventListener('click',doShare);
-  var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',copyAll);
-  var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',buildPoster);
+  var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',function(){closeTools();copyAll();});
+  var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',function(){closeTools();buildPoster();});
 
   // ---- 启动 ----
   var adminFab=document.getElementById('adminFab');if(adminFab)adminFab.innerHTML=uiIcon('edit')+'<span>管理员编辑</span>';
