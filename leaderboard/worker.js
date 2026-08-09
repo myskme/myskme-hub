@@ -14,7 +14,7 @@ const ALLOW = [
 const RANKS = [
   [0, "学徒"], [300, "习字者"], [800, "御词生"], [1800, "词灵使"],
   [3600, "驭灵师"], [6500, "黑域行者"], [11000, "噬词者"],
-  [18000, "词灵宗师"], [30000, "☠狼徒·封号弟子"],
+  [18000, "词灵宗师"], [30000, "狼徒·封号弟子"],
 ];
 function rankFor(p) { let n = RANKS[0][1]; for (const [t, name] of RANKS) if (p >= t) n = name; return n; }
 
@@ -349,7 +349,7 @@ const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
-  [15000, "深堑行者"], [26000, "灵石匠"], [42000, "矿脉宗师"], [65000, "☠执灯人·封号矿主"],
+  [15000, "深堑行者"], [26000, "灵石匠"], [42000, "矿脉宗师"], [65000, "执灯人·封号矿主"],
 ];
 function gfRankFor(p) { let n = GF_RANKS[0][1]; for (const [t, name] of GF_RANKS) if (p >= t) n = name; return n; }
 // 矿力：星与关卡为主（体现走得多远），分数为辅（体现打得多好）
