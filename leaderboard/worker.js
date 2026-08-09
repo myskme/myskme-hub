@@ -196,7 +196,9 @@ function mapRows(results) {
   return (results || []).map((r, i) => ({
     rank: i + 1, alias: r.alias, faction: r.faction || "",
     power: Math.max(0, (r.power || 0) - (r.base_power || 0)), lifetime: r.power || 0,
-    rankName: r.rank_name, badges: r.badges ? r.badges.split(",") : [],
+    /* 段位名始终按权威公式现算，避免 D1 旧行把退役字符继续带回公共响应。 */
+    rankName: rankFor(Math.max(0, (r.power || 0) - (r.base_power || 0))),
+    badges: r.badges ? r.badges.split(",") : [],
     tag: String(r.id || "").slice(-2),   // 同名区分用（非隐私，稳定 2 位）
   }));
 }
@@ -287,7 +289,8 @@ async function handleAdmin(req, env, origin) {
     const out = (rows.results || []).map(r => ({
       id: r.id, alias: r.alias, faction: r.faction || "",
       is_class: (r.class_tag || "") !== "", power: Math.max(0, (r.power || 0) - (r.base_power || 0)),
-      lifetime: r.power || 0, rank_name: r.rank_name, hidden: r.hidden,
+      lifetime: r.power || 0,
+      rank_name: rankFor(Math.max(0, (r.power || 0) - (r.base_power || 0))), hidden: r.hidden,
     }));
     return json({ ok: true, rows: out }, 200, origin);
   }
@@ -805,7 +808,9 @@ function gfMap(rows) {
   return (rows || []).map((r, i) => ({
     rank: i + 1, alias: r.alias, power: r.power || 0,
     lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
-    chain: r.chain || 0, rankName: r.rank_name || "", badges: (r.badges || "").split(",").filter(Boolean),
+    chain: r.chain || 0,
+    /* 历史存量可能还保留旧称号；公共输出只认当前权威段位表。 */
+    rankName: gfRankFor(r.power || 0), badges: (r.badges || "").split(",").filter(Boolean),
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
     luck: r.luck || 0,
     comp: r.comp || "",

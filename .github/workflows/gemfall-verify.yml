@@ -12,6 +12,8 @@ on:
       - 'match/icons/**'
       - 'match/art/**'
       - 'match/ports/**'
+      - 'leaderboard/worker.js'
+      - 'leaderboard/*.test.mjs'
       - '.github/workflows/gemfall-verify.yml'
 
 permissions:
@@ -49,6 +51,9 @@ jobs:
       # 「125 条全绿」曾经和「11 个人里 10 个每晚成绩倒退」同时成立了好几天。
       - name: 配速员不变量（只增不减 / 不越过真人 / 名片与榜单同源）
         run: node leaderboard/pacer.test.mjs
+
+      - name: 验证榜单公共响应不回流历史 emoji
+        run: node leaderboard/output-safety.test.mjs
 
       - name: 验证 EdgeOne 可重复发布包
         run: |
