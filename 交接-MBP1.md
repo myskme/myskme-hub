@@ -77,6 +77,28 @@
 - 排行榜后端 = Cloudflare Worker + D1（`leaderboard/worker.js`），
   **改 worker 后一条命令部署：`python3 leaderboard/deploy.py`**。
 
+## 1b. 2026-08-10 · Claude · 作品搬家后的主页链接对账（本轮唯一改动）
+
+自鸣棋 0810 搬到 `https://zimingqi.myskme.com/`（GitHub Pages + 仓库根 `CNAME`），但主页这边没跟上：
+
+- `build_hub.py` 的作品清单、`README.md` 收录表、**以及《灵石远征》游戏内「其他作品」那条**
+  都还指着 `myskme.github.io/myskme-zimingqi/`。Pages 会 301，所以没坏，
+  但主页详情页扫出来的二维码印的仍是旧址，品牌域等于白搬。三处都已改。
+- **坑（下次搬别的作品一定会再踩）**：`mergeVisualDefaults` 的回填只补缺失的 `url2..url6`，
+  **主 `url` 从来不回填**。老访客（尤其是王老师自己这台）的管理员存档里存着旧地址，
+  光改 `DEFAULT_DATA` 他们永远刷不出新域名。已照 `LEGACY_DEFAULT_DESC` 的同款做法加了
+  `LEGACY_DEFAULT_URL`：只把「历史上的官方默认地址」升级到最新，管理员亲手改过的网址一律不动。
+  **以后再搬一个作品，就往 `LEGACY_DEFAULT_URL` 里加一条旧地址**，别只改 `url`。
+- 改了 `match/index.html` 就必须重生成 `sw.js`（本轮已跑 `build-service-worker.mjs`，
+  缓存指纹 `6cb4c4d4` 变 `91bba7df`）。
+- **验证**：`build_hub.py` 重生成的 `index.html` 与仓库逐字节一致（生成器无漂移）；
+  gemfall CI 六项本地全过（selftest 143/143、网络层 7/7、SW、EdgeOne 代理 17/17、
+  配速员 15/15、榜单输出安全）；微信引擎测试通过；资源总账与微信美术副本重生成后无差异；
+  回填逻辑用页面里真实的 `mergeVisualDefaults` 跑过三种情形：老访客旧官方地址会升级、
+  管理员自定义地址原样保留、别的作品不受影响。
+- **没做的**：没有动 DNS、证书、EdgeOne，也没有点 production 发布。
+  合并到 main 只会触发构建校验，**上线仍需人工在 Actions 点 production**。
+
 ## 2. 必须手动拷到 MBP1 的文件（gitignore 挡着，git 里没有）
 
 | 文件 | 作用 |
