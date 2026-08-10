@@ -16,9 +16,9 @@ LIB = open(os.path.join(HERE, "qrcode-generator.js"), encoding="utf-8").read()
 DEFAULT_DATA = {
     "kicker": "THE MYSKME CHRONICLES · 王老师 MR. WANG",
     "titlePre": "MYSKME",
-    "titleEm": "编年史",
+    "titleEm": "作品启动台",
     "motto": "Make Yourself Special & Kind — 狼先生与他的学生们的远征编年",
-    "hint": "往下是 娱乐 与 学习 两区 —— 每一件都免下载免安装，扫码即玩，手机直接开。",
+    "hint": "一屏选作品，一键出发。娱乐、学习与世界观都在同一座 MYSKME 入口中。",
     "hubUrl": "https://myskme.com/",
     "sections": [
         {"label": "娱乐", "anchor": "vol-1", "vol": "壹", "era": "第一纪 · 游戏与世界观",
@@ -81,7 +81,7 @@ DEFAULT_DATA = {
              "coverSmall": "assets/image2-priority-20260712/cover-wall-640.webp",
              "coverLegacy": "assets/cover-wall.webp",
              "tag": "荣誉 · 优秀作文", "title": "荣誉殿堂 · 优秀作文墙", "en": "WALL OF FAME",
-             "desc": "优秀英语作文展示墙 · 手写真迹 · 王老师点评。班级口令进入。",
+             "desc": "优秀英语作文公开展示墙 · 手写真迹 · 王老师点评。打开即可浏览。",
              "url": "https://myskme.com/wall/"},
             {"key": "scoreboard", "glyph": "榜", "cat": "tool", "rarity": "SR", "cover": "assets/image2-priority-20260712/cover-scoreboard-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-scoreboard-640.webp",
@@ -538,6 +538,188 @@ footer b{color:var(--ink2);font-weight:400;}
 }
 """
 
+# ---------- 2026-08 一屏式作品启动台 ----------
+# 保留上方旧样式，确保导出旧存档与打印能力不丢失；以下规则接管正常浏览器界面。
+CSS += r"""
+:root{
+  --shell-gap:clamp(10px,1.2vw,18px);
+  --shell-radius:18px;
+  --shell-top:74px;
+  --panel:color-mix(in srgb,var(--bg3) 90%,transparent);
+  --panel-soft:color-mix(in srgb,var(--bg2) 76%,transparent);
+  --focus:0 0 0 2px var(--bg),0 0 0 4px var(--gold);
+}
+html,body{height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none;}
+html{scroll-behavior:auto;scroll-padding-top:0;}
+body{line-height:1.45;background-attachment:fixed;}
+body::before{opacity:.58;mix-blend-mode:normal;background:
+  linear-gradient(90deg,transparent 49.8%,var(--line2) 50%,transparent 50.2%),
+  linear-gradient(0deg,transparent 49.8%,var(--line2) 50%,transparent 50.2%);
+  background-size:72px 72px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 76%);}
+body::after{background:radial-gradient(900px 620px at 72% 18%,rgba(201,166,74,.08),transparent 68%),var(--vignette);}
+
+.launchpad-shell{position:relative;z-index:2;height:100dvh;min-height:560px;display:grid;
+  grid-template-rows:var(--shell-top) minmax(0,1fr);padding:0 var(--shell-gap) var(--shell-gap);}
+.app-topbar{height:var(--shell-top);display:flex;align-items:center;gap:16px;padding:10px 2px;min-width:0;}
+.brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:var(--ink);}
+.brand-seal{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);padding:4px;
+  background:linear-gradient(145deg,var(--bg4),var(--bg2));box-shadow:inset 0 0 0 1px var(--line2),var(--plate-shadow);object-fit:cover;}
+.brand-copy{display:flex;flex-direction:column;min-width:0;}
+.brand-copy b{font-size:19px;line-height:1.15;letter-spacing:.16em;font-weight:650;color:var(--gold2);}
+.brand-copy span{font-size:10px;letter-spacing:.18em;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw;}
+.topbar-motto{margin-left:auto;min-width:0;color:var(--ink2);font-size:12px;letter-spacing:.06em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;}
+.topbar-count{display:flex;align-items:baseline;gap:5px;padding:7px 10px;border-left:1px solid var(--line2);white-space:nowrap;}
+.topbar-count b{font-size:18px;font-weight:500;color:var(--gold2);}.topbar-count span{font-size:10px;color:var(--ink3);letter-spacing:.1em;}
+.top-controls{display:flex;align-items:center;gap:7px;flex:0 0 auto;}
+.top-controls .ctrl-btn,.tools-menu summary,.admin-fab{position:static;width:40px;height:40px;margin:0;border-radius:12px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink2);opacity:1;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:none;transition:border-color .2s,color .2s,background .2s,transform .2s;}
+.top-controls .ctrl-btn:hover,.tools-menu summary:hover,.admin-fab:hover{border-color:var(--gold3);color:var(--gold2);background:var(--bg4);transform:translateY(-1px);box-shadow:none;}
+.top-controls .ctrl-btn:focus-visible,.tools-menu summary:focus-visible,.admin-fab:focus-visible{outline:none;box-shadow:var(--focus);}
+.top-controls .icon,.tools-menu .icon,.admin-fab .icon{width:18px;height:18px;}
+.tools-menu{position:relative;}.tools-menu summary{list-style:none;}.tools-menu summary::-webkit-details-marker{display:none;}
+.tools-pop{position:absolute;right:0;top:48px;width:230px;padding:10px;border:1px solid var(--line);border-radius:14px;
+  background:color-mix(in srgb,var(--bg3) 96%,transparent);box-shadow:0 22px 60px rgba(0,0,0,.45);z-index:90;display:grid;gap:6px;}
+.tools-pop button{width:100%;min-height:42px;display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid transparent;border-radius:9px;
+  background:transparent;color:var(--ink2);font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;text-align:left;}
+.tools-pop button:hover{background:var(--bg4);border-color:var(--line);color:var(--gold2);}.tools-pop .admin-fab{width:100%;height:42px;justify-content:flex-start;}
+
+.launchpad-workspace{min-height:0;display:grid;grid-template-columns:88px minmax(390px,.82fr) minmax(480px,1.18fr);
+  gap:var(--shell-gap);max-width:1720px;width:100%;margin:0 auto;}
+.category-rail,.library-panel,.project-stage{min-width:0;min-height:0;border:1px solid var(--line);border-radius:var(--shell-radius);
+  background:var(--panel-soft);box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 54px rgba(0,0,0,.18);overflow:hidden;}
+.category-rail{padding:12px 8px;display:flex;flex-direction:column;align-items:stretch;gap:7px;}
+.rail-brand{width:42px;height:42px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);
+  color:var(--gold2);font-size:13px;letter-spacing:0;background:var(--bg3);}
+.nav-button{appearance:none;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--ink3);font-family:var(--serif);
+  min-height:66px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;position:relative;}
+.nav-button .icon{width:20px;height:20px;}.nav-button span{font-size:11px;letter-spacing:.08em;}
+.nav-button:hover{color:var(--ink);background:color-mix(in srgb,var(--bg4) 70%,transparent);}
+.nav-button.on{color:var(--gold2);border-color:var(--line);background:linear-gradient(150deg,rgba(201,166,74,.13),transparent);}
+.nav-button.on::before{content:'';position:absolute;left:-9px;width:3px;height:24px;border-radius:3px;background:var(--gold);box-shadow:var(--glow-gold);}
+.nav-button:focus-visible{outline:none;box-shadow:var(--focus);}
+
+.library-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:14px;gap:12px;background:var(--panel);}
+.library-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 10px;align-items:center;}
+.library-heading{min-width:0;}.library-eyebrow{display:block;color:var(--gold);font-size:9px;letter-spacing:.2em;margin-bottom:3px;}
+.library-heading h1{margin:0;font-size:20px;font-weight:520;letter-spacing:.08em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.library-heading p{margin:4px 0 0;color:var(--ink3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.search-box{grid-column:1/-1;height:38px;display:flex;align-items:center;gap:8px;border:1px solid var(--line2);border-radius:10px;
+  padding:0 11px;background:color-mix(in srgb,var(--bg2) 74%,transparent);color:var(--ink3);}
+.search-box:focus-within{border-color:var(--gold3);box-shadow:0 0 0 2px rgba(201,166,74,.08);}.search-box .icon{width:15px;height:15px;}
+.search-box input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:12px;letter-spacing:.04em;}
+.search-box input::placeholder{color:var(--ink3);}
+.view-count{font-size:11px;color:var(--ink3);white-space:nowrap;}.view-count b{font-size:16px;color:var(--gold2);font-weight:500;margin-right:3px;}
+
+.app-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:9px;}
+.app-grid.grid-compact{grid-template-rows:repeat(2,minmax(0,1fr));}
+.app-tile{min-width:0;min-height:0;position:relative;border:1px solid var(--line2);border-radius:13px;overflow:hidden;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--bg3) 94%,transparent),color-mix(in srgb,var(--bg2) 86%,transparent));
+  transition:border-color .2s,background .2s,transform .2s;}
+.app-tile:hover{border-color:var(--gold3);transform:translateY(-1px);}.app-tile.selected{border-color:var(--gold);background:linear-gradient(145deg,rgba(201,166,74,.16),var(--bg2));}
+.tile-button{appearance:none;border:0;background:transparent;color:inherit;font:inherit;width:100%;height:100%;padding:9px;cursor:pointer;
+  display:grid;grid-template-columns:minmax(54px,34%) minmax(0,1fr);gap:10px;align-items:center;text-align:left;}
+.tile-button:focus-visible{outline:none;box-shadow:inset var(--focus);}
+.tile-cover{width:100%;max-height:100%;aspect-ratio:1/1;border-radius:9px;overflow:hidden;border:1px solid var(--line2);background:var(--bg4);position:relative;}
+.tile-cover img{width:100%;height:100%;display:block;object-fit:cover;filter:saturate(.92) contrast(1.03);}
+.tile-fallback{width:100%;height:100%;display:grid;place-items:center;color:var(--gold2);font-size:24px;background:radial-gradient(circle,rgba(201,166,74,.16),transparent 70%);}
+.tile-copy{min-width:0;display:flex;flex-direction:column;gap:3px;}.tile-kicker{font-size:8.5px;letter-spacing:.13em;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tile-copy strong{font-size:14px;font-weight:520;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tile-copy small{font-size:8.5px;letter-spacing:.08em;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tile-state{position:absolute;right:7px;top:7px;width:7px;height:7px;border:1px solid var(--gold3);border-radius:50%;background:var(--bg3);}
+.app-tile.selected .tile-state{background:var(--gold);box-shadow:0 0 12px rgba(201,166,74,.65);}
+.empty-grid{grid-column:1/-1;grid-row:1/-1;display:grid;place-items:center;text-align:center;color:var(--ink3);font-size:13px;letter-spacing:.08em;border:1px dashed var(--line);border-radius:13px;}
+
+.library-foot{height:32px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pager{display:flex;align-items:center;gap:7px;}.page-button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:var(--bg3);color:var(--ink2);display:grid;place-items:center;cursor:pointer;}
+.page-button:hover:not(:disabled){border-color:var(--gold3);color:var(--gold2);}.page-button:disabled{opacity:.28;cursor:default;}.page-button .icon{width:15px;height:15px;}
+.page-label{font-size:10px;color:var(--ink3);min-width:46px;text-align:center;letter-spacing:.08em;}
+.shortcut-hint{font-size:9px;color:var(--ink3);letter-spacing:.08em;white-space:nowrap;}.shortcut-hint kbd{border:1px solid var(--line);border-radius:5px;padding:2px 5px;background:var(--bg3);font:inherit;color:var(--ink2);}
+.admin-add{display:none;border:1px dashed var(--gold3);border-radius:9px;background:transparent;color:var(--gold2);height:30px;padding:0 10px;font:inherit;font-size:10px;cursor:pointer;}
+body.admin .admin-add{display:block;}
+
+.project-stage{position:relative;background:var(--bg2);}
+.stage-card{position:relative;width:100%;height:100%;overflow:hidden;display:grid;grid-template-rows:minmax(210px,48%) minmax(0,1fr);}
+.stage-visual{position:relative;overflow:hidden;background:var(--bg4);isolation:isolate;}
+.stage-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 34%,var(--bg2) 100%),linear-gradient(100deg,rgba(0,0,0,.25),transparent 55%);z-index:1;}
+.stage-visual img{width:100%;height:100%;display:block;object-fit:cover;filter:saturate(.94) contrast(1.04);transform:scale(1.015);}
+.stage-visual .tile-fallback{font-size:80px;}.stage-badges{position:absolute;left:18px;top:16px;z-index:3;display:flex;gap:7px;flex-wrap:wrap;}
+.stage-badge{padding:5px 8px;border-radius:999px;border:1px solid rgba(240,230,210,.28);background:rgba(10,10,12,.66);color:#f0e6d2;font-size:9px;letter-spacing:.11em;}
+.stage-badge.rarity{color:#f3d67d;border-color:rgba(232,199,104,.52);}
+.stage-index{position:absolute;right:18px;top:16px;z-index:3;color:rgba(255,255,255,.74);font-size:10px;letter-spacing:.16em;text-shadow:0 2px 10px #000;}
+.stage-content{min-height:0;padding:clamp(16px,2vw,26px);display:flex;flex-direction:column;gap:10px;position:relative;background:
+  radial-gradient(560px 260px at 0 0,rgba(201,166,74,.09),transparent 70%),var(--bg2);}
+.stage-titleline{display:flex;align-items:flex-start;gap:12px;}.stage-mark{width:42px;height:42px;border-radius:11px;border:1px solid var(--line);display:grid;place-items:center;color:var(--gold2);flex:0 0 auto;background:var(--bg3);}
+.stage-mark svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round;}
+.stage-titles{min-width:0;}.stage-titles h2{font-size:clamp(23px,2.4vw,38px);line-height:1.12;letter-spacing:.07em;font-weight:520;margin:0;color:var(--ink);}
+.stage-en{display:block;margin-top:5px;color:var(--gold);font-size:9px;letter-spacing:.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stage-desc{margin:0;color:var(--ink2);font-size:13px;line-height:1.72;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-width:68ch;}
+.stage-actions{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}.stage-actions .btn{min-height:40px;border-radius:10px;}
+.stage-actions .btn-primary{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:transparent;color:#191207;font-weight:700;min-width:128px;justify-content:center;}
+.stage-actions .btn-primary:hover{color:#080603;box-shadow:0 10px 28px rgba(201,166,74,.2);}.stage-actions .btn-icon{width:42px;padding:0;justify-content:center;}
+.stage-actions .btn-icon span{display:none;}.stage-links{display:flex;gap:6px;flex-wrap:wrap;max-height:31px;overflow:hidden;}
+.stage-links a{font-size:10px;color:var(--ink2);text-decoration:none;padding:6px 8px;border:1px solid var(--line2);border-radius:8px;white-space:nowrap;}
+.stage-links a:hover{border-color:var(--gold3);color:var(--gold2);}
+.stage-qr{position:absolute;right:18px;bottom:18px;z-index:8;display:none;align-items:center;gap:10px;padding:10px;border:1px solid var(--gold3);border-radius:13px;
+  background:var(--bg3);box-shadow:0 18px 50px rgba(0,0,0,.5);}.stage-qr.show{display:flex;animation:fade .2s both;}.stage-qr .qr-box,.stage-qr .qr{width:104px;height:104px;}
+.stage-qr-copy{display:flex;flex-direction:column;gap:4px;max-width:150px;}.stage-qr-copy b{font-size:12px;color:var(--gold2);}.stage-qr-copy span{font-size:10px;color:var(--ink3);line-height:1.5;}
+.stage-qr-close{position:absolute;right:5px;top:5px;width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:var(--ink3);cursor:pointer;}
+.stage-qr-close:hover{background:var(--bg4);color:var(--gold2)}.stage-qr-close:focus-visible{outline:none;box-shadow:var(--focus)}.stage-qr-close .icon{width:17px;height:17px}
+.card-admin.stage-admin{display:none;margin-top:0;padding-top:9px;}.stage-admin button{border-radius:7px;}body.admin .stage-admin{display:flex;}
+
+.mobile-tabs{display:none;}.print-catalog{display:none;}
+.admin-bar{position:fixed;inset:0 0 auto 0;height:52px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;padding:7px 12px;z-index:120;}
+.admin-bar .ab-title{white-space:nowrap;}.admin-bar button{white-space:nowrap;flex:0 0 auto;}
+body.admin .launchpad-shell{padding-top:52px;height:100dvh;}
+
+@media (max-width:1180px){
+  .launchpad-workspace{grid-template-columns:76px minmax(340px,.9fr) minmax(390px,1.1fr);}
+  .app-grid{grid-template-rows:repeat(3,minmax(0,1fr));}.stage-card{grid-template-rows:minmax(190px,44%) minmax(0,1fr);}
+  .topbar-motto{display:none;}.tile-button{grid-template-columns:minmax(48px,31%) minmax(0,1fr);}
+}
+@media (max-width:820px){
+  :root{--shell-top:60px;--shell-gap:9px;}
+  .launchpad-shell{padding:0 9px calc(68px + env(safe-area-inset-bottom));}
+  .app-topbar{gap:9px;padding:6px 0;}.brand-seal{width:40px;height:40px;border-radius:12px;}.brand-copy b{font-size:16px;}.brand-copy span{font-size:8px;max-width:36vw;}
+  .topbar-count{display:none;}.top-controls{margin-left:auto;gap:5px;}.top-controls .ctrl-btn,.tools-menu summary{width:44px;height:44px;border-radius:12px;}
+  #printBtn{display:none;}
+  .launchpad-workspace{display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,.92fr) minmax(0,1.08fr);gap:9px;}
+  .category-rail{display:none;}.project-stage{grid-row:1;border-radius:15px;}.library-panel{grid-row:2;border-radius:15px;padding:10px;gap:7px;}
+  .stage-card{grid-template-rows:100%;display:block;}.stage-visual{position:absolute;inset:0;}.stage-visual::after{background:linear-gradient(to top,var(--bg2) 3%,rgba(17,17,20,.86) 43%,rgba(10,10,12,.2) 88%),linear-gradient(90deg,rgba(0,0,0,.35),transparent 70%);}
+  .stage-content{height:100%;z-index:2;background:transparent;padding:14px;gap:6px;justify-content:flex-end;pointer-events:none;}
+  .stage-content>*{pointer-events:auto;}.stage-titleline{gap:9px;}.stage-mark{width:34px;height:34px;border-radius:9px;background:rgba(10,10,12,.62);}.stage-mark svg{width:18px;height:18px;}
+  .stage-titles h2{font-size:23px;text-shadow:0 2px 14px #000;color:#f0e6d2;}.stage-en{font-size:8px;color:#e8c768;}.stage-desc{font-size:11px;line-height:1.45;-webkit-line-clamp:2;color:#d7cdbb;text-shadow:0 1px 8px #000;}
+  .stage-badges{left:12px;top:11px;}.stage-index{right:12px;top:13px;}.stage-actions{margin-top:2px;gap:6px;flex-wrap:nowrap;}.stage-actions .btn{min-height:44px;padding:9px 12px;font-size:11px;background:rgba(10,10,12,.76);color:#f0e6d2;border-color:rgba(232,199,104,.34);}
+  .stage-actions .btn-primary{min-width:105px;background:linear-gradient(135deg,#e8c768,#c9a64a);color:#191207;border:0;}.stage-links{display:flex;flex-wrap:nowrap;overflow-x:auto;max-height:29px;scrollbar-width:none;}.stage-links::-webkit-scrollbar{display:none;}
+  .stage-qr{right:10px;bottom:10px;left:10px;justify-content:center;background:rgba(17,17,20,.97);}.stage-qr .qr-box,.stage-qr .qr{width:96px;height:96px;}
+  .library-head{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;}.library-eyebrow,.library-heading p{display:none;}.library-heading h1{font-size:15px;}.view-count{font-size:9px;}.view-count b{font-size:13px;}
+  .search-box{grid-column:auto;width:min(138px,35vw);height:38px;padding:0 9px;justify-content:flex-start;}.search-box input{width:100%;padding:0;opacity:1;font-size:10px;}
+  .app-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:7px;}.tile-button{padding:7px;grid-template-columns:minmax(44px,34%) minmax(0,1fr);gap:7px;}
+  .tile-kicker{font-size:7.5px;}.tile-copy strong{font-size:12.5px;}.tile-copy small{font-size:7px;}.tile-state{right:5px;top:5px;}
+  .library-foot{height:32px;}.page-button{width:32px;height:32px;}.shortcut-hint{display:none;}.admin-add{height:32px;}
+  .mobile-tabs{position:fixed;z-index:50;left:9px;right:9px;bottom:max(7px,env(safe-area-inset-bottom));height:58px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
+    padding:5px;border:1px solid var(--line);border-radius:17px;background:color-mix(in srgb,var(--bg3) 96%,transparent);box-shadow:0 12px 40px rgba(0,0,0,.38);}
+  .mobile-tabs .nav-button{min-height:0;height:46px;padding:3px;gap:2px;border-radius:10px;}.mobile-tabs .nav-button .icon{width:17px;height:17px;}.mobile-tabs .nav-button span{font-size:8px;}.mobile-tabs .nav-button.on::before{display:none;}
+  .tools-pop{position:fixed;left:9px;right:9px;top:60px;width:auto;}
+  .toast{bottom:76px;}.admin-bar{height:48px;}.admin-bar .ab-title{display:none;}body.admin .launchpad-shell{padding-top:48px;}
+}
+@media (max-height:680px) and (max-width:820px){
+  :root{--shell-top:52px;}.brand-copy span{display:none;}.brand-seal{width:36px;height:36px;}.top-controls .ctrl-btn,.tools-menu summary{width:40px;height:40px;}
+  .launchpad-workspace{grid-template-rows:minmax(0,.82fr) minmax(0,1.18fr);}.stage-desc{display:none;}.stage-badges{display:none;}.tile-copy small{display:none;}
+}
+@media (max-width:350px){.brand-copy span{display:none;}.brand-copy b{font-size:14px;}.top-controls #shareBtn{display:none;}.launchpad-shell{padding-left:6px;padding-right:6px;}.mobile-tabs{left:6px;right:6px;}}
+
+@media print{
+  html,body{height:auto!important;overflow:visible!important;}.launchpad-shell,.admin-bar,.pw-mask,.toast{display:none!important;}
+  .print-catalog{display:block!important;padding:8mm 9mm;color:#241d12;background:#fbf7ee;font-family:var(--serif);}
+  .print-catalog h1{font-size:20pt;margin:0 0 2mm;}.print-catalog>p{font-size:9pt;margin:0 0 6mm;color:#5d513d;}
+  .print-grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;}.print-item{display:grid;grid-template-columns:25mm 1fr;gap:4mm;align-items:center;border:1px solid #b3954c;padding:3mm;break-inside:avoid;}
+  .print-item .qr,.print-item .qr-box{width:25mm;height:25mm;}.print-item h2{font-size:11pt;margin:0 0 1mm;}.print-item p{font-size:7pt;margin:0;color:#5d513d;word-break:break-all;}
+  @page{size:A4;margin:10mm;}
+}
+"""
+
 APP_JS = r"""
 var LS='myskme-hub-data', SS='myskme-admin', PW_HASH='%%PWHASH%%';
 function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0');}).join('');}).catch(function(){return '';});}
@@ -631,7 +813,16 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z"/>',
     edit:'<path d="M4 20l4.5-1 10-10a2.1 2.1 0 00-3-3l-10 10z"/><path d="M14.5 7.5l3 3M4 20h6"/>',
     links:'<path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"/>',
-    poster:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M7 16l3-3 2 2 3-4 2 3M8 7h5"/>'};
+    poster:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M7 16l3-3 2 2 3-4 2 3M8 7h5"/>',
+    home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/>',
+    game:'<path d="M8 8h8a5 5 0 014.7 6.7l-1.1 3a2 2 0 01-3.3.8L14 16h-4l-2.3 2.5a2 2 0 01-3.3-.8l-1.1-3A5 5 0 018 8z"/><path d="M7 12h4M9 10v4"/><circle cx="16" cy="11.5" r=".7"/><circle cx="18" cy="13.5" r=".7"/>',
+    book:'<path d="M4 5a3 3 0 013-2h5v17H7a3 3 0 00-3 2z"/><path d="M20 5a3 3 0 00-3-2h-5v17h5a3 3 0 013 2z"/>',
+    world:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>',
+    prev:'<path d="M15 5l-7 7 7 7"/>',
+    next:'<path d="M9 5l7 7-7 7"/>',
+    more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+    close:'<path d="M6 6l12 12M18 6L6 18"/>'};
   var CAT_NAME={game:'游戏',lore:'世界观',tool:'学习工具'};
   function iconSVG(path,extra){return '<svg class="icon'+(extra?' '+extra:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+path+'</svg>';}
   function uiIcon(name){return iconSVG(UI_PATH[name]||UI_PATH.external);}
@@ -639,100 +830,88 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     return '<span class="cat-icon" title="'+(CAT_NAME[cat]||'作品')+'" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg><small>'+esc(CAT_NAME[cat]||'作品')+'</small></span>';}
   function workMark(it){var d=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
     return '<span class="work-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
-  function cardHTML(it,si,ii){
-    var cover=it.cover||'';
-    var coverSmall=it.coverSmall||'';
-    var fb='<div class="thumb-fallback"'+(cover?' style="display:none"':'')+'><span data-bind="glyph">'+esc(it.glyph)+'</span></div>';
-    var srcset=coverSmall?' srcset="'+esc(coverSmall)+' 640w, '+esc(cover)+' 1280w" sizes="(max-width:720px) 94vw, 600px"':'';
-    var img=cover?'<img class="cover-img" loading="lazy" decoding="async" width="1280" height="800" alt="" src="'+esc(cover)+'"'+srcset+' onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(&quot;.thumb-fallback&quot;);if(f)f.style.display=\'flex\'">':'';
-    var rar=esc(it.rarity||'N');
-    var ext=(it.url||'').indexOf('https://myskme.com/')!==0; // 主域自家子页当前标签打开,保住返回键;外站才开新标签
-    var tgt=ext?' target="_blank" rel="noopener"':'';
-    var badges=catIcon(it.cat)+'<span class="rarity-badge">'+rar+'</span>'; // 稀有度角标接线——CSS 早就写好(rar-* 左描边+角标),markup 一直没输出
-    var thumb='<a class="thumb" href="'+esc(it.url)+'"'+tgt+' aria-label="打开 '+esc(it.title)+'">'+badges+img+fb+'</a>';
-    return '<article class="card ornate rar-'+rar+(it.featured?' featured':'')+(it.key==='print'?' finale':'')+'" style="--i:'+ii+'" data-sec="'+si+'" data-idx="'+ii+'">'
-      +thumb
-      +'<div class="card-body"><div class="card-heading">'+workMark(it)+'<div class="card-titles"><span class="tag" data-bind="tag">'+esc(it.tag)+'</span>'+(it.featured?'<span class="tag feat-tag">★ 主推</span>':'')
-        +'<h3><a class="title-link" href="'+esc(it.url)+'"'+tgt+' data-bind="title">'+esc(it.title)+'</a></h3>'
-        +'<span class="en" data-bind="en">'+esc(it.en)+'</span></div></div>'
-        +'<p class="card-desc" data-bind="desc">'+esc(it.desc)+'</p></div>'
-      +'<div class="card-foot">'
-        +'<div class="btn-row"><a class="btn btn-go" href="'+esc(it.url)+'"'+tgt+'>'+uiIcon('external')+'<span>访问</span></a>'
-        +(it.url2?'<a class="btn btn-go2" href="'+esc(it.url2)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url2label||'更多')+'</span></a>':'')
-        +(it.url3?'<a class="btn btn-go2" href="'+esc(it.url3)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url3label||'更多')+'</span></a>':'')
-        +(it.url4?'<a class="btn btn-go2" href="'+esc(it.url4)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url4label||'更多')+'</span></a>':'')
-        +(it.url5?'<a class="btn btn-go2" href="'+esc(it.url5)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url5label||'更多')+'</span></a>':'')
-        +(it.url6?'<a class="btn btn-go2" href="'+esc(it.url6)+'"'+tgt+'>'+uiIcon('external')+'<span>'+esc(it.url6label||'更多')+'</span></a>':'')
-        +'<button class="btn btn-qr">'+uiIcon('scan')+'<span>扫码</span></button>'
-        +'<button class="btn btn-copy" data-url="'+esc(it.url)+'">'+uiIcon('copy')+'<span>复制</span></button></div>'
-        +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
-        +'<div class="qr-plate" title="手机扫码打开"><div class="qr-box">'+qrSVG(it.url)+'</div><span class="qr-hint">'+uiIcon('scan')+'扫码即玩 · 投屏给学生扫</span></div></div>'
-      +'<div class="card-admin">'
-        +'<button data-op="up" title="上移">↑ 上移</button><button data-op="down" title="下移">↓ 下移</button>'
-        +'<button data-op="move" title="移到另一区">⇄ 换区</button>'
-        +'<button data-op="feat" title="主推开关(金色边框+★主推章)">★ 主推</button>'
-        +'<button data-op="del" class="danger" title="删除此作品">删除</button>'
+  var VIEW_STORE='myskme-hub-view-v2',RECENT_STORE='myskme-hub-recent-v2';
+  var viewKey='home',viewPage=0,selectedKey='',query='';
+  try{var oldView=JSON.parse(localStorage.getItem(VIEW_STORE)||'{}');viewKey=oldView.view||'home';viewPage=+oldView.page||0;selectedKey=oldView.selected||'';}catch(e){}
+  var VIEW_DEFS={
+    home:{label:'精选',eyebrow:'MYSKME NOW',desc:'主推与最近打开的作品',icon:'home'},
+    games:{label:'游戏',eyebrow:'PLAY',desc:'远征、养成与策略世界',icon:'game'},
+    learn:{label:'学习',eyebrow:'LEARN',desc:'中考修行与课堂器物',icon:'book'},
+    world:{label:'世界',eyebrow:'LORE',desc:'正典、角色与远征源头',icon:'world'}
+  };
+
+  function allEntries(){var out=[];(DATA.sections||[]).forEach(function(sec,si){(sec.items||[]).forEach(function(it,ii){out.push({it:it,si:si,ii:ii});});});return out;}
+  function entryByKey(key){var found=null;allEntries().some(function(e){if((e.it.key||'')===key){found=e;return true;}return false;});return found;}
+  function recentKeys(){try{return JSON.parse(localStorage.getItem(RECENT_STORE)||'[]');}catch(e){return [];}}
+  function saveView(){try{localStorage.setItem(VIEW_STORE,JSON.stringify({view:viewKey,page:viewPage,selected:selectedKey}));}catch(e){}}
+  function recordRecent(key){if(!key)return;var r=recentKeys().filter(function(k){return k!==key;});r.unshift(key);try{localStorage.setItem(RECENT_STORE,JSON.stringify(r.slice(0,8)));}catch(e){}}
+  function entriesForView(){
+    var all=allEntries(),q=query.trim().toLowerCase();
+    if(q)return all.filter(function(e){var it=e.it,s=[it.title,it.en,it.tag,it.desc,it.glyph].join(' ').toLowerCase();return s.indexOf(q)>=0;});
+    if(viewKey==='games')return all.filter(function(e){return e.it.cat==='game';});
+    if(viewKey==='learn')return all.filter(function(e){return e.si===1;});
+    if(viewKey==='world')return all.filter(function(e){return e.it.cat==='lore'||['expedition','starling','zimingqi'].indexOf(e.it.key)>=0;});
+    var order=[],seen={};
+    recentKeys().forEach(function(k){var e=entryByKey(k);if(e&&!seen[k]){seen[k]=1;order.push(e);}});
+    all.filter(function(e){return !!e.it.featured;}).forEach(function(e){var k=e.it.key||('x'+e.si+'-'+e.ii);if(!seen[k]){seen[k]=1;order.push(e);}});
+    all.forEach(function(e){var k=e.it.key||('x'+e.si+'-'+e.ii);if(!seen[k]){seen[k]=1;order.push(e);}});
+    return order;
+  }
+  function pageSize(){return matchMedia('(max-width:820px)').matches?4:(matchMedia('(max-width:1180px)').matches?6:8);}
+  function targetAttr(url){return (url||'').indexOf('https://myskme.com/')===0?'':' target="_blank" rel="noopener"';}
+  function itemCover(it,cls){
+    var cover=it.cover||'',small=it.coverSmall||'',srcset=small?' srcset="'+esc(small)+' 640w, '+esc(cover)+' 1280w"':'';
+    if(!cover)return '<div class="tile-fallback">'+esc(it.glyph||'作')+'</div>';
+    return '<img class="'+(cls||'')+'" src="'+esc(cover)+'"'+srcset+' alt="" loading="eager" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="tile-fallback" style="display:none">'+esc(it.glyph||'作')+'</div>';
+  }
+  function tileHTML(entry){var it=entry.it,key=it.key||('x'+entry.si+'-'+entry.ii),sel=key===selectedKey;
+    return '<article class="app-tile'+(sel?' selected':'')+'" data-key="'+esc(key)+'">'
+      +'<button class="tile-button" data-select="'+esc(key)+'" aria-pressed="'+(sel?'true':'false')+'" aria-label="查看 '+esc(it.title)+'">'
+      +'<span class="tile-cover">'+itemCover(it,'')+'</span><span class="tile-copy"><span class="tile-kicker">'+esc(it.tag||CAT_NAME[it.cat]||'MYSKME')+'</span>'
+      +'<strong>'+esc(it.title)+'</strong><small>'+esc(it.en||'MYSKME ORIGINAL')+'</small></span><span class="tile-state"></span></button></article>';
+  }
+  function secondaryLinks(it,key){var h='';for(var i=2;i<=6;i++){var u=it['url'+i],lab=it['url'+i+'label'];if(u)h+='<a href="'+esc(u)+'"'+targetAttr(u)+' data-launch="'+esc(key)+'">'+uiIcon('external')+esc(lab||'更多入口')+'</a>';}
+    return h?'<div class="stage-links" aria-label="相关入口">'+h+'</div>':'';}
+  function stageHTML(entry,absoluteIndex,total){
+    if(!entry)return '<div class="empty-grid">没有找到匹配的作品</div>';
+    var it=entry.it,key=it.key||('x'+entry.si+'-'+entry.ii),rar=esc(it.rarity||'N');
+    var path=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
+    return '<article class="stage-card card" data-sec="'+entry.si+'" data-idx="'+entry.ii+'">'
+      +'<div class="stage-visual">'+itemCover(it,'stage-cover')+'<div class="stage-badges"><span class="stage-badge" data-bind="tag">'+esc(it.tag||CAT_NAME[it.cat]||'原创作品')+'</span><span class="stage-badge rarity">'+rar+'</span></div>'
+      +'<span class="stage-index">'+String(absoluteIndex+1).padStart(2,'0')+' / '+String(total).padStart(2,'0')+'</span></div>'
+      +'<div class="stage-content"><div class="stage-titleline"><span class="stage-mark"><svg viewBox="0 0 24 24">'+path+'</svg></span><div class="stage-titles">'
+      +'<h2 data-bind="title">'+esc(it.title)+'</h2><span class="stage-en" data-bind="en">'+esc(it.en||'MYSKME ORIGINAL')+'</span></div></div>'
+      +'<p class="stage-desc" data-bind="desc">'+esc(it.desc||'')+'</p>'+secondaryLinks(it,key)
+      +'<div class="stage-actions"><a class="btn btn-go btn-primary" href="'+esc(it.url)+'"'+targetAttr(it.url)+' data-launch="'+esc(key)+'">'+uiIcon('external')+'<span>启动作品</span></a>'
+      +'<button class="btn btn-qr btn-icon" title="显示二维码">'+uiIcon('scan')+'<span>扫码</span></button>'
+      +'<button class="btn btn-copy btn-icon" data-url="'+esc(it.url)+'" title="复制链接">'+uiIcon('copy')+'<span>复制</span></button></div>'
+      +'<span class="url" data-bind="url">'+esc(it.url)+'</span>'
+      +'<div class="qr-plate stage-qr" role="dialog" aria-label="作品二维码"><button class="stage-qr-close" aria-label="关闭二维码">'+uiIcon('close')+'</button><div class="qr-box">'+qrSVG(it.url)+'</div><div class="stage-qr-copy"><b>扫码直接出发</b><span>手机浏览器打开，无需下载或安装。</span></div></div>'
+      +'<div class="card-admin stage-admin"><button data-op="up">上移</button><button data-op="down">下移</button><button data-op="move">换区</button><button data-op="feat">主推</button><button data-op="del" class="danger">删除</button></div>'
       +'</div></article>';
   }
-
-  function chapHead(sec,si,collapsible,collapsed){
-    var ico=sec.icon?('<span class="chap-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(CAT_PATH[sec.icon==='sword'?'game':sec.icon==='book'?'tool':sec.icon]||CAT_PATH.lore)+'</svg></span>'):'';
-    var era=sec.era?'<div class="chap-era">'+esc(sec.era)+'</div>':'';
-    var epi=sec.epigraph?'<div class="chap-epi">'+esc(sec.epigraph)+'</div>':'';
-    var caret=collapsible?'<span class="rule-caret"></span>':'';
-    return '<div class="rule'+(collapsible?' rule-toggle'+(collapsed?' collapsed':''):'')+'"'+(collapsible?' data-sec-toggle="'+si+'"':'')+'>'
-      +(sec.vol?'<div class="chap-vol">'+esc(sec.vol)+'</div>':'')
-      +'<div class="chap-text"><div class="chap-title">'+ico+'<span data-seclabel="'+si+'">'+esc(sec.label)+'</span></div>'+era+epi+'</div>'
-      +caret+'</div>';
-  }
+  function printItemHTML(e){return '<article class="print-item"><div class="qr-box">'+qrSVG(e.it.url)+'</div><div><h2>'+esc(e.it.title)+'</h2><p>'+esc(e.it.url)+'</p></div></article>';}
   function buildNav(){
-    var nav=document.getElementById('volnav-inner'); if(!nav)return;
-    var h='<a class="volnav-brand" href="#top" title="回到顶部">✦ <b>MYSKME 总目</b></a>'; // 品牌可点=回顶;自称统一「总目」,让「编年史」独属世界编年史
-    DATA.sections.forEach(function(sec,si){
-      var anc=sec.anchor||('vol-'+(si+1));
-      h+='<a class="vlink" href="#'+anc+'" data-nav="'+anc+'">'+(sec.vol?'<span class="vl-num">'+esc(sec.vol)+'</span>':'')+esc((sec.label||'').replace(/^卷[一二三四五六七八九十]+\s*·\s*/,''))+'</a>';
-    });
-    h+='<span class="volnav-spacer"></span>';
-    nav.innerHTML=h;
-  }
-  var _secObs=null;
-  function observeSections(){
-    if(_secObs)_secObs.disconnect();
-    var links={};document.querySelectorAll('.vlink').forEach(function(a){links[a.getAttribute('data-nav')]=a;});
-    _secObs=new IntersectionObserver(function(es){
-      es.forEach(function(e){if(e.isIntersecting){
-        var id=e.target.getAttribute('id');
-        Object.keys(links).forEach(function(k){links[k].classList.toggle('on',k===id);});
-      }});
-    },{rootMargin:'-45% 0px -50% 0px'});
-    document.querySelectorAll('section[id]').forEach(function(s){_secObs.observe(s);});
+    var h='',defs=['home','games','learn','world'];defs.forEach(function(k){var d=VIEW_DEFS[k];h+='<button class="nav-button'+(viewKey===k&&!query?' on':'')+'" data-view="'+k+'" aria-pressed="'+(viewKey===k&&!query?'true':'false')+'">'+uiIcon(d.icon)+'<span>'+d.label+'</span></button>';});
+    var rail=document.getElementById('volnav-inner'),mobile=document.getElementById('mobileNav');if(rail)rail.innerHTML='<div class="rail-brand" aria-hidden="true">MY</div>'+h;if(mobile)mobile.innerHTML=h;
   }
   function render(){
-    var html='';
-    DATA.sections.forEach(function(sec,si){
-      var collapsible=!!sec.collapsible, collapsed=false;
-      if(collapsible){collapsed=true;try{var s=localStorage.getItem('myskme-sec'+si);if(s!==null)collapsed=(s==='1');}catch(e){}}
-      var anc=sec.anchor||('vol-'+(si+1));
-      html+='<section id="'+anc+'" data-section="'+si+'"'+(collapsed?' data-collapsed="1"':'')+'>'+chapHead(sec,si,collapsible,collapsed)+'<div class="grid">';
-      sec.items.forEach(function(it,ii){html+=cardHTML(it,si,ii);});
-      html+='<button class="add-work" data-addsec="'+si+'">＋ 添加作品</button></div></section>';
-    });
-    content.innerHTML=html;
-    buildNav();
-    updateCounts();
-    applyAdmin();
-    reveal();
-    observeSections();
+    var entries=entriesForView(),size=pageSize(),pages=Math.max(1,Math.ceil(entries.length/size));viewPage=Math.max(0,Math.min(viewPage,pages-1));
+    var selectedAt=entries.findIndex(function(e){return (e.it.key||('x'+e.si+'-'+e.ii))===selectedKey;});
+    if(selectedAt<0){selectedKey=entries[0]?(entries[0].it.key||('x'+entries[0].si+'-'+entries[0].ii)):'';selectedAt=entries.length?0:-1;}
+    if(selectedAt>=0)viewPage=Math.floor(selectedAt/size);
+    var start=viewPage*size,slice=entries.slice(start,start+size),html='';slice.forEach(function(e){html+=tileHTML(e);});if(!html)html='<div class="empty-grid">没有找到匹配的作品<br>换个关键词试试</div>';content.innerHTML=html;content.classList.toggle('grid-compact',slice.length<=4);
+    var selected=selectedAt>=0?entries[selectedAt]:(entries[0]||null),absoluteIndex=Math.max(0,selectedAt);var stage=document.getElementById('projectStage');if(stage)stage.innerHTML=stageHTML(selected,absoluteIndex,entries.length);
+    var def=query?{label:'搜索结果',eyebrow:'SEARCH',desc:'按名称、类型或内容查找'}:(VIEW_DEFS[viewKey]||VIEW_DEFS.home);
+    var title=document.getElementById('viewTitle'),eye=document.getElementById('viewEyebrow'),desc=document.getElementById('viewDesc'),cnt=document.getElementById('viewCount');
+    if(title)title.textContent=def.label;if(eye)eye.textContent=def.eyebrow;if(desc)desc.textContent=def.desc;if(cnt)cnt.innerHTML='<b>'+entries.length+'</b>项';
+    var label=document.getElementById('pageLabel');if(label)label.textContent=(viewPage+1)+' / '+pages;var prev=document.getElementById('pagePrev'),next=document.getElementById('pageNext');if(prev)prev.disabled=viewPage<=0;if(next)next.disabled=viewPage>=pages-1;
+    var pc=document.getElementById('printCatalog');if(pc)pc.innerHTML='<h1>MYSKME · 作品总目</h1><p>Make Yourself Special &amp; Kind · 扫码即玩</p><div class="print-grid">'+allEntries().map(printItemHTML).join('')+'</div>';
+    buildNav();updateCounts();applyAdmin();reveal();saveView();
   }
-  function toggleSection(si){
-    var sec=content.querySelector('section[data-section="'+si+'"]'); if(!sec)return;
-    var ruleEl=sec.querySelector('[data-sec-toggle]'), collapsed=sec.getAttribute('data-collapsed')==='1';
-    collapsed=!collapsed;
-    if(collapsed){sec.setAttribute('data-collapsed','1');ruleEl&&ruleEl.classList.add('collapsed');}
-    else{sec.removeAttribute('data-collapsed');ruleEl&&ruleEl.classList.remove('collapsed');
-      sec.querySelectorAll('.card').forEach(function(c){c.classList.add('in');});}
-    try{localStorage.setItem('myskme-sec'+si,collapsed?'1':'0');}catch(e){}
-  }
+  function setView(k){if(!VIEW_DEFS[k])return;viewKey=k;query='';viewPage=0;var q=document.getElementById('hubSearch');if(q)q.value='';selectedKey='';render();}
+  function setPage(delta){var entries=entriesForView(),size=pageSize(),pages=Math.max(1,Math.ceil(entries.length/size));viewPage=Math.max(0,Math.min(viewPage+delta,pages-1));var first=entries[viewPage*size];if(first)selectedKey=first.it.key||('x'+first.si+'-'+first.ii);render();}
+  function selectEntry(key){if(!entryByKey(key))return;selectedKey=key;render();}
 
   function renderHeader(){
     document.querySelectorAll('[data-h]').forEach(function(el){
@@ -740,11 +919,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     });
   }
 
-  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
   function reveal(){
-    var cards=content.querySelectorAll('.card');
-    if(isAdmin()){cards.forEach(function(c){c.classList.add('in');});return;}
-    cards.forEach(function(c){io.observe(c);});
+    document.querySelectorAll('.stage-card,.app-tile').forEach(function(c){c.classList.add('in');});
   }
 
   function setNum(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
@@ -789,6 +965,10 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       var th=card.querySelector('a.thumb'); if(th)th.href=txt;
       var cp=card.querySelector('.btn-copy'); if(cp)cp.setAttribute('data-url',txt);
     }
+    if(key==='title'||key==='en'||key==='tag'){
+      var chosen=Array.prototype.find.call(content.querySelectorAll('[data-select]'),function(b){return b.getAttribute('data-select')===selectedKey;});
+      if(chosen){var preview=chosen.querySelector(key==='title'?'strong':key==='en'?'small':'.tile-kicker');if(preview)preview.textContent=txt;}
+    }
     dsave();
   }
   function onKey(e){if(e.key==='Enter'&&e.target.isContentEditable){e.preventDefault();e.target.blur();}}
@@ -807,10 +987,12 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     save();render();
   }
   function addWork(si){
-    DATA.sections[si].items.push({glyph:'新',tag:'分类',title:'新作品',en:'NEW WORK',desc:'在这里写一句作品介绍……',url:'https://'});
+    if(!DATA.sections[si])return;
+    var key='custom-'+Date.now();
+    DATA.sections[si].items.push({key:key,glyph:'新',cat:si===0?'game':'tool',rarity:'N',tag:'新入口',title:'新作品',en:'NEW WORK',desc:'在这里写一句作品介绍。',url:'https://'});
+    selectedKey=key;viewKey=si===0?'games':'learn';viewPage=Math.max(0,Math.ceil(DATA.sections[si].items.length/pageSize())-1);
     save();render();
-    var secs=content.querySelectorAll('section');
-    if(secs[si]){var cards=secs[si].querySelectorAll('.card');var last=cards[cards.length-1];if(last){last.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'});var t=last.querySelector('[data-bind="title"]');if(t)setTimeout(function(){t.focus();},300);}}
+    var t=document.querySelector('#projectStage [data-bind="title"]');if(t)setTimeout(function(){t.focus();},80);
   }
 
   function copyLink(btn){
@@ -931,6 +1113,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   }
 
   // ---- 事件绑定 ----
+  function closeStageQr(){document.querySelectorAll('.stage-qr.show').forEach(function(el){el.classList.remove('show');});}
+  function closeTools(){var tools=document.querySelector('.tools-menu');if(tools)tools.open=false;}
   content.addEventListener('input',onEdit);
   header.addEventListener('input',onEdit);
   content.addEventListener('keydown',onKey,true);
@@ -939,16 +1123,40 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   header.addEventListener('paste',onPaste);
 
   document.addEventListener('click',function(e){
-    var st=e.target.closest('[data-sec-toggle]');
-    if(st && !(isAdmin()&&e.target.closest('[data-seclabel]'))){toggleSection(+st.getAttribute('data-sec-toggle'));return;}
+    var qx=e.target.closest('.stage-qr-close');if(qx){var plate=qx.closest('.stage-qr');if(plate)plate.classList.remove('show');return;}
+    var nav=e.target.closest('[data-view]');if(nav){setView(nav.getAttribute('data-view'));return;}
+    var tile=e.target.closest('[data-select]');if(tile){selectEntry(tile.getAttribute('data-select'));return;}
+    if(e.target.closest('#pagePrev')){setPage(-1);return;}if(e.target.closest('#pageNext')){setPage(1);return;}
+    if(e.target.closest('#adminAdd')){addWork(viewKey==='learn'?1:0);return;}
     var op=e.target.closest('[data-op]'); if(op){doOp(op);return;}
     var add=e.target.closest('[data-addsec]'); if(add){addWork(+add.getAttribute('data-addsec'));return;}
     var cp=e.target.closest('.btn-copy'); if(cp){copyLink(cp);return;}
-    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card');var qp=qc&&qc.querySelector('.qr-plate');if(qp)qp.classList.toggle('show');return;}
+    var qb=e.target.closest('.btn-qr'); if(qb){var qc=qb.closest('.card'),qp=qc&&qc.querySelector('.qr-plate'),was=qp&&qp.classList.contains('show');closeStageQr();if(qp&&!was){qp.classList.add('show');var qclose=qp.querySelector('.stage-qr-close');if(qclose)setTimeout(function(){qclose.focus();},0);}return;}
+    var launch=e.target.closest('[data-launch]');if(launch){recordRecent(launch.getAttribute('data-launch'));if(isAdmin())e.preventDefault();return;}
     if(isAdmin()){var a=e.target.closest('a');if(a)e.preventDefault();}  // 编辑时不跳转
   });
 
-  document.getElementById('adminFab').addEventListener('click',openPw);
+  var searchInput=document.getElementById('hubSearch');
+  if(searchInput)searchInput.addEventListener('input',function(){query=this.value||'';viewPage=0;selectedKey='';render();if(document.activeElement!==this)this.focus();});
+  document.addEventListener('click',function(e){
+    var tools=document.querySelector('.tools-menu');if(tools&&tools.open&&!tools.contains(e.target))tools.open=false;
+    if(!e.target.closest('.stage-qr')&&!e.target.closest('.btn-qr'))closeStageQr();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&document.activeElement!==searchInput){e.preventDefault();searchInput&&searchInput.focus();return;}
+    if(e.key==='Escape'){
+      if(document.querySelector('.stage-qr.show')){e.preventDefault();closeStageQr();return;}
+      var tools=document.querySelector('.tools-menu');if(tools&&tools.open){e.preventDefault();tools.open=false;return;}
+      if(query){query='';if(searchInput)searchInput.value='';render();return;}
+    }
+    if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.key)<0||/INPUT|TEXTAREA/.test((document.activeElement&&document.activeElement.tagName)||''))return;
+    var buttons=Array.prototype.slice.call(content.querySelectorAll('[data-select]'));if(!buttons.length)return;
+    var current=buttons.findIndex(function(b){return b.getAttribute('data-select')===selectedKey;}),cols=2,step=(e.key==='ArrowUp'?-cols:e.key==='ArrowDown'?cols:e.key==='ArrowLeft'?-1:1);
+    var next=Math.max(0,Math.min((current<0?0:current)+step,buttons.length-1));if(next!==current){e.preventDefault();selectEntry(buttons[next].getAttribute('data-select'));setTimeout(function(){var b=content.querySelector('[data-select="'+selectedKey+'"]');b&&b.focus();},0);}
+  });
+  var resizeTimer;window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(render,120);});
+
+  document.getElementById('adminFab').addEventListener('click',function(){closeTools();openPw();});
   document.getElementById('pwOk').addEventListener('click',tryPw);
   document.getElementById('pwCancel').addEventListener('click',closePw);
   pwInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tryPw();}if(e.key==='Escape')closePw();});
@@ -988,15 +1196,19 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   document.getElementById('themeBtn').addEventListener('click',cycleTheme);
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
   document.getElementById('shareBtn').addEventListener('click',doShare);
-  var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',copyAll);
-  var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',buildPoster);
+  var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',function(){closeTools();copyAll();});
+  var pb=document.getElementById('posterBtn'); if(pb)pb.addEventListener('click',function(){closeTools();buildPoster();});
 
   // ---- 启动 ----
-  var adminFab=document.getElementById('adminFab');if(adminFab)adminFab.innerHTML=uiIcon('edit')+'<span class="sr-only">管理员</span>';
+  var adminFab=document.getElementById('adminFab');if(adminFab)adminFab.innerHTML=uiIcon('edit')+'<span>管理员编辑</span>';
   var printCtl=document.getElementById('printBtn');if(printCtl)printCtl.innerHTML=uiIcon('print')+'<span class="sr-only">打印</span>';
   var shareCtl=document.getElementById('shareBtn');if(shareCtl)shareCtl.innerHTML=uiIcon('share')+'<span class="sr-only">分享</span>';
   if(cab)cab.innerHTML=uiIcon('links')+'<span>复制全部链接</span>';
   if(pb)pb.innerHTML=uiIcon('poster')+'<span>导出竖版海报</span>';
+  var moreSummary=document.getElementById('moreSummary');if(moreSummary)moreSummary.innerHTML=uiIcon('more');
+  var searchIcon=document.getElementById('searchIcon');if(searchIcon)searchIcon.innerHTML=uiIcon('search');
+  var pagePrev=document.getElementById('pagePrev');if(pagePrev)pagePrev.innerHTML=uiIcon('prev');
+  var pageNext=document.getElementById('pageNext');if(pageNext)pageNext.innerHTML=uiIcon('next');
   applyTheme(getPref());
   var sq=document.getElementById('shareQr'); if(sq)sq.innerHTML='<div class="qr-box">'+qrSVG(DATA.hubUrl||location.href)+'</div>';
   var su=document.getElementById('shareUrl'); if(su)su.textContent=(DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,'');
@@ -1019,28 +1231,25 @@ STARMAP_SVG = (
 
 def static_header(d):
     return (
-        '  <header class="hero">\n'
-        '    <div class="hero-art">\n'
-        '      <div class="hero-figure">\n'
-        '        <div class="hero-halo"></div>\n'
-        '        <img src="assets/hero-wolf.webp" alt="狼先生" '
-        'onerror="this.style.display=&quot;none&quot;;this.closest(&quot;.hero-figure&quot;).classList.add(&quot;nofig&quot;)">\n'
-        '        <div class="hero-crestbig" hidden><span>狼</span></div>\n'
-        '      </div>\n'
+        '  <header class="app-topbar" id="appHeader">\n'
+        '    <a class="brand-lockup" href="https://myskme.com/" aria-label="MYSKME 作品启动台首页">\n'
+        '      <img class="brand-seal" src="icons/apple-touch-icon.png" alt="">\n'
+        '      <span class="brand-copy">\n'
+        f'        <b><span data-h="titlePre">{d["titlePre"]}</span> · <span data-h="titleEm">{d["titleEm"]}</span></b>\n'
+        f'        <span data-h="kicker">{d["kicker"]}</span>\n'
+        '      </span>\n'
+        '    </a>\n'
+        f'    <div class="topbar-motto" data-h="motto">{d["motto"]}</div>\n'
+        '    <div class="topbar-count"><b id="stat-total">0</b><span>原创入口</span></div>\n'
+        '    <div class="top-controls">\n'
+        '      <button class="ctrl-btn" id="themeBtn" title="切换主题" aria-label="切换深浅主题"></button>\n'
+        '      <button class="ctrl-btn" id="printBtn" title="打印二维码总目" aria-label="打印二维码总目"></button>\n'
+        '      <button class="ctrl-btn" id="shareBtn" title="分享本页" aria-label="分享本页"></button>\n'
+        '      <details class="tools-menu"><summary id="moreSummary" aria-label="更多工具"></summary><div class="tools-pop">\n'
+        '        <button id="copyAllBtn"></button><button id="posterBtn"></button><button class="admin-fab" id="adminFab"></button>\n'
+        '      </div></details>\n'
         '    </div>\n'
-        '    <div class="hero-body">\n'
-        f'      <div class="kicker"><span class="crest">狼</span><span data-h="kicker">{d["kicker"]}</span></div>\n'
-        f'      <h1 class="title-hero"><span data-h="titlePre">{d["titlePre"]}</span> <em data-h="titleEm">{d["titleEm"]}</em></h1>\n'
-        f'      <p class="motto" data-h="motto">{d["motto"]}</p>\n'
-        f'      <p class="epilogue" data-h="hint">{d["hint"]}</p>\n'
-        '      <div class="meta-row">\n'
-        '        <div class="stat"><b id="stat-total">0</b><span>部作品</span></div>\n'
-        '        <div class="stat"><b id="stat-a">0</b><span>娱乐</span></div>\n'
-        '        <div class="stat"><b id="stat-b">0</b><span>学习</span></div>\n'
-        '      </div>\n'
-        '    </div>\n'
-        '  </header>\n'
-        f'  <div class="starmap">{STARMAP_SVG}</div>'
+        '  </header>'
     )
 
 data_json = json.dumps(DEFAULT_DATA, ensure_ascii=False, indent=2)
@@ -1087,68 +1296,44 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <body>
 <div class="admin-bar" id="adminBar">
   <span class="ab-title">管理员模式 · <b>直接点文字即可编辑，改动自动保存在本机</b></span>
-  <button id="abConsole">控制台 ↗</button>
-  <button id="abMaker">出题工坊 ↗</button>
-  <button id="abForge">命题铸炉 ↗</button>
+  <button id="abConsole">控制台</button>
+  <button id="abMaker">出题工坊</button>
+  <button id="abForge">命题铸炉</button>
   <button id="abExport">导出 index.html</button>
   <button id="abReset" class="danger">重置默认</button>
   <button id="abExit">退出</button>
 </div>
 
-<a id="top"></a>
-<nav class="volnav" id="volnav"><div class="volnav-inner" id="volnav-inner"></div></nav>
-
-<div class="wrap">
+<div class="launchpad-shell">
 %%HEADER%%
-  <div id="content"></div>
-  <footer>
-    <div class="foot-share">
-      <div class="qr-plate share-plate" id="shareQr"></div>
-      <div class="foot-share-text">
-        <div class="fs-title">扫码打开 · 分享本页</div>
-        <div class="fs-url" id="shareUrl"></div>
-        <div class="fs-actions">
-          <button class="btn" id="copyAllBtn">复制全部链接</button>
-          <button class="btn" id="posterBtn">导出竖版海报</button>
+  <main class="launchpad-workspace">
+    <nav class="category-rail" id="volnav" aria-label="作品分类">
+      <div id="volnav-inner"></div>
+    </nav>
+    <section class="library-panel" aria-label="作品列表">
+      <div class="library-head">
+        <div class="library-heading">
+          <span class="library-eyebrow" id="viewEyebrow">MYSKME NOW</span>
+          <h1 id="viewTitle">精选</h1>
+          <p id="viewDesc">主推与最近打开的作品</p>
         </div>
+        <div class="view-count" id="viewCount"><b>0</b>项</div>
+        <label class="search-box" for="hubSearch" title="搜索全部作品">
+          <span id="searchIcon"></span><input id="hubSearch" type="search" autocomplete="off" placeholder="搜索全部作品" aria-label="搜索全部作品">
+        </label>
       </div>
-    </div>
-    <div class="foot-links">
-      <a href="https://myskme.github.io/myskme-star-dungeon/" target="_blank" rel="noopener">星徒地牢</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-expedition-web/" target="_blank" rel="noopener">远征录</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-starling/" target="_blank" rel="noopener">星灵远征</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-zimingqi/" target="_blank" rel="noopener">自鸣棋</a>
-      <span>·</span>
-      <a href="https://myskme.github.io/myskme-chronicle/" target="_blank" rel="noopener">世界编年史</a>
-    </div>
-    <div class="foot-links">
-      <a href="https://myskme.com/banks/">题库书架</a>
-      <span>·</span>
-      <a href="https://myskme.com/wall/">优秀作文墙</a>
-      <span>·</span>
-      <a href="https://myskme.com/write/">作文训练场</a>
-      <span>·</span>
-      <a href="https://myskme.com/daily/">每日一题</a>
-      <span>·</span>
-      <a href="https://myskme.com/listen/">听力训练场</a>
-      <span>·</span>
-      <a href="https://myskme.com/print/">打印中心</a>
-    </div>
-    <div><b>MYSKME</b> — Make Yourself Special &amp; Kind · Mr. Wang（王老师）</div>
-    <div>免下载免安装 · 二维码浏览器端生成 · 可投屏 / 打印 / 截图分发</div>
-  </footer>
+      <div class="app-grid" id="content"></div>
+      <div class="library-foot">
+        <div class="pager"><button class="page-button" id="pagePrev" aria-label="上一页"></button><span class="page-label" id="pageLabel">1 / 1</span><button class="page-button" id="pageNext" aria-label="下一页"></button></div>
+        <span class="shortcut-hint"><kbd>/</kbd> 搜索 · 方向键选取</span>
+        <button class="admin-add" id="adminAdd">添加作品</button>
+      </div>
+    </section>
+    <aside class="project-stage" id="projectStage" aria-label="当前作品详情" aria-live="polite"></aside>
+  </main>
+  <nav class="mobile-tabs" id="mobileNav" aria-label="作品分类"></nav>
 </div>
-
-<button class="admin-fab" id="adminFab" title="管理员">✎</button>
-
-<div class="ctrl" id="ctrl">
-  <button class="ctrl-btn" id="themeBtn" title="切换主题" aria-label="切换深浅主题">◐</button>
-  <button class="ctrl-btn" id="printBtn" title="打印 / 另存 PDF（自动浅色）" aria-label="打印">⎙</button>
-  <button class="ctrl-btn" id="shareBtn" title="分享本页链接" aria-label="分享">↗</button>
-</div>
+<div class="print-catalog" id="printCatalog"></div>
 
 <div class="toast" id="toast"></div>
 

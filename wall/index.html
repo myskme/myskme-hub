@@ -9,8 +9,11 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="荣誉殿堂 · 优秀作文展示墙 | MYSKME">
 <meta property="og:description" content="王老师班级优秀英语作文真迹墙 · 点评 + 亮点 + 金奖。">
-<meta property="og:image" content="https://myskme.github.io/myskme-hub/og-cover.png">
-<meta property="og:url" content="https://myskme.github.io/myskme-hub/wall/">
+<meta property="og:image" content="https://myskme.com/og-cover.png">
+<meta property="og:url" content="https://myskme.com/wall/">
+<link rel="canonical" href="https://myskme.com/wall/">
+<link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 :root{
@@ -34,13 +37,17 @@ body{transition:background-color .35s ease,color .35s ease}
 .ctrl{position:fixed;right:16px;bottom:16px;z-index:90;display:flex;gap:8px;
   background:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 :root[data-theme="light"] .ctrl{background:linear-gradient(180deg,#f2e8d2,rgba(242,232,210,.97))}
-.ctrl button{width:40px;height:40px;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--ink);
+.ctrl button{width:44px;height:44px;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--ink);
   font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .25s,box-shadow .25s,color .25s}
 .ctrl button:hover{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow)}
+.ctrl button:focus-visible,.fab:focus-visible,.lb-close:focus-visible,.poster-btn:focus-visible,.chip:focus-visible,.card:focus-visible,
+.abar button:focus-visible,.footer-link:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(232,199,104,.34)}
+.icon{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;flex:0 0 auto}
 @media print{.ctrl{display:none}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.7;overflow-x:hidden;
   background-image:radial-gradient(1100px 640px at 50% -8%,rgba(201,166,74,.10),transparent 60%);background-attachment:fixed;}
+body.modal-open{overflow:hidden}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.26;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");}
 .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:clamp(34px,6vw,72px) clamp(16px,4vw,40px) 80px;}
@@ -50,7 +57,7 @@ h1{font-size:clamp(30px,5.6vw,60px);font-weight:300;letter-spacing:.16em;margin:
 h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow);}
 .sub{color:var(--ink2);letter-spacing:.14em;font-size:clamp(13px,2vw,16px);}
 .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
-.chip{font-size:13px;letter-spacing:.12em;color:var(--ink2);border:1px solid var(--line);padding:6px 16px;cursor:pointer;
+.chip{min-height:44px;font-size:13px;letter-spacing:.12em;color:var(--ink2);border:1px solid var(--line);padding:8px 16px;cursor:pointer;
   background:transparent;transition:all .25s;font-family:var(--serif);}
 .chip:hover{border-color:var(--gold);color:var(--gold2);}
 .chip.on{border-color:var(--gold);color:#1a1208;background:var(--gold);font-weight:600;}
@@ -62,6 +69,7 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
 .card{break-inside:avoid;margin:0 0 18px;position:relative;border:1px solid var(--line);cursor:pointer;overflow:hidden;
   background:var(--bg3);transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .4s;display:block;}
 .card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 16px 40px rgba(0,0,0,.5);}
+.card:focus-visible{transform:translateY(-3px);border-color:var(--gold)}
 .card img{width:100%;display:block;}
 .card .cap{position:absolute;left:0;right:0;bottom:0;padding:32px 12px 12px;
   background:linear-gradient(180deg,transparent,rgba(8,8,10,.92));}
@@ -90,22 +98,13 @@ h1 em{font-style:normal;color:var(--gold);font-weight:500;text-shadow:var(--glow
 .lb-note b{color:var(--gold2);font-weight:500;}
 .lb-hl{display:flex;gap:7px;flex-wrap:wrap;}
 .lb-hl span{font-size:12px;color:var(--gold2);border:1px solid var(--line);padding:3px 10px;}
-.lb-close{position:fixed;top:18px;right:22px;font-size:26px;color:var(--ink2);cursor:pointer;z-index:61;line-height:1;}
+.lb-close{position:fixed;top:18px;right:22px;width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--bg3);color:var(--ink2);cursor:pointer;z-index:61;display:grid;place-items:center;}
 .lb-close:hover{color:var(--gold);}
-
-/* gate */
-.gate{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:var(--bg);}
-.gate.show{display:flex;}
-.gate-box{text-align:center;padding:30px;width:min(360px,90vw);}
-.gate-box h2{font-weight:300;letter-spacing:.14em;color:var(--gold);}
-.gate-box input{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--ink);padding:11px 14px;
-  font-family:var(--serif);letter-spacing:.2em;text-align:center;outline:none;margin:14px 0;}
-.gate-box input:focus{border-color:var(--gold);}
-.gate-box button{background:linear-gradient(180deg,rgba(201,166,74,.22),rgba(201,166,74,.08));border:1px solid var(--gold3);
-  color:var(--ink);padding:10px 28px;letter-spacing:.14em;cursor:pointer;font-family:var(--serif);}
+.poster-btn{margin:14px auto 0;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 14px/1 var(--serif);letter-spacing:.1em;padding:9px 20px;cursor:pointer;background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border:1px solid var(--gold3);color:var(--ink)}
+.poster-btn:hover{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow)}
 
 /* admin */
-.fab{position:fixed;left:16px;bottom:16px;z-index:40;width:40px;height:40px;border:1px solid var(--line);background:var(--bg3);
+.fab{position:fixed;left:16px;bottom:16px;z-index:40;width:44px;height:44px;border:1px solid var(--line);background:var(--bg3);
   color:var(--ink3);cursor:pointer;font-size:16px;opacity:.45;transition:all .3s;display:flex;align-items:center;justify-content:center;}
 .fab:hover{opacity:1;border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow);}
 body.admin .fab{display:none;}
@@ -133,13 +132,15 @@ body.admin .card-admin{display:flex;}
   color:var(--gold2);padding:11px 24px;letter-spacing:.12em;font-size:14px;z-index:90;opacity:0;pointer-events:none;box-shadow:var(--glow);transition:all .3s;max-width:88vw;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-align:center;color:var(--ink3);font-size:12.5px;letter-spacing:.1em;line-height:1.9;}
+.footer-links{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.footer-link{min-height:44px;display:inline-flex;align-items:center;gap:6px;color:var(--gold2);text-decoration:none;padding:6px 4px}
+.footer-link .icon{width:15px;height:15px}
+@media(max-width:620px){.wrap{padding-bottom:92px}.lb{padding:72px 14px 24px}.lb-close{top:12px;right:12px}.fab{bottom:14px;left:14px}.ctrl{bottom:14px;right:14px}.abar button{min-height:40px}.footer-links{gap:2px 10px}}
 </style>
 </head>
 <body>
 <div class="abar" id="abar">
-  <span class="t">管理员 · <b style="color:var(--ink3);font-weight:400">点文字可改，「＋ 加作品」选扫描件自动嵌入</b></span>
-  <button id="aAdd">＋ 加作品</button>
-  <button id="aGate">设班级口令</button>
+  <span class="t">管理员 · <b style="color:var(--ink3);font-weight:400">点文字可改，添加作品可选择扫描件</b></span>
+  <button id="aAdd">添加作品</button>
   <button id="aExport">导出 index.html</button>
   <button id="aReload">丢弃本机草稿</button>
   <button id="aExit">退出</button>
@@ -151,24 +152,36 @@ footer{margin-top:60px;padding-top:26px;border-top:1px solid var(--line2);text-a
     <h1>学院谷地 · <em>荣誉殿堂</em></h1>
     <p class="sub" data-h="subtitle">优秀英语作文展示墙 · 手写真迹</p>
     <div class="filters" id="filters"></div>
-    <button id="wPosterBtn" style="margin:14px auto 0;display:block;font:600 14px/1 var(--serif,serif);letter-spacing:.1em;padding:9px 22px;cursor:pointer;background:linear-gradient(180deg,rgba(201,166,74,.18),rgba(201,166,74,.06));border:1px solid var(--gold3,#7a6320);color:var(--ink,#f0e6d2)">📥 导出作文墙海报</button>
+    <button class="poster-btn" id="wPosterBtn"></button>
   </header>
   <div class="wall" id="wall"></div>
-  <div class="empty" id="empty" style="display:none">这一类暂时还没有上墙的作品～</div>
+  <div class="empty" id="empty" style="display:none">这一类暂时还没有上墙的作品</div>
   <footer>
-    <div><a href="../" style="color:var(--gold2);text-decoration:none">← 作品总目</a>　·　<a href="../write/" style="color:var(--gold2);text-decoration:none">想上墙？去作文训练场练一篇 →</a></div>
+    <div class="footer-links"><a class="footer-link" id="backLink" href="../">作品总目</a><span aria-hidden="true">·</span><a class="footer-link" id="writeLink" href="../write/">想上墙？去作文训练场练一篇</a></div>
     <div style="margin-top:8px">MYSKME — Make Yourself Special &amp; Kind</div>
     <div>每一笔，都值得被看见 · 单文件离线展示墙</div>
   </footer>
 </div>
 
-<button class="fab" id="fab" title="管理员">✎</button>
-<div class="ctrl"><button id="themeBtn" title="切换主题">◐</button></div>
+<button class="fab" id="fab" title="管理员编辑" aria-label="打开管理员编辑"></button>
+<div class="ctrl"><button id="themeBtn" title="切换主题" aria-label="切换深浅主题"></button></div>
 <script>
-(function(){var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'◐',light:'☀',dark:'☾'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+(function(){
+var PATH={
+  auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 15.5A8.5 8.5 0 118.5 4 7 7 0 0020 15.5z"/>',
+  edit:'<path d="M4 20l4.5-1 10-10a2.1 2.1 0 00-3-3l-10 10z"/><path d="M14.5 7.5l3 3M4 20h6"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 20h14"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  back:'<path d="M15 5l-7 7 7 7"/><path d="M8 12h11"/>',
+  external:'<path d="M14 5h5v5M10 14l9-9"/><path d="M19 13v6H5V5h6"/>'
+};
+window.wallIcon=function(name){return '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">'+(PATH[name]||PATH.external)+'</svg>';};
+var TLS='myskme-theme',order=['auto','light','dark'],name={auto:'跟随系统',light:'浅色',dark:'深色'},icon={auto:'auto',light:'sun',dark:'moon'},mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
 function pref(){try{return localStorage.getItem(TLS)||'auto'}catch(e){return 'auto'}}
 function resolve(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p}
-function apply(p){var e=document.documentElement;e.setAttribute('data-theme',resolve(p));e.setAttribute('data-themepref',p);var b=document.getElementById('themeBtn');if(b){b.textContent=icon[p];b.title='主题：'+name[p]}}
+function apply(p){var e=document.documentElement;e.setAttribute('data-theme',resolve(p));e.setAttribute('data-themepref',p);var b=document.getElementById('themeBtn');if(b){b.innerHTML=wallIcon(icon[p]);b.title='主题：'+name[p]+'（点按切换）';}}
 var btn=document.getElementById('themeBtn');
 if(btn)btn.addEventListener('click',function(){var nx=order[(order.indexOf(pref())+1)%order.length];try{localStorage.setItem(TLS,nx)}catch(e){}apply(nx)});
 if(mq&&mq.addEventListener)mq.addEventListener('change',function(){if(pref()==='auto')apply('auto')});
@@ -177,14 +190,7 @@ apply(pref());
 </script>
 <div class="toast" id="toast"></div>
 
-<div class="lb" id="lb"><span class="lb-close" id="lbClose">✕</span><div class="lb-box" id="lbBox"></div></div>
-
-<div class="gate" id="gate"><div class="gate-box">
-  <h2>荣誉殿堂</h2>
-  <p style="color:var(--ink3);font-size:13px">输入班级口令进入</p>
-  <input id="gateIn" type="text" placeholder="班级口令" aria-label="班级口令">
-  <button id="gateOk">进入</button>
-</div></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="作文详情"><button class="lb-close" id="lbClose" aria-label="关闭作文详情"></button><div class="lb-box" id="lbBox"></div></div>
 
 <input type="file" id="fileIn" accept="image/*" style="display:none">
 <div class="mask" id="mask"><div class="pw">
@@ -197,7 +203,6 @@ apply(pref());
 /*WALLDATA_START*/
 var DEFAULT_WALL = {
   "subtitle": "优秀英语作文展示墙 · 手写真迹",
-  "gate": "myskme2026",
   "entries": [
     {"id":"w-lin","title":"A Letter to the Other You","author":"Lin（化名）","grade":"初三","theme":"书信 · 想象","date":"2026-06","score":"满分范文","tag":"美化版","note":"立意新颖——给“平行世界的另一个自己”写信，把“选择”写出了哲思。虚拟语气 what might have happened if I had made a different choice 用得准确老练；通篇书写如印刷体，几乎零涂改。","highlights":["虚拟语气准确","立意新颖","书写印刷级"],"featured":true,"img":""},
     {"id":"w-hai","title":"Dear Other Me","author":"Hai（化名）","grade":"初三","theme":"书信 · 选择","date":"2026-06","score":"优秀","tag":"美化版","note":"同样写给“另一个自己”，却落到长兴岛求学的真实处境，情感细腻克制；I do not regret my choice、become our own heroes 收束有力，起承转合完整。","highlights":["情感细腻","结构完整","主题积极"],"featured":false,"img":""},
@@ -216,7 +221,7 @@ var DEFAULT_WALL = {
       filtersEl=document.getElementById('filters'), toastEl=document.getElementById('toast');
 
   function clone(o){return JSON.parse(JSON.stringify(o));}
-  function load(){try{var s=localStorage.getItem(LS);if(s)return JSON.parse(s);}catch(e){}return clone(DEFAULT_WALL);}
+  function load(){try{var s=localStorage.getItem(LS);if(s){var old=JSON.parse(s);if(old&&Object.prototype.hasOwnProperty.call(old,'gate')){delete old.gate;localStorage.setItem(LS,JSON.stringify(old));}return old;}}catch(e){}return clone(DEFAULT_WALL);}
   function save(){try{localStorage.setItem(LS,JSON.stringify(DATA));}catch(e){}}
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function isAdmin(){return document.body.classList.contains('admin');}
@@ -245,15 +250,15 @@ var DEFAULT_WALL = {
     filtersEl.innerHTML=cats.map(function(c){return '<button class="chip'+(c===filter?' on':'')+'" data-f="'+esc(c)+'">'+esc(c)+'</button>';}).join('');
   }
   function cardHTML(e,i){
-    return '<a class="card" data-i="'+i+'">'
+    return '<article class="card" data-i="'+i+'" tabindex="0" role="button" aria-label="查看作文《'+esc(e.title)+'》">'
       +(e.featured?'<span class="ribbon">金奖</span>':'')
       +(e.score?'<span class="score">'+esc(e.score)+'</span>':'')
-      +'<img loading="lazy" alt="" src="'+esc(imgOf(e))+'">'
+      +'<img loading="lazy" alt="作文《'+esc(e.title)+'》的展示图" src="'+esc(imgOf(e))+'">'
       +'<div class="cap"><div class="ct" data-bind="title" data-i="'+i+'">'+esc(e.title)+'</div>'
       +'<div class="cm"><span data-bind="author" data-i="'+i+'">'+esc(e.author)+'</span> · '+esc(e.date||'')+'</div>'
       +'<div class="hl">'+(e.tag?'<span class="tagchip">'+esc(e.tag)+'</span>':'')+(e.highlights||[]).slice(0,3).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>'
-      +'<div class="card-admin"><button data-op="img" data-i="'+i+'">换图</button><button data-op="feat" data-i="'+i+'">★ 金奖</button><button data-op="edit" data-i="'+i+'">改</button><button data-op="del" data-i="'+i+'">删</button></div>'
-      +'</a>';
+      +'<div class="card-admin"><button data-op="img" data-i="'+i+'">换图</button><button data-op="feat" data-i="'+i+'">标记金奖</button><button data-op="edit" data-i="'+i+'">修改</button><button data-op="del" data-i="'+i+'">撤下</button></div>'
+      +'</article>';
   }
   function render(){
     var list=DATA.entries.map(function(e,i){return {e:e,i:i};}).filter(function(o){return filter==='全部'||o.e.grade===filter;});
@@ -270,18 +275,20 @@ var DEFAULT_WALL = {
   }
 
   // lightbox
-  var lb=document.getElementById('lb'), lbBox=document.getElementById('lbBox');
+  var lb=document.getElementById('lb'), lbBox=document.getElementById('lbBox'),lbClose=document.getElementById('lbClose'),lastFocus=null;
   function openLB(i){
     var e=DATA.entries[i];if(!e)return;
-    lbBox.innerHTML='<div class="lb-img"><img src="'+esc(imgOf(e))+'" alt=""></div>'
+    lastFocus=document.activeElement;
+    lbBox.innerHTML='<div class="lb-img"><img src="'+esc(imgOf(e))+'" alt="作文《'+esc(e.title)+'》的展示图"></div>'
       +'<div class="lb-info"><h3>'+esc(e.title)+(e.score?' <span style="color:var(--gold);font-size:18px">'+esc(e.score)+'</span>':'')+'</h3>'
       +'<div class="lb-meta">'+esc(e.author||'')+' · '+esc(e.grade||'')+' · '+esc(e.theme||'')+' · '+esc(e.date||'')+'</div>'
       +(e.note?'<div class="lb-note"><b>王老师点评 · </b>'+esc(e.note)+'</div>':'')
       +'<div class="lb-hl">'+(e.tag?'<span class="tagchip">'+esc(e.tag)+'</span>':'')+(e.highlights||[]).map(function(h){return '<span>'+esc(h)+'</span>';}).join('')+'</div></div>';
-    lb.classList.add('show');
+    lb.classList.add('show');document.body.classList.add('modal-open');setTimeout(function(){lbClose.focus();},0);
   }
-  document.getElementById('lbClose').onclick=function(){lb.classList.remove('show');};
-  lb.addEventListener('click',function(ev){if(ev.target===lb)lb.classList.remove('show');});
+  function closeLB(){if(!lb.classList.contains('show'))return;lb.classList.remove('show');document.body.classList.remove('modal-open');if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+  lbClose.onclick=closeLB;
+  lb.addEventListener('click',function(ev){if(ev.target===lb)closeLB();});
 
   // events
   filtersEl.addEventListener('click',function(ev){var b=ev.target.closest('[data-f]');if(b){filter=b.getAttribute('data-f');renderFilters();render();}});
@@ -290,6 +297,10 @@ var DEFAULT_WALL = {
     if(op){ev.preventDefault();var i=+op.getAttribute('data-i');doOp(op.getAttribute('data-op'),i);return;}
     if(isAdmin()){ ev.preventDefault(); return; }   // 编辑模式：点卡片一律不弹灯箱（含图片/角标/评分）
     var card=ev.target.closest('.card'); if(card)openLB(+card.getAttribute('data-i'));
+  });
+  wallEl.addEventListener('keydown',function(ev){
+    var card=ev.target.closest('.card');if(!card||ev.target!==card||isAdmin())return;
+    if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openLB(+card.getAttribute('data-i'));}
   });
   wallEl.addEventListener('input',function(ev){
     var el=ev.target, key=el.getAttribute('data-bind'); if(!key)return;
@@ -341,29 +352,17 @@ var DEFAULT_WALL = {
     fr.readAsDataURL(f);
   };
 
-  // gate
-  var gate=document.getElementById('gate');
-  function checkGate(){
-    if(!DATA.gate){gate.classList.remove('show');return;}
-    if(sessionStorage.getItem('wall-gate-ok')==='1'){gate.classList.remove('show');return;}
-    gate.classList.add('show');
-  }
-  document.getElementById('gateOk').onclick=function(){
-    if(document.getElementById('gateIn').value.trim()===DATA.gate){sessionStorage.setItem('wall-gate-ok','1');gate.classList.remove('show');}
-    else toast('口令不对');
-  };
-  document.getElementById('gateIn').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('gateOk').click();});
-
   // admin
   var mask=document.getElementById('mask'), pwIn=document.getElementById('pwIn');
-  document.getElementById('fab').onclick=function(){mask.classList.add('show');pwIn.value='';setTimeout(function(){pwIn.focus();},50);};
-  document.getElementById('pwCancel').onclick=function(){mask.classList.remove('show');};
+  function closeMask(){mask.classList.remove('show');document.body.classList.remove('modal-open');}
+  document.getElementById('fab').onclick=function(){mask.classList.add('show');document.body.classList.add('modal-open');pwIn.value='';setTimeout(function(){pwIn.focus();},50);};
+  document.getElementById('pwCancel').onclick=closeMask;
   document.getElementById('pwOk').onclick=tryPw;
-  pwIn.addEventListener('keydown',function(e){if(e.key==='Enter')tryPw();if(e.key==='Escape')mask.classList.remove('show');});
-  function tryPw(){sha256hex((pwIn.value||'').trim()).then(function(h){if(h===PW_HASH){mask.classList.remove('show');document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}});}
+  pwIn.addEventListener('keydown',function(e){if(e.key==='Enter')tryPw();if(e.key==='Escape')closeMask();});
+  mask.addEventListener('click',function(e){if(e.target===mask)closeMask();});
+  function tryPw(){sha256hex((pwIn.value||'').trim()).then(function(h){if(h===PW_HASH){closeMask();document.body.classList.add('admin');sessionStorage.setItem(SS,'1');applyAdmin();toast('已进入管理员');}else{pwIn.select();toast('密码错误');}});}
   document.getElementById('aExit').onclick=function(){document.body.classList.remove('admin');sessionStorage.removeItem(SS);applyAdmin();toast('已退出');};
   document.getElementById('aReload').onclick=function(){if(!confirm('丢弃本机所有未导出的改动，重新载入线上最新内容？'))return;try{localStorage.removeItem(LS);}catch(e){}location.reload();};
-  document.getElementById('aGate').onclick=function(){var g=prompt('设置班级口令（留空=公开，无门槛）：',DATA.gate||'');if(g!==null){DATA.gate=g.trim();save();toast(DATA.gate?'已设口令：'+DATA.gate:'已设为公开');}};
   document.getElementById('aExport').onclick=function(){
     save();var jsonStr=JSON.stringify(DATA,null,2);
     fetch(location.pathname+location.search,{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
@@ -409,8 +408,7 @@ var DEFAULT_WALL = {
     var qs=200,qx=(W-qs)/2,qy=fy+34;
     if(qr){x.strokeStyle='rgba(150,120,50,.6)';x.lineWidth=2;x.strokeRect(qx-6,qy-6,qs+12,qs+12);x.drawImage(qr,qx,qy,qs,qs);}
     x.textAlign='center';x.fillStyle='#8a6d1e';x.font='600 30px "Songti SC",serif';x.fillText('扫码看全部优秀范文',W/2,qy+qs+46);
-    x.fillStyle='#5a4f38';x.font='400 21px ui-monospace,Menlo,monospace';x.fillText('myskme.github.io/myskme-hub/wall',W/2,qy+qs+82);
-    if(DATA&&DATA.gate){x.fillStyle='#6a5f47';x.font='400 22px "Songti SC",serif';x.fillText('班级口令：'+DATA.gate,W/2,qy+qs+120);}
+    x.fillStyle='#5a4f38';x.font='400 21px ui-monospace,Menlo,monospace';x.fillText('myskme.com/wall/',W/2,qy+qs+82);
     x.fillStyle='#8a6d1e';x.font='600 21px serif';x.fillText('MYSKME — Make Yourself Special & Kind',W/2,H-46);
     cv.toBlob(function(blob){if(!blob){toast('海报导出失败');return;}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='MYSKME-优秀作文墙-海报.png';
@@ -418,11 +416,23 @@ var DEFAULT_WALL = {
   }
   var wpb=document.getElementById('wPosterBtn');if(wpb)wpb.addEventListener('click',buildWallPoster);
 
+  // original line icons
+  document.getElementById('fab').innerHTML=wallIcon('edit');
+  lbClose.innerHTML=wallIcon('close');
+  if(wpb)wpb.innerHTML=wallIcon('download')+'<span>导出作文墙海报</span>';
+  document.getElementById('backLink').insertAdjacentHTML('afterbegin',wallIcon('back'));
+  document.getElementById('writeLink').insertAdjacentHTML('beforeend',wallIcon('external'));
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape')return;
+    if(lb.classList.contains('show')){e.preventDefault();closeLB();return;}
+    if(mask.classList.contains('show')){e.preventDefault();closeMask();}
+  });
+
   // boot
   fetch('index.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
-    if(j&&j.entries&&!localStorage.getItem(LS)){DATA=j;}
+    if(j&&j.entries&&!localStorage.getItem(LS)){if(Object.prototype.hasOwnProperty.call(j,'gate'))delete j.gate;DATA=j;}
   }).catch(function(){}).finally(function(){
-    renderFilters();render();checkGate();
+    renderFilters();render();
     if(sessionStorage.getItem(SS)==='1'){document.body.classList.add('admin');applyAdmin();}
   });
 })();
