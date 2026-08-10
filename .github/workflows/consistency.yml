@@ -1,0 +1,48 @@
+name: 作品总目 · 对外口径自检
+
+# 主页对外宣传别人家作品的信息（网址、单位数），必须对得上那个作品仓库里的事实源。
+# 由来：0810 自鸣棋搬到 zimingqi.myskme.com 之后，主页这边三处还指着 github.io——
+# build_hub.py 作品清单、README 收录表、以及《灵石远征》游戏内的「其他作品」。
+# Pages 会 301 所以没人发现，但主页扫出来的二维码印的仍是旧址，品牌域等于白搬。
+#
+# 自鸣棋是公开仓库，直接 checkout 取它的 CNAME 与 UNITS 作为事实源，不采信主页自己写的数字。
+# 定时那条是兜底：自鸣棋那边改了域名或加删单位时，主页这边没人动也能被发现。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # 每天 01:20 UTC（北京时间 09:20）
+    - cron: '20 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: consistency-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出本仓库
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 检出自鸣棋（取事实源）
+        uses: actions/checkout@v4
+        with:
+          repository: myskme/myskme-zimingqi
+          path: _zimingqi
+          fetch-depth: 1
+
+      - name: 对外口径自检
+        env:
+          ZIMINGQI_DIR: ${{ github.workspace }}/_zimingqi
+        run: node qa-consistency.mjs
