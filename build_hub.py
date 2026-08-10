@@ -39,15 +39,16 @@ DEFAULT_DATA = {
              "tag": "消消乐 · 三消远征", "title": "灵石远征", "en": "GEMFALL",
              "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
              "url": "https://play.myskme.com/"},
-            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi.webp",
+            {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi-20260810.webp",
+             "coverSmall": "assets/cover-zimingqi-20260810-640.webp", "coverLegacy": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 41 位正典学员，扫码即玩。",
+             "desc": "单人十关 · 无尽回廊 · 课堂多人 · 43 位可玩单位（41 位正典学员）—— 子鱼与 VOL.3 五名新徒已入棋，立绘同步终版。",
              "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
              "coverLegacy": "assets/cover-volvme.webp",
              "tag": "世界观 · 叙事", "title": "世界编年史 II", "en": "VOLVME II",
-             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。",
+             "desc": "狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战。正典角色页已同步新徒普通／SP 收藏卡，另有《无月》剧情图册、地点、信物与名场面。",
              "url": "https://myskme.github.io/myskme-chronicle/",
              "url2": "https://myskme.github.io/myskme-chronicle/wuyue.html", "url2label": "剧情图册·无月",
              "url3": "https://myskme.github.io/myskme-chronicle/locations.html", "url3label": "正典地点",
@@ -736,6 +737,15 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
 
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function mergeVisualDefaults(data){
+    var LEGACY_DEFAULT_DESC={
+      zimingqi:[
+        '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 37 位正典学员，扫码即玩。',
+        '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 41 位正典学员，扫码即玩。'
+      ],
+      volvme:[
+        '狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。'
+      ]
+    };
     var present={};
     (data.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){
       if(it.key)present[it.key]=true;
@@ -743,6 +753,9 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
       if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
       if(!it.icon&&d.icon)it.icon=d.icon;
+      // 仅把历史官方默认文案升级到最新口径；管理员亲手改过的介绍保持不动。
+      var legacyDesc=it.key&&LEGACY_DEFAULT_DESC[it.key];
+      if(legacyDesc&&legacyDesc.indexOf(it.desc)>-1)it.desc=d.desc;
       // 次链接也要回填：0718 给「世界编年史」加的「剧情图册·无月」原本只有清空过
       // localStorage 的人看得见——老访客(尤其是王老师自己这台)存档里没有 url2,
       // 永远刷不出来。只补缺失的,不覆盖用户改过的。

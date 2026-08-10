@@ -18,7 +18,7 @@
 | 星灵远征 · 电子宠物 | https://myskme.github.io/myskme-starling/ |
 | 世界编年史 II | https://myskme.github.io/myskme-chronicle/ |
 | MYSKME 题库训练场 | https://myskme.github.io/myskme-quiz/ |
-| MYSKME自鸣棋 · 课堂肉鸽自走棋 | https://myskme.github.io/myskme-zimingqi/ |
+| MYSKME自鸣棋 · 43 单位策略肉鸽 | https://myskme.github.io/myskme-zimingqi/ |
 
 ## 学习工具（本仓库托管 · EdgeOne + GitHub Pages 灾备）
 中考四板块（词汇语法 / 阅读完形 / 写作 / 听力）全数字化，纯静态、扫码即用：
