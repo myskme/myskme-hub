@@ -663,7 +663,7 @@ body::before{display:none}
 #end-waystone .copy b{display:block;color:var(--gold2);font-size:14px;font-weight:500}
 #end-guide{flex:none;padding:8px 10px;font-size:12px}
 /* 矿脉榜：只留荣誉席、榜首和玩家附近三层，不再平铺 50 行。 */
-#ovl-lb .ovl-card{width:min(440px,94vw)}
+#ovl-lb .ovl-card{width:min(440px,94vw);max-height:calc(100dvh - 36px)}
 .lb-tabs{display:flex;gap:8px;margin:10px 0 12px}
 .lb-tabs button{flex:1;font-family:var(--serif);font-size:13.5px;letter-spacing:.14em;padding:8px 4px;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
@@ -691,6 +691,17 @@ body::before{display:none}
 .lb-row .pw{flex:none;text-align:right}
 .lb-row .pv{font-size:15px;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.2}
 .lb-row .pl{font-size:10px;color:var(--ink3);letter-spacing:.16em}
+.rush-prizes{margin:0 0 12px;padding:10px 11px;border:1px solid var(--gold-line);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 10%,var(--panel)),var(--panel));text-align:left}
+.rush-prizes .rp-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  color:var(--gold2);font-size:12px;letter-spacing:.13em}
+.rush-prizes .rp-hd small{color:var(--ink3);font-size:10px;letter-spacing:.04em}
+.rush-prizes .rp-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.rush-prizes .rp{padding:7px 5px;border:1px solid var(--line2);text-align:center;color:var(--ink2);
+  font-size:10.5px;line-height:1.55;background:color-mix(in srgb,var(--bg2) 82%,transparent)}
+.rush-prizes .rp b{display:block;color:var(--ink);font-size:11.5px;font-weight:600}
+.rush-prizes .rp-note{margin-top:7px;color:var(--ink3);font-size:10px;line-height:1.55;text-align:center}
+@media(max-width:370px){.rush-prizes .rp-list{gap:3px}.rush-prizes .rp{padding:6px 2px;font-size:9.8px}}
 /* 六位同行全部曜衔后的终身奖励。只做静态矿彩，不常驻流动动画；
    既能在榜单与名片上被看见，也不会让低端设备持续合成图层。 */
 .prism-name{display:inline-block;color:var(--gold2);font-weight:600;
@@ -1896,7 +1907,7 @@ body{--shk:4px}
   <div class="ovl-title">远征 · <em>榜</em></div>
   <div class="lb-tabs">
     <button data-scope="depth" class="on">闯关</button>
-    <button data-scope="rush">90 秒</button>
+    <button data-scope="rush">90 秒·周榜</button>
     <button data-scope="camp">阵营</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
@@ -1989,6 +2000,9 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
+  /* 90 秒周榜：best 只记当周单局最佳，claimed 记已入行囊的历史奖励。
+     历史最佳仍在 rushBest，周榜换榜绝不会让个人纪录倒退。 */
+  rushWeek:{w:'',best:0,claimed:{}},
   /* ---- 追求线（2026-08 加）----
      streak = 冒险关连胜（cur 当前 / best 生涯纪录）。聚会与周挑战不计。
      cs     = 同伴生涯账（每人 r 出战 / w 胜场 / u 大招次数），炉石职业胜场那套。
@@ -2044,6 +2058,11 @@ function loadSave(){
      同一个对象引用，一个人的进度会写进别人的（同一页面多存档时）。这里深拷贝。 */
   out.q3=Object.assign({d:0,q:null},s.q3||{});
   out.wk=Object.assign({w:0,score:null,best:0,plays:0},s.wk||{});
+  out.rushWeek=Object.assign({w:'',best:0,claimed:{}},s.rushWeek||{});
+  out.rushWeek.w=/^\d{8}$/.test(String(out.rushWeek.w||''))?String(out.rushWeek.w):'';
+  out.rushWeek.best=Math.max(0,Math.floor(+out.rushWeek.best||0));
+  out.rushWeek.claimed=(out.rushWeek.claimed&&typeof out.rushWeek.claimed==='object')
+    ?out.rushWeek.claimed:{};
   out.streak=Object.assign({cur:0,best:0},s.streak||{});
   out.camp=Object.assign({side:'',m:0,log:{},claimed:{}},s.camp||{});
   out.camp.log=(out.camp.log&&typeof out.camp.log==='object')?out.camp.log:{};
@@ -5767,7 +5786,6 @@ function endRush(){
      每局都能分享会让分享变廉价，值得晒的东西必须稀有。 */
   $('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
-  fetchRushRank();                        // 不阻塞：查到名次会自己补进战报
   const prevBest=SAVE.rushBest;
   const best=GS.score>prevBest;
   /* ⚠ 战报要用**这一局之前**的最佳来判「新纪录」。
@@ -5776,7 +5794,11 @@ function endRush(){
      分享写谎话比不分享更糟，所以把判定结果在这里存下来给它用。 */
   GS.wasRecord=best;
   if(best){SAVE.rushBest=GS.score;persist()}
-  setTimeout(()=>LB.flush('clear'),600);
+  const rw=rushWeekState();
+  if(GS.score>rw.best){rw.best=GS.score;persist()}
+  /* 先把本局周最佳传上去，再查名次。旧顺序是先读榜后上传，
+     刚破纪录的战报仍会报上一局的名次。 */
+  setTimeout(async()=>{await LB.flush('clear');fetchRushRank()},600);
   if(GS.score>=100000)grant('a8');
   SFX.win();
   /* 限时局天然以「灯熄」收场，所以默认用 lose 的将熄意象；
@@ -6616,7 +6638,8 @@ const LB={
     /* runs/days/dbest 是仅有的三个**累计**项，其余都是历史最高值。
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
-    return {score:best,rush:SAVE.rushBest||0,lv,stars,chain:SAVE.chainBest||0,
+    const rw=rushWeekState();
+    return {score:best,rush:SAVE.rushBest||0,rushWeek:rw.best||0,rushWeekKey:rw.w,lv,stars,chain:SAVE.chainBest||0,
             runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
             mv:(SAVE.dig&&SAVE.dig.best)||0,luck:luckCount(),mastery:csMasteryCount()};
   },
@@ -6681,6 +6704,7 @@ const LB={
       SAVE.lbConfirmedAlias=SAVE.lbAlias;
       if(d.aliasMonth)SAVE.lbAliasMonth=String(d.aliasMonth);
       campLogParticipation();                                  // 只在服务端确认收到成绩后记当月参与
+      rushClaimAwards(d.rushAwards);                           // 历史周奖只在本机入账一次
       SAVE.lbAt=Date.now();persist();
       if(!silent)toast('远征成绩已同步 · 闯关榜第 <b>'+(d.depthRank||d.rank)+'</b>',2600);
     }else{
@@ -6712,7 +6736,7 @@ const LB={
   /* 指纹里必须包含 runs/days，否则「只涨天数不涨成绩」的人 pending() 永远为假、
      flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
   sig(){const s=this.stats();
-    return [s.score,s.rush,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,s.mastery,
+    return [s.score,s.rush,s.rushWeek,s.rushWeekKey,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,s.mastery,
             SAVE.comp||'',(SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
@@ -6825,8 +6849,10 @@ function lbRowHTML(r,mine){
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   const rush=LB.scope==='rush';
   const c=r.comp&&compById(r.comp);
+  const reward=rush&&rushRewardFor(rank);
   const sub=rush
-    ? [r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+    ? [reward?('奖励 匣 '+reward.boxes+' · 星屑 '+reward.dust):'',
+       r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
     : ['星数 '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div>'
@@ -6872,7 +6898,10 @@ function lbCardHTML(r){
     +'<div class="lc-grid">'
       +row('星数',r.stars?String(r.stars):'')
       +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
-      +row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):'')
+      +(LB.scope==='rush'
+        ?row('本周矿灯',r.rush?r.rush.toLocaleString('en-US'):'')
+          +row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
+        :row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):''))
       +row('最长连锁',r.chain?(r.chain+' 重'):'')
       +row('到场天数',r.days?(r.days+' 天'):'')
       +row('累计局数',r.runs?(r.runs+' 局'):'')
@@ -6896,6 +6925,50 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
    免得出现「矿灯已经翻篇、周挑战还没翻」这种错位。 */
 const weekNum=()=>Math.floor((dayNum()-4)/7);
 const weekSeed=w=>'gemfall|week|'+w;
+const RUSH_WEEK_REWARDS=[
+  {rank:1,boxes:3,dust:180},
+  {rank:2,boxes:2,dust:100},
+  {rank:3,boxes:1,dust:60},
+];
+const rushRewardFor=rank=>RUSH_WEEK_REWARDS.find(x=>x.rank===Number(rank))||null;
+/* 竞技周统一按北京时间周一换榜，不受玩家手机所在时区影响。 */
+function rushWeekKey(now){
+  const d=new Date((now==null?Date.now():now)+8*3600000);
+  d.setUTCHours(0,0,0,0);
+  d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));
+  return ''+d.getUTCFullYear()+String(d.getUTCMonth()+1).padStart(2,'0')
+    +String(d.getUTCDate()).padStart(2,'0');
+}
+function rushWeekLabel(key){
+  const m=/^(\d{4})(\d{2})(\d{2})$/.exec(String(key||''));if(!m)return '本周';
+  const a=new Date(Date.UTC(+m[1],+m[2]-1,+m[3])),b=new Date(+a+6*86400000);
+  return (a.getUTCMonth()+1)+'月'+a.getUTCDate()+'日—'+(b.getUTCMonth()+1)+'月'+b.getUTCDate()+'日';
+}
+function rushWeekState(){
+  const w=rushWeekKey(),s=SAVE.rushWeek||(SAVE.rushWeek={w:'',best:0,claimed:{}});
+  if(!s.claimed||typeof s.claimed!=='object')s.claimed={};
+  if(s.w!==w){s.w=w;s.best=0;persist()}
+  s.best=Math.max(0,Math.floor(+s.best||0));
+  return s;
+}
+/* 服务端只回传“哪周第几名”，具体数量仍由本地固定表决定；
+   即使响应被重放，claimed 也会拦住重复入账。 */
+function rushClaimAwards(rows){
+  if(!Array.isArray(rows)||!rows.length)return 0;
+  const s=rushWeekState(),got=[];let boxes=0,dust=0;
+  colFix();
+  for(const a of rows){
+    const week=String((a&&a.week)||''),r=rushRewardFor(a&&a.rank);
+    if(!/^\d{8}$/.test(week)||!r||s.claimed[week])continue;
+    s.claimed[week]=r.rank;boxes+=r.boxes;dust+=r.dust;got.push(r.rank);
+  }
+  if(!got.length)return 0;
+  COLS.box+=boxes;COLS.dust+=dust;
+  for(const k of Object.keys(s.claimed).sort().reverse().slice(52))delete s.claimed[k];
+  persist();colSave();renderMenu();
+  toast(icTag('box')+' 90 秒周榜奖励已入行囊<br>典藏匣 <b>+'+boxes+'</b>　星屑 <b>+'+dust+'</b>',3800);
+  return got.length;
+}
 function wkState(){
   const w=weekNum(), s=SAVE.wk||(SAVE.wk={w:0,score:null,best:0,plays:0});
   if(s.w!==w){s.w=w;s.score=null;s.best=0;s.plays=0;persist()}
@@ -6933,7 +7006,7 @@ function rushTablet(){
     +(rows||'□')+'\n'
     +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax
     +(isNew?' · 新纪录':'')+'\n'
-    +(RUSH_RANK>0?('矿灯榜 第 '+RUSH_RANK+' 名\n'):'')
+    +(RUSH_RANK>0?('90 秒周榜 第 '+RUSH_RANK+' 名\n'):'')
     +'同样 90 秒，你能打多少？\n'
     +share;
 }
@@ -7361,15 +7434,16 @@ async function renderLB(){
   }
   const rows=d.rows||[];
   if(!rows.length){
-    msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。'
-      :LB.scope==='rush'?'还没人下过矿灯局——<b>你可以是第一个</b>。'
+    if(LB.scope==='rush'){
+      msg.textContent='';list.innerHTML=rushRewardHTML(d);mine2.innerHTML=lbMineHTML([],-1);
+    }else msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。'
       :'榜上还空着——<b>你可以是第一个</b>。';
     return;
   }
   msg.textContent='';
   const myIdx=rows.findIndex(lbIsMe);
   LB_ROWS=rows;                                   // 点开名片时按 rank 查这一份
-  list.innerHTML=lbBoardHTML(rows,myIdx);
+  list.innerHTML=lbBoardHTML(rows,myIdx,d);
   /* 事件挂在容器上：紧凑榜重渲染时不用逐行重新接线。 */
   if(!list.__cardWired){
     list.__cardWired=true;
@@ -7455,12 +7529,19 @@ function campEchoHTML(){
     +'<br>月内成功上榜即算参与：参与 40，胜方 100。</div>';
 }
 const lbIsMe=r=>!!(r&&r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
-function lbBoardHTML(rows,myIdx){
+function rushRewardHTML(meta){
+  const label=(meta&&meta.weekLabel)||rushWeekLabel((meta&&meta.week)||rushWeekKey());
+  return '<div class="rush-prizes"><div class="rp-hd"><span>90 秒周榜 · 前三奖励</span><small>'+esc(label)+'</small></div>'
+    +'<div class="rp-list">'+RUSH_WEEK_REWARDS.map(r=>'<div class="rp"><b>第 '+r.rank+' 名</b>典藏匣 '+r.boxes+'<br>星屑 '+r.dust+'</div>').join('')+'</div>'
+    +'<div class="rp-note">每周一换榜 · 结榜后自动入行囊 · 奖励不计入矿力</div></div>';
+}
+function lbBoardHTML(rows,myIdx,meta){
   const row=r=>lbRowHTML(r,lbIsMe(r),'');
   /* 深度榜保留前三；90 秒榜多露一行前列，让小时级变化能被看见，
      同时仍给玩家附近三行留足空间。 */
   const leadN=LB.scope==='rush'?4:3,top=rows.slice(0,leadN);
-  let h='<div class="lb-group"><div class="lb-gh"><span>'+(LB.scope==='rush'?'矿灯前列':'榜首')+'</span><i>点名字看名片</i></div>'
+  let h=(LB.scope==='rush'?rushRewardHTML(meta):'')
+    +'<div class="lb-group"><div class="lb-gh"><span>'+(LB.scope==='rush'?'本周矿灯':'榜首')+'</span><i>点名字看名片</i></div>'
     +top.map(row).join('')+'</div>';
   if(myIdx>=leadN){
     const near=rows.slice(Math.max(leadN,myIdx-1),Math.min(rows.length,myIdx+2));
@@ -7471,8 +7552,9 @@ function lbBoardHTML(rows,myIdx){
 }
 function lbMineHTML(rows,myIdx){
   const s=LB.stats(), rush=LB.scope==='rush';
+  const mineRush=s.rushWeek||0;
   if(!LB.registered())return rush
-    ?'本机 90 秒最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 起个化名就能上榜'
+    ?'历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 本周 <b>'+mineRush.toLocaleString('en-US')+'</b><br>起个化名就能上榜'
     :'本机已到第 <b>'+s.lv+'</b> 关 · 起个化名就能上榜';
   if(myIdx>=0){
     const me=rows[myIdx], up=rows[myIdx-1], key=rush?'rush':'lv';
@@ -7480,8 +7562,9 @@ function lbMineHTML(rows,myIdx){
     if(up){
       if(rush){
         const gap=Math.max(1,(Number(up.rush)||0)-val+1);
-        return '我的位置 · 第 <b>'+me.rank+'</b> 名　90 秒 <b>'+val.toLocaleString('en-US')
-          +'</b><br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 就能越过 '+esc(up.alias||'上一名');
+        return '我的位置 · 第 <b>'+me.rank+'</b> 名　本周 <b>'+val.toLocaleString('en-US')
+          +'</b><br>历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 再多 <b>'+gap.toLocaleString('en-US')
+          +'</b> 越过 '+esc(up.alias||'上一名');
       }
       const lvGap=(Number(up.lv)||0)-val, starGap=(Number(up.stars)||0)-(Number(me.stars)||0);
       return '我的位置 · 第 <b>'+me.rank+'</b> 名　已到第 <b>'+val+'</b> 关<br>'
@@ -7490,15 +7573,19 @@ function lbMineHTML(rows,myIdx){
           :'下一次通关就有机会前进');
     }
     const dn=rows[1], lead=dn?val-(Number(dn[key])||0):0;
-    return '我的位置 · <b>榜首</b>　'+(rush?'90 秒 ':'第 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
-      +(rush?'':' 关')+(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b> '+(rush?'分':'关'):'');
+    return '我的位置 · <b>榜首</b>　'+(rush?'本周 ':'第 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
+      +(rush?'':' 关')+(rush?'<br>历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>':'')
+      +(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b> '+(rush?'分':'关'):'');
   }
   if(rows.length>=LB_LIMIT){
-    const key=rush?'rush':'lv', mine=rush?s.rush:s.lv;
+    const key=rush?'rush':'lv', mine=rush?mineRush:s.lv;
     const last=Number((rows[rows.length-1]||{})[key])||0, gap=last-mine+1;
     if(gap>0)return '我的位置 · 榜外<br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 可进前 '+rows.length;
   }
-  return '我的成绩已记下 · 刷新后会出现在榜上';
+  return rush
+    ?('历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 本周 <b>'+mineRush.toLocaleString('en-US')+'</b><br>'
+      +(mineRush?'正在同步本周名次':'点一盏矿灯就能入榜'))
+    :'我的成绩已记下 · 刷新后会出现在榜上';
 }
 function lbRenameMonth(now){
   const d=new Date((now==null?Date.now():now)+8*3600000);
@@ -9171,12 +9258,13 @@ window.__selftest=function(){
     /* 写死 10 段是个坑：加一项就红，而红的原因看不出来是「漏传」还是「多传了一项」。
        改成「stats() 里每一个上传项都必须出现在 sig() 里」——加新项时自动覆盖。
        sig 少一项，那条线就永远触发不了上传，而且悄无声息。 */
-    const SIG_KEYS=['score','rush','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
-    ok('累计账：成绩、到场与人物熟练度都进了 stats() 与 sig()',
+    const SIG_KEYS=['score','rush','rushWeek','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
+    ok('累计账：历史成绩、周成绩、到场与人物熟练度都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
        &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
+       &&/^\d{8}$/.test(st.rushWeekKey)
        &&SIG_KEYS.every(k=>typeof st[k]==='number')
-       &&sg.split('|').length===SIG_KEYS.length+2        // 末两位是同伴与阵营，不是数字
+       &&sg.split('|').length===SIG_KEYS.length+3        // 周 key、同伴与阵营不是数字
        &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
@@ -9578,7 +9666,8 @@ window.__selftest=function(){
       LB.scope='rush';const rush=lbBoardHTML(R,0,{});
       ok('闯关榜不再显示矿力荣誉席',!depth.includes('荣 誉 席')&&!depth.includes('矿力'));
       ok('闯关榜右栏直接显示关卡',depth.includes('第 160 关')&&depth.includes('闯关'));
-      ok('90 秒榜不混入闯关与累计矿力',!rush.includes('闯关')&&!rush.includes('矿力'));
+      ok('90 秒榜不混入闯关或把累计矿力当排序栏',
+         !rush.includes('闯关')&&!/class="pl">矿力/.test(rush));
       ok('90 秒榜右栏显示矿灯分，不拿矿力冒充排序依据',rush.includes('90,000')&&rush.includes('矿灯'));
       ok('90 秒紧凑榜显示前四名，持续变化的前列不会被前三截掉',
          (rush.match(/class="lb-row/g)||[]).length===4&&rush.includes('云朵朵'));
@@ -9593,6 +9682,23 @@ window.__selftest=function(){
         /云朵朵/.test(blend)&&/同行 钧/.test(blend)
         &&(blend.match(/class="lb-row/g)||[]).length===2);
       SAVE.lbPower=bakP;SAVE.lbAlias=bakA;LB.scope=bakS;
+    }
+    /* 90 秒周榜：周一零点（北京时间）换榜，三档奖励直白且不重发。 */
+    {
+      const sun=Date.UTC(2026,7,9,15,59),mon=Date.UTC(2026,7,9,16,0);
+      ok('90 秒周榜：北京时间周一零点精确换榜',
+         rushWeekKey(sun)==='20260803'&&rushWeekKey(mon)==='20260810');
+      ok('90 秒周榜：前三奖励为匣 3/2/1 与星屑 180/100/60',
+         RUSH_WEEK_REWARDS.map(x=>x.boxes).join(',')==='3,2,1'
+         &&RUSH_WEEK_REWARDS.map(x=>x.dust).join(',')==='180,100,60');
+      colFix();
+      const bakC=JSON.parse(JSON.stringify(COLS)),bakR=JSON.parse(JSON.stringify(SAVE.rushWeek||{}));
+      const oldWeek='19990104',b0=COLS.box,d0=COLS.dust;
+      SAVE.rushWeek={w:rushWeekKey(),best:0,claimed:{}};
+      rushClaimAwards([{week:oldWeek,rank:1}]);rushClaimAwards([{week:oldWeek,rank:1}]);
+      ok('90 秒周榜：同一周奖励响应重放也只入行囊一次',
+         COLS.box===b0+3&&COLS.dust===d0+180&&SAVE.rushWeek.claimed[oldWeek]===1);
+      COLS=bakC;SAVE.rushWeek=bakR;colSave();persist();
     }
     /* 长内容不再要求玩家滚到底才能退出；每个悬浮关闭键必须落到已有的安全关闭流程。 */
     {

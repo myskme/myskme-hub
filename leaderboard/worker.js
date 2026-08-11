@@ -347,8 +347,51 @@ async function handleAdmin(req, env, origin) {
    ══════════════════════════════════════════════════════════════ */
 /* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
    定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
-const GF_CAP = { score: 500000, rush: 500000, lv: 999, stars: 192, chain: 30,
-                 runs: 45000, days: 3000, dbest: 3000, mv: 500000, luck: 400, mastery: 6 };
+/* 这些是防止脏数据撑爆 D1 的技术闸，不是玩法上限。
+   500,000 曾被当成“不可能达到”，但 90 秒实战已经越过，导致真实最佳
+   在服务端静默变成 500,000。分数类统一放到远高于可玩区间的安全整数；
+   关卡与连锁也留足无尽模式的增长空间。 */
+const GF_RECORD_CAP = 18999999;
+const GF_CAP = { score: GF_RECORD_CAP, rush: GF_RECORD_CAP, lv: 99999, stars: 192, chain: 120,
+                 runs: 45000, days: 3000, dbest: 3000, mv: GF_RECORD_CAP, luck: 400, mastery: 6 };
+const GF_RUSH_REWARDS = [
+  { rank: 1, boxes: 3, dust: 180 },
+  { rank: 2, boxes: 2, dust: 100 },
+  { rank: 3, boxes: 1, dust: 60 },
+];
+function gfRushReward(rank) { return GF_RUSH_REWARDS.find(x => x.rank === rank) || null; }
+/* 90 秒周榜统一按北京时间周一换榜。key 是该周周一 YYYYMMDD，
+   字典序就是时间序，D1 可以直接比较。 */
+function gfRushWeekKey(now) {
+  const d = new Date(now + 8 * 3600000);
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return "" + d.getUTCFullYear() + String(d.getUTCMonth() + 1).padStart(2, "0")
+    + String(d.getUTCDate()).padStart(2, "0");
+}
+function gfRushWeekLabel(key) {
+  const m = /^(\d{4})(\d{2})(\d{2})$/.exec(String(key || ""));
+  if (!m) return "本周";
+  const a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  const b = new Date(a.getTime() + 6 * 86400000);
+  return (a.getUTCMonth() + 1) + "月" + a.getUTCDate() + "日—"
+    + (b.getUTCMonth() + 1) + "月" + b.getUTCDate() + "日";
+}
+function gfCleanStats(st) {
+  st = st || {};
+  const s = {
+    score: clampInt(st.score, 0, GF_CAP.score), rush: clampInt(st.rush, 0, GF_CAP.rush),
+    lv: clampInt(st.lv, 0, GF_CAP.lv), stars: clampInt(st.stars, 0, GF_CAP.stars),
+    chain: clampInt(st.chain, 0, GF_CAP.chain),
+    runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
+    dbest: clampInt(st.dbest, 0, GF_CAP.dbest), mv: clampInt(st.mv, 0, GF_CAP.mv),
+    luck: clampInt(st.luck, 0, GF_CAP.luck), mastery: clampInt(st.mastery, 0, GF_CAP.mastery),
+  };
+  s.days = Math.min(s.days, s.runs);
+  s.dbest = Math.min(s.dbest, s.days);
+  s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
+  return s;
+}
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
   [0, "矿工学徒"], [1500, "持镐人"], [4000, "探脉者"], [8000, "碎岩者"],
@@ -537,7 +580,59 @@ async function gfEnsure(env) {
     `CREATE TABLE IF NOT EXISTS gemfall_alias_month (
        id TEXT PRIMARY KEY, changed_month TEXT NOT NULL DEFAULT '')`
   ).run();
+  /* 90 秒周榜独立建表，不往事故敏感的 gemfall 主表追加列。
+     周榜只收真实设备提交；配速员继续留在长期闯关榜，不占资源奖励。 */
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_rush_week (
+       week TEXT NOT NULL, id TEXT NOT NULL, alias TEXT NOT NULL,
+       best_rush INTEGER NOT NULL DEFAULT 0, comp TEXT DEFAULT '', updated_at INTEGER DEFAULT 0,
+       PRIMARY KEY (week,id))`
+  ).run();
+  await env.DB.prepare(
+    "CREATE INDEX IF NOT EXISTS idx_gf_rush_week_rank ON gf_rush_week(week,best_rush DESC)"
+  ).run();
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_rush_award (
+       week TEXT NOT NULL, id TEXT NOT NULL, rank INTEGER NOT NULL,
+       boxes INTEGER NOT NULL DEFAULT 0, dust INTEGER NOT NULL DEFAULT 0, created_at INTEGER DEFAULT 0,
+       PRIMARY KEY (week,id))`
+  ).run();
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_rush_seal (
+       week TEXT PRIMARY KEY, sealed_at INTEGER NOT NULL DEFAULT 0)`
+  ).run();
   _gfReady = true;
+}
+
+/* 懒封榜：任一榜单读写都会把已结束的周定格。
+   奖励行与 seal 标记同一个 batch 落库；INSERT OR IGNORE 让并发请求也不会重复颁发。 */
+async function gfSealRushWeeks(env, now) {
+  const current = gfRushWeekKey(now);
+  const old = await env.DB.prepare(
+    `SELECT DISTINCT w.week FROM gf_rush_week w
+      LEFT JOIN gf_rush_seal s ON s.week=w.week
+      WHERE w.week<? AND s.week IS NULL ORDER BY w.week ASC LIMIT 16`
+  ).bind(current).all();
+  for (const x of (old.results || [])) {
+    const top = await env.DB.prepare(
+      `SELECT w.id,w.best_rush FROM gf_rush_week w
+        JOIN gemfall g ON g.id=w.id
+        WHERE w.week=? AND w.best_rush>0 AND g.hidden=0
+        ORDER BY w.best_rush DESC,g.alias ASC LIMIT 3`
+    ).bind(x.week).all();
+    const stmts = [];
+    for (let i = 0; i < (top.results || []).length; i++) {
+      const r = top.results[i], reward = gfRushReward(i + 1);
+      stmts.push(env.DB.prepare(
+        `INSERT OR IGNORE INTO gf_rush_award(week,id,rank,boxes,dust,created_at)
+         VALUES(?,?,?,?,?,?)`
+      ).bind(x.week, r.id, reward.rank, reward.boxes, reward.dust, now));
+    }
+    stmts.push(env.DB.prepare(
+      "INSERT OR IGNORE INTO gf_rush_seal(week,sealed_at) VALUES(?,?)"
+    ).bind(x.week, now));
+    await env.DB.batch(stmts);
+  }
 }
 /* ══════════════════════════════════════════════════════════════
    配速员 · PACERS
@@ -821,6 +916,7 @@ function gfMap(rows) {
   return (rows || []).map((r, i) => ({
     rank: i + 1, alias: r.alias, power: r.power || 0,
     lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
+    rushAll: r.rush_all || r.best_rush || 0,
     chain: r.chain || 0,
     /* 历史存量可能还保留旧称号；公共输出只认当前权威段位表。 */
     rankName: gfRankFor(r.power || 0), badges: (r.badges || "").split(",").filter(Boolean),
@@ -870,23 +966,15 @@ async function gfSubmit(req, env, origin) {
     classTag = await sha256("class|" + String(body.pw).trim() + "|" + env.LB_SALT);
     classJoined = true;
   }
-  // 硬上限：不可能的数值直接压回，伪造分数进不来
+  // 硬上限只拦明显脏数据，不再把真实成绩压在 50 万
   const st = body.stats || {};
-  const s = {
-    score: clampInt(st.score, 0, GF_CAP.score), rush: clampInt(st.rush, 0, GF_CAP.rush),
-    lv: clampInt(st.lv, 0, GF_CAP.lv), stars: clampInt(st.stars, 0, GF_CAP.stars),
-    chain: clampInt(st.chain, 0, GF_CAP.chain),
-    runs: clampInt(st.runs, 0, GF_CAP.runs), days: clampInt(st.days, 0, GF_CAP.days),
-    dbest: clampInt(st.dbest, 0, GF_CAP.dbest), mv: clampInt(st.mv, 0, GF_CAP.mv),
-    luck: clampInt(st.luck, 0, GF_CAP.luck), mastery: clampInt(st.mastery, 0, GF_CAP.mastery),
-  };
+  const s = gfCleanStats(st);
   /* 下矿天数不可能多于下矿局数——一天至少打一局才算来过。
      连续到场纪录也不可能超过累计到场天数。
      老客户端不送这些字段，落到 0，MAX 合并时不会覆盖已有值。 */
-  s.days = Math.min(s.days, s.runs);
-  s.dbest = Math.min(s.dbest, s.days);
-  // 星数不可能超过已通关卡数的三倍
-  s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
+  const rushWeekKey = String(st.rushWeekKey || "");
+  const rushWeek = rushWeekKey === gfRushWeekKey(now)
+    ? clampInt(st.rushWeek, 0, GF_CAP.rush) : 0;
   const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
@@ -917,6 +1005,14 @@ async function gfSubmit(req, env, origin) {
     `INSERT INTO gemfall_alias_month(id,changed_month) VALUES(?,?)
      ON CONFLICT(id) DO UPDATE SET changed_month=excluded.changed_month`
   ).bind(id, rename.month).run();
+  if (rushWeek > 0) await env.DB.prepare(
+    `INSERT INTO gf_rush_week(week,id,alias,best_rush,comp,updated_at) VALUES(?,?,?,?,?,?)
+     ON CONFLICT(week,id) DO UPDATE SET
+       alias=excluded.alias,
+       best_rush=MAX(COALESCE(gf_rush_week.best_rush,0),excluded.best_rush),
+       comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_rush_week.comp END,
+       updated_at=excluded.updated_at`
+  ).bind(rushWeekKey, id, alias, rushWeek, comp, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
@@ -953,10 +1049,18 @@ async function gfSubmit(req, env, origin) {
   const aheadPower = await env.DB.prepare(
     "SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND power>?"
   ).bind(myPower).first();
+  await gfSealRushWeeks(env, now);
+  const awards = await env.DB.prepare(
+    `SELECT week,rank,boxes,dust FROM gf_rush_award WHERE id=?
+     ORDER BY week DESC LIMIT 24`
+  ).bind(id).all();
   return json({ ok: true, power: myPower, rank: ((aheadPower && aheadPower.c) || 0) + 1,
     depthRank: ((aheadDepth && aheadDepth.c) || 0) + 1,
     rankName: myRank, badges: myBadges, tag: id.slice(-2),   // tag 给客户端区分同名
     aliasMonth: rename.changed ? rename.month : ((aliasLog && aliasLog.changed_month) || ""),
+    rushAwards: (awards.results || []).map(a => ({
+      week: a.week, rank: a.rank, boxes: a.boxes, dust: a.dust,
+    })),
     classJoined, season: sea }, 200, origin);
 }
 /* 两阵营实力比。只返回占比：不返回人数、化名或个人贡献。
@@ -1023,7 +1127,9 @@ function gfBoardCmp(scope, a, b) {
 }
 
 async function gfBoard(req, env, origin, url) {
+  await gfEnsure(env);
   await gfSealMonth(env);   // 访问量最大的入口，靠它把月初那一刻兜住
+  await gfSealRushWeeks(env, Date.now());
   const sea = url.searchParams.get("season") || await getSeason(env);
   const scope = url.searchParams.get("scope") || "world";
   const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
@@ -1036,14 +1142,18 @@ async function gfBoard(req, env, origin, url) {
      而 meta.season 是和词灵榜共用的 —— 一旦老师在词灵榜点「封榜」推进了赛季，
      这里按 season 过滤就会把整个矿脉榜读成空。矿脉榜记的是累计进度（关卡、星数），
      本来就该是长期榜，要清空走 /gf/admin 的 reset。 */
-  /* 90 秒榜：按**单局矿灯最佳**排，不按累计矿力。
-     这是新人唯一能当天上榜的地方 —— 世界榜比累计，老玩家永远压着；
-     矿灯是单局成绩，第一天就能冲。王老师说它最受欢迎、新老玩家都公平，理由正在这里。 */
+  /* 90 秒榜：只比本周真实玩家的单局最佳。长期历史最佳仍留在 gemfall，
+     用于矿灯段位、名片和个人纪录；周榜单独让新人有重新追榜的窗口。 */
   if (scope === "rush") {
+    const week = gfRushWeekKey(Date.now());
     rows = await env.DB.prepare(
-      `SELECT ${cols} FROM gemfall WHERE hidden=0 AND best_rush>0
-       ORDER BY best_rush DESC, alias ASC LIMIT ?`
-    ).bind(limit).all();
+      `SELECT g.id,g.alias,g.power,g.best_score,w.best_rush,g.best_rush AS rush_all,g.lv,g.stars,g.chain,
+              g.rank_name,g.badges,g.runs,g.days,g.dbest,g.best_dig,g.luck,
+              CASE WHEN w.comp!='' THEN w.comp ELSE g.comp END AS comp
+         FROM gf_rush_week w JOIN gemfall g ON g.id=w.id
+        WHERE w.week=? AND g.hidden=0 AND w.best_rush>0
+        ORDER BY w.best_rush DESC,g.alias ASC LIMIT ?`
+    ).bind(week, limit).all();
   } else if (scope === "depth") {
     rows = await env.DB.prepare(
       `SELECT ${cols} FROM gemfall WHERE hidden=0 AND lv>0
@@ -1061,17 +1171,20 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  /* 配速员并进所有公开榜，不进带口令的历史私榜。条目先合并再走同一个排序器，
-     闯关榜、矿灯榜与旧世界榜都不会留下第二套版式或特殊身份标记。 */
+  /* 配速员并进无资源奖励的长期公开榜，不进带口令的历史私榜，
+     也不进 90 秒周榜：榜上名次必须与真实可领奖名次完全一致。 */
   let merged = rows.results || [];
-  if (scope !== "class" && await pacersOn(env)) {
+  if (scope !== "class" && scope !== "rush" && await pacersOn(env)) {
     merged = merged.concat(pacerRows(Date.now()))
       .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "depth" || (r.lv || 0) > 0)
       .sort((a, b) => gfBoardCmp(scope, a, b))
       .slice(0, limit);
   }
-  return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged) }, 200, origin);
+  const week = scope === "rush" ? gfRushWeekKey(Date.now()) : "";
+  return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged),
+    week, weekLabel: week ? gfRushWeekLabel(week) : "",
+    rewards: scope === "rush" ? GF_RUSH_REWARDS : [] }, 200, origin);
 }
 /* 月结算只返回阵营胜方与实力，不返回旧表中的 members 或旧门派记录。 */
 async function gfMonth(req, env, origin, url) {

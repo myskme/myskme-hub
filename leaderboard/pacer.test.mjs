@@ -197,7 +197,7 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
       { alias: '同关高星', lv: 20, stars: 61, best_score: 30000, __bot: 1 },
     ].sort((a, b) => M.gfBoardCmp('depth', a, b));
     const boardSrc = fnOf(workerSrc, 'gfBoard');
-    const merged = /scope\s*!==\s*["']class["']\s*&&\s*await pacersOn/.test(boardSrc)
+    const merged = /scope\s*!==\s*["']class["']\s*&&\s*scope\s*!==\s*["']rush["']\s*&&\s*await pacersOn/.test(boardSrc)
       && /concat\(pacerRows/.test(boardSrc)
       && /gfBoardCmp\(scope/.test(boardSrc);
     ok('闯关榜并入配速员并共用关卡排序',
