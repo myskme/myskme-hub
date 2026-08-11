@@ -43,7 +43,7 @@ DEFAULT_DATA = {
              "coverSmall": "assets/cover-zimingqi-20260810-640.webp", "coverLegacy": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
              "desc": "单人十关 · 无尽回廊 · 课堂多人 · 43 位可玩单位（41 位正典学员）—— 子鱼与 VOL.3 五名新徒已入棋，立绘同步终版。",
-             "url": "https://myskme.github.io/myskme-zimingqi/", "featured": True},
+             "url": "https://zimingqi.myskme.com/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
              "coverLegacy": "assets/cover-volvme.webp",
@@ -746,6 +746,14 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
         '狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。'
       ]
     };
+    // 0810 作品搬家：自鸣棋正门从 github.io 改到 zimingqi.myskme.com。
+    // 主 url 不在上面那批「只补缺失」的回填里(url2..url6 才是)，老访客的管理员存档里
+    // 存着旧地址，光改 DEFAULT_DATA 他们永远刷不出新域名——卷子上的二维码也就白搬了。
+    // 故照 LEGACY_DEFAULT_DESC 的同款做法：只把「历史上的官方默认地址」升级到最新，
+    // 管理员亲手改过的网址一律不动。以后再搬别的作品，往这里加一条即可。
+    var LEGACY_DEFAULT_URL={
+      zimingqi:['https://myskme.github.io/myskme-zimingqi/']
+    };
     var present={};
     (data.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){
       if(it.key)present[it.key]=true;
@@ -756,6 +764,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       // 仅把历史官方默认文案升级到最新口径；管理员亲手改过的介绍保持不动。
       var legacyDesc=it.key&&LEGACY_DEFAULT_DESC[it.key];
       if(legacyDesc&&legacyDesc.indexOf(it.desc)>-1)it.desc=d.desc;
+      var legacyUrl=it.key&&LEGACY_DEFAULT_URL[it.key];
+      if(legacyUrl&&d.url&&legacyUrl.indexOf(it.url)>-1)it.url=d.url;
       // 次链接也要回填：0718 给「世界编年史」加的「剧情图册·无月」原本只有清空过
       // localStorage 的人看得见——老访客(尤其是王老师自己这台)存档里没有 url2,
       // 永远刷不出来。只补缺失的,不覆盖用户改过的。
