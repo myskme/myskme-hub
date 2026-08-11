@@ -138,7 +138,7 @@ async function handleSubmit(req, env, origin) {
   let faction = String(body.faction || "").trim().slice(0, 8);
   if (faction && (!FACTION_RE.test(faction) || hasBlocked(faction))) faction = "";
 
-  // 班级口令（可选）：加盐命名空间；口令错/空都不阻断世界榜提交（仅不进班级榜）
+  // 小队口令（可选）：加盐命名空间；口令错/空都不阻断世界榜提交（仅不进小队榜）
   let classTag = "", classJoined = false;
   if (body.pw && String(body.pw).trim()) {
     classTag = await sha256("class|" + String(body.pw).trim() + "|" + env.LB_SALT);
@@ -210,7 +210,7 @@ async function handleBoard(req, env, origin, url) {
   let rows;
   if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
-    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
     const c = await sha256("class|" + pw + "|" + env.LB_SALT);
     rows = await env.DB.prepare(
       "SELECT id,alias,faction,power,base_power,rank_name,badges FROM leaderboard WHERE season=? AND class_tag=? AND hidden=0 ORDER BY (power-base_power) DESC, alias ASC LIMIT ?"
@@ -233,7 +233,7 @@ async function handleFactions(req, env, origin, url) {
   let rows;
   if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
-    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
     const c = await sha256("class|" + pw + "|" + env.LB_SALT);
     rows = await env.DB.prepare(sql.replace("%CLASS%", " AND class_tag=?")).bind(sea, c, limit).all();
   } else {
@@ -253,7 +253,7 @@ async function handleHall(req, env, origin, url) {
   let rows;
   if (scope === "class") {
     const pw = (url.searchParams.get("pw") || "").trim();
-    if (!pw) return json({ ok: false, err: "缺少班级口令" }, 400, origin);
+    if (!pw) return json({ ok: false, err: "缺少小队口令" }, 400, origin);
     const c = await sha256("class|" + pw + "|" + env.LB_SALT);
     rows = await env.DB.prepare(
       "SELECT season,rank,alias,faction,power,badges,crowned_at FROM hall_of_fame WHERE scope='class' AND class_tag=? ORDER BY season DESC, rank ASC LIMIT ?"
@@ -342,8 +342,8 @@ async function handleAdmin(req, env, origin) {
 /* ══════════════════════════════════════════════════════════════
    灵石远征 · 矿脉榜（GEMFALL）—— 独立表 gemfall，独立路由 /gf/*
    与词灵榜完全隔离：不共用表、不共用公式、不改上面任何一行。
-   消消乐的分数没法像答题那样服务端重算，所以走「硬上限 + 限频 +
-   老师可删」的课堂级防线，与词灵榜同级，不是银行级。
+   消除局的分数无法由服务端完整重算，所以走「硬上限 + 限频 +
+   管理端可删」的常规防线，不是银行级。
    ══════════════════════════════════════════════════════════════ */
 /* runs/days 的上限按「十年重度玩」估：每天 15 局 × 3000 天。
    定得住恶意改本地存档，又高到正常玩家这辈子都碰不到。 */
@@ -354,6 +354,9 @@ async function handleAdmin(req, env, origin) {
 const GF_RECORD_CAP = 18999999;
 const GF_CAP = { score: GF_RECORD_CAP, rush: GF_RECORD_CAP, lv: 99999, stars: 192, chain: 120,
                  runs: 45000, days: 3000, dbest: 3000, mv: GF_RECORD_CAP, luck: 400, mastery: 6 };
+/* Boss 连战不进入矿力，只在独立世界榜比较。层数与下一层进度留足长期增长，
+   战果使用 32 位有符号整数上限，避免长局真实成绩被普通关卡的技术闸截断。 */
+const GF_BOSS_CAP = { floor: 9999, progress: 10000, score: 2147483647 };
 const GF_RUSH_REWARDS = [
   { rank: 1, boxes: 3, dust: 180 },
   { rank: 2, boxes: 2, dust: 100 },
@@ -391,6 +394,19 @@ function gfCleanStats(st) {
   s.dbest = Math.min(s.dbest, s.days);
   s.stars = Math.min(s.stars, Math.min(s.lv, 64) * 3);
   return s;
+}
+function gfCleanBoss(st) {
+  st = st || {};
+  const comps = ["wolf", "jun", "qi", "xi", "xiao", "zi"];
+  return {
+    floor: clampInt(st.bossFloor, 0, GF_BOSS_CAP.floor),
+    progress: clampInt(st.bossProgress, 0, GF_BOSS_CAP.progress),
+    score: clampInt(st.bossScore, 0, GF_BOSS_CAP.score),
+    /* build 只收受控强化 ID。既不让任意文本进入公共响应，也给客户端留够
+       组合摘要空间；数组经 String() 后自然成为逗号分隔的 ID。 */
+    build: String(st.bossBuild || "").slice(0, 160).replace(/[^a-z0-9,_:+.\-]/gi, ""),
+    comp: comps.includes(String(st.bossComp || "")) ? String(st.bossComp) : "",
+  };
 }
 let _gfFails = 0, _gfLockUntil = 0;   // /gf/admin 口令爆破限速
 const GF_RANKS = [
@@ -591,16 +607,19 @@ async function gfEnsure(env) {
   await env.DB.prepare(
     "CREATE INDEX IF NOT EXISTS idx_gf_rush_week_rank ON gf_rush_week(week,best_rush DESC)"
   ).run();
-  /* 轮转周榜同样独立于 gemfall 主表：不碰矿力公式，也不把短期竞技成绩
-     塞进事故敏感的七处同步链。只收真实设备，不混入配速员。 */
+  /* Boss 一命连战独立于 gemfall 主表，三项成绩始终作为同一趟纪录更新。
+     不加主表列就不会触碰矿力七处同步链，也不会改变既有段位。 */
   await env.DB.prepare(
-    `CREATE TABLE IF NOT EXISTS gf_rotate_week (
-       week TEXT NOT NULL, id TEXT NOT NULL, alias TEXT NOT NULL,
-       best_rotate INTEGER NOT NULL DEFAULT 0, comp TEXT DEFAULT '', updated_at INTEGER DEFAULT 0,
-       PRIMARY KEY (week,id))`
+    `CREATE TABLE IF NOT EXISTS gf_boss_best (
+       id TEXT PRIMARY KEY,
+       best_floor INTEGER NOT NULL DEFAULT 0,
+       best_progress INTEGER NOT NULL DEFAULT 0,
+       best_score INTEGER NOT NULL DEFAULT 0,
+       build TEXT DEFAULT '', comp TEXT DEFAULT '', updated_at INTEGER DEFAULT 0)`
   ).run();
   await env.DB.prepare(
-    "CREATE INDEX IF NOT EXISTS idx_gf_rotate_week_rank ON gf_rotate_week(week,best_rotate DESC)"
+    `CREATE INDEX IF NOT EXISTS idx_gf_boss_rank
+       ON gf_boss_best(best_floor DESC,best_progress DESC,best_score DESC,updated_at ASC)`
   ).run();
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gf_rush_award (
@@ -928,7 +947,8 @@ function gfMap(rows) {
     rank: i + 1, alias: r.alias, power: r.power || 0,
     lv: r.lv || 0, stars: r.stars || 0, score: r.best_score || 0, rush: r.best_rush || 0,
     rushAll: r.rush_all || r.best_rush || 0,
-    rotate: r.best_rotate || 0,
+    bossFloor: r.boss_floor || 0, bossProgress: r.boss_progress || 0,
+    bossScore: r.boss_score || 0, bossBuild: r.boss_build || "",
     chain: r.chain || 0,
     /* 历史存量可能还保留旧称号；公共输出只认当前权威段位表。 */
     rankName: gfRankFor(r.power || 0), badges: (r.badges || "").split(",").filter(Boolean),
@@ -987,9 +1007,7 @@ async function gfSubmit(req, env, origin) {
   const rushWeekKey = String(st.rushWeekKey || "");
   const rushWeek = rushWeekKey === gfRushWeekKey(now)
     ? clampInt(st.rushWeek, 0, GF_CAP.rush) : 0;
-  const rotateWeekKey = String(st.rotateWeekKey || "");
-  const rotateWeek = rotateWeekKey === gfRushWeekKey(now)
-    ? clampInt(st.rotateWeek, 0, GF_CAP.score) : 0;
+  const boss = gfCleanBoss(st);
   const power = gfPower(s), rname = gfRankFor(power), badges = gfBadges(s).join(",");
   const seen = (prev && prev.first_seen) || new Date().toISOString().slice(0, 10);
   await env.DB.prepare(
@@ -1028,14 +1046,23 @@ async function gfSubmit(req, env, origin) {
        comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_rush_week.comp END,
        updated_at=excluded.updated_at`
   ).bind(rushWeekKey, id, alias, rushWeek, comp, now).run();
-  if (rotateWeek > 0) await env.DB.prepare(
-    `INSERT INTO gf_rotate_week(week,id,alias,best_rotate,comp,updated_at) VALUES(?,?,?,?,?,?)
-     ON CONFLICT(week,id) DO UPDATE SET
-       alias=excluded.alias,
-       best_rotate=MAX(COALESCE(gf_rotate_week.best_rotate,0),excluded.best_rotate),
-       comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_rotate_week.comp END,
-       updated_at=excluded.updated_at`
-  ).bind(rotateWeekKey, id, alias, rotateWeek, "", now).run();
+  if (boss.floor > 0) await env.DB.prepare(
+    `INSERT INTO gf_boss_best(id,best_floor,best_progress,best_score,build,comp,updated_at)
+     VALUES(?,?,?,?,?,?,?)
+     ON CONFLICT(id) DO UPDATE SET
+       best_floor=excluded.best_floor,
+       best_progress=excluded.best_progress,
+       best_score=excluded.best_score,
+       build=excluded.build,
+       comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_boss_best.comp END,
+       updated_at=excluded.updated_at
+     WHERE excluded.best_floor>COALESCE(gf_boss_best.best_floor,0)
+        OR (excluded.best_floor=COALESCE(gf_boss_best.best_floor,0)
+            AND excluded.best_progress>COALESCE(gf_boss_best.best_progress,0))
+        OR (excluded.best_floor=COALESCE(gf_boss_best.best_floor,0)
+            AND excluded.best_progress=COALESCE(gf_boss_best.best_progress,0)
+            AND excluded.best_score>COALESCE(gf_boss_best.best_score,0))`
+  ).bind(id, boss.floor, boss.progress, boss.score, boss.build, boss.comp || comp, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
      而 rank_name/badges 取本次提交的值，会让榜上出现「矿力很高但段位是学徒」。 */
@@ -1145,7 +1172,12 @@ function gfBoardCmp(scope, a, b) {
     || (b.stars || 0) - (a.stars || 0)
     || (b.best_score || 0) - (a.best_score || 0)
     || String(a.alias).localeCompare(String(b.alias));
-  const key = scope === "rush" ? "best_rush" : scope === "rotate" ? "best_rotate" : "power";
+  if (scope === "boss") return (b.boss_floor || 0) - (a.boss_floor || 0)
+    || (b.boss_progress || 0) - (a.boss_progress || 0)
+    || (b.boss_score || 0) - (a.boss_score || 0)
+    || (a.updated_at || 0) - (b.updated_at || 0)
+    || String(a.alias).localeCompare(String(b.alias));
+  const key = (scope === "rush" || scope === "rushAll") ? "best_rush" : "power";
   return (b[key] || 0) - (a[key] || 0) || String(a.alias).localeCompare(String(b.alias));
 }
 
@@ -1177,16 +1209,23 @@ async function gfBoard(req, env, origin, url) {
         WHERE w.week=? AND g.hidden=0 AND w.best_rush>0
         ORDER BY w.best_rush DESC,g.alias ASC LIMIT ?`
     ).bind(week, limit).all();
-  } else if (scope === "rotate") {
-    const week = gfRushWeekKey(Date.now());
+  } else if (scope === "rushAll") {
     rows = await env.DB.prepare(
-      `SELECT g.id,g.alias,g.power,g.best_score,g.best_rush,w.best_rotate,g.lv,g.stars,g.chain,
+      `SELECT ${cols} FROM gemfall WHERE hidden=0 AND best_rush>0
+       ORDER BY best_rush DESC, alias ASC LIMIT ?`
+    ).bind(limit).all();
+  } else if (scope === "boss") {
+    rows = await env.DB.prepare(
+      `SELECT g.id,g.alias,g.power,g.best_score,g.best_rush,g.lv,g.stars,g.chain,
               g.rank_name,g.badges,g.runs,g.days,g.dbest,g.best_dig,g.luck,
-              '' AS comp
-         FROM gf_rotate_week w JOIN gemfall g ON g.id=w.id
-        WHERE w.week=? AND g.hidden=0 AND w.best_rotate>0
-        ORDER BY w.best_rotate DESC,g.alias ASC LIMIT ?`
-    ).bind(week, limit).all();
+              CASE WHEN b.comp!='' THEN b.comp ELSE g.comp END AS comp,
+              b.best_floor AS boss_floor,b.best_progress AS boss_progress,
+              b.best_score AS boss_score,b.build AS boss_build,b.updated_at
+         FROM gf_boss_best b JOIN gemfall g ON g.id=b.id
+        WHERE g.hidden=0 AND b.best_floor>0
+        ORDER BY b.best_floor DESC,b.best_progress DESC,b.best_score DESC,
+                 b.updated_at ASC,g.alias ASC LIMIT ?`
+    ).bind(limit).all();
   } else if (scope === "depth") {
     rows = await env.DB.prepare(
       `SELECT ${cols} FROM gemfall WHERE hidden=0 AND lv>0
@@ -1204,17 +1243,17 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  /* 配速员并进无资源奖励的长期公开榜，不进带口令的历史私榜，
-     也不进 90 秒周榜：榜上名次必须与真实可领奖名次完全一致。 */
+  /* 配速员并进无资源奖励的长期公开榜（含恢复后的 90 秒历史榜），
+     不进带口令的历史私榜、90 秒周榜与 Boss 真人榜。 */
   let merged = rows.results || [];
-  if (scope !== "class" && scope !== "rush" && scope !== "rotate" && await pacersOn(env)) {
+  if (scope !== "class" && scope !== "rush" && scope !== "boss" && await pacersOn(env)) {
     merged = merged.concat(pacerRows(Date.now()))
-      .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
+      .filter(r => scope !== "rushAll" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "depth" || (r.lv || 0) > 0)
       .sort((a, b) => gfBoardCmp(scope, a, b))
       .slice(0, limit);
   }
-  const week = (scope === "rush" || scope === "rotate") ? gfRushWeekKey(Date.now()) : "";
+  const week = scope === "rush" ? gfRushWeekKey(Date.now()) : "";
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged),
     week, weekLabel: week ? gfRushWeekLabel(week) : "",
     rewards: scope === "rush" ? GF_RUSH_REWARDS : [] }, 200, origin);
@@ -1261,7 +1300,7 @@ async function gfAdmin(req, env, origin) {
       env.DB.prepare("DELETE FROM gemfall_alias_month WHERE id=?").bind(id),
       env.DB.prepare("DELETE FROM gf_rush_week WHERE id=?").bind(id),
       env.DB.prepare("DELETE FROM gf_rush_award WHERE id=?").bind(id),
-      env.DB.prepare("DELETE FROM gf_rotate_week WHERE id=?").bind(id),
+      env.DB.prepare("DELETE FROM gf_boss_best WHERE id=?").bind(id),
     ]);
     return json({ ok: true }, 200, origin);
   }
@@ -1281,7 +1320,7 @@ async function gfAdmin(req, env, origin) {
       env.DB.prepare("DELETE FROM gf_rush_week"),
       env.DB.prepare("DELETE FROM gf_rush_award"),
       env.DB.prepare("DELETE FROM gf_rush_seal"),
-      env.DB.prepare("DELETE FROM gf_rotate_week"),
+      env.DB.prepare("DELETE FROM gf_boss_best"),
     ]);
     return json({ ok: true }, 200, origin);
   }

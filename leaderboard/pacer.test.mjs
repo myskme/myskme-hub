@@ -5,7 +5,7 @@
  *
  *     node leaderboard/pacer.test.mjs
  *
- * ⚠ 它**从源码里现抽函数**，不另存一份拷贝。拷贝会漂移，
+ * 注意：它**从源码里现抽函数**，不另存一份拷贝。拷贝会漂移，
  *   漂移之后测的就是拷贝，而不是线上真正在跑的那一份。
  */
 
@@ -187,9 +187,9 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
   const ms = Date.now() - t0;
   ok('单次 pacerAt（十年那头）< 120ms', ms < 120, `实测 ${ms}ms`);
 
-  /* ⑨ 新闯关榜也必须真正并入配速员，而且真人与配速员共用关卡→星数→单关最佳
-        这一套排序。只测比较器不够：还要盯住 gfBoard 的公开榜合并条件，
-        防止又写回 scope !== "depth"，导致服务端悄悄把它们排除。 */
+  /* ⑨ 新闯关榜与恢复后的 90 秒历史榜必须真正并入配速员；有资源奖励的
+        90 秒周榜与真实玩家 Boss 榜则必须排除。只测比较器不够，还要盯住
+        gfBoard 的公开榜合并条件，避免一次改 scope 让奖励榜混入虚拟条目。 */
   if (workerSrc) {
     const mixed = [
       { alias: '普通条目', lv: 20, stars: 60, best_score: 50000 },
@@ -197,11 +197,18 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
       { alias: '同关高星', lv: 20, stars: 61, best_score: 30000, __bot: 1 },
     ].sort((a, b) => M.gfBoardCmp('depth', a, b));
     const boardSrc = fnOf(workerSrc, 'gfBoard');
-    const merged = /scope\s*!==\s*["']class["']\s*&&\s*scope\s*!==\s*["']rush["']\s*&&\s*scope\s*!==\s*["']rotate["']\s*&&\s*await pacersOn/.test(boardSrc)
+    const rushMixed = [
+      { alias: '旧纪录', best_rush: 650000 },
+      { alias: '配速纪录', best_rush: 710000, __bot: 1 },
+      { alias: '追赶纪录', best_rush: 680000 },
+    ].sort((a, b) => M.gfBoardCmp('rushAll', a, b));
+    const merged = /scope\s*!==\s*["']class["']\s*&&\s*scope\s*!==\s*["']rush["']\s*&&\s*scope\s*!==\s*["']boss["']\s*&&\s*await pacersOn/.test(boardSrc)
       && /concat\(pacerRows/.test(boardSrc)
       && /gfBoardCmp\(scope/.test(boardSrc);
-    ok('闯关榜并入配速员并共用关卡排序',
-       merged && mixed.map(x => x.alias).join(',') === '成长条目,同关高星,普通条目');
+    ok('长期闯关/90 秒历史榜并入配速员，奖励周榜与 Boss 榜隔离',
+       merged
+       && mixed.map(x => x.alias).join(',') === '成长条目,同关高星,普通条目'
+       && rushMixed.map(x => x.alias).join(',') === '配速纪录,追赶纪录,旧纪录');
   }
 
   return out;

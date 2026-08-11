@@ -10,14 +10,14 @@
     "assets/og-gemfall.png"
   ],
   "totals": {
-    "files": 75,
-    "bytes": 15449550,
+    "files": 81,
+    "bytes": 15865125,
     "byCategory": {
       "cover": 1,
       "social-card": 1,
-      "art": 1,
+      "art": 4,
       "ally": 6,
-      "boss": 4,
+      "boss": 7,
       "collection-box": 2,
       "collection-card": 14,
       "easter-egg": 1,
@@ -62,8 +62,8 @@
     },
     {
       "path": "match/art/README.md",
-      "bytes": 302,
-      "sha256": "00674668c3622674365461349f546075070cc6ea3e4a9ac01ae3510d9cc180fe",
+      "bytes": 821,
+      "sha256": "3fb745ed53d80a672b2e2888de64a5cb0b91d2039bf82b83e5bfd97f45cdb69d",
       "category": "art",
       "platforms": [
         "web",
@@ -170,12 +170,40 @@
       ]
     },
     {
+      "path": "match/art/boss-hang.webp",
+      "bytes": 120714,
+      "sha256": "2ca77ae3b7777468116a402a95e30cf157bd8ebdfedefd859810cb652b171d19",
+      "width": 512,
+      "height": 768,
+      "alpha": true,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
       "path": "match/art/boss-intro.webp",
       "bytes": 61420,
       "sha256": "47e6aebcb35f547bf18b659ad14bdf16380478cf859fa1c929ff4da63e592146",
       "width": 1024,
       "height": 448,
       "alpha": false,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-parrot.webp",
+      "bytes": 80162,
+      "sha256": "ef4b6ae48f91c8479d47b4ed20babfbab402c70c40fc6acdd5074d0ad5b3d276",
+      "width": 512,
+      "height": 768,
+      "alpha": true,
       "category": "boss",
       "platforms": [
         "web",
@@ -203,6 +231,20 @@
       "sha256": "a7de1f3c2d37f80b133fc28413c4c445fbe8759835197d1e6605e2c93d07ffee",
       "width": 512,
       "height": 512,
+      "alpha": true,
+      "category": "boss",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/boss-yin.webp",
+      "bytes": 115748,
+      "sha256": "09474668427448dd4923744245d806b602e2bc52d91b426a32d1156a264f58b9",
+      "width": 512,
+      "height": 768,
       "alpha": true,
       "category": "boss",
       "platforms": [
@@ -807,6 +849,48 @@
       "height": 256,
       "alpha": true,
       "category": "obstacle",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/support-jia.webp",
+      "bytes": 33350,
+      "sha256": "65f45d843778e1bec7ee00e5d2f5ddd3feb6a2c90297cab5e69f0bf923a318c4",
+      "width": 256,
+      "height": 384,
+      "alpha": true,
+      "category": "art",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/support-nuo.webp",
+      "bytes": 35238,
+      "sha256": "842407e8660fd684e2b7e5eaab22c00ff28e803558564f8877b814d58bb445b0",
+      "width": 256,
+      "height": 384,
+      "alpha": true,
+      "category": "art",
+      "platforms": [
+        "web",
+        "ios",
+        "wechat"
+      ]
+    },
+    {
+      "path": "match/art/support-yue.webp",
+      "bytes": 29844,
+      "sha256": "5abd9185e002fe40f27f028d3daa66686ca06abe32230788f0472d8d29bd5677",
+      "width": 256,
+      "height": 384,
+      "alpha": true,
+      "category": "art",
       "platforms": [
         "web",
         "ios",

@@ -27,9 +27,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
 <meta name="theme-color" content="#ead9b9">
-<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征、无尽矿脉、90 秒矿灯、轮转周榜与本地聚会赛。离线可玩，扫码即开。">
+<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征、无尽矿脉、90 秒矿灯、首领连战与本地聚会赛。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
-<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯局 + 轮转周榜 + 聚会赛。">
+<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯局 + 首领连战 + 聚会赛。">
 <!-- 分享卡片走品牌域名：网页玩家基本在国内，github.io 的图爬虫抓不到，
      卡片就成了无图裸链。og.png 随 EdgeOne 直传包的 icons/ 目录发布，
      GitHub Pages 上同路径也有，两边都不断。 -->
@@ -895,6 +895,32 @@ body::before{display:none}
 .qs-dim{font-size:11px;color:var(--ink3)}
 .qs-go{width:100%;margin-top:8px;padding:7px;font-size:14px}
 
+/* 首领连战：开局只选同行；每层之后的三选一用平铺决策条，避免层层套卡。 */
+.ga-rule{margin:12px auto 10px;max-width:340px;padding:10px 12px;border:1px solid var(--gold-line);
+  color:var(--ink2);font-size:12.5px;line-height:1.75;text-align:left;background:color-mix(in srgb,var(--gold) 5%,var(--panel))}
+.ga-rule b{color:var(--gold2);font-weight:600}
+.ga-bosses{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:9px auto 13px;max-width:340px}
+.ga-bosses span,.ga-build span{padding:4px 7px;border:1px solid var(--line2);color:var(--ink2);font-size:10.5px;letter-spacing:.04em;background:var(--bg2)}
+.ga-role-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px auto 0;max-width:340px}
+.ga-role{min-width:0;border:1px solid var(--line2);background:var(--bg2);padding:7px 4px;cursor:pointer;color:var(--ink2);font-family:var(--serif)}
+.ga-role.sel{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-soft)}
+.ga-role-face{width:52px;height:52px;margin:0 auto 5px;border:1px solid var(--line);background-color:var(--panel2)}
+.ga-role b,.ga-role i{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ga-role b{font-size:12px;font-weight:600}.ga-role i{font-size:10px;font-style:normal;color:var(--ink3)}
+#ovl-gauntlet-pick .ovl-card{width:min(470px,95vw)}
+.ga-build{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:9px 0 12px;min-height:23px}
+.ga-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ga-choice{min-width:0;border:1px solid var(--line2);background:color-mix(in srgb,var(--gold) 4%,var(--bg2));padding:0 0 10px;cursor:pointer;
+  color:var(--ink);font-family:var(--serif);text-align:left;overflow:hidden;touch-action:manipulation}
+.ga-choice:hover,.ga-choice:focus-visible{border-color:var(--gold);box-shadow:var(--glow-soft)}
+.ga-choice:active{transform:translateY(1px)}
+.ga-choice-face{height:92px;background-color:var(--panel2);border-bottom:1px solid var(--line2)}
+.ga-choice-copy{padding:8px 9px 0}.ga-choice-by{font-size:9.5px;letter-spacing:.18em;color:var(--ink3)}
+.ga-choice b{display:block;margin:3px 0 4px;color:var(--gold2);font-size:14px;font-weight:600}
+.ga-choice p{margin:0;color:var(--ink2);font-size:11.5px;line-height:1.55}
+.ga-choice small{display:block;margin-top:5px;color:var(--ink3);font-size:9.5px}
+@media(max-width:430px){.ga-choices{grid-template-columns:1fr}.ga-choice{display:grid;grid-template-columns:82px minmax(0,1fr);padding:0}.ga-choice-face{height:100%;min-height:92px;border:0;border-right:1px solid var(--line2)}.ga-choice-copy{padding:9px 10px}}
+
 /* 追求线：同伴衔位角标 / 百胜描金 / 岁记 / 名片 */
 .ally-opt{position:relative}
 .ally-opt .csrk{position:absolute;top:3px;right:4px;font-size:9.5px;letter-spacing:.1em;
@@ -1445,7 +1471,7 @@ body{--shk:4px}
       <div class="menu-modes">
         <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
         <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人轮流</span></button>
-        <button class="btn ornate" id="btn-quest">挑战<span id="quest-dot"></span><span class="sub">三桩 · 轮转</span></button>
+        <button class="btn ornate" id="btn-quest">挑战<span id="quest-dot"></span><span class="sub">三桩 · 首领连战</span></button>
       </div>
       <div class="menu-dock">
         <button class="btn ghost" id="btn-pack">行囊<span id="pack-dot"></span></button>
@@ -1625,6 +1651,30 @@ body{--shk:4px}
   <div id="boss-intro-title">红笔判官</div>
   <div class="quip boss" id="boss-intro-line"></div>
   <div class="ovl-btns"><button class="btn primary big" id="boss-go">应 战</button></div>
+</div></div>
+
+<!-- 首领连战 · 开局选同行。六位在此模式统一开放，世界榜规则一致。 -->
+<div class="ovl" id="ovl-gauntlet"><div class="ovl-card">
+  <div class="ovl-kick">BOSS GAUNTLET</div>
+  <div class="ovl-title">首领 · <em>连战</em></div>
+  <div class="ga-rule"><b>每层都是首领。</b>一趟只走一次，败退即结算；击破后从三项强化中选一项，效果会叠到本趟结束。击破首位后进入世界榜：先看击破层数，同层再看下一位首领的伤害进度。</div>
+  <div class="ga-bosses" id="gauntlet-bosses"></div>
+  <div class="ovl-kick" style="margin-top:12px">选择同行 · 六位统一开放</div>
+  <div class="ga-role-grid" id="gauntlet-role-grid"></div>
+  <div class="ovl-sub" id="gauntlet-role-desc" style="margin-top:10px"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="gauntlet-close">返 回</button>
+    <button class="btn primary big" id="gauntlet-go">开始连战</button>
+  </div>
+</div></div>
+
+<!-- 首领连战 · 层间三选一 -->
+<div class="ovl" id="ovl-gauntlet-pick"><div class="ovl-card">
+  <div class="ovl-kick" id="gauntlet-pick-kick">首领已退</div>
+  <div class="ovl-title">三选 · <em>一</em></div>
+  <div class="ovl-sub" id="gauntlet-pick-sub"></div>
+  <div class="ga-build" id="gauntlet-build"></div>
+  <div class="ga-choices" id="gauntlet-choices"></div>
 </div></div>
 
 <!-- 结算 -->
@@ -1907,8 +1957,9 @@ body{--shk:4px}
   <div class="ovl-title">远征 · <em>榜</em></div>
   <div class="lb-tabs">
     <button data-scope="depth" class="on">闯关</button>
-    <button data-scope="rush">90 秒·周榜</button>
-    <button data-scope="rotate">轮转·周榜</button>
+    <button data-scope="rushAll">90 秒·历史</button>
+    <button data-scope="rush">90 秒·本周</button>
+    <button data-scope="boss">首领连战</button>
     <button data-scope="camp">阵营</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
@@ -2004,6 +2055,9 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 90 秒周榜：best 只记当周单局最佳，claimed 记已入行囊的历史奖励。
      历史最佳仍在 rushBest，周榜换榜绝不会让个人纪录倒退。 */
   rushWeek:{w:'',best:0,claimed:{}},
+  /* 首领连战历史最佳。floor=已击破层数，progress=下一层伤害进度（万分制），
+     score=整趟战果；三项必须成组替换，不能分别取最大。 */
+  bossBest:{floor:0,progress:0,score:0,build:'',comp:''},
   /* ---- 追求线（2026-08 加）----
      streak = 冒险关连胜（cur 当前 / best 生涯纪录）。聚会与周挑战不计。
      cs     = 同伴生涯账（每人 r 出战 / w 胜场 / u 大招次数），炉石职业胜场那套。
@@ -2064,6 +2118,12 @@ function loadSave(){
   out.rushWeek.best=Math.max(0,Math.floor(+out.rushWeek.best||0));
   out.rushWeek.claimed=(out.rushWeek.claimed&&typeof out.rushWeek.claimed==='object')
     ?out.rushWeek.claimed:{};
+  out.bossBest=Object.assign({floor:0,progress:0,score:0,build:'',comp:''},s.bossBest||{});
+  out.bossBest.floor=Math.max(0,Math.floor(+out.bossBest.floor||0));
+  out.bossBest.progress=clamp(Math.floor(+out.bossBest.progress||0),0,10000);
+  out.bossBest.score=Math.max(0,Math.floor(+out.bossBest.score||0));
+  out.bossBest.build=String(out.bossBest.build||'').replace(/[^a-z0-9,:-]/gi,'').slice(0,160);
+  out.bossBest.comp=['wolf','jun','qi','xi','xiao','zi'].includes(String(out.bossBest.comp||''))?String(out.bossBest.comp):'';
   out.streak=Object.assign({cur:0,best:0},s.streak||{});
   out.camp=Object.assign({side:'',m:0,log:{},claimed:{}},s.camp||{});
   out.camp.log=(out.camp.log&&typeof out.camp.log==='object')?out.camp.log:{};
@@ -2132,6 +2192,21 @@ const BOSSES={
     hurt:['「放肆！」','「嘶——疼的呢。」','「两只手都还在。」'],
     doing:['「判！」','「缠住。」','「这次两样一起来。」'],
     ko:'「原来……两只手，也拦不住一个人往下走。」'},
+  parrot:{key:'parrot',short:'鹦鹉教授',name:'鹦鹉教授',title:'重复之声',act:'echo',every:3,
+    intro:'一句话重复得够多，连灵石也会忘记自己原来的颜色。',
+    hurt:['这句不算。','再说一遍。','你记得倒快。'],
+    doing:['重复。','换一种说法，还是同一句。','听清楚。'],
+    ko:'这一次……回声没有回来。'},
+  hang:{key:'hang',short:'航',name:'航 · 紫光面具',title:'戴面者',act:'mask',every:3,
+    intro:'面具亮起紫光。他没有解释，只把前路一起封住。',
+    hurt:['面具还在。','这道光不会退。','继续。'],
+    doing:['紫光落下。','封住。','别看面具里面。'],
+    ko:'紫光熄了一瞬。他仍然站着，只是让开了路。'},
+  yin:{key:'yin',short:'音',name:'音 · 两面之声',title:'双声者',act:'shift',every:3,
+    intro:'两个声音同时开口，棋盘上的颜色跟着换了位置。',
+    hurt:['我听见了。','两个声音都记得。','还没唱完。'],
+    doing:['换声。','另一面，接上。','听这一次。'],
+    ko:'两个声音终于合成一句：「这一层，你过。」'},
 };
 
 /* ---------- 狼先生台词（原创 · 轻松第一） ---------- */
@@ -2682,6 +2757,8 @@ const ART={
   ally_qi:'art/ally-qi.webp',     ally_xi:'art/ally-xi.webp',
   ally_xiao:'art/ally-xiao.webp', ally_zi:'art/ally-zi.webp',
   boss_ye:'art/boss-ye.webp', boss_she:'art/boss-she.webp', boss_both:'art/boss-both.webp',
+  boss_parrot:'art/boss-parrot.webp', boss_hang:'art/boss-hang.webp', boss_yin:'art/boss-yin.webp',
+  support_jia:'art/support-jia.webp', support_yue:'art/support-yue.webp', support_nuo:'art/support-nuo.webp',
   gem_0:'art/gem-0.webp', gem_1:'art/gem-1.webp', gem_2:'art/gem-2.webp',
   gem_3:'art/gem-3.webp', gem_4:'art/gem-4.webp', gem_5:'art/gem-5.webp',
   gem_orb:'art/gem-orb.webp',
@@ -3533,9 +3610,216 @@ function draw(t){
    ================================================================== */
 const GS={mode:'adv',L:null,moves:0,score:0,over:false,busy:true,goals:[],
   boss:null,hp:0,hpMax:0,bossTick:0,bells:0,rushT:0,rushOn:false,idle:0,chainMax:0,specials:0,started:0,
-  rotateOn:false,rotateStage:0,rotateTarget:0,rotateNeed:10};
+  gauntletFloor:0};
 const DYING=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,REDUCED?Math.min(ms,40):ms));
+
+/* ---------- 首领连战 ----------
+   每层都是首领；层数是唯一主排名，当前首领伤害进度与整趟战果只作同层比较。
+   道具与引路晶不带入，六位同行统一开放，避免世界榜被主线解锁差异切成两套规则。 */
+const GAUNTLET={active:false,opening:false,played:false,floor:1,cleared:0,total:0,seed:'',comp:'wolf',mods:{},picks:[],choices:[],guard:0,bonus:{moves:0,special:0,damage:0}};
+const GAUNTLET_BOSSES=['ye','she','parrot','hang','yin'];
+const GAUNTLET_SUPPORT={
+  jia:{name:'佳',role:'探路',art:'support_jia'},
+  yue:{name:'月',role:'调和',art:'support_yue'},
+  nuo:{name:'诺',role:'洞察',art:'support_nuo'},
+};
+const GAUNTLET_UPGRADES=[
+  {id:'fury',by:'nuo',name:'攻势',tip:'对首领的全部伤害提高 35%。',max:5},
+  {id:'chain',by:'nuo',name:'连锁增压',tip:'三重以上连锁会追加一段首领伤害。',max:5},
+  {id:'echo',by:'nuo',name:'灵技回响',tip:'同行灵技伤害提高，并在发动后保留部分充能。',max:4},
+  {id:'reserve',by:'jia',name:'余力',tip:'以后每层多 3 步，只改变生存空间，不参与排名。',max:4},
+  {id:'wind',by:'jia',name:'先手疾风',tip:'以后每层开局多一颗疾风灵石。',max:4},
+  {id:'guard',by:'jia',name:'护路',tip:'以后每层抵消首领第一次行动。',max:3},
+  {id:'blast',by:'yue',name:'先手爆裂',tip:'以后每层开局多一颗爆裂灵石。',max:4},
+  {id:'fortune',by:'yue',name:'万象机会',tip:'以后每层多一颗随机特殊灵石，并有机会化为万象。',max:5},
+  {id:'charge',by:'yue',name:'同行满载',tip:'以后每层开局带有 25% 同行充能。',max:4},
+];
+/* 单路强化叠满后不再给“选了也不变”的假选项，改为只生效一层的补给。 */
+const GAUNTLET_OVERFLOW=[
+  {id:'supply',by:'jia',name:'补给',tip:'下一层额外增加 2 步。',once:true},
+  {id:'special',by:'yue',name:'特殊石增援',tip:'下一层开局多一颗特殊灵石。',once:true},
+  {id:'surge',by:'nuo',name:'临场强攻',tip:'下一层对首领的伤害提高 25%。',once:true},
+];
+const gauntletStack=id=>Math.max(0,Math.floor(+GAUNTLET.mods[id]||0));
+const gauntletUp=id=>GAUNTLET_UPGRADES.concat(GAUNTLET_OVERFLOW).find(x=>x.id===id);
+function gauntletBuildText(mods){
+  mods=mods||GAUNTLET.mods;
+  return GAUNTLET_UPGRADES.filter(u=>mods[u.id]).map(u=>u.name+' '+mods[u.id]+'重').join(' · ');
+}
+function gauntletBuildCode(mods){
+  mods=mods||GAUNTLET.mods;
+  return GAUNTLET_UPGRADES.filter(u=>mods[u.id]).map(u=>u.id+':'+Math.floor(mods[u.id])).join(',').slice(0,160);
+}
+function gauntletBuildLabel(code){
+  return String(code||'').split(',').map(x=>{const p=x.split(':'),u=gauntletUp(p[0]),n=Math.max(0,Math.floor(+p[1]||0));return u&&n?u.name+' '+n+'重':''})
+    .filter(Boolean).join(' · ');
+}
+const gauntletPct=n=>Math.min(100,Math.floor(clamp(+n||0,0,10000)/100));
+function gauntletBossAt(floor,seed){
+  floor=Math.max(1,Math.floor(+floor||1));
+  if(floor%6===0)return 'both';
+  const block=Math.floor((floor-1)/6),a=GAUNTLET_BOSSES.slice(),R=rngOf(String(seed)+'|boss|'+block);
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a[(floor-1)%6];
+}
+function gauntletChoiceSet(seed,floor,mods){
+  mods=mods||{};const R=rngOf(String(seed)+'|choice|'+floor),out=[];
+  for(const by of ['jia','yue','nuo']){
+    let pool=GAUNTLET_UPGRADES.filter(u=>u.by===by&&(mods[u.id]||0)<u.max);
+    if(!pool.length)pool=GAUNTLET_OVERFLOW.filter(u=>u.by===by);
+    out.push(pool[Math.floor(R()*pool.length)]);
+  }
+  return out;
+}
+function gauntletLevel(floor,seed,mods,comp){
+  floor=Math.max(1,Math.floor(+floor||1));mods=mods||{};
+  const boss=gauntletBossAt(floor,seed),R=rngOf(String(seed)+'|floor|'+floor);
+  const hp=Math.round(110+floor*30+floor*floor*1.5);
+  const L={n:0,ch:9,pos:0,endless:false,depth:floor,colors:floor>=10?6:5,
+    moves:22+(comp==='xi'?2:0)+(mods.reserve||0)*3+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
+    ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss,bossHP:hp,
+    bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)),s1:9000,s2:24000,s3:52000,
+    chName:'首领连战',era:'第 '+floor+' 层',epi:'击破后选择一项强化，继续下潜。'};
+  const n=Math.min(8,2+Math.floor(floor/3)),spots=PAT.scatter(R,18,1,6);
+  if(boss==='ye')L.ink=spots.slice(0,n);
+  else if(boss==='she')L.cages=spots.slice(0,n);
+  else if(boss==='parrot')L.crates=spots.slice(0,Math.max(2,n-1));
+  else if(boss==='hang'){L.ink=spots.slice(0,Math.ceil(n/2));L.cages=spots.slice(9,9+Math.floor(n/2))}
+  else if(boss==='yin'){L.crates=spots.slice(0,Math.ceil(n/2));L.ink=spots.slice(9,9+Math.floor(n/2))}
+  else {L.ink=spots.slice(0,Math.ceil(n/2));L.cages=spots.slice(9,9+Math.ceil(n/2))}
+  return L;
+}
+function gauntletDamage(base,opt){
+  opt=opt||{};let n=Math.max(0,+base||0);
+  n*=1+gauntletStack('fury')*.35;
+  if(opt.chain>=3)n+=opt.chain*4*gauntletStack('chain');
+  if(ULTING)n*=1+gauntletStack('echo')*.45;
+  n*=1+(GAUNTLET.bonus.damage||0);
+  return Math.max(1,Math.round(n));
+}
+function gauntletBetter(a,b){
+  a=a||{};b=b||{};
+  return (+a.floor||0)>(+b.floor||0)
+    ||(+a.floor||0)===(+b.floor||0)&&((+a.progress||0)>(+b.progress||0)
+      ||(+a.progress||0)===(+b.progress||0)&&(+a.score||0)>(+b.score||0));
+}
+function gauntletRecord(floor,progress,score){
+  const next={floor:Math.max(0,Math.floor(+floor||0)),progress:clamp(Math.floor(+progress||0),0,10000),
+    score:Math.max(0,Math.floor(+score||0)),build:gauntletBuildCode(),comp:GAUNTLET.comp};
+  if(gauntletBetter(next,SAVE.bossBest)){SAVE.bossBest=next;persist();return true}
+  return false;
+}
+function renderGauntletSetup(){
+  if(!COMPANIONS.some(c=>c.id===GAUNTLET.comp))GAUNTLET.comp=SAVE.comp||'wolf';
+  $('#gauntlet-bosses').innerHTML=['叶王','缠丝夫人','鹦鹉教授','航','音','叶王真形'].map(x=>'<span>'+x+'</span>').join('');
+  const host=$('#gauntlet-role-grid');host.innerHTML='';
+  for(const c of COMPANIONS){
+    const b=document.createElement('button');b.type='button';b.className='ga-role'+(GAUNTLET.comp===c.id?' sel':'');
+    b.innerHTML='<div class="ga-role-face" data-fit="contain"></div><b>'+c.name+'</b><i>'+c.title+'</i>';
+    applyArt(b.querySelector('.ga-role-face'),'ally_'+c.id);
+    b.onclick=()=>{SFX.click();GAUNTLET.comp=c.id;renderGauntletSetup()};host.appendChild(b);
+  }
+  const c=compById(GAUNTLET.comp),best=SAVE.bossBest||{};
+  $('#gauntlet-role-desc').innerHTML='<b>'+c.name+'</b> · '+c.ult+'　'+c.desc.replace(/<[^>]+>/g,'')
+    +'<br>本机最佳：击破 <b>'+Math.max(0,best.floor||0)+'</b> 层';
+}
+function openGauntletSetup(){
+  GAUNTLET.comp=SAVE.comp||GAUNTLET.comp||'wolf';renderGauntletSetup();ovl('gauntlet');
+}
+function gauntletStart(){
+  GAUNTLET.active=true;GAUNTLET.opening=true;GAUNTLET.played=false;GAUNTLET.floor=1;GAUNTLET.cleared=0;GAUNTLET.total=0;GAUNTLET.mods={};GAUNTLET.picks=[];GAUNTLET.choices=[];GAUNTLET.guard=0;GAUNTLET.bonus={moves:0,special:0,damage:0};
+  GAUNTLET.seed='gf-boss-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+  gauntletRenderChoices(true);
+}
+function gauntletOpenFloor(){
+  const floor=GAUNTLET.floor,L=gauntletLevel(floor,GAUNTLET.seed,GAUNTLET.mods,GAUNTLET.comp);GS.mode='gauntlet';GS.L=L;
+  buildBoard(L,GAUNTLET.seed+'|board|'+floor);GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
+  GS.boss=L.boss;GS.hp=L.bossHP;GS.hpMax=L.bossHP;GS.bossTick=0;GS.gauntletFloor=floor;
+  GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;GS.prep='';GS.guideAssist=false;
+  GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
+  GS.compDef=compById(GAUNTLET.comp);GS.charge=0;GS.xiaoN=0;GS.pasRng=rngOf(GAUNTLET.seed+'|passive|'+floor);
+  BGM.play('boss');show('game');fitCanvas();
+  $('#rush-bar').classList.remove('on');$('#toolbar').style.display='none';$('#tool-hint').classList.remove('on');
+  $('#score-stars').innerHTML='';renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='第 '+floor+' 层';updHUD();
+  const bo=BOSSES[L.boss],bb=$('#boss-bar');bb.classList.add('on');
+  $('#boss-face').innerHTML=bossFaceSVG(L.boss);applyArt($('#boss-face'),'boss_'+L.boss);
+  $('#boss-name').textContent=bo.title;$('#boss-hpbar').querySelector('i').style.width='100%';$('#boss-hpbar').classList.remove('low');
+  $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;$('#quip-line').innerHTML='<b>'+bo.short+'：</b>'+bo.intro;
+  $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);$('#boss-intro-face').dataset.fit='contain';applyArt($('#boss-banner'),'boss_banner');applyArt($('#boss-intro-face'),'boss_'+L.boss);
+  $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');$('#boss-intro-title').textContent='首领连战 · 第 '+floor+' 层';$('#boss-intro-line').textContent=bo.intro;
+  ovl('boss');
+}
+function gauntletPlant(kind,n,R){
+  const spots=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].cage&&!T[r][c].ink&&!T[r][c].crate)spots.push([r,c]);
+  for(let i=spots.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]]}
+  for(let i=0;i<n&&spots.length;i++){const [r,c]=spots.pop();B[r][c].k=typeof kind==='function'?kind(i):kind;B[r][c].sc=.3}
+}
+function gauntletBeginFloor(){
+  GS.compDef=compById(GAUNTLET.comp);GS.charge=0;GS.xiaoN=0;
+  applyOpeningPassives({rng:GS.pasRng});
+  const R=rngOf(GAUNTLET.seed+'|opening|'+GAUNTLET.floor),wind=gauntletStack('wind');
+  gauntletPlant(i=>i%2?'V':'H',wind,R);gauntletPlant('B',gauntletStack('blast'),R);
+  gauntletPlant(()=>R()<.22?'O':['H','V','B'][Math.floor(R()*3)],gauntletStack('fortune'),R);
+  gauntletPlant(()=>['H','V','B'][Math.floor(R()*3)],GAUNTLET.bonus.special||0,R);
+  GS.charge=Math.min(GS.compDef.need,GS.compDef.need*.25*gauntletStack('charge'));
+  GAUNTLET.guard=gauntletStack('guard');renderGoals($('#goal-row'),30);updHUD();renderAlly();
+  ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
+  toast('首领连战 · 第 <b>'+GAUNTLET.floor+'</b> 层'+(gauntletBuildText()?'<br>'+gauntletBuildText():''),2600);
+}
+function gauntletRenderChoices(opening){
+  GAUNTLET.opening=!!opening;
+  GAUNTLET.choices=gauntletChoiceSet(GAUNTLET.seed,opening?0:GAUNTLET.floor,GAUNTLET.mods);
+  $('#gauntlet-pick-kick').textContent=opening?'出发强化':'第 '+GAUNTLET.floor+' 层击破';
+  $('#gauntlet-pick-sub').textContent=opening?'先选一项带入整趟的强化 · 选定后进入第 1 层'
+    :'已击破 '+GAUNTLET.cleared+' 层 · 选择后进入第 '+(GAUNTLET.floor+1)+' 层';
+  const build=$('#gauntlet-build'),txt=gauntletBuildText();build.innerHTML=txt?txt.split(' · ').map(x=>'<span>'+esc(x)+'</span>').join(''):'<span>尚无强化</span>';
+  const host=$('#gauntlet-choices');host.innerHTML='';
+  for(const u of GAUNTLET.choices){
+    const s=GAUNTLET_SUPPORT[u.by],b=document.createElement('button');b.type='button';b.className='ga-choice';b.dataset.up=u.id;
+    b.innerHTML='<div class="ga-choice-face" data-fit="contain"></div><div class="ga-choice-copy"><div class="ga-choice-by">'+s.name+' · '+s.role+'</div><b>'+u.name+'</b><p>'+u.tip+'</p><small>'
+      +(u.once?'只作用下一层':('当前 '+gauntletStack(u.id)+' 重 · 上限 '+u.max+' 重'))+'</small></div>';
+    applyArt(b.querySelector('.ga-choice-face'),s.art);b.onclick=()=>gauntletChoose(u.id);host.appendChild(b);
+  }
+  ovl('gauntlet-pick');
+}
+function gauntletChoose(id){
+  if(!GAUNTLET.active||!GAUNTLET.choices.some(u=>u.id===id))return;
+  const u=gauntletUp(id);if(!u)return;SFX.click();GAUNTLET.picks.push(id);GAUNTLET.choices=[];
+  if(u.once){
+    if(id==='supply')GAUNTLET.bonus.moves=2;
+    else if(id==='special')GAUNTLET.bonus.special=1;
+    else if(id==='surge')GAUNTLET.bonus.damage=.25;
+  }else GAUNTLET.mods[id]=Math.min(u.max,gauntletStack(id)+1);
+  toast('<b>'+u.name+'</b> · '+u.tip,1800);
+  if(GAUNTLET.opening)GAUNTLET.opening=false;else GAUNTLET.floor++;
+  ovl(null);gauntletOpenFloor();
+}
+function gauntletFloorWon(){
+  GAUNTLET.total+=GS.score;GAUNTLET.cleared=GAUNTLET.floor;gauntletRecord(GAUNTLET.cleared,0,GAUNTLET.total);
+  GAUNTLET.bonus={moves:0,special:0,damage:0};
+  gauntletRenderChoices();
+}
+function gauntletEnd(reason){
+  if(!GAUNTLET.active)return;
+  const progress=GS.hpMax?clamp(Math.round((GS.hpMax-GS.hp)/GS.hpMax*10000),0,10000):0;
+  GAUNTLET.total+=GS.score;GAUNTLET.active=false;GAUNTLET.opening=false;const best=gauntletRecord(GAUNTLET.cleared,progress,GAUNTLET.total);
+  GS.over=true;GS.busy=true;GS.won=false;$('#toolbar').style.display='';
+  if(GAUNTLET.played){
+    markRun();q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);csBump('r',1);bountyCheck();
+    setTimeout(()=>LB.flush('clear'),600);
+  }
+  SFX.lose();applyArt($('#end-banner'),best?'end_win':'end_lose');
+  $('#end-kick').textContent='首领连战 · BOSS GAUNTLET';$('#end-title').innerHTML=best?'新 · <em>纪录</em>':'连战 · <em>结算</em>';
+  countTo($('#end-score'),GAUNTLET.total);$('#end-stars').style.display='none';$('#end-waystone').classList.remove('on');
+  $('#end-detail').innerHTML='击破 <b>'+GAUNTLET.cleared+'</b> 层　下一位首领进度 <b>'+gauntletPct(progress)+'%</b><br>整趟战果 <b>'+GAUNTLET.total.toLocaleString('en-US')+'</b>'
+    +(gauntletBuildText()?'<br>'+esc(gauntletBuildText()):'');
+  $('#end-quip').textContent=!GAUNTLET.played?'尚未出手，这次不计入累计记录。':reason==='quit'?'这一趟到这里。阵容与选择都还在你手里。':GAUNTLET.cleared?'败退不是清零——这一趟已经留在榜上，下一趟换一种组合。':'首位首领的进度已留在本机；击破它之后，这趟纪录就会进入世界榜。';
+  $('#end-next').textContent='再战一趟';$('#end-next').dataset.act='gauntlet';$('#end-menu').textContent='回大厅';
+  $('#end-retry').style.display='none';$('#end-retry').dataset.act='';$('#end-continue').style.display='none';$('#end-share').style.display='none';
+  $('#wk-tablet').style.display='none';ovl('end');
+}
 
 function toast(msg,ms){
   const el=$('#toast'); el.innerHTML=msg; el.classList.add('on');
@@ -3707,41 +3991,6 @@ function addScore(n,r,c,color){
     if(el){el.querySelector('.cnt').textContent=goalText(sg);if(sg.got>=sg.need)el.classList.add('done')}}
 }
 
-/* ---- 轮转赛：一套核心同时服务单人周榜与聚会赛 ----
-   当前目标只在完成一轮后换色；同一种子决定起始色，同轮同盘也同序。
-   非目标消除仍照常得分，目标色额外加分，因此它改变取舍，却不会把坏盘变成死局。 */
-function rotateNeedAt(stage){return 10+Math.min(6,Math.max(0,stage))*2}
-function rotateBegin(seed){
-  const r=rngOf(String(seed)+'|rotate-target');
-  GS.rotateOn=true;GS.rotateStage=0;GS.rotateTarget=Math.floor(r()*Math.min(5,GS.L.colors||5));
-  GS.rotateNeed=rotateNeedAt(0);GS.goals=[{type:'collect',col:GS.rotateTarget,need:GS.rotateNeed,got:0}];
-}
-function rotateRender(){
-  if(!GS.rotateOn)return;
-  renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='轮转目标';
-  if(GS.party)$('#rush-best').textContent='完成 '+GS.rotateStage+' 轮';
-}
-function rotateCollect(col,n){
-  if(!GS.rotateOn||Number(col)!==GS.rotateTarget||n<=0)return false;
-  const g=GS.goals[0];if(!g)return false;
-  const take=Math.min(Math.max(0,g.need-g.got),Math.max(0,Math.floor(n)));
-  if(!take)return false;
-  g.got+=take;
-  addScore(take*(90+Math.min(8,GS.rotateStage)*15));
-  const el=$('#goal-row').children[0];
-  if(el){el.querySelector('.cnt').textContent=goalText(g);el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),260)}
-  if(g.got<g.need)return true;
-  const cleared=GS.rotateStage+1;
-  addScore(1200+cleared*260);
-  GS.rotateStage=cleared;
-  GS.rotateTarget=(GS.rotateTarget+1+(cleared%2))%Math.min(5,GS.L.colors||5);
-  GS.rotateNeed=rotateNeedAt(cleared);
-  GS.goals=[{type:'collect',col:GS.rotateTarget,need:GS.rotateNeed,got:0}];
-  rotateRender();
-  toast('完成第 <b>'+cleared+'</b> 轮 · 下一色 '+GEMS[GS.rotateTarget].name,1500);
-  return true;
-}
-
 /* ---- 清除一批格子 ---- */
 function killPiece(r,c,opts){
   const p=B[r][c]; if(!p)return null;
@@ -3789,10 +4038,7 @@ function clearCells(cells,chain,noCrateSplash){
       if(T[r][c].crate===0)fxRing(cxOf(c),cyOf(r),'#9a8c68',ENG.cs*1.6);
     }
   }
-  for(const g in colors){
-    if(GS.rotateOn)rotateCollect(+g,colors[g]);
-    else bumpGoal('collect',+g,colors[g]);
-  }
+  for(const g in colors)bumpGoal('collect',+g,colors[g]);
   allyChargeFrom(colors,specials);
   /* 今日三桩的计数。挂在这里而不是结算处，是因为这三样**不看胜负**——
      输的那一局消掉的石头也该算数。 */
@@ -3815,8 +4061,9 @@ function bossSay(txt){
   const el=$('#boss-say');el.textContent=txt;el.classList.add('on');
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2100);
 }
-function bossHurt(dmg){
+function bossHurt(dmg,opt){
   if(!GS.boss||GS.hp<=0)return;
+  if(GS.mode==='gauntlet')dmg=gauntletDamage(dmg,opt);
   GS.hp=Math.max(0,GS.hp-dmg);
   const g=GS.goals.find(x=>x.type==='boss');
   if(g){g.got=GS.hpMax-GS.hp;const el=$('#goal-row').children[GS.goals.indexOf(g)];
@@ -3833,24 +4080,42 @@ const pick2=a=>a[Math.floor(rnd()*a.length)];
 async function bossAct(){
   const bo=BOSSES[GS.boss]; if(!bo||GS.hp<=0)return;
   GS.bossTick++;
-  if(GS.bossTick%bo.every!==0)return;
+  const every=(GS.L&&GS.L.bossEvery)||bo.every;
+  if(GS.bossTick%every!==0)return;
+  if(GS.mode==='gauntlet'&&GAUNTLET.guard>0){
+    GAUNTLET.guard--;bossSay('来路被护住了。');SFX.made();toast('<b>佳 · 护路</b>　挡下首领行动',1500);return;
+  }
   let act=bo.act;
-  if(act==='both')act=(GS.bossTick/bo.every)%2?'seal':'snake';
+  if(act==='both')act=(GS.bossTick/every)%2?'seal':'snake';
+  if(act==='echo')act=(GS.bossTick/every)%2?'shift':'seal';
   bossSay(pick2(bo.doing));SFX.bossAct();flash(true);shake();
   await sleep(240);
   const spots=[];
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     if(act==='seal'&&T[r][c].ink===0&&T[r][c].crate===0&&isGem(r,c))spots.push([r,c]);
     if(act==='snake'&&isGem(r,c)&&B[r][c].cage===0&&B[r][c].k==='n')spots.push([r,c]);
+    if((act==='mask'||act==='shift')&&T[r][c].ink===0&&T[r][c].crate===0&&isGem(r,c)&&B[r][c].cage===0&&B[r][c].k==='n')spots.push([r,c]);
   }
   for(let i=spots.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]]}
-  const n=Math.min(spots.length,act==='seal'?3:2);
+  const floor=GS.mode==='gauntlet'?GAUNTLET.floor:1;
+  const n=Math.min(spots.length,act==='seal'?Math.min(5,3+Math.floor(floor/8))
+    :act==='snake'?Math.min(4,2+Math.floor(floor/10)):act==='mask'?4:Math.min(8,4+Math.floor(floor/5)));
   for(let i=0;i<n;i++){
     const [r,c]=spots[i];
     if(act==='seal'){T[r][c].ink=1;fxRing(cxOf(c),cyOf(r),'#d56060',ENG.cs*1.4)}
-    else {B[r][c].cage=1;B[r][c].snake=true;fxRing(cxOf(c),cyOf(r),'#6aa86a',ENG.cs*1.4)}
+    else if(act==='snake'){B[r][c].cage=1;B[r][c].snake=true;fxRing(cxOf(c),cyOf(r),'#6aa86a',ENG.cs*1.4)}
+    else if(act==='mask'){
+      if(i%2){B[r][c].cage=1;B[r][c].snake=false;fxRing(cxOf(c),cyOf(r),'#8e7bd8',ENG.cs*1.4)}
+      else {T[r][c].ink=1;fxRing(cxOf(c),cyOf(r),'#8e7bd8',ENG.cs*1.4)}
+    }else{
+      B[r][c].g=(B[r][c].g+1+Math.floor(rnd()*Math.max(1,(GS.L.colors||5)-1)))%(GS.L.colors||5);
+      fxRing(cxOf(c),cyOf(r),GEMS[B[r][c].g].base,ENG.cs*1.2);
+    }
     await sleep(90);
   }
+  /* 双声换色若碰巧拼成了现成三连，就立即重排成可操作的稳定盘，
+     不让玩家下一手面对一个来源不明的自动连锁。 */
+  if(act==='shift'&&(scanRuns().length||!anyMove()))shuffleBoard();
   /* 万一封成死局，立刻重组 */
   if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('矿脉重组 · <b>手感还在</b>')}
 }
@@ -3862,7 +4127,7 @@ async function settleBoard(firstChain){
     const groups=findGroups();
     if(!groups.length)break;
     chain++;GS.chainMax=Math.max(GS.chainMax,chain);
-    if(!GS.party&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 客人打的连锁不算机主的
+    if(!GS.party&&GS.mode!=='gauntlet'&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 来宾局与连战不抬主榜技巧线
     /* 先记下要炼成的特殊灵石 */
     const makes=[];
     const all=new Set();
@@ -3879,7 +4144,7 @@ async function settleBoard(firstChain){
     total+=base;
     const anchor=seed[0]||[0,0];
     addScore(base,anchor[0],anchor[1],chain>=3?'#e8c768':null);
-    if(GS.boss)bossHurt(res.gems+res.specials*5);
+    if(GS.boss)bossHurt(res.gems+res.specials*5,{chain});
     SFX.pop(chain);
     if(chain>=3){
       comboBanner(chain);
@@ -3954,7 +4219,7 @@ async function settleBoard(firstChain){
   /* 连锁流水：本周矿脉与限时局都记，两者的战报都要用它拼形状。
      ⚠ 每个模式开局必须清空 —— 不清的话，打完本周矿脉再去打 90 秒，
      战报上会画出**上一局留下的形状**，比空着更糟（那是在撒谎）。 */
-  if((GS.weekly||GS.mode==='rush'||GS.mode==='rotate')&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
+  if((GS.weekly||GS.mode==='rush')&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
   /* 狼先生·执灯人的被动「灯常亮」：连锁到 4 就点亮一颗疾风。
      这条原来是晓的，现在移交给狼先生 —— 因为它**正好喂他自己的大招**
      （「执灯」引爆全盘特殊石），造石与引爆形成自循环：
@@ -4060,6 +4325,7 @@ async function trySwap(a,b){
     if(stale())return;
     GS.busy=false;GS.idle=PLAT.now();return;
   }
+  if(GS.mode==='gauntlet')GAUNTLET.played=true;
   if(!GS.rushOn)GS.moves--;
   ENG.lastMove=[[ar,ac],[br,bc]];
   updHUD();
@@ -4091,7 +4357,7 @@ async function trySwap(a,b){
   /* 矿灯将熄：这一手打得好才回灯油。
      ⚠ 以前用的是 GS.chainMax（整局历史最大连锁），意味着只要全局打出过一次 3 连锁，
      此后每一步都无条件 +1.2 秒——90 秒的局能拖成好几分钟，榜单彻底失真。
-     这条只属于 90 秒矿灯；聚会赛与轮转赛虽也计时，但不会续秒。 */
+     这条只属于 90 秒矿灯；聚会赛虽也计时，但不会续秒。 */
   if(GS.mode==='rush'&&GS.rushOn){
     const ch=GS.lastChain||0;
     const bonus=(ch>=5?1.6:ch>=3?0.8:0)+(gained>6000?1.0:0);
@@ -4131,6 +4397,9 @@ async function checkEnd(){
   if(goalsMet()){
     GS.over=true;GS.busy=true;GS.won=true;
     if(GS.boss){await bossDown()}
+    if(GS.mode==='gauntlet'){
+      await sleep(180);gauntletFloorWon();return;
+    }
     await sleep(260);
     await finale();
     endLevel(true);
@@ -4139,6 +4408,7 @@ async function checkEnd(){
   if(GS.moves<=0){
     GS.over=true;GS.busy=true;
     await sleep(400);
+    if(GS.mode==='gauntlet'){gauntletEnd();return}
     endLevel(false);
     return;
   }
@@ -4150,7 +4420,7 @@ async function checkEnd(){
    规矩：**一关只提一次**，而且只在真的吃紧时提——步数见底、目标还差得远。
    不吃紧的时候一声不吭，否则就成了唠叨，比不提还烦。 */
 function toolNudge(){
-  if(GS.over||GS.party||GS.toldTool||GS.rushOn)return;
+  if(GS.over||GS.party||GS.mode==='gauntlet'||GS.toldTool||GS.rushOn)return;
   if(GS.moves>5||GS.moves<2)return;                           // 太早不提；只剩 1 步提了也没用
   const prog=GS.goals.length
     ? GS.goals.reduce((a,g)=>a+Math.min(1,g.need?g.got/g.need:1),0)/GS.goals.length : 1;
@@ -4175,8 +4445,10 @@ async function bossDown(){
     fxBurst(CSS_W*(.3+rnd()*.4),CSS_W*(.3+rnd()*.4),'#d56060',24,2);
     await sleep(180);
   }
-  if(GS.boss==='ye'||GS.boss==='both')grant('a9');
-  if(GS.boss==='she'||GS.boss==='both')grant('a10');
+  if(GS.mode!=='gauntlet'){
+    if(GS.boss==='ye'||GS.boss==='both')grant('a9');
+    if(GS.boss==='she'||GS.boss==='both')grant('a10');
+  }
   await sleep(500);
 }
 /* 达标后剩余步数化作灵技全场引爆——收尾的爽点 */
@@ -4487,10 +4759,11 @@ function renderAlly(){
 async function fireUlt(){
   const c=GS.compDef;
   if(!c||GS.busy||GS.over||GS.charge<c.need)return;
+  if(GS.mode==='gauntlet')GAUNTLET.played=true;
   GS.charge=0;GS.tool=null;GS.toolFirst=null;selCell=null;hintCell=null;
   GS.busy=true;ULTING=true;renderAlly();renderTools();
   /* 聚会赛是来宾局，不把客人的人物使用写进机主成就与衔位。 */
-  if(!GS.party){
+  if(!GS.party&&GS.mode!=='gauntlet'){
     SAVE.ach['ult_'+c.id]=1;grant('a13');csBump('u',1);
     if(COMPANIONS.every(x=>SAVE.ach['ult_'+x.id]))grant('a14');
     persist();
@@ -4570,7 +4843,7 @@ async function fireUlt(){
       B[r][c2].k='O';B[r][c2].sc=.2;
       fxRing(cxOf(c2),cyOf(r),'#ffffff',ENG.cs*4);SFX.orb();SFX.made();
       floatNum(r,c2,'万象','#ffffff');
-      if(!GS.party)grant('a4');
+      if(!GS.party&&GS.mode!=='gauntlet')grant('a4');
     }
   }else if(c.id==='zi'){                                      // 破封：机关各褪一层（梓）
     let n=0;
@@ -4601,6 +4874,8 @@ async function fireUlt(){
      所以 ULTING 在 settleBoard 之前就放掉。 */
   ULTING=false;
   await settleBoard(2);
+  if(GS.mode==='gauntlet'&&!GS.over&&gauntletStack('echo'))
+    GS.charge=Math.min(c.need,GS.charge+c.need*.22*gauntletStack('echo'));
   if(!anyMove()){if(!shuffleBoard())buildBoard(GS.L);toast('无路可走 · <b>矿脉重组</b>')}
   renderAlly();
   GS.busy=false;
@@ -5690,7 +5965,7 @@ function openLevel(n,mode){
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;
   GS.prep=(SAVE.prep&&PREPS[SAVE.prep.armed]&&prepCount(SAVE.prep.armed)>0)?SAVE.prep.armed:'';
   GS.guideAssist=guideAssist;
-  GS.party=false;GS.weekly=false;GS.rotateOn=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
+  GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;                                             // 不复位会让 checkEnd 跳过通关判定，这关永远打不通
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
   GS.pasRng=null;                          // 冒险关不需要可复现
@@ -5785,7 +6060,7 @@ function startRush(){
   /* 晰·探路者的被动在限时局折算成 +5 秒（冒险关是 +2 步） */
   const xiMs=(compById(SAVE.comp).id==='xi')?5000:0;
   const baseMs=90000;
-  GS.boss=null;GS.rushOn=true;GS.rushT=baseMs+xiMs;GS.rushMax=baseMs+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;GS.rotateOn=false;
+  GS.boss=null;GS.rushOn=true;GS.rushT=baseMs+xiMs;GS.rushMax=baseMs+xiMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   BGM.play('rush');
   GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.wkLog=[];   // 连锁流水每局清空，别把上一局的形状画进战报
@@ -5813,15 +6088,16 @@ function startRush(){
 }
 function endRush(){
   $('#end-waystone').classList.remove('on');
+  $('#end-stars').style.display='';
+  $('#end-menu').textContent='回大厅';
   GS.over=true;GS.busy=true;GS.rushOn=false;
   markRun();
   csBump('r',1);
   yjBump('rushN',1);
   if(GS.chainMax>=8)yjBump('chain8',1);
   bountyCheck();
-  /* 90 秒局与轮转赛都是「人人同规则、时长一样、直接可比」的公平局。
-     这里保留矿灯战报；轮转赛在自己的结算层生成轮转战报。关卡各打各的，
-     第 12 关和第 40 关的分数没有可比性，不进世界周榜。 */
+  /* 90 秒局人人同规则、时长一样，直接可比，因此保留矿灯战报。
+     关卡各打各的，第 12 关和第 40 关的分数没有可比性，不进世界周榜。 */
   $('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   const prevBest=SAVE.rushBest;
@@ -5863,63 +6139,6 @@ function endRush(){
   $('#end-retry').style.display='none';
   $('#end-retry').dataset.act='';
   $('#end-continue').style.display='none';   // 不复位会把冒险关的续挖状态漏进限时赛结算屏
-  ovl('end');
-}
-/* ---------- 轮转赛 · 60 秒世界周榜 ----------
-   全服同周同盘、目标同序；非目标仍得基础分，命中目标再得轮转分。
-   它与聚会轮转共用 rotateCollect，不再养第二套近似规则。 */
-function startRotate(){
-  GS.mode='rotate';
-  const key=rushWeekKey(),seed='gemfall|rotate|'+key,L=levelDef(3);
-  L.n=0;L.endless=false;L.boss=null;L.bells=0;L.colors=5;L.moves=999;
-  L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
-  L.goals=[];L.chName='轮转赛 · 60 秒';L.era='ROTATION';L.s1=22000;L.s2=52000;L.s3=90000;
-  GS.L=L;GS.goals=[];GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
-  const baseMs=60000;
-  GS.boss=null;GS.rushOn=true;GS.rushT=baseMs;GS.rushMax=baseMs;GS.started=PLAT.now();GS.paused=false;GS.party=false;GS.weekly=false;
-  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;GS.wkLog=[];GS.gemsTotal=0;
-  GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.compDef=null;GS.charge=0;GS.xiaoN=0;
-  buildBoard(L,seed);
-  GS.pasRng=null;ENG.rng=rngOf(seed+'|play');rotateBegin(seed);
-  BGM.play('rush');show('game');fitCanvas();
-  $('#boss-bar').classList.remove('on');
-  $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
-  $('#rush-title').textContent='轮转赛 · ROTATION 60';
-  $('#rush-time').textContent=(GS.rushT/1000).toFixed(1);
-  const rs=rotateWeekState();
-  $('#rush-best').textContent='本周 '+(rs.best?rs.best.toLocaleString('en-US'):'—');
-  $('#toolbar').style.display='none';$('#tool-hint').classList.remove('on');
-  $('#pt-bar').classList.remove('on');
-  $('#score-stars').innerHTML='<s style="left:24%">'+ICONS.star+'</s><s style="left:57%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
-  rotateRender();renderAlly();
-  $('#quip-line').innerHTML='<b>轮转赛：</b>人物能力与灵器封存，只看你怎么追当前目标。';
-  updHUD();GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
-  showTut('60 秒轮转 · <b>清准当前目标，完成后立即换色</b>',4200);
-}
-function endRotate(){
-  $('#end-waystone').classList.remove('on');
-  GS.over=true;GS.busy=true;GS.rushOn=false;GS.rotateOn=false;$('#toolbar').style.display='';
-  const finished=GS.rotateStage||0;GS.rotateFinished=finished;
-  markRun();q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);bountyCheck();
-  if(GS.chainMax>=8)yjBump('chain8',1);
-  const prev=SAVE.rotateBest||0,best=GS.score>prev;GS.wasRecord=best;
-  if(best)SAVE.rotateBest=GS.score;
-  const rs=rotateWeekState();if(GS.score>rs.best)rs.best=GS.score;
-  persist();
-  setTimeout(async()=>{await LB.flush('clear');fetchRotateRank()},600);
-  SFX.win();applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent='轮转赛 · ROTATION 60';
-  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'轮 · <em>转</em>';
-  countTo($('#end-score'),GS.score);
-  $('#end-detail').innerHTML='完成轮转 <b>'+finished+'</b> 轮　最长连锁 <b>'+GS.chainMax+'</b>'
-    +'<br>本周最佳 <b>'+rs.best.toLocaleString('en-US')+'</b>　历史最佳 <b>'+(SAVE.rotateBest||0).toLocaleString('en-US')+'</b>';
-  const stars=$('#end-stars').children,lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
-  for(let i=0;i<3;i++)stars[i].classList.remove('lit');
-  setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
-  $('#end-quip').textContent=finished?'目标会换，手感不会。下一局还能更快看懂盘面。':'第一轮还没合上，再试一局就会找到节奏。';
-  $('#end-next').textContent='再转一局';$('#end-next').dataset.act='rotate';
-  $('#end-retry').style.display='none';$('#end-retry').dataset.act='';$('#end-continue').style.display='none';
-  $('#end-share').style.display='flex';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   ovl('end');
 }
 /* ---------- 引路晶 · 卡关兜底 ----------
@@ -6028,6 +6247,8 @@ function guideUse(){
 }
 function endLevel(win){
   const L=GS.L, n=L.n;
+  $('#end-stars').style.display='';
+  $('#end-menu').textContent='回图';
   $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
@@ -6102,7 +6323,8 @@ function endLevel(win){
     setTimeout(()=>{for(let i=0;i<st;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i);
       fxBurstDom(i)},i*300)},260);
     $('#end-quip').textContent=pick2(Q_WIN);
-    $('#end-next .nav-label').textContent=L.endless?'再深一层':'下一关';
+    $('#end-next').innerHTML='<span class="nav-label">'+(L.endless?'再深一层':'下一关')
+      +'</span><span class="icw nav-next">'+ICONS.chev+'</span>';
     $('#end-next').dataset.act='next';
     /* end-retry 在限时结算页会被隐藏，回到冒险结算时
        必须同时复位显示、文案和 act，不让旧状态串场。 */
@@ -6182,10 +6404,9 @@ function fxBurstDom(i,origin){
 
 /* ==================================================================
    [ 聚会赛 · PARTY（一台机器轮流玩） ]
-   三条真正不同的规则：
+   两条真正不同的规则：
    · 镜盘赛：人物只作身份，同轮同盘、能力封存，纯比手艺；
    · 灵契赛：同一张基础盘，各选一位不重复同伴，被动与灵技生效。
-   · 轮转赛：能力封存，目标灵石按同一顺序轮换，清准目标会追加得分。
    赛长固定在合理的 2–4 轮内；每轮每位选手都要从 30 / 60 / 90 秒三档重新选择。
    四张矿盘按选定起点逐轮轮换；同一轮所有人仍拿同一张盘，比较不受运气干扰。
    按设置顺序依次交机；随机点名与额外思考倒计时继续退役，棋盘计时只在真正开局后运行。
@@ -6244,7 +6465,7 @@ function ptSecondsAt(r,p){
 function ptRoundReady(r){return PARTY.players.slice(0,PARTY.n).every(p=>ptRoundChoice(r,p)!=null)}
 function ptFmt(p){return {rounds:clamp(Math.round(+PARTY.rounds||3),2,4),seconds:ptSecondsAt(PARTY.round,p)}}
 function ptComp(p){return compById(p&&p.comp)}
-function ptRuleName(){return PARTY.rules==='pact'?'灵契赛':PARTY.rules==='rotate'?'轮转赛':'镜盘赛'}
+function ptRuleName(){return PARTY.rules==='pact'?'灵契赛':'镜盘赛'}
 /* 预计总时长：每手时间 + 交接停顿，用于设置页提前告知，免得一局拖太久 */
 function ptEstimate(){
   const seconds=PARTY.players.slice(0,PARTY.n).reduce((n,p)=>n+ptSecondsAt(0,p),0);
@@ -6360,7 +6581,6 @@ function renderPartySetup(){
   for(const r of [
     {id:'mirror',name:'镜盘赛',note:'同轮同盘 · 能力封存'},
     {id:'pact',name:'灵契赛',note:'人物能力生效 · 各显所长'},
-    {id:'rotate',name:'轮转赛',note:'目标依次换色 · 命中加分'},
   ]){
     const d=document.createElement('div');
     d.className='pt-chip wide'+(PARTY.rules===r.id?' on':'');
@@ -6400,9 +6620,7 @@ function renderPartySetup(){
   $('#pt-hint').innerHTML=
     (PARTY.rules==='mirror'
       ?'<b>镜盘赛</b>里人物只作身份：同一轮盘面完全相同，人物能力封存，纯比得分。'
-      :PARTY.rules==='pact'
-        ?'<b>灵契赛</b>里六位人物不可重复：同一张基础盘开局，但各人的被动与灵技会把局面带向不同方向。开局明确点亮被动，灵技从七成充能起步。'
-        :'<b>轮转赛</b>里目标灵石会依次换色：命中当前目标可追加得分，完成一轮后立即换下一色；人物能力封存。')
+      :'<b>灵契赛</b>里六位人物不可重复：同一张基础盘开局，但各人的被动与灵技会把局面带向不同方向。开局明确点亮被动，灵技从七成充能起步。')
     +'<br><b>逐轮定时</b>：每位选手每轮都要重新选短局 30、标准 60 或深挖 90 秒；不会沿用上一轮。时长不同就是让时玩法，要纯比手艺就选相同档。'
     +'<br><b>四盘轮换</b>：首轮从「'+ptArenaAt(0).name+'」开始，此后每轮换一张；同轮所有人仍是同盘。'
     +'<br>计时从点下“我准备好了”并进入棋盘后开始；递机前会遮住棋盘。'
@@ -6430,7 +6648,7 @@ function ptOpenRole(i){
 function renderPTRole(){
   const i=PARTY.pick,p=PARTY.players[i];if(!p)return;
   $('#pt-role-title').innerHTML=esc((p.name||'').trim()||ptDefaultName(i))+' · <em>人物</em>';
-  $('#pt-role-sub').textContent=PARTY.rules==='pact'?'灵契赛中能力生效，人物不可重复':(PARTY.rules==='rotate'?'轮转赛中能力封存，人物不可重复':'镜盘赛中人物只作身份，人物不可重复');
+  $('#pt-role-sub').textContent=PARTY.rules==='pact'?'灵契赛中能力生效，人物不可重复':'镜盘赛中人物只作身份，人物不可重复';
   const host=$('#pt-role-grid');host.innerHTML='';
   for(const c of COMPANIONS){
     const b=document.createElement('button');b.type='button';
@@ -6447,7 +6665,7 @@ function renderPTRole(){
 }
 function ptRoleDesc(c){
   $('#pt-role-desc').innerHTML='<b>'+c.name+' · '+c.title+'</b><br>'
-    +(PARTY.rules==='pact'?PT_ROLE_DESC[c.id]:(PARTY.rules==='rotate'?'轮转赛中能力封存，只保留人物身份。':'镜盘赛中能力封存，只保留人物身份。'));
+    +(PARTY.rules==='pact'?PT_ROLE_DESC[c.id]:'镜盘赛中能力封存，只保留人物身份。');
 }
 function startParty(){
   ptEnsurePlayers();
@@ -6455,7 +6673,7 @@ function startParty(){
   PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
     name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),seconds:ptSecondsAt(0,p),roundSeconds:[ptSecondsAt(0,p)],
-    comp:p.comp||COMPANIONS[i].id,scores:[],rotates:[],total:0,idx:i,
+    comp:p.comp||COMPANIONS[i].id,scores:[],total:0,idx:i,
   }));
   ptHandoff();
 }
@@ -6465,7 +6683,7 @@ function ptHandoff(){
   $('#hand-kick').textContent=(PARTY.round===0&&PARTY.cur===0)?'第一位，开始':'把机器递给下一位';
   $('#hand-who').textContent=p.name+' · '+c.name;
   $('#hand-meta').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
-  const rule=PARTY.rules==='pact'?'灵契生效':PARTY.rules==='rotate'?'目标轮转':'镜盘同规';
+  const rule=PARTY.rules==='pact'?'灵契生效':'镜盘同规';
   $('#hand-mult').textContent=a.name+' · '+rule+' · '+f.seconds+' 秒';
   $('#hand-scores').innerHTML=ptScoreLines();
   show('game');ovl('hand');
@@ -6476,7 +6694,7 @@ function ptScoreLines(){
     .map((p,i)=>(i+1)+'. '+esc(p.name)+' <b>'+p.total.toLocaleString('en-US')+'</b>').join('　');
 }
 function ptStartTurn(){
-  const p=PARTY.players[PARTY.cur], c=ptComp(p), f=ptFmt(p), pact=PARTY.rules==='pact',rotate=PARTY.rules==='rotate',a=ptArenaAt(PARTY.round);
+  const p=PARTY.players[PARTY.cur], c=ptComp(p), f=ptFmt(p), pact=PARTY.rules==='pact',a=ptArenaAt(PARTY.round);
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=(a.ink||[]).map(x=>x.slice());L.ink2=(a.ink2||[]).map(x=>x.slice());
@@ -6500,14 +6718,12 @@ function ptStartTurn(){
   GS.pasRng=rngOf(PARTY.seed+'|r'+PARTY.round+'|'+a.id+'|pas|'+c.id);
   if(pact)ptApplyOpening(c);
   ENG.rng=rngOf(PARTY.seed+'|play'+PARTY.round+'|'+a.id);     // 补位/重排也吃同一条随机流
-  if(rotate)rotateBegin(PARTY.seed+'|r'+PARTY.round+'|'+a.id);
-  else GS.rotateOn=false;
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
   $('#rush-bar').classList.add('on');$('#rush-bar').classList.remove('crit');
   $('#rush-title').textContent=p.name+' · '+a.name;
   $('#rush-time').textContent=(GS.rushT/1000).toFixed(1);
-  $('#rush-best').textContent=rotate?'完成 0 轮':'本轮计分';
+  $('#rush-best').textContent='本轮计分';
   $('#toolbar').style.display='none';                          // 聚会赛不用灵器，人人同起点
   $('#tool-hint').classList.remove('on');
   const bar=$('#pt-bar');bar.classList.add('on');
@@ -6516,11 +6732,9 @@ function ptStartTurn(){
   $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
   $('#ptb-mult').textContent=a.name+' · '+f.seconds+'秒';
   $('#score-stars').innerHTML='<s style="left:23%">'+ICONS.star+'</s><s style="left:54%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
-  if(rotate)rotateRender();
-  else{renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='本轮得分'}
+  renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='本轮得分';
   $('#quip-line').innerHTML=pact
     ?'<b>被动已生效 · '+c.name+'：</b>'+PT_ROLE_DESC[c.id]
-    :rotate?'<b>轮转赛：</b>清准当前目标，完成后立即换色。'
     :'<b>镜盘赛：</b>'+a.name+'，同盘开局，各凭手艺。';
   updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
@@ -6532,7 +6746,7 @@ function ptTurnEnd(){
   GS.rushOn=false;$('#rush-bar').classList.remove('on');
   const p=PARTY.players[PARTY.cur];
   const gained=GS.score;                                     // 无倍率，得多少记多少
-  p.scores.push(gained);p.rotates.push(GS.rotateStage||0);p.total+=gained;GS.rotateOn=false;
+  p.scores.push(gained);p.total+=gained;
   SFX.win();
   PARTY.cur++;
   if(PARTY.cur>=PARTY.players.length){
@@ -6545,11 +6759,11 @@ function ptTurnEnd(){
 }
 function ptRankHTML(players){
   return players.map((q,i)=>{
-    const g=GEMS[ptComp(q).col],c=ptComp(q),used=q.scores.reduce((n,_,r)=>n+ptSecondsAt(r,q),0),turns=(q.rotates||[]).reduce((n,x)=>n+(x||0),0);
+    const g=GEMS[ptComp(q).col],c=ptComp(q),used=q.scores.reduce((n,_,r)=>n+ptSecondsAt(r,q),0);
     return '<div class="pd-row'+(i===0?' w1':'')+'">'
       +'<div class="rk">'+(i+1)+'</div>'
       +'<div class="dot" data-role="'+c.id+'" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+c.g+'</div>'
-      +'<div class="nm">'+esc(q.name)+'<span style="color:var(--ink3);font-size:11px">　'+c.name+(used?' · '+used+'秒':'')+(PARTY.rules==='rotate'?' · '+turns+'轮':'')+'</span></div>'
+      +'<div class="nm">'+esc(q.name)+'<span style="color:var(--ink3);font-size:11px">　'+c.name+(used?' · '+used+'秒':'')+'</span></div>'
       +'<div class="sc">'+q.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
 }
@@ -6604,7 +6818,7 @@ function ptFinish(){
   /* 中途终结时，还没轮到的人一手都没打过。以前这里会输出「选手二：」后面空着，
      像是文案没写完；给他一句明话。 */
   $('#pt-rounds').innerHTML=ranked.map(p=>esc(p.name)+'：'+(p.scores.length
-    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')+'（'+ptSecondsAt(i,p)+'秒 · '+ptArenaAt(i).name+(PARTY.rules==='rotate'?' · 轮转 '+((p.rotates||[])[i]||0)+'轮':'')+'）').join(' · ')
+    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')+'（'+ptSecondsAt(i,p)+'秒 · '+ptArenaAt(i).name+'）').join(' · ')
     : '<span style="color:var(--ink3)">未出手</span>')).join('<br>');
   $('#pte-quip').textContent=pick2(Q_WIN);
   fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
@@ -6647,8 +6861,8 @@ function ptCardData(){
     c.fillStyle=i===0?'rgba(201,166,87,.10)':'rgba(255,255,255,.018)';c.fillRect(112,y-52,856,84);
     c.textAlign='left';c.fillStyle=i===0?'#f0d07b':'#9c9388';c.font='34px serif';c.fillText(String(i+1).padStart(2,'0'),142,y);
     c.fillStyle='#f5eddf';c.font='39px serif';c.fillText(p.name,235,y-8);
-    const used=p.scores.reduce((n,_,r)=>n+ptSecondsAt(r,p),0),turns=(p.rotates||[]).reduce((n,x)=>n+(x||0),0);
-    c.fillStyle='#9c9388';c.font='24px serif';c.fillText(co.name+' · '+p.scores.length+' 手 · '+used+' 秒'+(PARTY.rules==='rotate'?' · '+turns+'轮':''),235,y+26);
+    const used=p.scores.reduce((n,_,r)=>n+ptSecondsAt(r,p),0);
+    c.fillStyle='#9c9388';c.font='24px serif';c.fillText(co.name+' · '+p.scores.length+' 手 · '+used+' 秒',235,y+26);
     c.textAlign='right';c.fillStyle=i===0?'#f0d07b':'#c4b9aa';c.font='44px serif';c.fillText(p.total.toLocaleString('en-US'),922,y+4);
   });
   const base=390+ranked.length*105+20;
@@ -6656,7 +6870,7 @@ function ptCardData(){
   c.font='24px serif';
   ranked.slice(0,4).forEach((p,i)=>{
     c.fillStyle=i===0?'#f0d07b':'#c4b9aa';
-    const line=p.name+'　'+(p.scores.length?p.scores.map((s,j)=>'R'+(j+1)+' '+s.toLocaleString('en-US')+'/'+ptSecondsAt(j,p)+'秒'+(PARTY.rules==='rotate'?'/'+((p.rotates||[])[j]||0)+'轮':'')).join('　'):'尚未完成');
+    const line=p.name+'　'+(p.scores.length?p.scores.map((s,j)=>'R'+(j+1)+' '+s.toLocaleString('en-US')+'/'+ptSecondsAt(j,p)+'秒').join('　'):'尚未完成');
     c.fillText(line.slice(0,48),130,base+48+i*38);
   });
   c.textAlign='center';c.fillStyle='#7f756c';c.font='23px serif';
@@ -6745,9 +6959,10 @@ const LB={
     /* runs/days/dbest 是仅有的三个**累计**项，其余都是历史最高值。
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
-    const rw=rushWeekState(),rot=rotateWeekState();
+    const rw=rushWeekState(),bb=SAVE.bossBest||{floor:0,progress:0,score:0,build:'',comp:''};
     return {score:best,rush:SAVE.rushBest||0,rushWeek:rw.best||0,rushWeekKey:rw.w,
-            rotateWeek:rot.best||0,rotateWeekKey:rot.w,lv,stars,chain:SAVE.chainBest||0,
+            bossFloor:bb.floor||0,bossProgress:bb.progress||0,bossScore:bb.score||0,bossBuild:bb.build||'',bossComp:bb.comp||'',
+            lv,stars,chain:SAVE.chainBest||0,
             runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
             mv:(SAVE.dig&&SAVE.dig.best)||0,luck:luckCount(),mastery:csMasteryCount()};
   },
@@ -6844,7 +7059,7 @@ const LB={
   /* 指纹里必须包含 runs/days，否则「只涨天数不涨成绩」的人 pending() 永远为假、
      flush() 直接 skipped，累计项永远停在第一次上传那天，而且没有任何报错。 */
   sig(){const s=this.stats();
-    return [s.score,s.rush,s.rushWeek,s.rushWeekKey,s.rotateWeek,s.rotateWeekKey,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,s.mastery,
+    return [s.score,s.rush,s.rushWeek,s.rushWeekKey,s.bossFloor,s.bossProgress,s.bossScore,s.bossBuild,s.bossComp,s.lv,s.stars,s.chain,s.runs,s.days,s.dbest,s.mv,s.luck,s.mastery,
             SAVE.comp||'',(SAVE.camp&&SAVE.camp.side)||''].join('|')},
   pending(){return this.registered()&&this.sig()!==SAVE.lbSig},
   busy:false, timer:0, wait:0, again:false, stop:false, _tok:0,
@@ -6914,7 +7129,7 @@ const LB={
          换边那一发若正卡在弱网退避里，玩家一关页面就走 beacon，
          漏了 camp 换边就白换了（服务端 camp='' 时保留旧值）。 */
       const body=JSON.stringify({deviceUUID:this.dev(),alias:SAVE.lbAlias,pw:SAVE.lbPw||'',
-        camp:(SAVE.camp&&SAVE.camp.side)||'',stats:this.stats()});
+        camp:(SAVE.camp&&SAVE.camp.side)||'',comp:SAVE.comp||'',stats:this.stats()});
       return navigator.sendBeacon(this.api+'/gf/submit',new Blob([body],{type:'text/plain'}));
     }catch(e){return false}
   },
@@ -6955,26 +7170,23 @@ function lbNameHTML(r,mine){
 function lbRowHTML(r,mine){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
-  const rush=LB.scope==='rush',rotate=LB.scope==='rotate';
-  const c=r.comp&&compById(r.comp);
-  const reward=rush&&rushRewardFor(rank);
+  const rush=LB.scope==='rush',rushAll=LB.scope==='rushAll',boss=LB.scope==='boss';
+  const c=r.comp&&compById(r.comp),reward=rush&&rushRewardFor(rank);
   const sub=rush
-    ? [reward?('奖励 匣 '+reward.boxes+' · 星屑 '+reward.dust):'',
-       r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
-    : rotate
-      ? [r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):'','每周同盘同序'].filter(Boolean).join(' · ')
-    : ['星数 '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
+    ? [reward?('奖励 匣 '+reward.boxes+' · 星屑 '+reward.dust):'',r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+    :rushAll
+      ?[r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):'','终身最高'].filter(Boolean).join(' · ')
+    :boss
+      ?['下一位 '+gauntletPct(r.bossProgress)+'%',r.bossScore?('战果 '+Number(r.bossScore).toLocaleString('en-US')):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+      :['星数 '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
-    +'<div class="rk">'+medal+'</div>'
-    +'<div class="who"><div class="nm">'
-      +lbNameHTML(r,mine)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div>'
-    +'<div class="sub">'+esc(sub)+'</div></div>'
-    +(rush
-      ? '<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">矿灯</div></div>'
-      : rotate
-        ? '<div class="pw"><div class="pv">'+(Number(r.rotate)||0).toLocaleString('en-US')+'</div><div class="pl">轮转</div></div>'
-      : '<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')
-    +'</div>';
+    +'<div class="rk">'+medal+'</div><div class="who"><div class="nm">'
+    +lbNameHTML(r,mine)+(mine?' <span style="color:var(--gold2);font-size:11px">（你）</span>':'')+'</div><div class="sub">'+esc(sub)+'</div></div>'
+    +(rush||rushAll
+      ?'<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">'+(rush?'本周':'历史')+'</div></div>'
+      :boss
+        ?'<div class="pw"><div class="pv">击破 '+(Number(r.bossFloor)||0)+' 层</div><div class="pl">首领</div></div>'
+        :'<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')+'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
    榜单一行要塞下 17 个字段，只显示得下 3 个：化名、段位、矿力。
@@ -6986,47 +7198,32 @@ function lbRowHTML(r,mine){
    比任何说明文字都管用。 */
 function lbCardHTML(r){
   const row=(k,v)=>v?('<div class="lc-r"><span>'+k+'</span><b>'+v+'</b></div>'):'';
-  const me=LB_ROWS&&LB_ROWS.find(x=>x.alias===SAVE.lbAlias
-    &&(!SAVE.lbTag||!x.tag||x.tag===SAVE.lbTag));
+  const me=LB_ROWS&&LB_ROWS.find(x=>x.alias===SAVE.lbAlias&&(!SAVE.lbTag||!x.tag||x.tag===SAVE.lbTag));
   let cmp='';
-  if(me&&me!==r&&LB.registered()&&(LB.scope==='rush'||LB.scope==='rotate')){
-    const key=LB.scope==='rotate'?'rotate':'rush',gap=(Number(r[key])||0)-(Number(me[key])||0);
-    cmp='<div class="lc-cmp">'+(gap>0?'再多 <b>'+gap.toLocaleString('en-US')+'</b> 分，就到他的周榜位置':'你已不低于他的本周成绩')+'</div>';
+  if(me&&me!==r&&LB.registered()&&(LB.scope==='rush'||LB.scope==='rushAll')){
+    const gap=(Number(r.rush)||0)-(Number(me.rush)||0),label=LB.scope==='rush'?'本周':'历史';
+    cmp='<div class="lc-cmp">'+(gap>0?'再多 <b>'+gap.toLocaleString('en-US')+'</b> 分，就到他的'+label+'位置':'你已不低于他的'+label+'成绩')+'</div>';
+  }else if(me&&me!==r&&LB.registered()&&LB.scope==='boss'){
+    const df=(Number(r.bossFloor)||0)-(Number(me.bossFloor)||0),dp=(Number(r.bossProgress)||0)-(Number(me.bossProgress)||0),ds=(Number(r.bossScore)||0)-(Number(me.bossScore)||0);
+    cmp='<div class="lc-cmp">'+(df>0?'再击破 <b>'+df+'</b> 层，就到他的连战位置':df<0?'你已比他多击破 <b>'+(-df)+'</b> 层':dp>0?'同层 · 下一位首领再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平':dp<0?'你在同层的推进更深':ds>0?'同层同进度 · 战果再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 可越过他':'你已不低于他的连战记录')+'</div>';
   }else if(me&&me!==r&&LB.registered()){
-    const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0), starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
-    cmp='<div class="lc-cmp">'+(lvGap>0
-      ? '再通 <b>'+lvGap+'</b> 关，就到他的远征位置'
-      : lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关'
-      : starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
+    const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0),starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
+    cmp='<div class="lc-cmp">'+(lvGap>0?'再通 <b>'+lvGap+'</b> 关，就到他的远征位置':lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关':starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
   }
-  const c=r.comp&&compById(r.comp);
-  return '<div class="lc">'
-    +'<button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
-    +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div>'
-      +'<div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div>'
-      +'<div class="lc-tt">远征记录</div>'
-    +(c
-      ? '<div class="lc-comp">同行 · <b>'+esc(c.name)+'</b> '+esc(c.title)+'</div>'
-      : '')
-    +'</div>'
-    +'<div class="lc-pw">'+(LB.scope==='rotate'
-      ?(Number(r.rotate)||0).toLocaleString('en-US')+'<span>本周轮转</span>'
-      :LB.scope==='rush'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>本周矿灯</span>'
-      :'第 '+(Number(r.lv)||0)+' 关<span>远征位置</span>')+'</div>'
-    +'<div class="lc-grid">'
-      +row('星数',r.stars?String(r.stars):'')
-      +row('单关最佳',r.score?r.score.toLocaleString('en-US'):'')
-      +(LB.scope==='rush'
-        ?row('本周矿灯',r.rush?r.rush.toLocaleString('en-US'):'')
-          +row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
-        :LB.scope==='rotate'
-          ?row('本周轮转',r.rotate?Number(r.rotate).toLocaleString('en-US'):'')
-        :row('矿灯最佳',r.rush?r.rush.toLocaleString('en-US'):''))
-      +row('最长连锁',r.chain?(r.chain+' 重'):'')
-      +row('到场天数',r.days?(r.days+' 天'):'')
-      +row('累计局数',r.runs?(r.runs+' 局'):'')
-      +row('连续记录',r.dbest?(r.dbest+' 天'):'')
-    +'</div>'+cmp+'</div>';
+  const c=r.comp&&compById(r.comp),scope=LB.scope;
+  const main=scope==='rush'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>本周矿灯</span>'
+    :scope==='rushAll'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>90 秒历史</span>'
+    :scope==='boss'?'击破 '+(Number(r.bossFloor)||0)+' 层<span>首领连战</span>'
+    :'第 '+(Number(r.lv)||0)+' 关<span>远征位置</span>';
+  const scoped=scope==='rush'?row('本周矿灯',r.rush?Number(r.rush).toLocaleString('en-US'):'')+row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
+    :scope==='rushAll'?row('90 秒历史',r.rush?Number(r.rush).toLocaleString('en-US'):'')
+    :scope==='boss'?row('下一位进度',gauntletPct(r.bossProgress)+'%')+row('整趟战果',r.bossScore?Number(r.bossScore).toLocaleString('en-US'):'')+row('强化组合',esc(gauntletBuildLabel(r.bossBuild)||'未记录'))
+    :row('矿灯最佳',r.rush?Number(r.rush).toLocaleString('en-US'):'');
+  return '<div class="lc"><button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
+    +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div><div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div><div class="lc-tt">远征记录</div>'
+    +(c?'<div class="lc-comp">同行 · <b>'+esc(c.name)+'</b> '+esc(c.title)+'</div>':'')+'</div>'
+    +'<div class="lc-pw">'+main+'</div><div class="lc-grid">'+row('星数',r.stars?String(r.stars):'')+row('单关最佳',r.score?Number(r.score).toLocaleString('en-US'):'')+scoped
+    +row('最长连锁',r.chain?(r.chain+' 重'):'')+row('到场天数',r.days?(r.days+' 天'):'')+row('累计局数',r.runs?(r.runs+' 局'):'')+row('连续记录',r.dbest?(r.dbest+' 天'):'')+'</div>'+cmp+'</div>';
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 /* ==================================================================
@@ -7071,12 +7268,6 @@ function rushWeekState(){
   s.best=Math.max(0,Math.floor(+s.best||0));
   return s;
 }
-function rotateWeekState(){
-  const w=rushWeekKey(),s=SAVE.rotateWeek||(SAVE.rotateWeek={w:'',best:0});
-  if(s.w!==w){s.w=w;s.best=0;persist()}
-  s.best=Math.max(0,Math.floor(+s.best||0));
-  return s;
-}
 /* 服务端只回传“哪周第几名”，具体数量仍由本地固定表决定；
    即使响应被重放，claimed 也会拦住重复入账。 */
 function rushClaimAwards(rows){
@@ -7114,7 +7305,6 @@ const WK_MOVES=25;
       但照着抄不出来——这正是它能当谈资的原因。 */
 /* ---- 矿灯战报：90 秒局的拓片 ----
    只给公平局做可比战报，不给每一关：关卡进度不同，分数不能直接对比。
-   90 秒矿灯与轮转赛各有独立战报，两者不混榜。
    照拓片那套：纯文本、几何符号（禁 emoji）、不泄露走法。
    多一样 —— **报名次**。那是竞争的钩子：不是「我打了多少」，是「我第几」。 */
 function rushTablet(){
@@ -7145,27 +7335,6 @@ async function fetchRushRank(){
     const i=d.rows.findIndex(r=>r.alias===SAVE.lbAlias
       &&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
     if(i>=0){RUSH_RANK=i+1;const t=$('#wk-tablet');if(t&&t.style.display!=='none')t.textContent=rushTablet()}
-  }catch(e){}
-}
-function rotateTablet(){
-  const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
-    ||location.origin+location.pathname.replace(/index\.html$/,'');
-  return '灵石远征 · 轮转赛 60 秒\n'
-    +GS.score.toLocaleString('en-US')+' 分 · 完成 '+(GS.rotateFinished||0)+' 轮 · 最长连锁 '+GS.chainMax
-    +(GS.wasRecord?' · 新纪录':'')+'\n'
-    +(ROTATE_RANK>0?('轮转周榜 第 '+ROTATE_RANK+' 名\n'):'')
-    +'同一副盘与目标次序，你能打多少？\n'+share;
-}
-let ROTATE_RANK=0;
-async function fetchRotateRank(){
-  ROTATE_RANK=0;
-  if(!LB.registered())return;
-  try{
-    const d=await LB.board('rotate');
-    if(!d||!d.ok||!Array.isArray(d.rows))return;
-    const i=d.rows.findIndex(r=>r.alias===SAVE.lbAlias
-      &&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
-    if(i>=0){ROTATE_RANK=i+1;const t=$('#wk-tablet');if(t&&t.style.display!=='none')t.textContent=rotateTablet()}
   }catch(e){}
 }
 function wkTablet(){
@@ -7326,7 +7495,7 @@ function showNameCard(){
 function showCard(){
   /* 限时局不出图：名帖画的是「本周第 N 期 + 解法形状」，那套前提在 90 秒局不成立。
      文字战报够用，而且群里粘贴不吃压缩、打输了也发得出去。 */
-  if(GS.mode==='rush'||GS.mode==='rotate'){copyTablet();return}
+  if(GS.mode==='rush'){copyTablet();return}
   const p=$('#wk-tablet');
   p.style.display='block';
   /* 同一个容器两种形态：文字拓片要等宽带框，图片名帖要素底。
@@ -7338,7 +7507,7 @@ function showCard(){
 }
 /* 分享按模式取对应的战报：本周矿脉走 wkTablet（同一副盘，可以晒解法形状），
    90 秒走 rushTablet（同规则同时长，晒的是「你能不能打过我」）。 */
-function tabletFor(){return GS.mode==='rush'?rushTablet():GS.mode==='rotate'?rotateTablet():wkTablet()}
+function tabletFor(){return GS.mode==='rush'?rushTablet():wkTablet()}
 async function copyTablet(){
   const t=tabletFor();
   try{
@@ -7361,7 +7530,7 @@ function renderQuest(){
   const bs=bountyState();
   const yj=yjState();
   const nx=lampNext(SAVE.rushBest);
-  const rot=rotateWeekState();
+  const gb=SAVE.bossBest||{floor:0,progress:0,score:0};
   let h='';
   /* 本周矿脉 */
   h+='<div class="qs-sec"><div class="qs-hd">本周矿脉 · 第 '+s.w+' 期'
@@ -7385,13 +7554,13 @@ function renderQuest(){
     +'<div class="qs-bd">同一时长，连锁越长，灯油续得越久'
     +(nx?'<br><span class="qs-dim">距 '+nx.nm+' 还差 '+(nx.need-SAVE.rushBest).toLocaleString('en-US')+' 分</span>':'')
     +'</div><button class="btn qs-go" data-go="rush">点 灯</button></div>';
-  /* 轮转赛不是换皮计时：它把每一手的决策改成“基础大分还是追当前目标”。
-     单人用固定周种子接世界榜，聚会复用同一核心，不再新增一套相似代码。 */
-  h+='<div class="qs-sec"><div class="qs-hd">轮转赛 · 60 秒'
-    +'<span class="qs-sub">'+(rot.best?('本周 '+rot.best.toLocaleString('en-US')):'本周还没试过')+'</span></div>'
-    +'<div class="qs-bd">全服同周同盘 · 人物能力与灵器封存，目标灵石依次换色'
-    +((SAVE.rotateBest||0)?'<br><span class="qs-dim">历史最佳 '+SAVE.rotateBest.toLocaleString('en-US')+'</span>':'')
-    +'</div><button class="btn qs-go" data-go="rotate">开 始 轮 转</button></div>';
+  /* 首领连战：玩法变化来自首领机制、人物和三选一组合，不再复制计时局。 */
+  h+='<div class="qs-sec"><div class="qs-hd">首领连战'
+    +'<span class="qs-sub">'+(gb.floor?('最佳击破 '+gb.floor+' 层'):'还没出发')+'</span></div>'
+    +'<div class="qs-bd">每层都是首领 · 六位同行统一开放 · 击破后从三项强化中选一项'
+    +(gb.floor?'<br><span class="qs-dim">下一位首领进度 '+gauntletPct(gb.progress)+'% · 战果 '+Number(gb.score||0).toLocaleString('en-US')+'</span>'
+      :gb.progress?'<br><span class="qs-dim">首位首领已推进 '+gauntletPct(gb.progress)+'% · 击破后入世界榜</span>':'')
+    +'</div><button class="btn qs-go" data-go="gauntlet">选 人 出 发</button></div>';
   /* 岁记 */
   h+='<div class="qs-sec"><div class="qs-hd">岁记 · '+monthTag(yj.m)
     +'<span class="qs-sub">'+(yj.n?('已刻 '+yj.n+' / 3 轮'):'每月只此一枚')+'</span></div>'
@@ -7413,7 +7582,7 @@ function renderQuest(){
     SFX.click();ovl(null);
     if(btn.dataset.go==='weekly')startWeekly();
     else if(btn.dataset.go==='rush')startRush();
-    else if(btn.dataset.go==='rotate')startRotate();
+    else if(btn.dataset.go==='gauntlet')openGauntletSetup();
   };
 }
 function startWeekly(){
@@ -7434,7 +7603,7 @@ function startWeekly(){
   GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
   GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;
-  GS.party=false;GS.weekly=true;GS.paused=false;GS.usedTool=false;GS.wkLog=[];GS.rotateOn=false;
+  GS.party=false;GS.weekly=true;GS.paused=false;GS.usedTool=false;GS.wkLog=[];
   GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
   GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
@@ -7462,6 +7631,8 @@ function startWeekly(){
 }
 function endWeekly(){
   $('#end-waystone').classList.remove('on');
+  $('#end-stars').style.display='';
+  $('#end-menu').textContent='回图';
   GS.over=true;GS.busy=true;
   markRun();
   const s=wkState();
@@ -7589,10 +7760,9 @@ async function renderLB(){
   if(!rows.length){
     if(LB.scope==='rush'){
       msg.textContent='';list.innerHTML=rushRewardHTML(d);mine2.innerHTML=lbMineHTML([],-1);
-    }else if(LB.scope==='rotate'){
+    }else if(LB.scope==='rushAll'||LB.scope==='boss'){
       msg.textContent='';list.innerHTML='';mine2.innerHTML=lbMineHTML([],-1);
-    }else msg.innerHTML=LB.scope==='class'?'这个小队还没人上榜——<b>你可以是第一个</b>。'
-      :'榜上还空着——<b>你可以是第一个</b>。';
+    }else msg.innerHTML='榜上还空着——<b>你可以是第一个</b>。';
     return;
   }
   msg.textContent='';
@@ -7692,11 +7862,12 @@ function rushRewardHTML(meta){
 }
 function lbBoardHTML(rows,myIdx,meta){
   const row=r=>lbRowHTML(r,lbIsMe(r),'');
-  /* 深度榜保留前三；90 秒榜多露一行前列，让小时级变化能被看见，
+  /* 深度与首领榜保留前三；90 秒双榜多露一行前列，让变化能被看见，
      同时仍给玩家附近三行留足空间。 */
-  const timed=LB.scope==='rush'||LB.scope==='rotate',leadN=timed?4:3,top=rows.slice(0,leadN);
+  const lamp=LB.scope==='rush'||LB.scope==='rushAll',leadN=lamp?4:3,top=rows.slice(0,leadN);
+  const heading=LB.scope==='rush'?'本周矿灯':LB.scope==='rushAll'?'90 秒历史':LB.scope==='boss'?'首领连战':'榜首';
   let h=(LB.scope==='rush'?rushRewardHTML(meta):'')
-    +'<div class="lb-group"><div class="lb-gh"><span>'+(LB.scope==='rush'?'本周矿灯':LB.scope==='rotate'?'本周轮转':'榜首')+'</span><i>点名字看名片</i></div>'
+    +'<div class="lb-group"><div class="lb-gh"><span>'+heading+'</span><i>点名字看名片</i></div>'
     +top.map(row).join('')+'</div>';
   if(myIdx>=leadN){
     const near=rows.slice(Math.max(leadN,myIdx-1),Math.min(rows.length,myIdx+2));
@@ -7706,42 +7877,54 @@ function lbBoardHTML(rows,myIdx,meta){
   return h;
 }
 function lbMineHTML(rows,myIdx){
-  const s=LB.stats(),rush=LB.scope==='rush',rotate=LB.scope==='rotate',timed=rush||rotate;
-  const mineRush=s.rushWeek||0,mineRotate=s.rotateWeek||0,mineTimed=rotate?mineRotate:mineRush;
-  const history=rotate?(SAVE.rotateBest||0):s.rush;
-  if(!LB.registered())return timed
-    ?'历史最佳 <b>'+history.toLocaleString('en-US')+'</b> · 本周 <b>'+mineTimed.toLocaleString('en-US')+'</b><br>起个化名就能上榜'
+  const s=LB.stats(),scope=LB.scope,registered=LB.registered();
+  if(scope==='boss'){
+    const b={floor:s.bossFloor||0,progress:s.bossProgress||0,score:s.bossScore||0};
+    if(!registered)return b.floor
+      ?'本机最佳 · 击破 <b>'+b.floor+'</b> 层 · 下一位 <b>'+gauntletPct(b.progress)+'%</b><br>起个化名就能上榜'
+      :b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b><br>击破首位后进入世界榜':'击破首位首领后就能进入世界榜';
+    if(myIdx>=0){
+      const me=rows[myIdx],up=rows[myIdx-1];
+      if(up){const df=(Number(up.bossFloor)||0)-(Number(me.bossFloor)||0),dp=(Number(up.bossProgress)||0)-(Number(me.bossProgress)||0);
+        return '我的位置 · 第 <b>'+me.rank+'</b> 名　击破 <b>'+me.bossFloor+'</b> 层<br>'
+          +(df>0?'再击破 <b>'+df+'</b> 层可追到 '+esc(up.alias||'上一名'):dp>0?'同层 · 下一位再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平 '+esc(up.alias||'上一名'):'下一趟提高战果即可前进')}
+      const down=rows[1];let lead='';
+      if(down){
+        const df=(Number(me.bossFloor)||0)-(Number(down.bossFloor)||0),dp=(Number(me.bossProgress)||0)-(Number(down.bossProgress)||0),ds=(Number(me.bossScore)||0)-(Number(down.bossScore)||0);
+        lead='<br>领先 '+esc(down.alias||'第二名')+' · '+(df>0?df+' 层':dp>0?Math.max(1,Math.ceil(dp/100))+'%':Math.max(0,ds).toLocaleString('en-US')+' 战果');
+      }
+      return '我的位置 · <b>榜首</b>　击破 <b>'+me.bossFloor+'</b> 层 · 下一位 <b>'+gauntletPct(me.bossProgress)+'%</b>'+lead;
+    }
+    if(rows.length>=LB_LIMIT&&b.floor){
+      const last=rows[rows.length-1]||{},df=(Number(last.bossFloor)||0)-b.floor,
+        dp=(Number(last.bossProgress)||0)-b.progress,ds=(Number(last.bossScore)||0)-b.score;
+      return '我的位置 · 榜外<br>'+(df>0?'再击破 <b>'+df+'</b> 层可进前 '+rows.length
+        :dp>0?'同层 · 下一位再推进 <b>'+Math.ceil(dp/100)+'%</b> 可进榜'
+        :'同层同进度 · 战果再多 <b>'+Math.max(1,ds+1).toLocaleString('en-US')+'</b> 可进榜');
+    }
+    return b.floor?'连战记录正在同步 · 击破 <b>'+b.floor+'</b> 层':b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b> · 击破后入榜':'击破首位首领后就能进入世界榜';
+  }
+  const weekly=scope==='rush',history=scope==='rushAll',lamp=weekly||history;
+  const mine=weekly?(s.rushWeek||0):history?(s.rush||0):(s.lv||0);
+  if(!registered)return lamp
+    ?(weekly?'历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 本周 <b>'+mine.toLocaleString('en-US')+'</b>':'历史最佳 <b>'+mine.toLocaleString('en-US')+'</b>')+'<br>起个化名就能上榜'
     :'本机已到第 <b>'+s.lv+'</b> 关 · 起个化名就能上榜';
   if(myIdx>=0){
-    const me=rows[myIdx],up=rows[myIdx-1],key=rotate?'rotate':rush?'rush':'lv';
-    const val=Number(me[key])||0;
+    const me=rows[myIdx],up=rows[myIdx-1],val=Number(lamp?me.rush:me.lv)||0;
     if(up){
-      if(timed){
-        const gap=Math.max(1,(Number(up[key])||0)-val+1);
-        return '我的位置 · 第 <b>'+me.rank+'</b> 名　本周 <b>'+val.toLocaleString('en-US')
-          +'</b><br>历史最佳 <b>'+history.toLocaleString('en-US')+'</b> · 再多 <b>'+gap.toLocaleString('en-US')
-          +'</b> 越过 '+esc(up.alias||'上一名');
-      }
-      const lvGap=(Number(up.lv)||0)-val, starGap=(Number(up.stars)||0)-(Number(me.stars)||0);
-      return '我的位置 · 第 <b>'+me.rank+'</b> 名　已到第 <b>'+val+'</b> 关<br>'
-        +(lvGap>0?'再通 <b>'+lvGap+'</b> 关可追到 '+esc(up.alias||'上一名')
-          :starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平 '+esc(up.alias||'上一名')
-          :'下一次通关就有机会前进');
+      if(lamp){const gap=Math.max(1,(Number(up.rush)||0)-val+1);
+        return '我的位置 · 第 <b>'+me.rank+'</b> 名　'+(weekly?'本周 ':'历史 ')+'<b>'+val.toLocaleString('en-US')+'</b><br>'
+          +(weekly?'历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · ':'')+'再多 <b>'+gap.toLocaleString('en-US')+'</b> 越过 '+esc(up.alias||'上一名')}
+      const lvGap=(Number(up.lv)||0)-val,starGap=(Number(up.stars)||0)-(Number(me.stars)||0);
+      return '我的位置 · 第 <b>'+me.rank+'</b> 名　已到第 <b>'+val+'</b> 关<br>'+(lvGap>0?'再通 <b>'+lvGap+'</b> 关可追到 '+esc(up.alias||'上一名'):starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平 '+esc(up.alias||'上一名'):'下一次通关就有机会前进')
     }
-    const dn=rows[1], lead=dn?val-(Number(dn[key])||0):0;
-    return '我的位置 · <b>榜首</b>　'+(timed?'本周 ':'第 ')+'<b>'+val.toLocaleString('en-US')+'</b>'
-      +(timed?'':' 关')+(timed?'<br>历史最佳 <b>'+history.toLocaleString('en-US')+'</b>':'')
-      +(dn&&lead>0?'<br>领先 '+esc(dn.alias||'第二名')+' <b>'+lead.toLocaleString('en-US')+'</b> '+(timed?'分':'关'):'');
+    const down=rows[1],lead=down?(lamp
+      ?('<br>领先 '+esc(down.alias||'第二名')+' <b>'+Math.max(0,val-(Number(down.rush)||0)).toLocaleString('en-US')+'</b> 分')
+      :('<br>领先 '+esc(down.alias||'第二名')+' <b>'+Math.max(0,val-(Number(down.lv)||0))+'</b> 关')):'';
+    return '我的位置 · <b>榜首</b>　'+(lamp?(weekly?'本周 ':'历史 '):'第 ')+'<b>'+val.toLocaleString('en-US')+'</b>'+(lamp?'':' 关')+(weekly?'<br>历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b>':'')+lead;
   }
-  if(rows.length>=LB_LIMIT){
-    const key=rotate?'rotate':rush?'rush':'lv',mine=timed?mineTimed:s.lv;
-    const last=Number((rows[rows.length-1]||{})[key])||0, gap=last-mine+1;
-    if(gap>0)return '我的位置 · 榜外<br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 可进前 '+rows.length;
-  }
-  return timed
-    ?('历史最佳 <b>'+history.toLocaleString('en-US')+'</b> · 本周 <b>'+mineTimed.toLocaleString('en-US')+'</b><br>'
-      +(mineTimed?'正在同步本周名次':(rotate?'完成一局轮转赛就能入榜':'点一盏矿灯就能入榜')))
-    :'我的成绩已记下 · 刷新后会出现在榜上';
+  if(rows.length>=LB_LIMIT){const last=Number((rows[rows.length-1]||{})[lamp?'rush':'lv'])||0,gap=last-mine+1;if(gap>0)return '我的位置 · 榜外<br>再多 <b>'+gap.toLocaleString('en-US')+'</b> 可进前 '+rows.length}
+  return lamp?(history?(mine?'历史最佳已记下 · 正在同步历史名次':'完成一局 90 秒矿灯就能进入历史榜'):'历史最佳 <b>'+s.rush.toLocaleString('en-US')+'</b> · 本周 <b>'+mine.toLocaleString('en-US')+'</b><br>'+(mine?'正在同步本周名次':'点一盏矿灯就能入榜')):'我的成绩已记下 · 刷新后会出现在榜上';
 }
 function lbRenameMonth(now){
   const d=new Date((now==null?Date.now():now)+8*3600000);
@@ -8360,11 +8543,10 @@ const HOW_HTML=`
 　每一轮、每一位选手都重新选择 30 / 60 / 90 秒；计时只在进入棋盘后开始。<br>
 　<b>镜盘赛</b>：人物只作身份，同一轮的盘面与规则完全相同，纯比手艺。<br>
 　<b>灵契赛</b>：同一张基础盘开局，所选人物的被动与灵技生效；开局会明确提示被动，灵技从七成充能起步。<br>
-　<b>轮转赛</b>：人物能力封存，当前目标灵石依次换色；清准目标会追加得分。<br>
 自定 <b>2–4 轮</b>。每一轮都要为每位选手重新选择 <b>短局 30、标准 60、深挖 90 秒</b>，不会沿用上一轮；四张矿盘按首轮选择逐轮轮换，同轮所有人仍拿同一张盘。按设置顺序依次交机，递机时棋盘会完全遮住；随时能看总分、保存战绩图或当场结算。<br><br>
 <b>矿上的挑战</b>（大厅「挑战」一键直达）<br>
 　<b>矿灯将熄 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
-　<b>轮转赛 · 60 秒</b>　全服同周同盘、目标同序，人物能力与灵器封存，成绩进入真实玩家周榜。<br>
+　<b>首领连战</b>　每层都是首领；六位同行统一开放，击破后从佳、月、诺带来的三项强化中选一项。一趟败退即结算，不续挖、不复活、不消耗行囊道具。<br>
 　<b>本周矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
 　<b>狼先生的悬赏</b>　每周一条，输的局达成也算，赏典藏匣。<br>
 　<b>岁记</b>　每月三桩全清，铸一枚<b>刻着年月的绝版徽记</b>，过月不再有。<br><br>
@@ -8372,7 +8554,7 @@ const HOW_HTML=`
 典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
-<b>远征榜</b>　起个化名就能比较闯关进度：先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
+<b>远征榜</b>　90 秒<b>历史榜</b>永久保留最高分，<b>本周榜</b>每周刷新并给前三发奖励；首领连战按击破层数排名，同层再看下一位首领的伤害进度与整趟战果。闯关榜先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
@@ -8485,7 +8667,6 @@ function loop(now){
          上传到榜单的也是截断值。等 busy 落下来再定分。 */
       if(GS.rushT<=0&&!GS.busy){
         if(GS.mode==='party'){GS.over=true;GS.busy=true;ptTurnEnd()}
-        else if(GS.mode==='rotate')endRotate();
         else endRush();
       }
     }
@@ -8651,6 +8832,8 @@ $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
 for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-quest').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
 $('#quest-close').addEventListener('click',()=>{SFX.click();ovl(null)});
+$('#gauntlet-close').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
+$('#gauntlet-go').addEventListener('click',()=>{AU.ensure();SFX.click();ovl(null);gauntletStart()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how');
   /* 玩法页每次打开都重插 HTML，按钮得现挂。
      王老师反馈过「迁移存档好像没太怎么找到」——原来这里只写了「去页脚找」，
@@ -8671,8 +8854,8 @@ $('#map-back').addEventListener('click',()=>{SFX.click();show('menu')});
 $('#map-prev').addEventListener('click',()=>{SFX.click();mapCh--;renderMap()});
 $('#map-next').addEventListener('click',()=>{SFX.click();mapCh++;renderMap()});
 $('#intro-go').addEventListener('click',()=>{SFX.click();beginPlay()});
-$('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);show('map')});
-$('#boss-go').addEventListener('click',()=>{SFX.click();ovl('intro')});
+$('#intro-back').addEventListener('click',()=>{SFX.click();ovl(null);if(GS.mode==='gauntlet'){gauntletEnd('quit');return}show('map')});
+$('#boss-go').addEventListener('click',()=>{SFX.click();if(GS.mode==='gauntlet'){gauntletBeginFloor();return}ovl('intro')});
 /* 暂停只冻结计时，绝不动 GS.rushOn——
    动了它会让暂停期间悬空的回合走进 checkEnd 的通关分支，把限时赛判成「第 3 关通关」写进存档 */
 $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
@@ -8680,18 +8863,19 @@ $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
   SFX.click();GS.paused=true;
   /* 聚会赛不给「重开」：同一轮是同一颗种子，能重开就等于可以无限重刷到满意为止，
      「同盘面比手艺」的前提就没了 */
-  $('#pause-retry').style.display=GS.party?'none':'';
+  $('#pause-retry').style.display=GS.party||GS.mode==='gauntlet'?'none':'';
   /* 聚会赛里这个按钮点下去是**终结整场比赛、当场出名次**，不是退出这一手。
      交接屏和轮间小结上同样的动作都写着「终结比赛」，这里也必须写一样的，
      否则 6 人 5 轮打到一半，谁暂停时把它当成「退出本关」一点，全场就没了。 */
-  $('#pause-quit').textContent=GS.party?'终结比赛':'离开本关';
+  $('#pause-quit').textContent=GS.party?'终结比赛':GS.mode==='gauntlet'?'结束连战':'离开本关';
   ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
-  GS.mode==='rush'?startRush():GS.mode==='rotate'?startRotate():openLevel(GS.L.n)});
+  GS.mode==='rush'?startRush():openLevel(GS.L.n)});
 $('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.paused=false;
   if(GS.party){ptQuit();return}                               // 聚会赛里「退出」＝随时终结比赛
-  GS.mode==='rush'||GS.mode==='rotate'?show('menu'):show('map')});
+  if(GS.mode==='gauntlet'){GAUNTLET.active=true;gauntletEnd('quit');return}
+  GS.mode==='rush'?show('menu'):show('map')});
 /* 地脉打通 → 先看编年史片段，再回图 */
 function loreFor(n){
   if(!n||n>64||n%8!==0)return null;
@@ -8718,18 +8902,17 @@ function maybeLore(after){
   $('#lore-close').onclick=()=>{SFX.click();ovl(null);after()};
   SFX.win();ovl('lore');
 }
-$('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'||GS.mode==='rotate'?show('menu'):show('map'))});
+$('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'||GS.mode==='gauntlet'?show('menu'):show('map'))});
 $('#end-retry').addEventListener('click',e=>{SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
-  if(act==='rotate'){startRotate();return}
   openLevel(GS.L.n);
 });
 $('#end-next').addEventListener('click',e=>{
   SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
-  if(act==='rotate'){startRotate();return}
+  if(act==='gauntlet'){openGauntletSetup();return}
   if(act==='weekly'){startWeekly();return}
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
@@ -8785,7 +8968,7 @@ const ESC_ACT={'ovl-pause':'#pause-resume','ovl-hand':'#hand-go','ovl-ptround':'
   'ovl-pt-end':'#pte-menu','ovl-pt-role':'#pt-role-close','ovl-lore':'#lore-close','ovl-intro':'#intro-back','ovl-boss':'#intro-back',
   'ovl-pt-live':'#pt-live-close',
   'ovl-pt-hint':'#pt-hint-close','ovl-install':'#install-close','ovl-ach':'#ach-close','ovl-how':'#how-close',
-  'ovl-lb':'#lb-close','ovl-col':'#col-esc'};
+  'ovl-lb':'#lb-close','ovl-col':'#col-esc','ovl-gauntlet':'#gauntlet-close'};
 addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   const cur=[...$$('.ovl.on')].pop();
@@ -9221,14 +9404,52 @@ window.__selftest=function(){
        ring1&&dust1&&dayKept);
   }
   {
-    /* 45 秒重复玩法继续退役；90 秒追连锁与 60 秒追目标必须是两套不同决策。 */
-    const timed=[startRush,endRush,startRotate,endRotate,rotateCollect,renderQuest,drawNameCard].map(String).join('\n');
+    /* 45 秒重复计时入口已退役；计时挑战只剩 90 秒矿灯。 */
+    const timed=[startRush,endRush,renderQuest,drawNameCard].map(String).join('\n');
     const nc=/toDataURL\(\s*['"]image\/jpeg['"]/.test(String(drawNameCard))
       &&/lampRank/.test(String(drawNameCard))&&/yjSeal/.test(String(drawNameCard));
-    const distinct=/const baseMs=90000/.test(String(startRush))
-      &&/baseMs=60000/.test(String(startRotate))&&/rotateCollect/.test(timed);
-    ok('45 秒重复玩法继续退役；90 秒续灯与 60 秒轮转内核明确不同',
-       distinct&&!/baseMs\s*=\s*45000/.test(timed)&&nc);
+    ok('45 秒重复计时入口退役，90 秒矿灯仍保留独立纪录与名帖',
+       /const baseMs=90000/.test(String(startRush))&&!/baseMs\s*=\s*45000/.test(timed)
+       &&nc);
+  }
+  {
+    const seed='selftest-gauntlet',levels=Array.from({length:18},(_,i)=>gauntletLevel(i+1,seed,{},'wolf'));
+    const everyBoss=levels.every(L=>L.boss&&BOSSES[L.boss]&&L.goals.length===1
+      &&L.goals[0].type==='boss'&&L.goals[0].need===L.bossHP);
+    ok('首领连战前十八层每层都生成真实首领目标',everyBoss);
+
+    const choiceSets=Array.from({length:12},(_,i)=>gauntletChoiceSet(seed,i+1,{}));
+    const uniqueChoices=choiceSets.every(xs=>xs.length===3
+      &&new Set(xs.map(x=>x.id)).size===3
+      &&xs.map(x=>x.by).join(',')==='jia,yue,nuo'
+      &&xs.every(x=>gauntletUp(x.id)===x));
+    const deterministic=JSON.stringify(choiceSets[4])===JSON.stringify(gauntletChoiceSet(seed,5,{}));
+    ok('首领击破后的三选一互不重复、三路各一且同种子稳定',uniqueChoices&&deterministic);
+    const fullMods=Object.fromEntries(GAUNTLET_UPGRADES.map(u=>[u.id,u.max]));
+    const overflow=gauntletChoiceSet(seed,99,fullMods);
+    ok('持久强化全部叠满后仍给三个真正生效的下层补给',
+       overflow.map(x=>x.id).join(',')==='supply,special,surge'&&overflow.every(x=>x.once));
+
+    const burden=L=>L.ink.length+L.ink2.length+L.crates.length+L.crates2.length+L.cages.length+L.snakes.length;
+    const hpRises=levels.every((L,i)=>i===0||L.bossHP>levels[i-1].bossHP);
+    const pressureRises=burden(levels[11])>burden(levels[0])
+      &&levels[8].bossEvery<=levels[0].bossEvery&&levels[9].colors===6;
+    ok('首领层数提高会抬高生命、盘面负担与行动压力',hpRises&&pressureRises);
+
+    const bakBest=JSON.parse(JSON.stringify(SAVE.bossBest)),bakMods=Object.assign({},GAUNTLET.mods),bakComp=GAUNTLET.comp;
+    SAVE.bossBest={floor:3,progress:4000,score:9000,build:'fury:1',comp:'jun'};
+    GAUNTLET.mods={fury:2,guard:1};GAUNTLET.comp='wolf';
+    const lowerRejected=!gauntletRecord(2,9999,999999);
+    const progressAccepted=gauntletRecord(3,5000,100)
+      &&SAVE.bossBest.floor===3&&SAVE.bossBest.progress===5000&&SAVE.bossBest.score===100;
+    const scoreAccepted=gauntletRecord(3,5000,101)&&SAVE.bossBest.score===101;
+    const scoreRejected=!gauntletRecord(3,5000,100)&&SAVE.bossBest.score===101;
+    const floorAccepted=gauntletRecord(4,0,1)&&SAVE.bossBest.floor===4
+      &&SAVE.bossBest.progress===0&&SAVE.bossBest.score===1
+      &&SAVE.bossBest.build==='fury:2,guard:1'&&SAVE.bossBest.comp==='wolf';
+    SAVE.bossBest=bakBest;GAUNTLET.mods=bakMods;GAUNTLET.comp=bakComp;persist();
+    ok('bossBest 按层数、进度、战果、同行整组替换且永不倒退',
+       lowerRejected&&progressAccepted&&scoreAccepted&&scoreRejected&&floorAccepted);
   }
   /* 33. 目标文案里不许出现哨兵大数。
      聚会赛的分数目标 need 是个够不到的哨兵，曾经直接拼成
@@ -9238,9 +9459,10 @@ window.__selftest=function(){
   ok('无目标的分数只报当前分，不漏哨兵值',
      !/\d{7}/.test(noTargetTxt)&&noTargetTxt.replace(/,/g,'')==='180'&&realTxt==='180/6000');
 
-  /* 聚会赛的减法必须锁住：三种赛制、2–4 轮、每轮每人重选三档时长；不再外挂随机点名或思考倒计时。 */
+  /* 聚会赛的减法必须锁住：仅镜盘／灵契、2–4 轮、每轮每人重选三档时长。 */
   {
     const src=[ptStartTurn,ptTurnEnd,ptFinish,ptRoundBreak].map(String).join('\n');
+    const setup=String(renderPartySetup);
     const bak={rounds:PARTY.rounds,seconds:PARTY.seconds,players:PARTY.players,n:PARTY.n,round:PARTY.round,cur:PARTY.cur,arena:PARTY.arena,rules:PARTY.rules};
     const a={seconds:30,roundSeconds:[30,60,90]},b={seconds:90,roundSeconds:[90,30,60]};
     PARTY.rounds=4;PARTY.seconds=60;PARTY.players=[a,b];PARTY.n=2;PARTY.round=1;PARTY.cur=0;PARTY.arena='bridge';
@@ -9250,8 +9472,9 @@ window.__selftest=function(){
     const route=[0,1,2,3].map(ptArenaAt),fourMaps=new Set(route.map(x=>x.id)).size===4
       &&route.every(x=>x.colors>=4&&x.colors<=5);
     Object.assign(PARTY,bak);
-    ok('聚会赛含镜盘/灵契/轮转，自定 2–4 轮且每轮每人重选 30/60/90 秒',
+    ok('聚会赛仅留镜盘/灵契，自定 2–4 轮且每轮每人重选 30/60/90 秒',
        PT_TIME_TIERS.map(t=>t.seconds).join(',')==='30,60,90'&&custom&&waits&&ready
+       &&/id:'mirror'/.test(setup)&&/id:'pact'/.test(setup)&&!/rotate/.test(setup)
        &&/roundSeconds\[PARTY\.round\]=null/.test(src)&&!/team|relay|ptQuota/.test(src));
     ok('聚会赛四张矿盘逐轮轮换，同轮仍共用同一盘种子',
        fourMaps&&/\|r['"]\+PARTY\.round/.test(String(ptStartTurn))&&/a\.id/.test(String(ptStartTurn)));
@@ -9264,13 +9487,6 @@ window.__selftest=function(){
     ok('实时战绩可随时结算并生成 jpeg 相册图',
        /toDataURL\(['"]image\/jpeg['"]/.test(String(ptCardData))
        &&/navigator\.share/.test(String(ptSaveCard))&&/ptFinish/.test(String(ptQuit)));
-    ok('轮转赛由单人和聚会共用同一套目标换色内核',
-       /id:'rotate'/.test(String(renderPartySetup))&&/rotateBegin/.test(String(ptStartTurn))
-       &&/rotateBegin/.test(String(startRotate))&&/rotateCollect/.test(String(clearCells))
-       &&rotateNeedAt(0)===10&&rotateNeedAt(6)===22);
-    ok('单人轮转周榜固定 60 秒，并封存人物能力与灵器',
-       /const baseMs=60000/.test(String(startRotate))&&/GS\.compDef=null/.test(String(startRotate))
-       &&/toolbar.*display='none'/.test(String(startRotate))&&!/applyOpeningPassives/.test(String(startRotate)));
   }
   {
     const bak={lv:SAVE.lv,cs:SAVE.cs,alias:SAVE.lbAlias,month:SAVE.lbAliasMonth};
@@ -9300,7 +9516,7 @@ window.__selftest=function(){
     ok('灵契赛被动、主动与七成起充均接入，来宾使用不写进机主成就',
        /GS\.compDef=pact\?c:null/.test(start)&&/ptPactCharge\(c\)/.test(start)
        &&/ptApplyOpening\(c\)/.test(start)&&/renderAlly\(\)/.test(start)
-       &&PT_PACT_START>=.65&&PT_PACT_START<=.72&&/if\(!GS\.party\)/.test(ult));
+       &&PT_PACT_START>=.65&&PT_PACT_START<=.72&&/if\(!GS\.party&&GS\.mode!==['"]gauntlet['"]\)/.test(ult));
   }
   {
     const bak={guide:SAVE.guide,lv:SAVE.lv,fails:SAVE.fails,stars:SAVE.stars,mode:GS.mode,L:GS.L};
@@ -9435,13 +9651,13 @@ window.__selftest=function(){
     /* 写死 10 段是个坑：加一项就红，而红的原因看不出来是「漏传」还是「多传了一项」。
        改成「stats() 里每一个上传项都必须出现在 sig() 里」——加新项时自动覆盖。
        sig 少一项，那条线就永远触发不了上传，而且悄无声息。 */
-    const SIG_KEYS=['score','rush','rushWeek','rotateWeek','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
-    ok('累计账：历史成绩、周成绩、到场与人物熟练度都进了 stats() 与 sig()',
+    const SIG_KEYS=['score','rush','rushWeek','bossFloor','bossProgress','bossScore','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
+    ok('累计账：历史、周成绩、首领连战、到场与人物熟练度都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
        &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
-       &&/^\d{8}$/.test(st.rushWeekKey)&&/^\d{8}$/.test(st.rotateWeekKey)
+       &&/^\d{8}$/.test(st.rushWeekKey)&&typeof st.bossBuild==='string'&&typeof st.bossComp==='string'
        &&SIG_KEYS.every(k=>typeof st[k]==='number')
-       &&sg.split('|').length===SIG_KEYS.length+4        // 两条周 key、同伴与阵营不是数字
+       &&sg.split('|').length===SIG_KEYS.length+5        // 周 key、强化组合、连战同行、当前同行与阵营不是数字
        &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
@@ -9834,27 +10050,39 @@ window.__selftest=function(){
       const bakP=SAVE.lbPower,bakA=SAVE.lbAlias,bakS=LB.scope;
       SAVE.lbAlias='甲甲';SAVE.lbPower=50000;
       const R=[
-        {rank:1,alias:'甲甲',power:50000,rush:90000,rotate:76000,lv:160,stars:192,chain:14,score:120000,days:30,runs:200,dbest:20,luck:4},
-        {rank:2,alias:'乙乙',power:45000,rush:87000,rotate:72000,lv:120,stars:160,chain:12,score:90000,days:40,runs:260,dbest:25,luck:2},
-        {rank:3,alias:'丙丙',power:42000,rush:85000,rotate:69000,lv:110,stars:150,chain:11,score:80000,days:28,runs:180,dbest:18,luck:5},
-        {rank:4,alias:'云朵朵',power:39000,rush:82000,rotate:65000,lv:86,stars:180,chain:10,score:62000,days:20,runs:120,dbest:12,luck:3,comp:'jun'}
+        {rank:1,alias:'甲甲',power:50000,rush:90000,rushAll:190000,bossFloor:8,bossProgress:4600,bossScore:420000,bossBuild:'fury:2,guard:1',lv:160,stars:192,chain:14,score:120000,days:30,runs:200,dbest:20,luck:4},
+        {rank:2,alias:'乙乙',power:45000,rush:87000,rushAll:187000,bossFloor:7,bossProgress:8200,bossScore:380000,bossBuild:'chain:2',lv:120,stars:160,chain:12,score:90000,days:40,runs:260,dbest:25,luck:2},
+        {rank:3,alias:'丙丙',power:42000,rush:85000,rushAll:185000,bossFloor:7,bossProgress:6500,bossScore:350000,bossBuild:'blast:2',lv:110,stars:150,chain:11,score:80000,days:28,runs:180,dbest:18,luck:5},
+        {rank:4,alias:'云朵朵',power:39000,rush:82000,rushAll:182000,bossFloor:6,bossProgress:9000,bossScore:310000,bossBuild:'wind:2',lv:86,stars:180,chain:10,score:62000,days:20,runs:120,dbest:12,luck:3,comp:'jun'}
       ];
+      const H=R.map(r=>Object.assign({},r,{rush:r.rushAll}));
       LB.scope='depth';const depth=lbBoardHTML(R,0,{});
       LB.scope='rush';const rush=lbBoardHTML(R,0,{});
-      LB.scope='rotate';const rotate=lbBoardHTML(R,0,{});
+      LB.scope='rushAll';const history=lbBoardHTML(H,0,{});
+      LB.scope='boss';const boss=lbBoardHTML(R,0,{});
       ok('闯关榜不再显示矿力荣誉席',!depth.includes('荣 誉 席')&&!depth.includes('矿力'));
       ok('闯关榜右栏直接显示关卡',depth.includes('第 160 关')&&depth.includes('闯关'));
-      ok('90 秒榜不混入闯关或把累计矿力当排序栏',
+      ok('90 秒本周榜不混入闯关或把累计矿力当排序栏',
          !rush.includes('闯关')&&!/class="pl">矿力/.test(rush));
-      ok('90 秒榜右栏显示矿灯分，不拿矿力冒充排序依据',rush.includes('90,000')&&rush.includes('矿灯'));
-      ok('90 秒紧凑榜显示前四名，持续变化的前列不会被前三截掉',
-         (rush.match(/class="lb-row/g)||[]).length===4&&rush.includes('云朵朵'));
-      ok('轮转周榜显示真实轮转分与前四名，不混入闯关排序栏',
-         rotate.includes('76,000')&&rotate.includes('轮转')&&!rotate.includes('闯关')
-         &&(rotate.match(/class="lb-row/g)||[]).length===4);
+      ok('90 秒历史榜与本周榜显示各自成绩并保持两个独立入口',
+         rush.includes('class="pv">90,000<')&&!rush.includes('class="pv">190,000<')
+         &&history.includes('class="pv">190,000<')&&!history.includes('class="pv">90,000<')
+         &&!!document.querySelector('[data-scope="rush"]')&&!!document.querySelector('[data-scope="rushAll"]'));
+      ok('90 秒双榜都显示前四名，首领榜按击破层数显示前三',
+         (rush.match(/class="lb-row/g)||[]).length===4
+         &&(history.match(/class="lb-row/g)||[]).length===4
+         &&(boss.match(/class="lb-row/g)||[]).length===3
+         &&boss.includes('击破 8 层')&&boss.includes('首领'));
+
+      const bakRush=SAVE.rushBest,bakWeek=JSON.parse(JSON.stringify(SAVE.rushWeek));
+      SAVE.rushBest=190000;SAVE.rushWeek={w:rushWeekKey(),best:90000,claimed:{}};
+      const split=LB.stats();SAVE.rushBest=bakRush;SAVE.rushWeek=bakWeek;persist();
+      ok('90 秒历史最高永久保留，本周最佳按周独立刷新',
+         split.rush===190000&&split.rushWeek===90000&&split.rushWeekKey===rushWeekKey());
       LB.scope='depth';
       const mine=lbMineHTML(R,0).replace(/<[^>]+>/g,'');
-      ok('榜首个人摘要只报领先对象与真实关数差额',mine.includes('榜首')&&mine.includes('40')&&mine.includes('乙乙'));
+      ok('榜首个人摘要报真实关数与领先第二名的差距',
+         mine.includes('榜首')&&mine.includes('160')&&mine.includes('乙乙')&&mine.includes('40')&&!mine.includes('再通'));
       const blend=lbBoardHTML([
         {rank:1,alias:'云朵朵',lv:86,stars:180,score:62000,chain:11,comp:'jun'},
         {rank:2,alias:'乙乙',lv:72,stars:160,score:54000,chain:9,comp:'wolf'}
