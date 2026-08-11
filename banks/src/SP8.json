@@ -1,0 +1,159 @@
+{
+ "date": "2026-08-10",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "炼狱",
+ "tier": "free",
+ "name": "画中人 · 人物传 VOL.7（陷阱猎人版）",
+ "code": "SP8",
+ "desc": "2026 暑假特辑 SP8《画中人》陷阱猎人版语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的画廊平面图、逻辑推理格（13–17）、传记阅读（18–20）、矛盾侦测与密码显影依赖纸面图与原文，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "It is not easy ___ the truth in a room where everyone remembers a different yesterday.",
+    "ops": [
+     "find",
+     "finds",
+     "found",
+     "to find"
+    ],
+    "ans": 3,
+    "why": "It 作形式主语，真正的主语是后面的不定式 to find。",
+    "lv": 1
+   },
+   {
+    "q": "This is ___ second time the sitter's hand has moved this week.",
+    "ops": [
+     "a",
+     "an",
+     "the",
+     "one"
+    ],
+    "ans": 2,
+    "why": "序数词前面用定冠词 the——the second time。",
+    "lv": 1
+   },
+   {
+    "q": "Nobody could tell us ___ the change to the painting.",
+    "ops": [
+     "how explaining",
+     "how to explain",
+     "how explain",
+     "how we explaining"
+    ],
+    "ans": 1,
+    "why": "疑问词 + 不定式，作 tell 的宾语——how to explain。",
+    "lv": 2
+   },
+   {
+    "q": "She looked out of the frame as if she ___ every one of our names.",
+    "ops": [
+     "knows",
+     "will know",
+     "has known",
+     "knew"
+    ],
+    "ans": 3,
+    "why": "as if 引导与事实相反的情况，从句用过去式表虚拟。",
+    "lv": 2
+   },
+   {
+    "q": "The news ___ the painting had changed spread through the school in one morning.",
+    "ops": [
+     "that",
+     "which",
+     "what",
+     "whether"
+    ],
+    "ans": 0,
+    "why": "同位语从句说明 news 的内容，从句成分完整，用连词 that。",
+    "lv": 2
+   },
+   {
+    "q": "Han copied twice ___ pages as Chen did that afternoon.",
+    "ops": [
+     "as much",
+     "more",
+     "as many",
+     "as many as"
+    ],
+    "ans": 2,
+    "why": "twice as many + 可数名词复数 + as，pages 可数。",
+    "lv": 2
+   },
+   {
+    "q": "___ carefully Han copied, one line always came out different.",
+    "ops": [
+     "No matter how",
+     "No matter what",
+     "However much",
+     "Whatever"
+    ],
+    "ans": 0,
+    "why": "no matter how + 副词，表示“无论多么仔细地”。",
+    "lv": 2
+   },
+   {
+    "q": "___ at the frame, Yu finally noticed that the hand had moved.",
+    "ops": [
+     "Looked",
+     "Looking",
+     "To look",
+     "Look"
+    ],
+    "ans": 1,
+    "why": "现在分词作状语，逻辑主语是 Yu，他是“看”的发出者。",
+    "lv": 2
+   },
+   {
+    "q": "The rest of the notes ___ still on Han's desk, page after page.",
+    "ops": [
+     "are",
+     "is",
+     "was",
+     "has been"
+    ],
+    "ans": 0,
+    "why": "the rest of 的单复数跟着 of 后面的名词走，notes 是复数，用 are。",
+    "lv": 2
+   },
+   {
+    "q": "By Friday morning Han ___ the same page for three days, and still it did not match.",
+    "ops": [
+     "has been copying",
+     "was copying",
+     "copied",
+     "had been copying"
+    ],
+    "ans": 3,
+    "why": "过去完成进行时——到过去某一时刻为止一直在做，且还在继续。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "It was the cat that nobody had written down.",
+     "Having checked every page, Han said nothing.",
+     "Not until the third day she noticed the hand had moved.",
+     "The rest of the room was quiet."
+    ],
+    "ans": 2,
+    "why": "Not until 置于句首，主句要部分倒装 → Not until the third day did she notice…",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "She looked as if she had been waiting for years.",
+     "The record must changed by someone with the right to do it.",
+     "The hall is three times as wide as the room.",
+     "Nobody could tell us where to look next."
+    ],
+    "ans": 1,
+    "why": "情态动词后面缺了 be——must have been changed 或 must be changed。",
+    "lv": 2
+   }
+  ]
+ }
+}
+
