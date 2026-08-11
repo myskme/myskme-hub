@@ -27,9 +27,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
 <meta name="theme-color" content="#ead9b9">
-<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，64 关远征、无尽矿脉、90 秒矿灯、首领连战与本地聚会赛。离线可玩，扫码即开。">
+<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，远征与无尽、90 秒矿灯、灵脉战境与本地聚会赛。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
-<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 64 关 + 无尽矿脉 + 矿灯局 + 首领连战 + 聚会赛。">
+<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 远征与无尽 + 90 秒矿灯 + 灵脉战境 + 聚会赛。">
 <!-- 分享卡片走品牌域名：网页玩家基本在国内，github.io 的图爬虫抓不到，
      卡片就成了无图裸链。og.png 随 EdgeOne 直传包的 icons/ 目录发布，
      GitHub Pages 上同路径也有，两边都不断。 -->
@@ -159,8 +159,8 @@ body::before{display:none}
              0 4px 0 rgba(87,58,42,.2),
              0 12px 24px rgba(87,58,42,.2),
              0 0 30px color-mix(in srgb,var(--gold) 20%,transparent)}
-/* 次级入口退后，保持大厅只有一个明确主动作。 */
-.menu-modes .btn,.menu-dock .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 2px 7px rgba(87,58,42,.13)}
+/* 三条游戏线平级可见，远征仍是唯一主动作；聚会与本周内容退到辅助层。 */
+.menu-route-pair .btn,.menu-extras .btn,.menu-dock .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 2px 7px rgba(87,58,42,.13)}
 .btn.ghost{background:transparent;border-color:var(--line2);color:var(--ink2);font-size:14px;padding:9px 16px}
 .ornate{position:relative;border:1px solid var(--line)}
 .ornate::before,.ornate::after{display:none}
@@ -217,7 +217,7 @@ body::before{display:none}
   mask-image:linear-gradient(180deg,#000 66%,transparent)}
 @media (max-height:740px){
   .wolf-badge.has-art{width:min(110px,30vw);height:min(122px,34vw)}
-  #scr-menu .kicker,#scr-menu .subtitle{display:none}      /* 小屏砍掉题头与副题，保住四个入口 */
+  #scr-menu .kicker,#scr-menu .subtitle{display:none}      /* 小屏砍掉题头与副题，保住三条主玩法 */
   .title-hero{margin-top:0}
 }
 .wolf-badge::before{content:'';position:absolute;inset:6px;border:1px solid var(--gold-line);opacity:.45;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s}
@@ -244,11 +244,19 @@ body::before{display:none}
 .btn .sub.warn{color:var(--gold2)}                 /* 有成绩没传上去时描金提醒 */
 .btn .sub.warn b{color:var(--gold2);font-weight:500}
 .btn.primary .sub{color:color-mix(in srgb,var(--gold) 55%,var(--ink3))}
-.menu-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.menu-routes{display:flex;flex-direction:column;gap:8px}
+.menu-route-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.menu-route-pair .btn{min-height:58px;padding:8px 6px;font-size:14px;letter-spacing:.06em}
+.menu-route-pair .btn .mi{width:var(--ic-md);height:var(--ic-md);margin-right:3px;vertical-align:-5px}
+.menu-route-pair .btn .mi .ic{width:var(--ic-md);height:var(--ic-md)}
+.menu-route-pair .btn .sub{font-size:9.5px;letter-spacing:.035em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#btn-gauntlet{border-color:color-mix(in srgb,var(--gold) 52%,var(--line));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--prism2) 9%,var(--panel2)),var(--panel))}
+#btn-gauntlet .mi{color:var(--gold2)}
+.menu-extras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.menu-extras .btn{min-height:38px;padding:6px 5px;font-size:12px;letter-spacing:.06em}
+.menu-extras .btn .sub{font-size:8.8px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .menu-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.menu-modes .btn{padding:clamp(8px,1.2dvh,12px) 4px;font-size:13px;letter-spacing:.04em;white-space:nowrap}
-.menu-modes .btn .ic{display:none}
-.menu-modes .btn .sub{font-size:9px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .menu-dock{margin-top:-1px}
 .menu-dock .btn{padding:clamp(6px,.9dvh,9px) 4px;font-size:12px;letter-spacing:.06em;white-space:nowrap}
 .menu-dock .btn .dot{display:inline-block;width:5px;height:5px;background:var(--gold);
@@ -662,12 +670,18 @@ body::before{display:none}
 #end-waystone .copy{flex:1;min-width:0;font-size:11.5px;line-height:1.55;color:var(--ink3)}
 #end-waystone .copy b{display:block;color:var(--gold2);font-size:14px;font-weight:500}
 #end-guide{flex:none;padding:8px 10px;font-size:12px}
-/* 矿脉榜：只留荣誉席、榜首和玩家附近三层，不再平铺 50 行。 */
+/* 排行榜：只留前列、我的位置与相邻名次，不再平铺 50 行。 */
 #ovl-lb .ovl-card{width:min(440px,94vw);max-height:calc(100dvh - 36px)}
-.lb-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:10px 0 12px}
+.lb-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0 7px}
 .lb-tabs button{min-width:0;font-family:var(--serif);font-size:13px;letter-spacing:.1em;padding:8px 4px;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
 .lb-tabs button.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
+.lb-periods{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin:0 0 12px;padding:3px;
+  border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 4%,var(--panel2))}
+.lb-periods.on{display:grid}
+.lb-periods button{min-width:0;border:0;background:transparent;color:var(--ink3);font-family:var(--serif);
+  font-size:11.5px;letter-spacing:.1em;padding:7px 4px;cursor:pointer}
+.lb-periods button.on{color:var(--gold2);background:var(--panel);box-shadow:inset 0 0 0 1px var(--gold-line)}
 #lb-list{text-align:left}
 .lb-group{margin-top:12px}
 .lb-group:first-child{margin-top:0}
@@ -895,7 +909,7 @@ body::before{display:none}
 .qs-dim{font-size:11px;color:var(--ink3)}
 .qs-go{width:100%;margin-top:8px;padding:7px;font-size:14px}
 
-/* 首领连战：开局只选同行；每层之后的三选一用平铺决策条，避免层层套卡。 */
+/* 灵脉战境：开局只选同行；每层之后的三选一用平铺决策条，避免层层套卡。 */
 .ga-rule{margin:12px auto 10px;max-width:340px;padding:10px 12px;border:1px solid var(--gold-line);
   color:var(--ink2);font-size:12.5px;line-height:1.75;text-align:left;background:color-mix(in srgb,var(--gold) 5%,var(--panel))}
 .ga-rule b{color:var(--gold2);font-weight:600}
@@ -1053,12 +1067,12 @@ body::before{display:none}
              inset 0 -1px 0 rgba(87,58,42,.15),
              0 1px 0 rgba(87,58,42,.14),
              0 3px 8px rgba(87,58,42,.11)}
-.iconbtn,.ally-opt,.lb-tabs button,.lore-link{
+.iconbtn,.ally-opt,.lb-tabs button,.lb-periods button,.lore-link{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.62),
              inset 0 -1px 0 rgba(87,58,42,.18),
              0 2px 0 rgba(87,58,42,.16),
              0 4px 10px rgba(87,58,42,.12)}
-.iconbtn:active,.ally-opt:active,.lb-tabs button:active,.lore-link:active{
+.iconbtn:active,.ally-opt:active,.lb-tabs button:active,.lb-periods button:active,.lore-link:active{
   transform:translateY(2px);
   box-shadow:inset 0 2px 5px rgba(87,58,42,.24);transition-duration:.05s}
 /* 输入框反过来：它是「凹进去的槽」，不是凸起的块 —— 能按的和能填的必须一眼分开 */
@@ -1433,8 +1447,9 @@ body{--shk:4px}
   .menu-cast button{width:34px;height:34px}
   .menu-btns{gap:4px;margin-top:1px}
   .menu-btns .btn{min-height:44px;padding-top:5px;padding-bottom:5px;font-size:14px}
-  .menu-modes,.menu-dock{gap:5px}
-  .menu-modes .btn,.menu-dock .btn{min-height:44px;padding:5px 2px}
+  .menu-route-pair,.menu-extras,.menu-dock{gap:5px}
+  .menu-route-pair .btn{min-height:50px;padding:5px 3px}
+  .menu-extras .btn,.menu-dock .btn{min-height:38px;padding:4px 2px}
   .menu-help{min-height:36px;padding:0 10px}
   .claimcard.on{width:min(320px,90vw);min-height:50px;margin-top:2px;padding:5px 8px 5px 12px;
     display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left}
@@ -1467,15 +1482,20 @@ body{--shk:4px}
     </div>
     <div class="menu-cast" id="menu-cast" aria-label="远征同行"></div>
     <div class="menu-btns">
-      <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 灵脉远征<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
-      <div class="menu-modes">
-        <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 90 秒<span class="sub" id="rush-sub">最佳 —</span></button>
+      <div class="menu-routes" aria-label="三种主要玩法">
+        <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 远征 · 无尽<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
+        <div class="menu-route-pair">
+          <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 矿灯 · 90 秒<span class="sub" id="rush-sub">连锁续灯 · 最佳 —</span></button>
+          <button class="btn ornate" id="btn-gauntlet"><span class="icw mi" data-ic="crown"></span>灵脉战境<span class="sub" id="gauntlet-sub">逐层首领 · 三选一强化</span></button>
+        </div>
+      </div>
+      <div class="menu-extras">
         <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人轮流</span></button>
-        <button class="btn ornate" id="btn-quest">挑战<span id="quest-dot"></span><span class="sub">三桩 · 首领连战</span></button>
+        <button class="btn ornate" id="btn-quest">本周挑战<span id="quest-dot"></span><span class="sub">同盘矿脉 · 悬赏 · 岁记</span></button>
       </div>
       <div class="menu-dock">
         <button class="btn ghost" id="btn-pack">行囊<span id="pack-dot"></span></button>
-        <button class="btn ghost" id="btn-lb">远征榜<span id="lb-dot"></span></button>
+        <button class="btn ghost" id="btn-lb">排行榜<span id="lb-dot"></span></button>
         <button class="btn ghost" id="btn-ach">生涯</button>
         <button class="btn ghost" id="btn-col">典藏<span id="col-dot"></span></button>
       </div>
@@ -1653,22 +1673,22 @@ body{--shk:4px}
   <div class="ovl-btns"><button class="btn primary big" id="boss-go">应 战</button></div>
 </div></div>
 
-<!-- 首领连战 · 开局选同行。六位在此模式统一开放，世界榜规则一致。 -->
+<!-- 灵脉战境 · 开局选同行。六位在此模式统一开放，世界榜规则一致。 -->
 <div class="ovl" id="ovl-gauntlet"><div class="ovl-card">
-  <div class="ovl-kick">BOSS GAUNTLET</div>
-  <div class="ovl-title">首领 · <em>连战</em></div>
-  <div class="ga-rule"><b>每层都是首领。</b>一趟只走一次，败退即结算；击破后从三项强化中选一项，效果会叠到本趟结束。击破首位后进入世界榜：先看击破层数，同层再看下一位首领的伤害进度。</div>
+  <div class="ovl-kick">VEIN REALM</div>
+  <div class="ovl-title">灵脉 · <em>战境</em></div>
+  <div class="ga-rule"><b>逐层迎战首领。</b>一趟只有一次机会；每次击破后从三项强化中选一项，构筑会保留到本趟结束。击破首位后进入排行榜：先看击破层数，同层再看下一位首领的推进进度。</div>
   <div class="ga-bosses" id="gauntlet-bosses"></div>
   <div class="ovl-kick" style="margin-top:12px">选择同行 · 六位统一开放</div>
   <div class="ga-role-grid" id="gauntlet-role-grid"></div>
   <div class="ovl-sub" id="gauntlet-role-desc" style="margin-top:10px"></div>
   <div class="ovl-btns">
     <button class="btn ghost" id="gauntlet-close">返 回</button>
-    <button class="btn primary big" id="gauntlet-go">开始连战</button>
+    <button class="btn primary big" id="gauntlet-go">进入战境</button>
   </div>
 </div></div>
 
-<!-- 首领连战 · 层间三选一 -->
+<!-- 灵脉战境 · 层间三选一 -->
 <div class="ovl" id="ovl-gauntlet-pick"><div class="ovl-card">
   <div class="ovl-kick" id="gauntlet-pick-kick">首领已退</div>
   <div class="ovl-title">三选 · <em>一</em></div>
@@ -1950,17 +1970,20 @@ body{--shk:4px}
   </div>
 </div></div>
 
-<!-- 远征榜 -->
+<!-- 全游戏排行榜：远征、90 秒双榜、灵脉战境与阵营统一收在一处。 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
-  <button class="ovl-top-close" id="lb-top-close" data-close-target="#lb-close" aria-label="合上远征榜"></button>
-  <div class="ovl-kick">GEMFALL LEADERBOARD</div>
-  <div class="ovl-title">远征 · <em>榜</em></div>
-  <div class="lb-tabs">
-    <button data-scope="depth" class="on">闯关</button>
-    <button data-scope="rushAll">90 秒·历史</button>
-    <button data-scope="rush">90 秒·本周</button>
-    <button data-scope="boss">首领连战</button>
-    <button data-scope="camp">阵营</button>
+  <button class="ovl-top-close" id="lb-top-close" data-close-target="#lb-close" aria-label="合上排行榜"></button>
+  <div class="ovl-kick">GEMFALL RANKINGS</div>
+  <div class="ovl-title">世界 · <em>排行榜</em></div>
+  <div class="lb-tabs" aria-label="排行榜分类">
+    <button id="lb-group-depth" data-group="depth" class="on">远征</button>
+    <button id="lb-group-rush" data-group="rush">90 秒</button>
+    <button id="lb-group-boss" data-group="boss">战境</button>
+    <button id="lb-group-camp" data-group="camp">阵营</button>
+  </div>
+  <div class="lb-periods" id="lb-periods" aria-label="90 秒榜单范围">
+    <button id="lb-period-history" data-scope="rushAll">历史最高</button>
+    <button id="lb-period-week" data-scope="rush">本周排行</button>
   </div>
   <div id="lb-msg">正在连接矿脉…</div>
   <div id="lb-mine"></div>
@@ -2055,7 +2078,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 90 秒周榜：best 只记当周单局最佳，claimed 记已入行囊的历史奖励。
      历史最佳仍在 rushBest，周榜换榜绝不会让个人纪录倒退。 */
   rushWeek:{w:'',best:0,claimed:{}},
-  /* 首领连战历史最佳。floor=已击破层数，progress=下一层伤害进度（万分制），
+  /* 灵脉战境历史最佳。floor=已击破层数，progress=下一层伤害进度（万分制），
      score=整趟战果；三项必须成组替换，不能分别取最大。 */
   bossBest:{floor:0,progress:0,score:0,build:'',comp:''},
   /* ---- 追求线（2026-08 加）----
@@ -3614,7 +3637,7 @@ const GS={mode:'adv',L:null,moves:0,score:0,over:false,busy:true,goals:[],
 const DYING=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,REDUCED?Math.min(ms,40):ms));
 
-/* ---------- 首领连战 ----------
+/* ---------- 灵脉战境 ----------
    每层都是首领；层数是唯一主排名，当前首领伤害进度与整趟战果只作同层比较。
    道具与引路晶不带入，六位同行统一开放，避免世界榜被主线解锁差异切成两套规则。 */
 const GAUNTLET={active:false,opening:false,played:false,floor:1,cleared:0,total:0,seed:'',comp:'wolf',mods:{},picks:[],choices:[],guard:0,bonus:{moves:0,special:0,damage:0}};
@@ -3680,7 +3703,7 @@ function gauntletLevel(floor,seed,mods,comp){
     moves:22+(comp==='xi'?2:0)+(mods.reserve||0)*3+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
     ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss,bossHP:hp,
     bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)),s1:9000,s2:24000,s3:52000,
-    chName:'首领连战',era:'第 '+floor+' 层',epi:'击破后选择一项强化，继续下潜。'};
+    chName:'灵脉战境',era:'第 '+floor+' 层',epi:'击破后选择一项强化，继续下潜。'};
   const n=Math.min(8,2+Math.floor(floor/3)),spots=PAT.scatter(R,18,1,6);
   if(boss==='ye')L.ink=spots.slice(0,n);
   else if(boss==='she')L.cages=spots.slice(0,n);
@@ -3748,7 +3771,7 @@ function gauntletOpenFloor(){
   $('#boss-name').textContent=bo.title;$('#boss-hpbar').querySelector('i').style.width='100%';$('#boss-hpbar').classList.remove('low');
   $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;$('#quip-line').innerHTML='<b>'+bo.short+'：</b>'+bo.intro;
   $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);$('#boss-intro-face').dataset.fit='contain';applyArt($('#boss-banner'),'boss_banner');applyArt($('#boss-intro-face'),'boss_'+L.boss);
-  $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');$('#boss-intro-title').textContent='首领连战 · 第 '+floor+' 层';$('#boss-intro-line').textContent=bo.intro;
+  $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');$('#boss-intro-title').textContent='灵脉战境 · 第 '+floor+' 层';$('#boss-intro-line').textContent=bo.intro;
   ovl('boss');
 }
 function gauntletPlant(kind,n,R){
@@ -3766,7 +3789,7 @@ function gauntletBeginFloor(){
   GS.charge=Math.min(GS.compDef.need,GS.compDef.need*.25*gauntletStack('charge'));
   GAUNTLET.guard=gauntletStack('guard');renderGoals($('#goal-row'),30);updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
-  toast('首领连战 · 第 <b>'+GAUNTLET.floor+'</b> 层'+(gauntletBuildText()?'<br>'+gauntletBuildText():''),2600);
+  toast('灵脉战境 · 第 <b>'+GAUNTLET.floor+'</b> 层'+(gauntletBuildText()?'<br>'+gauntletBuildText():''),2600);
 }
 function gauntletRenderChoices(opening){
   GAUNTLET.opening=!!opening;
@@ -3811,7 +3834,7 @@ function gauntletEnd(reason){
     setTimeout(()=>LB.flush('clear'),600);
   }
   SFX.lose();applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent='首领连战 · BOSS GAUNTLET';$('#end-title').innerHTML=best?'新 · <em>纪录</em>':'连战 · <em>结算</em>';
+  $('#end-kick').textContent='灵脉战境 · VEIN REALM';$('#end-title').innerHTML=best?'新 · <em>纪录</em>':'战境 · <em>结算</em>';
   countTo($('#end-score'),GAUNTLET.total);$('#end-stars').style.display='none';$('#end-waystone').classList.remove('on');
   $('#end-detail').innerHTML='击破 <b>'+GAUNTLET.cleared+'</b> 层　下一位首领进度 <b>'+gauntletPct(progress)+'%</b><br>整趟战果 <b>'+GAUNTLET.total.toLocaleString('en-US')+'</b>'
     +(gauntletBuildText()?'<br>'+esc(gauntletBuildText()):'');
@@ -4127,7 +4150,7 @@ async function settleBoard(firstChain){
     const groups=findGroups();
     if(!groups.length)break;
     chain++;GS.chainMax=Math.max(GS.chainMax,chain);
-    if(!GS.party&&GS.mode!=='gauntlet'&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 来宾局与连战不抬主榜技巧线
+    if(!GS.party&&GS.mode!=='gauntlet'&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 来宾局与战境不抬主榜技巧线
     /* 先记下要炼成的特殊灵石 */
     const makes=[];
     const all=new Set();
@@ -7185,7 +7208,7 @@ function lbRowHTML(r,mine){
     +(rush||rushAll
       ?'<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">'+(rush?'本周':'历史')+'</div></div>'
       :boss
-        ?'<div class="pw"><div class="pv">击破 '+(Number(r.bossFloor)||0)+' 层</div><div class="pl">首领</div></div>'
+        ?'<div class="pw"><div class="pv">击破 '+(Number(r.bossFloor)||0)+' 层</div><div class="pl">战境</div></div>'
         :'<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')+'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
@@ -7205,7 +7228,7 @@ function lbCardHTML(r){
     cmp='<div class="lc-cmp">'+(gap>0?'再多 <b>'+gap.toLocaleString('en-US')+'</b> 分，就到他的'+label+'位置':'你已不低于他的'+label+'成绩')+'</div>';
   }else if(me&&me!==r&&LB.registered()&&LB.scope==='boss'){
     const df=(Number(r.bossFloor)||0)-(Number(me.bossFloor)||0),dp=(Number(r.bossProgress)||0)-(Number(me.bossProgress)||0),ds=(Number(r.bossScore)||0)-(Number(me.bossScore)||0);
-    cmp='<div class="lc-cmp">'+(df>0?'再击破 <b>'+df+'</b> 层，就到他的连战位置':df<0?'你已比他多击破 <b>'+(-df)+'</b> 层':dp>0?'同层 · 下一位首领再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平':dp<0?'你在同层的推进更深':ds>0?'同层同进度 · 战果再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 可越过他':'你已不低于他的连战记录')+'</div>';
+    cmp='<div class="lc-cmp">'+(df>0?'再击破 <b>'+df+'</b> 层，就到他的战境位置':df<0?'你已比他多击破 <b>'+(-df)+'</b> 层':dp>0?'同层 · 下一位首领再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平':dp<0?'你在同层的推进更深':ds>0?'同层同进度 · 战果再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 可越过他':'你已不低于他的战境记录')+'</div>';
   }else if(me&&me!==r&&LB.registered()){
     const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0),starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
     cmp='<div class="lc-cmp">'+(lvGap>0?'再通 <b>'+lvGap+'</b> 关，就到他的远征位置':lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关':starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
@@ -7213,14 +7236,15 @@ function lbCardHTML(r){
   const c=r.comp&&compById(r.comp),scope=LB.scope;
   const main=scope==='rush'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>本周矿灯</span>'
     :scope==='rushAll'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>90 秒历史</span>'
-    :scope==='boss'?'击破 '+(Number(r.bossFloor)||0)+' 层<span>首领连战</span>'
+    :scope==='boss'?'击破 '+(Number(r.bossFloor)||0)+' 层<span>灵脉战境</span>'
     :'第 '+(Number(r.lv)||0)+' 关<span>远征位置</span>';
+  const recordTitle=scope==='rush'?'90 秒本周记录':scope==='rushAll'?'90 秒历史记录':scope==='boss'?'灵脉战境记录':'远征记录';
   const scoped=scope==='rush'?row('本周矿灯',r.rush?Number(r.rush).toLocaleString('en-US'):'')+row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
     :scope==='rushAll'?row('90 秒历史',r.rush?Number(r.rush).toLocaleString('en-US'):'')
     :scope==='boss'?row('下一位进度',gauntletPct(r.bossProgress)+'%')+row('整趟战果',r.bossScore?Number(r.bossScore).toLocaleString('en-US'):'')+row('强化组合',esc(gauntletBuildLabel(r.bossBuild)||'未记录'))
     :row('矿灯最佳',r.rush?Number(r.rush).toLocaleString('en-US'):'');
   return '<div class="lc"><button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
-    +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div><div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div><div class="lc-tt">远征记录</div>'
+    +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div><div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div><div class="lc-tt">'+recordTitle+'</div>'
     +(c?'<div class="lc-comp">同行 · <b>'+esc(c.name)+'</b> '+esc(c.title)+'</div>':'')+'</div>'
     +'<div class="lc-pw">'+main+'</div><div class="lc-grid">'+row('星数',r.stars?String(r.stars):'')+row('单关最佳',r.score?Number(r.score).toLocaleString('en-US'):'')+scoped
     +row('最长连锁',r.chain?(r.chain+' 重'):'')+row('到场天数',r.days?(r.days+' 天'):'')+row('累计局数',r.runs?(r.runs+' 局'):'')+row('连续记录',r.dbest?(r.dbest+' 天'):'')+'</div>'+cmp+'</div>';
@@ -7529,8 +7553,6 @@ function renderQuest(){
   const s=wkState(), first=(s.score===null), left=wkDaysLeft();
   const bs=bountyState();
   const yj=yjState();
-  const nx=lampNext(SAVE.rushBest);
-  const gb=SAVE.bossBest||{floor:0,progress:0,score:0};
   let h='';
   /* 本周矿脉 */
   h+='<div class="qs-sec"><div class="qs-hd">本周矿脉 · 第 '+s.w+' 期'
@@ -7548,19 +7570,6 @@ function renderQuest(){
       ?'<b>'+esc(bs.def.nm)+'</b> —— 赏金已入账，下周一换新的'
       :esc(bs.def.nm)+'　<span class="qs-dim">'+icTag('box')+' 匣 ×1 + 星屑 10 · 输的局达成也算</span>')
     +'</div></div>';
-  /* 90 秒矿灯：保留续秒追连锁这一条老玩法。 */
-  h+='<div class="qs-sec"><div class="qs-hd">矿灯将熄 · 90 秒'
-    +'<span class="qs-sub">'+(SAVE.rushBest?('最佳 '+SAVE.rushBest.toLocaleString('en-US')):'还没试过')+'</span></div>'
-    +'<div class="qs-bd">同一时长，连锁越长，灯油续得越久'
-    +(nx?'<br><span class="qs-dim">距 '+nx.nm+' 还差 '+(nx.need-SAVE.rushBest).toLocaleString('en-US')+' 分</span>':'')
-    +'</div><button class="btn qs-go" data-go="rush">点 灯</button></div>';
-  /* 首领连战：玩法变化来自首领机制、人物和三选一组合，不再复制计时局。 */
-  h+='<div class="qs-sec"><div class="qs-hd">首领连战'
-    +'<span class="qs-sub">'+(gb.floor?('最佳击破 '+gb.floor+' 层'):'还没出发')+'</span></div>'
-    +'<div class="qs-bd">每层都是首领 · 六位同行统一开放 · 击破后从三项强化中选一项'
-    +(gb.floor?'<br><span class="qs-dim">下一位首领进度 '+gauntletPct(gb.progress)+'% · 战果 '+Number(gb.score||0).toLocaleString('en-US')+'</span>'
-      :gb.progress?'<br><span class="qs-dim">首位首领已推进 '+gauntletPct(gb.progress)+'% · 击破后入世界榜</span>':'')
-    +'</div><button class="btn qs-go" data-go="gauntlet">选 人 出 发</button></div>';
   /* 岁记 */
   h+='<div class="qs-sec"><div class="qs-hd">岁记 · '+monthTag(yj.m)
     +'<span class="qs-sub">'+(yj.n?('已刻 '+yj.n+' / 3 轮'):'每月只此一枚')+'</span></div>'
@@ -7581,8 +7590,6 @@ function renderQuest(){
   for(const btn of $$('#quest-body .qs-go'))btn.onclick=()=>{
     SFX.click();ovl(null);
     if(btn.dataset.go==='weekly')startWeekly();
-    else if(btn.dataset.go==='rush')startRush();
-    else if(btn.dataset.go==='gauntlet')openGauntletSetup();
   };
 }
 function startWeekly(){
@@ -7696,7 +7703,10 @@ async function renderLB(){
        不先收起就会残留上一个榜单的人。 */
   {const c=$('#lb-card'); if(c){c.classList.remove('on');c.innerHTML=''}}
   const form=$('#lb-form');
-  for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
+  const lbGroup=(LB.scope==='rush'||LB.scope==='rushAll')?'rush':LB.scope;
+  for(const b of $$('.lb-tabs button'))b.classList.toggle('on',b.dataset.group===lbGroup);
+  $('#lb-periods').classList.toggle('on',lbGroup==='rush');
+  for(const b of $$('.lb-periods button'))b.classList.toggle('on',b.dataset.scope===LB.scope);
   /* 世界榜与阵营战况都先给看；想把自己记上去时再起化名。 */
   form.hidden=true;$('#lb-edit').style.display='';
   $('#lb-submit').textContent=LB.registered()?'刷新上榜':'起名上榜';
@@ -7862,10 +7872,10 @@ function rushRewardHTML(meta){
 }
 function lbBoardHTML(rows,myIdx,meta){
   const row=r=>lbRowHTML(r,lbIsMe(r),'');
-  /* 深度与首领榜保留前三；90 秒双榜多露一行前列，让变化能被看见，
+  /* 远征与战境榜保留前三；90 秒双榜多露一行前列，让变化能被看见，
      同时仍给玩家附近三行留足空间。 */
   const lamp=LB.scope==='rush'||LB.scope==='rushAll',leadN=lamp?4:3,top=rows.slice(0,leadN);
-  const heading=LB.scope==='rush'?'本周矿灯':LB.scope==='rushAll'?'90 秒历史':LB.scope==='boss'?'首领连战':'榜首';
+  const heading=LB.scope==='rush'?'本周矿灯':LB.scope==='rushAll'?'90 秒历史':LB.scope==='boss'?'灵脉战境':'远征榜首';
   let h=(LB.scope==='rush'?rushRewardHTML(meta):'')
     +'<div class="lb-group"><div class="lb-gh"><span>'+heading+'</span><i>点名字看名片</i></div>'
     +top.map(row).join('')+'</div>';
@@ -7902,7 +7912,7 @@ function lbMineHTML(rows,myIdx){
         :dp>0?'同层 · 下一位再推进 <b>'+Math.ceil(dp/100)+'%</b> 可进榜'
         :'同层同进度 · 战果再多 <b>'+Math.max(1,ds+1).toLocaleString('en-US')+'</b> 可进榜');
     }
-    return b.floor?'连战记录正在同步 · 击破 <b>'+b.floor+'</b> 层':b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b> · 击破后入榜':'击破首位首领后就能进入世界榜';
+    return b.floor?'战境记录正在同步 · 击破 <b>'+b.floor+'</b> 层':b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b> · 击破后入榜':'击破首位首领后就能进入排行榜';
   }
   const weekly=scope==='rush',history=scope==='rushAll',lamp=weekly||history;
   const mine=weekly?(s.rushWeek||0):history?(s.rush||0):(s.lv||0);
@@ -8072,7 +8082,10 @@ function renderMenu(){
   const n=Math.min(SAVE.lv,65);
   const L=n>64?null:levelDef(n);
   $('#adv-sub').textContent=n>64?('无尽矿脉 · 深度 '+(SAVE.lv-64)):('第 '+n+' 关 · '+L.chName);
-  $('#rush-sub').textContent='最佳 '+(SAVE.rushBest?SAVE.rushBest.toLocaleString('en-US'):'—');
+  $('#rush-sub').textContent='连锁续灯 · 最佳 '+(SAVE.rushBest?SAVE.rushBest.toLocaleString('en-US'):'—');
+  const gb=SAVE.bossBest||{floor:0,progress:0};
+  $('#gauntlet-sub').textContent=gb.floor?('最佳 '+gb.floor+' 层 · 下一位 '+gauntletPct(gb.progress)+'%')
+    :gb.progress?('首位推进 '+gauntletPct(gb.progress)+'% · 击破后入榜'):'逐层首领 · 三选一强化';
   const totStars=totalStars();
   const got=ACHS.filter(a=>SAVE.ach[a.id]).length;
   const tools=TOOLKEYS.reduce((a,t)=>a+toolCount(t),0);
@@ -8544,17 +8557,19 @@ const HOW_HTML=`
 　<b>镜盘赛</b>：人物只作身份，同一轮的盘面与规则完全相同，纯比手艺。<br>
 　<b>灵契赛</b>：同一张基础盘开局，所选人物的被动与灵技生效；开局会明确提示被动，灵技从七成充能起步。<br>
 自定 <b>2–4 轮</b>。每一轮都要为每位选手重新选择 <b>短局 30、标准 60、深挖 90 秒</b>，不会沿用上一轮；四张矿盘按首轮选择逐轮轮换，同轮所有人仍拿同一张盘。按设置顺序依次交机，递机时棋盘会完全遮住；随时能看总分、保存战绩图或当场结算。<br><br>
-<b>矿上的挑战</b>（大厅「挑战」一键直达）<br>
-　<b>矿灯将熄 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
-　<b>首领连战</b>　每层都是首领；六位同行统一开放，击破后从佳、月、诺带来的三项强化中选一项。一趟败退即结算，不续挖、不复活、不消耗行囊道具。<br>
-　<b>本周矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
+<b>三条主玩法</b>（大厅各有独立入口）<br>
+　<b>远征 · 无尽</b>　先走完 64 关并解锁同行，贯通后继续挑战无尽矿脉。<br>
+　<b>矿灯 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
+　<b>灵脉战境</b>　逐层迎战首领；六位同行统一开放，击破后从三项强化中选一项。一趟败退即结算，不续挖、不复活、不消耗行囊道具。<br><br>
+<b>本周挑战</b><br>
+　<b>同盘矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
 　<b>狼先生的悬赏</b>　每周一条，输的局达成也算，赏典藏匣。<br>
-　<b>岁记</b>　每月三桩全清，铸一枚<b>刻着年月的绝版徽记</b>，过月不再有。<br><br>
+　<b>岁记</b>　每做成一桩就刻一轮，三轮齐了完成当月徽记，过月不再有。<br><br>
 <b>攒什么</b>　90 秒模式打出<b>灯位</b>（黑灯到曜灯六档）；带同伴打胜场攒<b>衔位</b>（5/15/40/100 胜）；
 典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
-<b>远征榜</b>　90 秒<b>历史榜</b>永久保留最高分，<b>本周榜</b>每周刷新并给前三发奖励；首领连战按击破层数排名，同层再看下一位首领的伤害进度与整趟战果。闯关榜先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
+<b>排行榜</b>　远征、90 秒、灵脉战境与阵营统一收在同一个栏目。90 秒<b>历史榜</b>永久保留最高分，<b>本周榜</b>每周刷新并给前三发奖励；灵脉战境按击破层数排名，同层再看下一位首领的推进进度与整趟战果。远征榜先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
@@ -8701,6 +8716,7 @@ function drawMenuGems(t){
    ================================================================== */
 $('#btn-adventure').addEventListener('click',()=>{AU.ensure();SFX.click();mapCh=clamp(Math.ceil(Math.min(SAVE.lv,64)/8),1,8);show('map')});
 $('#btn-rush').addEventListener('click',()=>{AU.ensure();SFX.click();startRush()});
+$('#btn-gauntlet').addEventListener('click',()=>{AU.ensure();SFX.click();openGauntletSetup()});
 $('#btn-ach').addEventListener('click',()=>{SFX.click();renderAch();ovl('ach')});
 /* 典藏册。多个子视图共用一张卡片，所以关闭要看当前在哪一层：
    在子视图里退回册子，在册子里才真的合上。全站别处的 ovl(null) 惯例
@@ -8829,10 +8845,16 @@ $('#end-card').addEventListener('click',()=>{SFX.click();showCard()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
 $('#lb-submit').addEventListener('click',()=>{SFX.click();lbSave()});
-for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
+for(const b of $$('.lb-tabs button'))b.addEventListener('click',()=>{
+  SFX.click();
+  const group=b.dataset.group;
+  LB.scope=group==='rush'?(LB.scope==='rush'?'rush':'rushAll'):group;
+  renderLB();
+});
+for(const b of $$('.lb-periods button'))b.addEventListener('click',()=>{SFX.click();LB.scope=b.dataset.scope;renderLB()});
 $('#btn-quest').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
 $('#quest-close').addEventListener('click',()=>{SFX.click();ovl(null)});
-$('#gauntlet-close').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
+$('#gauntlet-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#gauntlet-go').addEventListener('click',()=>{AU.ensure();SFX.click();ovl(null);gauntletStart()});
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how');
   /* 玩法页每次打开都重插 HTML，按钮得现挂。
@@ -8867,7 +8889,7 @@ $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
   /* 聚会赛里这个按钮点下去是**终结整场比赛、当场出名次**，不是退出这一手。
      交接屏和轮间小结上同样的动作都写着「终结比赛」，这里也必须写一样的，
      否则 6 人 5 轮打到一半，谁暂停时把它当成「退出本关」一点，全场就没了。 */
-  $('#pause-quit').textContent=GS.party?'终结比赛':GS.mode==='gauntlet'?'结束连战':'离开本关';
+  $('#pause-quit').textContent=GS.party?'终结比赛':GS.mode==='gauntlet'?'结束战境':'离开本关';
   ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
@@ -9416,7 +9438,7 @@ window.__selftest=function(){
     const seed='selftest-gauntlet',levels=Array.from({length:18},(_,i)=>gauntletLevel(i+1,seed,{},'wolf'));
     const everyBoss=levels.every(L=>L.boss&&BOSSES[L.boss]&&L.goals.length===1
       &&L.goals[0].type==='boss'&&L.goals[0].need===L.bossHP);
-    ok('首领连战前十八层每层都生成真实首领目标',everyBoss);
+    ok('灵脉战境前十八层每层都生成真实首领目标',everyBoss);
 
     const choiceSets=Array.from({length:12},(_,i)=>gauntletChoiceSet(seed,i+1,{}));
     const uniqueChoices=choiceSets.every(xs=>xs.length===3
@@ -9652,12 +9674,12 @@ window.__selftest=function(){
        改成「stats() 里每一个上传项都必须出现在 sig() 里」——加新项时自动覆盖。
        sig 少一项，那条线就永远触发不了上传，而且悄无声息。 */
     const SIG_KEYS=['score','rush','rushWeek','bossFloor','bossProgress','bossScore','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
-    ok('累计账：历史、周成绩、首领连战、到场与人物熟练度都进了 stats() 与 sig()',
+    ok('累计账：历史、周成绩、灵脉战境、到场与人物熟练度都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
        &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
        &&/^\d{8}$/.test(st.rushWeekKey)&&typeof st.bossBuild==='string'&&typeof st.bossComp==='string'
        &&SIG_KEYS.every(k=>typeof st[k]==='number')
-       &&sg.split('|').length===SIG_KEYS.length+5        // 周 key、强化组合、连战同行、当前同行与阵营不是数字
+       &&sg.split('|').length===SIG_KEYS.length+5        // 周 key、强化组合、战境同行、当前同行与阵营不是数字
        &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
@@ -10068,11 +10090,19 @@ window.__selftest=function(){
          rush.includes('class="pv">90,000<')&&!rush.includes('class="pv">190,000<')
          &&history.includes('class="pv">190,000<')&&!history.includes('class="pv">90,000<')
          &&!!document.querySelector('[data-scope="rush"]')&&!!document.querySelector('[data-scope="rushAll"]'));
-      ok('90 秒双榜都显示前四名，首领榜按击破层数显示前三',
+      ok('90 秒双榜都显示前四名，战境榜按击破层数显示前三',
          (rush.match(/class="lb-row/g)||[]).length===4
          &&(history.match(/class="lb-row/g)||[]).length===4
          &&(boss.match(/class="lb-row/g)||[]).length===3
-         &&boss.includes('击破 8 层')&&boss.includes('首领'));
+         &&boss.includes('击破 8 层')&&boss.includes('战境'));
+      renderQuest();
+      const questHTML=$('#quest-body').innerHTML;
+      ok('大厅把远征、90 秒矿灯与灵脉战境列为三个独立主入口',
+         !!$('#btn-adventure')&&!!$('#btn-rush')&&!!$('#btn-gauntlet')
+         &&!questHTML.includes('data-go="rush"')&&!questHTML.includes('data-go="gauntlet"'));
+      ok('排行榜统一为远征、90 秒、战境、阵营四类，90 秒再分历史与本周',
+         !!$('#lb-group-depth')&&!!$('#lb-group-rush')&&!!$('#lb-group-boss')&&!!$('#lb-group-camp')
+         &&!!$('#lb-period-history')&&!!$('#lb-period-week'));
 
       const bakRush=SAVE.rushBest,bakWeek=JSON.parse(JSON.stringify(SAVE.rushWeek));
       SAVE.rushBest=190000;SAVE.rushWeek={w:rushWeekKey(),best:90000,claimed:{}};
