@@ -1,0 +1,157 @@
+{
+  "name": "画中人 · 人物传 VOL.7（学徒版）",
+  "code": "SP8M",
+  "desc": "2026 暑假特辑 SP8M《画中人》学徒版语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的画廊平面图、逻辑推理格（13–17）、传记阅读（18–20）、矛盾侦测与密码显影依赖纸面图与原文，未进题库。",
+  "tier": "free",
+  "level": "进阶",
+  "cat": "人物传连载",
+  "pack": "2026 暑假特辑",
+  "mods": {
+    "m5": [
+      {
+        "q": "It is not easy ___ two pages at the same time.",
+        "ops": [
+          "check",
+          "checks",
+          "to check",
+          "checked"
+        ],
+        "ans": 2,
+        "why": "It 作形式主语，真正的主语是后面的不定式 to check。",
+        "lv": 1
+      },
+      {
+        "q": "The rest of the page ___ still clean.",
+        "ops": [
+          "are",
+          "were",
+          "is",
+          "have been"
+        ],
+        "ans": 2,
+        "why": "the rest of 的单复数跟着 of 后面的名词走，page 是单数，用 is。",
+        "lv": 1
+      },
+      {
+        "q": "Nobody told me ___ the notebook.",
+        "ops": [
+          "where to put",
+          "where putting",
+          "where put",
+          "where I putting"
+        ],
+        "ans": 0,
+        "why": "疑问词 + 不定式，整块作 told 的宾语——where to put。",
+        "lv": 1
+      },
+      {
+        "q": "He talked about the painting as if he ___ it every morning.",
+        "ops": [
+          "sees",
+          "will see",
+          "has seen",
+          "saw"
+        ],
+        "ans": 3,
+        "why": "as if 引导与事实相反的情况，从句用过去式表虚拟。",
+        "lv": 2
+      },
+      {
+        "q": "Can you tell me ___ ?",
+        "ops": [
+          "where is the drawer",
+          "where the drawer is",
+          "where the drawer",
+          "where is drawer"
+        ],
+        "ans": 1,
+        "why": "宾语从句用陈述语序——主语 the drawer 在前，谓语 is 在后。",
+        "lv": 2
+      },
+      {
+        "q": "The new page is twice ___ long as the old one.",
+        "ops": [
+          "as",
+          "so",
+          "more",
+          "very"
+        ],
+        "ans": 0,
+        "why": "倍数 + as + 原级 + as——twice as long as。",
+        "lv": 2
+      },
+      {
+        "q": "___ into the room, she saw that the drawer was open.",
+        "ops": [
+          "Come",
+          "To come",
+          "Coming",
+          "Came"
+        ],
+        "ans": 2,
+        "why": "现在分词作状语，逻辑主语是 she，她是「进来」的发出者。",
+        "lv": 2
+      },
+      {
+        "q": "It was Han ___ noticed the change first.",
+        "ops": [
+          "which",
+          "whom",
+          "what",
+          "who"
+        ],
+        "ans": 3,
+        "why": "强调句 It was … who/that，被强调的是人 Han，且在从句里作主语。",
+        "lv": 2
+      },
+      {
+        "q": "Someone ___ my notebook — it is not on the desk now.",
+        "ops": [
+          "must take",
+          "must have taken",
+          "should take",
+          "must be taken"
+        ],
+        "ans": 1,
+        "why": "对过去的肯定推测用 must have done——一定已经拿走了。",
+        "lv": 2
+      },
+      {
+        "q": "When I got to the gallery, the room was empty — everyone ___ .",
+        "ops": [
+          "had left",
+          "has left",
+          "leaves",
+          "was leaving"
+        ],
+        "ans": 0,
+        "why": "过去完成时——「走」发生在「我到」之前，两个过去时间点分先后。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "It was Chen who spoke first that afternoon.",
+          "Opening the drawer, he found nothing inside.",
+          "The rest of the paint had dried.",
+          "I wonder where did she put the key."
+        ],
+        "ans": 3,
+        "why": "wonder 后面是宾语从句，要用陈述语序 → where she put the key。",
+        "lv": 2
+      },
+      {
+        "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+        "ops": [
+          "She must have left before four.",
+          "This hall is three times as larger as that one.",
+          "He looked as if he knew the answer.",
+          "Nobody showed us how to open it."
+        ],
+        "ans": 1,
+        "why": "as…as 中间必须是原级 → three times as large as。",
+        "lv": 2
+      }
+    ]
+  }
+}
