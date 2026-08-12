@@ -1,4 +1,4 @@
-name: 猴先生上楼 · 验证并发布
+name: 是猴就上100层 · 验证并发布
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   verify:
-    name: 单文件、资源与发布包验收
+    name: 游戏、PWA、资源与发布包验收
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
