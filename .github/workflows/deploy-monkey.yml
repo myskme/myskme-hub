@@ -72,9 +72,10 @@ jobs:
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
         run: >-
-          npx --yes edgeone@1.6.19 makers deploy dist/myskme-monkey.zip
-          -n myskme-monkey
+          npx --yes edgeone@1.6.23 makers deploy dist/myskme-monkey.zip
+          -n monkey
           -e production
+          -a overseas
           -t "$EDGEONE_API_TOKEN"
       - name: 验收正式域名
         run: node deploy/monkey/verify-online-monkey.mjs
