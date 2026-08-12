@@ -15,7 +15,7 @@ MYSKME 荒诞休闲系列第一作。正式入口为 https://monkey.myskme.com/ 
 2. 运行 node monkey/tools/extract-assets.mjs 更新可复用资源。
 3. 运行 node monkey/tools/extract-assets.mjs --check 与
    node deploy/monkey/build-edgeone-monkey.mjs /tmp/myskme-monkey.zip。
-4. 合并进 main 后，GitHub Actions 自动发布到独立 EdgeOne 项目 myskme-monkey。
+4. 合并进 main 后，GitHub Actions 自动发布到独立 EdgeOne 项目 monkey（海外区，项目 ID makers-tf8nmwxqv8bq）。
 
 首次上线需要在 EdgeOne 为项目绑定 monkey.myskme.com 并在 DNSPod 添加 CNAME；
 此后发布不再需要碰控制台。

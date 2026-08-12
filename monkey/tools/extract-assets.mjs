@@ -20,7 +20,7 @@ const exportsList = [
   ['monkey-rise.svg', 'art-monkey-rise'],
   ['monkey-fall.svg', 'art-monkey-fall'],
   ['monkey-land.svg', 'art-monkey-land'],
-  ['fish-teal.svg', 'art-fish'],
+  ['fish-gold.svg', 'art-fish'],
   ['donkey.svg', 'art-donkey'],
   ['egg.svg', 'art-egg'],
   ['snake.svg', 'art-snake'],
@@ -61,7 +61,7 @@ function cover() {
     '<defs>', defs, '</defs>',
     '<use href="#art-monkey-rise" x="210" y="96" width="425" height="493"/>',
     '<use href="#art-fish" x="790" y="164" width="402" height="402"/>',
-    '<g stroke="#28211a" stroke-width="9" stroke-linejoin="round"><rect x="105" y="610" width="430" height="38" rx="18" fill="#f5b731"/><rect x="710" y="570" width="420" height="38" rx="18" fill="#1f9e8e"/></g>',
+    '<g stroke="#28211a" stroke-width="9" stroke-linejoin="round"><rect x="105" y="610" width="430" height="38" rx="18" fill="#f5b731"/><rect x="710" y="570" width="420" height="38" rx="18" fill="#e3ad32"/></g>',
     '</svg>', '',
   ].join('\n');
 }
@@ -77,7 +77,7 @@ const manifest = JSON.stringify({
   schema: 1,
   source: '../index.html',
   license: 'MYSKME original reusable asset',
-  palette: { paper: '#faf3e2', ink: '#28211a', teal: '#1f9e8e', banana: '#f5b731', red: '#e0452c' },
+  palette: { paper: '#faf3e2', ink: '#28211a', teal: '#1f9e8e', fishGold: '#e3ad32', banana: '#f5b731', red: '#e0452c' },
   assets: manifestAssets,
 }, null, 2) + '\n';
 outputs.set(path.join(outputRoot, 'asset-manifest.json'), manifest);

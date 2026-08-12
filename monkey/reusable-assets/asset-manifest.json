@@ -6,6 +6,7 @@
     "paper": "#faf3e2",
     "ink": "#28211a",
     "teal": "#1f9e8e",
+    "fishGold": "#e3ad32",
     "banana": "#f5b731",
     "red": "#e0452c"
   },
@@ -26,9 +27,9 @@
       "sha256": "d715e945af2f55b15985c50ba8a113ff4435d42d6733384f6d8f07654b126d34"
     },
     {
-      "file": "fish-teal.svg",
+      "file": "fish-gold.svg",
       "symbol": "art-fish",
-      "sha256": "4408b82f1ed00628a8de0d96361c1ab02fda7916a378cce9bb4409e3992191fa"
+      "sha256": "934d5771c60128095dd018ed5463d6193897ecaa9d4b0d3c98f97b7b418def81"
     },
     {
       "file": "donkey.svg",
