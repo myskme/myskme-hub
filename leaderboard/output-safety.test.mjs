@@ -96,8 +96,8 @@ if (clamped.score !== 18999999 || clamped.rush !== 18999999 || clamped.mv !== 18
 if (bossClean.floor !== 9999 || bossClean.progress !== 10000 || bossClean.score !== 2147483647
   || bossClean.build !== 'blast3,script,echo-2,' || bossClean.comp !== 'zi')
   failures.push('Boss 连战技术安全闸或强化 ID 清洗失效');
-if (bossOrder.map(x => x.alias).join(',') !== '多一层,同层高进度,同层低进度')
-  failures.push('Boss 连战比较器没有按层数、进度、战果排序');
+if (bossOrder.map(x => x.alias).join(',') !== '同层低进度,同层高进度,多一层')
+  failures.push('Boss 连战比较器没有按战果积分、层数、进度排序');
 if (gfRushWeekKey(beforeMonday) !== '20260803' || gfRushWeekKey(atMonday) !== '20260810'
   || gfRushWeekLabel('20260810') !== '8月10日—8月16日')
   failures.push('90 秒周榜没有在北京时间周一零点换榜');
@@ -111,14 +111,20 @@ if (!src.includes('CREATE TABLE IF NOT EXISTS gf_rush_week')
   || !rushPart.includes("CASE WHEN w.comp!='' THEN w.comp ELSE g.comp END AS comp")
   || !rushAllPart.includes('WHERE hidden=0 AND best_rush>0')
   || !rushAllPart.includes('ORDER BY best_rush DESC, alias ASC')
-  || !src.includes('scope !== "class" && scope !== "rush" && scope !== "boss"')
+  || !src.includes('scope !== "class" && await pacersOn')
+  || !src.includes('reward_rank:i+1')
+  || !src.includes('rewardRank: r.reward_rank || 0')
+  || !src.includes('merged.concat(bots).sort((a,b)=>gfBoardCmp(scope,a,b))')
+  || src.includes('bot: !!r.__bot')
   || !src.includes('scope !== "rushAll" || (r.best_rush || 0) > 0'))
-  failures.push('90 秒周榜、历史榜或配速员隔离口径漂移');
+  failures.push('90 秒周榜、历史榜或配速员公开榜口径漂移');
 if (!src.includes('CREATE TABLE IF NOT EXISTS gf_boss_best')
-  || !src.includes('idx_gf_boss_rank')
+  || !src.includes('idx_gf_boss_points')
   || !bossPart.includes('FROM gf_boss_best b JOIN gemfall g ON g.id=b.id')
-  || !bossPart.includes('ORDER BY b.best_floor DESC,b.best_progress DESC,b.best_score DESC')
-  || !submitSrc.includes('WHERE excluded.best_floor>COALESCE(gf_boss_best.best_floor,0)')
+  || !bossPart.includes('ORDER BY b.best_score DESC,b.best_floor DESC,b.best_progress DESC')
+  || !submitSrc.includes('WHERE excluded.best_score>COALESCE(gf_boss_best.best_score,0)')
+  || !src.includes("gf_boss_points_v3")
+  || !src.includes('WHERE best_floor>0`)')
   || !adminSrc.includes('DELETE FROM gf_boss_best WHERE id=?')
   || !adminSrc.includes('DELETE FROM gf_boss_best'))
   failures.push('Boss 连战没有独立持久化、成对更新、真实玩家排序或管理清理');
@@ -132,4 +138,4 @@ if (failures.length) {
 console.log('PASS 榜单公共响应不回流历史 emoji');
 console.log('PASS 虹彩矿名与自然月更名策略');
 console.log('PASS 90 秒历史/周榜并存与周榜奖励');
-console.log('PASS Boss 连战独立纪录与真人世界榜');
+console.log('PASS Boss 十二层积分纪录、旧成绩折算与公开世界榜');
