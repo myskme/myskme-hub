@@ -70,4 +70,23 @@ const 核对 = (名, 文件, 正则, 期望, 出处) => {
 核对('主页自鸣棋作品介绍的单位数', 'build_hub.py', /(\d+) 位可玩单位/, UNITS, '自鸣棋 index.html 的 UNITS');
 核对('主页 README 的自鸣棋单位数', 'README.md', /自鸣棋 · (\d+) 单位/, UNITS, '自鸣棋 index.html 的 UNITS');
 
+// ── 《是猴就上100层》正门：0812 新上的第四个域名 ──
+// 事实源取发布线自己认的那个地址（deploy/monkey/verify-online-monkey.mjs 里 fetch 的域名）——
+// 真正决定「线上是哪个域名」的就是它，主页写的只是宣传口径。
+// 猴子走 EdgeOne，仓库里没有 CNAME 文件，所以判据与自鸣棋那套不同，别照抄。
+{
+  const verifier = 读('deploy/monkey/verify-online-monkey.mjs');
+  if (verifier == null) 疑.push('猴子正门：找不到 deploy/monkey/verify-online-monkey.mjs，跳过');
+  else {
+    const m = verifier.match(/fetch\('(https:\/\/[^/']+\/)/);
+    if (!m) 疑.push('猴子正门：没从验收脚本里取到域名（写法变了？正则要跟着更新）');
+    else {
+      const 猴门 = m[1];
+      过.push(`事实源（取自猴子发布验收脚本）：正门=${猴门}`);
+      核对('主页作品清单的猴子网址', 'build_hub.py', /"key": "monkey-upstairs"[\s\S]{0,800}?"url": "([^"]+)"/, 猴门, '猴子发布线认的正门');
+      核对('主页 README 的猴子网址', 'README.md', /是猴就上100层[^|\n]*\|\s*(\S+)\s*\|/, 猴门, '猴子发布线认的正门');
+    }
+  }
+}
+
 收尾();
