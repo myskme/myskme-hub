@@ -187,9 +187,8 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
   const ms = Date.now() - t0;
   ok('单次 pacerAt（十年那头）< 120ms', ms < 120, `实测 ${ms}ms`);
 
-  /* ⑨ 新闯关榜与恢复后的 90 秒历史榜必须真正并入配速员；有资源奖励的
-        90 秒周榜与真实玩家 Boss 榜则必须排除。只测比较器不够，还要盯住
-        gfBoard 的公开榜合并条件，避免一次改 scope 让奖励榜混入虚拟条目。 */
+  /* ⑨ 配速员要进入全部公开玩法榜；90 秒周榜统一按分数排，但封榜奖励
+        只读真实 D1 行的独立 reward_rank。只测比较器不够，还要盯住合并与奖励口径。 */
   if (workerSrc) {
     const mixed = [
       { alias: '普通条目', lv: 20, stars: 60, best_score: 50000 },
@@ -202,13 +201,22 @@ export function runChecks(M, hoursNow, clientSrc, workerSrc) {
       { alias: '配速纪录', best_rush: 710000, __bot: 1 },
       { alias: '追赶纪录', best_rush: 680000 },
     ].sort((a, b) => M.gfBoardCmp('rushAll', a, b));
-    const merged = /scope\s*!==\s*["']class["']\s*&&\s*scope\s*!==\s*["']rush["']\s*&&\s*scope\s*!==\s*["']boss["']\s*&&\s*await pacersOn/.test(boardSrc)
-      && /concat\(pacerRows/.test(boardSrc)
+    const bossMixed=[
+      {alias:'真人甲',boss_score:1200000,boss_floor:8,boss_progress:3000},
+      {alias:'同行乙',boss_score:1450000,boss_floor:7,boss_progress:9000,__bot:1},
+      {alias:'真人丙',boss_score:900000,boss_floor:10,boss_progress:0},
+    ].sort((a,b)=>M.gfBoardCmp('boss',a,b));
+    const merged = /scope\s*!==\s*["']class["']\s*&&\s*await pacersOn/.test(boardSrc)
+      && /reward_rank\s*:\s*i\s*\+\s*1/.test(boardSrc)
+      && /merged\.concat\(bots\)\.sort/.test(boardSrc)
+      && /rewardRank\s*:\s*r\.reward_rank/.test(workerSrc)
+      && /scope\s*!==\s*["']boss["']\s*\|\|\s*\(r\.boss_score/.test(boardSrc)
       && /gfBoardCmp\(scope/.test(boardSrc);
-    ok('长期闯关/90 秒历史榜并入配速员，奖励周榜与 Boss 榜隔离',
+    ok('全部公开玩法榜并入配速员，90 秒统一排位且真人周奖独立不写库',
        merged
        && mixed.map(x => x.alias).join(',') === '成长条目,同关高星,普通条目'
-       && rushMixed.map(x => x.alias).join(',') === '配速纪录,追赶纪录,旧纪录');
+       && rushMixed.map(x => x.alias).join(',') === '配速纪录,追赶纪录,旧纪录'
+       && bossMixed.map(x=>x.alias).join(',')==='同行乙,真人甲,真人丙');
   }
 
   return out;

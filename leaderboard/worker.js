@@ -597,7 +597,7 @@ async function gfEnsure(env) {
        id TEXT PRIMARY KEY, changed_month TEXT NOT NULL DEFAULT '')`
   ).run();
   /* 90 秒周榜独立建表，不往事故敏感的 gemfall 主表追加列。
-     周榜只收真实设备提交；配速员继续留在长期闯关榜，不占资源奖励。 */
+     周成绩只收真实设备提交；公开周榜仍可并入配速员，但它们不占资源奖励。 */
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gf_rush_week (
        week TEXT NOT NULL, id TEXT NOT NULL, alias TEXT NOT NULL,
@@ -621,6 +621,23 @@ async function gfEnsure(env) {
     `CREATE INDEX IF NOT EXISTS idx_gf_boss_rank
        ON gf_boss_best(best_floor DESC,best_progress DESC,best_score DESC,updated_at ASC)`
   ).run();
+  await env.DB.prepare(
+    `CREATE INDEX IF NOT EXISTS idx_gf_boss_points
+       ON gf_boss_best(best_score DESC,best_floor DESC,best_progress DESC,updated_at ASC)`
+  ).run();
+  /* 旧版按无限层数排位，新版是一趟十二层、按战果积分排位。每一条旧纪录都把
+     深度折成不低于原战果的传承积分，绝不降分；标记落在 meta，整个库只换算一次。 */
+  try {
+    const done = await env.DB.prepare("SELECT v FROM meta WHERE k='gf_boss_points_v3'").first();
+    if (!done || done.v !== "1") {
+      await env.DB.batch([
+        env.DB.prepare(`UPDATE gf_boss_best
+          SET best_score=MAX(COALESCE(best_score,0),COALESCE(best_floor,0)*60000+COALESCE(best_progress,0)*6)
+          WHERE best_floor>0`),
+        env.DB.prepare("INSERT INTO meta(k,v) VALUES('gf_boss_points_v3','1') ON CONFLICT(k) DO UPDATE SET v='1'"),
+      ]);
+    }
+  } catch (e) {}
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS gf_rush_award (
        week TEXT NOT NULL, id TEXT NOT NULL, rank INTEGER NOT NULL,
@@ -915,6 +932,12 @@ function pacerRows(nowMs) {
        既不会出现第 3 关带着第 32 关人物，也不会每次刷新换人。 */
     const comps = [["wolf",1],["jun",4],["qi",10],["xi",16],["xiao",24],["zi",32]]
       .filter(([, unlock]) => st.lv >= unlock);
+    const bossScore = Math.max(0, Math.round(st.score * 7 + st.rush * .8 + st.runs * 2500 + st.days * 18000));
+    const bossFloor = bossScore > 0 ? Math.min(12, Math.max(1, Math.floor(bossScore / 170000) + 1)) : 0;
+    const bossProgress = bossFloor >= 12 ? 0 : (p.seed * 1871 + st.runs * 379 + st.days * 613) % 10000;
+    const bossBuild = ["fury:" + Math.min(5, 1 + Math.floor(st.runs / 24)),
+      "guard:" + Math.min(3, Math.floor(st.days / 3)),
+      "recovery:" + Math.min(3, Math.floor(st.runs / 30))].filter(x => !/:0$/.test(x)).join(",");
     return {
       id: "pacer:" + p.seed, alias: p.alias,
       camp: pacerCamp(i),
@@ -925,6 +948,7 @@ function pacerRows(nowMs) {
         lv: st.lv, stars: st.stars, score: st.score, rush: st.rush, chain: st.chain,
       }).join(","),
       comp: comps[p.seed % comps.length][0],
+      boss_floor: bossFloor, boss_progress: bossProgress, boss_score: bossScore, boss_build: bossBuild,
       __bot: 1,
     };
   });
@@ -955,6 +979,9 @@ function gfMap(rows) {
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
     luck: r.luck || 0,
     comp: r.comp || "",
+    /* 90 秒资源奖只认 D1 真人名次。公开名次仍按所有条目的分数统一排序，
+       客户端只拿到可领奖名次，不下发任何身份标签。 */
+    rewardRank: r.reward_rank || 0,
     tag: String(r.id || "").slice(-2),
   }));
 }
@@ -1056,12 +1083,12 @@ async function gfSubmit(req, env, origin) {
        build=excluded.build,
        comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_boss_best.comp END,
        updated_at=excluded.updated_at
-     WHERE excluded.best_floor>COALESCE(gf_boss_best.best_floor,0)
-        OR (excluded.best_floor=COALESCE(gf_boss_best.best_floor,0)
-            AND excluded.best_progress>COALESCE(gf_boss_best.best_progress,0))
-        OR (excluded.best_floor=COALESCE(gf_boss_best.best_floor,0)
-            AND excluded.best_progress=COALESCE(gf_boss_best.best_progress,0)
-            AND excluded.best_score>COALESCE(gf_boss_best.best_score,0))`
+     WHERE excluded.best_score>COALESCE(gf_boss_best.best_score,0)
+        OR (excluded.best_score=COALESCE(gf_boss_best.best_score,0)
+            AND excluded.best_floor>COALESCE(gf_boss_best.best_floor,0))
+        OR (excluded.best_score=COALESCE(gf_boss_best.best_score,0)
+            AND excluded.best_floor=COALESCE(gf_boss_best.best_floor,0)
+            AND excluded.best_progress>COALESCE(gf_boss_best.best_progress,0))`
   ).bind(id, boss.floor, boss.progress, boss.score, boss.build, boss.comp || comp, now).run();
   /* 统计列各自取 MAX 之后，power/段位/徽章必须基于合并后的那一行重算：
      两次提交各有所长（A 星多、B 分高）时，直接 MAX 两个旧合成值会低报；
@@ -1172,9 +1199,9 @@ function gfBoardCmp(scope, a, b) {
     || (b.stars || 0) - (a.stars || 0)
     || (b.best_score || 0) - (a.best_score || 0)
     || String(a.alias).localeCompare(String(b.alias));
-  if (scope === "boss") return (b.boss_floor || 0) - (a.boss_floor || 0)
+  if (scope === "boss") return (b.boss_score || 0) - (a.boss_score || 0)
+    || (b.boss_floor || 0) - (a.boss_floor || 0)
     || (b.boss_progress || 0) - (a.boss_progress || 0)
-    || (b.boss_score || 0) - (a.boss_score || 0)
     || (a.updated_at || 0) - (b.updated_at || 0)
     || String(a.alias).localeCompare(String(b.alias));
   const key = (scope === "rush" || scope === "rushAll") ? "best_rush" : "power";
@@ -1223,7 +1250,7 @@ async function gfBoard(req, env, origin, url) {
               b.best_score AS boss_score,b.build AS boss_build,b.updated_at
          FROM gf_boss_best b JOIN gemfall g ON g.id=b.id
         WHERE g.hidden=0 AND b.best_floor>0
-        ORDER BY b.best_floor DESC,b.best_progress DESC,b.best_score DESC,
+        ORDER BY b.best_score DESC,b.best_floor DESC,b.best_progress DESC,
                  b.updated_at ASC,g.alias ASC LIMIT ?`
     ).bind(limit).all();
   } else if (scope === "depth") {
@@ -1243,15 +1270,23 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 ORDER BY power DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   }
-  /* 配速员并进无资源奖励的长期公开榜（含恢复后的 90 秒历史榜），
-     不进带口令的历史私榜、90 秒周榜与 Boss 真人榜。 */
+  /* 配速员进入全部公开玩法榜；私榜仍隔离。90 秒周奖只按真实 D1 行封榜，
+     配速员不写库、不领匣，也不会改变任何真人已经取得的奖励。先给真人行记下
+     独立奖励名次，再统一按分数混排，避免周初出现低分压在高分上面的假榜。 */
   let merged = rows.results || [];
-  if (scope !== "class" && scope !== "rush" && scope !== "boss" && await pacersOn(env)) {
-    merged = merged.concat(pacerRows(Date.now()))
-      .filter(r => scope !== "rushAll" || (r.best_rush || 0) > 0)
+  if(scope==="rush")merged=merged.map((r,i)=>Object.assign({},r,{reward_rank:i+1}));
+  if (scope !== "class" && await pacersOn(env)) {
+    let bots=pacerRows(Date.now()).map(r=>Object.assign({},r));
+    if(scope==="rush"){
+      const week=gfRushWeekKey(Date.now());
+      bots=bots.map(r=>{const q=.80+pacerRnd((parseInt(String(r.id).split(':')[1],10)||1)+(parseInt(week,10)||0))()*.17;return Object.assign({},r,{best_rush:Math.round((r.best_rush||0)*q)})});
+    }
+    bots=bots.filter(r => scope !== "rushAll" || (r.best_rush || 0) > 0)
+      .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "depth" || (r.lv || 0) > 0)
-      .sort((a, b) => gfBoardCmp(scope, a, b))
-      .slice(0, limit);
+      .filter(r => scope !== "boss" || (r.boss_score || 0) > 0)
+      .sort((a,b)=>gfBoardCmp(scope,a,b));
+    merged=merged.concat(bots).sort((a,b)=>gfBoardCmp(scope,a,b)).slice(0,limit);
   }
   const week = scope === "rush" ? gfRushWeekKey(Date.now()) : "";
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged),
