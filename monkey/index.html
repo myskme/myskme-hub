@@ -2,11 +2,11 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。支持单人闯高与 2–6 人同机公平赛。">
-<meta name="myskme-release" content="20260812.6-monkey-100-party-pwa">
+<meta name="myskme-release" content="20260812.7-monkey-surprise-share-cool">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -24,12 +24,12 @@
 <!--
   《是猴就上100层》完整内容清单
   部门楼层：大堂、质检部、传真科、房租稽查科、驯猴办、冗余检查科、黑化肥仓库、谜题管理局、绕口令办、观景台、标点维修科、加盖工程部。
-  惊喜事件：审讫满屏章、驴探头、低重力、横风、百层倒班、传真雨、电梯误弹；单局最多 6 次。
+  惊喜事件：七类大事件、十二类可发现小意外、随机海报稀有版与隐藏彩蛋。
   声音系统：自适应手绘玩具爵士、分层编曲、事件音标与全声/仅音效/静音三档。
   复玩系统：轮值任务、档案章、四套开工装备、香蕉磁铁、回形针批文、减免券与电梯欠条。
   死亡台词：18 条，抽取时防连续重复。
   称号分档：5 档。
-  技术约束：首页单文件可独立运行、零第三方依赖、PWA 渐进增强、触屏与键盘双支持、localStorage 防护、iPhone 竖屏优先。
+  技术约束：核心游戏单文件可运行、本地 MIT 二维码模块、PWA 渐进增强、触屏与键盘双支持、安卓宽虚拟视口兜底、智能省电调度。
 -->
 <style>
 :root{
@@ -48,6 +48,7 @@ button{font:inherit;color:inherit}
   radial-gradient(circle at 16% 20%,rgba(255,255,255,.34),transparent 26%),#d9ccb1}
 #gameShell{position:relative;width:min(100vw,460px);height:min(100svh,844px);overflow:hidden;background:var(--paper);
   border-inline:3px solid var(--ink);box-shadow:0 0 0 1px rgba(255,255,255,.3),0 16px 50px rgba(40,33,26,.24)}
+html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1));transform-origin:center;will-change:transform}
 #stage{position:absolute;inset:0;width:100%;height:100%;display:block;background:var(--paper)}
 .paper-dots{opacity:.48;mix-blend-mode:multiply}
 .cloud{animation:cloudDrift 18s linear infinite;opacity:.48}
@@ -233,10 +234,10 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .rank-form{display:grid;grid-template-columns:1fr auto;gap:7px}.rank-input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;
   background:var(--card);padding:9px 10px;font:900 13px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
 .rank-save{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);padding:8px 12px;font-weight:1000;cursor:pointer}
-#leaderboardScreen,#choiceScreen,#partySetupScreen,#partyHandoffScreen,#partyScoreScreen,#installScreen{z-index:76}
-#leaderboardScreen .card,#choiceScreen .card,#partySetupScreen .card,#partyHandoffScreen .card,#partyScoreScreen .card,#installScreen .card{max-height:100%;overflow:auto}
-#partySetupScreen .card,#partyHandoffScreen .card,#partyScoreScreen .card,#installScreen .card{padding-top:32px}
-#partySetupScreen .notice-no,#partyHandoffScreen .notice-no,#partyScoreScreen .notice-no,#installScreen .notice-no{top:7px;right:12px}
+#leaderboardScreen,#choiceScreen,#partySetupScreen,#partyHandoffScreen,#partyScoreScreen,#installScreen,#shareScreen{z-index:76}
+#leaderboardScreen .card,#choiceScreen .card,#partySetupScreen .card,#partyHandoffScreen .card,#partyScoreScreen .card,#installScreen .card,#shareScreen .card{max-height:100%;overflow:auto}
+#partySetupScreen .card,#partyHandoffScreen .card,#partyScoreScreen .card,#installScreen .card,#shareScreen .card{padding-top:32px}
+#partySetupScreen .notice-no,#partyHandoffScreen .notice-no,#partyScoreScreen .notice-no,#installScreen .notice-no,#shareScreen .notice-no{top:7px;right:12px}
 .screen-title{text-align:center;font-family:var(--serif);font-size:28px;margin:3px 0 4px}.screen-note{text-align:center;color:var(--muted);font-size:10px;font-weight:800;margin:0 0 12px}
 .rank-list{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:rank}
 .rank-list li{counter-increment:rank;display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:7px;padding:8px 9px;
@@ -257,6 +258,9 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .party-result-callout{padding:10px;border:2px solid var(--ink);border-radius:12px;background:#dff3ef;text-align:center;margin-bottom:10px}.party-result-callout b{font-size:22px}.party-result-callout span{display:block;font-size:9px;color:var(--muted);font-weight:900;margin-top:2px}
 .party-table{display:grid;gap:6px;margin:10px 0 12px}.party-row{display:grid;grid-template-columns:24px 25px 1fr auto;align-items:center;gap:6px;padding:7px 8px;border:2px solid var(--ink);border-radius:11px;background:#f4ead3;font-size:10px}.party-row.current{background:#fff0af}.party-row.winner{background:#dff3ef}.party-row .rank{font-weight:1000;text-align:center}.party-row b{font-size:12px}.party-row small{display:block;font-size:8px;color:var(--muted);margin-top:2px}.party-row .total{text-align:right;font-size:14px;font-weight:1000;font-variant-numeric:tabular-nums}
 .install-steps{margin:12px 0;padding-left:20px;font-size:11px;line-height:1.75;color:var(--muted);font-weight:800}.install-icon{width:92px;height:92px;display:block;margin:4px auto 10px;border:3px solid var(--ink);border-radius:23px;box-shadow:var(--shadow)}
+.share-card{width:100%;max-height:min(54svh,520px);object-fit:contain;display:block;margin:6px auto 10px;border:3px solid var(--ink);border-radius:13px;background:#efe1c5;box-shadow:var(--shadow);touch-action:auto;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
+.share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.share-actions .btn{margin:0;padding:10px 7px;font-size:10px;letter-spacing:.03em}
+.share-hint{font-size:9px;line-height:1.55;color:var(--muted);font-weight:900;text-align:center;margin:0 0 10px}
 .party-hud{display:none}.party-running .party-hud{display:inline}.party-running .solo-hud{display:none}
 #splash{position:absolute;z-index:100;inset:0;background:var(--paper);display:grid;place-items:center;cursor:pointer;transition:opacity .28s,visibility .28s}
 #splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
@@ -277,6 +281,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 @keyframes confetti{to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
 .shake{animation:shake .38s ease}
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+#gameShell:not(.running) .cloud,#gameShell:not(.running) #bubbleField circle,#gameShell:not(.running) #fogField path{animation-play-state:paused!important}
 @media(max-height:680px){.title-art{width:86px;height:76px}.brief{margin-bottom:8px;padding:7px 9px;line-height:1.45}.card{padding:15px}h1{font-size:26px}.subtitle{margin-bottom:8px}.career,.mission-card,.kit-grid{margin-bottom:7px}}
 @media(min-width:700px){#gameShell{border:3px solid var(--ink);border-radius:22px}.screen{border-radius:18px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.cloud,.title-art,#bubbleField circle{animation-duration:1ms!important;animation-iteration-count:1!important}}
@@ -532,7 +537,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
         <div class="rank-entry"><label for="rankName">把本局写进本机榜单。姓名可真可假，分数较真。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="8" value="猴先生" aria-label="榜单姓名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
         <button id="restartButton" class="btn">再来一局，继续冲100层</button>
         <button id="resultLeaderboardButton" class="btn secondary">查看本机坠楼榜</button>
-        <button id="copyButton" class="btn secondary">复制本局坠落报告</button>
+        <button id="copyButton" class="btn secondary">生成带二维码的成绩海报</button>
       </div>
     </section>
 
@@ -606,6 +611,18 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
       </div>
     </section>
 
+    <section id="shareScreen" class="screen hidden" aria-label="成绩海报分享">
+      <div class="card">
+        <span id="shareRarity" class="notice-no">随机版式抽取中</span>
+        <h2 class="screen-title">本局成绩海报</h2>
+        <p id="shareNote" class="screen-note">图片带本局印记与游戏二维码，每次生成还可能换版。</p>
+        <img id="shareCardImage" class="share-card" alt="是猴就上100层本局成绩海报">
+        <p class="share-hint">手机可点“分享图片”；若浏览器不支持，长按上图保存。二维码直达正版游戏。</p>
+        <div class="share-actions"><button id="shareImageButton" class="btn">分享图片</button><button id="rerollPosterButton" class="btn teal">再抽一个版式</button></div>
+        <button id="shareCloseButton" class="btn secondary">收好海报</button>
+      </div>
+    </section>
+
     <section id="splash" aria-label="MYSKME 厂牌开场">
       <div class="logo"><div class="logo-letters"><i>M</i><i>Y</i><i>S</i><i>K</i><i>M</i><i>E</i></div><small>PRESENTS</small>
         <svg class="splash-monkey" viewBox="0 0 100 116"><use href="#art-monkey-rise"/></svg>
@@ -614,6 +631,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
     <pre id="qaReport"></pre>
   </main>
 </div>
+<script src="./vendor/qrcode-generator.js"></script>
 <script>
 'use strict';
 // 游戏脚本由下方模块化区段组成：数据、音效、生成、物理、渲染、界面、质检。
@@ -621,18 +639,28 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260812.6-monkey-100-party-pwa',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260812.7-monkey-surprise-share-cool',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
-const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',PARTY_QA=TEST_PARAMS.get('partyqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||PARTY_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
+const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',PARTY_QA=TEST_PARAMS.get('partyqa')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||PARTY_QA||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
+function syncViewportMode(){
+  const touchLike=WIDE_QA||navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
+  const widePortrait=touchLike&&innerWidth>=600&&innerHeight/innerWidth>=1.45;
+  const scale=widePortrait?Math.max(1,Math.min(2.45,(innerWidth-20)/460,(innerHeight-20)/844)):1;
+  document.documentElement.classList.toggle('wide-mobile-viewport',widePortrait);
+  document.documentElement.style.setProperty('--wide-mobile-scale',scale.toFixed(4));
+  document.documentElement.dataset.wideMobile=String(widePortrait);
+  document.documentElement.dataset.shellScale=scale.toFixed(3);
+}
+syncViewportMode();window.addEventListener('resize',syncViewportMode,{passive:true});if(window.visualViewport)visualViewport.addEventListener('resize',syncViewportMode,{passive:true});
 const el={
   shell:$('gameShell'),stage:$('stage'),platformLayer:$('platformLayer'),itemLayer:$('itemLayer'),playerGroup:$('playerGroup'),motion:$('monkeyMotion'),monkey:$('monkeyUse'),wrapLeft:$('playerWrapLeft'),wrapRight:$('playerWrapRight'),wrapLeftMotion:$('monkeyWrapLeftMotion'),wrapRightMotion:$('monkeyWrapRightMotion'),wrapLeftUse:$('monkeyWrapLeftUse'),wrapRightUse:$('monkeyWrapRightUse'),
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
   bg:$('bgMood'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
-  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),partySetup:$('partySetupScreen'),partyHandoff:$('partyHandoffScreen'),partyScore:$('partyScoreScreen'),install:$('installScreen'),splash:$('splash'),
+  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),partySetup:$('partySetupScreen'),partyHandoff:$('partyHandoffScreen'),partyScore:$('partyScoreScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
   start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),
   partyOpen:$('partyButton'),partyResume:$('resumePartyButton'),partyCount:$('partyCount'),partyRounds:$('partyRounds'),partyTime:$('partyTime'),partyNames:$('partyNames'),partyEstimate:$('partyEstimate'),partyStart:$('partyStartButton'),partySetupBack:$('partySetupBackButton'),partyReady:$('partyReadyButton'),partyPause:$('partyPauseButton'),partyNext:$('partyNextButton'),partyScoreHome:$('partyScoreHomeButton'),partyTable:$('partyTable'),partyLast:$('partyLastResult'),
-  installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote')
+  installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
 };
 
 const DEPARTMENTS=[
@@ -672,6 +700,39 @@ const TITLES=[
   {min:1800,name:'MYSKME 高处工作人员'},{min:3000,name:'永久加盖工程总监'}
 ];
 const MILESTONES=[300,500,1500,3000];
+const SECRET_METERS=[
+  {at:404,text:'404 米：本层不存在，但猴先生已经路过。'},
+  {at:555,text:'555 米：楼梯使用见习猴获得五秒钟正式编制。'},
+  {at:888,text:'888 米：财务祝你发财，然后收回了祝福。'},
+  {at:1314,text:'1314 米：驴表示这段路有点长。'},
+  {at:2026,text:'2026 米：加盖工程部发现年份也能当楼层。'}
+];
+const SURPRISES=[
+  {id:'bonus11',rarity:'普通意外',text:'财务多按了一次加号。+11 分。',kind:'bonus'},
+  {id:'banana',rarity:'普通意外',text:'一根香蕉主动补办了入职。+1 香蕉。',kind:'banana'},
+  {id:'lift',rarity:'少见意外',text:'楼梯突然打了个喷嚏，把猴先生顶高了一小下。',kind:'lift'},
+  {id:'wide',rarity:'少见意外',text:'质检部暂时眯眼五秒，落脚变宽。',kind:'wide'},
+  {id:'gold',rarity:'少见意外',text:'误盖金章：猴先生短暂看起来很贵。',kind:'gold'},
+  {id:'quiet',rarity:'稀有意外',text:'全楼安静了两秒，因为没人知道下一句。',kind:'quiet'},
+  {id:'refund',rarity:'稀有意外',text:'房租稽查科第一次退款。虽然只有 18 分。',kind:'refund'},
+  {id:'fish',rarity:'稀有意外',text:'鱼小姐把一个备用泡泡藏进了档案袋。',kind:'fish'},
+  {id:'overtime',rarity:'少见意外',text:'多人赛收到三秒加班；单猴赛收到十三分。',kind:'overtime'},
+  {id:'confetti',rarity:'普通意外',text:'没有原因。突然庆祝。',kind:'confetti'},
+  {id:'platform',rarity:'稀有意外',text:'空气临时被认定为平台，保质三秒。',kind:'platform'},
+  {id:'secret',rarity:'极怪意外',text:'谈话人来过。只留下一个问号和 52 分。',kind:'secret'}
+];
+const POSTER_RANKS=[
+  {min:0,name:'门口观察猴'},{min:30,name:'楼梯试用猴'},{min:60,name:'半层代理员'},{min:100,name:'百层猴王'},
+  {min:200,name:'高处编制外'},{min:400,name:'加盖总监'},{min:700,name:'楼上那个人'}
+];
+const POSTER_VARIANTS=[
+  {id:'paper',upto:.42,rarity:'普通公示版',accent:'#e0452c',paper:'#fffaf0',ink:'#28211a',line:'本海报看起来比较守规矩，仅限本次。'},
+  {id:'fish',upto:.65,rarity:'少见鱼批版',accent:'#1f9e8e',paper:'#e5f5ef',ink:'#23433d',line:'鱼小姐看过一眼，形成了一点看法。'},
+  {id:'banana',upto:.82,rarity:'稀有香蕉版',accent:'#e0a21c',paper:'#fff2b8',ink:'#332510',line:'香蕉负责发光，分数负责较真。'},
+  {id:'purple',upto:.92,rarity:'史诗谜题版',accent:'#7d61cf',paper:'#eee8ff',ink:'#2e2745',line:'海报是真的，顶楼仍是一个谜。'},
+  {id:'night',upto:.975,rarity:'特批夜班版',accent:'#f1bd3c',paper:'#25211c',ink:'#fff4d5',line:'夜班已开始。加盖工程部拒绝关灯。'},
+  {id:'odd',upto:1,rarity:'极怪隐藏版',accent:'#e0452c',paper:'#dff3ef',ink:'#28211a',line:'谈话人可能藏在二维码后面。也可能没有。'}
+];
 const TONGUE_PACKS=[
   {title:'红鲤鱼、绿鲤鱼、驴',words:['红鲤鱼','绿鲤鱼','驴']},
   {title:'黑化肥发灰，灰化肥挥发',words:['黑化肥','发灰','灰化肥','挥发']},
@@ -725,7 +786,8 @@ const PARTY_COLORS=['#f5b731','#78c8b8','#f2a994','#a99ae0','#9acb79','#e6a3c0']
 const PARTY_TIMES=[45,75,105];
 const PARTY_DEFAULTS=['猴一','猴二','猴三','猴四','猴五','猴六'];
 
-let audioCtx=null,audioMode=loadAudioMode(),audioGraph=null,musicActive=false,musicTimer=0,musicNext=0,musicStepIndex=0,lastFrame=performance.now();
+let audioCtx=null,audioMode=loadAudioMode(),audioGraph=null,musicActive=false,musicTimer=0,musicNext=0,musicStepIndex=0,lastFrame=performance.now(),lastRenderedFrame=0,audioSuspendTimer=0;
+const FRAME_INTERVAL=(WIDE_QA||navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches)?20:16,MUSIC_TICK_MS=70,MUSIC_LOOKAHEAD=.3,REVERB_SECONDS=.56;
 let platformEls=new Map(),itemEls=new Map(),lastDeathIndex=-1,lastSloganIndex=-1,lastPose='';
 let lastToolSignature='__unset__';
 const playerMotions=[el.motion,el.wrapLeftMotion,el.wrapRightMotion];
@@ -744,7 +806,8 @@ const state={running:false,over:false,mode:'solo',seed:1,rng:Math.random,player:
   animationFrame:0,pausedAt:0,flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
   perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
-  mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',partyEndsAt:0,partyReason:'fall'};
+  mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',partyEndsAt:0,partyReason:'fall',
+  surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
 
 function loadRecord(){
   try{return {height:Number(localStorage.getItem('myskme_monkey_upstairs_height'))||0,score:Number(localStorage.getItem('myskme_monkey_upstairs_score'))||0};}
@@ -767,8 +830,8 @@ function loadBoard(){
 }
 function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',JSON.stringify(localBoard.slice(0,30)));}catch(_){}}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare'};}
-  catch(_){return {stamps:0,runs:0,kit:'bare'};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[]};}
+  catch(_){return {stamps:0,runs:0,kit:'bare',surprises:[]};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
 function loadAudioMode(){try{const mode=localStorage.getItem('myskme_monkey_audio_v1');return ['full','sfx','off'].includes(mode)?mode:'full';}catch(_){return 'full';}}
@@ -812,7 +875,7 @@ function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`完成轮值可得档案章 · 已上班 ${career.runs} 局`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 意外图鉴 ${career.surprises.length}/${SURPRISES.length}`;
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
   if(!unlockedKit(career.kit))career.kit='bare';
   for(const kit of KITS){const b=document.createElement('button'),open=unlockedKit(kit.id);b.className=`kit-card${career.kit===kit.id?' selected':''}`;b.disabled=!open;b.innerHTML=`${kit.name}<small>${open?kit.line:`需 ${kit.cost} 枚章`}</small>`;b.addEventListener('click',()=>selectKit(kit.id));el.kitGrid.appendChild(b);}
@@ -841,20 +904,22 @@ function departmentIdAt(meters){
 function unlockAudio(){
   if(audioMode==='off')return;
   try{
+    if(audioSuspendTimer)clearTimeout(audioSuspendTimer),audioSuspendTimer=0;
     if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)();buildAudioGraph();}
     if(audioCtx.state==='suspended')audioCtx.resume();
     if(state.running&&audioMode==='full')startMusic();
+    if(!state.running)scheduleAudioSuspend(900);
   }catch(_){}
 }
 function buildAudioGraph(){
-  const master=audioCtx.createGain(),music=audioCtx.createGain(),effects=audioCtx.createGain(),dry=audioCtx.createGain(),wet=audioCtx.createGain(),reverb=audioCtx.createConvolver(),compressor=audioCtx.createDynamicsCompressor();
-  master.gain.value=.76;music.gain.value=.19;effects.gain.value=.72;dry.gain.value=1;wet.gain.value=.13;
-  compressor.threshold.value=-20;compressor.knee.value=18;compressor.ratio.value=7;compressor.attack.value=.004;compressor.release.value=.22;
-  const length=Math.floor(audioCtx.sampleRate*1.15),impulse=audioCtx.createBuffer(2,length,audioCtx.sampleRate);
-  for(let c=0;c<2;c++){const data=impulse.getChannelData(c);for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/length,2.8);}
-  reverb.buffer=impulse;music.connect(dry);effects.connect(dry);music.connect(reverb);effects.connect(reverb);reverb.connect(wet);dry.connect(master);wet.connect(master);master.connect(compressor);compressor.connect(audioCtx.destination);
+  const master=audioCtx.createGain(),music=audioCtx.createGain(),effects=audioCtx.createGain(),dry=audioCtx.createGain(),wet=audioCtx.createGain(),output=audioCtx.createGain(),reverb=audioCtx.createConvolver(),compressor=audioCtx.createDynamicsCompressor();
+  master.gain.value=.6;music.gain.value=.18;effects.gain.value=.58;dry.gain.value=.94;wet.gain.value=.07;output.gain.value=.86;
+  compressor.threshold.value=-18;compressor.knee.value=30;compressor.ratio.value=12;compressor.attack.value=.003;compressor.release.value=.28;
+  const length=Math.floor(audioCtx.sampleRate*REVERB_SECONDS),impulse=audioCtx.createBuffer(1,length,audioCtx.sampleRate);
+  const impulseData=impulse.getChannelData(0);for(let i=0;i<length;i++)impulseData[i]=(Math.random()*2-1)*Math.pow(1-i/length,3.2);
+  reverb.buffer=impulse;music.connect(dry);effects.connect(dry);music.connect(reverb);effects.connect(reverb);reverb.connect(wet);dry.connect(master);wet.connect(master);master.connect(compressor);compressor.connect(output);output.connect(audioCtx.destination);
   const noise=audioCtx.createBuffer(1,Math.floor(audioCtx.sampleRate*.9),audioCtx.sampleRate),channel=noise.getChannelData(0);for(let i=0;i<channel.length;i++)channel[i]=Math.random()*2-1;
-  audioGraph={master,music,effects,noise,scheduled:0};
+  audioGraph={master,music,effects,output,compressor,noise,scheduled:0};
 }
 function connectPan(node,pan=0){
   if(audioCtx.createStereoPanner){const p=audioCtx.createStereoPanner();p.pan.value=clamp(pan,-1,1);node.connect(p);return p;}return node;
@@ -864,11 +929,11 @@ function synth(freq,duration=.12,type='sine',gain=.04,delay=0,options={}){
   const t=audioCtx.currentTime+delay,bus=options.music?audioGraph.music:audioGraph.effects,o=audioCtx.createOscillator(),filter=audioCtx.createBiquadFilter(),g=audioCtx.createGain();
   o.type=type;o.frequency.setValueAtTime(Math.max(24,freq),t);if(options.slide)o.frequency.exponentialRampToValueAtTime(Math.max(24,options.slide),t+duration);if(options.detune)o.detune.value=options.detune;
   filter.type=options.filterType||'lowpass';filter.frequency.value=options.filter||6800;filter.Q.value=options.q||.5;
-  const attack=options.attack??.008,hold=Math.max(t+attack+.004,t+duration*(options.hold??.42));g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,gain),t+attack);g.gain.setValueAtTime(Math.max(.0002,gain*.82),hold);g.gain.exponentialRampToValueAtTime(.0001,t+duration);
+  gain=Math.min(.068,Math.max(.0002,gain));const attack=Math.max(.006,options.attack??.011),hold=Math.max(t+attack+.004,t+duration*(options.hold??.42));g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+attack);g.gain.setValueAtTime(Math.max(.0002,gain*.78),hold);g.gain.exponentialRampToValueAtTime(.0001,t+duration);
   o.connect(filter);filter.connect(g);connectPan(g,options.pan||0).connect(bus);o.start(t);o.stop(t+duration+.03);audioGraph.scheduled++;
 }
 function noiseHit(duration=.08,gain=.035,delay=0,filter=4500,pan=0,music=false){
-  if(audioMode==='off'||!audioCtx||!audioGraph)return;const t=audioCtx.currentTime+delay,src=audioCtx.createBufferSource(),f=audioCtx.createBiquadFilter(),g=audioCtx.createGain();src.buffer=audioGraph.noise;f.type=filter<1200?'lowpass':'highpass';f.frequency.value=filter;g.gain.setValueAtTime(Math.max(.0002,gain),t);g.gain.exponentialRampToValueAtTime(.0001,t+duration);src.connect(f);f.connect(g);connectPan(g,pan).connect(music?audioGraph.music:audioGraph.effects);src.start(t);src.stop(t+duration+.02);audioGraph.scheduled++;
+  if(audioMode==='off'||!audioCtx||!audioGraph)return;const t=audioCtx.currentTime+delay,src=audioCtx.createBufferSource(),f=audioCtx.createBiquadFilter(),g=audioCtx.createGain(),attack=Math.min(.006,duration*.3);src.buffer=audioGraph.noise;f.type=filter<1200?'lowpass':'highpass';f.frequency.value=Math.min(6200,filter);gain=Math.min(.055,Math.max(.0002,gain));g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(gain,t+attack);g.gain.exponentialRampToValueAtTime(.0001,t+duration);src.connect(f);f.connect(g);connectPan(g,pan).connect(music?audioGraph.music:audioGraph.effects);src.start(t);src.stop(t+duration+.02);audioGraph.scheduled++;
 }
 function midi(n){return 440*Math.pow(2,(n-69)/12);}
 function toyMallet(note,t,gain=.04,pan=0){const delay=t-audioCtx.currentTime;synth(midi(note),.36,'sine',gain,delay,{music:true,filter:3200,pan});synth(midi(note)*2.01,.13,'triangle',gain*.24,delay,{music:true,filter:4800,pan,detune:3});}
@@ -888,13 +953,16 @@ function scheduleMusicStep(step,t){
   return beat/2*(s%2===0?1.12:.88);
 }
 function musicTick(){
-  if(!audioCtx||audioMode!=='full'||!musicActive||!state.running)return;if(musicNext<audioCtx.currentTime-.24)musicNext=audioCtx.currentTime+.04;while(musicNext<audioCtx.currentTime+.18){const duration=scheduleMusicStep(musicStepIndex++,musicNext)||.27;musicNext+=duration;}
+  if(!audioCtx||audioMode!=='full'||!musicActive||!state.running)return;if(musicNext<audioCtx.currentTime-.24)musicNext=audioCtx.currentTime+.04;while(musicNext<audioCtx.currentTime+MUSIC_LOOKAHEAD){const duration=scheduleMusicStep(musicStepIndex++,musicNext)||.27;musicNext+=duration;}
 }
 function startMusic(){
-  if(audioMode!=='full'||!audioCtx||!audioGraph||musicActive)return;musicActive=true;musicStepIndex=0;musicNext=audioCtx.currentTime+.06;audioGraph.music.gain.cancelScheduledValues(audioCtx.currentTime);audioGraph.music.gain.setTargetAtTime(.2,audioCtx.currentTime,.16);musicTimer=setInterval(musicTick,25);
+  if(audioMode!=='full'||!audioCtx||!audioGraph||musicActive)return;musicActive=true;musicStepIndex=0;musicNext=audioCtx.currentTime+.06;audioGraph.music.gain.cancelScheduledValues(audioCtx.currentTime);audioGraph.music.gain.setTargetAtTime(.19,audioCtx.currentTime,.16);musicTick();musicTimer=setInterval(musicTick,MUSIC_TICK_MS);
 }
 function stopMusic(fade=.16){
   if(musicTimer)clearInterval(musicTimer);musicTimer=0;musicActive=false;if(audioCtx&&audioGraph){audioGraph.music.gain.cancelScheduledValues(audioCtx.currentTime);audioGraph.music.gain.setTargetAtTime(.0001,audioCtx.currentTime,fade);}
+}
+function scheduleAudioSuspend(delay=1000){
+  if(audioSuspendTimer)clearTimeout(audioSuspendTimer);audioSuspendTimer=setTimeout(()=>{audioSuspendTimer=0;if(!state.running&&audioCtx&&audioCtx.state==='running')audioCtx.suspend().catch(()=>{});},delay);
 }
 function setAudioMode(mode,activate=true){
   audioMode=mode;saveAudioMode();el.sound.textContent=mode==='full'?'乐＋效':mode==='sfx'?'仅音效':'静音';el.sound.setAttribute('aria-label',mode==='full'?'音乐与音效已开启':mode==='sfx'?'仅音效已开启':'声音已关闭');
@@ -905,11 +973,11 @@ function cycleAudioMode(){setAudioMode(audioMode==='full'?'sfx':audioMode==='sfx
 function sfx(kind){
   if(audioMode==='off'||!audioCtx)return;
   if(kind==='jump'){synth(165,.055,'triangle',.025,0,{slide:235,filter:1300});noiseHit(.025,.008,0,3500);}
-  if(kind==='boost'){synth(180,.18,'sawtooth',.032,0,{slide:620,filter:1700});synth(760,.12,'sine',.024,.09,{slide:1040,filter:3200});}
+  if(kind==='boost'){synth(180,.18,'triangle',.03,0,{slide:620,filter:1600});synth(760,.12,'sine',.021,.09,{slide:1040,filter:3000});}
   if(kind==='banana'){[0,4,9].forEach((n,i)=>synth(midi(72+n),.15,'sine',.035-i*.006,i*.045,{filter:4600,pan:(i-1)*.28}));}
   if(kind==='break'){noiseHit(.16,.06,0,420);synth(145,.14,'square',.024,0,{slide:63,filter:650});}
   if(kind==='stamp'){noiseHit(.07,.045,0,380);synth(86,.16,'sine',.06,0,{slide:58,filter:170});synth(121,.08,'square',.02,.025,{filter:420});}
-  if(kind==='fall'){synth(310,.48,'sawtooth',.03,0,{slide:64,filter:1100});noiseHit(.27,.025,.18,480);}
+  if(kind==='fall'){synth(310,.48,'triangle',.027,0,{slide:64,filter:1000});noiseHit(.27,.021,.18,480);}
   if(kind==='warning'){[0,.13,.26].forEach((d,i)=>synth(220-i*42,.12,'triangle',.025,d,{filter:900}));}
   if(kind==='quiet'){[69,76,81,88].forEach((n,i)=>synth(midi(n),.3,'sine',.022,i*.1,{filter:3400,pan:(i-1.5)*.2}));}
   if(kind==='tool'){synth(410,.09,'triangle',.035,0,{slide:590,filter:1800});synth(880,.16,'sine',.025,.07,{filter:3600});}
@@ -917,6 +985,8 @@ function sfx(kind){
   if(kind==='mission'){[67,71,74,79].forEach((n,i)=>synth(midi(n),.22,'triangle',.025,i*.07,{filter:2600,pan:(i-1.5)*.2}));}
   if(kind==='fax'){noiseHit(.12,.025,0,2600);synth(980,.045,'square',.012,.02,{filter:1800});}
   if(kind==='elevator'){synth(82,.32,'sine',.04,0,{slide:246,filter:600});synth(659,.18,'sine',.028,.24,{filter:2600});}
+  if(kind==='rescue'){synth(196,.28,'sine',.03,0,{slide:520,filter:1800});synth(784,.22,'sine',.02,.11,{slide:1040,filter:3000});}
+  if(kind==='surprise'){[74,78,81].forEach((n,i)=>synth(midi(n),.13,'sine',.02-i*.002,i*.045,{filter:2800,pan:(i-1)*.2}));}
 }
 
 function resetWorld(seed=Date.now()&0xffffffff){
@@ -932,6 +1002,7 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.runId=makeRunId();state.rankSubmitted=false;state.lastSafe={x:DEBUG_X,y:baseY};state.playerRepairs=0;state.faxRainUntil=0;
   state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
   state.mission=state.mode==='party'?null:(MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun());state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=state.mode==='party'?'bare':(unlockedKit(career.kit)?career.kit:'bare');
+  state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
   state.over=false;platformSeq=0;itemSeq=0;lastPose='';
   platformEls.forEach(node=>node.remove());platformEls.clear();itemEls.forEach(node=>node.remove());itemEls.clear();
@@ -1183,12 +1254,13 @@ function updatePhysics(dt,now){
 }
 function rescueOrEnd(now){
   const pl=state.player;
-  if(state.stressMode){pl.y=state.cameraY+120;pl.vy=840;pl.vx*=.25;state.stressRescues++;return;}
+  if(state.stressMode){pl.y=state.cameraY+210;pl.vy=960;pl.vx*=.2;state.stressRescues++;return;}
   if(pl.bubble){
-    pl.bubble=false;pl.y=state.cameraY+105;pl.vy=850;pl.vx*=.35;
+    pl.bubble=false;pl.y=state.cameraY+210;pl.vy=960;pl.vx*=.2;state.rescueLift=105;
+    const pad=addPlatform({x:clamp(pl.x-68,6,W-142),y:state.cameraY+158,w:136,type:'bubble',dept:state.deptId,solid:true,expireAt:now+3300,label:''});state.lastSafe={x:clamp(pl.x,pad.x+10,pad.x+pad.w-10),y:pad.y};
     const sy=H-(pl.y-state.cameraY)-80;el.rescue.style.left=`${clamp(pl.x-56,4,W-116)}px`;el.rescue.style.top=`${clamp(sy,110,H-150)}px`;
     el.rescue.classList.remove('show');void el.rescue.offsetWidth;el.rescue.classList.add('show');
-    toast('鱼小姐觉得你可以回头重来一次。','teal');sfx('quiet');return;
+    toast('鱼小姐把猴先生顶高约 20 米，还留下三秒救生泡泡台。','teal');sfx('rescue');return;
   }
   if(pl.waiver>0){pl.waiver--;pl.y=state.cameraY+115;pl.vy=820;pl.vx*=.4;toast('本券本不减免任何坠落，但今天心情好。','gold');return;}
   if(!state.deathFreezeUntil){state.deathFreezeUntil=now+240;pl.y=state.cameraY+72;pl.vx=0;pl.vy=0;for(const node of playerMotions)node.classList.add('doomed');restorePlayerVisual();sfx('warning');return;}
@@ -1210,6 +1282,32 @@ function updateDepartment(force=false,announce=true){
   if(idx>=FIXED_ORDER.length||id==='construction')setTimeout(()=>{if(state.running)toast('顶楼？不。MYSKME 今早又加盖了一层。','red');},1900);
 }
 
+function discoverSurprise(id){
+  if(IS_TEST_RUN||state.mode==='party'||career.surprises.includes(id))return;
+  career.surprises.push(id);saveCareer();renderCareer();
+}
+function triggerSurprise(entry,now){
+  const pl=state.player;if(!pl||!entry)return;state.surpriseCount++;state.lastSurprise=entry.id;discoverSurprise(entry.id);
+  if(entry.kind==='bonus')state.bonus+=11;
+  if(entry.kind==='banana')state.bananas+=1;
+  if(entry.kind==='lift')pl.vy=Math.max(pl.vy,830),pl.y+=36;
+  if(entry.kind==='wide')state.wideUntil=Math.max(state.wideUntil,now+5000);
+  if(entry.kind==='gold')pl.goldenUntil=Math.max(pl.goldenUntil,now+2600);
+  if(entry.kind==='quiet'){stopMusic(.08);setTimeout(()=>{if(state.running&&audioMode==='full')startMusic();},1650);}
+  if(entry.kind==='refund')state.bonus+=18;
+  if(entry.kind==='fish'){if(pl.bubble)state.bonus+=26;else pl.bubble=true;}
+  if(entry.kind==='overtime'){if(state.mode==='party')state.partyEndsAt+=3000;else state.bonus+=13;}
+  if(entry.kind==='confetti')spawnConfetti(16);
+  if(entry.kind==='platform')addPlatform({x:clamp(pl.x-66,6,W-138),y:Math.max(state.cameraY+92,pl.y-44),w:132,type:'bubble',dept:state.deptId,solid:true,expireAt:now+3100,label:''});
+  if(entry.kind==='secret')state.bonus+=52;
+  toast(`${entry.rarity}：${entry.text}` ,entry.rarity==='极怪意外'?'red':entry.rarity==='稀有意外'?'gold':'teal');sfx('surprise');
+}
+function maybeSurprise(now){
+  if(state.choiceOpen||state.maxMeters<state.nextSurpriseMeter||state.stressMode)return;
+  if(!state.surpriseBag.length)state.surpriseBag=shuffle(SURPRISES);
+  const entry=state.surpriseBag.shift();state.nextSurpriseMeter=state.maxMeters+145+Math.floor(state.rng()*190);triggerSurprise(entry,now);
+}
+
 function maybeDepartmentEffects(now){
   if(state.deptId==='fax'&&now>state.faxNextAt){
     state.faxNextAt=now+7600;el.fax.classList.remove('show');void el.fax.offsetWidth;el.fax.classList.add('show');
@@ -1219,6 +1317,8 @@ function maybeDepartmentEffects(now){
   }
   if(state.maxMeters>=1020&&!state.lucky){state.lucky=true;state.bonus+=52;state.score+=52;celebrate('此高度已被 MYSKME 认证为幸运高度。加 52 分。');}
   for(const m of MILESTONES){if(state.maxMeters>=m&&!state.milestones.has(m)){state.milestones.add(m);celebrate(m===300?'100层已到。谈话人刚好又上了一层。':`${m} 米：加盖工程部被迫更新了楼层目录。`);}}
+  for(const secret of SECRET_METERS){if(state.maxMeters>=secret.at&&!state.secretMeters.has(secret.at)){state.secretMeters.add(secret.at);state.bonus+=secret.at===555?5:0;celebrate(secret.text);}}
+  maybeSurprise(now);
   if(state.mode!=='party'&&state.maxMeters>=state.nextChoiceMeter&&!state.choiceOpen){state.nextChoiceMeter+=1500;openPerkChoice();}
   if(state.shaftUntil&&now>=state.shaftUntil)endShaftEvent('百层倒班结束。你一层也没下，但脸面受到了锻炼。');
   if(state.mode!=='party'&&!state.recordToast&&saved.score>0&&state.score>saved.score){state.recordToast=true;el.shell.classList.add('shake');setTimeout(()=>el.shell.classList.remove('shake'),420);toast('破纪录：谜题管理局为你重新盖了一个章。','gold');}
@@ -1303,9 +1403,9 @@ function renderToolDock(now){
 }
 
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function hideMenuScreens(){for(const screen of [el.title,el.result,el.leaderboard,el.choice,el.partySetup,el.partyHandoff,el.partyScore,el.install])screen.classList.add('hidden');}
+function hideMenuScreens(){for(const screen of [el.title,el.result,el.leaderboard,el.choice,el.partySetup,el.partyHandoff,el.partyScore,el.install,el.share])screen.classList.add('hidden');}
 function updatePartyResume(){el.partyResume.classList.toggle('is-hidden',!party.active);if(party.active)el.partyResume.textContent=party.phase==='complete'?'查看上一场百层猴榜':`继续 ${party.n} 人挑战 · 第 ${Math.min(party.round+1,party.rounds)} 轮`;}
-function showTitleScreen(){stopMusic();state.running=false;state.mode='solo';el.shell.classList.remove('running','party-running');hideMenuScreens();el.title.classList.remove('hidden');renderCareer();updateBestLabels();updatePartyResume();}
+function showTitleScreen(){stopMusic();state.running=false;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;state.mode='solo';el.shell.classList.remove('running','party-running');hideMenuScreens();el.title.classList.remove('hidden');renderCareer();updateBestLabels();updatePartyResume();scheduleAudioSuspend(500);}
 function renderPartySetup(){
   el.partyCount.innerHTML='';for(let n=2;n<=6;n++){const b=document.createElement('button');b.type='button';b.className=`party-chip${party.n===n?' on':''}`;b.textContent=`${n}人`;b.onclick=()=>{party.n=n;renderPartySetup();};el.partyCount.appendChild(b);}
   el.partyRounds.innerHTML='';for(let n=2;n<=4;n++){const b=document.createElement('button');b.type='button';b.className=`party-chip${party.rounds===n?' on':''}`;b.textContent=`${n}轮`;b.onclick=()=>{party.rounds=n;renderPartySetup();};el.partyRounds.appendChild(b);}
@@ -1342,13 +1442,16 @@ function partyNext(){if(party.phase==='complete'){party=defaultParty();saveParty
 function resumeParty(){if(!party.active)return openPartySetup();party.phase==='complete'?renderPartyScore():party.phase==='score'?renderPartyScore():showPartyHandoff();}
 
 function loop(now){
+  state.animationFrame=0;if(!state.running)return;
+  if(now-lastRenderedFrame<FRAME_INTERVAL){state.animationFrame=requestAnimationFrame(loop);return;}lastRenderedFrame=now;
   const dt=Math.min(.034,Math.max(0,(now-lastFrame)/1000));lastFrame=now;
   if(state.running&&!state.choiceOpen){
     if(state.mode==='party'&&now>=state.partyEndsAt){state.partyReason='timeout';finishRun('timeout');}
     else{updateMovingPlatforms(now);updatePhysics(dt,now);updateDepartment();maybeDepartmentEffects(now);maybeMajorEvent(now);renderAll(now);}
-  }else if(state.player)renderAll(now);
-  state.animationFrame=requestAnimationFrame(loop);
+  }else if(state.player&&state.choiceOpen)renderAll(now);
+  if(state.running)state.animationFrame=requestAnimationFrame(loop);
 }
+function ensureGameLoop(){if(!state.running||state.animationFrame)return;lastFrame=performance.now();lastRenderedFrame=0;state.animationFrame=requestAnimationFrame(loop);}
 
 function startSolo(){state.mode='solo';startRun();}
 function startRun(seed=Date.now()&0xffffffff){
@@ -1356,17 +1459,18 @@ function startRun(seed=Date.now()&0xffffffff){
   if(FORCE_FALL&&!forcedFallConsumed){forcedFallConsumed=true;state.player.bubble=false;state.player.y=state.cameraY-110;state.player.vy=-240;}
   else if(FORCE_RESCUE){state.player.y=state.cameraY-110;state.player.vy=-240;}
   input.left=input.right=false;lastFrame=performance.now();lastToolSignature='__start__';updateMissionUI();toast(state.mode==='party'?`${party.players[party.cur].name} 开跳：${party.seconds} 秒，输赢不怪楼。`:`开工装备：${KITS.find(k=>k.id===state.kitId).name}。点左点右，往上。`,'gold');
+  ensureGameLoop();
   if(MAJOR_EVENTS.includes(DEBUG_EVENT))setTimeout(()=>triggerMajorEvent(DEBUG_EVENT,performance.now()),260);
 }
 function finishRun(reason='fall'){
-  if(!state.running)return;state.running=false;state.over=true;stopMusic(.1);state.choiceOpen=false;state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.choice.classList.add('hidden');el.shell.classList.remove('running','party-running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');
+  if(!state.running)return;state.running=false;state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.choiceOpen=false;state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.choice.classList.add('hidden');el.shell.classList.remove('running','party-running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
   if(state.mode==='party'){finishPartyTurn(reason);return;}
   const oldHeight=saved.height,oldScore=saved.score;saved.height=Math.max(saved.height,state.maxMeters);saved.score=Math.max(saved.score,state.score);saveRecord();
   const di=chooseNonRepeat(DEATH_LINES,lastDeathIndex);lastDeathIndex=di;const si=chooseNonRepeat(SLOGANS,lastSloganIndex);lastSloganIndex=si;
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
-  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次。`;$('resultSlogan').textContent=SLOGANS[si];
+  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;$('resultSlogan').textContent=SLOGANS[si];
   const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
   el.rankSave.disabled=false;el.rankSave.textContent='登记';el.result.classList.remove('hidden');el.result.scrollTop=0;updateBestLabels();
   renderCareer();
@@ -1382,12 +1486,44 @@ function submitRank(){
   if(!state.over||state.rankSubmitted)return;const row={id:state.runId,name:cleanName(el.rankName.value),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
   localBoard.push(row);localBoard.sort((a,b)=>b.score-a.score||b.height-a.height||b.at-a.at);localBoard.splice(30);saveBoard();state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='已登记';renderLeaderboard();toast('榜单已写入本机。云端对此一无所知。','teal');
 }
-function copyReport(){
-  const text=`《是猴就上100层》坠落报告\n层数：${floorsFromMeters(state.maxMeters)} 层\n高度：${state.maxMeters} 米\n香蕉：${state.bananas}\n总分：${state.score}\n最高连跳：${state.maxFlow}\n险落：${state.nearMisses} 次\n轮值：${missionDone()?'完成':'未完成'} · ${state.mission?.label||'略'}\n档案章：${career.stamps}\n称号：${$('resultTitle').textContent}\n本次公章：${state.resultStamp||'已阅'}\nMYSKME：${$('resultSlogan').textContent}\n来上100层：https://monkey.myskme.com/`;
-  const done=()=>toast('坠落报告已复制。请谨慎传播事实。','teal');
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));else fallbackCopy(text,done);
+let posterData='',posterVariant=null,posterMark='',posterGenerating=false,posterQrModules=0;
+function randomUnit(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296;}return Math.random();}
+function posterRank(){const floor=floorsFromMeters(state.maxMeters);return [...POSTER_RANKS].reverse().find(r=>floor>=r.min)||POSTER_RANKS[0];}
+function choosePosterVariant(){const roll=randomUnit();return POSTER_VARIANTS.find(v=>roll<=v.upto)||POSTER_VARIANTS[0];}
+function receiptMark(){const raw=[state.runId,state.seed,state.maxMeters,state.score,state.bananas,state.maxFlow,state.nearMisses,state.surpriseCount].join('|');let h=2166136261;for(let i=0;i<raw.length;i++)h=Math.imul(h^raw.charCodeAt(i),16777619);const code=(h>>>0).toString(36).toUpperCase().padStart(7,'0');return `${code.slice(0,4)}-${code.slice(4)}`;}
+function roundRectPath(c,x,y,w,h,r=18){const rr=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+rr,y);c.arcTo(x+w,y,x+w,y+h,rr);c.arcTo(x+w,y+h,x,y+h,rr);c.arcTo(x,y+h,x,y,rr);c.arcTo(x,y,x+w,y,rr);c.closePath();}
+function wrapCanvasText(c,text,x,y,maxWidth,lineHeight,maxLines=2){const chars=[...String(text)],lines=[];let line='';for(const ch of chars){const next=line+ch;if(c.measureText(next).width>maxWidth&&line){lines.push(line);line=ch;if(lines.length===maxLines-1)break;}else line=next;}const used=lines.join('').length;if(lines.length<maxLines)lines.push(used<chars.length?chars.slice(used).join(''):line);if(lines.length===maxLines&&used<chars.length){while(c.measureText(lines[maxLines-1]+'…').width>maxWidth)lines[maxLines-1]=lines[maxLines-1].slice(0,-1);lines[maxLines-1]+='…';}lines.slice(0,maxLines).forEach((part,i)=>c.fillText(part,x,y+i*lineHeight));return y+Math.min(lines.length,maxLines)*lineHeight;}
+function drawPosterQr(c,url,x,y,size,ink,paper){
+  if(typeof qrcode!=='function')return 0;const qr=qrcode(0,'Q');qr.addData(url);qr.make();const n=qr.getModuleCount(),quiet=4,cell=size/(n+quiet*2);c.fillStyle=paper;c.fillRect(x,y,size,size);c.fillStyle=ink;for(let row=0;row<n;row++)for(let col=0;col<n;col++)if(qr.isDark(row,col))c.fillRect(x+(col+quiet)*cell,y+(row+quiet)*cell,Math.ceil(cell+.15),Math.ceil(cell+.15));return n;
 }
-function fallbackCopy(text,done){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(_){toast('复制失败。传真科说：略。','red');}ta.remove();}
+function loadPosterIcon(){return new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src='./icons/monkey-100-512.png';});}
+async function buildPoster(){
+  const Wc=1080,Hc=1350,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const c=cv.getContext('2d',{alpha:false}),variant=choosePosterVariant(),rank=posterRank(),floors=floorsFromMeters(state.maxMeters),dark=variant.id==='night';posterVariant=variant;posterMark=receiptMark();
+  c.fillStyle=variant.paper;c.fillRect(0,0,Wc,Hc);c.strokeStyle=variant.accent;c.lineWidth=8;c.strokeRect(36,36,Wc-72,Hc-72);c.globalAlpha=.45;c.lineWidth=3;c.strokeRect(54,54,Wc-108,Hc-108);c.globalAlpha=1;
+  c.textAlign='left';c.fillStyle=variant.ink;c.font='700 30px system-ui,sans-serif';c.fillText('M Y S K M E  ·  MONKEY UP 100',92,112);
+  roundRectPath(c,92,145,896,106,26);c.fillStyle=variant.accent;c.fill();c.fillStyle=dark?'#28211a':'#fffdf6';c.font='900 46px system-ui,sans-serif';c.fillText(variant.rarity,124,211);
+  const icon=await loadPosterIcon();if(icon){roundRectPath(c,92,286,218,218,42);c.save();c.clip();c.drawImage(icon,92,286,218,218);c.restore();c.strokeStyle=variant.ink;c.lineWidth=5;roundRectPath(c,92,286,218,218,42);c.stroke();}
+  c.fillStyle=variant.ink;c.font='900 44px "Songti SC",serif';c.fillText(cleanName(el.rankName.value||'猴先生'),354,326);c.fillStyle=variant.accent;c.font='900 70px "Songti SC",serif';c.fillText(rank.name,354,402);
+  c.fillStyle=variant.ink;c.font='700 28px system-ui,sans-serif';c.fillText(`${state.maxMeters} 米 · 本局印记 ${posterMark}`,354,460);
+  c.textAlign='center';c.fillStyle=variant.ink;c.font='1000 162px system-ui,sans-serif';c.fillText(String(floors),540,690);c.font='900 35px system-ui,sans-serif';c.fillText('层',540,744);
+  const stats=[['总分',state.score],['香蕉',state.bananas],['最高连跳',state.maxFlow],['意外',state.surpriseCount]];stats.forEach(([label,value],i)=>{const x=92+i*226;roundRectPath(c,x,786,198,118,20);c.fillStyle=dark?'#3a342d':'rgba(255,255,255,.55)';c.fill();c.strokeStyle=variant.ink;c.lineWidth=3;c.stroke();c.fillStyle=variant.accent;c.font='900 42px system-ui,sans-serif';c.textAlign='center';c.fillText(String(value),x+99,842);c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText(label,x+99,878);});
+  const surprise=SURPRISES[Math.floor(randomUnit()*SURPRISES.length)];roundRectPath(c,92,936,610,250,24);c.fillStyle=dark?'#39332b':'rgba(255,255,255,.56)';c.fill();c.strokeStyle=variant.accent;c.lineWidth=4;c.stroke();c.textAlign='left';c.fillStyle=variant.accent;c.font='900 25px system-ui,sans-serif';c.fillText('本次随机批注',126,988);c.fillStyle=variant.ink;c.font='800 31px "Songti SC",serif';wrapCanvasText(c,variant.line,126,1042,530,45,2);c.font='700 23px system-ui,sans-serif';c.globalAlpha=.78;wrapCanvasText(c,`海报附带：${surprise.text}`,126,1133,530,34,2);c.globalAlpha=1;
+  const shareUrl=`https://monkey.myskme.com/?from=poster&mark=${encodeURIComponent(posterMark)}&skin=${variant.id}`;const modules=drawPosterQr(c,shareUrl,746,944,242,variant.ink,dark?'#fffaf0':'#fffdf6');
+  c.textAlign='center';c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText('扫码来挑战',867,1217);c.font='700 17px system-ui,sans-serif';c.globalAlpha=.7;c.fillText('图片为本机生成，不代表云端认证',540,1265);c.fillText('monkey.myskme.com',540,1300);c.globalAlpha=1;
+  posterQrModules=modules;return cv.toDataURL('image/jpeg',.91);
+}
+async function openSharePoster(){
+  if(posterGenerating)return;posterGenerating=true;unlockAudio();hideMenuScreens();el.share.classList.remove('hidden');el.shareNote.textContent='正在从档案袋里抽一个随机版式……';el.shareImage.removeAttribute('src');
+  try{posterData=await buildPoster();el.shareImage.src=posterData;el.shareRarity.textContent=posterVariant.rarity;el.shareRarity.style.background=posterVariant.accent;el.shareNote.textContent=`${posterVariant.line} 本局印记 ${posterMark}。`;sfx('surprise');}
+  catch(_){el.shareNote.textContent='海报生成失败。传真科已经把错误传真走了。';toast('海报没画出来。请再抽一次。','red');}
+  finally{posterGenerating=false;}
+}
+async function sharePosterImage(){
+  if(!posterData)return openSharePoster();
+  if(typeof navigator.share==='function'&&typeof File!=='undefined')try{const encoded=posterData.slice(posterData.indexOf(',')+1),raw=atob(encoded),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);const file=new File([bytes],`monkey-up-100-${Date.now()}.jpg`,{type:'image/jpeg'});if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}catch(error){if(error?.name==='AbortError')return;}
+  el.shareNote.textContent='当前浏览器没有开放图片分享。请长按海报保存，再从相册发送。';
+}
+function closeSharePoster(){el.share.classList.add('hidden');el.result.classList.remove('hidden');setTimeout(()=>{if(el.share.classList.contains('hidden')){posterData='';el.shareImage.removeAttribute('src');}},500);}
 
 let deferredInstallPrompt=null;
 function isStandalone(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
@@ -1421,8 +1557,8 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;});
 window.addEventListener('blur',()=>{input.left=input.right=false;});
 window.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('visibilitychange',()=>{if(document.hidden){input.left=input.right=false;lastFrame=performance.now();stopMusic();if(audioCtx&&audioCtx.state==='running')audioCtx.suspend();}else if(state.running&&audioMode==='full')unlockAudio();});
-el.start.addEventListener('click',startSolo);el.restart.addEventListener('click',startSolo);el.copy.addEventListener('click',copyReport);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){input.left=input.right=false;lastFrame=performance.now();stopMusic();if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;if(audioCtx&&audioCtx.state==='running')audioCtx.suspend();}else if(state.running){if(audioMode==='full')unlockAudio();ensureGameLoop();}});
+el.start.addEventListener('click',startSolo);el.restart.addEventListener('click',startSolo);el.copy.addEventListener('click',openSharePoster);el.shareSend.addEventListener('click',sharePosterImage);el.shareReroll.addEventListener('click',openSharePoster);el.shareClose.addEventListener('click',closeSharePoster);
 el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);el.rankClose.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
 el.sound.addEventListener('click',cycleAudioMode);
 el.partyOpen.addEventListener('click',openPartySetup);el.partyResume.addEventListener('click',resumeParty);el.partyStart.addEventListener('click',startParty);el.partySetupBack.addEventListener('click',cancelPartySetup);el.partyReady.addEventListener('click',startPartyTurn);el.partyPause.addEventListener('click',showTitleScreen);el.partyNext.addEventListener('click',partyNext);el.partyScoreHome.addEventListener('click',showTitleScreen);
@@ -1435,6 +1571,7 @@ function runQA(){
   const sorted=[...new Set(state.platforms.map(p=>Math.round(p.y)))].sort((a,b)=>a-b),gaps=sorted.slice(1).map((y,i)=>y-sorted[i]);
   const clusters=new Map();for(const p of state.platforms){const y=Math.round(p.y/5)*5;if(!clusters.has(y))clusters.set(y,[]);clusters.get(y).push(p);}
   const unsafeOnly=[...clusters.entries()].filter(([,ps])=>!ps.some(p=>p.solid));
+  const runtimeAssets=[...document.querySelectorAll('script[src],link[rel="stylesheet"]')],assetsStayLocal=runtimeAssets.length===1&&runtimeAssets.every(node=>{const url=new URL(node.src||node.href,location.href);return url.origin===location.origin&&url.pathname.endsWith('/vendor/qrcode-generator.js');});
   const checks=[
     ['12 个部门完整登记',DEPARTMENTS.length===12],['十个指定部门均存在',['lobby','quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','observation'].every(id=>DEPT[id])],
     ['平台最大垂直间距不超过 132',Math.max(...gaps)<=132],['每一高度簇至少有一块实体平台',unsafeOnly.length===0],['机制表完整',MECHANICS.length>=14],
@@ -1445,7 +1582,10 @@ function runQA(){
     ['台阶仅绕口令与标点保留可见文字',MECHANICS.filter(type=>/<text\b/.test(platformMarkup({type,w:100,label:'词牌',direction:1}))).every(type=>['tongue','punctuation'].includes(type))],
     ['桌面安装入口完整',!!document.querySelector('link[rel="manifest"]')&&!!$('installButton')&&'serviceWorker' in navigator],
     ['主猴与环屏副本完整',playerUses.length===3&&playerUses.every(use=>use.isConnected&&use.getAttribute('href'))],
-    ['没有外部脚本或样式',[...document.querySelectorAll('script[src],link[rel="stylesheet"]')].length===0],['1020 米彩蛋加分值为 52',true]
+    ['二维码模块仅从本站本地加载',assetsStayLocal&&typeof qrcode==='function'],['成绩海报与六档稀有版完整',typeof buildPoster==='function'&&POSTER_VARIANTS.length===6&&POSTER_RANKS.length>=7],
+    ['十二种随机意外与固定暗号完整',SURPRISES.length===12&&SECRET_METERS.length===5],['鱼式救援含上推动量与临时平台',/pl\.vy=960/.test(rescueOrEnd.toString())&&/expireAt:now\+3300/.test(rescueOrEnd.toString())],
+    ['低功耗调度已启用',FRAME_INTERVAL>=16&&MUSIC_TICK_MS>=70&&REVERB_SECONDS<=.6&&state.animationFrame===0],['音频限制器与防爆音包络完整',typeof audioCtx==='object'&&/createDynamicsCompressor/.test(buildAudioGraph.toString())&&/linearRampToValueAtTime/.test(noiseHit.toString())],
+    ['安卓宽虚拟视口兜底完整',typeof syncViewportMode==='function'&&document.documentElement.dataset.shellScale],['1020 米彩蛋加分值为 52',true]
   ];
   const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
 }
@@ -1470,13 +1610,17 @@ function runStressQA(steps=24000){
   }
   state.running=false;state.autopilot=false;state.stressMode=false;renderAll(now);$('qaReport').style.display='block';$('qaReport').textContent=`${fail?'FAIL':'PASS'} · 角色长局可见性压力测试\n\n模拟帧：${steps}\n模拟时长：${Math.round(steps*16/1000)} 秒\n最高高度：${maxHeight} 米\n鱼式接回：${state.stressRescues} 次\n画面纵坐标：${minSy.toFixed(1)} 至 ${maxSy.toFixed(1)}\n坐标修复：${state.playerRepairs} 次${fail?`\n失败：${fail}`:'\n结论：猴先生全程保持在安全画面内。'}`;
 }
-Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,mode:state.mode,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:rankedRows().length,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,musicActive,musicScheduled:audioGraph?.scheduled||0,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],partyActive:party.active,partyCount:party.n,partyRound:party.round,partyPlayer:party.cur,partyPhase:party.phase,standalone:isStandalone()})});
+function runPosterQA(){
+  resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
+}
+Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,mode:state.mode,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:rankedRows().length,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],partyActive:party.active,partyCount:party.n,partyRound:party.round,partyPlayer:party.cur,partyPhase:party.phase,posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
 Object.defineProperty(window,'MONKEY_UPSTAIRS_REPORT',{enumerable:true,get:()=>window.__MONKEY_UPSTAIRS_REPORT});
-setAudioMode(audioMode,false);renderCareer();updateBestLabels();updatePartyResume();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());requestAnimationFrame(loop);
+setAudioMode(audioMode,false);renderCareer();updateBestLabels();updatePartyResume();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 if(TEST_PARAMS.get('qa')==='1'){hideSplash();setTimeout(runQA,50);}
 if(PARTY_QA){hideSplash();setTimeout(runPartyQA,50);}
 if(STRESS_TEST){hideSplash();setTimeout(()=>runStressQA(),60);}
+if(POSTER_QA){hideSplash();setTimeout(runPosterQA,80);}
 if(AUTO_PLAY){hideSplash();setTimeout(startRun,80);}
 if(FORCE_FALL){hideSplash();setTimeout(startRun,80);}
 if(FORCE_RESCUE){hideSplash();setTimeout(startRun,80);}
