@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。支持单人闯高与 2–6 人同机公平赛。">
-<meta name="myskme-release" content="20260812.8-monkey-reachable-route">
+<meta name="myskme-release" content="20260812.9-teal-fish-canon">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -346,17 +346,17 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
         </symbol>
         <symbol id="art-fish" viewBox="0 0 120 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="99" cy="25" r="5" fill="none" stroke="#d7a536" stroke-width="2.4"/><circle cx="109" cy="13" r="3" fill="none" stroke="#d7a536" stroke-width="2"/>
-            <path d="M24 42 Q37 27 61 30 Q83 31 94 48 Q104 66 92 82 Q78 98 53 93 Q28 96 18 77 Q8 58 24 42 Z" fill="#e3ad32"/>
-            <path d="M91 57 Q106 45 116 49 Q110 63 117 77 Q106 81 92 72 Z" fill="#f4cf68"/>
-            <path d="M56 32 Q61 18 69 25 Q73 30 66 36" fill="#f4cf68"/>
-            <path d="M35 73 Q20 77 19 90 Q32 89 43 78" fill="#f4cf68"/>
+            <circle cx="99" cy="25" r="5" fill="none" stroke="#3fa27a" stroke-width="2.4"/><circle cx="109" cy="13" r="3" fill="none" stroke="#3fa27a" stroke-width="2"/>
+            <path d="M24 42 Q37 27 61 30 Q83 31 94 48 Q104 66 92 82 Q78 98 53 93 Q28 96 18 77 Q8 58 24 42 Z" fill="#3fab84"/>
+            <path d="M91 57 Q106 45 116 49 Q110 63 117 77 Q106 81 92 72 Z" fill="#6cd0af"/>
+            <path d="M56 32 Q61 18 69 25 Q73 30 66 36" fill="#6cd0af"/>
+            <path d="M35 73 Q20 77 19 90 Q32 89 43 78" fill="#6cd0af"/>
             <path d="M23 48 Q31 35 45 37 Q57 39 59 54 Q62 68 50 77 Q37 83 25 73 Q15 63 23 48 Z" fill="#fff5d1" stroke-width="2.4"/>
             <ellipse cx="40" cy="54" rx="7" ry="10" fill="#2f5148" stroke="none"/><circle cx="38" cy="51" r="2" fill="#fffdf6" stroke="none"/>
             <ellipse cx="40" cy="54" rx="10" ry="13" fill="none" stroke-width="2.2"/><path d="M50 53 Q59 50 68 52" fill="none" stroke-width="2.2"/>
             <ellipse cx="27" cy="67" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".8"/>
             <path d="M29 68 Q36 72 43 68" fill="none" stroke-width="2.2"/>
-            <path d="M73 73 Q84 77 87 87" fill="none" stroke="#f4cf68" stroke-width="7"/>
+            <path d="M73 73 Q84 77 87 87" fill="none" stroke="#6cd0af" stroke-width="7"/>
             <path d="M19 37 L15 31 M29 31 L27 25" fill="none" stroke-width="2" opacity=".6"/>
           </g>
         </symbol>
@@ -639,7 +639,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260812.8-monkey-reachable-route',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260812.9-teal-fish-canon',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',PARTY_QA=TEST_PARAMS.get('partyqa')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||PARTY_QA||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
