@@ -15,8 +15,9 @@ async function verify() {
   assert(html.includes('<title>猴先生上楼 · MYSKME</title>'), '线上标题不匹配');
   assert(html.includes('https://monkey.myskme.com/'), '线上正式域名元数据缺失');
   assert(html.includes('fill="#e3ad32"'), '线上鱼小姐暖金主色不匹配');
-  assert(html.includes('20260812.2-monkey-visible-hotfix'), '线上仍是猴子可见性修复前旧版本');
-  assert(html.includes('data-pose="fall"'), '线上缺少常驻坠落姿态');
+  assert(html.includes('20260812.4-monkey-visible-hotfix'), '线上仍是猴子可见性修复前旧版本');
+  assert(html.includes('id="monkeyUse"'), '线上缺少完整主猴渲染节点');
+  assert(!html.includes("translate(100 0) scale(-1 1)"), '线上仍含会把猴子推出画面的 SVG use 镜像');
   assert(!/<script\s+[^>]*src=/i.test(html), '线上页面出现外部脚本');
   assert(!/<link\s+[^>]*rel=["']stylesheet/i.test(html), '线上页面出现外部样式');
 }
