@@ -70,6 +70,10 @@ assert(html.includes('function buildPoster()') && html.includes('function syncVi
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
 await access(path.join(projectRoot, 'vendor/qrcode-generator.js'));
 const swSource = await readFile(path.join(projectRoot, 'sw.js'), 'utf8');
+// Service Worker 安装必须绕开浏览器 HTTP 缓存，否则「版本升了、资源还是旧的」。
+// 0812 血泪：鱼小姐改青绿后成绩海报里仍是金鱼——海报画的是 app 图标 PNG，
+// 而 cache.addAll 走 HTTP 缓存，把 EdgeOne 上长缓存的旧图装进了新版 SW 缓存。
+assert(/cache:\s*'reload'/.test(swSource), "sw.js 安装没用 cache:'reload'，新版缓存会被旧的 HTTP 缓存污染（0812 海报金鱼就是这么来的）");
 const SW_CACHE = (swSource.match(/const CACHE='([^']+)'/) || [])[1];
 assert(SW_CACHE, '取不到 sw.js 的缓存版本名（const CACHE 的写法变了？）');
 
