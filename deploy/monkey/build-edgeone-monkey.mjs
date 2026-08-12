@@ -35,7 +35,13 @@ const html = await readFile(source, 'utf8');
 const manifest = JSON.parse(await readFile(path.join(projectRoot, 'manifest.webmanifest'), 'utf8'));
 assert(html.includes('<title>是猴就上100层 · MYSKME</title>'), '标题不匹配');
 assert(html.includes('https://monkey.myskme.com/'), '缺少正式域名');
-assert(html.includes('fill="#e3ad32"'), '鱼小姐主色不是暖金色');
+// 鱼小姐是绿鲤鱼成精，canon 上不存在金鲤鱼。她已经被改成金色两次——
+// 第二次连交接文档和 PWA 图标描述都跟着写成了「金色鱼小姐」，等于把错误转正了。
+// **这一条是立法，不是镜像**：版本号那种会变的东西要从源头取，而 canon 是约束，就该写死在这里。
+// 谁再把她改离青绿系，构建/发布直接失败。2026-08-12 定。
+const FISH_TEAL = '#3fab84';
+assert(html.includes(`fill="${FISH_TEAL}"`), '鱼小姐主色必须是青绿 ' + FISH_TEAL + '（绿鲤鱼成精，canon 无金鲤鱼）');
+assert(!html.includes('fill="#e3ad32"'), '鱼小姐又被改回金色了。canon 不存在金鲤鱼，这已是第三次，不要再改。');
 // 版本号从源头取，不再硬写。0812 就是这么出事的：sw 缓存名从 -7 升到 -8，
 // 构建器跟着改了、线上验收器被漏了，结果发布成功却被自己的验收判失败。
 const RELEASE = (html.match(/const RELEASE='([^']+)'/) || [])[1];

@@ -32,7 +32,8 @@ async function verify() {
   assert(response.status === 200, '首页状态码 ' + response.status);
   assert(html.includes('<title>是猴就上100层 · MYSKME</title>'), '线上标题不匹配');
   assert(html.includes('https://monkey.myskme.com/'), '线上正式域名元数据缺失');
-  assert(html.includes('fill="#e3ad32"'), '线上鱼小姐暖金主色不匹配');
+  assert(html.includes('fill="#3fab84"'), '线上鱼小姐不是青绿色（绿鲤鱼成精，canon 无金鲤鱼）');
+  assert(!html.includes('fill="#e3ad32"'), '线上鱼小姐还是金色的：要么没发布成功，要么又被人改回去了');
   assert(html.includes(EXPECT_RELEASE), '线上版本不是 ' + EXPECT_RELEASE + '（CDN 还没刷新，或发布包不对）');
   assert(html.includes('id="monkeyUse"'), '线上缺少完整主猴渲染节点');
   assert(!html.includes("translate(100 0) scale(-1 1)"), '线上仍含会把猴子推出画面的 SVG use 镜像');

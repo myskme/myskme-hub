@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">是猴就上100层图标</title>
-  <desc id="desc">手绘猴先生正在向上跳，右上角有一条金色鱼小姐。</desc>
+  <desc id="desc">手绘猴先生正在向上跳，右上角有一条青绿色鱼小姐。</desc>
   <rect width="512" height="512" rx="116" fill="#faf3e2"/>
   <path d="M32 386C112 347 157 380 216 337s124-17 177-66c34-31 59-28 87-16v225H32Z" fill="#dff3ef"/>
   <g fill="none" stroke="#2f5148" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
@@ -29,8 +29,8 @@
   </g>
   <g transform="translate(333 66)" stroke="#2f5148" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="69" cy="69" r="67" fill="#fffdf6"/>
-    <path d="M28 54c18-21 58-24 79 1 15 18 8 50-18 56-30 8-68-4-72-26-2-12 2-23 11-31Z" fill="#e3ad32"/>
-    <path d="M102 68c20-18 34-14 42-2-11 14-11 28-2 40-19 6-31-1-43-13Z" fill="#f4cf68"/>
+    <path d="M28 54c18-21 58-24 79 1 15 18 8 50-18 56-30 8-68-4-72-26-2-12 2-23 11-31Z" fill="#3fab84"/>
+    <path d="M102 68c20-18 34-14 42-2-11 14-11 28-2 40-19 6-31-1-43-13Z" fill="#6cd0af"/>
     <ellipse cx="47" cy="73" rx="9" ry="13" fill="#2f5148" stroke="none"/>
     <circle cx="44" cy="69" r="3" fill="#fffdf6" stroke="none"/>
     <path d="M35 93q12 10 25 1" fill="none"/>

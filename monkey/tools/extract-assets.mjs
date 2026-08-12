@@ -20,7 +20,7 @@ const exportsList = [
   ['monkey-rise.svg', 'art-monkey-rise'],
   ['monkey-fall.svg', 'art-monkey-fall'],
   ['monkey-land.svg', 'art-monkey-land'],
-  ['fish-gold.svg', 'art-fish'],
+  ['fish.svg', 'art-fish'],   // 曾叫 fish-gold.svg；鱼小姐 0812 按 canon 改回青绿，文件名不再带颜色，免得下次换色又变成骗人的名字
   ['donkey.svg', 'art-donkey'],
   ['egg.svg', 'art-egg'],
   ['snake.svg', 'art-snake'],
@@ -77,7 +77,7 @@ const manifest = JSON.stringify({
   schema: 1,
   source: '../index.html',
   license: 'MYSKME original reusable asset',
-  palette: { paper: '#faf3e2', ink: '#28211a', teal: '#1f9e8e', fishGold: '#e3ad32', banana: '#f5b731', red: '#e0452c' },
+  palette: { paper: '#faf3e2', ink: '#28211a', teal: '#1f9e8e', fish: '#3fab84', fishFin: '#6cd0af', banana: '#f5b731', red: '#e0452c' },
   assets: manifestAssets,
 }, null, 2) + '\n';
 outputs.set(path.join(outputRoot, 'asset-manifest.json'), manifest);
