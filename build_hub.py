@@ -40,8 +40,8 @@ DEFAULT_DATA = {
              "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
              "url": "https://play.myskme.com/"},
             {"key": "monkey-upstairs", "glyph": "猴", "cat": "game", "rarity": "SSR", "cover": "assets/cover-monkey-upstairs.svg",
-             "tag": "荒诞休闲 · 无尽上楼", "title": "猴先生上楼", "en": "MR MONKEY UPSTAIRS",
-             "desc": "猴先生收到一份上楼谈话通知，于是决定跳上去 · 左右两键 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，轻松、离谱、越跳越不对劲。",
+             "tag": "荒诞休闲 · 多人百层挑战", "title": "是猴就上100层", "en": "MONKEY UP 100",
+             "desc": "左右两键冲上 100 层 · 2–6 人同机公平赛 · 同轮同楼 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，还能添加到桌面反复挑战。",
              "url": "https://monkey.myskme.com/", "featured": True},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi-20260810.webp",
              "coverSmall": "assets/cover-zimingqi-20260810-640.webp", "coverLegacy": "assets/cover-zimingqi.webp",
@@ -1316,10 +1316,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MYSKME">
 <meta name="theme-color" content="#0a0a0c">
-<meta name="description" content="王老师的原创作品总目：猴先生上楼 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
+<meta name="description" content="王老师的原创作品总目：是猴就上100层 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的原创作品总目：猴先生上楼 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
+<meta property="og:description" content="王老师的原创作品总目：是猴就上100层 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
 <meta property="og:image" content="https://myskme.com/og-cover.png">
 <meta property="og:image:alt" content="MYSKME · 狼先生与他的学生们作品总目">
 <meta property="og:url" content="https://myskme.com/">

@@ -54,7 +54,7 @@ function cover() {
   const deps = new Set([...dependencies('art-monkey-rise'), ...dependencies('art-fish')]);
   const defs = [...deps].map(dep => symbols.get(dep).markup).join('\n');
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="猴先生上楼封面">',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="是猴就上100层封面">',
     '<rect width="1280" height="720" rx="48" fill="#faf3e2"/>',
     '<path d="M0 540 Q250 470 470 560 T910 520 T1280 545 V720 H0Z" fill="#dff3ef"/>',
     '<g opacity=".28" fill="#28211a"><circle cx="75" cy="86" r="5"/><circle cx="170" cy="145" r="4"/><circle cx="1130" cy="110" r="5"/><circle cx="1030" cy="204" r="4"/></g>',
