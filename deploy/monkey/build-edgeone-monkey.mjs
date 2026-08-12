@@ -34,6 +34,8 @@ const html = await readFile(source, 'utf8');
 assert(html.includes('<title>猴先生上楼 · MYSKME</title>'), '标题不匹配');
 assert(html.includes('https://monkey.myskme.com/'), '缺少正式域名');
 assert(html.includes('fill="#e3ad32"'), '鱼小姐主色不是暖金色');
+assert(html.includes('20260812.2-monkey-visible-hotfix'), '缺少猴子可见性紧急修复版本标记');
+assert(html.includes('data-pose="fall"'), '缺少常驻坠落姿态');
 assert(!/<script\s+[^>]*src=/i.test(html), '游戏包含外部脚本');
 assert(!/<link\s+[^>]*rel=["']stylesheet/i.test(html), '游戏包含外部样式');
 assert(!/\b(fetch|XMLHttpRequest|WebSocket)\s*\(/.test(html), '游戏包含网络请求');
