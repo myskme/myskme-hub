@@ -36,7 +36,7 @@ const manifest = JSON.parse(await readFile(path.join(projectRoot, 'manifest.webm
 assert(html.includes('<title>是猴就上100层 · MYSKME</title>'), '标题不匹配');
 assert(html.includes('https://monkey.myskme.com/'), '缺少正式域名');
 assert(html.includes('fill="#e3ad32"'), '鱼小姐主色不是暖金色');
-assert(html.includes('20260812.7-monkey-surprise-share-cool'), '缺少惊喜海报省电版版本标记');
+assert(html.includes('20260812.8-monkey-reachable-route'), '缺少可达路线版版本标记');
 assert(html.includes('id="monkeyUse"'), '缺少完整主猴渲染节点');
 assert(!html.includes("translate(100 0) scale(-1 1)"), '仍含会把猴子推出画面的 SVG use 镜像');
 assert(html.includes('function repairPlayerState(now)'), '猴子可见性看门狗缺失');
@@ -58,7 +58,7 @@ for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
 await access(path.join(projectRoot, 'vendor/qrcode-generator.js'));
-assert((await readFile(path.join(projectRoot, 'sw.js'), 'utf8')).includes('myskme-monkey-20260812-7'), '离线缓存版本不匹配');
+assert((await readFile(path.join(projectRoot, 'sw.js'), 'utf8')).includes('myskme-monkey-20260812-8'), '离线缓存版本不匹配');
 
 await mkdir(path.dirname(output), { recursive: true });
 const staging = await mkdtemp(path.join(tmpdir(), 'myskme-monkey-stage-'));

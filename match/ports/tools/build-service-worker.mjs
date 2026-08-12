@@ -10,6 +10,7 @@ const matchRoot = path.join(repoRoot, 'match');
 const core = [
   'index.html',
   'network-config.js',
+  'vendor/qrcode-generator.js',
   'manifest.json',
   'icons/favicon-32.png',
   'icons/icon-192.png',

@@ -639,7 +639,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260812.7-monkey-surprise-share-cool',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260812.8-monkey-reachable-route',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',PARTY_QA=TEST_PARAMS.get('partyqa')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||PARTY_QA||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1008,13 +1008,13 @@ function resetWorld(seed=Date.now()&0xffffffff){
   platformEls.forEach(node=>node.remove());platformEls.clear();itemEls.forEach(node=>node.remove());itemEls.clear();
   el.audit.classList.remove('show');el.elevator.classList.remove('show');el.flow.classList.remove('show');el.tongue.classList.remove('show');el.choice.classList.add('hidden');
   for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');
-  addPlatform({x:132,y:baseY-2,w:126,type:'good',dept:startDept,solid:true,label:DEBUG_START?'临时起点':'接待台'});
+  addPlatform({x:132,y:baseY-2,w:126,type:'good',dept:startDept,solid:true,route:true,label:DEBUG_START?'临时起点':'接待台'});
   generatePlatforms(baseY+7600);
   updateDepartment(true,DEBUG_START>0);renderAll(performance.now());
 }
 
 function addPlatform(data){
-  const p=Object.assign({id:`p${++platformSeq}`,x:0,y:0,w:88,type:'good',dept:'lobby',solid:true,alive:true,phase:state.rng()*Math.PI*2,
+  const p=Object.assign({id:`p${++platformSeq}`,x:0,y:0,w:88,type:'good',dept:'lobby',solid:true,alive:true,route:false,phase:state.rng()*Math.PI*2,
     breakAt:0,expireAt:0,landed:false,opacity:1,baseX:data.x||0,speed:0,direction:state.rng()<.5?-1:1,label:''},data);
   p.baseX=p.x;state.platforms.push(p);return p;
 }
@@ -1026,10 +1026,18 @@ function nextPlatformX(width){
   center=clamp(center,width*.5+4,W-width*.5-4);state.lastX=center;return center-width*.5;
 }
 function safeWidth(meters){return Math.round(clamp(104-meters/90,64,104));}
+/* 台阶间距不能只用统一 132 像素封顶。绕口令踩错后起跳速度只有 610，
+   它的物理最高点约 109px；下一台若仍生成在 120–132px，就会出现“怎么跳都够不到”。
+   这里按玩家可能落到的最弱弹跳台计算安全上升量，并留 22% 手感余量。 */
+function platformBounceValue(p){
+  if(!p)return 790;if(p.type==='bananaBoard')return 955;if(p.type==='egg')return 900;if(p.type==='stamp')return 930;
+  if(p.type==='snake')return 770;if(p.type==='bubble')return 735;if(p.type==='tongue'&&!p.tongueCorrect)return 610;return 790;
+}
+function platformRiseCap(p){const v=platformBounceValue(p);return Math.floor(clamp(v*v/(2*1700)*.78,86,132));}
 function generatePlatforms(targetY){
   while(state.nextY<targetY){
     const meters=metersFromY(state.nextY),dept=departmentIdAt(meters),width=safeWidth(meters),gap=88+state.rng()*19+Math.min(22,meters/230);
-    const y=state.nextY,x=nextPlatformX(width);let primary=null;
+    const y=state.nextY,x=nextPlatformX(width),before=state.platforms.length;let primary=null;
     if(dept==='lobby')primary=addPlatform({x,y,w:width+12,type:'good',dept,label:state.rng()<.4?'访客请跳':'这边上楼'});
     if(dept==='quality'){
       const bad=!state.unsafeStreak&&state.rng()<clamp(.24+meters/9000,.24,.42);
@@ -1077,7 +1085,11 @@ function generatePlatforms(targetY){
       if((forceCrate||state.rng()<.026)&&meters>300){addItem('crate',primary);state.crateGiven=true;}
       if(meters>=state.nextToolMeter&&!state.items.some(item=>item.platformId===primary.id)){addItem(TOOL_POOL[Math.floor(state.rng()*TOOL_POOL.length)],primary);state.nextToolMeter=meters+390+Math.floor(state.rng()*310);}
     }
-    state.nextY+=Math.min(gap,132);
+    const route=state.platforms.slice(before).filter(p=>p.solid&&Math.abs(p.y-y)<=8);
+    for(const p of route)p.route=true;
+    if(primary)state.lastX=wrap(primary.x+primary.w*.5);
+    const riseCap=route.length?Math.min(...route.map(platformRiseCap)):132;
+    state.nextY+=Math.min(gap,riseCap);
   }
 }
 
@@ -1571,10 +1583,14 @@ function runQA(){
   const sorted=[...new Set(state.platforms.map(p=>Math.round(p.y)))].sort((a,b)=>a-b),gaps=sorted.slice(1).map((y,i)=>y-sorted[i]);
   const clusters=new Map();for(const p of state.platforms){const y=Math.round(p.y/5)*5;if(!clusters.has(y))clusters.set(y,[]);clusters.get(y).push(p);}
   const unsafeOnly=[...clusters.entries()].filter(([,ps])=>!ps.some(p=>p.solid));
+  const routeRows=new Map();for(const p of state.platforms.filter(p=>p.route&&p.solid)){const y=Math.round(p.y);if(!routeRows.has(y))routeRows.set(y,[]);routeRows.get(y).push(p)}
+  const routeY=[...routeRows.keys()].sort((a,b)=>a-b),unreachable=routeY.slice(0,-1).filter((y,i)=>{
+    const cap=Math.min(...routeRows.get(y).map(platformRiseCap));return routeY[i+1]-y>cap;
+  });
   const runtimeAssets=[...document.querySelectorAll('script[src],link[rel="stylesheet"]')],assetsStayLocal=runtimeAssets.length===1&&runtimeAssets.every(node=>{const url=new URL(node.src||node.href,location.href);return url.origin===location.origin&&url.pathname.endsWith('/vendor/qrcode-generator.js');});
   const checks=[
     ['12 个部门完整登记',DEPARTMENTS.length===12],['十个指定部门均存在',['lobby','quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','observation'].every(id=>DEPT[id])],
-    ['平台最大垂直间距不超过 132',Math.max(...gaps)<=132],['每一高度簇至少有一块实体平台',unsafeOnly.length===0],['机制表完整',MECHANICS.length>=14],
+    ['平台最大垂直间距不超过 132',Math.max(...gaps)<=132],['每条主路按上一台真实弹跳力保证可达',unreachable.length===0],['每一高度簇至少有一块实体平台',unsafeOnly.length===0],['机制表完整',MECHANICS.length>=14],
     ['死亡台词不少于 12 条',DEATH_LINES.length>=12],['称号五档',TITLES.length===5],['七种大事件，单局最多六种',MAJOR_EVENTS.length===7],
     ['本机排行榜和三选一完整',typeof rankedRows==='function'&&PERK_POOL.length>=5],['帮助道具与轮值任务完整',TOOL_POOL.length>=5&&MISSIONS.length>=8&&KITS.length>=4],
     ['自适应音乐与三档声音完整',typeof startMusic==='function'&&typeof cycleAudioMode==='function'&&['full','sfx','off'].includes(audioMode)],['角色可见性看门狗已启用',typeof repairPlayerState==='function'],
@@ -1587,7 +1603,7 @@ function runQA(){
     ['低功耗调度已启用',FRAME_INTERVAL>=16&&MUSIC_TICK_MS>=70&&REVERB_SECONDS<=.6&&state.animationFrame===0],['音频限制器与防爆音包络完整',typeof audioCtx==='object'&&/createDynamicsCompressor/.test(buildAudioGraph.toString())&&/linearRampToValueAtTime/.test(noiseHit.toString())],
     ['安卓宽虚拟视口兜底完整',typeof syncViewportMode==='function'&&document.documentElement.dataset.shellScale],['1020 米彩蛋加分值为 52',true]
   ];
-  const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
+  const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n不可达主路：${unreachable.length}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
 }
 function runPartyQA(){
   const match=defaultParty();match.active=true;match.n=3;match.rounds=2;match.seconds=75;match.seed=0x10203040;match.players=match.players.slice(0,3);

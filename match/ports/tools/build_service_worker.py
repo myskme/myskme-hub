@@ -25,6 +25,7 @@ MATCH = os.path.abspath(os.path.join(HERE, "..", ".."))
 CORE = [
     "index.html",
     "network-config.js",
+    "vendor/qrcode-generator.js",
     "manifest.json",
     "icons/favicon-32.png",
     "icons/icon-192.png",
