@@ -27,9 +27,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="灵石远征">
 <meta name="theme-color" content="#ead9b9">
-<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，远征与无尽、90 秒矿灯、灵脉战境与本地聚会赛。离线可玩，扫码即开。">
+<meta name="description" content="MYSKME 消消乐：学院谷地地底的灵石矿脉。三三对齐唤醒灵石，疾风·爆裂·万象组合技，远征与无尽、90 秒矿灯、首领战与本地聚会赛。离线可玩，扫码即开。">
 <meta property="og:title" content="灵石远征 · MYSKME 消消乐">
-<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 远征与无尽 + 90 秒矿灯 + 灵脉战境 + 聚会赛。">
+<meta property="og:description" content="学院谷地三消远征 · 组合技连锁 · 远征与无尽 + 90 秒矿灯 + 首领战 + 聚会赛。">
 <!-- 分享卡片走品牌域名：网页玩家基本在国内，github.io 的图爬虫抓不到，
      卡片就成了无图裸链。og.png 随 EdgeOne 直传包的 icons/ 目录发布，
      GitHub Pages 上同路径也有，两边都不断。 -->
@@ -48,7 +48,7 @@
   --glow:0 0 22px rgba(168,102,37,.22);--glow-soft:0 0 12px rgba(168,102,37,.16);
   --paper:#f0e2c8;--noise-op:0;--noise-blend:multiply;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#786057;--mine2:#876d5f;--mine-edge:#b78e61;
+  --mine:#7d716b;--mine2:#8c7f77;--mine-edge:#b99c7c;
 }
 
 /* ── 图标基线 ──
@@ -391,7 +391,7 @@ body::before{display:none}
 #boss-face{width:46px;height:46px;flex:none}
 #boss-face svg{width:100%;height:100%}
 #boss-bar.hit #boss-face{animation:hitFlash .35s ease}
-@keyframes hitFlash{0%{filter:brightness(2.2);transform:translateX(0) scale(1.04)}30%{transform:translateX(-5px)}60%{transform:translateX(4px)}100%{filter:brightness(1);transform:translateX(0) scale(1)}}
+@keyframes hitFlash{0%{filter:brightness(1.5);transform:translateX(0) scale(1.04)}30%{transform:translateX(-4px)}60%{transform:translateX(3px)}100%{filter:brightness(1);transform:translateX(0) scale(1)}}
 #boss-mid{flex:1;min-width:0}
 #boss-name{font-size:13px;letter-spacing:.2em;color:var(--red);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #boss-hpbar{height:9px;background:var(--bg2);border:1px solid var(--edge);position:relative;overflow:hidden;margin-top:3px}
@@ -399,23 +399,28 @@ body::before{display:none}
 #boss-hpbar.low i{filter:brightness(1.35)}
 @keyframes hpWarn{50%{filter:brightness(1.6)}}
 #boss-hp-num{font-size:11px;color:var(--ink2);min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+#boss-dmg{position:absolute;right:82px;top:13px;z-index:2;min-width:44px;padding:2px 6px;text-align:center;
+  border:1px solid color-mix(in srgb,var(--red) 45%,var(--line));background:color-mix(in srgb,var(--panel) 88%,var(--red));
+  color:var(--red);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;opacity:0;pointer-events:none}
+#boss-dmg.go{opacity:1;animation:bossDmg .62s ease-out both}
+@keyframes bossDmg{0%{opacity:0;transform:translateY(5px) scale(.94)}18%,72%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-5px) scale(.98)}}
 #boss-say{position:absolute;left:56px;top:-30px;background:var(--panel);border:1px solid var(--line);padding:3px 10px;font-size:12px;color:var(--ink2);
   opacity:0;transition:opacity .3s,transform .3s;transform:translateY(6px);pointer-events:none;max-width:76%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #boss-say.on{opacity:1;transform:translateY(0)}
 /* 棋盘 */
 #board-wrap{position:relative;width:min(94vw,520px);margin:0 auto;flex:none}
-/* 棋盘改成暖胡桃矿盘：仍要给亮色灵石足够对比，但不再是一块突兀的黑洞。
-   外圈取纸面的铜线与暖岩色，内侧只压一层柔和深度，不使用黑色厚边。 */
+/* 棋盘改成低对比暖岩盘：让六种轮廓先于亮度被识别，长时间游玩不被高反差持续刺激。
+   外圈取纸面的铜线与灰棕，内侧只压一层柔和深度，不使用黑色厚边。 */
 #board{display:block;width:100%;touch-action:none;
   border:1px solid var(--mine-edge);background:var(--mine);
   box-shadow:
     0 0 0 1px color-mix(in srgb,var(--gold) 56%,var(--mine-edge)),
     0 0 0 5px color-mix(in srgb,var(--mine-edge) 74%,var(--bg2)),
     0 0 0 6px color-mix(in srgb,var(--gold) 24%,transparent),
-    inset 0 0 34px rgba(59,39,34,.30),
-    inset 0 2px 0 rgba(255,238,207,.28),
-    inset 0 -3px 10px rgba(59,39,34,.24),
-    0 9px 24px rgba(87,58,42,.22)}
+    inset 0 0 28px rgba(58,48,45,.20),
+    inset 0 2px 0 rgba(255,244,225,.22),
+    inset 0 -3px 10px rgba(58,48,45,.18),
+    0 8px 22px rgba(79,62,54,.18)}
 #board-wrap::before,#board-wrap::after{content:'';position:absolute;width:20px;height:20px;border:2px solid var(--gold);opacity:.75;pointer-events:none;z-index:3}
 #board-wrap::before{top:-6px;left:-6px;border-right:0;border-bottom:0}
 #board-wrap::after{bottom:-6px;right:-6px;border-left:0;border-top:0}
@@ -909,7 +914,7 @@ body::before{display:none}
 .qs-dim{font-size:11px;color:var(--ink3)}
 .qs-go{width:100%;margin-top:8px;padding:7px;font-size:14px}
 
-/* 灵脉战境：开局只选同行；每层之后的三选一用平铺决策条，避免层层套卡。 */
+/* 首领战：开局只选同行；层间用平铺决策条完成强化与战魂锻造。 */
 .ga-rule{margin:12px auto 10px;max-width:340px;padding:10px 12px;border:1px solid var(--gold-line);
   color:var(--ink2);font-size:12.5px;line-height:1.75;text-align:left;background:color-mix(in srgb,var(--gold) 5%,var(--panel))}
 .ga-rule b{color:var(--gold2);font-weight:600}
@@ -923,6 +928,10 @@ body::before{display:none}
 .ga-role b{font-size:12px;font-weight:600}.ga-role i{font-size:10px;font-style:normal;color:var(--ink3)}
 #ovl-gauntlet-pick .ovl-card{width:min(470px,95vw)}
 .ga-build{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:9px 0 12px;min-height:23px}
+.ga-runline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 2px;color:var(--ink2);font-size:11px;letter-spacing:.06em}
+.ga-runline b{color:var(--gold2);font-weight:600}
+.ga-synergies{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:-5px 0 10px;min-height:0}
+.ga-synergies span{padding:3px 7px;border:1px solid color-mix(in srgb,var(--gold) 52%,var(--line));color:var(--gold2);font-size:10px;background:color-mix(in srgb,var(--gold) 8%,var(--panel))}
 .ga-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .ga-choice{min-width:0;border:1px solid var(--line2);background:color-mix(in srgb,var(--gold) 4%,var(--bg2));padding:0 0 10px;cursor:pointer;
   color:var(--ink);font-family:var(--serif);text-align:left;overflow:hidden;touch-action:manipulation}
@@ -1486,7 +1495,7 @@ body{--shk:4px}
         <button class="btn primary big ornate" id="btn-adventure"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 13.5 11"/><path d="M7 6c4.5-2.6 10-1 13 3.5"/><path d="M7 6l3.2 3.4M20 9.5l-3.5-2.6"/></svg> 远征 · 无尽<span class="sub" id="adv-sub">第 1 关 · 晨光浅脉</span></button>
         <div class="menu-route-pair">
           <button class="btn ornate" id="btn-rush"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6c1.3 1.5 1.3 2.7 0 4.2-1.3-1.5-1.3-2.7 0-4.2z"/><path d="M9.5 9.5h5V20h-5z"/><path d="M12 9.5V8"/></svg> 矿灯 · 90 秒<span class="sub" id="rush-sub">连锁续灯 · 最佳 —</span></button>
-          <button class="btn ornate" id="btn-gauntlet"><span class="icw mi" data-ic="crown"></span>灵脉战境<span class="sub" id="gauntlet-sub">逐层首领 · 三选一强化</span></button>
+          <button class="btn ornate" id="btn-gauntlet"><span class="icw mi" data-ic="crown"></span>首领战<span class="sub" id="gauntlet-sub">狂化首领 · 战魂构筑</span></button>
         </div>
       </div>
       <div class="menu-extras">
@@ -1608,6 +1617,7 @@ body{--shk:4px}
         <div id="boss-hpbar"><i></i></div>
       </div>
       <div id="boss-hp-num"></div>
+      <div id="boss-dmg" aria-live="polite"></div>
       <div id="boss-say"></div>
     </div>
     <div id="hud">
@@ -1673,28 +1683,32 @@ body{--shk:4px}
   <div class="ovl-btns"><button class="btn primary big" id="boss-go">应 战</button></div>
 </div></div>
 
-<!-- 灵脉战境 · 开局选同行。六位在此模式统一开放，世界榜规则一致。 -->
+<!-- 首领战 · 开局选同行。六位在此模式统一开放，世界榜规则一致。 -->
 <div class="ovl" id="ovl-gauntlet"><div class="ovl-card">
-  <div class="ovl-kick">VEIN REALM</div>
-  <div class="ovl-title">灵脉 · <em>战境</em></div>
-  <div class="ga-rule"><b>逐层迎战首领。</b>一趟只有一次机会；每次击破后从三项强化中选一项，构筑会保留到本趟结束。击破首位后进入排行榜：先看击破层数，同层再看下一位首领的推进进度。</div>
+  <div class="ovl-kick">BOSS RUN</div>
+  <div class="ovl-title">首领 · <em>战</em></div>
+  <div class="ga-rule"><b>我方越强，首领也越狂。</b>击破后强化构筑并获得战魂；攒够 3 点可再取一项。关键层强化一次升两重，组合路线还能激活质变联动。每一手自动保存，可随时暂离后继续。</div>
   <div class="ga-bosses" id="gauntlet-bosses"></div>
   <div class="ovl-kick" style="margin-top:12px">选择同行 · 六位统一开放</div>
   <div class="ga-role-grid" id="gauntlet-role-grid"></div>
   <div class="ovl-sub" id="gauntlet-role-desc" style="margin-top:10px"></div>
   <div class="ovl-btns">
     <button class="btn ghost" id="gauntlet-close">返 回</button>
-    <button class="btn primary big" id="gauntlet-go">进入战境</button>
+    <button class="btn" id="gauntlet-new" style="display:none">放弃暂离档</button>
+    <button class="btn primary big" id="gauntlet-go">开始首领战</button>
   </div>
 </div></div>
 
-<!-- 灵脉战境 · 层间三选一 -->
+<!-- 首领战 · 层间三选一与战魂锻造 -->
 <div class="ovl" id="ovl-gauntlet-pick"><div class="ovl-card">
   <div class="ovl-kick" id="gauntlet-pick-kick">首领已退</div>
   <div class="ovl-title">三选 · <em>一</em></div>
   <div class="ovl-sub" id="gauntlet-pick-sub"></div>
+  <div class="ga-runline"><span id="gauntlet-souls">战魂 <b>0</b></span><span id="gauntlet-threat"></span></div>
   <div class="ga-build" id="gauntlet-build"></div>
+  <div class="ga-synergies" id="gauntlet-synergies"></div>
   <div class="ga-choices" id="gauntlet-choices"></div>
+  <div class="ovl-btns"><button class="btn ghost" id="gauntlet-pick-skip" style="display:none">保留战魂 · 进入下一层</button></div>
 </div></div>
 
 <!-- 结算 -->
@@ -1731,6 +1745,7 @@ body{--shk:4px}
   <div class="quip">矿不会跑，茶要趁热。缓口气再挖。</div>
   <div class="ovl-btns">
     <button class="btn ghost" id="pause-quit">离开本关</button>
+    <button class="btn" id="pause-leave" style="display:none">暂离并保存</button>
     <button class="btn" id="pause-retry">重开</button>
     <button class="btn primary" id="pause-resume">继续</button>
   </div>
@@ -1970,7 +1985,7 @@ body{--shk:4px}
   </div>
 </div></div>
 
-<!-- 全游戏排行榜：远征、90 秒双榜、灵脉战境与阵营统一收在一处。 -->
+<!-- 全游戏排行榜：远征、90 秒双榜、首领战与阵营统一收在一处。 -->
 <div class="ovl" id="ovl-lb"><div class="ovl-card">
   <button class="ovl-top-close" id="lb-top-close" data-close-target="#lb-close" aria-label="合上排行榜"></button>
   <div class="ovl-kick">GEMFALL RANKINGS</div>
@@ -1978,7 +1993,7 @@ body{--shk:4px}
   <div class="lb-tabs" aria-label="排行榜分类">
     <button id="lb-group-depth" data-group="depth" class="on">远征</button>
     <button id="lb-group-rush" data-group="rush">90 秒</button>
-    <button id="lb-group-boss" data-group="boss">战境</button>
+    <button id="lb-group-boss" data-group="boss">首领</button>
     <button id="lb-group-camp" data-group="camp">阵营</button>
   </div>
   <div class="lb-periods" id="lb-periods" aria-label="90 秒榜单范围">
@@ -2078,9 +2093,11 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   /* 90 秒周榜：best 只记当周单局最佳，claimed 记已入行囊的历史奖励。
      历史最佳仍在 rushBest，周榜换榜绝不会让个人纪录倒退。 */
   rushWeek:{w:'',best:0,claimed:{}},
-  /* 灵脉战境历史最佳。floor=已击破层数，progress=下一层伤害进度（万分制），
+  /* 首领战历史最佳。floor=已击破层数，progress=下一层伤害进度（万分制），
      score=整趟战果；三项必须成组替换，不能分别取最大。 */
   bossBest:{floor:0,progress:0,score:0,build:'',comp:''},
+  /* 首领战暂离档只保留一趟，战魂总数只增不减。暂离档是本机断点，不进入世界榜签名。 */
+  bossRun:null,bossSoul:0,
   /* ---- 追求线（2026-08 加）----
      streak = 冒险关连胜（cur 当前 / best 生涯纪录）。聚会与周挑战不计。
      cs     = 同伴生涯账（每人 r 出战 / w 胜场 / u 大招次数），炉石职业胜场那套。
@@ -2112,6 +2129,37 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   shop:{own:{},worn:{},at:{}},
   lbDev:'',lbAlias:'',lbConfirmedAlias:'',lbAliasMonth:'',lbPw:'',lbPower:0,lbRank:0,lbRankName:'',
   lbAt:0,lbTry:0,lbSig:'',lbErr:'',lbTag:'',muteBgm:false};
+function cleanBossRun(raw){
+  if(!raw||typeof raw!=='object'||+raw.v!==1)return null;
+  const phase=['choice','intro','play'].includes(raw.phase)?raw.phase:'';
+  const ids=['fury','chain','echo','reserve','wind','guard','blast','fortune','charge','supply','special','surge'];
+  const maxes={fury:5,chain:5,echo:4,reserve:4,wind:4,guard:3,blast:4,fortune:5,charge:4};
+  const comps=['wolf','jun','qi','xi','xiao','zi'];
+  const bosses=['ye','she','parrot','hang','yin','both'];
+  if(!phase||!comps.includes(raw.comp)||!/^gf-boss-[a-z0-9-]{4,72}$/i.test(String(raw.seed||'')))return null;
+  const mods={};for(const id of ids.slice(0,9)){const n=clamp(Math.floor(+(raw.mods||{})[id]||0),0,maxes[id]);if(n)mods[id]=n}
+  const picks=Array.isArray(raw.picks)?raw.picks.filter(x=>ids.includes(x)).slice(0,240):[];
+  const choices=Array.isArray(raw.choices)?raw.choices.filter((x,i,a)=>ids.includes(x)&&a.indexOf(x)===i).slice(0,3):[];
+  const piece=p=>{
+    if(p===null)return null;if(!p||typeof p!=='object')return null;
+    const bell=!!p.bell,g=bell?-1:clamp(Math.floor(+p.g||0),0,5),k=['n','H','V','B','O'].includes(p.k)?p.k:'n';
+    return {g,k,bell,cage:bell?0:clamp(Math.floor(+p.cage||0),0,1),snake:!!p.snake,id:Math.max(1,Math.floor(+p.id||1))};
+  };
+  const board=Array.isArray(raw.board)&&raw.board.length===8&&raw.board.every(r=>Array.isArray(r)&&r.length===8)
+    ?raw.board.map(r=>r.map(piece)):null;
+  const terrain=Array.isArray(raw.terrain)&&raw.terrain.length===8&&raw.terrain.every(r=>Array.isArray(r)&&r.length===8)
+    ?raw.terrain.map(r=>r.map(t=>({ink:clamp(Math.floor(+(t&&t.ink)||0),0,2),crate:clamp(Math.floor(+(t&&t.crate)||0),0,2)}))):null;
+  if((phase==='intro'||phase==='play')&&(!board||!terrain))return null;
+  const floor=clamp(Math.floor(+raw.floor||1),1,999),hpMax=Math.max(1,Math.floor(+raw.hpMax||1));
+  return {v:1,phase,floor,cleared:clamp(Math.floor(+raw.cleared||0),0,floor),total:Math.max(0,Math.floor(+raw.total||0)),
+    seed:String(raw.seed),comp:raw.comp,mods,picks,choices,opening:!!raw.opening,forge:!!raw.forge,played:!!raw.played,
+    souls:clamp(Math.floor(+raw.souls||0),0,999),guard:clamp(Math.floor(+raw.guard||0),0,20),
+    bonus:{moves:clamp(Math.floor(+(raw.bonus&&raw.bonus.moves)||0),0,20),special:clamp(Math.floor(+(raw.bonus&&raw.bonus.special)||0),0,12),damage:clamp(+(raw.bonus&&raw.bonus.damage)||0,0,3)},
+    board,terrain,moves:clamp(Math.floor(+raw.moves||0),0,120),score:Math.max(0,Math.floor(+raw.score||0)),
+    boss:bosses.includes(raw.boss)?raw.boss:'ye',hp:clamp(Math.floor(+raw.hp||0),0,hpMax),hpMax,
+    bossTick:clamp(Math.floor(+raw.bossTick||0),0,999),charge:Math.max(0,+raw.charge||0),xiaoN:clamp(Math.floor(+raw.xiaoN||0),0,999),
+    chainMax:clamp(Math.floor(+raw.chainMax||0),0,999),specials:clamp(Math.floor(+raw.specials||0),0,999),lastChain:clamp(Math.floor(+raw.lastChain||0),0,999),at:Math.max(0,Math.floor(+raw.at||0))};
+}
 function loadSave(){
   let s={};try{s=JSON.parse(localStorage.getItem(SKEY)||'{}')}catch(e){}
   const out=Object.assign({},SAVE_DEF,s);
@@ -2147,6 +2195,8 @@ function loadSave(){
   out.bossBest.score=Math.max(0,Math.floor(+out.bossBest.score||0));
   out.bossBest.build=String(out.bossBest.build||'').replace(/[^a-z0-9,:-]/gi,'').slice(0,160);
   out.bossBest.comp=['wolf','jun','qi','xi','xiao','zi'].includes(String(out.bossBest.comp||''))?String(out.bossBest.comp):'';
+  out.bossRun=cleanBossRun(s.bossRun);
+  out.bossSoul=Math.max(0,Math.floor(+s.bossSoul||0));
   out.streak=Object.assign({cur:0,best:0},s.streak||{});
   out.camp=Object.assign({side:'',m:0,log:{},claimed:{}},s.camp||{});
   out.camp.log=(out.camp.log&&typeof out.camp.log==='object')?out.camp.log:{};
@@ -2168,6 +2218,7 @@ function loadSave(){
 const SAVE=loadSave();
 let saveT=null;
 function persist(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(SKEY,JSON.stringify(SAVE))}catch(e){}},120)}
+function persistNow(){clearTimeout(saveT);saveT=null;try{localStorage.setItem(SKEY,JSON.stringify(SAVE))}catch(e){}}
 
 /* ---------- 随机 ---------- */
 function xmur3(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return h>>>0}}
@@ -2177,12 +2228,14 @@ const rnd=Math.random;
 
 /* ---------- 灵石图鉴 ---------- */
 const GEMS=[
-  {name:'金曜',en:'AURUM', base:'#f2c14e',hi:'#ffe9ad',lo:'#9a6f16',shape:'hex'},
-  {name:'赤晶',en:'EMBER', base:'#e0524f',hi:'#ffb3a8',lo:'#8f2424',shape:'tri'},
-  {name:'蓝月',en:'LUNA',  base:'#4da3e8',hi:'#bfe4ff',lo:'#1f5a94',shape:'orb'},
-  {name:'翠叶',en:'VERDE', base:'#57c26c',hi:'#c0f2c8',lo:'#1f6b36',shape:'leaf'},
-  {name:'紫辉',en:'VIOLA', base:'#a97fe8',hi:'#e5d0ff',lo:'#58368f',shape:'dia'},
-  {name:'星屑',en:'STELLA',base:'#ece2c8',hi:'#ffffff',lo:'#8f866c',shape:'star'},
+  /* 六色改为“矿物柔彩”：色相仍分得开，但中间调更宽、白点不再顶满。
+     识别同时依靠六种不同轮廓，不能只靠越来越亮的颜色。 */
+  {name:'金曜',en:'AURUM', base:'#c49a50',hi:'#ead3a0',lo:'#76572c',shape:'hex'},
+  {name:'赤晶',en:'EMBER', base:'#b85f5b',hi:'#e2aaa2',lo:'#713a39',shape:'tri'},
+  {name:'蓝月',en:'LUNA',  base:'#5684a6',hi:'#aac8da',lo:'#315672',shape:'orb'},
+  {name:'翠叶',en:'VERDE', base:'#679270',hi:'#b1cbb5',lo:'#3d6146',shape:'leaf'},
+  {name:'紫辉',en:'VIOLA', base:'#806fa0',hi:'#c4b8d3',lo:'#4e4368',shape:'dia'},
+  {name:'星屑',en:'STELLA',base:'#c7b99a',hi:'#e8dfca',lo:'#746b59',shape:'star'},
 ];
 const KIND={N:'n',H:'H',V:'V',B:'B',O:'O',BELL:'bell'};
 
@@ -3282,6 +3335,24 @@ function gemPath(ctx,x,y,R,shape,rot){
     for(let i=0;i<10;i++){const [px,py]=pt(-Math.PI/2+i*Math.PI/5,i%2?R*.46:R*1.12);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}
     ctx.closePath()}
 }
+/* 插画灵石不改源文件：每张图首次出现时只柔化一次，缓存成 192px 小画布。
+   之后每帧只是普通 drawImage，不给 64 颗灵石逐颗跑滤镜；既保住原稿，也避免长局增加发热。 */
+const _gemTone={};
+function tonedGemArt(key,special){
+  const im=art(key);if(!im)return null;
+  const ck=key+'|'+(special?'s':'n'),old=_gemTone[ck];if(old&&old.im===im)return old.cv;
+  const cv=document.createElement('canvas'),w=Math.min(192,Math.max(64,im.naturalWidth||192)),h=Math.min(192,Math.max(64,im.naturalHeight||192));
+  cv.width=w;cv.height=h;const c=cv.getContext('2d');
+  if('filter' in c)c.filter=special?'saturate(.66) brightness(.87) contrast(.90)':'saturate(.54) brightness(.82) contrast(.86)';
+  c.drawImage(im,0,0,w,h);_gemTone[ck]={im,cv};return cv;
+}
+function drawGemArt(ctx,key,x,y,size,special){
+  const im=tonedGemArt(key,special);if(!im)return false;
+  ctx.save();
+  ctx.globalAlpha*=special ? .93 : .89;
+  ctx.drawImage(im,x-size/2,y-size/2,size,size);
+  ctx.restore();return true;
+}
 /* ---- 画一颗灵石（HUD 小图标与棋盘共用） ---- */
 function drawGem(ctx,x,y,size,gi,kind,o){
   o=o||{};
@@ -3296,14 +3367,14 @@ function drawGem(ctx,x,y,size,gi,kind,o){
   /* o.amb 让调用方收窄底光。大厅那排装饰灵石画在一张只有 54px 高的画布上，
      而默认底光半径 R*1.9≈30px、灵石还在上下漂 ±7px —— 光晕上下都被画布边缘
      切平，看起来就是一条硬边的浅色带子，像穿帮的方块。收窄到能装下为止。 */
-  const ambR=R*1.9*(o.amb||1);
+  const ambR=R*1.55*(o.amb||1);
   const amb=ctx.createRadialGradient(x,y,R*.2,x,y,ambR);
-  amb.addColorStop(0,hexA(G.base,kind==='n'?.30:.5));
+  amb.addColorStop(0,hexA(G.base,kind==='n'?.08:.16));
   amb.addColorStop(1,hexA(G.base,0));
   ctx.fillStyle=amb;ctx.beginPath();ctx.arc(x,y,ambR,0,Math.PI*2);ctx.fill();
   /* 有插画就贴插画当本体，疾风/爆裂的标记仍旧画在上层（标记必须随状态变，不能烘进图里） */
-  if(kind==='O'&&drawArt(ctx,'gem_orb',x,y,size*1.04)){drawGemSkin(ctx,x,y,R);ctx.restore();return}
-  if(kind!=='O'&&drawArt(ctx,'gem_'+gi,x,y,size*1.02)){
+  if(kind==='O'&&drawGemArt(ctx,'gem_orb',x,y,size*1.04,true)){drawGemSkin(ctx,x,y,R);ctx.restore();return}
+  if(kind!=='O'&&drawGemArt(ctx,'gem_'+gi,x,y,size*1.02,kind!=='n')){
     if(kind!=='n')drawGemMark(ctx,x,y,size,R,kind,t);
     drawGemSkin(ctx,x,y,R);
     ctx.restore();return;
@@ -3364,24 +3435,29 @@ function drawGemSkin(ctx,x,y,R){
 function drawGemMark(ctx,x,y,size,R,kind,t){
   if(kind==='H'||kind==='V'){
     ctx.save();ctx.translate(x,y);if(kind==='V')ctx.rotate(Math.PI/2);
-    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.4,size*.05);ctx.lineCap='round';
-    ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=size*.08;
-    for(const s of [-1,1]){
-      ctx.beginPath();ctx.moveTo(s*R*.28,0);ctx.lineTo(s*R*.86,0);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(s*R*.58,-R*.26);ctx.lineTo(s*R*.88,0);ctx.lineTo(s*R*.58,R*.26);ctx.stroke();
+    /* 疾风不再画白色双箭头。两道嵌入式轨纹本身就是方向，
+       深色底槽保证在六种颜色上都清楚，暖象牙线避免刺眼。 */
+    ctx.lineCap='round';
+    ctx.strokeStyle='rgba(45,38,35,.44)';ctx.lineWidth=Math.max(2.5,size*.12);
+    ctx.beginPath();ctx.moveTo(-R*.78,0);ctx.lineTo(R*.78,0);ctx.stroke();
+    ctx.strokeStyle='rgba(236,218,181,.84)';ctx.lineWidth=Math.max(1.05,size*.027);
+    for(const yy of [-R*.15,R*.15]){ctx.beginPath();ctx.moveTo(-R*.72,yy);ctx.lineTo(R*.72,yy);ctx.stroke()}
+    ctx.fillStyle='rgba(194,143,76,.88)';
+    for(const xx of [-R*.48,0,R*.48]){
+      ctx.save();ctx.translate(xx,0);ctx.rotate(Math.PI/4);ctx.fillRect(-R*.05,-R*.05,R*.10,R*.10);ctx.restore();
     }
     ctx.restore();
   }else if(kind==='B'){
-    ctx.save();ctx.translate(x,y);ctx.rotate(t*.0011);
-    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=Math.max(1.3,size*.045);
-    ctx.shadowColor='rgba(0,0,0,.55)';ctx.shadowBlur=size*.08;
-    ctx.beginPath();ctx.arc(0,0,R*.5,0,Math.PI*2);ctx.stroke();
-    ctx.setLineDash([R*.22,R*.2]);ctx.globalAlpha=.85;
-    ctx.beginPath();ctx.arc(0,0,R*.8,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-    ctx.restore();
-    const p=.5+.5*Math.sin(t*.006);
-    ctx.fillStyle='rgba(255,255,255,'+(.55+p*.4)+')';
-    ctx.beginPath();ctx.arc(x,y,R*.22,0,Math.PI*2);ctx.fill();
+    /* 爆裂改成静态六瓣封印，取消旋转虚线和呼吸白点。 */
+    ctx.save();ctx.translate(x,y);ctx.lineCap='round';
+    ctx.strokeStyle='rgba(45,38,35,.43)';ctx.lineWidth=Math.max(2.5,size*.12);
+    ctx.beginPath();ctx.arc(0,0,R*.48,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='rgba(236,218,181,.83)';ctx.lineWidth=Math.max(1.05,size*.029);
+    ctx.beginPath();ctx.arc(0,0,R*.48,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<6;i++){
+      const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(Math.cos(a)*R*.6,Math.sin(a)*R*.6);ctx.lineTo(Math.cos(a)*R*.78,Math.sin(a)*R*.78);ctx.stroke();
+    }
+    ctx.fillStyle='rgba(207,160,91,.94)';ctx.beginPath();ctx.arc(0,0,R*.16,0,Math.PI*2);ctx.fill();ctx.restore();
   }
 }
 function hexA(h,a){
@@ -3574,13 +3650,13 @@ let selCell=null, hintCell=null, dragTo=null;
 function draw(t){
   const s=ENG.cs;
   cx.clearRect(0,0,CSS_W,CSS_W);
-  /* 暖胡桃矿底：用同一组纸面棕色做轻格纹，不再叠黑紫棋盘。 */
+  /* 低对比暖岩底：格线只负责定位，不与灵石争夺注意力。 */
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const x=c*s,y=r*s;
-    cx.fillStyle=(r+c)%2?'rgba(255,245,224,.055)':'rgba(74,49,42,.10)';
+    cx.fillStyle=(r+c)%2?'rgba(255,245,224,.035)':'rgba(66,54,50,.055)';
     cx.fillRect(x,y,s,s);
   }
-  cx.strokeStyle='rgba(239,211,168,.10)';cx.lineWidth=1;
+  cx.strokeStyle='rgba(239,220,190,.075)';cx.lineWidth=1;
   for(let i=1;i<N;i++){cx.beginPath();cx.moveTo(i*s,0);cx.lineTo(i*s,CSS_W);cx.stroke();
     cx.beginPath();cx.moveTo(0,i*s);cx.lineTo(CSS_W,i*s);cx.stroke()}
   /* 墨封（在灵石之下） */
@@ -3637,10 +3713,10 @@ const GS={mode:'adv',L:null,moves:0,score:0,over:false,busy:true,goals:[],
 const DYING=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,REDUCED?Math.min(ms,40):ms));
 
-/* ---------- 灵脉战境 ----------
+/* ---------- 首领战 ----------
    每层都是首领；层数是唯一主排名，当前首领伤害进度与整趟战果只作同层比较。
    道具与引路晶不带入，六位同行统一开放，避免世界榜被主线解锁差异切成两套规则。 */
-const GAUNTLET={active:false,opening:false,played:false,floor:1,cleared:0,total:0,seed:'',comp:'wolf',mods:{},picks:[],choices:[],guard:0,bonus:{moves:0,special:0,damage:0}};
+const GAUNTLET={active:false,phase:'',opening:false,forge:false,played:false,floor:1,cleared:0,total:0,seed:'',comp:'wolf',mods:{},picks:[],choices:[],souls:0,guard:0,bonus:{moves:0,special:0,damage:0}};
 const GAUNTLET_BOSSES=['ye','she','parrot','hang','yin'];
 const GAUNTLET_SUPPORT={
   jia:{name:'佳',role:'探路',art:'support_jia'},
@@ -3664,8 +3740,36 @@ const GAUNTLET_OVERFLOW=[
   {id:'special',by:'yue',name:'特殊石增援',tip:'下一层开局多一颗特殊灵石。',once:true},
   {id:'surge',by:'nuo',name:'临场强攻',tip:'下一层对首领的伤害提高 25%。',once:true},
 ];
+const GAUNTLET_MUTATIONS=[
+  {id:'iron',name:'厚甲',tip:'首领受到的伤害降低 28%。'},
+  {id:'haste',name:'急袭',tip:'首领行动间隔缩短一手。'},
+  {id:'spread',name:'增殖',tip:'登场时额外铺下三处机关。'},
+  {id:'rage',name:'狂怒',tip:'每次行动额外影响两格。'},
+];
+const GAUNTLET_SYNERGIES=[
+  {id:'onslaught',name:'强攻连锁',a:'fury',b:'chain',tip:'连锁追加伤害提高到两倍。'},
+  {id:'storm',name:'风爆炼成',a:'wind',b:'blast',tip:'每层开局额外炼成一颗万象。'},
+  {id:'resonance',name:'万象共鸣',a:'fortune',b:'charge',tip:'每层额外获得半格同行充能。'},
+  {id:'bulwark',name:'不破阵线',a:'reserve',b:'guard',tip:'每层再加两步并多抵挡一次首领行动。'},
+];
 const gauntletStack=id=>Math.max(0,Math.floor(+GAUNTLET.mods[id]||0));
 const gauntletUp=id=>GAUNTLET_UPGRADES.concat(GAUNTLET_OVERFLOW).find(x=>x.id===id);
+function gauntletMutations(floor,seed){
+  floor=Math.max(1,Math.floor(+floor||1));let n=floor<3?0:1+(floor>=8?1:0)+(floor>=16?1:0);
+  const a=GAUNTLET_MUTATIONS.slice(),R=rngOf(String(seed)+'|mutation|'+floor);
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a.slice(0,n);
+}
+const gauntletElite=floor=>Math.max(1,Math.floor(+floor||1))%5===0;
+function gauntletThreatText(floor,seed){
+  const a=gauntletMutations(floor,seed).map(x=>x.name);if(gauntletElite(floor))a.unshift('狂化');
+  return a.length?a.join(' · '):'尚未狂化';
+}
+function gauntletSynergies(mods){
+  mods=mods||GAUNTLET.mods;return GAUNTLET_SYNERGIES.filter(x=>(mods[x.a]||0)>=2&&(mods[x.b]||0)>=2);
+}
+const gauntletHasSynergy=id=>gauntletSynergies().some(x=>x.id===id);
+const gauntletChoiceGain=()=>!GAUNTLET.opening&&GAUNTLET.floor%3===0?2:1;
 function gauntletBuildText(mods){
   mods=mods||GAUNTLET.mods;
   return GAUNTLET_UPGRADES.filter(u=>mods[u.id]).map(u=>u.name+' '+mods[u.id]+'重').join(' · ');
@@ -3697,14 +3801,18 @@ function gauntletChoiceSet(seed,floor,mods){
 }
 function gauntletLevel(floor,seed,mods,comp){
   floor=Math.max(1,Math.floor(+floor||1));mods=mods||{};
-  const boss=gauntletBossAt(floor,seed),R=rngOf(String(seed)+'|floor|'+floor);
+  const boss=gauntletBossAt(floor,seed),R=rngOf(String(seed)+'|floor|'+floor),mut=gauntletMutations(floor,seed);
+  const has=id=>mut.some(x=>x.id===id),elite=gauntletElite(floor);
+  /* 血量本身逐层严格上升；厚甲与狂化改走减伤，避免下一层随机词条变化时
+     出现“层数更深、血条反而更短”的视觉倒退。 */
   const hp=Math.round(110+floor*30+floor*floor*1.5);
   const L={n:0,ch:9,pos:0,endless:false,depth:floor,colors:floor>=10?6:5,
-    moves:22+(comp==='xi'?2:0)+(mods.reserve||0)*3+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
+    moves:22+(comp==='xi'?2:0)+(mods.reserve||0)*3+(gauntletSynergies(mods).some(x=>x.id==='bulwark')?2:0)+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
     ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss,bossHP:hp,
-    bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)),s1:9000,s2:24000,s3:52000,
-    chName:'灵脉战境',era:'第 '+floor+' 层',epi:'击破后选择一项强化，继续下潜。'};
-  const n=Math.min(8,2+Math.floor(floor/3)),spots=PAT.scatter(R,18,1,6);
+    bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)-(has('haste')?1:0)),bossExtra:(has('rage')?2:0)+(elite?1:0),
+    mutations:mut.map(x=>x.id),elite,s1:9000,s2:24000,s3:52000,
+    chName:'首领战',era:'第 '+floor+' 层',epi:'击破后强化构筑，继续迎战。'};
+  const n=Math.min(12,2+Math.floor(floor/3)+(has('spread')?3:0)),spots=PAT.scatter(R,24,1,6);
   if(boss==='ye')L.ink=spots.slice(0,n);
   else if(boss==='she')L.cages=spots.slice(0,n);
   else if(boss==='parrot')L.crates=spots.slice(0,Math.max(2,n-1));
@@ -3716,9 +3824,11 @@ function gauntletLevel(floor,seed,mods,comp){
 function gauntletDamage(base,opt){
   opt=opt||{};let n=Math.max(0,+base||0);
   n*=1+gauntletStack('fury')*.35;
-  if(opt.chain>=3)n+=opt.chain*4*gauntletStack('chain');
+  if(opt.chain>=3)n+=opt.chain*4*gauntletStack('chain')*(gauntletHasSynergy('onslaught')?2:1);
   if(ULTING)n*=1+gauntletStack('echo')*.45;
   n*=1+(GAUNTLET.bonus.damage||0);
+  if(GS.L&&Array.isArray(GS.L.mutations)&&GS.L.mutations.includes('iron'))n*=.72;
+  if(GS.L&&GS.L.elite)n*=.80;
   return Math.max(1,Math.round(n));
 }
 function gauntletBetter(a,b){
@@ -3733,7 +3843,32 @@ function gauntletRecord(floor,progress,score){
   if(gauntletBetter(next,SAVE.bossBest)){SAVE.bossBest=next;persist();return true}
   return false;
 }
+function gauntletRunData(phase){
+  phase=phase||GAUNTLET.phase||'choice';const onBoard=phase==='intro'||phase==='play';
+  return cleanBossRun({v:1,phase,floor:GAUNTLET.floor,cleared:GAUNTLET.cleared,total:GAUNTLET.total,seed:GAUNTLET.seed,
+    comp:GAUNTLET.comp,mods:GAUNTLET.mods,picks:GAUNTLET.picks,choices:GAUNTLET.choices.map(x=>x.id||x),opening:GAUNTLET.opening,
+    forge:GAUNTLET.forge,played:GAUNTLET.played,souls:GAUNTLET.souls,guard:GAUNTLET.guard,bonus:GAUNTLET.bonus,
+    board:onBoard?B.map(row=>row.map(p=>p?{g:p.g,k:p.k,bell:!!p.bell,cage:p.cage||0,snake:!!p.snake,id:p.id}:null)):null,
+    terrain:onBoard?T.map(row=>row.map(t=>({ink:t.ink||0,crate:t.crate||0}))):null,
+    moves:GS.moves,score:GS.score,boss:GS.boss,hp:GS.hp,hpMax:GS.hpMax,bossTick:GS.bossTick,charge:GS.charge,
+    xiaoN:GS.xiaoN,chainMax:GS.chainMax,specials:GS.specials,lastChain:GS.lastChain,at:Date.now()});
+}
+function gauntletSaveRun(phase,now){
+  if(!GAUNTLET.active)return false;phase=phase||GAUNTLET.phase;
+  if(phase==='play'&&(GS.busy||GS.over))return false;
+  const data=gauntletRunData(phase);if(!data)return false;
+  SAVE.bossRun=data;now?persistNow():persist();return true;
+}
+function gauntletClearRun(now){SAVE.bossRun=null;now?persistNow():persist()}
+function gauntletLoadMeta(run){
+  GAUNTLET.active=true;GAUNTLET.phase=run.phase;GAUNTLET.opening=run.opening;GAUNTLET.forge=run.forge;GAUNTLET.played=run.played;
+  GAUNTLET.floor=run.floor;GAUNTLET.cleared=run.cleared;GAUNTLET.total=run.total;GAUNTLET.seed=run.seed;GAUNTLET.comp=run.comp;
+  GAUNTLET.mods=Object.assign({},run.mods);GAUNTLET.picks=run.picks.slice();GAUNTLET.choices=run.choices.map(gauntletUp).filter(Boolean);
+  GAUNTLET.souls=run.souls;GAUNTLET.guard=run.guard;GAUNTLET.bonus=Object.assign({moves:0,special:0,damage:0},run.bonus||{});
+}
 function renderGauntletSetup(){
+  const run=cleanBossRun(SAVE.bossRun);
+  if(run)GAUNTLET.comp=run.comp;
   if(!COMPANIONS.some(c=>c.id===GAUNTLET.comp))GAUNTLET.comp=SAVE.comp||'wolf';
   $('#gauntlet-bosses').innerHTML=['叶王','缠丝夫人','鹦鹉教授','航','音','叶王真形'].map(x=>'<span>'+x+'</span>').join('');
   const host=$('#gauntlet-role-grid');host.innerHTML='';
@@ -3741,21 +3876,32 @@ function renderGauntletSetup(){
     const b=document.createElement('button');b.type='button';b.className='ga-role'+(GAUNTLET.comp===c.id?' sel':'');
     b.innerHTML='<div class="ga-role-face" data-fit="contain"></div><b>'+c.name+'</b><i>'+c.title+'</i>';
     applyArt(b.querySelector('.ga-role-face'),'ally_'+c.id);
-    b.onclick=()=>{SFX.click();GAUNTLET.comp=c.id;renderGauntletSetup()};host.appendChild(b);
+    b.disabled=!!run;
+    b.onclick=()=>{if(run)return;SFX.click();GAUNTLET.comp=c.id;renderGauntletSetup()};host.appendChild(b);
   }
   const c=compById(GAUNTLET.comp),best=SAVE.bossBest||{};
   $('#gauntlet-role-desc').innerHTML='<b>'+c.name+'</b> · '+c.ult+'　'+c.desc.replace(/<[^>]+>/g,'')
-    +'<br>本机最佳：击破 <b>'+Math.max(0,best.floor||0)+'</b> 层';
+    +'<br>本机最佳：击破 <b>'+Math.max(0,best.floor||0)+'</b> 层　累计战魂 <b>'+Math.max(0,SAVE.bossSoul||0)+'</b>'
+    +(run?'<br>暂离记录：第 <b>'+run.floor+'</b> 层 · '+(run.phase==='choice'?'等待强化':'剩余 '+run.moves+' 步')+' · 同行已锁定':'');
+  $('#gauntlet-go').textContent=run?('继续第 '+run.floor+' 层'):'开始首领战';
+  $('#gauntlet-new').style.display=run?'':'none';
 }
 function openGauntletSetup(){
   GAUNTLET.comp=SAVE.comp||GAUNTLET.comp||'wolf';renderGauntletSetup();ovl('gauntlet');
 }
 function gauntletStart(){
-  GAUNTLET.active=true;GAUNTLET.opening=true;GAUNTLET.played=false;GAUNTLET.floor=1;GAUNTLET.cleared=0;GAUNTLET.total=0;GAUNTLET.mods={};GAUNTLET.picks=[];GAUNTLET.choices=[];GAUNTLET.guard=0;GAUNTLET.bonus={moves:0,special:0,damage:0};
+  gauntletClearRun();
+  GAUNTLET.active=true;GAUNTLET.phase='choice';GAUNTLET.opening=true;GAUNTLET.forge=false;GAUNTLET.played=false;GAUNTLET.floor=1;GAUNTLET.cleared=0;GAUNTLET.total=0;GAUNTLET.mods={};GAUNTLET.picks=[];GAUNTLET.choices=[];GAUNTLET.souls=0;GAUNTLET.guard=0;GAUNTLET.bonus={moves:0,special:0,damage:0};
   GAUNTLET.seed='gf-boss-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
   gauntletRenderChoices(true);
 }
-function gauntletOpenFloor(){
+function gauntletResume(){
+  const run=cleanBossRun(SAVE.bossRun);if(!run){SAVE.bossRun=null;persist();gauntletStart();return}
+  gauntletLoadMeta(run);ovl(null);
+  if(run.phase==='choice')gauntletRenderChoices(run.opening,true);
+  else gauntletOpenFloor(run);
+}
+function gauntletOpenFloor(run){
   const floor=GAUNTLET.floor,L=gauntletLevel(floor,GAUNTLET.seed,GAUNTLET.mods,GAUNTLET.comp);GS.mode='gauntlet';GS.L=L;
   buildBoard(L,GAUNTLET.seed+'|board|'+floor);GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;GS.usedTool=false;
@@ -3763,16 +3909,29 @@ function gauntletOpenFloor(){
   GS.rushOn=false;GS.started=PLAT.now();GS.tool=null;GS.toolFirst=null;GS.cont=0;GS.paused=false;GS.prep='';GS.guideAssist=false;
   GS.party=false;GS.weekly=false;GS.toldTool=false;GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
   GS.compDef=compById(GAUNTLET.comp);GS.charge=0;GS.xiaoN=0;GS.pasRng=rngOf(GAUNTLET.seed+'|passive|'+floor);
+  if(run){
+    L.boss=run.boss;L.bossHP=run.hpMax;L.goals=[{type:'boss',need:run.hpMax}];GS.boss=run.boss;GS.hp=run.hp;GS.hpMax=run.hpMax;
+    B=run.board.map(row=>row.map(p=>p?newPiece(p):null));T=run.terrain.map(row=>row.map(t=>({ink:t.ink,crate:t.crate})));
+    idSeq=Math.max(1,...B.flat().filter(Boolean).map(p=>p.id||0))+1;ENG.colors=L.colors;
+    GS.goals=[{type:'boss',need:run.hpMax,got:run.hpMax-run.hp}];GS.moves=run.moves;GS.score=run.score;GS.bossTick=run.bossTick;
+    GS.charge=run.charge;GS.xiaoN=run.xiaoN;GS.chainMax=run.chainMax;GS.specials=run.specials;GS.lastChain=run.lastChain;
+  }
   BGM.play('boss');show('game');fitCanvas();
   $('#rush-bar').classList.remove('on');$('#toolbar').style.display='none';$('#tool-hint').classList.remove('on');
-  $('#score-stars').innerHTML='';renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='第 '+floor+' 层';updHUD();
+  $('#score-stars').innerHTML='';renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='第 '+floor+' 层 · '+gauntletThreatText(floor,GAUNTLET.seed);updHUD();
   const bo=BOSSES[L.boss],bb=$('#boss-bar');bb.classList.add('on');
   $('#boss-face').innerHTML=bossFaceSVG(L.boss);applyArt($('#boss-face'),'boss_'+L.boss);
-  $('#boss-name').textContent=bo.title;$('#boss-hpbar').querySelector('i').style.width='100%';$('#boss-hpbar').classList.remove('low');
+  const hpPct=GS.hp/GS.hpMax*100;$('#boss-name').textContent=bo.title;$('#boss-hpbar').querySelector('i').style.width=hpPct+'%';$('#boss-hpbar').classList.toggle('low',hpPct<30);
   $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;$('#quip-line').innerHTML='<b>'+bo.short+'：</b>'+bo.intro;
   $('#boss-intro-face').innerHTML=bossFaceSVG(L.boss);$('#boss-intro-face').dataset.fit='contain';applyArt($('#boss-banner'),'boss_banner');applyArt($('#boss-intro-face'),'boss_'+L.boss);
-  $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');$('#boss-intro-title').textContent='灵脉战境 · 第 '+floor+' 层';$('#boss-intro-line').textContent=bo.intro;
-  ovl('boss');
+  $('#boss-intro-name').textContent=bo.name.replace(' · ','\n');$('#boss-intro-title').textContent='首领战 · 第 '+floor+' 层 · '+gauntletThreatText(floor,GAUNTLET.seed);$('#boss-intro-line').textContent=bo.intro;
+  hintCell=null;selCell=null;
+  if(run&&run.phase==='play'){
+    GAUNTLET.phase='play';GS.busy=false;GS.paused=false;GS.idle=PLAT.now();ovl(null);renderAlly();gauntletSaveRun('play');
+    toast('已恢复第 <b>'+floor+'</b> 层 · 剩余 '+GS.moves+' 步',2200);
+  }else{
+    GAUNTLET.phase='intro';ovl('boss');gauntletSaveRun('intro');
+  }
 }
 function gauntletPlant(kind,n,R){
   const spots=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].cage&&!T[r][c].ink&&!T[r][c].crate)spots.push([r,c]);
@@ -3786,58 +3945,88 @@ function gauntletBeginFloor(){
   gauntletPlant(i=>i%2?'V':'H',wind,R);gauntletPlant('B',gauntletStack('blast'),R);
   gauntletPlant(()=>R()<.22?'O':['H','V','B'][Math.floor(R()*3)],gauntletStack('fortune'),R);
   gauntletPlant(()=>['H','V','B'][Math.floor(R()*3)],GAUNTLET.bonus.special||0,R);
-  GS.charge=Math.min(GS.compDef.need,GS.compDef.need*.25*gauntletStack('charge'));
-  GAUNTLET.guard=gauntletStack('guard');renderGoals($('#goal-row'),30);updHUD();renderAlly();
+  if(gauntletHasSynergy('storm'))gauntletPlant('O',1,R);
+  GS.charge=Math.min(GS.compDef.need,GS.compDef.need*(.25*gauntletStack('charge')+(gauntletHasSynergy('resonance')?.5:0)));
+  GAUNTLET.guard=gauntletStack('guard')+(gauntletHasSynergy('bulwark')?1:0);renderGoals($('#goal-row'),30);updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
-  toast('灵脉战境 · 第 <b>'+GAUNTLET.floor+'</b> 层'+(gauntletBuildText()?'<br>'+gauntletBuildText():''),2600);
+  GAUNTLET.phase='play';gauntletSaveRun('play');
+  toast('首领战 · 第 <b>'+GAUNTLET.floor+'</b> 层 · '+gauntletThreatText(GAUNTLET.floor,GAUNTLET.seed)+(gauntletBuildText()?'<br>'+gauntletBuildText():''),2600);
 }
-function gauntletRenderChoices(opening){
+function gauntletRenderChoices(opening,saved){
   GAUNTLET.opening=!!opening;
-  GAUNTLET.choices=gauntletChoiceSet(GAUNTLET.seed,opening?0:GAUNTLET.floor,GAUNTLET.mods);
-  $('#gauntlet-pick-kick').textContent=opening?'出发强化':'第 '+GAUNTLET.floor+' 层击破';
-  $('#gauntlet-pick-sub').textContent=opening?'先选一项带入整趟的强化 · 选定后进入第 1 层'
-    :'已击破 '+GAUNTLET.cleared+' 层 · 选择后进入第 '+(GAUNTLET.floor+1)+' 层';
+  if(!saved)GAUNTLET.choices=gauntletChoiceSet(GAUNTLET.seed,opening?0:GAUNTLET.floor,GAUNTLET.mods);
+  GAUNTLET.phase='choice';
+  $('#gauntlet-pick-kick').textContent=GAUNTLET.forge?'战魂锻造':opening?'出发强化':'第 '+GAUNTLET.floor+' 层击破';
+  const gain=gauntletChoiceGain(),next=opening?1:GAUNTLET.floor+1;
+  $('#gauntlet-pick-sub').textContent=GAUNTLET.forge?'已取得一项强化 · 消耗 3 战魂可从余下两项再取一项，也可保留战魂继续'
+    :opening?'先选一项带入整趟的强化 · 选定后进入第 1 层'
+    :'已击破 '+GAUNTLET.cleared+' 层 · '+(gain>1?'本次是突破强化，一次提升两重':'选择后进入第 '+next+' 层');
+  $('#gauntlet-souls').innerHTML='战魂 <b>'+GAUNTLET.souls+'</b>';
+  $('#gauntlet-threat').textContent='下层：'+gauntletThreatText(next,GAUNTLET.seed);
   const build=$('#gauntlet-build'),txt=gauntletBuildText();build.innerHTML=txt?txt.split(' · ').map(x=>'<span>'+esc(x)+'</span>').join(''):'<span>尚无强化</span>';
+  const syn=gauntletSynergies();$('#gauntlet-synergies').innerHTML=syn.map(x=>'<span>'+x.name+' · '+x.tip+'</span>').join('');
   const host=$('#gauntlet-choices');host.innerHTML='';
   for(const u of GAUNTLET.choices){
     const s=GAUNTLET_SUPPORT[u.by],b=document.createElement('button');b.type='button';b.className='ga-choice';b.dataset.up=u.id;
     b.innerHTML='<div class="ga-choice-face" data-fit="contain"></div><div class="ga-choice-copy"><div class="ga-choice-by">'+s.name+' · '+s.role+'</div><b>'+u.name+'</b><p>'+u.tip+'</p><small>'
-      +(u.once?'只作用下一层':('当前 '+gauntletStack(u.id)+' 重 · 上限 '+u.max+' 重'))+'</small></div>';
+      +(GAUNTLET.forge?'消耗 3 战魂 · ':gain>1?'突破强化 · ':'')+(u.once?'只作用下一层':('本次 +'+gain+' 重 · 当前 '+gauntletStack(u.id)+' / '+u.max+' 重'))+'</small></div>';
     applyArt(b.querySelector('.ga-choice-face'),s.art);b.onclick=()=>gauntletChoose(u.id);host.appendChild(b);
   }
+  $('#gauntlet-pick-skip').style.display=GAUNTLET.forge?'':'none';
+  gauntletSaveRun('choice');
   ovl('gauntlet-pick');
 }
-function gauntletChoose(id){
-  if(!GAUNTLET.active||!GAUNTLET.choices.some(u=>u.id===id))return;
-  const u=gauntletUp(id);if(!u)return;SFX.click();GAUNTLET.picks.push(id);GAUNTLET.choices=[];
+function gauntletApplyChoice(u,gain){
+  gain=Math.max(1,Math.floor(+gain||1));GAUNTLET.picks.push(u.id);
   if(u.once){
-    if(id==='supply')GAUNTLET.bonus.moves=2;
-    else if(id==='special')GAUNTLET.bonus.special=1;
-    else if(id==='surge')GAUNTLET.bonus.damage=.25;
-  }else GAUNTLET.mods[id]=Math.min(u.max,gauntletStack(id)+1);
-  toast('<b>'+u.name+'</b> · '+u.tip,1800);
+    if(u.id==='supply')GAUNTLET.bonus.moves+=2*gain;
+    else if(u.id==='special')GAUNTLET.bonus.special+=gain;
+    else if(u.id==='surge')GAUNTLET.bonus.damage+=.25*gain;
+  }else GAUNTLET.mods[u.id]=Math.min(u.max,gauntletStack(u.id)+gain);
+}
+function gauntletFinishChoice(){
+  GAUNTLET.forge=false;GAUNTLET.choices=[];
   if(GAUNTLET.opening)GAUNTLET.opening=false;else GAUNTLET.floor++;
   ovl(null);gauntletOpenFloor();
 }
+function gauntletChoose(id){
+  if(!GAUNTLET.active||!GAUNTLET.choices.some(u=>u.id===id))return;
+  const u=gauntletUp(id);if(!u)return;SFX.click();
+  if(GAUNTLET.forge){if(GAUNTLET.souls<3)return;GAUNTLET.souls-=3}
+  gauntletApplyChoice(u,gauntletChoiceGain());GAUNTLET.choices=GAUNTLET.choices.filter(x=>x.id!==id);
+  toast('<b>'+u.name+'</b> · '+u.tip,1800);
+  if(!GAUNTLET.opening&&!GAUNTLET.forge&&GAUNTLET.souls>=3&&GAUNTLET.choices.length){GAUNTLET.forge=true;gauntletRenderChoices(false,true);return}
+  gauntletFinishChoice();
+}
+function gauntletSkipForge(){if(!GAUNTLET.active||!GAUNTLET.forge)return;SFX.click();gauntletFinishChoice()}
+function gauntletLeave(){
+  if(!GAUNTLET.active||GS.mode!=='gauntlet'||GAUNTLET.phase!=='play')return;
+  if(GS.busy||GS.over){toast('等这一手落定再暂离');return}
+  if(!gauntletSaveRun('play',true)){toast('暂离记录没有保存成功');return}
+  GS.paused=false;GS.over=true;GS.busy=true;GS.epoch=(GS.epoch||0)+1;GAUNTLET.active=false;
+  $('#toolbar').style.display='';ovl(null);show('menu');toast('首领战已保存 · 下次从第 <b>'+GAUNTLET.floor+'</b> 层继续',2600);
+}
 function gauntletFloorWon(){
   GAUNTLET.total+=GS.score;GAUNTLET.cleared=GAUNTLET.floor;gauntletRecord(GAUNTLET.cleared,0,GAUNTLET.total);
+  const earned=gauntletElite(GAUNTLET.floor)?3:1;GAUNTLET.souls+=earned;SAVE.bossSoul=Math.max(0,SAVE.bossSoul||0)+earned;
   GAUNTLET.bonus={moves:0,special:0,damage:0};
+  toast('击破首领 · 战魂 <b>+'+earned+'</b>',1800);
   gauntletRenderChoices();
 }
 function gauntletEnd(reason){
   if(!GAUNTLET.active)return;
   const progress=GS.hpMax?clamp(Math.round((GS.hpMax-GS.hp)/GS.hpMax*10000),0,10000):0;
-  GAUNTLET.total+=GS.score;GAUNTLET.active=false;GAUNTLET.opening=false;const best=gauntletRecord(GAUNTLET.cleared,progress,GAUNTLET.total);
+  GAUNTLET.total+=GS.score;GAUNTLET.active=false;GAUNTLET.phase='';GAUNTLET.opening=false;GAUNTLET.forge=false;const best=gauntletRecord(GAUNTLET.cleared,progress,GAUNTLET.total);gauntletClearRun();
   GS.over=true;GS.busy=true;GS.won=false;$('#toolbar').style.display='';
   if(GAUNTLET.played){
     markRun();q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);csBump('r',1);bountyCheck();
     setTimeout(()=>LB.flush('clear'),600);
   }
   SFX.lose();applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent='灵脉战境 · VEIN REALM';$('#end-title').innerHTML=best?'新 · <em>纪录</em>':'战境 · <em>结算</em>';
+  $('#end-kick').textContent='首领战 · BOSS RUN';$('#end-title').innerHTML=best?'新 · <em>纪录</em>':'首领 · <em>结算</em>';
   countTo($('#end-score'),GAUNTLET.total);$('#end-stars').style.display='none';$('#end-waystone').classList.remove('on');
   $('#end-detail').innerHTML='击破 <b>'+GAUNTLET.cleared+'</b> 层　下一位首领进度 <b>'+gauntletPct(progress)+'%</b><br>整趟战果 <b>'+GAUNTLET.total.toLocaleString('en-US')+'</b>'
-    +(gauntletBuildText()?'<br>'+esc(gauntletBuildText()):'');
+    +(gauntletBuildText()?'<br>'+esc(gauntletBuildText()):'')+'<br>本趟剩余战魂 <b>'+GAUNTLET.souls+'</b>';
   $('#end-quip').textContent=!GAUNTLET.played?'尚未出手，这次不计入累计记录。':reason==='quit'?'这一趟到这里。阵容与选择都还在你手里。':GAUNTLET.cleared?'败退不是清零——这一趟已经留在榜上，下一趟换一种组合。':'首位首领的进度已留在本机；击破它之后，这趟纪录就会进入世界榜。';
   $('#end-next').textContent='再战一趟';$('#end-next').dataset.act='gauntlet';$('#end-menu').textContent='回大厅';
   $('#end-retry').style.display='none';$('#end-retry').dataset.act='';$('#end-continue').style.display='none';$('#end-share').style.display='none';
@@ -4087,7 +4276,8 @@ function bossSay(txt){
 function bossHurt(dmg,opt){
   if(!GS.boss||GS.hp<=0)return;
   if(GS.mode==='gauntlet')dmg=gauntletDamage(dmg,opt);
-  GS.hp=Math.max(0,GS.hp-dmg);
+  dmg=Math.max(0,Math.round(+dmg||0));const dealt=Math.min(GS.hp,dmg);
+  GS.hp=Math.max(0,GS.hp-dealt);
   const g=GS.goals.find(x=>x.type==='boss');
   if(g){g.got=GS.hpMax-GS.hp;const el=$('#goal-row').children[GS.goals.indexOf(g)];
     if(el)el.querySelector('.cnt').textContent=goalText(g)}
@@ -4095,6 +4285,10 @@ function bossHurt(dmg,opt){
   $('#boss-hpbar').querySelector('i').style.width=pct+'%';
   $('#boss-hpbar').classList.toggle('low',pct<30);
   $('#boss-hp-num').textContent=GS.hp+' / '+GS.hpMax;
+  /* 参考战斗三消里“落子立刻对应战果”的优点，只给一个小型真实伤害回执。
+     不做巨型数字、连跳数字或角色切屏，棋盘永远是主角。 */
+  const hit=$('#boss-dmg');if(hit&&dealt>0){hit.textContent='−'+dealt;hit.classList.remove('go');void hit.offsetWidth;hit.classList.add('go');
+    clearTimeout(hit._t);hit._t=setTimeout(()=>hit.classList.remove('go'),680)}
   const bar=$('#boss-bar');bar.classList.remove('hit');void bar.offsetWidth;bar.classList.add('hit');
   SFX.bossHit();
   if(rnd()<.3)bossSay(pick2(BOSSES[GS.boss].hurt));
@@ -4121,8 +4315,9 @@ async function bossAct(){
   }
   for(let i=spots.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[spots[i],spots[j]]=[spots[j],spots[i]]}
   const floor=GS.mode==='gauntlet'?GAUNTLET.floor:1;
-  const n=Math.min(spots.length,act==='seal'?Math.min(5,3+Math.floor(floor/8))
-    :act==='snake'?Math.min(4,2+Math.floor(floor/10)):act==='mask'?4:Math.min(8,4+Math.floor(floor/5)));
+  const extra=(GS.L&&GS.L.bossExtra)||0;
+  const n=Math.min(spots.length,(act==='seal'?Math.min(5,3+Math.floor(floor/8))
+    :act==='snake'?Math.min(4,2+Math.floor(floor/10)):act==='mask'?4:Math.min(8,4+Math.floor(floor/5)))+extra);
   for(let i=0;i<n;i++){
     const [r,c]=spots[i];
     if(act==='seal'){T[r][c].ink=1;fxRing(cxOf(c),cyOf(r),'#d56060',ENG.cs*1.4)}
@@ -4150,7 +4345,7 @@ async function settleBoard(firstChain){
     const groups=findGroups();
     if(!groups.length)break;
     chain++;GS.chainMax=Math.max(GS.chainMax,chain);
-    if(!GS.party&&GS.mode!=='gauntlet'&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 来宾局与战境不抬主榜技巧线
+    if(!GS.party&&GS.mode!=='gauntlet'&&chain>(SAVE.chainBest||0)){SAVE.chainBest=chain;persist()}  // 来宾局与首领战不抬主榜技巧线
     /* 先记下要炼成的特殊灵石 */
     const makes=[];
     const all=new Set();
@@ -4407,6 +4602,7 @@ async function trySwap(a,b){
   /* 已经结束了就别把 busy 放开（计时归零时 endRush 已经把 busy 置 true 定分了） */
   if(!GS.over){GS.busy=false;GS.idle=PLAT.now()}
   await checkEnd();
+  if(GS.mode==='gauntlet'&&GAUNTLET.active&&GAUNTLET.phase==='play'&&!GS.busy&&!GS.over)gauntletSaveRun('play');
 }
 
 async function checkEnd(){
@@ -4903,6 +5099,7 @@ async function fireUlt(){
   renderAlly();
   GS.busy=false;
   await checkEnd();
+  if(GS.mode==='gauntlet'&&GAUNTLET.active&&GAUNTLET.phase==='play'&&!GS.busy&&!GS.over)gauntletSaveRun('play');
 }
 function renderAllyPick(){
   const host=$('#ally-pick');host.innerHTML='';
@@ -7208,7 +7405,7 @@ function lbRowHTML(r,mine){
     +(rush||rushAll
       ?'<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">'+(rush?'本周':'历史')+'</div></div>'
       :boss
-        ?'<div class="pw"><div class="pv">击破 '+(Number(r.bossFloor)||0)+' 层</div><div class="pl">战境</div></div>'
+        ?'<div class="pw"><div class="pv">击破 '+(Number(r.bossFloor)||0)+' 层</div><div class="pl">首领战</div></div>'
         :'<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')+'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
@@ -7228,7 +7425,7 @@ function lbCardHTML(r){
     cmp='<div class="lc-cmp">'+(gap>0?'再多 <b>'+gap.toLocaleString('en-US')+'</b> 分，就到他的'+label+'位置':'你已不低于他的'+label+'成绩')+'</div>';
   }else if(me&&me!==r&&LB.registered()&&LB.scope==='boss'){
     const df=(Number(r.bossFloor)||0)-(Number(me.bossFloor)||0),dp=(Number(r.bossProgress)||0)-(Number(me.bossProgress)||0),ds=(Number(r.bossScore)||0)-(Number(me.bossScore)||0);
-    cmp='<div class="lc-cmp">'+(df>0?'再击破 <b>'+df+'</b> 层，就到他的战境位置':df<0?'你已比他多击破 <b>'+(-df)+'</b> 层':dp>0?'同层 · 下一位首领再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平':dp<0?'你在同层的推进更深':ds>0?'同层同进度 · 战果再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 可越过他':'你已不低于他的战境记录')+'</div>';
+    cmp='<div class="lc-cmp">'+(df>0?'再击破 <b>'+df+'</b> 层，就到他的首领战位置':df<0?'你已比他多击破 <b>'+(-df)+'</b> 层':dp>0?'同层 · 下一位首领再推进 <b>'+Math.ceil(dp/100)+'%</b> 可追平':dp<0?'你在同层的推进更深':ds>0?'同层同进度 · 战果再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 可越过他':'你已不低于他的首领战记录')+'</div>';
   }else if(me&&me!==r&&LB.registered()){
     const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0),starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
     cmp='<div class="lc-cmp">'+(lvGap>0?'再通 <b>'+lvGap+'</b> 关，就到他的远征位置':lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关':starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
@@ -7236,9 +7433,9 @@ function lbCardHTML(r){
   const c=r.comp&&compById(r.comp),scope=LB.scope;
   const main=scope==='rush'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>本周矿灯</span>'
     :scope==='rushAll'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>90 秒历史</span>'
-    :scope==='boss'?'击破 '+(Number(r.bossFloor)||0)+' 层<span>灵脉战境</span>'
+    :scope==='boss'?'击破 '+(Number(r.bossFloor)||0)+' 层<span>首领战</span>'
     :'第 '+(Number(r.lv)||0)+' 关<span>远征位置</span>';
-  const recordTitle=scope==='rush'?'90 秒本周记录':scope==='rushAll'?'90 秒历史记录':scope==='boss'?'灵脉战境记录':'远征记录';
+  const recordTitle=scope==='rush'?'90 秒本周记录':scope==='rushAll'?'90 秒历史记录':scope==='boss'?'首领战记录':'远征记录';
   const scoped=scope==='rush'?row('本周矿灯',r.rush?Number(r.rush).toLocaleString('en-US'):'')+row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
     :scope==='rushAll'?row('90 秒历史',r.rush?Number(r.rush).toLocaleString('en-US'):'')
     :scope==='boss'?row('下一位进度',gauntletPct(r.bossProgress)+'%')+row('整趟战果',r.bossScore?Number(r.bossScore).toLocaleString('en-US'):'')+row('强化组合',esc(gauntletBuildLabel(r.bossBuild)||'未记录'))
@@ -7872,10 +8069,10 @@ function rushRewardHTML(meta){
 }
 function lbBoardHTML(rows,myIdx,meta){
   const row=r=>lbRowHTML(r,lbIsMe(r),'');
-  /* 远征与战境榜保留前三；90 秒双榜多露一行前列，让变化能被看见，
+  /* 远征与首领榜保留前三；90 秒双榜多露一行前列，让变化能被看见，
      同时仍给玩家附近三行留足空间。 */
   const lamp=LB.scope==='rush'||LB.scope==='rushAll',leadN=lamp?4:3,top=rows.slice(0,leadN);
-  const heading=LB.scope==='rush'?'本周矿灯':LB.scope==='rushAll'?'90 秒历史':LB.scope==='boss'?'灵脉战境':'远征榜首';
+  const heading=LB.scope==='rush'?'本周矿灯':LB.scope==='rushAll'?'90 秒历史':LB.scope==='boss'?'首领战':'远征榜首';
   let h=(LB.scope==='rush'?rushRewardHTML(meta):'')
     +'<div class="lb-group"><div class="lb-gh"><span>'+heading+'</span><i>点名字看名片</i></div>'
     +top.map(row).join('')+'</div>';
@@ -7912,7 +8109,7 @@ function lbMineHTML(rows,myIdx){
         :dp>0?'同层 · 下一位再推进 <b>'+Math.ceil(dp/100)+'%</b> 可进榜'
         :'同层同进度 · 战果再多 <b>'+Math.max(1,ds+1).toLocaleString('en-US')+'</b> 可进榜');
     }
-    return b.floor?'战境记录正在同步 · 击破 <b>'+b.floor+'</b> 层':b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b> · 击破后入榜':'击破首位首领后就能进入排行榜';
+    return b.floor?'首领战记录正在同步 · 击破 <b>'+b.floor+'</b> 层':b.progress?'首位首领已推进 <b>'+gauntletPct(b.progress)+'%</b> · 击破后入榜':'击破首位首领后就能进入排行榜';
   }
   const weekly=scope==='rush',history=scope==='rushAll',lamp=weekly||history;
   const mine=weekly?(s.rushWeek||0):history?(s.rush||0):(s.lv||0);
@@ -8560,7 +8757,7 @@ const HOW_HTML=`
 <b>三条主玩法</b>（大厅各有独立入口）<br>
 　<b>远征 · 无尽</b>　先走完 64 关并解锁同行，贯通后继续挑战无尽矿脉。<br>
 　<b>矿灯 · 90 秒</b>　同一时长，连锁越长，灯油续得越久。<br>
-　<b>灵脉战境</b>　逐层迎战首领；六位同行统一开放，击破后从三项强化中选一项。一趟败退即结算，不续挖、不复活、不消耗行囊道具。<br><br>
+　<b>首领战</b>　逐层迎战狂化首领；六位同行统一开放，击破后从三项强化中选一项，攒战魂还能加选。敌我会一起变强，每一手自动保存，可从暂停页暂离续接；败退即结算，不续挖、不复活、不消耗行囊道具。<br><br>
 <b>本周挑战</b><br>
 　<b>同盘矿脉</b>　每周一换盘，全服同一副，<b>第一把记成绩</b>，之后随便练。<br>
 　<b>狼先生的悬赏</b>　每周一条，输的局达成也算，赏典藏匣。<br>
@@ -8569,7 +8766,7 @@ const HOW_HTML=`
 典藏册收 32 张卡，重复卡会自动化成星屑，可按已收、未收或名字快速筛选；
 成就页底部可<b>出示矿工名片</b>——你的生涯一张图。<br><br>
 <b>换设备 / 换手机</b>　进度存在这台设备上。导出一段口令，粘到新设备就接着玩，全程离线、不经服务器。<br><button class="btn ghost" id="how-xfer" style="margin:6px 0 2px">导出 / 导入进度口令</button><br><br>
-<b>排行榜</b>　远征、90 秒、灵脉战境与阵营统一收在同一个栏目。90 秒<b>历史榜</b>永久保留最高分，<b>本周榜</b>每周刷新并给前三发奖励；灵脉战境按击破层数排名，同层再看下一位首领的推进进度与整趟战果。远征榜先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
+<b>排行榜</b>　远征、90 秒、首领战与阵营统一收在同一个栏目。90 秒<b>历史榜</b>永久保留最高分，<b>本周榜</b>每周刷新并给前三发奖励；首领战按击破层数排名，同层再看下一位首领的推进进度与整趟战果。远征榜先看<b>通关数</b>，同关再看星数与单关最佳。借道但尚未补通的关卡不计入。
 榜上只出现化名，不收集真实身份信息；化名、设备标识和成绩经 play.myskme.com 加密转发，设备标识在服务端哈希后才入库。离线也照常能玩，联网后自动补交。
 还可以选一条你信的<b>挖法</b>——持灯的光明或冒险的黑域，两营各看各的本事，每月可改投一次。
 `;
@@ -8756,9 +8953,17 @@ $('#btn-lb').addEventListener('click',()=>{SFX.click();ovl('lb');
 addEventListener('online',()=>{LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('online')});
 addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'){LB.wait=0;clearTimeout(LB.timer);LB.timer=0;LB.flush('visible')}
-  else LB.beacon();                                            // 切走就可能被系统回收，先发一发
+  else{
+    /* 手机切到后台后随时可能被系统回收。首领战只保存已经完全落定的盘面，
+       结算动画中的半盘不写入，避免回来后得到一份前后不一致的棋盘。 */
+    if(GAUNTLET.active&&GS.mode==='gauntlet'&&GAUNTLET.phase==='play'&&!GS.busy&&!GS.over)gauntletSaveRun('play',true);
+    LB.beacon();                                               // 切走就可能被系统回收，先发一发
+  }
 });
-addEventListener('pagehide',()=>LB.beacon());
+addEventListener('pagehide',()=>{
+  if(GAUNTLET.active&&GS.mode==='gauntlet'&&GAUNTLET.phase==='play'&&!GS.busy&&!GS.over)gauntletSaveRun('play',true);
+  LB.beacon();
+});
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
 $('#pt-round-dec').addEventListener('click',()=>ptAdjust('rounds',-1));
 $('#pt-round-inc').addEventListener('click',()=>ptAdjust('rounds',1));
@@ -8855,7 +9060,9 @@ for(const b of $$('.lb-periods button'))b.addEventListener('click',()=>{SFX.clic
 $('#btn-quest').addEventListener('click',()=>{SFX.click();renderQuest();ovl('quest')});
 $('#quest-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#gauntlet-close').addEventListener('click',()=>{SFX.click();ovl(null)});
-$('#gauntlet-go').addEventListener('click',()=>{AU.ensure();SFX.click();ovl(null);gauntletStart()});
+$('#gauntlet-go').addEventListener('click',()=>{AU.ensure();SFX.click();ovl(null);cleanBossRun(SAVE.bossRun)?gauntletResume():gauntletStart()});
+$('#gauntlet-new').addEventListener('click',()=>{SFX.click();gauntletClearRun(true);GAUNTLET.comp=SAVE.comp||'wolf';renderGauntletSetup();toast('暂离记录已放弃 · 可重新选择同行',2200)});
+$('#gauntlet-pick-skip').addEventListener('click',gauntletSkipForge);
 $('#btn-how').addEventListener('click',()=>{SFX.click();$('#how-body').innerHTML=HOW_HTML;ovl('how');
   /* 玩法页每次打开都重插 HTML，按钮得现挂。
      王老师反馈过「迁移存档好像没太怎么找到」——原来这里只写了「去页脚找」，
@@ -8886,12 +9093,14 @@ $('#btn-pause').addEventListener('click',()=>{if(GS.over)return;
   /* 聚会赛不给「重开」：同一轮是同一颗种子，能重开就等于可以无限重刷到满意为止，
      「同盘面比手艺」的前提就没了 */
   $('#pause-retry').style.display=GS.party||GS.mode==='gauntlet'?'none':'';
+  $('#pause-leave').style.display=GS.mode==='gauntlet'?'':'none';
   /* 聚会赛里这个按钮点下去是**终结整场比赛、当场出名次**，不是退出这一手。
      交接屏和轮间小结上同样的动作都写着「终结比赛」，这里也必须写一样的，
      否则 6 人 5 轮打到一半，谁暂停时把它当成「退出本关」一点，全场就没了。 */
-  $('#pause-quit').textContent=GS.party?'终结比赛':GS.mode==='gauntlet'?'结束战境':'离开本关';
+  $('#pause-quit').textContent=GS.party?'终结比赛':GS.mode==='gauntlet'?'结束本趟':'离开本关';
   ovl('pause')});
 $('#pause-resume').addEventListener('click',()=>{SFX.click();GS.paused=false;ovl(null);GS.idle=PLAT.now()});
+$('#pause-leave').addEventListener('click',()=>{SFX.click();gauntletLeave()});
 $('#pause-retry').addEventListener('click',()=>{SFX.click();ovl(null);GS.paused=false;
   GS.mode==='rush'?startRush():openLevel(GS.L.n)});
 $('#pause-quit').addEventListener('click',()=>{SFX.click();ovl(null);GS.over=true;GS.paused=false;
@@ -9438,7 +9647,7 @@ window.__selftest=function(){
     const seed='selftest-gauntlet',levels=Array.from({length:18},(_,i)=>gauntletLevel(i+1,seed,{},'wolf'));
     const everyBoss=levels.every(L=>L.boss&&BOSSES[L.boss]&&L.goals.length===1
       &&L.goals[0].type==='boss'&&L.goals[0].need===L.bossHP);
-    ok('灵脉战境前十八层每层都生成真实首领目标',everyBoss);
+    ok('首领战前十八层每层都生成真实首领目标',everyBoss);
 
     const choiceSets=Array.from({length:12},(_,i)=>gauntletChoiceSet(seed,i+1,{}));
     const uniqueChoices=choiceSets.every(xs=>xs.length===3
@@ -9451,6 +9660,32 @@ window.__selftest=function(){
     const overflow=gauntletChoiceSet(seed,99,fullMods);
     ok('持久强化全部叠满后仍给三个真正生效的下层补给',
        overflow.map(x=>x.id).join(',')==='supply,special,surge'&&overflow.every(x=>x.once));
+
+    const runBoard=Array.from({length:8},(_,r)=>Array.from({length:8},(_,c)=>({g:(r+c)%6,k:r===0&&c===0?'H':'n',bell:false,cage:0,snake:false,id:r*8+c+1})));
+    const runTerrain=Array.from({length:8},()=>Array.from({length:8},()=>({ink:0,crate:0})));
+    const resumed=cleanBossRun({v:1,phase:'play',floor:7,cleared:6,total:43210,seed:'gf-boss-selftest-1234',comp:'qi',
+      mods:{fury:2,chain:2,guard:1},picks:['fury','chain','guard'],choices:[],opening:false,forge:false,played:true,souls:4,guard:1,
+      bonus:{moves:2,special:1,damage:.25},board:runBoard,terrain:runTerrain,moves:13,score:7654,boss:'hang',hp:321,hpMax:900,
+      bossTick:2,charge:18,xiaoN:1,chainMax:6,specials:9,lastChain:4,at:123456});
+    ok('首领战暂离档完整保留棋盘、血量、构筑、同行、战魂与回合状态',
+       resumed&&resumed.floor===7&&resumed.comp==='qi'&&resumed.souls===4&&resumed.moves===13&&resumed.hp===321
+       &&resumed.mods.chain===2&&resumed.board[0][0].k==='H'&&resumed.board[7][7].id===64&&resumed.terrain.length===8);
+    ok('首领战进行中缺少完整棋盘的暂离档会被拒绝，不会恢复半盘',
+       cleanBossRun(Object.assign({},resumed,{board:null}))===null);
+
+    const bakL=GS.L,bakGM=Object.assign({},GAUNTLET.mods);
+    GAUNTLET.mods={fury:2,chain:2,wind:2,blast:2,fortune:2,charge:2,reserve:2,guard:2};
+    GS.L={mutations:[],elite:false};const wild=gauntletDamage(100,{chain:4});
+    GS.L={mutations:['iron'],elite:true};const armored=gauntletDamage(100,{chain:4});
+    const syn=gauntletSynergies().map(x=>x.id).sort().join(',');GS.L=bakL;GAUNTLET.mods=bakGM;
+    ok('首领战四组构筑联动能同时点亮，厚甲与狂化会在我方变强后继续施压',
+       syn==='bulwark,onslaught,resonance,storm'&&wild>100&&armored<wild);
+
+    const bakHit={boss:GS.boss,mode:GS.mode,hp:GS.hp,hpMax:GS.hpMax,goals:GS.goals};
+    GS.boss='ye';GS.mode='adv';GS.hp=30;GS.hpMax=30;GS.goals=[];bossHurt(9);
+    const honestHit=$('#boss-dmg').textContent==='−9'&&GS.hp===21;
+    GS.boss=bakHit.boss;GS.mode=bakHit.mode;GS.hp=bakHit.hp;GS.hpMax=bakHit.hpMax;GS.goals=bakHit.goals;
+    ok('首领受击只显示一次小型真实伤害回执，不用巨型战斗数字遮棋盘',honestHit);
 
     const burden=L=>L.ink.length+L.ink2.length+L.crates.length+L.crates2.length+L.cages.length+L.snakes.length;
     const hpRises=levels.every((L,i)=>i===0||L.bossHP>levels[i-1].bossHP);
@@ -9674,12 +9909,12 @@ window.__selftest=function(){
        改成「stats() 里每一个上传项都必须出现在 sig() 里」——加新项时自动覆盖。
        sig 少一项，那条线就永远触发不了上传，而且悄无声息。 */
     const SIG_KEYS=['score','rush','rushWeek','bossFloor','bossProgress','bossScore','lv','stars','chain','runs','days','dbest','mv','luck','mastery'];
-    ok('累计账：历史、周成绩、灵脉战境、到场与人物熟练度都进了 stats() 与 sig()',
+    ok('累计账：历史、周成绩、首领战、到场与人物熟练度都进了 stats() 与 sig()',
        st.runs===SAVE.runs&&st.days===SAVE.days
        &&typeof st.dbest==='number'&&typeof st.mv==='number'&&typeof st.luck==='number'
        &&/^\d{8}$/.test(st.rushWeekKey)&&typeof st.bossBuild==='string'&&typeof st.bossComp==='string'
        &&SIG_KEYS.every(k=>typeof st[k]==='number')
-       &&sg.split('|').length===SIG_KEYS.length+5        // 周 key、强化组合、战境同行、当前同行与阵营不是数字
+       &&sg.split('|').length===SIG_KEYS.length+5        // 周 key、强化组合、首领战同行、当前同行与阵营不是数字
        &&sg.indexOf('|'+SAVE.days+'|')>=0);
     SAVE.runs=bak.r;SAVE.days=bak.d;SAVE.lastDay=bak.l;SAVE.todayRuns=bak.t;
   }
@@ -10090,17 +10325,17 @@ window.__selftest=function(){
          rush.includes('class="pv">90,000<')&&!rush.includes('class="pv">190,000<')
          &&history.includes('class="pv">190,000<')&&!history.includes('class="pv">90,000<')
          &&!!document.querySelector('[data-scope="rush"]')&&!!document.querySelector('[data-scope="rushAll"]'));
-      ok('90 秒双榜都显示前四名，战境榜按击破层数显示前三',
+      ok('90 秒双榜都显示前四名，首领榜按击破层数显示前三',
          (rush.match(/class="lb-row/g)||[]).length===4
          &&(history.match(/class="lb-row/g)||[]).length===4
          &&(boss.match(/class="lb-row/g)||[]).length===3
-         &&boss.includes('击破 8 层')&&boss.includes('战境'));
+         &&boss.includes('击破 8 层')&&boss.includes('首领战'));
       renderQuest();
       const questHTML=$('#quest-body').innerHTML;
-      ok('大厅把远征、90 秒矿灯与灵脉战境列为三个独立主入口',
+      ok('大厅把远征、90 秒矿灯与首领战列为三个独立主入口',
          !!$('#btn-adventure')&&!!$('#btn-rush')&&!!$('#btn-gauntlet')
          &&!questHTML.includes('data-go="rush"')&&!questHTML.includes('data-go="gauntlet"'));
-      ok('排行榜统一为远征、90 秒、战境、阵营四类，90 秒再分历史与本周',
+      ok('排行榜统一为远征、90 秒、首领、阵营四类，90 秒再分历史与本周',
          !!$('#lb-group-depth')&&!!$('#lb-group-rush')&&!!$('#lb-group-boss')&&!!$('#lb-group-camp')
          &&!!$('#lb-period-history')&&!!$('#lb-period-week'));
 
