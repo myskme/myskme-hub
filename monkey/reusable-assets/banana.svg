@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54" role="img" aria-label="art-banana">
+<defs>
+<symbol id="art-banana" viewBox="0 0 54 54"><g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16 Q15 41 37 39 Q48 36 46 22 Q40 31 29 31 Q18 31 15 15 Z" fill="#f1bd3c"/><path d="M13 15 L12 10 M45 23 L48 18"/></g></symbol>
+</defs>
+<use href="#art-banana" width="54" height="54"/>
+</svg>

@@ -1,0 +1,80 @@
+name: 猴先生上楼 · 验证并发布
+
+on:
+  pull_request:
+    paths:
+      - 'monkey/**'
+      - 'deploy/monkey/**'
+      - '.github/workflows/deploy-monkey.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'monkey/**'
+      - 'deploy/monkey/**'
+      - '.github/workflows/deploy-monkey.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-monkey-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: 单文件、资源与发布包验收
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 核对可复用美术资源
+        run: node monkey/tools/extract-assets.mjs --check
+      - name: 构建并检查 EdgeOne 发布包
+        run: |
+          node deploy/monkey/build-edgeone-monkey.mjs /tmp/myskme-monkey.zip
+          unzip -tq /tmp/myskme-monkey.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: myskme-monkey-${{ github.sha }}
+          path: /tmp/myskme-monkey.zip
+          compression-level: 0
+          retention-days: 14
+
+  deploy:
+    name: 发布 monkey.myskme.com
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: myskme-monkey-production
+      url: https://monkey.myskme.com/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: myskme-monkey-${{ github.sha }}
+          path: dist
+      - name: 确认 EdgeOne 凭证
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: |
+          if [ -z "$EDGEONE_API_TOKEN" ]; then
+            echo '::error title=缺少 EdgeOne Token::请配置 EDGEONE_API_TOKEN。'
+            exit 1
+          fi
+      - name: 发布独立 EdgeOne 项目
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+        run: >-
+          npx --yes edgeone@1.6.19 makers deploy dist/myskme-monkey.zip
+          -n myskme-monkey
+          -e production
+          -t "$EDGEONE_API_TOKEN"
+      - name: 验收正式域名
+        run: node deploy/monkey/verify-online-monkey.mjs

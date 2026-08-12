@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="art-fertilizer">
+<defs>
+<symbol id="art-fertilizer" viewBox="0 0 120 120">
+          <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M34 29 Q59 18 86 29 L81 41 Q89 58 86 86 Q83 102 61 104 Q37 103 33 87 Q29 58 39 41 Z" fill="#5b5a50"/>
+            <path d="M37 30 Q60 36 83 30" fill="none" stroke-width="2.4"/>
+            <ellipse cx="49" cy="58" rx="3.2" ry="4.2" fill="#eef3df" stroke="none"/><ellipse cx="70" cy="58" rx="3.2" ry="4.2" fill="#eef3df" stroke="none"/>
+            <path d="M50 71 Q60 67 70 71" fill="none" stroke="#eef3df" stroke-width="2.2"/>
+            <rect x="38" y="80" width="44" height="15" rx="6" fill="#d9d8c8" stroke-width="2.2"/><text x="60" y="91" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2f5148" stroke="none">黑化肥</text>
+            <path d="M90 25 Q99 17 95 8 M101 36 Q112 32 109 22 M94 47 Q105 49 105 58" fill="none" stroke-width="2.2" opacity=".55"/>
+          </g>
+        </symbol>
+</defs>
+<use href="#art-fertilizer" width="120" height="120"/>
+</svg>

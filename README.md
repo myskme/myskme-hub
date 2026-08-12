@@ -9,6 +9,7 @@
 ## 收录作品
 | 作品 | 地址 |
 |---|---|
+| 猴先生上楼 · 荒诞休闲 | https://monkey.myskme.com/ |
 | 灵石远征 · GEMFALL | https://play.myskme.com/ |
 | 星徒地牢 | https://myskme.github.io/myskme-star-dungeon/ |
 | MYSKME 积分板 | https://myskme.github.io/myskme-scoreboard/ |

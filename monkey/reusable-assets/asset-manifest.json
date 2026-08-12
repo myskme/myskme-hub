@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "source": "../index.html",
+  "license": "MYSKME original reusable asset",
+  "palette": {
+    "paper": "#faf3e2",
+    "ink": "#28211a",
+    "teal": "#1f9e8e",
+    "banana": "#f5b731",
+    "red": "#e0452c"
+  },
+  "assets": [
+    {
+      "file": "monkey-rise.svg",
+      "symbol": "art-monkey-rise",
+      "sha256": "54eec28caa62ecd1bf1d257050c22b333e3eada634e38723cb32d17c14c8a024"
+    },
+    {
+      "file": "monkey-fall.svg",
+      "symbol": "art-monkey-fall",
+      "sha256": "0ce797e0f06b7cd3c6bbefca6d5c4763e6f765ecb7683c3d3622d77a70430112"
+    },
+    {
+      "file": "monkey-land.svg",
+      "symbol": "art-monkey-land",
+      "sha256": "d715e945af2f55b15985c50ba8a113ff4435d42d6733384f6d8f07654b126d34"
+    },
+    {
+      "file": "fish-teal.svg",
+      "symbol": "art-fish",
+      "sha256": "4408b82f1ed00628a8de0d96361c1ab02fda7916a378cce9bb4409e3992191fa"
+    },
+    {
+      "file": "donkey.svg",
+      "symbol": "art-donkey",
+      "sha256": "5085b199084211834c33e3c578c60afca9f61196b28aec48bea085f78935f81b"
+    },
+    {
+      "file": "egg.svg",
+      "symbol": "art-egg",
+      "sha256": "5bbb564212febb556dac6cc93ca6ea4b46876cc8a212f644c8b7fffd42bc41b0"
+    },
+    {
+      "file": "snake.svg",
+      "symbol": "art-snake",
+      "sha256": "ce29a4b2ab90f56d48e2e19b0975f6b3fd9db7fa8fa1931698e933c663fdee00"
+    },
+    {
+      "file": "fertilizer.svg",
+      "symbol": "art-fertilizer",
+      "sha256": "ba050dfe05403a6e135f38becb555d9ade7e6e50324bae6aa6c7129402d75c61"
+    },
+    {
+      "file": "banana.svg",
+      "symbol": "art-banana",
+      "sha256": "049e210555e9e1f3d198b8c6c6e9dfd6a2b40744ff452df5b393e40fd9223a62"
+    },
+    {
+      "file": "crate.svg",
+      "symbol": "art-crate",
+      "sha256": "ae549f835334371cdb949a9dfe64f2821db64a2306a2ec214a9d4c02127c9463"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" role="img" aria-label="art-crate">
+<defs>
+<symbol id="art-crate" viewBox="0 0 90 90"><g stroke="#2f5148" stroke-width="3" stroke-linejoin="round"><path d="M20 18 Q45 7 70 18 L66 26 Q45 19 24 26 Z" fill="#e8dfcc"/><rect x="18" y="29" width="54" height="49" rx="8" fill="#c8a66c"/><path d="M18 45 L72 45 M31 29 L31 78 M59 29 L59 78" opacity=".5"/><rect x="25" y="49" width="40" height="14" rx="6" fill="#f1bd3c" stroke-width="2.2"/><text x="45" y="59.5" text-anchor="middle" font-size="8" font-weight="700" fill="#2f5148" stroke="none">MYSKME</text></g></symbol>
+</defs>
+<use href="#art-crate" width="90" height="90"/>
+</svg>
