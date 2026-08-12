@@ -1,5 +1,5 @@
-const CACHE='myskme-monkey-20260812-6';
-const CORE=['./','./index.html','./manifest.webmanifest','./icons/monkey-100.svg','./icons/monkey-100-180.png','./icons/monkey-100-192.png','./icons/monkey-100-512.png','./icons/monkey-100-maskable-512.png'];
+const CACHE='myskme-monkey-20260812-7';
+const CORE=['./','./index.html','./manifest.webmanifest','./vendor/qrcode-generator.js','./icons/monkey-100.svg','./icons/monkey-100-180.png','./icons/monkey-100-192.png','./icons/monkey-100-512.png','./icons/monkey-100-maskable-512.png'];
 
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('myskme-monkey-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
