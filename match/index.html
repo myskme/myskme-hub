@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="gemfall-release" content="2026-08-10-android-touch-safe">
+<meta name="gemfall-release" content="2026-08-12-comfort-board-share">
 
 <!-- 部署入口只改这一个小文件：未配置时继续使用现有 Worker，不影响 GitHub Pages。 -->
 <script src="network-config.js"></script>
@@ -48,7 +48,7 @@
   --glow:0 0 22px rgba(168,102,37,.22);--glow-soft:0 0 12px rgba(168,102,37,.16);
   --paper:#f0e2c8;--noise-op:0;--noise-blend:multiply;
   --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
-  --mine:#7d716b;--mine2:#8c7f77;--mine-edge:#b99c7c;
+  --mine:#3f3942;--mine2:#4b444d;--mine-edge:#967b62;--game-width:520px;
 }
 
 /* ── 图标基线 ──
@@ -75,6 +75,11 @@ html,body{height:100%;position:fixed;inset:0;width:100%;overflow:hidden;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   -webkit-tap-highlight-color:transparent}
 html.android-touch,html.android-touch body{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* 安卓浏览器偶尔以平板/桌面宽度报告视口，旧版仍把整套游戏锁在 520px，
+   于是棋盘和控件只占屏幕中间一小块。只在“宽竖屏触控”放宽游戏列；
+   不使用 zoom / transform，视觉坐标与触控坐标始终是同一套。 */
+html.android-roomy{--game-width:min(78vw,680px)}
+html.android-roomy .btn{font-size:clamp(17px,2.15vw,20px)}
 input,textarea{-webkit-user-select:text;user-select:text}
 /* 全站底纹不再使用旧花叶纸图；静态 CSS 测绘纹既与狼先生一致，也少一次图片解码。 */
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.6;overflow:hidden;color-scheme:light;
@@ -351,7 +356,7 @@ body::before{display:none}
 /* auto-margin 居中：比 justify-content:center 安全，内容超高时不会把顶部裁掉 */
 #scr-game::before{content:'';margin-top:auto}
 #scr-game::after{content:'';margin-bottom:auto}
-#hud{width:min(520px,100%);display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
+#hud{width:min(var(--game-width),100%);display:flex;align-items:stretch;gap:8px;margin-bottom:6px}
 /* HUD 与棋盘是一家人：同样给厚度，不然三块平板浮在一口有厚度的井上面很割裂 */
 .hud-box{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 10px;text-align:center;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.66),
@@ -385,7 +390,7 @@ body::before{display:none}
 .sbar .stars s .ic{display:block;width:9px;height:9px}
 .sbar .stars s.lit{color:var(--gold2);text-shadow:0 0 8px color-mix(in srgb,var(--gold) 70%,transparent)}
 /* Boss 条 */
-#boss-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));
+#boss-bar{width:min(var(--game-width),100%);display:none;align-items:center;gap:10px;margin-bottom:6px;border:1px solid color-mix(in srgb,var(--red) 40%,var(--line));
   background:linear-gradient(180deg,color-mix(in srgb,var(--red) 8%,var(--panel2)),var(--panel));padding:5px 10px;position:relative}
 #boss-bar.on{display:flex}
 #boss-face{width:46px;height:46px;flex:none}
@@ -408,9 +413,9 @@ body::before{display:none}
   opacity:0;transition:opacity .3s,transform .3s;transform:translateY(6px);pointer-events:none;max-width:76%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #boss-say.on{opacity:1;transform:translateY(0)}
 /* 棋盘 */
-#board-wrap{position:relative;width:min(94vw,520px);margin:0 auto;flex:none}
-/* 棋盘改成低对比暖岩盘：让六种轮廓先于亮度被识别，长时间游玩不被高反差持续刺激。
-   外圈取纸面的铜线与灰棕，内侧只压一层柔和深度，不使用黑色厚边。 */
+#board-wrap{position:relative;width:min(94vw,var(--game-width));margin:0 auto;flex:none}
+/* 棋盘用中深的暖紫灰托住鲜明灵石：不是黑洞，也不再是灰蒙蒙的“低饱和岩盘”。
+   宝石靠色相+轮廓区分，盘面只给足够的定位反差，长局不需要盯着高亮白格线。 */
 #board{display:block;width:100%;touch-action:none;
   border:1px solid var(--mine-edge);background:var(--mine);
   box-shadow:
@@ -443,7 +448,7 @@ body::before{display:none}
 .float-num{position:absolute;font-size:22px;font-weight:600;pointer-events:none;z-index:30;color:var(--gold2);
   text-shadow:0 2px 8px rgba(0,0,0,.85);animation:floatUp 1s ease forwards;letter-spacing:.02em;font-variant-numeric:tabular-nums}
 @keyframes floatUp{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}25%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
-#game-foot{width:min(520px,100%);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+#game-foot{width:min(var(--game-width),100%);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
 #quip-line{flex:1;font-size:12.5px;color:var(--ink3);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .4s}
 #quip-line b{color:var(--ink2);font-weight:500}
 .iconbtn{width:40px;height:40px;flex:none;border:1px solid var(--line);background:var(--panel);color:var(--ink2);font-size:17px;cursor:pointer;
@@ -451,7 +456,7 @@ body::before{display:none}
 .iconbtn:hover{color:var(--gold);border-color:var(--gold);box-shadow:var(--glow-soft)}
 .iconbtn:active{transform:scale(.94)}
 /* 矿灯将熄 · 限时 */
-#rush-bar{width:min(520px,100%);display:none;margin-bottom:6px;border:1px solid var(--line);background:var(--panel);padding:5px 10px}
+#rush-bar{width:min(var(--game-width),100%);display:none;margin-bottom:6px;border:1px solid var(--line);background:var(--panel);padding:5px 10px}
 #rush-bar.on{display:block}
 #rush-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);letter-spacing:.14em;margin-bottom:3px}
 #rush-time{color:var(--gold2);font-size:15px;font-variant-numeric:tabular-nums}
@@ -479,7 +484,7 @@ body::before{display:none}
 #boss-face.has-art,#boss-intro-face.has-art{border:1px solid color-mix(in srgb,var(--red) 40%,var(--line))}
 #boss-face.has-art svg,#boss-intro-face.has-art svg{opacity:0}
 /* 同伴 · 助战 */
-#ally{width:min(520px,100%);display:flex;align-items:center;gap:10px;margin-top:8px;
+#ally{width:min(var(--game-width),100%);display:flex;align-items:center;gap:10px;margin-top:8px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:7px 10px;
   cursor:default;transition:border-color .25s,box-shadow .3s}
 #ally.ready{border-color:var(--gold);box-shadow:var(--glow-soft);cursor:pointer}
@@ -636,7 +641,7 @@ body::before{display:none}
 #hand-scores{margin-top:14px;font-size:12.5px;color:var(--ink2);line-height:2;letter-spacing:.04em}
 #hand-scores b{color:var(--gold2);font-weight:500}
 /* 聚会赛 HUD 条 */
-#pt-bar{width:min(520px,100%);display:none;align-items:center;gap:10px;margin-bottom:6px;
+#pt-bar{width:min(var(--game-width),100%);display:none;align-items:center;gap:10px;margin-bottom:6px;
   border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));padding:6px 11px}
 #pt-bar.on{display:flex}
 #pt-bar .dot{width:34px;height:34px;flex:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
@@ -759,7 +764,7 @@ body::before{display:none}
 .lore-link .lt{font-size:15px;letter-spacing:.12em;color:var(--gold2);margin-top:2px}
 .lore-link .ld{font-size:12px;color:var(--ink2);letter-spacing:.03em;margin-top:2px;line-height:1.6}
 /* 灵器栏 */
-#toolbar{width:min(520px,100%);display:flex;gap:8px;margin-top:8px}
+#toolbar{width:min(var(--game-width),100%);display:flex;gap:8px;margin-top:8px}
 /* 灵器是「握在手里的家伙」，要有金属感，而且**有货和没货必须一眼分得开** ——
    它们是局内唯一的翻盘手段，玩家常常攒了一堆忘了用。 */
 .tool{flex:1;position:relative;display:flex;align-items:center;justify-content:center;gap:7px;
@@ -784,7 +789,7 @@ body::before{display:none}
 .tool:disabled .icw{color:var(--ink3)}
 .tool.armed{border-color:var(--gold);color:var(--gold2);box-shadow:var(--glow-soft)}
 @keyframes armedPulse{50%{box-shadow:0 0 32px color-mix(in srgb,var(--gold) 55%,transparent)}}
-#tool-hint{width:min(520px,100%);margin-top:6px;font-size:12.5px;color:var(--gold2);letter-spacing:.08em;
+#tool-hint{width:min(var(--game-width),100%);margin-top:6px;font-size:12.5px;color:var(--gold2);letter-spacing:.08em;
   text-align:center;min-height:0;height:0;overflow:hidden;transition:height .25s,margin .25s}
 #tool-hint.on{height:22px;margin-top:6px}
 /* 每日矿灯 / 星辰宝箱 */
@@ -1752,8 +1757,7 @@ body{--shk:4px}
     <pre id="wk-tablet"></pre>
   <div class="ovl-btns">
     <div id="end-share" style="display:none;gap:8px">
-      <button class="btn ghost" id="end-tablet">拓 片 · 文字</button>
-      <button class="btn ghost" id="end-card">名 帖 · 图片</button>
+      <button class="btn ghost" id="end-card">生成分享图</button>
     </div>
     <button class="btn primary big" id="end-continue" style="display:none;width:100%">续挖 5 步<span class="sub" id="cont-cost">灵力 300</span></button>
     <button class="btn ghost" id="end-menu">回图</button>
@@ -2089,6 +2093,7 @@ body{--shk:4px}
 <a class="nav-inline" id="chip-home" href="https://myskme.github.io/myskme-hub/"><span class="icw nav-back" data-ic="chev"></span>作品总目</a>
 
 
+<script src="vendor/qrcode-generator.js"></script>
 <script>
 'use strict';
 /* ============================================================
@@ -2838,6 +2843,12 @@ function needsNativeTouchLayout(ua,platform,points){
 const TOUCH_NATIVE_LAYOUT=needsNativeTouchLayout(
   navigator.userAgent,(navigator.userAgentData&&navigator.userAgentData.platform)||'',navigator.maxTouchPoints);
 document.documentElement.classList.toggle('android-touch',TOUCH_NATIVE_LAYOUT);
+function roomyAndroidLayout(touch,w,h){return !!touch&&w>=560&&h>w*1.05}
+function syncAndroidRoomy(){
+  const vv=window.visualViewport,w=vv&&vv.width||innerWidth,h=vv&&vv.height||innerHeight;
+  document.documentElement.classList.toggle('android-roomy',roomyAndroidLayout(TOUCH_NATIVE_LAYOUT,w,h));
+}
+syncAndroidRoomy();
 const PLAT={
   name:'web',
   store:{
@@ -3368,21 +3379,22 @@ function gemPath(ctx,x,y,R,shape,rot){
     for(let i=0;i<10;i++){const [px,py]=pt(-Math.PI/2+i*Math.PI/5,i%2?R*.46:R*1.12);i?ctx.lineTo(px,py):ctx.moveTo(px,py)}
     ctx.closePath()}
 }
-/* 插画灵石不改源文件：每张图首次出现时只柔化一次，缓存成 192px 小画布。
-   之后每帧只是普通 drawImage，不给 64 颗灵石逐颗跑滤镜；既保住原稿，也避免长局增加发热。 */
+/* 插画灵石不改源文件：每张图首次出现时缓存成 192px 小画布。
+   旧版的 saturate(.54)+brightness(.82) 会把色相和立体感一起抹掉，看起来像资源未加载完。
+   现在恢复原稿色彩，只做极轻的边缘对比；每帧仍然只是 drawImage，不增加长局发热。 */
 const _gemTone={};
 function tonedGemArt(key,special){
   const im=art(key);if(!im)return null;
   const ck=key+'|'+(special?'s':'n'),old=_gemTone[ck];if(old&&old.im===im)return old.cv;
   const cv=document.createElement('canvas'),w=Math.min(192,Math.max(64,im.naturalWidth||192)),h=Math.min(192,Math.max(64,im.naturalHeight||192));
   cv.width=w;cv.height=h;const c=cv.getContext('2d');
-  if('filter' in c)c.filter=special?'saturate(.66) brightness(.87) contrast(.90)':'saturate(.54) brightness(.82) contrast(.86)';
+  if('filter' in c)c.filter=special?'saturate(1.08) contrast(1.06)':'saturate(1.02) contrast(1.04)';
   c.drawImage(im,0,0,w,h);_gemTone[ck]={im,cv};return cv;
 }
 function drawGemArt(ctx,key,x,y,size,special){
   const im=tonedGemArt(key,special);if(!im)return false;
   ctx.save();
-  ctx.globalAlpha*=special ? .93 : .89;
+  ctx.globalAlpha*=1;
   ctx.drawImage(im,x-size/2,y-size/2,size,size);
   ctx.restore();return true;
 }
@@ -3468,29 +3480,28 @@ function drawGemSkin(ctx,x,y,R){
 function drawGemMark(ctx,x,y,size,R,kind,t){
   if(kind==='H'||kind==='V'){
     ctx.save();ctx.translate(x,y);if(kind==='V')ctx.rotate(Math.PI/2);
-    /* 疾风不再画白色双箭头。两道嵌入式轨纹本身就是方向，
-       深色底槽保证在六种颜色上都清楚，暖象牙线避免刺眼。 */
+    /* 疾风用一枚“方向针”：一条主轴+一枚尖端，比双轨/双箭头干净，
+       横竖一眼可分；暗色细衬保证六种灵石上都有对比。 */
     ctx.lineCap='round';
-    ctx.strokeStyle='rgba(45,38,35,.44)';ctx.lineWidth=Math.max(2.5,size*.12);
-    ctx.beginPath();ctx.moveTo(-R*.78,0);ctx.lineTo(R*.78,0);ctx.stroke();
-    ctx.strokeStyle='rgba(236,218,181,.84)';ctx.lineWidth=Math.max(1.05,size*.027);
-    for(const yy of [-R*.15,R*.15]){ctx.beginPath();ctx.moveTo(-R*.72,yy);ctx.lineTo(R*.72,yy);ctx.stroke()}
-    ctx.fillStyle='rgba(194,143,76,.88)';
-    for(const xx of [-R*.48,0,R*.48]){
-      ctx.save();ctx.translate(xx,0);ctx.rotate(Math.PI/4);ctx.fillRect(-R*.05,-R*.05,R*.10,R*.10);ctx.restore();
-    }
+    ctx.strokeStyle='rgba(35,29,36,.58)';ctx.lineWidth=Math.max(3,size*.105);
+    ctx.beginPath();ctx.moveTo(-R*.66,0);ctx.lineTo(R*.48,0);ctx.stroke();
+    ctx.strokeStyle='rgba(255,239,202,.94)';ctx.lineWidth=Math.max(1.35,size*.032);
+    ctx.beginPath();ctx.moveTo(-R*.66,0);ctx.lineTo(R*.48,0);ctx.stroke();
+    ctx.fillStyle='rgba(255,224,153,.96)';ctx.beginPath();ctx.moveTo(R*.74,0);ctx.lineTo(R*.38,-R*.22);ctx.lineTo(R*.38,R*.22);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(45,35,42,.72)';ctx.beginPath();ctx.arc(-R*.68,0,R*.105,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else if(kind==='B'){
-    /* 爆裂改成静态六瓣封印，取消旋转虚线和呼吸白点。 */
+    /* 爆裂是小型四向辉印：不旋转、不呼吸、不用厚重封印盖住原石。 */
     ctx.save();ctx.translate(x,y);ctx.lineCap='round';
-    ctx.strokeStyle='rgba(45,38,35,.43)';ctx.lineWidth=Math.max(2.5,size*.12);
-    ctx.beginPath();ctx.arc(0,0,R*.48,0,Math.PI*2);ctx.stroke();
-    ctx.strokeStyle='rgba(236,218,181,.83)';ctx.lineWidth=Math.max(1.05,size*.029);
-    ctx.beginPath();ctx.arc(0,0,R*.48,0,Math.PI*2);ctx.stroke();
-    for(let i=0;i<6;i++){
-      const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(Math.cos(a)*R*.6,Math.sin(a)*R*.6);ctx.lineTo(Math.cos(a)*R*.78,Math.sin(a)*R*.78);ctx.stroke();
+    ctx.strokeStyle='rgba(35,29,36,.56)';ctx.lineWidth=Math.max(3,size*.10);
+    for(let i=0;i<4;i++){
+      const a=i*Math.PI/2;ctx.beginPath();ctx.moveTo(Math.cos(a)*R*.22,Math.sin(a)*R*.22);ctx.lineTo(Math.cos(a)*R*.72,Math.sin(a)*R*.72);ctx.stroke();
     }
-    ctx.fillStyle='rgba(207,160,91,.94)';ctx.beginPath();ctx.arc(0,0,R*.16,0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.strokeStyle='rgba(255,239,202,.94)';ctx.lineWidth=Math.max(1.35,size*.031);
+    for(let i=0;i<4;i++){
+      const a=i*Math.PI/2;ctx.beginPath();ctx.moveTo(Math.cos(a)*R*.22,Math.sin(a)*R*.22);ctx.lineTo(Math.cos(a)*R*.72,Math.sin(a)*R*.72);ctx.stroke();
+    }
+    ctx.fillStyle='rgba(255,219,139,.98)';ctx.save();ctx.rotate(Math.PI/4);ctx.fillRect(-R*.15,-R*.15,R*.30,R*.30);ctx.restore();ctx.restore();
   }
 }
 function hexA(h,a){
@@ -3683,13 +3694,13 @@ let selCell=null, hintCell=null, dragTo=null;
 function draw(t){
   const s=ENG.cs;
   cx.clearRect(0,0,CSS_W,CSS_W);
-  /* 低对比暖岩底：格线只负责定位，不与灵石争夺注意力。 */
+  /* 暖紫灰盘面：相邻格有微差，不用高亮白线割裂画面。 */
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const x=c*s,y=r*s;
-    cx.fillStyle=(r+c)%2?'rgba(255,245,224,.035)':'rgba(66,54,50,.055)';
+    cx.fillStyle=(r+c)%2?'rgba(255,245,224,.035)':'rgba(15,11,18,.085)';
     cx.fillRect(x,y,s,s);
   }
-  cx.strokeStyle='rgba(239,220,190,.075)';cx.lineWidth=1;
+  cx.strokeStyle='rgba(244,222,190,.13)';cx.lineWidth=1;
   for(let i=1;i<N;i++){cx.beginPath();cx.moveTo(i*s,0);cx.lineTo(i*s,CSS_W);cx.stroke();
     cx.beginPath();cx.moveTo(0,i*s);cx.lineTo(CSS_W,i*s);cx.stroke()}
   /* 墨封（在灵石之下） */
@@ -3759,11 +3770,11 @@ const GAUNTLET_SUPPORT={
   nuo:{name:'诺',role:'洞察',art:'support_nuo'},
 };
 const GAUNTLET_UPGRADES=[
-  {id:'fury',by:'nuo',name:'攻势',tip:'对首领的全部伤害提高 35%。',max:5},
+  {id:'fury',by:'nuo',name:'攻势',tip:'对首领的全部伤害提高 26%。',max:5},
   {id:'chain',by:'nuo',name:'连锁增压',tip:'三重以上连锁会追加一段首领伤害。',max:5},
-  {id:'echo',by:'nuo',name:'灵技回响',tip:'同行灵技伤害提高，并在发动后保留部分充能。',max:4},
+  {id:'echo',by:'nuo',name:'灵技回响',tip:'同行灵技伤害提高 32%，并在发动后保留部分充能。',max:4},
   {id:'revive',by:'nuo',name:'复活准备',tip:'生命归零时恢复 40%，整趟最多触发一次。',max:1},
-  {id:'reserve',by:'jia',name:'余力',tip:'以后每层多 3 步，只改变生存空间，不参与排名。',max:4},
+  {id:'reserve',by:'jia',name:'余力',tip:'以后每层多 2 步，扩大构筑空间。',max:3},
   {id:'wind',by:'jia',name:'先手疾风',tip:'以后每层开局多一颗疾风灵石。',max:4},
   {id:'guard',by:'jia',name:'护路',tip:'以后每层抵消首领第一次行动。',max:3},
   {id:'vitality',by:'jia',name:'生命上限',tip:'生命上限提高 15，并立即恢复 15。',max:3},
@@ -3779,7 +3790,7 @@ const GAUNTLET_OVERFLOW=[
   {id:'surge',by:'nuo',name:'临场强攻',tip:'下一层对首领的伤害提高 25%。',once:true},
 ];
 const GAUNTLET_MUTATIONS=[
-  {id:'iron',name:'厚甲',tip:'首领受到的伤害降低 28%。'},
+  {id:'iron',name:'厚甲',tip:'首领受到的伤害降低 15%。'},
   {id:'haste',name:'急袭',tip:'首领行动间隔缩短一手。'},
   {id:'spread',name:'增殖',tip:'登场时额外铺下三处机关。'},
   {id:'rage',name:'狂怒',tip:'每次行动额外影响两格。'},
@@ -3796,7 +3807,7 @@ const GAUNTLET_RELICS=[
   {id:'focus',rarity:'rare',name:'专注刻印',tip:'对首领造成的伤害提高 12%。'},
   {id:'rebirth',rarity:'legend',name:'复生刻印',tip:'每趟自带一次复活，恢复 45% 生命。'},
   {id:'prism',rarity:'legend',name:'万象刻印',tip:'每层开局多一颗万象灵珠。'},
-  {id:'lastlight',rarity:'legend',name:'背水刻印',tip:'生命不高于 35% 时，对首领伤害提高 45%。'},
+  {id:'lastlight',rarity:'legend',name:'背水刻印',tip:'生命不高于 35% 时，对首领伤害提高 35%。'},
 ];
 const GA_RARITY={common:{name:'普通',gain:1},rare:{name:'珍稀',gain:2},legend:{name:'传说',gain:3}};
 const gauntletRelic=id=>GAUNTLET_RELICS.find(x=>x.id===id)||null;
@@ -3862,8 +3873,8 @@ function gauntletRelicDrop(floor,seed,owned){
   return pool[Math.floor(R()*pool.length)];
 }
 function gauntletEnemyDamage(floor,boss,L){
-  const s=gauntletStage(floor),bossAdd={ye:0,she:1,parrot:2,hang:2,yin:1,both:3}[boss]||0;
-  return 4+Math.floor((s-1)/3)*2+bossAdd+((L&&L.elite)?2:0)+((L&&L.mutations||[]).includes('rage')?2:0);
+  const s=gauntletStage(floor),bossAdd={ye:0,she:0,parrot:1,hang:1,yin:0,both:2}[boss]||0;
+  return 3+Math.floor((s-1)/3)*2+bossAdd+((L&&L.elite)?1:0)+((L&&L.mutations||[]).includes('rage')?1:0);
 }
 function gauntletRenderLife(){
   const el=$('#gauntlet-life');if(!el)return;
@@ -3905,11 +3916,11 @@ function gauntletLevel(floor,seed,mods,comp){
   const has=id=>mut.some(x=>x.id===id),elite=gauntletElite(floor);
   /* 血量本身逐层严格上升；厚甲与狂化改走减伤，避免下一层随机词条变化时
      出现“层数更深、血条反而更短”的视觉倒退。 */
-  const hp=Math.round(110+floor*30+floor*floor*1.5);
+  const hp=Math.round(120+floor*24+floor*floor*1.55);
   const L={n:0,ch:9,pos:0,endless:false,depth:floor,colors:floor>=10?6:5,
-    moves:22+(comp==='xi'?2:0)+(mods.reserve||0)*3+(gauntletSynergies(mods).some(x=>x.id==='bulwark')?2:0)+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
+    moves:(floor<=3?24:floor<=8?23:22)+(comp==='xi'?2:0)+(mods.reserve||0)*2+(gauntletSynergies(mods).some(x=>x.id==='bulwark')?2:0)+(GAUNTLET.bonus.moves||0),goals:[{type:'boss',need:hp}],
     ink:[],ink2:[],crates:[],crates2:[],cages:[],snakes:[],bells:0,boss,bossHP:hp,
-    bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)-(has('haste')?1:0)),bossExtra:(has('rage')?2:0)+(elite?1:0),
+    bossEvery:Math.max(2,(BOSSES[boss].every||3)-(floor>=9?1:0)-(has('haste')?1:0)),bossExtra:(has('rage')?1:0)+(elite?1:0),
     mutations:mut.map(x=>x.id),elite,s1:9000,s2:24000,s3:52000,
     chName:'首领战',era:'第 '+floor+' / '+GAUNTLET_MAX+' 层',epi:gauntletAct(floor)+'阶段 · 生命跨层保留。'};
   const n=Math.min(12,2+Math.floor(floor/3)+(has('spread')?3:0)),spots=PAT.scatter(R,24,1,6);
@@ -3921,16 +3932,23 @@ function gauntletLevel(floor,seed,mods,comp){
   else {L.ink=spots.slice(0,Math.ceil(n/2));L.cages=spots.slice(9,9+Math.ceil(n/2))}
   return L;
 }
+/* 首领战的可测量平衡账：同时看血条、出手数、反击次数与厚甲等效血量。
+   这不代替真人手感，但会拦住“一个随机词条让下层突然难一倍”这种公式事故。 */
+function gauntletBalanceProfile(L){
+  const armor=(L.mutations||[]).includes('iron')?0.85:1;
+  const actions=Math.floor(L.moves/Math.max(1,L.bossEvery||3));
+  return {effectiveHp:Math.round(L.bossHP/armor),actions,incoming:actions*gauntletEnemyDamage(L.depth,L.boss,L),
+    damagePerMove:L.bossHP/Math.max(1,L.moves),burden:L.ink.length+L.ink2.length+L.crates.length+L.crates2.length+L.cages.length+L.snakes.length};
+}
 function gauntletDamage(base,opt){
   opt=opt||{};let n=Math.max(0,+base||0);
-  n*=1+gauntletStack('fury')*.35;
-  if(opt.chain>=3)n+=opt.chain*4*gauntletStack('chain')*(gauntletHasSynergy('onslaught')?2:1);
-  if(ULTING)n*=1+gauntletStack('echo')*.45;
+  n*=1+gauntletStack('fury')*.26;
+  if(opt.chain>=3)n+=(6+(opt.chain-3)*3)*gauntletStack('chain')*(gauntletHasSynergy('onslaught')?2:1);
+  if(ULTING)n*=1+gauntletStack('echo')*.32;
   n*=1+(GAUNTLET.bonus.damage||0);
   if(GAUNTLET.relic==='focus')n*=1.12;
-  if(GAUNTLET.relic==='lastlight'&&GAUNTLET.life<=GAUNTLET.lifeMax*.35)n*=1.45;
-  if(GS.L&&Array.isArray(GS.L.mutations)&&GS.L.mutations.includes('iron'))n*=.72;
-  if(GS.L&&GS.L.elite)n*=.80;
+  if(GAUNTLET.relic==='lastlight'&&GAUNTLET.life<=GAUNTLET.lifeMax*.35)n*=1.35;
+  if(GS.L&&Array.isArray(GS.L.mutations)&&GS.L.mutations.includes('iron'))n*=.85;
   return Math.max(1,Math.round(n));
 }
 function gauntletBetter(a,b){
@@ -4167,7 +4185,8 @@ function gauntletEnd(reason,scored){
     +(gauntletBuildText()?'<br>'+esc(gauntletBuildText()):'')+(GAUNTLET.drop?'<br>新珍品 <b>'+esc(gauntletRelic(GAUNTLET.drop).name)+'</b>':'');
   $('#end-quip').textContent=!GAUNTLET.played?'尚未出手，这次不计入累计记录。':complete?'十二位首领已退。战魂与珍品已经留下，下一趟换一件珍品再构筑。':reason==='quit'?'这一趟到这里。已经取得的战魂与珍品不会失去。':reason==='life'?'生命归零，这趟到此结算；战魂、珍品和积分都已经留下。':'步数用尽，这趟到此结算；下一趟可以换同行与珍品。';
   $('#end-next').textContent='再战一趟';$('#end-next').dataset.act='gauntlet';$('#end-menu').textContent='回大厅';
-  $('#end-retry').style.display='none';$('#end-retry').dataset.act='';$('#end-continue').style.display='none';$('#end-share').style.display='none';
+  GAUNTLET.lastPoints=points;GAUNTLET.lastCleared=GAUNTLET.cleared;
+  $('#end-retry').style.display='none';$('#end-retry').dataset.act='';$('#end-continue').style.display='none';$('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';ovl('end');
 }
 
@@ -6459,16 +6478,14 @@ function endRush(){
   yjBump('rushN',1);
   if(GS.chainMax>=8)yjBump('chain8',1);
   bountyCheck();
-  /* 90 秒局人人同规则、时长一样，直接可比，因此保留矿灯战报。
+  /* 90 秒局人人同规则、时长一样，直接可比，因此保留矿灯成绩图。
      关卡各打各的，第 12 关和第 40 关的分数没有可比性，不进世界周榜。 */
   $('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   const prevBest=SAVE.rushBest;
   const best=GS.score>prevBest;
-  /* ⚠ 战报要用**这一局之前**的最佳来判「新纪录」。
-     下一行就把 SAVE.rushBest 改成本局分数了，rushTablet 再去读它的话
-     `GS.score>=best` 永远为真 —— 每一份战报都写「新纪录」，打得再烂也写。
-     分享写谎话比不分享更糟，所以把判定结果在这里存下来给它用。 */
+  /* 成绩图要用**这一局之前**的最佳来判「新纪录」；
+     下面会立即更新 SAVE.rushBest，所以先把判定存在 GS 里。 */
   GS.wasRecord=best;
   if(best){SAVE.rushBest=GS.score;persist()}
   const rw=rushWeekState();
@@ -6612,7 +6629,7 @@ function endLevel(win){
   const L=GS.L, n=L.n;
   $('#end-stars').style.display='';
   $('#end-menu').textContent='回图';
-  $('#end-share').style.display='none';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
+  $('#end-share').style.display='flex';$('#wk-tablet').style.display='none';$('#wk-tablet').innerHTML='';
   if(GS.score>=100000)grant('a8');
   $('#end-continue').style.display='none';
   let toolGot='',curioGot='';
@@ -6923,11 +6940,11 @@ function fitScreen(id,resetScroll){
 function refitActiveScreen(){
   const on=document.querySelector('.scr.on');if(on)fitScreen(on.id.replace('scr-',''),false);
 }
-addEventListener('resize',refitActiveScreen);
+addEventListener('resize',()=>{syncAndroidRoomy();refitActiveScreen()});
 addEventListener('orientationchange',()=>setTimeout(refitActiveScreen,120));
 /* Android WebView 同时有 layout / visual viewport；地址栏、分屏或软键盘只改后者时也重测。 */
 if(TOUCH_NATIVE_LAYOUT&&window.visualViewport)
-  window.visualViewport.addEventListener('resize',refitActiveScreen);
+  window.visualViewport.addEventListener('resize',()=>{syncAndroidRoomy();refitActiveScreen()});
 function renderPartySetup(){
   ptEnsurePlayers();
   PARTY.rounds=clamp(Math.round(+PARTY.rounds||3),2,4);
@@ -7659,33 +7676,19 @@ function wkState(){
    它会制造不必要的时间压力，不用。就静静写一句「还剩 N 天」。 */
 const wkDaysLeft=()=>7-((dayNum()-4)%7);
 const WK_MOVES=25;
-/* ---- 矿脉拓片：无剧透的纯文本战报 ----
-   照 Wordle 那套。三条讲究：
-   1. **纯文本，不出图**。微信群里粘贴不吃图片压缩、不吃截图裁切、
-      不吃长按保存的兼容坑；打输的那局也照样发得出去。
-   2. **用几何符号不用 emoji**（全站禁 emoji）。■▨◆□ 都在 Geometric Shapes
-      区段，微信、iOS、安卓、桌面都是同一个字形，不会变成彩色小图。
-   3. **不泄露走法**。只报每一手打出多长的连锁，别人看得见你打得多漂亮，
-      但照着抄不出来——这正是它能当谈资的原因。 */
-/* ---- 矿灯战报：90 秒局的拓片 ----
-   只给公平局做可比战报，不给每一关：关卡进度不同，分数不能直接对比。
-   照拓片那套：纯文本、几何符号（禁 emoji）、不泄露走法。
-   多一样 —— **报名次**。那是竞争的钩子：不是「我打了多少」，是「我第几」。 */
-function rushTablet(){
-  const log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
-  const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
-  const rows=log.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
-  const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
-    ||location.origin+location.pathname.replace(/index\.html$/,'');
-  /* 用 endRush 存下来的判定，不要现算 —— 现算的话 SAVE.rushBest 已经被更新过了 */
-  const isNew=!!GS.wasRecord;
-  return '灵石远征 · 矿灯将熄 90 秒\n'
-    +(rows||'□')+'\n'
-    +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax
-    +(isNew?' · 新纪录':'')+'\n'
-    +(RUSH_RANK>0?('90 秒周榜 第 '+RUSH_RANK+' 名\n'):'')
-    +'同样 90 秒，你能打多少？\n'
-    +share;
+/* 分享只产出图片：不复制长文本，不往剪贴板塞战报。
+   成绩、连锁形状与正版二维码同在一张 1080×1350 海报里。 */
+function shareCardInfo(){
+  if(GS.mode==='rush')return {mode:'rush',kick:'90 SECOND RUN',title:'矿灯将熄',sub:'90 秒标准局',score:GS.score,
+    note:(GS.wasRecord?'本局刷新个人纪录':'个人历史最高 '+(SAVE.rushBest||0).toLocaleString('en-US')),
+    rank:RUSH_RANK>0?('本周第 '+RUSH_RANK+' 名'):'本周排名同步中'};
+  if(GS.mode==='weekly'){
+    const s=wkState();return {mode:'weekly',kick:'WEEKLY VEIN',title:'本周矿脉',sub:'第 '+s.w+' 期 · 全服同一副盘',score:GS.score,note:'同盘不剧透 · 最长连锁 '+GS.chainMax,rank:'本周战果'};
+  }
+  if(GS.mode==='gauntlet')return {mode:'boss',kick:'TWELVE BOSS RUN',title:'十二层首领战',sub:'生命决定终点',score:GAUNTLET.lastPoints||0,
+    note:'击破 '+(GAUNTLET.lastCleared||0)+' / '+GAUNTLET_MAX+' 层 · 剩余生命 '+Math.max(0,GAUNTLET.life),rank:'战果积分'};
+  return {mode:'adventure',kick:'GEMFALL EXPEDITION',title:'灵脉远征',sub:'第 '+Math.max(1,GS.L&&GS.L.n||SAVE.lv||1)+' 关',score:GS.score,
+    note:'最长连锁 '+GS.chainMax+' · 累计 '+totalStars()+' 星',rank:'本局战果'};
 }
 /* 结算时顺手查一次自己在矿灯榜上的名次。**不阻塞结算** ——
    查不到就不报名次，绝不让玩家等在那里看转圈。 */
@@ -7698,83 +7701,57 @@ async function fetchRushRank(){
     if(!d||!d.ok||!Array.isArray(d.rows))return;
     const i=d.rows.findIndex(r=>r.alias===SAVE.lbAlias
       &&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
-    if(i>=0){RUSH_RANK=i+1;const t=$('#wk-tablet');if(t&&t.style.display!=='none')t.textContent=rushTablet()}
+    if(i>=0){RUSH_RANK=i+1;const img=$('#wk-cardimg');if(img)img.src=drawCard()}
   }catch(e){}
 }
-function wkTablet(){
-  const s=wkState(), log=(GS.wkLog||[]).slice();
-  /* 只留最精彩的六手，按连锁长度排；六行封顶是为了在群里一屏放得下 */
-  const top=log.filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
-  const sym=n=>n>=6?'◆':n>=4?'▨':n>=2?'■':'□';
-  const rows=top.map(n=>sym(n).repeat(Math.min(n,8))).join('\n');
-  /* 分享链接优先品牌域名（国内可达），没配置才回落到当前地址。
-     从 GitHub Pages 打开的人如果发出去 github.io 链接，群里根本点不开。 */
-  const share=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)
-    ||location.origin+location.pathname.replace(/index\.html$/,'');
-  return '灵石远征 · 本周矿脉 第 '+s.w+' 期\n'
-    +(rows||'□')+'\n'
-    +GS.score.toLocaleString('en-US')+' 分 · 最长连锁 '+GS.chainMax+'\n'
-    +'同一副盘，你能打多少？\n'
-    +share;
+/* ---- 成绩海报：和《是猴就上100层》同一套交付原则 ----
+   1080×1350、jpeg base64、真实二维码、只分享图片文件。
+   不绘制完整盘面和走法，保留比分谈资，不泄露同盘解法。 */
+function shareCardUrl(info){
+  const base=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||'https://play.myskme.com/';
+  try{const u=new URL(base,location.href);u.searchParams.set('from','poster');u.searchParams.set('mode',info.mode);return u.href}catch(e){return 'https://play.myskme.com/'}
 }
-/* ---- 矿脉名帖：拓片的图片版 ----
-   微信群里图片比文本传得开，但微信有几个硬坑，全都绕过：
-   · 长按菜单只对 <img> 生效，对 <canvas> 无效 → 必须导出成 <img>
-   · blob: 类型的图微信不给保存 → 必须用 toDataURL 的 base64
-   · 部分安卓机 png 长按识别异常 → 用 jpeg
-   · 高清屏要按 dpr 放大画布，否则糊
-   内容仍然**防剧透**：只画分数、连锁形状、期号，不画盘面也不画走法——
-   没玩的人看不出今天怎么解，这是拓片一开始就守的规矩。 */
+function drawShareQr(ctx,url,x,y,size,ink,paper){
+  if(typeof qrcode!=='function')return 0;
+  const qr=qrcode(0,'Q');qr.addData(url);qr.make();
+  const n=qr.getModuleCount(),quiet=4,cell=size/(n+quiet*2);
+  ctx.fillStyle=paper;ctx.fillRect(x,y,size,size);ctx.fillStyle=ink;
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(qr.isDark(r,c))ctx.fillRect(x+(c+quiet)*cell,y+(r+quiet)*cell,Math.ceil(cell+.15),Math.ceil(cell+.15));
+  return n;
+}
+function shareCardMark(info){
+  const raw=[info.mode,info.score,GS.chainMax,SAVE.lbAlias||'',Date.now()].join('|');let h=2166136261;
+  for(let i=0;i<raw.length;i++)h=Math.imul(h^raw.charCodeAt(i),16777619);
+  const s=(h>>>0).toString(36).toUpperCase().padStart(7,'0');return s.slice(0,4)+'-'+s.slice(4);
+}
 function drawCard(){
-  const s=wkState(), log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
-  const dpr=Math.min(devicePixelRatio||1,3);
-  const W=540,H=760;
-  const cv=document.createElement('canvas');
-  cv.width=W*dpr;cv.height=H*dpr;
-  const x=cv.getContext('2d');x.scale(dpr,dpr);
-  const GOLD='#c9a64a', GOLD2='#e8c768', INK='#8b8578';
-  x.fillStyle='#0a0a0c';x.fillRect(0,0,W,H);
-  /* 描金双线框——与全站插画同一套装帧语言 */
-  x.strokeStyle=GOLD;x.lineWidth=1.5;x.strokeRect(18,18,W-36,H-36);
-  x.globalAlpha=.5;x.strokeRect(25,25,W-50,H-50);x.globalAlpha=1;
-  const mid=W/2;
-  x.textAlign='center';
-  x.fillStyle=INK;x.font='500 15px serif';
-  x.fillText('M Y S K M E   ·   G E M F A L L',mid,72);
-  x.fillStyle=GOLD2;x.font='600 40px serif';
-  x.fillText('本周矿脉',mid,132);
-  x.fillStyle=INK;x.font='400 17px serif';
-  x.fillText('第 '+s.w+' 期 · 全服同一副盘',mid,164);
-  /* 连锁形状：把拓片那几行画成金块。行数即手数，块数即连锁长度。 */
-  let y=232;
-  const sym=n=>n>=6?GOLD2:n>=4?GOLD:'#7a6a3f';
-  if(log.length){
-    for(const n of log){
-      const cnt=Math.min(n,8), bw=30, gap=7;
-      const tot=cnt*bw+(cnt-1)*gap;
-      let bx=mid-tot/2;
-      for(let i=0;i<cnt;i++){
-        x.fillStyle=sym(n);
-        x.globalAlpha=.35+.65*(i+1)/cnt;
-        x.fillRect(bx,y,bw,18);
-        bx+=bw+gap;
-      }
-      x.globalAlpha=1;y+=30;
-    }
-  }else{x.fillStyle=INK;x.font='400 16px serif';x.fillText('—',mid,y);y+=30}
-  y=Math.max(y,430);
-  x.fillStyle=GOLD2;x.font='700 64px serif';
-  x.fillText(GS.score.toLocaleString('en-US'),mid,y+62);
-  x.fillStyle=INK;x.font='400 16px serif';
-  x.fillText('分   ·   最长连锁 '+GS.chainMax,mid,y+96);
-  x.fillStyle=GOLD;x.font='400 19px serif';
-  x.fillText('同一副盘，你能打多少？',mid,H-118);
-  x.fillStyle=INK;x.font='500 17px serif';
-  x.fillText('play.myskme.com',mid,H-82);
-  x.fillStyle='#5a564c';x.font='400 13px serif';
-  x.fillText('狼先生与远征者们 · 学院谷地',mid,H-52);
-  /* jpeg 而不是 png：部分安卓机对 png 的长按识别有问题 */
-  return cv.toDataURL('image/jpeg',0.92);
+  const info=shareCardInfo(),log=(GS.wkLog||[]).filter(n=>n>0).sort((a,b)=>b-a).slice(0,6);
+  const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const x=cv.getContext('2d',{alpha:false}),INK='#352d2a',DIM='#66554d',GOLD='#a86625',HI='#d89e56',PAPER='#f2e4ca';
+  const bg=x.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#f7ecd7');bg.addColorStop(.55,'#ead8b8');bg.addColorStop(1,'#dfc6a3');x.fillStyle=bg;x.fillRect(0,0,W,H);
+  x.strokeStyle=GOLD;x.lineWidth=7;x.strokeRect(36,36,W-72,H-72);x.globalAlpha=.42;x.lineWidth=3;x.strokeRect(54,54,W-108,H-108);x.globalAlpha=1;
+  x.textAlign='left';x.fillStyle=DIM;x.font='700 28px system-ui,sans-serif';x.fillText('M Y S K M E  ·  G E M F A L L',92,112);
+  x.fillStyle=GOLD;x.font='800 27px system-ui,sans-serif';x.fillText(info.kick,92,166);
+  x.fillStyle=INK;x.font='900 70px "Songti SC",serif';x.fillText(info.title,92,252);
+  x.fillStyle=DIM;x.font='700 28px system-ui,sans-serif';x.fillText(info.sub,94,302);
+  /* 五颗原色灵石就是品牌识别；不另存一套海报资源。 */
+  for(let i=0;i<5;i++)drawGem(x,752+i*52,168,52,i,'n',{t:0,amb:.7});
+  roundRect(x,92,350,896,300,32);x.fillStyle='rgba(255,255,255,.47)';x.fill();x.strokeStyle='rgba(105,72,49,.22)';x.lineWidth=3;x.stroke();
+  x.textAlign='center';x.fillStyle=GOLD;x.font='900 128px system-ui,sans-serif';x.fillText(Math.max(0,info.score||0).toLocaleString('en-US'),540,505);
+  x.fillStyle=INK;x.font='800 27px system-ui,sans-serif';x.fillText(info.rank,540,558);
+  x.fillStyle=DIM;x.font='700 25px system-ui,sans-serif';x.fillText(info.note,540,610);
+  /* 连锁节奏只留抽象短条，不暴露盘面。 */
+  x.textAlign='left';x.fillStyle=INK;x.font='800 28px system-ui,sans-serif';x.fillText('本局连锁节奏',92,728);
+  const rows=log.length?log:[1];
+  rows.forEach((n,i)=>{const y=770+i*48,cnt=Math.min(8,n),w=54,g=10;for(let j=0;j<cnt;j++){
+    roundRect(x,92+j*(w+g),y,w,22,8);x.fillStyle=n>=6?HI:n>=4?GOLD:'#8c6b4d';x.globalAlpha=.42+.58*(j+1)/cnt;x.fill();x.globalAlpha=1;
+  }});
+  const mark=shareCardMark(info),url=shareCardUrl(info);roundRect(x,92,1050,610,182,28);x.fillStyle='rgba(255,255,255,.42)';x.fill();x.strokeStyle='rgba(105,72,49,.22)';x.lineWidth=3;x.stroke();
+  x.textAlign='left';x.fillStyle=GOLD;x.font='900 25px system-ui,sans-serif';x.fillText('本局印记 '+mark,126,1105);x.fillStyle=INK;x.font='800 31px "Songti SC",serif';x.fillText('扫码进入正版远征',126,1162);x.fillStyle=DIM;x.font='700 21px system-ui,sans-serif';x.fillText('成绩图由本机生成',126,1202);
+  const modules=drawShareQr(x,url,748,994,240,INK,'#fffdf6');
+  x.textAlign='center';x.fillStyle=INK;x.font='800 20px system-ui,sans-serif';x.fillText(modules?'扫码挑战':'play.myskme.com',868,1260);
+  x.fillStyle=DIM;x.font='700 18px system-ui,sans-serif';x.fillText('play.myskme.com',540,1305);
+  return cv.toDataURL('image/jpeg',.91);
 }
 /* ---- 矿工名片 ----
    炉石名片那个思路：把生涯打成一张能拿出手的图。
@@ -7856,33 +7833,24 @@ function showNameCard(){
   $('#nc-img').src=drawNameCard();
   box.scrollIntoView({block:'nearest'});
 }
-function showCard(){
-  /* 限时局不出图：名帖画的是「本周第 N 期 + 解法形状」，那套前提在 90 秒局不成立。
-     文字战报够用，而且群里粘贴不吃压缩、打输了也发得出去。 */
-  if(GS.mode==='rush'){copyTablet();return}
+let SHARE_CARD_DATA='';
+function shareCardFile(data){
+  const raw=atob(data.slice(data.indexOf(',')+1)),bytes=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  return new File([bytes],'gemfall-'+Date.now()+'.jpg',{type:'image/jpeg'});
+}
+async function showCard(){
   const p=$('#wk-tablet');
   p.style.display='block';
-  /* 同一个容器两种形态：文字拓片要等宽带框，图片名帖要素底。
-     加类切换，别让 <pre> 的等宽与边框套在图片上。 */
   p.classList.add('asimg');
-  p.innerHTML='<img id="wk-cardimg" alt="本周矿脉成绩卡">'
-    +'<div class="cardtip">长按上面这张图，选择「保存图片」，发到群里比一比</div>';
-  $('#wk-cardimg').src=drawCard();
-}
-/* 分享按模式取对应的战报：本周矿脉走 wkTablet（同一副盘，可以晒解法形状），
-   90 秒走 rushTablet（同规则同时长，晒的是「你能不能打过我」）。 */
-function tabletFor(){return GS.mode==='rush'?rushTablet():wkTablet()}
-async function copyTablet(){
-  const t=tabletFor();
-  try{
-    await navigator.clipboard.writeText(t);
-    toast('拓片已复制 · 粘到群里就行',2600);
-  }catch(e){
-    /* 剪贴板在非安全上下文或旧内核里会被拒。别只报错——把文本摊开让人自己长按选。 */
-    const box=$('#wk-tablet');
-    if(box){box.classList.remove('asimg');box.textContent=t;box.style.display='block';
-      toast('复制被浏览器挡了 · <b>长按下面这段自己选</b>',3400)}
-  }
+  p.innerHTML='<img id="wk-cardimg" alt="灵石远征成绩海报">'
+    +'<div class="cardtip">图片已带正版二维码 · 浏览器不支持直接分享时，长按保存到相册</div>';
+  SHARE_CARD_DATA=drawCard();$('#wk-cardimg').src=SHARE_CARD_DATA;
+  if(typeof navigator.share==='function'&&typeof File!=='undefined')try{
+    const file=shareCardFile(SHARE_CARD_DATA);
+    if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
+  }catch(e){if(e&&e.name==='AbortError')return}
+  toast('分享图已生成 · 可长按保存到相册',2600);
 }
 /* ---- 挑战所 ----
    一屏看全「本周本月该干嘛」，每段都带**直接开打**的门。
@@ -8010,7 +7978,7 @@ function endWeekly(){
   $('#end-next').dataset.act='weekly';
   $('#end-retry').style.display='none';
   $('#end-continue').style.display='none';
-  $('#end-share').style.display='flex';                       // 只有本周矿脉给分享（拓片/名帖）
+  $('#end-share').style.display='flex';                       // 生成带正版二维码的成绩图
   $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
   setTimeout(()=>LB.flush('clear'),600);
   ovl('end');
@@ -9185,7 +9153,6 @@ $('#xfer-in').addEventListener('click',()=>{
   };
 });
 $('#lb-diag').addEventListener('click',()=>{SFX.click();lbDiagnose()});
-$('#end-tablet').addEventListener('click',()=>{SFX.click();copyTablet()});
 $('#end-card').addEventListener('click',()=>{SFX.click();showCard()});
 $('#lb-roll').addEventListener('click',()=>{SFX.click();
   const el=$('#lb-alias');el.value=rollAlias();el.focus();el.setSelectionRange(el.value.length,el.value.length)});
@@ -9672,9 +9639,8 @@ window.__selftest=function(){
        &&typeof xferExport==='function'&&typeof xferApply==='function'
        &&XFER_TAG==='GFSAVE1:');
   }
-  /* 31. 矿脉名帖：微信有三个硬坑，任何一条破了图就发不出去——
-     必须是 base64（blob 微信不给保存）、必须 jpeg（部分安卓 png 长按识别异常）、
-     必须能塞进 <img>（长按菜单对 canvas 无效）。 */
+  /* 31. 成绩海报：jpeg base64 可长按保存，图中有正版二维码，
+     Web Share 只发图片文件，绝不回退到剪贴板文字。 */
   {
     /* 无头环境（CI）没有真实 canvas，toDataURL 出不来图。
        所以这条只验**我们自己写对了没有**——导出格式选的是 jpeg 而不是 png、
@@ -9683,8 +9649,10 @@ window.__selftest=function(){
     const src=String(drawCard);
     const okFmt=/toDataURL\(\s*['"]image\/jpeg['"]/.test(src)&&!/toBlob/.test(src);
     const okImg=/<img id="wk-cardimg"/.test(String(showCard));
-    const okDpr=/devicePixelRatio/.test(src);
-    ok('名帖导出走 jpeg base64 且渲染成 img（微信三坑）',okFmt&&okImg&&okDpr);
+    const qr=/qrcode/.test(String(drawShareQr))&&/1080/.test(src)&&/1350/.test(src);
+    const imageOnly=/navigator\.share/.test(String(showCard))&&/files:\[file\]/.test(String(showCard))
+      &&!/clipboard|writeText/.test(String(showCard));
+    ok('分享只生成 1080×1350 jpeg 图片，带二维码且不写剪贴板',okFmt&&okImg&&qr&&imageOnly);
   }
   /* 32c. 两营各有独立指标；换边每月一次；
      阵营视图不能重新混入成员、人数或退役门派接口。 */
@@ -9841,6 +9809,16 @@ window.__selftest=function(){
       &&gauntletMutations(11,seed).length===3;
     const enemyRises=gauntletEnemyDamage(12,levels[11].boss,levels[11])>gauntletEnemyDamage(1,levels[0].boss,levels[0]);
     ok('十二层内首领生命、盘面负担、行动压力与我方受伤量都会提高',hpRises&&pressureRises&&enemyRises);
+
+    const profiles=levels.map(gauntletBalanceProfile);
+    const smooth=profiles.every((p,i)=>i===0||p.effectiveHp/profiles[i-1].effectiveHp<=1.40);
+    const openingFair=profiles[0].damagePerMove>=5.5&&profiles[0].damagePerMove<=6.5&&profiles[0].incoming<=36;
+    const finaleThreat=profiles[11].incoming>=95&&profiles[11].incoming<=150;
+    const maxMods=Object.fromEntries(GAUNTLET_UPGRADES.map(u=>[u.id,u.max])),bakMax=Object.assign({},GAUNTLET.mods),bakMaxL=GS.L;
+    GAUNTLET.mods=maxMods;GS.L={mutations:[],elite:false};const fullBuild=gauntletDamage(10,{chain:4});
+    GAUNTLET.mods=bakMax;GS.L=bakMaxL;
+    ok('首领战平衡带：首层可读、词条跳涨不超过四成、终层仍有生命压力',
+       openingFair&&smooth&&finaleThreat&&fullBuild>=90);
 
     const bakLife={life:GAUNTLET.life,lifeMax:GAUNTLET.lifeMax,revives:GAUNTLET.revives,relic:GAUNTLET.relic};
     GAUNTLET.lifeMax=100;GAUNTLET.life=20;GAUNTLET.revives=1;GAUNTLET.relic='';
@@ -10243,30 +10221,21 @@ window.__selftest=function(){
       const junN=(uf.slice(junAt,junAt+900).match(/i<(\d+)&&spots\.length/)||[])[1];
       ok('同伴：虎啸造 2 颗爆裂（5×5 之下三颗会打出 3.3 倍的分）',junN==='2');
     }
-    /* 「新纪录」不许每局都说。endRush 会先把 SAVE.rushBest 更新成本局分数，
-       战报若再去读它现算，判定永远为真 —— 打得再烂也写「新纪录」。
-       分享写谎话比不分享更糟。 */
+    /* 「新纪录」不许每局都说。endRush 必须在更新历史最高前存下本局判定。 */
     {
-      /* ⚠ 拿源码做断言时**必须先剥注释**。这一条第一版就栽在这：
-         我在注释里写了「SAVE.rushBest 已经被更新过了」，
-         而断言查的是「rushTablet 里不许出现 SAVE.rushBest」—— 注释把它匹配上了，
-         代码明明是对的却报红。今天已经栽过第二次，所以抽成工具。 */
       const bare=f=>String(f).replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
-      const e=bare(endRush), t=bare(rushTablet);
-      ok('战报：新纪录判定用的是**这一局之前**的最佳（不是每局都说新纪录）',
+      const e=bare(endRush), t=bare(shareCardInfo);
+      ok('成绩图：新纪录判定用的是这一局之前的最佳',
          /GS\.wasRecord=best/.test(e)
          && /const best=GS\.score>prevBest/.test(e)
-         && /GS\.wasRecord/.test(t)
-         && !/SAVE\.rushBest/.test(t));
+         && /GS\.wasRecord/.test(t));
     }
-    /* 战报的连锁形状不许串模式。wkLog 原来只在本周矿脉里记、也只在那里清空 ——
-       给 90 秒也出战报之后，不清的话会把**上一局本周矿脉的形状**画进去，
-       那比空着更糟：它是在撒谎。 */
+    /* 成绩图的连锁形状不许串模式。 */
     {
       const src=String(startRush);
-      ok('战报：限时局开局清空连锁流水（不把上一局的形状画进去）',
+      ok('成绩图：限时局开局清空连锁流水',
          /GS\.wkLog=\[\]/.test(src));
-      ok('战报：限时局也记连锁流水（否则形状永远是空的）',
+      ok('成绩图：限时局也记连锁流水',
          /GS\.weekly\|\|GS\.mode==='rush'/.test(String(settleBoard)));
     }
     /* 外链不许用 `../` 这类相对路径。
@@ -10565,10 +10534,13 @@ window.__selftest=function(){
       const fire=needsNativeTouchLayout('Mozilla/5.0 (Linux; U; en-US) Silk/126.4','Linux',10);
       const iphone=needsNativeTouchLayout('Mozilla/5.0 (iPhone; CPU iPhone OS 18_6)','iOS',5);
       const desktop=needsNativeTouchLayout('Mozilla/5.0 (Macintosh; Intel Mac OS X)','macOS',0);
+      const roomy=roomyAndroidLayout(android,800,1280)&&roomyAndroidLayout(android,980,2100)
+        &&!roomyAndroidLayout(android,412,915)&&!roomyAndroidLayout(false,800,1280);
       const p=boardPointFromClient(150,275,{left:50,top:75,width:400,height:400});
       const fitSrc=String(fitScreen);
-      ok('安卓触屏禁用整屏 zoom，并按实时棋盘边界换算落点',
+      ok('安卓触屏禁用整屏 zoom，宽竖屏放大游戏列且按实时边界换算落点',
          android&&fire&&!iphone&&!desktop
+         &&roomy
          &&Math.abs(p[0]-CSS_W*.25)<.01&&Math.abs(p[1]-CSS_W*.5)<.01
          &&/!TOUCH_NATIVE_LAYOUT/.test(fitSrc)&&/touch-native/.test(fitSrc));
     }

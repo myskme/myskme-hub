@@ -36,17 +36,17 @@ DEFAULT_DATA = {
              "desc": "余光之种孵出的小兽 · 蛋到觉醒五形态 · 你不在时它替你远征，寄回一封封寓言信。",
              "url": "https://myskme.github.io/myskme-starling/"},
             {"key": "gemfall", "glyph": "消", "cat": "game", "rarity": "SSR", "cover": "assets/cover-gemfall.webp",
-             "tag": "消消乐 · 三消远征", "title": "灵石远征", "en": "GEMFALL",
-             "desc": "学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。",
-             "url": "https://play.myskme.com/"},
+             "tag": "消消乐 · 远征 / 十二层首领战", "title": "灵石远征", "en": "GEMFALL",
+             "desc": "64 关远征与无尽矿脉 · 90 秒双榜 · 十二层首领战的生命、战魂与肉鸽构筑 · 2–6 人聚会赛。六位同行各有灵技，成绩可生成带正版二维码的分享图。",
+             "url": "https://play.myskme.com/", "featured": True},
             {"key": "monkey-upstairs", "glyph": "猴", "cat": "game", "rarity": "SSR", "cover": "assets/cover-monkey-upstairs.svg",
              "tag": "荒诞休闲 · 多人百层挑战", "title": "是猴就上100层", "en": "MONKEY UP 100",
-             "desc": "左右两键冲上 100 层 · 2–6 人同机公平赛 · 同轮同楼 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，还能添加到桌面反复挑战。",
+             "desc": "左右两键冲上 100 层 · 全程物理可达的随机楼道 · 2–6 人同机公平赛 · 绕口令办与百层倒班随机营业。可安装到桌面，结算生成带游戏二维码的随机成绩海报。",
              "url": "https://monkey.myskme.com/", "featured": True},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi-20260810.webp",
              "coverSmall": "assets/cover-zimingqi-20260810-640.webp", "coverLegacy": "assets/cover-zimingqi.webp",
              "tag": "肉鸽自走棋", "title": "自鸣棋", "en": "SELF-CHIME CHESS",
-             "desc": "单人十关 · 无尽回廊 · 课堂多人 · 43 位可玩单位（41 位正典学员）—— 子鱼与 VOL.3 五名新徒已入棋，立绘同步终版。",
+             "desc": "单人十关 · 无尽回廊 · 多人轮次 · 43 位可玩单位与四象羁绊。备战席、四象星图、高清战报与真人云榜已合流，弱网时成绩先留在本机，联网后自动补传。",
              "url": "https://zimingqi.myskme.com/", "featured": True},
             {"key": "volvme", "glyph": "史", "cat": "lore", "rarity": "SSR", "cover": "assets/image2-priority-20260712/cover-volvme-1280.webp",
              "coverSmall": "assets/image2-priority-20260712/cover-volvme-640.webp",
@@ -742,9 +742,16 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   function clone(o){return JSON.parse(JSON.stringify(o));}
   function mergeVisualDefaults(data){
     var LEGACY_DEFAULT_DESC={
+      gemfall:[
+        '学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。'
+      ],
+      'monkey-upstairs':[
+        '左右两键冲上 100 层 · 2–6 人同机公平赛 · 同轮同楼 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，还能添加到桌面反复挑战。'
+      ],
       zimingqi:[
         '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 37 位正典学员，扫码即玩。',
-        '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 41 位正典学员，扫码即玩。'
+        '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 41 位正典学员，扫码即玩。',
+        '单人十关 · 无尽回廊 · 课堂多人 · 43 位可玩单位（41 位正典学员）—— 子鱼与 VOL.3 五名新徒已入棋，立绘同步终版。'
       ],
       volvme:[
         '狼先生与他的学生们 · 八章正典故事线，从立学之初到八月十五仲夏夜之战 —— 一切远征的源头。另有《无月》剧情图册：五部二十九篇，一篇一张脸，配收藏卡读。'
@@ -765,6 +772,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
       if(d.cover&&(!it.cover||(d.coverLegacy&&it.cover===d.coverLegacy)))it.cover=d.cover;
       if(!it.coverSmall&&d.coverSmall)it.coverSmall=d.coverSmall;
       if(!it.icon&&d.icon)it.icon=d.icon;
+      if(it.featured==null&&d.featured!=null)it.featured=d.featured;
       // 仅把历史官方默认文案升级到最新口径；管理员亲手改过的介绍保持不动。
       var legacyDesc=it.key&&LEGACY_DEFAULT_DESC[it.key];
       if(legacyDesc&&legacyDesc.indexOf(it.desc)>-1)it.desc=d.desc;
@@ -1316,10 +1324,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MYSKME">
 <meta name="theme-color" content="#0a0a0c">
-<meta name="description" content="王老师的原创作品总目：是猴就上100层 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
+<meta name="description" content="王老师的原创作品启动台：灵石远征 / 是猴就上100层 / 自鸣棋 / 星徒地牢 / 远征录 / 世界编年史——手机直接打开。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="王老师的原创作品总目：是猴就上100层 / 星徒地牢 / 远征录 / 星灵远征 / 自鸣棋 / 世界编年史 + 中考四板块—— 扫码即玩。">
+<meta property="og:description" content="灵石远征、是猴就上100层、自鸣棋等 MYSKME 原创作品的统一手机入口。">
 <meta property="og:image" content="https://myskme.com/og-cover.png">
 <meta property="og:image:alt" content="MYSKME · 狼先生与他的学生们作品总目">
 <meta property="og:url" content="https://myskme.com/">
