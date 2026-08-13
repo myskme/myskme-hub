@@ -79,6 +79,19 @@ if (honors.some(honor => !/^[a-z0-9-]+$/.test(honor.id) || !honor.name || !honor
 // 十二种建筑立面语言。同样只认正本：把 FACADES 与 facadeMarkup 放进隔离上下文，
 // 导出的是一块三开间三层的「样板」——拿去做周边、卡面、说明页都能直接用。
 // 图形不含文字，所以将来出海不需要重画。
+// 配色也只认正本：色相分级表与分类器都从 index.html 取，导出器不另存一份判据。
+// 这样「声明的配色关系」在游戏里、在素材库里、在自检里永远是同一个算法算出来的。
+// 注意这几条都要**按行取**：hueGap 与 classifyScheme 都是单行函数，
+// 用 /[\s\S]*?\n\}/ 去匹会一路吞到下一个换行加右括号，把中间的 HUE_BANDS 一起卷进来，
+// 于是拼出来的源码里 HUE_BANDS 出现两次、直接 SyntaxError。
+// 这已经是同一类「范围没圈住」的第四次了：**先看清楚目标是几行，再决定用哪种匹配。**
+const paletteToolsSource = [
+  sourceMatch(/(function hexToHsl\(hex\)\{[\s\S]*?\n\})/, 'hexToHsl'),
+  sourceMatch(/(function hueGap\(a,b\)\{[^\n]*\})/, 'hueGap'),
+  sourceMatch(/(const HUE_BANDS=\[[^\n]*\];)/, 'HUE_BANDS'),
+  sourceMatch(/(function classifyScheme\(a,b\)\{[^\n]*\})/, 'classifyScheme'),
+].join('\n');
+
 const facadeArraySource = sourceMatch(/const FACADES=(\[[\s\S]*?\n\]);\nconst FACADE_BY_DEPT/, 'FACADES');
 const facadeConstSource = sourceMatch(/(const FACADE_BAYS=[^\n]*\n)/, 'FACADE 常量');
 const facadeFunctionSource = sourceMatch(/(function facadeMarkup\(facade\)\{[\s\S]*?\n\})/, 'facadeMarkup');
@@ -112,6 +125,23 @@ vm.runInNewContext(
   { timeout: 1000, filename: 'monkey-world-window-assets.vm.js' },
 );
 const motifs = motifRuntime.result?.motifs || [];
+// 每扇窗景的配色关系由**正本的分类器现算**，不在这里抄一份结论。
+const paletteRuntime = { result: null };
+vm.runInNewContext(
+  `const MOTIFS=${JSON.stringify(motifs)};\n${paletteToolsSource}\nresult=MOTIFS.map(m=>({`
+    + `id:m.id,scheme:m.scheme,measured:classifyScheme(m.ink,m.accent),hueGap:hueGap(m.ink,m.accent),`
+    + `hsl:{sky:hexToHsl(m.sky),ink:hexToHsl(m.ink),accent:hexToHsl(m.accent)}}));`,
+  paletteRuntime,
+  { timeout: 1000, filename: 'monkey-palette.vm.js' },
+);
+const palettes = paletteRuntime.result || [];
+// 导出器也守一遍：声明与实算不符就不许出包。游戏里那条自检只在有人跑 ?qa=1 时才拦，
+// 而这一条在 CI 的每次构建里都拦——同一个判据，两层各守一段。
+for (const entry of palettes) {
+  if (entry.scheme !== entry.measured) {
+    throw new Error('窗景 ' + entry.id + ' 声明的配色是「' + entry.scheme + '」，实算是「' + entry.measured + '」');
+  }
+}
 const motifArt = motifRuntime.result?.art || [];
 if (motifs.length !== 8 || motifArt.length !== motifs.length || new Set(motifs.map(motif => motif.id)).size !== motifs.length) {
   throw new Error('世界窗景必须从正本现算出八种唯一素材');
@@ -295,7 +325,12 @@ const manifestMotifs = motifs.map(motif => {
   const body = outputs.get(path.join(outputRoot, file));
   return {
     file, source: 'CULTURE_MOTIFS', id: motif.id, name: motif.name, line: motif.line, kind: motif.kind,
-    sky: motif.sky, ink: motif.ink, accent: motif.accent, viewBox: '0 0 390 844', width: 390, height: 844,
+    sky: motif.sky, ink: motif.ink, accent: motif.accent,
+    // 调色板连同它的色相关系一起进总账：做周边、卡面、说明页时可以直接照抄这三色，
+    // 也照抄它为什么成立。scheme 与 hueGap 都是现算的，不是手写的结论。
+    palette: (() => { const p = palettes.find(x => x.id === motif.id) || {};
+      return { scheme: p.scheme, hueGap: p.hueGap, hsl: p.hsl }; })(),
+    viewBox: '0 0 390 844', width: 390, height: 844,
     sha256: createHash('sha256').update(body).digest('hex'),
   };
 });
