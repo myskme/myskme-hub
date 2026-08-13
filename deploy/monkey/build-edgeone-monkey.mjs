@@ -194,6 +194,44 @@ assert(SW_CACHE.endsWith('-' + PWA_ASSET_HASH),
   'icons/ 或 manifest.webmanifest 已变化，但 sw.js CACHE 没带当前哈希 -' + PWA_ASSET_HASH
   + '。只在这两类资源变化时更新 CACHE；index.html 不在本门禁范围内。');
 
+// ---- 导航的人性化底线（2026-08-13 王老师反馈：结算与首页的「下一页下一页」不够人性化）----
+// 这几条守的是**结论**，不是像素：线性翻页把去处藏起来、结算回不了首页、
+// 主操作会随翻页消失——三样都是玩家一分钟内就会撞上的。
+// 注意匹配的是真正的属性写法 data-page-step="…"，不是这五个字出现在任何地方——
+// 第一版写成 /data-page-step/ 当场被自己的运行期自检满足了（那条自检里有
+// querySelector('[data-page-step]')），检测器和检测目标同形，是这仓库里反复出现的一类坑。
+assert(!/data-page-step="/.test(html),
+  '结算又退回「上一页/下一页」了。线性翻页把去处藏了起来，玩家只能盲点，0813 已换成命名标签。');
+const RESULT_TABS = [...html.matchAll(/data-result-tab="(\d)">([^<]*)</g)];
+assert(RESULT_TABS.length === 3 && RESULT_TABS.every(([, , label]) => label.trim().length >= 2),
+  '结算的三个分页标签必须都在、且都要有名字——没名字的标签跟「下一页」是一回事。');
+assert(html.includes('id="resultHomeButton"') && /el\.resultHome\.addEventListener\('click',\s*resultToTitle\)/.test(html),
+  '结算页的「返回首页」没了。改之前这一屏根本没有回首页的路：玩过一局就再也换不了开工装备。');
+assert(/function resultToTitle\(\)\{state\.over=false;/.test(html),
+  'resultToTitle 必须清掉 state.over，否则回到首页后子屏幕的返回键会把玩家又弹回结算。');
+// 翻页只许有一处实现。手势和按钮各写一套，迟早出现「滑得到第 4 页、按钮只到第 3 页」。
+// 数的是**裸标识符**，不是带括号的调用——0813 踩过：setTimeout(runQA,50) 根本没有括号，
+// 而 html.includes('runQA(') 又会被函数定义自己满足。
+// 更要命的是第二层：**数之前必须先把自检代码切掉**。自检里写着
+// /stepPage\(/.test(bindSwipePaging.toString())，这一句本身就会被数成一次「引用」，
+// 于是把真正的接线整行删掉，门照样绿——0813 反向验证时当场撞到，检测器满足了检测目标。
+const QA_AT = html.indexOf('function measureMenuOverflow(');
+assert(QA_AT > 0, '取不到自检代码的起点（measureMenuOverflow 改名了？先修本门禁的取法）');
+const PRODUCT_CODE = html.slice(0, QA_AT);
+for (const fn of ['activePager', 'stepPage', 'bindSwipePaging']) {
+  assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(PRODUCT_CODE), '导航函数 ' + fn + ' 不见了');
+  const uses = (PRODUCT_CODE.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
+  assert(uses >= 2, '导航函数 ' + fn + ' 在产品代码里只有定义、没有接线（自检里的引用不算数）');
+}
+// measureMenuOverflow 本身就是自检的一部分，所以单独查它确实被 runQA 调用了。
+assert(/measureMenuOverflow\(\)/.test(html.slice(html.indexOf('function runQA('))),
+  '「单屏菜单不溢出」那条自检没有被 runQA 调用，等于白写');
+// 主操作必须在三个 .result-page 之外。在里面就意味着翻到别的页它会消失。
+const ACTIONS_AT = html.indexOf('class="btn-row result-actions"');
+const TABS_AT = html.indexOf('id="resultTabs"');
+assert(ACTIONS_AT > 0 && TABS_AT > 0 && ACTIONS_AT > TABS_AT,
+  '再来一局/生成成绩海报必须常驻在分页标签之外。核心循环是「摔了再来」，这颗按钮不该会消失。');
+
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
 await run(process.execPath, [path.join(projectRoot, 'tools/extract-assets.mjs'), '--check'], { cwd: repoRoot });
