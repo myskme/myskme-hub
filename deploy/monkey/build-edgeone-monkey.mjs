@@ -135,6 +135,10 @@ for (const fn of ['runQA', 'runStressQA', 'runPosterQA']) {
   assert(uses >= 2, '自检入口 ' + fn + ' 只有定义没有任何引用，等于形同虚设');
 }
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
+assert(html.includes('id="worldWindow"') && html.includes('const CULTURE_MOTIFS=[')
+  && html.includes('function claimCultureMotif(') && html.includes('function choosePosterPair(')
+  && html.includes('career.motifs.push(state.motifId)'),
+  '世界窗景的八景轮换、正式局收藏或随机海报组合不完整');
 assert(html.includes('function pauseGame(') && html.includes('function resumeGame(') && html.includes('function shiftDeadlines('), '暂停系统缺失');
 assert(html.includes('const HONORS=['), '称号系统缺失');
 // 红鲤鱼帽必须是红的。做成青绿它就是鱼小姐本人了，「猴假扮红鲤鱼、驴说仿的」这个梗当场作废。

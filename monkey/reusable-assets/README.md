@@ -51,6 +51,21 @@
 | `teas/donkey.svg` | 驴认证 · 纯茶不加料 | 隐藏 | `#a58d72` | `#6b5844` |
 | `teas/ghost.svg` | 谈话人特饮（无人认领） | 限定 | `#b9a3d8` | `#5f4b86` |
 
+## 世界窗景素材
+
+以下八种窗景由正本 `CULTURE_MOTIFS` 数据与 `motifSvgMarkup()` 逐幅现算。游戏内、分享海报与素材总账共用同一组名称和颜色。
+
+| 文件 | 名称 | 视觉结构 | 天空色 | 线条色 |
+| --- | --- | --- | --- | --- |
+| `world-windows/jiangnan.svg` | 江南雨窗 | `rain` | `#dcebe4` | `#4f7f75` |
+| `world-windows/nordic.svg` | 北欧薄暮 | `nordic` | `#dfe7ed` | `#526b7c` |
+| `world-windows/silkroad.svg` | 丝路晨光 | `dunes` | `#f1e4c9` | `#8a684c` |
+| `world-windows/mediterranean.svg` | 地中海午后 | `arches` | `#e2edf0` | `#47778b` |
+| `world-windows/washi.svg` | 和纸月夜 | `moon` | `#ece8df` | `#5f665e` |
+| `world-windows/bauhaus.svg` | 包豪斯清晨 | `geometry` | `#eee9dc` | `#3e5664` |
+| `world-windows/andes.svg` | 安第斯风带 | `mountains` | `#e5e8df` | `#5c7465` |
+| `world-windows/indigo.svg` | 靛蓝鼓点 | `rhythm` | `#e3e6ec` | `#3f506e` |
+
 ## 画风参数
 
 - 描边：`#2f5148`，所有角色统一用这一种描边色，不要每个角色换一种
