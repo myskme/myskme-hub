@@ -54,9 +54,9 @@ assert(html.includes('function repairPlayerState(now)'), '猴子可见性看门�
 assert(html.includes('function startMusic()'), '自适应音乐引擎缺失');
 assert(html.includes("const TOOL_POOL=['magnet','clip','waiver','rocket','wide']"), '帮助道具池不完整');
 assert(html.includes('const MISSIONS=['), '轮值任务系统缺失');
-assert(html.includes("const PARTY_KEY='myskme_monkey_party_v1'"), '2–6 人比赛保存缺失');
-assert(html.includes('function partyRoundSeed('), '多人同轮公平种子缺失');
-assert(html.includes('function finishPartyTurn('), '多人轮转结算缺失');
+// 2–6 人多人模式 0813 已按王老师要求整体拆除，原来守着它的三条断言一并撤掉。
+// 反过来加一条：别再被悄悄加回来（要加就是一次正式决定，不是顺手粘回来）。
+assert(!/\bparty\b/i.test(html), '多人模式的代码又出现了。0813 已明确拆除，要恢复请先跟王老师确认');
 assert(html.includes('<link rel="manifest" href="./manifest.webmanifest">'), 'PWA 清单入口缺失');
 assert(html.includes('<script src="./vendor/qrcode-generator.js"></script>'), '本地二维码模块入口缺失');
 assert(!/<script\s+[^>]*src=["']https?:/i.test(html), '游戏包含外部脚本');

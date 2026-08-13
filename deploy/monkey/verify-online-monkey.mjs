@@ -41,7 +41,7 @@ async function verify() {
   assert(html.includes('function startMusic()'), '线上自适应音乐引擎缺失');
   assert(html.includes("const TOOL_POOL=['magnet','clip','waiver','rocket','wide']"), '线上帮助道具池不完整');
   assert(html.includes('const MISSIONS=['), '线上轮值任务系统缺失');
-  assert(html.includes("const PARTY_KEY='myskme_monkey_party_v1'"), '线上多人比赛保存缺失');
+  assert(!/\bparty\b/i.test(html), '线上又出现多人模式代码（0813 已拆除）');
   assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '线上海报或安卓宽视口修复缺失');
   assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '线上惊喜池或省电音频调度缺失');
   assert(html.includes('function pauseGame(') && html.includes('function shiftDeadlines('), '线上暂停系统缺失');
