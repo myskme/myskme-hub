@@ -1,66 +1,137 @@
 {
-  "schema": 1,
+  "schema": 2,
   "source": "../index.html",
+  "generator": "monkey/tools/extract-assets.mjs",
   "license": "MYSKME original reusable asset",
+  "usage": "直接 <img src> 或内联；矢量无损缩放。要改造型请改 ../index.html 里的同名 symbol 再重跑导出器，不要手改这里。",
   "palette": {
     "paper": "#faf3e2",
     "ink": "#28211a",
+    "outline": "#2f5148",
     "teal": "#1f9e8e",
     "fish": "#3fab84",
     "fishFin": "#6cd0af",
     "banana": "#f5b731",
-    "red": "#e0452c"
+    "red": "#e0452c",
+    "carpHat": "#e0452c",
+    "carpHatFin": "#f2836a",
+    "cream": "#fff5d1",
+    "blush": "#ee9f9a"
   },
+  "style": {
+    "outline": "#2f5148",
+    "outlineNote": "所有角色统一用这一种描边色，不要每个角色换一种",
+    "strokeWidth": "主轮廓 3，细节 2 至 2.6，四肢与尾巴 6 至 7",
+    "linecap": "round",
+    "linejoin": "round",
+    "fill": "平涂，无渐变、无阴影、无滤镜",
+    "blush": "#ee9f9a",
+    "highlight": "眼睛高光是纯白小圆点，位置偏左上"
+  },
+  "canon": [
+    "鱼小姐是绿鲤鱼成精，canon 上不存在金鲤鱼。她的配色不得离开青绿系；构建与线上验收都有门禁挡着。",
+    "红鲤鱼不是 canon 角色。carp-hat 只是猴先生假扮用的道具，必须是红的——做成青绿就变成鱼小姐本人，梗就没了。",
+    "一切 UI 与文案不使用 emoji 及 emoji 味符号（装饰星、带圈数字、箭头字符都算）。"
+  ],
   "assets": [
     {
       "file": "monkey-rise.svg",
       "symbol": "art-monkey-rise",
+      "role": "猴先生 · 上升姿势（主角，三姿之一）",
+      "viewBox": "0 0 100 116",
+      "width": 100,
+      "height": 116,
       "sha256": "54eec28caa62ecd1bf1d257050c22b333e3eada634e38723cb32d17c14c8a024"
     },
     {
       "file": "monkey-fall.svg",
       "symbol": "art-monkey-fall",
+      "role": "猴先生 · 坠落姿势",
+      "viewBox": "0 0 100 116",
+      "width": 100,
+      "height": 116,
       "sha256": "0ce797e0f06b7cd3c6bbefca6d5c4763e6f765ecb7683c3d3622d77a70430112"
     },
     {
       "file": "monkey-land.svg",
       "symbol": "art-monkey-land",
+      "role": "猴先生 · 落地姿势",
+      "viewBox": "0 0 100 116",
+      "width": 100,
+      "height": 116,
       "sha256": "d715e945af2f55b15985c50ba8a113ff4435d42d6733384f6d8f07654b126d34"
     },
     {
       "file": "fish.svg",
       "symbol": "art-fish",
+      "role": "鱼小姐 · 绿鲤鱼成精（canon 角色，配色不得离开青绿系）",
+      "viewBox": "0 0 120 120",
+      "width": 120,
+      "height": 120,
       "sha256": "e6f82bd38210ef8ba23ccacd8d5ffabdccb0f2ba6e23c1c416927d43a153e0d7"
     },
     {
       "file": "donkey.svg",
       "symbol": "art-donkey",
+      "role": "驴 · 沉默的鉴定者（canon 角色）",
+      "viewBox": "0 0 120 120",
+      "width": 120,
+      "height": 120,
       "sha256": "5085b199084211834c33e3c578c60afca9f61196b28aec48bea085f78935f81b"
     },
     {
       "file": "egg.svg",
       "symbol": "art-egg",
+      "role": "蛋 · 房租稽查科常驻（canon 角色）",
+      "viewBox": "0 0 110 120",
+      "width": 110,
+      "height": 120,
       "sha256": "5bbb564212febb556dac6cc93ca6ea4b46876cc8a212f644c8b7fffd42bc41b0"
     },
     {
       "file": "snake.svg",
       "symbol": "art-snake",
+      "role": "蛇 · 意见很多（canon 角色）",
+      "viewBox": "0 0 120 100",
+      "width": 120,
+      "height": 100,
       "sha256": "ce29a4b2ab90f56d48e2e19b0975f6b3fd9db7fa8fa1931698e933c663fdee00"
     },
     {
       "file": "fertilizer.svg",
       "symbol": "art-fertilizer",
+      "role": "黑化肥 · 场景道具",
+      "viewBox": "0 0 120 120",
+      "width": 120,
+      "height": 120,
       "sha256": "ba050dfe05403a6e135f38becb555d9ade7e6e50324bae6aa6c7129402d75c61"
     },
     {
       "file": "banana.svg",
       "symbol": "art-banana",
+      "role": "香蕉 · 收集物",
+      "viewBox": "0 0 54 54",
+      "width": 54,
+      "height": 54,
       "sha256": "049e210555e9e1f3d198b8c6c6e9dfd6a2b40744ff452df5b393e40fd9223a62"
     },
     {
       "file": "crate.svg",
       "symbol": "art-crate",
+      "role": "木箱 · 场景道具",
+      "viewBox": "0 0 90 90",
+      "width": 90,
+      "height": 90,
       "sha256": "ae549f835334371cdb949a9dfe64f2821db64a2306a2ec214a9d4c02127c9463"
+    },
+    {
+      "file": "carp-hat.svg",
+      "symbol": "art-carp-hat",
+      "role": "红鲤鱼帽 · 猴先生假扮红鲤鱼的道具（梗，非 canon 角色）",
+      "viewBox": "0 0 100 116",
+      "width": 100,
+      "height": 116,
+      "sha256": "ef73796361950e0f1b29d65c9f14e942df4a060ce42f0613ecfc84192a63538f"
     }
   ]
 }

@@ -68,6 +68,32 @@ assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'P
 for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.replace(/^\.\//, '')));
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
+assert(html.includes('function pauseGame(') && html.includes('function resumeGame(') && html.includes('function shiftDeadlines('), '暂停系统缺失');
+assert(html.includes('const HONORS=['), '称号系统缺失');
+// 红鲤鱼帽必须是红的。做成青绿它就是鱼小姐本人了，「猴假扮红鲤鱼、驴说仿的」这个梗当场作废。
+assert(/id="art-carp-hat"[\s\S]{0,1200}?fill="#e0452c"/.test(html), '红鲤鱼帽必须是红的（青绿那条是鱼小姐本人，戴上就不是梗了）');
+// 状态类名不许和资源类名同名。0813 踩过：给 #gameShell 加 .carp-hat 时它自己命中了
+// `.carp-hat{display:none}`，整个游戏画面当场消失，而所有数值自检都照样全绿。
+assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '戴帽子的状态类与资源类又同名了，会把整个画面藏掉');
+
+// 暂停要真暂停：绝对计时字段漏登记 = 暂停十秒白送十秒道具时间。
+// 这里在构建期把源码里所有以 Until / At 结尾的对象字面量键扫一遍，和三张登记表对账。
+// 门里写死的不是「有几个字段」（那是会过期的镜像），而是「一个都不许漏登记」（这是约束）。
+{
+  const tableOf = name => {
+    const m = html.match(new RegExp('const ' + name + '=\\[([\\s\\S]*?)\\];'));
+    assert(m, '取不到 ' + name + '（登记表写法变了？先修本脚本的取法）');
+    return (m[1].match(/'[^']+'/g) || []).map(s => s.slice(1, -1));
+  };
+  const registered = new Set([
+    ...tableOf('PAUSE_TIME_FIELDS'), ...tableOf('PAUSE_PLAYER_TIME_FIELDS'),
+    ...tableOf('PAUSE_ENTITY_TIME_FIELDS'), ...tableOf('PAUSE_NON_TIME_FIELDS'),
+  ]);
+  const declared = [...new Set([...html.matchAll(/\b([A-Za-z_$][\w$]*(?:Until|At))\s*:/g)].map(m => m[1]))];
+  assert(declared.length >= 14, '没从源码里扫到足够的计时字段，取法过时了（正则要跟着更新）');
+  const missing = declared.filter(k => !registered.has(k));
+  assert(missing.length === 0, '这些绝对计时字段没登记进 PAUSE_* 表，暂停会白送时间：' + missing.join('、'));
+}
 await access(path.join(projectRoot, 'vendor/qrcode-generator.js'));
 const swSource = await readFile(path.join(projectRoot, 'sw.js'), 'utf8');
 // Service Worker 安装必须绕开浏览器 HTTP 缓存，否则「版本升了、资源还是旧的」。
@@ -76,6 +102,10 @@ const swSource = await readFile(path.join(projectRoot, 'sw.js'), 'utf8');
 assert(/cache:\s*'reload'/.test(swSource), "sw.js 安装没用 cache:'reload'，新版缓存会被旧的 HTTP 缓存污染（0812 海报金鱼就是这么来的）");
 const SW_CACHE = (swSource.match(/const CACHE='([^']+)'/) || [])[1];
 assert(SW_CACHE, '取不到 sw.js 的缓存版本名（const CACHE 的写法变了？）');
+
+// 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
+// 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
+await run(process.execPath, [path.join(projectRoot, 'tools/extract-assets.mjs'), '--check'], { cwd: repoRoot });
 
 await mkdir(path.dirname(output), { recursive: true });
 const staging = await mkdtemp(path.join(tmpdir(), 'myskme-monkey-stage-'));
