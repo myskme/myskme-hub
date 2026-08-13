@@ -2,22 +2,18 @@
 <defs>
 <symbol id="art-egg" viewBox="0 0 110 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="14.5" cy="79" rx="8.5" ry="6.5" fill="#e8cf9a" transform="rotate(35 14.5 79)"/><ellipse cx="95.5" cy="79" rx="8.5" ry="6.5" fill="#e8cf9a" transform="rotate(-35 95.5 79)"/>
-            <ellipse cx="43" cy="100" rx="8" ry="5.5" fill="#e8cf9a"/><ellipse cx="67" cy="100" rx="8" ry="5.5" fill="#e8cf9a"/>
-            <path d="M55 14 A38 48 0 0 1 93 62 A38 38 0 0 1 55 100 A38 38 0 0 1 17 62 A38 48 0 0 1 55 14 Z" fill="#f5e0b0"/>
-            <path d="M38 24 Q23.5 35 22.5 58 Q22 71 26.5 80 M72 24 Q86.5 35 87.5 58 Q88 71 83.5 80" fill="none" stroke="#d9bd85" stroke-width="1.9" opacity=".38"/>
-            <path d="M55 29 C69 29 79 38 79 47 C79 59 68 67 55 67 C42 67 31 59 31 47 C31 38 41 29 55 29 Z" fill="#fffaea" stroke-width="2.4"/>
-            <path d="M37.4 36 Q42 33.7 46.6 35.6 M72.6 36 Q68 33.7 63.4 35.6" fill="none" stroke-width="2.1" opacity=".7"/>
-            <ellipse cx="42" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(14 42 45)"/><ellipse cx="68" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(-14 68 45)"/>
-            <circle cx="39.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/><circle cx="65.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="41" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="69" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/>
-            <path d="M52.3 59.6 Q55 62.5 57.7 59.6" fill="none" stroke-width="2.5"/>
-            <g transform="rotate(-2 55 81)">
-              <rect x="34" y="70" width="42" height="22" rx="7" fill="#f1bd3c" stroke-width="2.5"/>
-              <text x="45.5" y="85.4" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#7e7f68" stroke="none">egg</text>
-              <path d="M36.5 83.3 L55 82.5" stroke="#d94b32" stroke-width="2.4"/>
-              <text x="66" y="86.3" text-anchor="middle" font-family="sans-serif" font-size="14.5" font-weight="700" fill="#2f5148" stroke="none">蛋</text>
-            </g>
+            <path d="M24 69 Q12 75 10 88 M86 69 Q98 75 100 88" fill="none" stroke-width="5"/>
+            <path d="M41 99 Q38 108 34 114 M69 99 Q72 108 76 114" fill="none" stroke-width="6"/>
+            <path data-part="egg-shell" d="M55 10 Q77 11 89 42 Q103 78 82 98 Q70 108 55 108 Q39 108 27 98 Q7 78 21 42 Q33 11 55 10 Z" fill="#f5e0b0"/>
+            <path d="M31 45 Q40 31 55 31 Q72 31 80 46 Q84 60 75 72 Q67 82 53 81 Q38 80 30 68 Q23 56 31 45 Z" fill="#fff9e8" stroke-width="2.4"/>
+            <path d="M35 46 Q41 40 48 43 M63 42 Q72 39 78 46" fill="none" stroke-width="2.3"/>
+            <ellipse cx="43" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(10 43 53)"/>
+            <ellipse cx="69" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(-10 69 53)"/>
+            <circle cx="41.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="67.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/>
+            <path d="M50 66 Q55 63 60 66" fill="none" stroke-width="2.5"/>
+            <ellipse cx="34" cy="63" rx="5" ry="3" fill="#e8aa9f" stroke="none" opacity=".65"/>
+            <path d="M16 87 Q11 90 8 86 M94 87 Q99 90 102 86" fill="none" stroke-width="2.5"/>
+            <path d="M28 114 H40 M70 114 H82" fill="none" stroke-width="5"/>
           </g>
         </symbol>
 </defs>

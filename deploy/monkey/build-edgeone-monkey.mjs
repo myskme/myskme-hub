@@ -71,6 +71,14 @@ assert(html.includes('https://monkey.myskme.com/'), '缺少正式域名');
 const FISH_TEAL = '#3fab84';
 assert(html.includes(`fill="${FISH_TEAL}"`), '鱼小姐主色必须是青绿 ' + FISH_TEAL + '（绿鲤鱼成精，canon 无金鲤鱼）');
 assert(!html.includes('fill="#e3ad32"'), '鱼小姐又被改回金色了。canon 不存在金鲤鱼，这已是第三次，不要再改。');
+const symbolSource = id => (html.match(new RegExp('<symbol id="' + id + '"[\\s\\S]*?</symbol>')) || [])[0] || '';
+const donkeyArt = symbolSource('art-donkey'), eggArt = symbolSource('art-egg'), snakeArt = symbolSource('art-snake');
+assert(donkeyArt.includes('data-part="donkey-ears"') && donkeyArt.includes('data-part="donkey-muzzle"') && !/<text\b/.test(donkeyArt),
+  '驴必须保留长耳与口鼻识别特征，且不许再挂生硬的文字牌');
+assert(eggArt.includes('data-part="egg-shell"') && !/<text\b/.test(eggArt) && !eggArt.includes('#d94b32'),
+  '蛋必须是纯角色：不许写 egg/蛋字样，也不许恢复那条红色删除线');
+assert(snakeArt.includes('data-part="snake-body"') && !snakeArt.includes('art-egg') && !snakeArt.includes('egg-shell'),
+  '蛇必须是纯蛇身，不许再把蛋或蛋形部件接回身上');
 // 版本号从源头取，不再硬写。0812 就是这么出事的：sw 缓存名从 -7 升到 -8，
 // 构建器跟着改了、线上验收器被漏了，结果发布成功却被自己的验收判失败。
 const RELEASE = (html.match(/const RELEASE='([^']+)'/) || [])[1];
@@ -96,6 +104,13 @@ assert(!html.includes('myskme.com/fun/monkey'), '仍含已废弃的目录地址'
 assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'PWA 清单或图标声明不完整');
 for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.replace(/^\.\//, '')));
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
+{
+  const screenCss=(html.match(/\.screen\{([^}]*)\}/)||[])[1]||'';
+  assert(/overflow\s*:\s*hidden/.test(screenCss), '菜单屏幕又开始依赖上下滚动了');
+  assert(!/#(?:title|result)Screen\{[^}]*overflow-y\s*:\s*auto/.test(html), '首页或结算页又恢复成上下滚动了');
+  assert(html.includes('function renderPager(') && html.includes('data-result-page="2"') && html.includes('id="titlesPager"') && html.includes('id="teaPager"'),
+    '单屏分页结构不完整，长内容会重新把页面撑出屏幕');
+}
 // 每个自检入口都必须有对应的函数定义，而且不许有悬空调用。
 // 0813 血泪：拆多人模式时「从 runPartyQA 一路删到 runPosterQA」，把夹在中间的
 // runStressQA 一起删掉了——而 ?qa=1 覆盖不到 ?stress=1，于是自检全绿、
