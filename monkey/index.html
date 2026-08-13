@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.12-architecture">
+<meta name="myskme-release" content="20260813.13-modes">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -898,7 +898,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.12-architecture',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.13-modes',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -939,6 +939,57 @@ const DEPARTMENTS=[
 ];
 const DEPT=Object.fromEntries(DEPARTMENTS.map(d=>[d.id,d]));
 const FIXED_ORDER=DEPARTMENTS.map(d=>d.id);
+// 十二种调式，一个部门一种。和立面同一条线：一个部门一门学问。
+// 每条 fact 是**这套音阶为什么听起来是那个味道**的原因，不是名词解释。
+// steps 是半音级差；音乐引擎只用它来把旋律级数换算成音高，节奏与配器一律不变。
+const MODES=[
+  {id:'gong',dept:'lobby',name:'宫调式 · 五声',origin:'中国',steps:[0,2,4,7,9],
+   fact:'五声音阶把半音和三全音都躲开了，于是任意两个音同时响都不刺耳——合奏容错极高，谁跑调都不太听得出来。'},
+  {id:'ionian',dept:'quality',name:'伊奥尼亚 · 大调',origin:'欧洲通用',steps:[0,2,4,5,7,9,11],
+   fact:'第七级只差半音就到主音，于是它拼命想解决回去——「听起来完整」这件事，是这半个音干的。'},
+  {id:'mixolydian',dept:'fax',name:'混合利底亚',origin:'凯尔特 / 布鲁斯摇滚',steps:[0,2,4,5,7,9,10],
+   fact:'大调把第七级降半音，那股「非回主音不可」的拉力就没了——明亮，但永远不肯收尾。'},
+  {id:'dorian',dept:'rent',name:'多利亚调式',origin:'中世纪教会 / 爵士',steps:[0,2,3,5,7,9,10],
+   fact:'小调家族里唯独它的第六级是大六度，所以它暗，但不悲——中世纪把它排在第一位不是没有道理。'},
+  {id:'phrygian',dept:'monkey',name:'弗里几亚调式',origin:'安达卢西亚 / 弗拉门戈',steps:[0,1,3,5,7,8,10],
+   fact:'第二级就降了半音，旋律刚一开口就贴着主音走——那股绷着的劲是这半个音给的。'},
+  {id:'whole',dept:'redundancy',name:'全音阶',origin:'德彪西',steps:[0,2,4,6,8,10],
+   fact:'每一步都一样大，于是没有哪个音显得更像主音——听着永远落不了地，很适合一个不知为何存在的部门。'},
+  {id:'blues',dept:'fertilizer',name:'蓝调音阶',origin:'密西西比三角洲',steps:[0,3,5,6,7,10],
+   fact:'那个降五度就是「蓝调音」，它故意卡在大三度与小三度之间——不属于任何一边，所以听起来像在叹气。'},
+  // 原本想放利底亚（升四度那个），但实测发现：本作的旋律级数从不用到第 4 级，
+  // 而利底亚与大调**恰恰只在第 4 级上有区别**——放进去等于什么也没换。
+  // 换成和声小调：它的增二度落在旋律真会走到的位置上，一耳朵就听得出来。
+  {id:'harmonic',dept:'puzzle',name:'和声小调',origin:'欧洲 / 中东',steps:[0,2,3,5,7,8,11],
+   fact:'第六级到第七级隔了一个增二度——一个比全音还宽的缝。旋律每次跨过它都像被绊一下，这就是那股「异域感」的来源。'},
+  {id:'miyako',dept:'tongue',name:'都节音阶',origin:'日本 · 三味线',steps:[0,1,5,7,8],
+   fact:'两个半音分别贴在主音与五度上方，一句就能听出是哪里的音乐——识别度全靠这两个挨得极近的音。'},
+  {id:'aeolian',dept:'observation',name:'自然小调',origin:'欧洲通用',steps:[0,2,3,5,7,8,10],
+   fact:'它没有大调那个拼命回家的第七级，所以下行时格外顺——往下走比往上走容易，是音阶自己的形状决定的。'},
+  {id:'hirajoshi',dept:'punctuation',name:'平调子',origin:'日本 · 筝',steps:[0,2,3,7,8],
+   fact:'五个音里塞了两个半音，音与音之间的距离忽宽忽窄——那种走走停停的感觉，标点科应该很熟。'},
+  // 同理：利底亚属七与混合利底亚也只差第 4 级，实测两者音级集合完全相同。
+  // 换成八声减音阶——它对称到没有主音，正好配一栋永远在加盖、永远收不了尾的楼。
+  {id:'octatonic',dept:'construction',name:'八声减音阶',origin:'里姆斯基-科萨科夫 / 爵士',steps:[0,2,3,5,6,8,9,11],
+   fact:'全音半音交替，八个音把八度分得完全对称，于是哪个音都不像主音——从任何一处都能转出去，也就永远收不了尾。'}
+];
+const MODE_BY_DEPT=Object.fromEntries(MODES.map(m=>[m.dept,m]));
+// 旋律只记「第几级」，不记具体音高。现有三条旋律反解出来的就是下面这组级数——
+// 拿伊奥尼亚 [0,2,4,5,7,9,11] 代回去，和改版前的音一个不差。
+// 所以换调式换的是色彩，不是曲子。
+const MELODY_DEGREES=[[0,1,2,4,2,1,-1,-2],[0,2,4,5,4,2,1,-1],[4,2,1,0,-2,-1,1,2]];
+function modeSteps(){return (MODE_BY_DEPT[state.deptId]||MODES[0]).steps;}
+// 旋律第几个音。**这里修了一个改版前就有的老 bug**：
+// 原来写的是 `bar*4 + s/2`，而旋律只在 s=2/6/10/14 上响，s/2 恒为奇数（1,3,5,7），
+// 于是 `bar*4+奇数` mod 8 永远只落在 {1,3,5,7} —— **八个音的旋律，有四个从来没响过**。
+// 是做调式时量出来的：谜题科与加盖工程部的音程集合完全相同，而它俩的区别恰好
+// 落在那四个没响过的音上。改成每小节推进 4 个音，两小节走完一整条旋律。
+function melodyIndex(bar,step){return bar*4+(step-2)/4;}
+// 级数换算成半音。负级数往下一个八度取，正好接上原来旋律里 11 与 9 那两个低音。
+function degreeToSemitone(steps,degree){
+  const size=steps.length,octave=Math.floor(degree/size),index=((degree%size)+size)%size;
+  return steps[index]+12*octave+12;
+}
 // 十二种立面语言，对应十二个部门（部门每 300 米换一次，立面跟着换）。
 // 每一条都带**一句真的建筑学知识**：不是装饰性的科普口号，是这套语言之所以长成这样的原因。
 // unit(x,y,w,h) 只画一个开间，由 facadeMarkup 平铺——所以加一种语言只写一个函数。
@@ -1269,8 +1320,8 @@ function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',
 function blankTally(){return {f47:0,noPB:0,bare:0};}
 function safeTally(raw){const t=blankTally();if(raw&&typeof raw==='object')for(const k of Object.keys(t))t[k]=Math.max(0,Math.floor(Number(raw[k])||0));return t;}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],tally:safeTally(raw.tally)};}
-  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],tally:blankTally()};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],modes:Array.isArray(raw.modes)?[...new Set(raw.modes.filter(id=>MODES.some(m=>m.id===id)))]:[],tally:safeTally(raw.tally)};}
+  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],modes:[],tally:blankTally()};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
 function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
@@ -1400,7 +1451,7 @@ function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length} · 立面 ${career.facades.length}/${FACADES.length}`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length} · 立面 ${career.facades.length}/${FACADES.length} · 调式 ${career.modes.length}/${MODES.length}`;
   el.wornTitle.textContent=career.worn?`称号 · ${wornHonor().name}`:`称号墙 ${career.titles.length}/${HONORS.length}`;
   el.teaOpen.textContent=career.cup?`在喝 · ${currentCup().name}`:`奶茶图鉴 ${career.teas.length}/${TEAS.length}`;
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
@@ -1469,8 +1520,10 @@ function musicIntensity(){if(!state.running)return 0;return clamp(.38+state.maxM
 function scheduleMusicStep(step,t){
   if(audioMode!=='full'||!state.running||!audioGraph)return;const bpm=104+Math.min(18,state.maxMeters/280),beat=60/bpm,intensity=musicIntensity(),bar=Math.floor(step/16),root=[43,38,41,36][bar%4],s=step%16,danger=!!state.deathFreezeUntil||state.player?.vy<-620;
   if(s%4===0)fingerBass(root+(s===8?7:0),t,.047+intensity*.012);
-  if(!danger&&(s===2||s===6||s===10||s===14)){const melodies=[[12,14,16,19,16,14,11,9],[12,16,19,21,19,16,14,11],[19,16,14,12,9,11,14,16]],melody=melodies[(state.seed>>>0)%melodies.length],note=root+melody[(bar*4+s/2)%melody.length];toyMallet(note,t,.022+intensity*.025,s<8?-.28:.28);}
-  if(state.maxMeters>360&&(s===0||s===8)){toyMallet(root+12,t,.022,-.35);toyMallet(root+16,t,.018,.35);}
+  if(!danger&&(s===2||s===6||s===10||s===14)){const degrees=MELODY_DEGREES[(state.seed>>>0)%MELODY_DEGREES.length],steps=modeSteps(),note=root+degreeToSemitone(steps,degrees[melodyIndex(bar,s)%degrees.length]);toyMallet(note,t,.022+intensity*.025,s<8?-.28:.28);}
+  // 这两声和声也得跟着调式走，否则会和旋律撞出调外音（改版前它俩写死了大三度）。
+  if(state.maxMeters>360&&(s===0||s===8)){const steps=modeSteps();
+    toyMallet(root+degreeToSemitone(steps,0),t,.022,-.35);toyMallet(root+degreeToSemitone(steps,2),t,.018,.35);}
   if(s%2===0)brush(t,s%8===0);if(state.flow>=4&&s%2===1)noiseHit(.025,.006,t-audioCtx.currentTime,7200,s%4===1?-.5:.5,true);
   if(state.deptId==='fax'&&(s===3||s===11))synth(1180,.035,'square',.007,t-audioCtx.currentTime,{music:true,filter:2100,pan:.42});
   if(state.deptId==='puzzle'&&(s===4||s===12))synth(210,.045,'square',.012,t-audioCtx.currentTime,{music:true,filter:900,pan:-.38});
@@ -1832,8 +1885,15 @@ function updateDepartment(force=false,announce=true){
     const firstTime=!career.facades.includes(facade.id);
     if(!IS_TEST_RUN&&firstTime){career.facades.push(facade.id);saveCareer();}
     state.facadesSeen.add(facade.id);
+    // **第一次到这层讲建筑，第二次讲音乐。** 一次塞两条谁也记不住，
+    // 分两次讲既不挤，又给「再来一局」多了一个理由。
+    // 判据不用另建计数器：立面在第一次就入档，所以「立面已有、调式还没有」正好等于第二次。
+    const mode=MODE_BY_DEPT[id];
+    const modeFirst=!!mode&&!firstTime&&!career.modes.includes(mode.id);
+    if(!IS_TEST_RUN&&modeFirst){career.modes.push(mode.id);saveCareer();}
     // 晚一步再送：横幅上塞两行会把笑点和知识挤成一团，而且玩家这会儿正在跳，读不了长句。
-    if(announce&&firstTime)setTimeout(()=>{if(state.running&&state.deptId===id)toast(facade.fact,'teal');},2400);
+    const lesson=firstTime?facade.fact:(modeFirst?`${mode.name}（${mode.origin}）：${mode.fact}`:'');
+    if(announce&&lesson)setTimeout(()=>{if(state.running&&state.deptId===id)toast(lesson,'teal');},2400);
   }
   if(announce){el.banner.classList.toggle('avoid-left',state.player&&state.player.x<195);el.banner.style.top=getPlayerScreenY()<250?'calc(100% - 168px)':'116px';el.banner.classList.remove('show');void el.banner.offsetWidth;el.banner.classList.add('show');}
   if(id==='fax')state.faxNextAt=performance.now()+2600;
@@ -2743,6 +2803,39 @@ function runQA(){
       for(const n of document.querySelectorAll('.screen'))n.classList.add('hidden');
       for(const n of shown)n.classList.remove('hidden');
       return swiped&&keyed&&tabbed;})()],
+    ['十二种调式两两听得出区别（量的是排程器真排出来的音）',(()=>{
+      // 这一条抓到过两拨真问题，两次都是**判据本身**的问题，值得原样留着：
+      //  1) 一开始给谜题科放利底亚、加盖工程部放利底亚属七，实测与大调、混合利底亚
+      //     音级完全相同——因为它们只在第 4 级上有区别，而旋律用不到第 4 级。
+      //  2) 换掉之后仍然撞，因为老的 `bar*4+s/2` 让八音旋律只响四个音（见 melodyIndex 的注释）。
+      // 教训：**别量「数据上有没有区别」，要量「排程器真正排出来的音」**。
+      //  同理也别量绝对音级——四个根音一混就跑满十二个音，差异全被盖住（当场踩过）。
+      //  正确判据是相对根音的音程集合。
+      const ROOTS=[43,38,41,36];
+      const keyOf=mode=>{
+        const rel=new Set();
+        for(const degrees of MELODY_DEGREES)
+          for(let bar=0;bar<8;bar+=1)for(const step of [2,6,10,14])
+            rel.add(degreeToSemitone(mode.steps,degrees[melodyIndex(bar,step)%degrees.length]));
+        rel.add(degreeToSemitone(mode.steps,0));rel.add(degreeToSemitone(mode.steps,2));
+        return [...rel].sort((a,b)=>a-b).join(',');};
+      void ROOTS;
+      return new Set(MODES.map(keyOf)).size===MODES.length;})()],
+    ['旋律每一个音都真的会被排到',(()=>{
+      // 改版前八个音的旋律只响四个（bar*4+s/2 恒为奇数下标），没人发现过。
+      // 这条盯着「取号函数走完一圈能覆盖全部下标」，以后谁再改取号就会红。
+      const seen=new Set();
+      for(let bar=0;bar<8;bar+=1)for(const step of [2,6,10,14])seen.add(melodyIndex(bar,step)%8);
+      return seen.size===8;})()],
+    ['换调式没有改动原曲：大调代回去与改版前一个音不差',(()=>{
+      // 整套做法的前提就是「只换色彩、不换曲子」。谁改了 MELODY_DEGREES 或 degreeToSemitone，
+      // 这条会立刻红——否则曲子被悄悄改了，没人会发现。
+      const before=[[12,14,16,19,16,14,11,9],[12,16,19,21,19,16,14,11],[19,16,14,12,9,11,14,16]];
+      const ionian=MODES.find(m=>m.id==='ionian');
+      if(!ionian)return false;
+      return JSON.stringify(MELODY_DEGREES.map(d=>d.map(g=>degreeToSemitone(ionian.steps,g))))===JSON.stringify(before);})()],
+    ['每个部门都有一种调式与一种立面',
+      DEPARTMENTS.every(d=>MODE_BY_DEPT[d.id]&&FACADE_BY_DEPT[d.id])&&MODES.length===DEPARTMENTS.length&&FACADES.length===DEPARTMENTS.length],
     ['竖屏锁定：CSS 与 JS 用的是同一条媒体查询',(()=>{
       // 这两处是同一个判据的两份写法，抄错一个就出现「提示层出来了但局没暂停」
       // 或者反过来。所以直接拿 CSS 原文比一次。

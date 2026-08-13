@@ -372,12 +372,21 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
 }
 
+// 部门清单提到块外，立面与调式两道门共用一份——同一个清单取两次，迟早取法不一致。
+const DEPT_IDS = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(hit => hit[1]);
+
 // ---- 建筑立面语言 ----
 {
   // 十二个部门必须一一对应十二种立面。少一个就会有一段楼没有立面（静默变白墙），
   // 多一个就有一种永远看不到——两种都不会报错，只能靠这道门。
-  const deptIds = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(hit => hit[1]);
-  const facadeDepts = [...html.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  const deptIds = DEPT_IDS;
+  // **先把 FACADES 那一段圈出来再匹配**。第一版直接在整个 html 上匹
+  // /\{id:'…',dept:'…',name:/，结果把结构完全相同的 MODES 也数了进去，报「立面数 24」。
+  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 HONOR_GLYPHS 一路找 href=）：
+  // **扫描之前先把范围圈死**，否则迟早匹到隔壁那张结构一样的表。
+  const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(facadeBlock, '取不到 FACADES 那一段（写法变了？先修本门禁的取法）');
+  const facadeDepts = [...facadeBlock.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
   assert(deptIds.length >= 12, '取不到部门清单（写法变了？先修本门禁的取法）');
   assert(facadeDepts.length === deptIds.length,
     '立面数（' + facadeDepts.length + '）与部门数（' + deptIds.length + '）对不上，会出现没有立面的楼层或永远看不到的立面');
@@ -385,7 +394,7 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
     assert(facadeDepts.includes(dept), '部门 ' + dept + ' 没有对应的立面语言');
   }
   // 每一种都必须真带一句知识。没有 fact 的立面只是花纹，那就不是王老师要的那件事。
-  const facts = [...html.matchAll(/fact:'([^']{20,})'/g)];
+  const facts = [...facadeBlock.matchAll(/fact:'([^']{20,})'/g)];
   assert(facts.length === facadeDepts.length, '有立面缺 fact（或 fact 太短），立面就退化成纯花纹了');
   // 立面是背景纹理，不许盖住台阶与猴子：必须压在 buildingBack 里，且有自己的减淡规则。
   assert(html.indexOf('id="facadeLayer"') > html.indexOf('id="buildingBack"')
@@ -393,8 +402,26 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
     '立面层必须在楼体背景里、且在台阶层之前，否则会盖住台阶');
   assert(/#facadeLayer\{[^}]*opacity:/.test(html), '立面层没有减淡规则，会跟台阶抢视线（0813 截图实测过）');
   // 不写字：出海时建筑语言不需要翻译，写了字就得重画。
-  const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
   assert(!/<text|<image|href=/.test(facadeBlock), '立面里出现了文字或外链，就没法当免翻译的可复用素材了');
+}
+
+// ---- 音乐调式 ----
+{
+  // 十二个部门一一对应十二种调式，理由与立面那条相同：少一个会有一段楼静默用回默认调，
+  // 多一个会有一种永远听不到，两种都不报错。
+  const modeBlock = (CODE.match(/const MODES=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(modeBlock, '取不到 MODES 那一段（写法变了？先修本门禁的取法）');
+  const modeDepts = [...modeBlock.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(modeDepts.length === DEPT_IDS.length,
+    '调式数（' + modeDepts.length + '）与部门数（' + DEPT_IDS.length + '）对不上');
+  for (const dept of DEPT_IDS) assert(modeDepts.includes(dept), '部门 ' + dept + ' 没有对应的调式');
+  // 每种都要带一句真的乐理，否则它只是换了个音阶名。
+  const modeFacts = [...modeBlock.matchAll(/fact:'([^']{20,})'/g)];
+  assert(modeFacts.length === modeDepts.length, '有调式缺 fact（或太短），那就只是换了个音阶名');
+  // 换调式的前提是「只换色彩、不换曲子」：旋律必须由级数生成，不许再写死半音数组。
+  assert(/const MELODY_DEGREES=/.test(CODE) && /function degreeToSemitone\(/.test(CODE),
+    '旋律又被写死成半音了。整套调式的前提是「旋律只记第几级」，写死半音就换不了调式了。');
+  assert(!/melodies=\[\[12,14,16/.test(CODE), '改版前那份写死的旋律又回来了');
 }
 
 // ---- 翻页：页数少时不许再出现上一页/下一页 ----
