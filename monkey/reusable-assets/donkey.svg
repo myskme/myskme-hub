@@ -2,35 +2,30 @@
 <defs>
 <symbol id="art-donkey" viewBox="0 0 120 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(24 22 33)"/>
-            <ellipse cx="22" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(24 22 33)"/>
-            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(-24 86 33)"/>
-            <ellipse cx="86" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(-24 86 33)"/>
-            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
-            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
-            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#7b6248"/>
-            <ellipse cx="54" cy="110" rx="13.5" ry="8" fill="#fff5d1" stroke-width="2.3"/>
-            <circle cx="45.5" cy="23.5" r="4.6" fill="#7b6248" stroke-width="2.5"/>
-            <circle cx="55" cy="20" r="5.4" fill="#7b6248" stroke-width="2.5"/>
-            <circle cx="64.5" cy="23" r="4.8" fill="#7b6248" stroke-width="2.5"/>
-            <path d="M20 55 Q20 29 40 22 Q54 18 68 22 Q88 29 88 55 Q88 77 72 87 Q54 95 36 87 Q20 77 20 55 Z" fill="#a58d72"/>
-            <ellipse cx="54" cy="70" rx="19.5" ry="13.5" fill="#fff5d1" stroke-width="2.4"/>
-            <ellipse cx="41" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-12 41 49)"/>
-            <ellipse cx="67" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(12 67 49)"/>
-            <circle cx="38.9" cy="46.4" r="2" fill="#fffdf6" stroke="none"/>
-            <circle cx="64.9" cy="46.4" r="2" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="50" cy="68.5" rx="2.3" ry="1.7" fill="#2f5148" stroke="none"/>
-            <ellipse cx="58" cy="68.5" rx="2.3" ry="1.7" fill="#2f5148" stroke="none"/>
-            <path d="M50.6 78 L57.4 78" fill="none" stroke-width="2.6"/>
-            <ellipse cx="28" cy="58" rx="5.6" ry="3.5" fill="#ee9f9a" stroke="none" opacity=".78"/>
-            <ellipse cx="80" cy="58" rx="5.6" ry="3.5" fill="#ee9f9a" stroke="none" opacity=".78"/>
-            <path d="M54 26 L54 56" fill="none" stroke-width="1.6" stroke-dasharray="3.2 3.8" opacity=".32"/>
-            <path d="M54 96 L54 102" fill="none" stroke-width="1.6" stroke-dasharray="3.2 3.8" opacity=".3"/>
-            <path d="M12 59 Q12.5 65 14.5 70" fill="none" stroke-width="2.2"/>
-            <g transform="rotate(-8 14 78)">
-              <rect x="1" y="70" width="26" height="16" rx="5.5" fill="#f1bd3c" stroke-width="2.4"/>
-              <text x="14" y="81.8" text-anchor="middle" font-family="sans-serif" font-size="9.5" font-weight="700" fill="#2f5148" stroke="none">正版</text>
+            <g data-part="donkey-body">
+              <path d="M28 73 Q24 92 31 107 L82 107 Q91 94 85 73 Z" fill="#9d8a74"/>
+              <path d="M36 101 L34 116 M73 101 L75 116" fill="none" stroke-width="10"/>
+              <path d="M36 101 L34 116 M73 101 L75 116" fill="none" stroke="#9d8a74" stroke-width="6"/>
+              <path d="M29 116 H40 M69 116 H80" fill="none" stroke-width="5"/>
+              <path d="M84 80 Q103 78 99 93" fill="none" stroke-width="4"/>
+              <path d="M96 92 Q103 95 99 100 Q93 98 96 92 Z" fill="#5f5146"/>
             </g>
+            <g data-part="donkey-ears">
+              <path d="M34 40 Q17 24 20 5 Q35 7 44 33 Z" fill="#9d8a74"/>
+              <path d="M29 29 Q24 18 25 12 Q33 16 38 31 Z" fill="#e8bea9" stroke-width="2"/>
+              <path d="M70 34 Q78 9 95 6 Q98 24 79 42 Z" fill="#9d8a74"/>
+              <path d="M77 31 Q84 17 91 13 Q91 22 82 35 Z" fill="#e8bea9" stroke-width="2"/>
+            </g>
+            <path data-part="donkey-mane" d="M43 30 Q48 20 53 29 Q58 18 63 29 Q68 21 72 33" fill="#5f5146"/>
+            <path d="M27 56 Q27 34 49 29 Q70 25 84 42 Q94 54 87 72 Q79 89 57 91 Q34 91 26 74 Q22 65 27 56 Z" fill="#aa9780"/>
+            <ellipse data-part="donkey-muzzle" cx="57" cy="69" rx="22" ry="15" fill="#f5dfbc" stroke-width="2.5"/>
+            <path d="M38 50 Q44 46 50 49 M66 49 Q73 46 79 51" fill="none" stroke-width="2.5"/>
+            <ellipse cx="45" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/>
+            <ellipse cx="73" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/>
+            <circle cx="43.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/><circle cx="71.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/>
+            <ellipse cx="51" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/><ellipse cx="64" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/>
+            <path d="M50 77 Q57 81 65 76" fill="none" stroke-width="2.5"/>
+            <ellipse cx="33" cy="64" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".65"/>
           </g>
         </symbol>
 </defs>

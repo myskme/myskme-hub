@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.5-poster-honor-qa">
+<meta name="myskme-release" content="20260813.6-character-pages">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -193,8 +193,8 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .pause-stats div{border:2px solid var(--ink);border-radius:10px;background:rgba(255,255,255,.5);padding:6px 3px;text-align:center}
 .pause-stats b{display:block;font-size:18px;font-weight:1000;font-variant-numeric:tabular-nums}
 .pause-stats span{display:block;font-size:8px;font-weight:800;color:var(--muted);margin-top:2px}
-.titles-list{display:grid;gap:7px;margin-bottom:12px}
-.tea-list{display:grid;gap:7px;margin-bottom:12px}
+.titles-list{display:grid;gap:7px;margin-bottom:10px}
+.tea-list{display:grid;gap:7px;margin-bottom:10px}
 .tea-card{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:2px solid var(--ink);border-radius:12px;
   background:var(--card);padding:7px 10px;font:900 11px/1.35 var(--sans);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14)}
 .tea-card.locked{background:rgba(40,33,26,.06);color:var(--muted);cursor:not-allowed;box-shadow:none}
@@ -218,19 +218,19 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .tea-order{border:2px solid var(--ink);border-radius:12px;background:#f3ece0;padding:8px 10px;margin:0 0 11px;
   font:900 10px/1.45 var(--sans)}
 .tea-order b{color:var(--teal);font-size:9px;letter-spacing:.08em;display:block;margin-bottom:3px}
-.screen{position:absolute;z-index:60;inset:0;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--safe-top) + 18px) 22px calc(var(--safe-bottom) + 18px);
+.screen{position:absolute;z-index:60;inset:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:calc(var(--safe-top) + 18px) 22px calc(var(--safe-bottom) + 18px);
   background:rgba(250,243,226,.94);backdrop-filter:blur(5px);transition:opacity .24s,visibility .24s}
 .screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.card{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(40,33,26,.22);padding:20px}
-.notice-no{position:absolute;right:14px;top:-13px;background:var(--red);color:white;border:2.5px solid var(--ink);border-radius:999px;
+.card{position:relative;width:100%;max-height:100%;overflow:hidden;background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(40,33,26,.22);padding:20px}
+.notice-no{position:absolute;right:12px;top:7px;background:var(--red);color:white;border:2.5px solid var(--ink);border-radius:999px;
   padding:4px 11px;font-size:10px;font-weight:1000;transform:rotate(4deg)}
 .eyebrow{font-size:10px;color:var(--muted);font-weight:1000;letter-spacing:.24em;text-align:center}
-.title-art{width:126px;height:112px;margin:-4px auto -4px;display:block;animation:heroBob 2.7s ease-in-out infinite}
+.title-art{width:104px;height:92px;margin:-4px auto -4px;display:block;animation:heroBob 2.7s ease-in-out infinite}
 @keyframes heroBob{50%{transform:translateY(-8px) rotate(-2deg)}}
 h1{font-family:var(--serif);font-size:clamp(27px,7.4vw,36px);line-height:1.02;text-align:center;margin:0 0 7px;letter-spacing:.035em;white-space:nowrap}
 h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric:tabular-nums}
-.subtitle{text-align:center;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.08em;margin:0 0 15px}
-.brief{background:#f4ead3;border:2.5px dashed #9f8e70;border-radius:13px;padding:10px 12px;font-size:12px;line-height:1.65;margin-bottom:15px}
+.subtitle{text-align:center;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.08em;margin:0 0 10px}
+.brief{background:#f4ead3;border:2.5px dashed #9f8e70;border-radius:13px;padding:7px 10px;font-size:10px;line-height:1.45;margin-bottom:9px}
 .brief b{color:var(--red)}
 .btn{width:100%;border:3px solid var(--ink);border-radius:15px;background:var(--banana);box-shadow:var(--shadow);padding:13px 18px;
   font-weight:1000;letter-spacing:.08em;cursor:pointer;transition:transform .12s,box-shadow .12s}
@@ -240,19 +240,19 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .btn.compact{padding:9px 12px;font-size:11px;margin-top:8px}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.btn-row .btn{margin:0;padding:10px 7px;font-size:10px;letter-spacing:.03em}
 .btn.install{background:#dff3ef}.btn.resume{background:#f0d8ef}.btn.danger{background:#f8ded7}.is-hidden{display:none!important}
-.best-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-weight:900;margin-top:12px}
-#titleScreen{justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}#titleScreen .card{margin:auto 0;flex:0 0 auto}
+.best-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-weight:900;margin-top:9px}
+#titleScreen{justify-content:center}#titleScreen .card{margin:0;flex:0 1 auto}
 .career{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center;margin:0 0 11px;padding:9px 11px;
   border:2px dashed #a7977c;border-radius:12px;background:#f8efd9}.career b{font-size:12px}.career span{font-size:9px;color:var(--muted);font-weight:900}
 .career strong{grid-row:1/3;grid-column:2;font-size:23px;color:var(--red)}
-.mission-card{margin:0 0 11px;padding:8px 10px;border:2px solid var(--ink);border-radius:11px;background:#dff3ef;font-size:10px;line-height:1.45;font-weight:900}
+.mission-card{margin:0 0 8px;padding:7px 9px;border:2px solid var(--ink);border-radius:11px;background:#dff3ef;font-size:10px;line-height:1.4;font-weight:900}
 .mission-card b{color:var(--red);margin-right:5px}.kit-label{font-size:9px;color:var(--muted);font-weight:1000;letter-spacing:.12em;margin:0 0 6px}
-.kit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:11px}.kit-card{min-width:0;border:2px solid var(--ink);border-radius:10px;
+.kit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}.kit-card{min-width:0;border:2px solid var(--ink);border-radius:10px;
   background:var(--card);padding:6px 3px;font:900 9px/1.25 var(--sans);cursor:pointer}.kit-card.selected{background:var(--banana);box-shadow:inset 0 -3px 0 rgba(40,33,26,.13)}
 .kit-card:disabled{opacity:.5;cursor:not-allowed}.kit-card small{display:block;font-size:7px;color:var(--muted);margin-top:2px}
 .mission-result{padding:9px 11px;border:2px dashed #a7977c;border-radius:12px;background:#dff3ef;font-size:10px;line-height:1.55;font-weight:900;margin-bottom:11px}
-#resultScreen{justify-content:flex-start;overflow-y:auto;padding-top:calc(var(--safe-top) + 18px);overscroll-behavior:contain}
-#resultScreen .card{margin:auto 0;flex:0 0 auto}
+#resultScreen{justify-content:center}#resultScreen .card{margin:0;flex:0 1 auto}
+.result-page.hidden{display:none}.result-page{position:relative}
 .death-line{font-family:var(--serif);font-size:15px;line-height:1.65;text-align:center;margin:0 0 13px;color:var(--muted)}
 .result-title{text-align:center;font-family:var(--serif);font-size:24px;font-weight:1000;margin:2px 0 0}
 .result-score{text-align:center;font-size:58px;font-weight:1000;line-height:1;margin:8px 0 4px;font-variant-numeric:tabular-nums}
@@ -271,15 +271,19 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
   background:var(--card);padding:9px 10px;font:900 13px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
 .rank-save{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);padding:8px 12px;font-weight:1000;cursor:pointer}
 #leaderboardScreen,#choiceScreen,#installScreen,#shareScreen,#teaScreen{z-index:76}
-#leaderboardScreen .card,#choiceScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{max-height:100%;overflow:auto}
-#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{padding-top:32px}
+#leaderboardScreen .card,#choiceScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{max-height:100%;overflow:hidden}
+#titleScreen .card,#resultScreen .card,#leaderboardScreen .card,#choiceScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{padding-top:32px}
 #installScreen .notice-no,#shareScreen .notice-no,#pauseScreen .notice-no,#titlesScreen .notice-no,#teaScreen .notice-no{top:7px;right:12px}
 .screen-title{text-align:center;font-family:var(--serif);font-size:28px;margin:3px 0 4px}.screen-note{text-align:center;color:var(--muted);font-size:10px;font-weight:800;margin:0 0 12px}
-.rank-list{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:rank}
-.rank-list li{counter-increment:rank;display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:7px;padding:8px 9px;
+.rank-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.rank-list li{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:7px;padding:8px 9px;
   border:2px solid var(--ink);border-radius:11px;background:#f4ead3;font-size:11px}
-.rank-list li::before{content:counter(rank);width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--card);font-weight:1000}
+.rank-list li::before{content:attr(data-rank);width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--card);font-weight:1000}
 .rank-list li.local{background:#dff3ef}.rank-list small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.rank-score{text-align:right;font-weight:1000}.rank-score b{display:block;font-size:15px}
+.pager{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;margin:9px 0 0}
+.pager .btn{margin:0;padding:8px 7px;font-size:9px;letter-spacing:.03em}.pager .btn:last-child{grid-column:3}
+.pager span{grid-column:2;grid-row:1;color:var(--muted);font-size:9px;font-weight:1000;white-space:nowrap}
+.pager .btn:disabled{opacity:.35;cursor:default;transform:none;box-shadow:var(--shadow)}
 .choice-grid{display:grid;gap:9px;margin-top:13px}.choice-card{border:3px solid var(--ink);border-radius:14px;background:#f4ead3;padding:12px;text-align:left;cursor:pointer;box-shadow:0 4px 0 rgba(40,33,26,.18)}
 .choice-card b{display:block;font-size:15px}.choice-card span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.45}.choice-card:active{transform:translateY(3px);box-shadow:none}
 .install-steps{margin:12px 0;padding-left:20px;font-size:11px;line-height:1.75;color:var(--muted);font-weight:800}.install-icon{width:92px;height:92px;display:block;margin:4px auto 10px;border:3px solid var(--ink);border-radius:23px;box-shadow:var(--shadow)}
@@ -306,7 +310,16 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .shake{animation:shake .38s ease}
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
 #gameShell:not(.running) .cloud,#gameShell:not(.running) #bubbleField circle,#gameShell:not(.running) #fogField path{animation-play-state:paused!important}
-@media(max-height:680px){.title-art{width:86px;height:76px}.brief{margin-bottom:8px;padding:7px 9px;line-height:1.45}.card{padding:15px}h1{font-size:26px}.subtitle{margin-bottom:8px}.career,.mission-card,.kit-grid{margin-bottom:7px}}
+@media(max-height:760px){
+  .screen{padding-top:calc(var(--safe-top) + 10px);padding-bottom:calc(var(--safe-bottom) + 10px)}.card{padding:14px}
+  .title-art{width:78px;height:68px}.eyebrow{font-size:8px}h1{font-size:26px;margin-bottom:3px}.subtitle{font-size:10px;margin-bottom:6px}
+  .career{padding:6px 9px;margin-bottom:6px}.career strong{font-size:19px}.mission-card,.kit-grid{margin-bottom:6px}.kit-card{padding-block:4px}
+  .brief{margin-bottom:6px;padding:5px 8px}.btn{padding:10px 13px}.btn-row{margin-top:7px}.btn-row .btn{padding:8px 6px}.best-row{margin-top:6px}
+  .screen-title{font-size:23px}.screen-note{margin-bottom:8px}.death-line{margin-bottom:7px}.result-title{font-size:21px}.result-score{font-size:48px;margin-top:4px}
+  .stats{margin:9px 0}.stat{padding:5px 3px}.visited,.mission-result,.honor-fresh,.tea-order,.brand-box{margin-bottom:8px;padding:7px 9px}
+  .rank-entry{margin:8px 0;padding:8px}.rank-list{gap:4px}.rank-list li{padding:6px 8px}.pager{margin-top:7px}
+  .install-icon{width:70px;height:70px;margin-bottom:6px}.install-steps{margin:7px 0;line-height:1.55}.share-card{max-height:min(45svh,380px)}
+}
 @media(max-width:699px){
   #gameShell{width:min(100vw,460px);height:100vh;height:min(100svh,calc(min(100vw,460px) * 2.5));max-height:none;border-inline:0;box-shadow:none}
   html,body{background:var(--paper)}
@@ -409,77 +422,61 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         </symbol>
         <symbol id="art-donkey" viewBox="0 0 120 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(24 22 33)"/>
-            <ellipse cx="22" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(24 22 33)"/>
-            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(-24 86 33)"/>
-            <ellipse cx="86" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(-24 86 33)"/>
-            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
-            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
-            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#7b6248"/>
-            <ellipse cx="54" cy="110" rx="13.5" ry="8" fill="#fff5d1" stroke-width="2.3"/>
-            <circle cx="45.5" cy="23.5" r="4.6" fill="#7b6248" stroke-width="2.5"/>
-            <circle cx="55" cy="20" r="5.4" fill="#7b6248" stroke-width="2.5"/>
-            <circle cx="64.5" cy="23" r="4.8" fill="#7b6248" stroke-width="2.5"/>
-            <path d="M20 55 Q20 29 40 22 Q54 18 68 22 Q88 29 88 55 Q88 77 72 87 Q54 95 36 87 Q20 77 20 55 Z" fill="#a58d72"/>
-            <ellipse cx="54" cy="70" rx="19.5" ry="13.5" fill="#fff5d1" stroke-width="2.4"/>
-            <ellipse cx="41" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-12 41 49)"/>
-            <ellipse cx="67" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(12 67 49)"/>
-            <circle cx="38.9" cy="46.4" r="2" fill="#fffdf6" stroke="none"/>
-            <circle cx="64.9" cy="46.4" r="2" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="50" cy="68.5" rx="2.3" ry="1.7" fill="#2f5148" stroke="none"/>
-            <ellipse cx="58" cy="68.5" rx="2.3" ry="1.7" fill="#2f5148" stroke="none"/>
-            <path d="M50.6 78 L57.4 78" fill="none" stroke-width="2.6"/>
-            <ellipse cx="28" cy="58" rx="5.6" ry="3.5" fill="#ee9f9a" stroke="none" opacity=".78"/>
-            <ellipse cx="80" cy="58" rx="5.6" ry="3.5" fill="#ee9f9a" stroke="none" opacity=".78"/>
-            <path d="M54 26 L54 56" fill="none" stroke-width="1.6" stroke-dasharray="3.2 3.8" opacity=".32"/>
-            <path d="M54 96 L54 102" fill="none" stroke-width="1.6" stroke-dasharray="3.2 3.8" opacity=".3"/>
-            <path d="M12 59 Q12.5 65 14.5 70" fill="none" stroke-width="2.2"/>
-            <g transform="rotate(-8 14 78)">
-              <rect x="1" y="70" width="26" height="16" rx="5.5" fill="#f1bd3c" stroke-width="2.4"/>
-              <text x="14" y="81.8" text-anchor="middle" font-family="sans-serif" font-size="9.5" font-weight="700" fill="#2f5148" stroke="none">正版</text>
+            <g data-part="donkey-body">
+              <path d="M28 73 Q24 92 31 107 L82 107 Q91 94 85 73 Z" fill="#9d8a74"/>
+              <path d="M36 101 L34 116 M73 101 L75 116" fill="none" stroke-width="10"/>
+              <path d="M36 101 L34 116 M73 101 L75 116" fill="none" stroke="#9d8a74" stroke-width="6"/>
+              <path d="M29 116 H40 M69 116 H80" fill="none" stroke-width="5"/>
+              <path d="M84 80 Q103 78 99 93" fill="none" stroke-width="4"/>
+              <path d="M96 92 Q103 95 99 100 Q93 98 96 92 Z" fill="#5f5146"/>
             </g>
+            <g data-part="donkey-ears">
+              <path d="M34 40 Q17 24 20 5 Q35 7 44 33 Z" fill="#9d8a74"/>
+              <path d="M29 29 Q24 18 25 12 Q33 16 38 31 Z" fill="#e8bea9" stroke-width="2"/>
+              <path d="M70 34 Q78 9 95 6 Q98 24 79 42 Z" fill="#9d8a74"/>
+              <path d="M77 31 Q84 17 91 13 Q91 22 82 35 Z" fill="#e8bea9" stroke-width="2"/>
+            </g>
+            <path data-part="donkey-mane" d="M43 30 Q48 20 53 29 Q58 18 63 29 Q68 21 72 33" fill="#5f5146"/>
+            <path d="M27 56 Q27 34 49 29 Q70 25 84 42 Q94 54 87 72 Q79 89 57 91 Q34 91 26 74 Q22 65 27 56 Z" fill="#aa9780"/>
+            <ellipse data-part="donkey-muzzle" cx="57" cy="69" rx="22" ry="15" fill="#f5dfbc" stroke-width="2.5"/>
+            <path d="M38 50 Q44 46 50 49 M66 49 Q73 46 79 51" fill="none" stroke-width="2.5"/>
+            <ellipse cx="45" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/>
+            <ellipse cx="73" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/>
+            <circle cx="43.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/><circle cx="71.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/>
+            <ellipse cx="51" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/><ellipse cx="64" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/>
+            <path d="M50 77 Q57 81 65 76" fill="none" stroke-width="2.5"/>
+            <ellipse cx="33" cy="64" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".65"/>
           </g>
         </symbol>
         <symbol id="art-egg" viewBox="0 0 110 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="14.5" cy="79" rx="8.5" ry="6.5" fill="#e8cf9a" transform="rotate(35 14.5 79)"/><ellipse cx="95.5" cy="79" rx="8.5" ry="6.5" fill="#e8cf9a" transform="rotate(-35 95.5 79)"/>
-            <ellipse cx="43" cy="100" rx="8" ry="5.5" fill="#e8cf9a"/><ellipse cx="67" cy="100" rx="8" ry="5.5" fill="#e8cf9a"/>
-            <path d="M55 14 A38 48 0 0 1 93 62 A38 38 0 0 1 55 100 A38 38 0 0 1 17 62 A38 48 0 0 1 55 14 Z" fill="#f5e0b0"/>
-            <path d="M38 24 Q23.5 35 22.5 58 Q22 71 26.5 80 M72 24 Q86.5 35 87.5 58 Q88 71 83.5 80" fill="none" stroke="#d9bd85" stroke-width="1.9" opacity=".38"/>
-            <path d="M55 29 C69 29 79 38 79 47 C79 59 68 67 55 67 C42 67 31 59 31 47 C31 38 41 29 55 29 Z" fill="#fffaea" stroke-width="2.4"/>
-            <path d="M37.4 36 Q42 33.7 46.6 35.6 M72.6 36 Q68 33.7 63.4 35.6" fill="none" stroke-width="2.1" opacity=".7"/>
-            <ellipse cx="42" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(14 42 45)"/><ellipse cx="68" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(-14 68 45)"/>
-            <circle cx="39.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/><circle cx="65.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="41" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="69" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/>
-            <path d="M52.3 59.6 Q55 62.5 57.7 59.6" fill="none" stroke-width="2.5"/>
-            <g transform="rotate(-2 55 81)">
-              <rect x="34" y="70" width="42" height="22" rx="7" fill="#f1bd3c" stroke-width="2.5"/>
-              <text x="45.5" y="85.4" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#7e7f68" stroke="none">egg</text>
-              <path d="M36.5 83.3 L55 82.5" stroke="#d94b32" stroke-width="2.4"/>
-              <text x="66" y="86.3" text-anchor="middle" font-family="sans-serif" font-size="14.5" font-weight="700" fill="#2f5148" stroke="none">蛋</text>
-            </g>
+            <path d="M24 69 Q12 75 10 88 M86 69 Q98 75 100 88" fill="none" stroke-width="5"/>
+            <path d="M41 99 Q38 108 34 114 M69 99 Q72 108 76 114" fill="none" stroke-width="6"/>
+            <path data-part="egg-shell" d="M55 10 Q77 11 89 42 Q103 78 82 98 Q70 108 55 108 Q39 108 27 98 Q7 78 21 42 Q33 11 55 10 Z" fill="#f5e0b0"/>
+            <path d="M31 45 Q40 31 55 31 Q72 31 80 46 Q84 60 75 72 Q67 82 53 81 Q38 80 30 68 Q23 56 31 45 Z" fill="#fff9e8" stroke-width="2.4"/>
+            <path d="M35 46 Q41 40 48 43 M63 42 Q72 39 78 46" fill="none" stroke-width="2.3"/>
+            <ellipse cx="43" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(10 43 53)"/>
+            <ellipse cx="69" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(-10 69 53)"/>
+            <circle cx="41.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="67.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/>
+            <path d="M50 66 Q55 63 60 66" fill="none" stroke-width="2.5"/>
+            <ellipse cx="34" cy="63" rx="5" ry="3" fill="#e8aa9f" stroke="none" opacity=".65"/>
+            <path d="M16 87 Q11 90 8 86 M94 87 Q99 90 102 86" fill="none" stroke-width="2.5"/>
+            <path d="M28 114 H40 M70 114 H82" fill="none" stroke-width="5"/>
           </g>
         </symbol>
         <symbol id="art-snake" viewBox="0 0 120 100">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M80 70 Q103 63 99 45" fill="none" stroke-width="14"/>
-            <path d="M80 70 Q103 63 99 45" fill="none" stroke="#6fb87b" stroke-width="9"/>
-            <path d="M44 15 Q69 15 76 34 Q80 48 72 55 Q74 65 94 62 Q100 68 99 77 Q97 91 72 94 Q46 97 31 88 Q20 82 21 72 Q22 63 26 58 Q20 52 15 45 Q10 26 25 17 Q33 15 44 15 Z" fill="#6fb87b"/>
-            <path d="M83 65 Q90 70 92 78" fill="none" stroke-width="1.7" opacity=".26"/>
-            <path d="M19 32 Q16 41 19 50" fill="none" stroke-width="1.6" opacity=".28"/>
-            <path d="M34 27 Q42 25 50 27 Q62 29 68 38 Q71 48 63 55 Q69 61 78 67 Q85 74 80 82 Q73 88 56 88 Q42 87 36 79 Q32 71 37 65 Q41 60 34.5 55 Q26 48 24 40 Q23 29 34 27 Z" fill="#fff5d1" stroke-width="2.4"/>
-            <path d="M58 66.5 Q62.6 68.4 64.2 76 Q65.4 85 58 85.5 Q50.6 85 51.8 76 Q53.4 68.4 58 66.5 Z" fill="#f8dca2" stroke-width="2.1" stroke-opacity=".85"/>
-            <ellipse cx="35" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-14 35 41)"/>
-            <ellipse cx="57" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(14 57 41)"/>
-            <circle cx="33.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="55.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="30" cy="48" rx="6.2" ry="3.7" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="62" cy="48" rx="6.2" ry="3.7" fill="#ee9f9a" stroke="none" opacity=".8"/>
-            <path d="M40.5 53 Q46 57.5 51.5 53" fill="none" stroke-width="2.4"/>
-            <path d="M46 55.5 L46 58.5 M46 58.5 L43.2 61 M46 58.5 L48.8 61" fill="none" stroke="#d75d51" stroke-width="2.2"/>
-            <g transform="rotate(-8 46 16)">
-              <ellipse cx="46" cy="16" rx="22" ry="4.8" fill="#2f5148"/>
-              <path d="M35.5 16 L35.5 6 Q35.5 3 40.5 3 L51.5 3 Q56.5 3 56.5 6 L56.5 16 Z" fill="#2f5148"/>
-              <path d="M36.5 12.4 L55.5 12.4" fill="none" stroke="#e0452c" stroke-width="4" stroke-linecap="butt"/>
-            </g>
+            <path data-part="snake-body" d="M38 49 C27 59 27 76 41 84 C55 93 73 84 78 70 C83 55 91 46 101 51 C111 56 108 72 98 78" fill="none" stroke-width="20"/>
+            <path d="M38 49 C27 59 27 76 41 84 C55 93 73 84 78 70 C83 55 91 46 101 51 C111 56 108 72 98 78" fill="none" stroke="#6fb87b" stroke-width="14"/>
+            <path d="M42 14 Q57 14 66 25 Q72 36 64 49 Q56 58 40 57 Q23 57 16 46 Q9 34 17 24 Q26 14 42 14 Z" fill="#6fb87b"/>
+            <path d="M18 34 Q18 22 30 19" fill="none" stroke="#9bd29d" stroke-width="3" opacity=".7"/>
+            <ellipse cx="31" cy="33" rx="5.4" ry="6.4" fill="#2f5148" stroke="none" transform="rotate(-10 31 33)"/>
+            <ellipse cx="51" cy="33" rx="5.4" ry="6.4" fill="#2f5148" stroke="none" transform="rotate(10 51 33)"/>
+            <circle cx="29.5" cy="31" r="1.7" fill="#fffdf6" stroke="none"/><circle cx="49.5" cy="31" r="1.7" fill="#fffdf6" stroke="none"/>
+            <path d="M35 45 Q41 49 47 45" fill="none" stroke-width="2.4"/>
+            <path d="M41 48 L41 52 M41 52 L37.5 55 M41 52 L44.5 55" fill="none" stroke="#d75d51" stroke-width="2.2"/>
+            <path d="M47 83 Q53 79 57 84 M81 65 Q87 61 92 65" fill="none" stroke="#a5d7a8" stroke-width="2.2" opacity=".8"/>
+            <ellipse cx="22" cy="43" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".65"/>
           </g>
         </symbol>
         <symbol id="art-fertilizer" viewBox="0 0 120 120">
@@ -601,10 +598,9 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div id="titleMission" class="mission-card"><b>本局轮值</b><span>正在从传真机里抽一张任务。</span></div>
         <div class="kit-label">选择开工装备</div>
         <div id="kitGrid" class="kit-grid"></div>
-        <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。通知剩余 418 字，他已出发。<br>点左点右。往上。别问为什么。</div>
+        <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。他已出发；通知还剩 418 字。</div>
         <button id="startButton" class="btn">单猴挑战，立即上楼</button>
-        <button id="leaderboardButton" class="btn secondary">本机坠楼榜</button>
-        <button id="installButton" class="btn install compact">添加到桌面</button>
+        <div class="btn-row"><button id="leaderboardButton" class="btn secondary">本机坠楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
         <div class="best-row"><span>最高高度 <b id="bestHeight">0</b> 米</span><span>最高分 <b id="bestScore">0</b></span></div>
       </div>
     </section>
@@ -612,27 +608,35 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
     <section id="resultScreen" class="screen hidden" aria-label="本局结算">
       <div class="card">
         <span class="notice-no">坠落备案已受理</span>
-        <p id="deathLine" class="death-line"></p>
-        <div id="resultTitle" class="result-title"></div>
-        <div id="resultStamp" class="result-stamp">已阅</div>
-        <div class="result-score"><b id="resultHeight">0</b><small>米</small></div>
-        <div id="resultSub" class="result-sub"></div>
-        <div class="stats">
-          <div class="stat"><b id="resultBananas">0</b><span>香蕉</span></div>
-          <div class="stat"><b id="resultScore">0</b><span>总分</span></div>
-          <div class="stat"><b id="resultFloors">1</b><span>到访部门</span></div>
+        <div class="result-page" data-result-page="0">
+          <p id="deathLine" class="death-line"></p>
+          <div id="resultTitle" class="result-title"></div>
+          <div id="resultStamp" class="result-stamp">已阅</div>
+          <div class="result-score"><b id="resultHeight">0</b><small>米</small></div>
+          <div id="resultSub" class="result-sub"></div>
+          <div class="stats">
+            <div class="stat"><b id="resultBananas">0</b><span>香蕉</span></div>
+            <div class="stat"><b id="resultScore">0</b><span>总分</span></div>
+            <div class="stat"><b id="resultFloors">1</b><span>到访部门</span></div>
+          </div>
+          <div class="btn-row"><button id="restartButton" class="btn">再来一局</button><button id="copyButton" class="btn teal">生成成绩海报</button></div>
         </div>
-        <div id="visitedDepartments" class="visited"></div>
-        <div id="missionResult" class="mission-result"></div>
-        <div id="freshHonors" class="honor-fresh is-hidden"></div>
-        <div id="teaOrder" class="tea-order"></div>
-        <div class="brand-box"><b>MYSKME</b><p id="resultSlogan"></p></div>
-        <div class="rank-entry"><label for="rankName">把本局写进本机榜单。姓名可真可假，分数较真。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="8" value="猴先生" aria-label="榜单姓名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
-        <button id="restartButton" class="btn">再来一局，继续冲100层</button>
-        <button id="resultLeaderboardButton" class="btn secondary">查看本机坠楼榜</button>
-        <button id="copyButton" class="btn secondary">生成带二维码的成绩海报</button>
-        <button id="resultTitlesButton" class="btn secondary">查看称号墙</button>
-        <button id="resultTeaButton" class="btn secondary">查看奶茶图鉴</button>
+        <div class="result-page hidden" data-result-page="1">
+          <h2 class="screen-title">本局档案</h2>
+          <div id="visitedDepartments" class="visited"></div>
+          <div id="missionResult" class="mission-result"></div>
+          <div id="freshHonors" class="honor-fresh is-hidden"></div>
+          <div id="teaOrder" class="tea-order"></div>
+          <div class="brand-box"><b>MYSKME</b><p id="resultSlogan"></p></div>
+        </div>
+        <div class="result-page hidden" data-result-page="2">
+          <h2 class="screen-title">登记与收藏</h2>
+          <p class="screen-note">本局没有白摔。留下名字，或者去看看长期档案。</p>
+          <div class="rank-entry"><label for="rankName">把本局写进本机榜单。姓名可真可假，分数较真。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="8" value="猴先生" aria-label="榜单姓名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
+          <button id="resultLeaderboardButton" class="btn secondary">查看本机坠楼榜</button>
+          <div class="btn-row"><button id="resultTitlesButton" class="btn secondary">查看称号墙</button><button id="resultTeaButton" class="btn secondary">查看奶茶图鉴</button></div>
+        </div>
+        <div id="resultPager" class="pager"><button class="btn secondary" data-page-step="-1">上一页</button><span>1 / 3</span><button class="btn secondary" data-page-step="1">下一页</button></div>
       </div>
     </section>
 
@@ -655,6 +659,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <h2 class="screen-title">称号墙</h2>
         <p id="titlesNote" class="screen-note"></p>
         <div id="titlesList" class="titles-list"></div>
+        <div id="titlesPager" class="pager"></div>
         <button id="titlesCloseButton" class="btn secondary">看完了，继续上楼</button>
       </div>
     </section>
@@ -665,6 +670,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <h2 class="screen-title">奶茶图鉴</h2>
         <p id="teaNote" class="screen-note"></p>
         <div id="teaList" class="tea-list"></div>
+        <div id="teaPager" class="pager"></div>
         <button id="teaCloseButton" class="btn secondary">喝完了，继续上楼</button>
       </div>
     </section>
@@ -675,6 +681,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <h2 class="screen-title">MYSKME 坠楼榜</h2>
         <p class="screen-note">常驻员工负责撑场面，本机记录负责拆台。</p>
         <ol id="rankList" class="rank-list"></ol>
+        <div id="rankPager" class="pager"></div>
         <button id="leaderboardCloseButton" class="btn secondary">看完了，继续上楼</button>
       </div>
     </section>
@@ -728,7 +735,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.5-poster-honor-qa',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260813.6-character-pages',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -747,9 +754,9 @@ const el={
   bg:$('bgMood'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
-  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),
+  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankPager:$('rankPager'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultPager:$('resultPager'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
-  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
+  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
   installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
 };
 
@@ -953,6 +960,8 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
+const TITLE_PAGE_SIZE=4,TEA_PAGE_SIZE=4,RANK_PAGE_SIZE=5;
+let titlePage=0,teaPage=0,rankPage=0,resultPage=0;
 
 function loadRecord(){
   try{return {height:Number(localStorage.getItem('myskme_monkey_upstairs_height'))||0,score:Number(localStorage.getItem('myskme_monkey_upstairs_score'))||0};}
@@ -992,6 +1001,13 @@ function mulberry32(seed){return function(){let t=seed+=0x6D2B79F5;t=Math.imul(t
 function shuffle(list,rng=state.rng){const a=list.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function chooseNonRepeat(pool,last){if(pool.length<2)return 0;let i=Math.floor(Math.random()*pool.length);if(i===last)i=(i+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;return i;}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function renderPager(root,page,total,onPage){
+  root.innerHTML='';if(total<=1)return;
+  const prev=document.createElement('button'),label=document.createElement('span'),next=document.createElement('button');
+  prev.className=next.className='btn secondary';prev.textContent='上一页';next.textContent='下一页';label.textContent=`${page+1} / ${total}`;
+  prev.disabled=page<=0;next.disabled=page>=total-1;prev.addEventListener('click',()=>onPage(page-1));next.addEventListener('click',()=>onPage(page+1));
+  root.append(prev,label,next);
+}
 function wrap(v,max=W){return(v%max+max)%max;}
 function metersFromY(y){return Math.max(0,Math.floor(y/METER_SCALE));}
 function floorsFromMeters(meters){return Math.floor(Math.max(0,Number(meters)||0)/3);}
@@ -1562,6 +1578,12 @@ function renderToolDock(now){
 
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function hideMenuScreens(){for(const screen of [el.title,el.result,el.leaderboard,el.choice,el.install,el.share,el.pause,el.titles,el.teas])screen.classList.add('hidden');}
+function showResultPage(next=0){
+  resultPage=clamp(next,0,2);
+  for(const page of el.result.querySelectorAll('.result-page'))page.classList.toggle('hidden',Number(page.dataset.resultPage)!==resultPage);
+  const buttons=el.resultPager.querySelectorAll('button'),label=el.resultPager.querySelector('span');
+  buttons[0].disabled=resultPage===0;buttons[1].disabled=resultPage===2;label.textContent=`${resultPage+1} / 3`;
+}
 function showTitleScreen(){stopMusic();state.running=false;state.paused=false;state.pausedAt=0;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;el.shell.classList.remove('running');hideMenuScreens();el.title.classList.remove('hidden');renderCareer();updateBestLabels();scheduleAudioSuspend(500);}
 function loop(now){
   state.animationFrame=0;if(!state.running||state.paused)return;
@@ -1605,7 +1627,7 @@ function finishRun(reason='fall'){
     saveCareer();fresh=evaluateHonors(honorContext());freshTeas=evaluateTeas(teaContext());
   }
   renderFreshHonors(fresh);renderFreshTeas(freshTeas);
-  el.rankSave.disabled=false;el.rankSave.textContent='登记';el.result.classList.remove('hidden');el.result.scrollTop=0;updateBestLabels();
+  el.rankSave.disabled=false;el.rankSave.textContent='登记';showResultPage(0);el.result.classList.remove('hidden');updateBestLabels();
   renderCareer();
   el.shell.dataset.careerStamps=String(career.stamps);el.shell.dataset.careerRuns=String(career.runs);el.shell.dataset.missionDone=String(completed);
 }
@@ -1632,8 +1654,8 @@ function wearHonor(id){
 }
 function renderTitlesScreen(){
   $('titlesNote').textContent=`已解锁 ${career.titles.length}/${HONORS.length}。点一个佩戴，它会印在成绩海报上；再点一次摘下。`;
-  el.titlesList.innerHTML='';
-  for(const h of HONORS){
+  const total=Math.ceil(HONORS.length/TITLE_PAGE_SIZE);titlePage=clamp(titlePage,0,total-1);el.titlesList.innerHTML='';
+  for(const h of HONORS.slice(titlePage*TITLE_PAGE_SIZE,(titlePage+1)*TITLE_PAGE_SIZE)){
     const got=career.titles.includes(h.id),b=document.createElement('button');
     b.className=`honor-card${got?'':' locked'}${career.worn===h.id?' worn':''}`;b.disabled=!got;
     b.innerHTML=got
@@ -1642,13 +1664,16 @@ function renderTitlesScreen(){
     b.addEventListener('click',()=>wearHonor(h.id));
     el.titlesList.appendChild(b);
   }
+  renderPager(el.titlesPager,titlePage,total,page=>{titlePage=page;renderTitlesScreen();});
 }
-function openTitles(){unlockAudio();renderTitlesScreen();hideMenuScreens();el.titles.classList.remove('hidden');}
+function openTitles(){unlockAudio();const index=HONORS.findIndex(h=>h.id===career.worn);titlePage=index>=0?Math.floor(index/TITLE_PAGE_SIZE):0;renderTitlesScreen();hideMenuScreens();el.titles.classList.remove('hidden');}
 function closeTitles(){el.titles.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else showTitleScreen();}
 function renderFreshHonors(fresh){
   if(!fresh.length){el.freshHonors.classList.add('is-hidden');el.freshHonors.innerHTML='';return;}
   el.freshHonors.classList.remove('is-hidden');
-  el.freshHonors.innerHTML=`<b>人事部临时下发 ${fresh.length} 个称号</b>`+fresh.map(h=>`${escapeHTML(h.name)}<em>${escapeHTML(h.line)}</em>`).join('');
+  const shown=fresh.slice(0,2);
+  el.freshHonors.innerHTML=`<b>人事部临时下发 ${fresh.length} 个称号</b>`+shown.map(h=>`${escapeHTML(h.name)}<em>${escapeHTML(h.line)}</em>`).join('')
+    +(fresh.length>shown.length?`<em>另有 ${fresh.length-shown.length} 个已收入称号墙。</em>`:'');
   toast(`新称号：${fresh[0].name}`,'gold');sfx('mission');
 }
 function wearCarpHat(){
@@ -1769,8 +1794,8 @@ function teaCupSvg(tea,h=52){
 }
 function renderTeaScreen(){
   $('teaNote').textContent=`已点过 ${career.teas.length}/${TEAS.length}。点一杯端着，它会印在成绩海报上；再点一次放下。`;
-  el.teaList.innerHTML='';
-  for(const t of TEAS){
+  const total=Math.ceil(TEAS.length/TEA_PAGE_SIZE);teaPage=clamp(teaPage,0,total-1);el.teaList.innerHTML='';
+  for(const t of TEAS.slice(teaPage*TEA_PAGE_SIZE,(teaPage+1)*TEA_PAGE_SIZE)){
     const got=career.teas.includes(t.id),b=document.createElement('button');
     b.className=`tea-card${got?'':' locked'}${career.cup===t.id?' holding':''}`;b.disabled=!got;
     b.innerHTML=(got?teaCupSvg(t,52):teaCupSvg({liquid:'#e2ddd0',pearl:'#c9c2b1'},52))
@@ -1780,8 +1805,9 @@ function renderTeaScreen(){
     b.addEventListener('click',()=>drinkTea(t.id));
     el.teaList.appendChild(b);
   }
+  renderPager(el.teaPager,teaPage,total,page=>{teaPage=page;renderTeaScreen();});
 }
-function openTeas(){unlockAudio();renderTeaScreen();hideMenuScreens();el.teas.classList.remove('hidden');}
+function openTeas(){unlockAudio();const index=TEAS.findIndex(t=>t.id===career.cup);teaPage=index>=0?Math.floor(index/TEA_PAGE_SIZE):0;renderTeaScreen();hideMenuScreens();el.teas.classList.remove('hidden');}
 function closeTeas(){el.teas.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else showTitleScreen();}
 function renderFreshTeas(fresh){
   const cup=currentCup();
@@ -1791,16 +1817,20 @@ function renderFreshTeas(fresh){
       :`<b>本局茶水间</b>一杯都没点上。茶水间表示理解。`;
     return;
   }
+  const shown=fresh.slice(-3);
   el.teaOrder.innerHTML=`<b>茶水间新出 ${fresh.length} 杯</b>`
-    +`<div class="tea-fresh">${fresh.map(t=>`${teaCupSvg(t,40)}<span>${escapeHTML(t.name)}</span>`).join('')}</div>`;
+    +`<div class="tea-fresh">${shown.map(t=>`${teaCupSvg(t,40)}<span>${escapeHTML(t.name)}</span>`).join('')}</div>`
+    +(fresh.length>shown.length?`<span>另有 ${fresh.length-shown.length} 杯已收入图鉴。</span>`:'');
   toast(`茶水间新品：${fresh[fresh.length-1].name}`,'teal');
 }
 
 function updateBestLabels(){$('bestHeight').textContent=saved.height;$('bestScore').textContent=saved.score;}
 function renderLeaderboard(){
-  el.rankList.innerHTML='';for(const row of rankedRows()){const li=document.createElement('li');if(!row.npc)li.classList.add('local');const source=row.npc?'常驻员工':'本机记录';li.innerHTML=`<div><b>${row.name}</b><small>${source} · ${row.bananas} 根香蕉</small></div><div class="rank-score"><b>${row.score}</b><small>${row.height} 米</small></div>`;el.rankList.appendChild(li);}
+  const rows=rankedRows(),total=Math.ceil(rows.length/RANK_PAGE_SIZE);rankPage=clamp(rankPage,0,Math.max(0,total-1));el.rankList.innerHTML='';
+  rows.slice(rankPage*RANK_PAGE_SIZE,(rankPage+1)*RANK_PAGE_SIZE).forEach((row,index)=>{const li=document.createElement('li');li.dataset.rank=String(rankPage*RANK_PAGE_SIZE+index+1);if(!row.npc)li.classList.add('local');const source=row.npc?'常驻员工':'本机记录';li.innerHTML=`<div><b>${row.name}</b><small>${source} · ${row.bananas} 根香蕉</small></div><div class="rank-score"><b>${row.score}</b><small>${row.height} 米</small></div>`;el.rankList.appendChild(li);});
+  renderPager(el.rankPager,rankPage,total,page=>{rankPage=page;renderLeaderboard();});
 }
-function openLeaderboard(){renderLeaderboard();el.leaderboard.classList.remove('hidden');}
+function openLeaderboard(){rankPage=0;renderLeaderboard();el.leaderboard.classList.remove('hidden');}
 function closeLeaderboard(){el.leaderboard.classList.add('hidden');}
 function submitRank(){
   if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const row={id:state.runId,name:cleanName(el.rankName.value),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
@@ -1913,6 +1943,7 @@ document.addEventListener('visibilitychange',()=>{
   }else if(state.running&&!state.paused){if(audioMode==='full')unlockAudio();ensureGameLoop();}
 });
 el.start.addEventListener('click',startSolo);el.restart.addEventListener('click',startSolo);el.copy.addEventListener('click',openSharePoster);el.shareSend.addEventListener('click',sharePosterImage);el.shareReroll.addEventListener('click',openSharePoster);el.shareClose.addEventListener('click',closeSharePoster);
+el.resultPager.addEventListener('click',event=>{const button=event.target.closest('button[data-page-step]');if(button&&!button.disabled)showResultPage(resultPage+Number(button.dataset.pageStep));});
 el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);el.rankClose.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
 el.sound.addEventListener('click',cycleAudioMode);
 el.pauseBtn.addEventListener('click',()=>pauseGame());el.pauseResume.addEventListener('click',()=>resumeGame());
@@ -1944,6 +1975,7 @@ function runQA(){
     ['桌面安装入口完整',!!document.querySelector('link[rel="manifest"]')&&!!$('installButton')&&'serviceWorker' in navigator],
     ['主猴与环屏副本完整',playerUses.length===3&&playerUses.every(use=>use.isConnected&&use.getAttribute('href'))],
     ['二维码模块仅从本站本地加载',assetsStayLocal&&typeof qrcode==='function'],['成绩海报与六档稀有版完整',typeof buildPoster==='function'&&POSTER_VARIANTS.length===6&&POSTER_RANKS.length>=7],
+    ['菜单采用单屏分页且不依赖滚动',getComputedStyle(el.title).overflowY==='hidden'&&typeof renderPager==='function'&&document.querySelectorAll('.result-page').length===3],
     ['十三种随机意外与固定暗号完整',SURPRISES.length===13&&SECRET_METERS.length===5],
     ['暂停计时字段登记齐全',unregisteredTimerFields().length===0],
     ['暂停会把所有绝对计时整体后移',pauseShiftSelfTest()],
