@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.6-character-pages">
+<meta name="myskme-release" content="20260813.7-world-goals">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -183,6 +183,8 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
   background:rgba(185,242,234,.3);box-shadow:inset 12px 15px 0 rgba(255,255,255,.34);pointer-events:none;opacity:0}
 #rescueBubble.show{animation:rescue 1.25s ease-out both}
 @keyframes rescue{0%{opacity:0;transform:scale(.2)}22%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:translateY(-95px) scale(.84)}}
+#recordLine{pointer-events:none;transition:opacity .18s}.record-rule{stroke:var(--red);stroke-width:2.2;stroke-dasharray:7 6;opacity:.72}
+#recordLine rect{fill:#fff6de;stroke:var(--ink);stroke-width:2.2}#recordLine text{fill:var(--ink);font:900 10px var(--sans)}
 .carp-hat{display:none}#gameShell.carp-hat-on .carp-hat{display:inline}
 #pauseButton{position:absolute;z-index:43;right:12px;bottom:calc(var(--safe-bottom) + 58px);width:50px;height:42px;
   border:2.5px solid var(--ink);border-radius:50%;background:var(--card);box-shadow:var(--shadow);font-size:11px;
@@ -280,6 +282,9 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
   border:2px solid var(--ink);border-radius:11px;background:#f4ead3;font-size:11px}
 .rank-list li::before{content:attr(data-rank);width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--card);font-weight:1000}
 .rank-list li.local{background:#dff3ef}.rank-list small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.rank-score{text-align:right;font-weight:1000}.rank-score b{display:block;font-size:15px}
+.rank-list li.me{background:#fff0b5;box-shadow:inset 0 0 0 2px var(--banana)}
+.world-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.world-tab{border:2px solid var(--ink);border-radius:10px;background:var(--card);padding:7px 3px;font:900 9px var(--sans);cursor:pointer}.world-tab.active{background:var(--banana)}
+.world-status{min-height:30px;margin:0 0 8px;padding:6px 8px;border:2px dashed #a7977c;border-radius:10px;background:#f8efd9;color:var(--muted);font-size:9px;font-weight:900;line-height:1.45}
 .pager{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:7px;margin:9px 0 0}
 .pager .btn{margin:0;padding:8px 7px;font-size:9px;letter-spacing:.03em}.pager .btn:last-child{grid-column:3}
 .pager span{grid-column:2;grid-row:1;color:var(--muted);font-size:9px;font-weight:1000;white-space:nowrap}
@@ -552,6 +557,10 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <rect x="55" y="7" width="58" height="18" rx="7" fill="#fff3d0" stroke="#2f5148" stroke-width="2"/><text x="84" y="20" text-anchor="middle" font-size="10" font-weight="900" fill="#2f5148">电梯到了</text>
         <circle cx="157" cy="101" r="7" fill="#f1bd3c" stroke="#2f5148" stroke-width="2"/>
       </g>
+      <g id="recordLine" opacity="0">
+        <line class="record-rule" x1="8" y1="0" x2="382" y2="0"/>
+        <g transform="translate(10 -27)"><rect width="112" height="23" rx="9"/><text id="recordLineText" x="56" y="15.5" text-anchor="middle">上次纪录</text></g>
+      </g>
       <g id="platformLayer"></g>
       <g id="itemLayer"></g>
       <g id="playerGroup" transform="translate(145 660)">
@@ -600,7 +609,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div id="kitGrid" class="kit-grid"></div>
         <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。他已出发；通知还剩 418 字。</div>
         <button id="startButton" class="btn">单猴挑战，立即上楼</button>
-        <div class="btn-row"><button id="leaderboardButton" class="btn secondary">本机坠楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
+        <div class="btn-row"><button id="leaderboardButton" class="btn secondary">世界楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
         <div class="best-row"><span>最高高度 <b id="bestHeight">0</b> 米</span><span>最高分 <b id="bestScore">0</b></span></div>
       </div>
     </section>
@@ -632,8 +641,8 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="result-page hidden" data-result-page="2">
           <h2 class="screen-title">登记与收藏</h2>
           <p class="screen-note">本局没有白摔。留下名字，或者去看看长期档案。</p>
-          <div class="rank-entry"><label for="rankName">把本局写进本机榜单。姓名可真可假，分数较真。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="8" value="猴先生" aria-label="榜单姓名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
-          <button id="resultLeaderboardButton" class="btn secondary">查看本机坠楼榜</button>
+          <div class="rank-entry"><label for="rankName">登记世界楼榜。化名可真可假，本局会先留在本机，断网后自动补交。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="12" value="猴先生" aria-label="榜单化名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
+          <button id="resultLeaderboardButton" class="btn secondary">查看世界楼榜</button>
           <div class="btn-row"><button id="resultTitlesButton" class="btn secondary">查看称号墙</button><button id="resultTeaButton" class="btn secondary">查看奶茶图鉴</button></div>
         </div>
         <div id="resultPager" class="pager"><button class="btn secondary" data-page-step="-1">上一页</button><span>1 / 3</span><button class="btn secondary" data-page-step="1">下一页</button></div>
@@ -675,11 +684,12 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       </div>
     </section>
 
-    <section id="leaderboardScreen" class="screen hidden" aria-label="本机排行榜">
+    <section id="leaderboardScreen" class="screen hidden" aria-label="世界排行榜">
       <div class="card">
-        <span class="notice-no">仅本机有效</span>
-        <h2 class="screen-title">MYSKME 坠楼榜</h2>
-        <p class="screen-note">常驻员工负责撑场面，本机记录负责拆台。</p>
+        <span class="notice-no">每周一重新起跑</span>
+        <h2 class="screen-title">MYSKME 世界楼榜</h2>
+        <div id="worldTabs" class="world-tabs"><button class="world-tab active" data-world-scope="weekly">本周高度</button><button class="world-tab" data-world-scope="alltime">生涯高度</button><button class="world-tab" data-world-scope="effort">不白摔</button></div>
+        <div id="worldStatus" class="world-status">正在接世界楼榜。本机成绩不会等网络。</div>
         <ol id="rankList" class="rank-list"></ol>
         <div id="rankPager" class="pager"></div>
         <button id="leaderboardCloseButton" class="btn secondary">看完了，继续上楼</button>
@@ -735,7 +745,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.6-character-pages',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260813.7-world-goals',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -751,10 +761,10 @@ syncViewportMode();window.addEventListener('resize',syncViewportMode,{passive:tr
 const el={
   shell:$('gameShell'),stage:$('stage'),platformLayer:$('platformLayer'),itemLayer:$('itemLayer'),playerGroup:$('playerGroup'),motion:$('monkeyMotion'),monkey:$('monkeyUse'),wrapLeft:$('playerWrapLeft'),wrapRight:$('playerWrapRight'),wrapLeftMotion:$('monkeyWrapLeftMotion'),wrapRightMotion:$('monkeyWrapRightMotion'),wrapLeftUse:$('monkeyWrapLeftUse'),wrapRightUse:$('monkeyWrapRightUse'),
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
-  bg:$('bgMood'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),
+  bg:$('bgMood'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
-  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankPager:$('rankPager'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultPager:$('resultPager'),
+  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultPager:$('resultPager'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
   titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
   installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
@@ -954,7 +964,7 @@ const career=loadCareer();
 const state={running:false,over:false,seed:1,rng:Math.random,player:null,platforms:[],items:[],cameraY:0,nextY:0,lastX:195,
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
-  lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
+  lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
   animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
   perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
@@ -962,6 +972,8 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
 const TITLE_PAGE_SIZE=4,TEA_PAGE_SIZE=4,RANK_PAGE_SIZE=5;
 let titlePage=0,teaPage=0,rankPage=0,resultPage=0;
+const WORLD_DEVICE_KEY='myskme_monkey_device_v1',WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1',WORLD_PENDING_KEY='myskme_monkey_pending_v1',WORLD_TOKEN_KEY='myskme_monkey_player_token_v1';
+let worldScope='weekly',worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false},worldBoardSeq=0,worldSyncPromise=null,worldSyncMessage='';
 
 function loadRecord(){
   try{return {height:Number(localStorage.getItem('myskme_monkey_upstairs_height'))||0,score:Number(localStorage.getItem('myskme_monkey_upstairs_score'))||0};}
@@ -988,14 +1000,59 @@ function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',
 function blankTally(){return {f47:0,noPB:0,bare:0};}
 function safeTally(raw){const t=blankTally();if(raw&&typeof raw==='object')for(const k of Object.keys(t))t[k]=Math.max(0,Math.floor(Number(raw[k])||0));return t;}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',tally:safeTally(raw.tally)};}
-  catch(_){return {stamps:0,runs:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',tally:blankTally()};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',tally:safeTally(raw.tally)};}
+  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',tally:blankTally()};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
+function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
+function worldStorageSet(key,value){try{localStorage.setItem(key,String(value));return true;}catch(_){return false;}}
+function worldDeviceId(){
+  let id=worldStorageGet(WORLD_DEVICE_KEY);if(id.length>=12)return id;
+  if(globalThis.crypto?.randomUUID)id=crypto.randomUUID();else{const a=new Uint32Array(4);if(globalThis.crypto?.getRandomValues)crypto.getRandomValues(a);else for(let i=0;i<a.length;i++)a[i]=Math.floor(Math.random()*4294967296);id=[...a].map(n=>n.toString(16).padStart(8,'0')).join('-');}
+  worldStorageSet(WORLD_DEVICE_KEY,id);return id;
+}
+function worldAlias(){return cleanWorldAlias(worldStorageGet(WORLD_ALIAS_KEY,'猴先生'));}
+function worldEnabled(){return worldStorageGet(WORLD_ENABLED_KEY)==='1';}
+function worldPlayerToken(){const token=worldStorageGet(WORLD_TOKEN_KEY);return /^[0-9a-f]{64}$/.test(token)?token:'';}
+function loadWorldPending(){
+  try{const rows=JSON.parse(worldStorageGet(WORLD_PENDING_KEY,'[]'));return Array.isArray(rows)?rows.filter(r=>r&&/^[A-Za-z0-9_-]{8,80}$/.test(String(r.runId||''))).slice(-200):[];}catch(_){return [];}
+}
+function saveWorldPending(rows){worldStorageSet(WORLD_PENDING_KEY,JSON.stringify(rows.slice(-200)));}
+function pendingWorldCount(){return loadWorldPending().length;}
+function cleanWorldRun(run){const row={runId:String(run.runId||''),height:Math.max(0,Math.floor(Number(run.height)||0)),score:Math.max(0,Math.floor(Number(run.score)||0)),bananas:Math.max(0,Math.floor(Number(run.bananas)||0))};return /^[A-Za-z0-9_-]{8,80}$/.test(row.runId)&&row.score>=row.height&&row.bananas<=row.score?row:null;}
+function queueWorldRun(run){const row=cleanWorldRun(run);if(!row)return false;const rows=loadWorldPending(),index=rows.findIndex(item=>item.runId===row.runId);if(index>=0)rows[index]=row;else rows.push(row);saveWorldPending(rows);return true;}
+async function worldFetch(path,options={}){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
+  try{const response=await fetch(MONKEY_API+path,{...options,signal:controller.signal,headers:{Accept:'application/json',...(options.headers||{})}});let data={};try{data=await response.json();}catch(_){}if(!response.ok||!data.ok){const error=new Error(data.err||`榜单响应 ${response.status}`);error.status=response.status;throw error;}return data;}finally{clearTimeout(timer);}
+}
+function updateWorldStatus(){
+  if(!el.worldStatus)return;const pending=pendingWorldCount(),suffix=pending?` · 待补交 ${pending} 局`:'';
+  if(worldSyncMessage){el.worldStatus.textContent=worldSyncMessage+suffix;return;}
+  const me=worldBoard.me;if(worldBoard.connected&&me){const metric=worldScope==='weekly'?`${me.weekHeight} 米`:worldScope==='alltime'?`${me.height} 米`:`${me.runs} 局`;el.worldStatus.textContent=`你目前第 ${me.rank} 名 · ${metric}${suffix}`;return;}
+  el.worldStatus.textContent=(worldBoard.connected?'榜单已接通。登记一局后，这里会出现你的附近名次。':'网络暂时没接上，先显示本机候补。')+suffix;
+}
+async function flushWorldQueue(){
+  if(worldSyncPromise)return worldSyncPromise;
+  worldSyncPromise=(async()=>{
+    if(!worldEnabled()||!navigator.onLine)return false;
+    worldSyncMessage='正在补交本机成绩';updateWorldStatus();
+    for(const queued of loadWorldPending()){
+      try{
+        const data=await worldFetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceUUID:worldDeviceId(),alias:worldAlias(),run:queued})});
+        if(data.acceptedRunId!==queued.runId)throw new Error('榜单回执与本局不一致');
+        if(data.playerToken)worldStorageSet(WORLD_TOKEN_KEY,data.playerToken);
+        saveWorldPending(loadWorldPending().filter(row=>row.runId!==queued.runId));
+      }catch(error){worldSyncMessage=error.status===400?`登记被退回：${error.message}`:'网络未完成，成绩仍在本机排队';updateWorldStatus();return false;}
+    }
+    worldSyncMessage='补交完成';updateWorldStatus();return true;
+  })().finally(()=>{worldSyncPromise=null;setTimeout(()=>{if(worldSyncMessage==='补交完成'){worldSyncMessage='';updateWorldStatus();}},1600);});
+  return worldSyncPromise;
+}
 function loadAudioMode(){try{const mode=localStorage.getItem('myskme_monkey_audio_v1');return ['full','sfx','off'].includes(mode)?mode:'full';}catch(_){return 'full';}}
 function saveAudioMode(){try{localStorage.setItem('myskme_monkey_audio_v1',audioMode);}catch(_){}}
 function makeRunId(){return `${Date.now().toString(36)}-${Math.floor(Math.random()*1e8).toString(36)}`;}
 function cleanName(value){return String(value||'猴先生').replace(/[<>\n\r]/g,'').trim().slice(0,8)||'匿名猴';}
+function cleanWorldAlias(value){return String(value||'猴先生').replace(/[^一-龥A-Za-z0-9·\-_ ]/g,'').trim().slice(0,12)||'匿名猴';}
 function rankedRows(){return [...localBoard,...NPC_RANKS].sort((a,b)=>b.score-a.score||b.height-a.height||(a.at||0)-(b.at||0)).slice(0,10);}
 function mulberry32(seed){return function(){let t=seed+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function shuffle(list,rng=state.rng){const a=list.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -1023,7 +1080,7 @@ function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 意外图鉴 ${career.surprises.length}/${SURPRISES.length} · 称号 ${career.titles.length}/${HONORS.length}`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 图鉴 ${career.surprises.length}/${SURPRISES.length}`;
   el.wornTitle.textContent=career.worn?`称号 · ${wornHonor().name}`:`称号墙 ${career.titles.length}/${HONORS.length}`;
   el.teaOpen.textContent=career.cup?`在喝 · ${currentCup().name}`:`奶茶图鉴 ${career.teas.length}/${TEAS.length}`;
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
@@ -1144,7 +1201,7 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.platforms=[];state.items=[];state.cameraY=Math.max(0,baseY-230);state.nextY=baseY+86;state.lastX=195;state.maxMeters=DEBUG_START;state.bananas=0;state.bonus=0;state.score=DEBUG_START;
   state.deptCache=[];state.randomBag=[];const startDept=departmentIdAt(DEBUG_START);state.visited=new Set([startDept]);state.deptId=startDept;state.deptIndex=Math.floor(DEBUG_START/300);state.majorCount=0;
   state.eventPool=shuffle(MAJOR_EVENTS);state.nextEventMeter=DEBUG_START+520+Math.floor(state.rng()*180);state.lowGravityUntil=0;state.windUntil=0;
-  state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;
+  state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;state.personalBestAtStart=IS_TEST_RUN?0:saved.height;state.recordPassed=false;
   state.milestones=new Set(MILESTONES.filter(m=>m<=DEBUG_START));state.lucky=DEBUG_START>=1020;state.fertilizerCoughed=false;
   state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.lastLandingId='';state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
   state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.choiceOpen=false;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
@@ -1413,6 +1470,7 @@ function updatePhysics(dt,now){
   }
   collectItems(now);
   state.maxMeters=Math.max(state.maxMeters,metersFromY(pl.y));
+  if(!state.recordPassed&&state.personalBestAtStart>0&&state.maxMeters>state.personalBestAtStart){state.recordPassed=true;celebrate(`越过上次纪录 ${state.personalBestAtStart} 米。旧线已撤。`);}
   state.score=state.maxMeters+state.bananas+state.bonus;
   const cameraTarget=pl.y-(H-300);if(cameraTarget>state.cameraY)state.cameraY+=(cameraTarget-state.cameraY)*Math.min(1,dt*8);
   let sy=H-(pl.y-state.cameraY)-108;if(sy<92){state.cameraY=Math.max(state.cameraY,pl.y-(H-220));sy=112;}
@@ -1541,6 +1599,8 @@ function toast(text,kind=''){
 
 function renderAll(now){
   el.building.setAttribute('transform',`translate(0 ${(-((state.cameraY*.075)%172)).toFixed(1)})`);
+  const recordY=state.personalBestAtStart*METER_SCALE,recordSY=H-(recordY-state.cameraY),showRecord=state.running&&!state.recordPassed&&state.personalBestAtStart>0&&recordSY>138&&recordSY<H-78;
+  el.recordLine.style.opacity=showRecord?'1':'0';if(showRecord){el.recordLine.setAttribute('transform',`translate(0 ${recordSY.toFixed(1)})`);el.recordLineText.textContent=`上次 ${state.personalBestAtStart} 米`;}
   const liveIds=new Set();
   for(const p of state.platforms){
     const sy=H-(p.y-state.cameraY);if(!p.alive||sy<-90||sy>H+50)continue;
@@ -1616,7 +1676,7 @@ function finishRun(reason='fall'){
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
   state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;$('resultSlogan').textContent=SLOGANS[si];
-  const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
+  const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;career.totalMeters+=state.maxMeters;saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
   // 跨局计数只在正式局累计；质检局（IS_TEST_RUN）不许写进长期档案。
   let fresh=[],freshTeas=[];
   if(!IS_TEST_RUN){
@@ -1625,9 +1685,12 @@ function finishRun(reason='fall'){
     if(state.maxMeters>oldHeight)t.noPB=0;else t.noPB++;
     if(state.kitId==='bare')t.bare++;
     saveCareer();fresh=evaluateHonors(honorContext());freshTeas=evaluateTeas(teaContext());
+    const localRow={id:state.runId,name:worldAlias(),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
+    rememberLocalRun(localRow);
+    if(worldEnabled()){queueWorldRun(currentWorldRun());flushWorldQueue();}
   }
   renderFreshHonors(fresh);renderFreshTeas(freshTeas);
-  el.rankSave.disabled=false;el.rankSave.textContent='登记';showResultPage(0);el.result.classList.remove('hidden');updateBestLabels();
+  el.rankName.value=worldAlias();el.rankSave.disabled=false;el.rankSave.textContent=worldEnabled()?'更新化名':'登记';showResultPage(0);el.result.classList.remove('hidden');updateBestLabels();
   renderCareer();
   el.shell.dataset.careerStamps=String(career.stamps);el.shell.dataset.careerRuns=String(career.runs);el.shell.dataset.missionDone=String(completed);
 }
@@ -1825,16 +1888,50 @@ function renderFreshTeas(fresh){
 }
 
 function updateBestLabels(){$('bestHeight').textContent=saved.height;$('bestScore').textContent=saved.score;}
+function rememberLocalRun(row){
+  const index=localBoard.findIndex(item=>item.id===row.id);if(index>=0)localBoard[index]={...localBoard[index],...row};else localBoard.push(row);
+  localBoard.sort((a,b)=>b.height-a.height||b.score-a.score||b.at-a.at);localBoard.splice(30);saveBoard();
+}
+function currentWorldRun(){return {runId:state.runId,height:state.maxMeters,score:state.score,bananas:state.bananas};}
+function fallbackWorldRows(){
+  if(worldScope==='effort')return [{rank:1,alias:worldAlias(),height:saved.height,score:saved.score,weekHeight:saved.height,weekScore:saved.score,runs:career.runs,totalMeters:career.totalMeters,local:true}];
+  return rankedRows().map((row,index)=>({rank:index+1,alias:row.name,height:row.height,score:row.score,weekHeight:row.height,weekScore:row.score,runs:row.npc?0:1,totalMeters:row.height,bananas:row.bananas,local:!row.npc}));
+}
+function worldRows(){
+  if(!worldBoard.connected)return fallbackWorldRows();
+  const byRank=new Map();for(const row of [...worldBoard.rows,...worldBoard.nearby])if(row&&row.rank)byRank.set(row.rank,row);
+  return [...byRank.values()].sort((a,b)=>a.rank-b.rank);
+}
 function renderLeaderboard(){
-  const rows=rankedRows(),total=Math.ceil(rows.length/RANK_PAGE_SIZE);rankPage=clamp(rankPage,0,Math.max(0,total-1));el.rankList.innerHTML='';
-  rows.slice(rankPage*RANK_PAGE_SIZE,(rankPage+1)*RANK_PAGE_SIZE).forEach((row,index)=>{const li=document.createElement('li');li.dataset.rank=String(rankPage*RANK_PAGE_SIZE+index+1);if(!row.npc)li.classList.add('local');const source=row.npc?'常驻员工':'本机记录';li.innerHTML=`<div><b>${row.name}</b><small>${source} · ${row.bananas} 根香蕉</small></div><div class="rank-score"><b>${row.score}</b><small>${row.height} 米</small></div>`;el.rankList.appendChild(li);});
+  const rows=worldRows(),total=Math.max(1,Math.ceil(rows.length/RANK_PAGE_SIZE));rankPage=clamp(rankPage,0,total-1);el.rankList.innerHTML='';
+  rows.slice(rankPage*RANK_PAGE_SIZE,(rankPage+1)*RANK_PAGE_SIZE).forEach(row=>{
+    const li=document.createElement('li'),isMe=!!(worldBoard.me&&row.rank===worldBoard.me.rank);li.dataset.rank=String(row.rank);if(row.local)li.classList.add('local');if(isMe)li.classList.add('me');
+    const source=worldBoard.connected?(isMe?'这是你':`编号 ${escapeHTML(row.tag||'--')}`):(row.local?'本机候补':'常驻员工');
+    const primary=worldScope==='weekly'?`${row.weekHeight} 米`:worldScope==='alltime'?`${row.height} 米`:`${row.runs} 局`;
+    const secondary=worldScope==='weekly'?`${row.weekScore} 分`:worldScope==='alltime'?`${row.score} 分`:`累计 ${row.totalMeters} 米`;
+    li.innerHTML=`<div><b>${escapeHTML(row.alias)}</b><small>${source}</small></div><div class="rank-score"><b>${primary}</b><small>${secondary}</small></div>`;el.rankList.appendChild(li);
+  });
+  if(!rows.length){const li=document.createElement('li');li.dataset.rank='-';li.innerHTML='<div><b>世界榜正在上楼</b><small>本机成绩已经保管好，稍后再来。</small></div><div class="rank-score"><b>待接通</b><small>不会丢分</small></div>';el.rankList.appendChild(li);}
+  for(const tab of el.worldTabs.querySelectorAll('[data-world-scope]'))tab.classList.toggle('active',tab.dataset.worldScope===worldScope);
+  updateWorldStatus();
   renderPager(el.rankPager,rankPage,total,page=>{rankPage=page;renderLeaderboard();});
 }
-function openLeaderboard(){rankPage=0;renderLeaderboard();el.leaderboard.classList.remove('hidden');}
-function closeLeaderboard(){el.leaderboard.classList.add('hidden');}
+async function loadWorldBoard(scope=worldScope){
+  if(!['weekly','alltime','effort'].includes(scope))scope='weekly';worldScope=scope;rankPage=0;const seq=++worldBoardSeq;
+  worldSyncMessage='正在读取世界楼榜';renderLeaderboard();
+  const token=worldPlayerToken(),query=`/board?scope=${scope}&limit=30${token?`&playerToken=${token}`:''}`;
+  try{const data=await worldFetch(query);if(seq!==worldBoardSeq)return;worldBoard={rows:Array.isArray(data.rows)?data.rows:[],me:data.me||null,nearby:Array.isArray(data.nearby)?data.nearby:[],weekLabel:data.weekLabel||'本周',connected:true};worldSyncMessage='';renderLeaderboard();}
+  catch(_){if(seq!==worldBoardSeq)return;worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false};worldSyncMessage='';renderLeaderboard();}
+}
+function openLeaderboard(){rankPage=0;el.title.classList.add('hidden');el.result.classList.add('hidden');el.leaderboard.classList.remove('hidden');renderLeaderboard();flushWorldQueue().finally(()=>loadWorldBoard(worldScope));}
+function closeLeaderboard(){el.leaderboard.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else el.title.classList.remove('hidden');}
 function submitRank(){
-  if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const row={id:state.runId,name:cleanName(el.rankName.value),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
-  localBoard.push(row);localBoard.sort((a,b)=>b.score-a.score||b.height-a.height||b.at-a.at);localBoard.splice(30);saveBoard();state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='已登记';renderLeaderboard();toast('榜单已写入本机。云端对此一无所知。','teal');
+  if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const alias=cleanWorldAlias(el.rankName.value);if(alias.length<2){toast('化名至少两个字。世界楼榜不收单字批文。','red');return;}
+  worldStorageSet(WORLD_ALIAS_KEY,alias);worldStorageSet(WORLD_ENABLED_KEY,'1');el.rankName.value=alias;
+  rememberLocalRun({id:state.runId,name:alias,height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false});queueWorldRun(currentWorldRun());
+  state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='补交中';worldSyncMessage='本局已写入本机，正在补交';updateWorldStatus();
+  flushWorldQueue().then(ok=>{state.rankSubmitted=false;el.rankSave.disabled=false;el.rankSave.textContent=ok?'已登记，可改名':'待联网';if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});
+  toast('本局先写入本机。断网也会自动补交。','teal');
 }
 let posterData='',posterVariant=null,posterMark='',posterGenerating=false,posterQrModules=0,posterHonorLabel='';
 function randomUnit(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296;}return Math.random();}
@@ -1931,6 +2028,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;});
 window.addEventListener('blur',()=>{input.left=input.right=false;});
+window.addEventListener('online',()=>{flushWorldQueue().finally(()=>{if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});});
 window.addEventListener('contextmenu',e=>e.preventDefault());
 // 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，道具与多人赛倒计时白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
@@ -1945,6 +2043,7 @@ document.addEventListener('visibilitychange',()=>{
 el.start.addEventListener('click',startSolo);el.restart.addEventListener('click',startSolo);el.copy.addEventListener('click',openSharePoster);el.shareSend.addEventListener('click',sharePosterImage);el.shareReroll.addEventListener('click',openSharePoster);el.shareClose.addEventListener('click',closeSharePoster);
 el.resultPager.addEventListener('click',event=>{const button=event.target.closest('button[data-page-step]');if(button&&!button.disabled)showResultPage(resultPage+Number(button.dataset.pageStep));});
 el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);el.rankClose.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
+el.worldTabs.addEventListener('click',event=>{const button=event.target.closest('[data-world-scope]');if(button)loadWorldBoard(button.dataset.worldScope);});
 el.sound.addEventListener('click',cycleAudioMode);
 el.pauseBtn.addEventListener('click',()=>pauseGame());el.pauseResume.addEventListener('click',()=>resumeGame());
 el.pauseSound.addEventListener('click',()=>{cycleAudioMode();el.pauseSound.textContent='声音：'+el.sound.textContent;});
@@ -1969,13 +2068,14 @@ function runQA(){
     ['12 个部门完整登记',DEPARTMENTS.length===12],['十个指定部门均存在',['lobby','quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','observation'].every(id=>DEPT[id])],
     ['平台最大垂直间距不超过 132',Math.max(...gaps)<=132],['每条主路按上一台真实弹跳力保证可达',unreachable.length===0],['每一高度簇至少有一块实体平台',unsafeOnly.length===0],['机制表完整',MECHANICS.length>=14],
     ['死亡台词不少于 12 条',DEATH_LINES.length>=12],['称号五档',TITLES.length===5],['七种大事件，单局最多六种',MAJOR_EVENTS.length===7],
-    ['本机排行榜和三选一完整',typeof rankedRows==='function'&&PERK_POOL.length>=5],['帮助道具与轮值任务完整',TOOL_POOL.length>=5&&MISSIONS.length>=8&&KITS.length>=4],
+    ['世界楼榜三口径、补交队列和三选一完整',typeof loadWorldBoard==='function'&&typeof flushWorldQueue==='function'&&typeof queueWorldRun==='function'&&el.worldTabs.children.length===3&&PERK_POOL.length>=5],['帮助道具与轮值任务完整',TOOL_POOL.length>=5&&MISSIONS.length>=8&&KITS.length>=4],
     ['自适应音乐与三档声音完整',typeof startMusic==='function'&&typeof cycleAudioMode==='function'&&['full','sfx','off'].includes(audioMode)],['角色可见性看门狗已启用',typeof repairPlayerState==='function'],
     ['台阶仅绕口令与标点保留可见文字',MECHANICS.filter(type=>/<text\b/.test(platformMarkup({type,w:100,label:'词牌',direction:1}))).every(type=>['tongue','punctuation'].includes(type))],
     ['桌面安装入口完整',!!document.querySelector('link[rel="manifest"]')&&!!$('installButton')&&'serviceWorker' in navigator],
     ['主猴与环屏副本完整',playerUses.length===3&&playerUses.every(use=>use.isConnected&&use.getAttribute('href'))],
     ['二维码模块仅从本站本地加载',assetsStayLocal&&typeof qrcode==='function'],['成绩海报与六档稀有版完整',typeof buildPoster==='function'&&POSTER_VARIANTS.length===6&&POSTER_RANKS.length>=7],
     ['菜单采用单屏分页且不依赖滚动',getComputedStyle(el.title).overflowY==='hidden'&&typeof renderPager==='function'&&document.querySelectorAll('.result-page').length===3],
+    ['上次纪录目标线与越线庆祝完整',!!el.recordLine&&state.personalBestAtStart===0&&/recordPassed/.test(updatePhysics.toString())],
     ['十三种随机意外与固定暗号完整',SURPRISES.length===13&&SECRET_METERS.length===5],
     ['暂停计时字段登记齐全',unregisteredTimerFields().length===0],
     ['暂停会把所有绝对计时整体后移',pauseShiftSelfTest()],
@@ -2021,9 +2121,10 @@ function runPosterQA(){
   const longestHonor=[...HONORS].sort((a,b)=>[...b.name].length-[...a.name].length)[0];career.titles=[...new Set([...career.titles,longestHonor.id])];career.worn=longestHonor.id;
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }
-Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:rankedRows().length,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
+Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
 Object.defineProperty(window,'MONKEY_UPSTAIRS_REPORT',{enumerable:true,get:()=>window.__MONKEY_UPSTAIRS_REPORT});
-setAudioMode(audioMode,false);renderCareer();updateBestLabels();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
+setAudioMode(audioMode,false);el.rankName.value=worldAlias();renderCareer();updateBestLabels();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
+if(worldEnabled())setTimeout(()=>flushWorldQueue(),900);
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 if(TEST_PARAMS.get('qa')==='1'){hideSplash();setTimeout(runQA,50);}
 if(STRESS_TEST){hideSplash();setTimeout(()=>runStressQA(),60);}
