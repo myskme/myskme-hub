@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.10-reach-and-gates">
+<meta name="myskme-release" content="20260813.11-portrait-badges">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -195,23 +195,37 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .pause-stats div{border:2px solid var(--ink);border-radius:10px;background:rgba(255,255,255,.5);padding:6px 3px;text-align:center}
 .pause-stats b{display:block;font-size:18px;font-weight:1000;font-variant-numeric:tabular-nums}
 .pause-stats span{display:block;font-size:8px;font-weight:800;color:var(--muted);margin-top:2px}
-.titles-list{display:grid;gap:7px;margin-bottom:10px}
-.tea-list{display:grid;gap:7px;margin-bottom:10px}
-.tea-card{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:2px solid var(--ink);border-radius:12px;
-  background:var(--card);padding:7px 10px;font:900 11px/1.35 var(--sans);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14)}
+/* 称号墙：两列网格。原来一列一页只装 4 个，16 个称号要翻 4 页；
+   两列之后一页装 8 个，两页看完。 */
+.titles-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;align-content:start}
+/* 奶茶图鉴：三列网格。杯子本来就是画出来的，摆成一排比一行一行读更好看，
+   也更像一个「柜子」。20 杯从 5 页变 2 页。 */
+.tea-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;align-content:start}
+.tea-card{width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;border:2px solid var(--ink);border-radius:12px;
+  background:var(--card);padding:6px 4px;font:900 9.5px/1.25 var(--sans);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14)}
 .tea-card.locked{background:rgba(40,33,26,.06);color:var(--muted);cursor:not-allowed;box-shadow:none}
 .tea-card.locked svg{opacity:.45}
 .tea-card.holding{background:#d9f3ef;box-shadow:inset 0 -3px 0 rgba(40,33,26,.13)}
-.tea-txt{flex:1;min-width:0}.tea-txt b{display:block}
-.tea-txt small{display:block;font-size:8.5px;font-weight:800;color:var(--muted);margin-top:3px;line-height:1.4}
-.tea-tier{flex:0 0 auto;font-size:8px;font-weight:1000;color:var(--red);letter-spacing:.06em}
+.tea-txt{width:100%;min-width:0}
+/* 名字最多两行、超出省略：杯名长短不一（「加盖工程部 · 水泥灰拿铁」对「白开水（免费）」），
+   不封顶的话格子高度会被最长的那个决定，整柜子跟着变高。 */
+.tea-txt b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25;min-height:2.5em}
+/* 三列里放不下品鉴词，它挪到下面的详情条（点一杯才显示），杯子本身只负责好看。 */
+.tea-txt small{display:none}
+.tea-tier{font-size:7.5px;font-weight:1000;color:var(--red);letter-spacing:.05em}
 .tea-fresh{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px}
 .tea-fresh span{align-self:center;font-size:9.5px;font-weight:900;margin-right:5px}
 .honor-card{width:100%;text-align:left;border:2px solid var(--ink);border-radius:12px;background:var(--card);
-  padding:8px 10px;font:900 11px/1.35 var(--sans);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14)}
+  padding:6px 8px;font:900 10px/1.3 var(--sans);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14);
+  display:grid;grid-template-columns:auto 1fr;align-items:center;gap:6px}
+/* 徽章：一个函数画 16 枚，跟奶茶杯是同一套做法——数据驱动、可导出、能二次使用。 */
+.honor-card>svg{width:26px;height:26px;flex:0 0 auto}
+.honor-card .honor-name{min-width:0}
+.honor-card .honor-name>b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25;min-height:2.5em}
 .honor-card.locked{background:rgba(40,33,26,.06);color:var(--muted);cursor:not-allowed;box-shadow:none}
 .honor-card.worn{background:var(--banana);box-shadow:inset 0 -3px 0 rgba(40,33,26,.13)}
-.honor-card small{display:block;font-size:8.5px;font-weight:800;color:var(--muted);margin-top:3px;line-height:1.4}
+/* 台词挪到详情条，格子里只留名字——16 条台词同时挤在两列里谁也读不进去。 */
+.honor-card small{display:none}
 .honor-card .honor-tag{float:right;font-size:8px;font-weight:1000;color:var(--red);letter-spacing:.06em}
 .honor-fresh{border:2.5px dashed var(--red);border-radius:12px;background:#fff5ef;padding:9px 11px;margin:0 0 11px;
   font:900 11px/1.45 var(--sans)}
@@ -313,6 +327,17 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 /* 点占的是原来「1 / 4」那一格，**不新起一行**。第一版让它单独占一行，
    320x568 上把奶茶图鉴顶出去 26px——一个纯粹的便利功能不该拿走内容的高度。 */
 .pager-dots{grid-column:2;grid-row:1;display:flex;justify-content:center;align-items:center;gap:7px}
+/* 页码点单独成行时（页数少、没有上一页/下一页的那种）居中占满。 */
+.pager-dots.solo{grid-column:1/-1;grid-row:1}
+/* 详情条：点一个格子，它的台词显示在这里。
+   笑点是这个作品的命根子，但 16 条台词同时铺在两列里谁也读不进去——
+   一次只读一条反而看得见。高度写死两行，免得换一条长的整页跳一下。 */
+/* 注意别用 flex：里面的 <b>名字</b> 会变成一个 flex 子项，后面的台词变成另一个，
+   两段被并排摆成两栏，读起来是错行的（0813 截图当场看出来的）。这里就该是普通文本流。 */
+.pick-note{border:2px dashed #a7977c;border-radius:11px;background:#f8efd9;padding:7px 9px;margin-bottom:8px;
+  font:800 9.5px/1.55 var(--sans);color:var(--ink);min-height:3em;display:block}
+.pick-note b{display:block;font-size:10.5px;margin-bottom:2px}
+.pick-note em{font-style:normal;color:var(--muted)}
 .pager-dot{width:9px;height:9px;padding:0;border-radius:50%;border:2px solid var(--ink);background:transparent;cursor:pointer}
 .pager-dot.on{background:var(--ink)}
 /* 分段标签：给「页数固定、每页内容各不相同」的地方用（结算三页就是）。
@@ -344,6 +369,23 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.share-actions .btn{margin:0;padding:10px 7px;font-size:10px;letter-spacing:.03em}
 .share-hint{font-size:9px;line-height:1.55;color:var(--muted);font-weight:900;text-align:center;margin:0 0 10px}
 #splash{position:absolute;z-index:100;inset:0;background:var(--paper);display:grid;place-items:center;cursor:pointer;transition:opacity .28s,visibility .28s}
+/* 竖屏锁定（0813 王老师定：这个作品只做竖屏）。
+   判据是「横着 **而且** 矮」，不是单看 orientation——桌面 1280x720 与平板横屏
+   同样是 landscape，但它们高度够，照常玩。500px 这条线把手机横过来的情形单独圈出来：
+   iPhone 13 横屏 390 高、Pro Max 430 高、常见安卓 360 高，全在线下；
+   桌面 720 高、iPad 768 高，全在线上。
+   为什么值得单独做一层，而不是靠滚动兜底：横屏时这栋楼只剩一条缝，
+   台阶几乎看不见，勉强能玩也是难玩——与其让人以为游戏做坏了，不如直说。 */
+#rotateGate{position:absolute;z-index:200;inset:0;background:var(--paper);display:none;place-items:center;padding:16px;text-align:center}
+.rotate-card{max-width:320px;display:grid;justify-items:center;gap:8px}
+.rotate-art{width:96px;height:96px}
+.rotate-card b{font:900 20px var(--serif);color:var(--ink)}
+.rotate-card span{font:800 11px var(--sans);color:var(--muted);line-height:1.7}
+@media(orientation:landscape) and (max-height:500px){
+  #rotateGate{display:grid}
+  /* 提示层盖住一切时，底下不许再有能点的东西——否则玩家会隔着提示误触。 */
+  #gameShell .screen,#hud,#pauseBtn{pointer-events:none}
+}
 #splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
 .logo{position:relative;text-align:center}.logo-letters{display:flex;gap:4px;font-size:44px;font-weight:1000;letter-spacing:.03em}
 .logo-letters i{font-style:normal;display:inline-block;opacity:0;animation:letterPop .36s cubic-bezier(.2,1.7,.3,1) forwards}
@@ -397,7 +439,20 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
   .honor-fresh,.tea-order{padding:6px 9px;margin-bottom:7px}
   .tea-fresh{gap:6px;margin-top:4px}.tea-fresh svg{width:30px;height:30px}
   /* 图鉴与榜单在 375x553 这类「带地址栏的 SE2」上还差最后几像素。 */
-  .tea-card,.title-card{padding:6px 8px}.rank-list li{padding:5px 8px}.pager{margin-top:5px}
+  .rank-list li{padding:5px 8px}.pager{margin-top:5px}
+  /* 矮屏上把格子做小，而不是把页数加回去——加页数正是王老师嫌烦的那件事。
+     杯子尺寸交给 CSS 控制（JS 只给一个基准值），这样收紧只改一处。 */
+  .tea-card{padding:4px 3px;gap:2px;font-size:9px}
+  .tea-card>svg{width:32px;height:32px}
+  .tea-txt b{-webkit-line-clamp:2;min-height:2.4em}
+  .honor-card{padding:5px 6px;gap:5px}.honor-card>svg{width:22px;height:22px}
+  .pick-note{padding:6px 8px;margin-bottom:6px;min-height:2.8em;font-size:9px}
+}
+/* 再矮一档（320x568 与「带地址栏的 SE2」375x553）：奶茶柜一页从 12 杯降到 9 杯。
+   到这一档就只能加页了——但也只加到 3 页，仍然比改版前的 5 页少。
+   断点同样**只写在 CSS 这一处**，JS 读 --tight-grid，不再各写一个数字。 */
+@media(max-height:620px){
+  :root{--tight-grid:1}
   #resultScreen .screen-title{font-size:21px;margin:0 0 3px}
 }
 @media(max-width:699px){
@@ -745,6 +800,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <h2 class="screen-title">称号墙</h2>
         <p id="titlesNote" class="screen-note"></p>
         <div id="titlesList" class="titles-list"></div>
+        <div id="titlesPick" class="pick-note">点一枚看它的来历。点空白处翻页。</div>
         <div id="titlesPager" class="pager"></div>
         <button id="titlesCloseButton" class="btn secondary">看完了，继续上楼</button>
       </div>
@@ -756,6 +812,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <h2 class="screen-title">奶茶图鉴</h2>
         <p id="teaNote" class="screen-note"></p>
         <div id="teaList" class="tea-list"></div>
+        <div id="teaPick" class="pick-note">点一杯看品鉴词。点空白处翻页。</div>
         <div id="teaPager" class="pager"></div>
         <button id="teaCloseButton" class="btn secondary">喝完了，继续上楼</button>
       </div>
@@ -807,6 +864,19 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       </div>
     </section>
 
+    <section id="rotateGate" aria-label="请把手机竖过来">
+      <div class="rotate-card">
+        <svg class="rotate-art" viewBox="0 0 120 120" aria-hidden="true">
+          <rect x="34" y="12" width="52" height="96" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="4"/>
+          <rect x="42" y="24" width="36" height="66" rx="4" fill="#e9e0c8"/>
+          <circle cx="60" cy="99" r="4" fill="var(--ink)"/>
+          <g transform="translate(60 56) scale(.42) translate(-50 -58)"><use href="#art-monkey-rise"/></g>
+        </svg>
+        <b>请把手机竖过来</b>
+        <span>这栋楼是竖着盖的。物业不接受横向施工申请。</span>
+      </div>
+    </section>
+
     <section id="splash" aria-label="MYSKME 厂牌开场">
       <div class="logo"><div class="logo-letters"><i>M</i><i>Y</i><i>S</i><i>K</i><i>M</i><i>E</i></div><small>PRESENTS</small>
         <svg class="splash-monkey" viewBox="0 0 100 116"><use href="#art-monkey-rise"/></svg>
@@ -823,7 +893,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.10-reach-and-gates',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.11-portrait-badges',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -841,7 +911,7 @@ const el={
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
   bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
-  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
+  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),rotateGate:$('rotateGate'),
   start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
   titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
@@ -939,22 +1009,22 @@ const SURPRISES=[
 // 铁规矩：test 只许读 honorContext() 给的字段，不许直接摸 state / career，
 // 否则自检没法喂假数据，这张表就变成没人验得了的东西。
 const HONORS=[
-  {id:'certified',name:'专业坠落员（MYSKME 认证）',hint:'完成第一局',line:'认证方式：摔了一次。认证机构：也是我们。',test:c=>c.runs>=1},
-  {id:'zerofloor',name:'零层劝退',hint:'几乎没离开大堂就结束一局（不超过 45 米）',line:'前台还没抬头，你已经回来了。',test:c=>c.meters<=45},
-  {id:'grudge47',name:'和 47 层有私人恩怨',hint:'在第 47 层结束 3 次',line:'那层什么也没有。所以更可疑。',test:c=>c.tally.f47>=3},
-  {id:'genuine',name:'正版猴（驴颁发）',hint:'单局到访 8 个部门',line:'驴看了很久，然后盖了章。它平时不盖章。',test:c=>c.depts>=8},
-  {id:'moremonkey',name:'比猴先生还猴',hint:'单局最高连跳 12',line:'猴先生本人已就此提出异议。',test:c=>c.flow>=12},
-  {id:'overdue',name:'蛋：您的房租已逾期',hint:'单局险落 6 次',line:'蛋不说话，但它记账。',test:c=>c.near>=6},
-  {id:'skimread',name:'从不读完题',hint:'到访绕口令办，一次都没踩对',line:'题目还没念完，你已经落地了。',test:c=>c.visitedTongue&&c.tongue===0},
-  {id:'lightsugar',name:'三分糖 · 爬楼员',hint:'单局 300 到 599 米',line:'甜度适中，高度也是。',test:c=>c.meters>=300&&c.meters<600},
-  {id:'fullsugar',name:'全糖 · 香蕉本位制',hint:'单局入账 15 根香蕉',line:'财务不认这个本位制。香蕉认。',test:c=>c.bananas>=15},
-  {id:'noice',name:'去冰 · 全程冷静',hint:'零险落上到 600 米',line:'全程没有惊呼，包括落地那一下。',test:c=>c.near===0&&c.meters>=600},
-  {id:'roomtemp',name:'常温 · 混了一整天',hint:'累计完成 20 局',line:'既没上去，也没下来。非常稳定。',test:c=>c.runs>=20},
-  {id:'nopb',name:'纪录保持者（保持不动）',hint:'连续 10 局没刷新最高高度',line:'纪录很稳。稳到没人再碰它。',test:c=>c.tally.noPB>=10},
-  {id:'talker',name:'谈话人可能真的存在',hint:'单局上到 1020 米',line:'你到了通知里说的那个高度。通知仍未说完。',test:c=>c.meters>=1020},
-  {id:'archivist',name:'意外图鉴 · 全勤',hint:'集齐全部随机意外',line:'全都见过了。下一种正在开会。',test:c=>c.discoveries>=SURPRISES.length},
-  {id:'toolfree',name:'空手上班十局',hint:'用空手上班完成 10 局',line:'预算部门表示满意，并未表示奖励。',test:c=>c.tally.bare>=10},
-  {id:'fake',name:'山寨鲤鱼（未获授权）',hint:'',secret:true,line:'驴看了一眼：「仿的。」',test:c=>c.carpHat}
+  {id:'certified',emblem:'stamp',tint:'#e0452c',name:'专业坠落员 · 试用期已满',hint:'完成第一局',line:'认证方式：摔了一次。认证机构：也是我们。发证时间：也是那一次。',test:c=>c.runs>=1},
+  {id:'zerofloor',emblem:'door',tint:'#a7977c',name:'大堂一日游',hint:'几乎没离开大堂就结束一局（不超过 45 米）',line:'前台还没抬头，你已经回来了。她抬头时，你又走了。',test:c=>c.meters<=45},
+  {id:'grudge47',emblem:'lion',tint:'#7d61cf',name:'四十七层石狮子清点员',hint:'在第 47 层结束 3 次',line:'四十七层四十七只石狮子，第四十七只坚称自己不是石狮子，也不是第四十七只。',test:c=>c.tally.f47>=3},
+  {id:'genuine',emblem:'seal',tint:'#e0a21c',name:'正版猴（驴亲自盖章）',hint:'单局到访 8 个部门',line:'驴看了很久，然后盖了章。它平时不盖章，它平时只看。',test:c=>c.depts>=8},
+  {id:'moremonkey',emblem:'monkey',tint:'#c98a4b',name:'比猴先生还猴',hint:'单局最高连跳 12',line:'猴先生本人已就此提出异议。异议内容是：他也想学。',test:c=>c.flow>=12},
+  {id:'overdue',emblem:'egg',tint:'#e6d9b8',name:'蛋：您的房租已逾期',hint:'单局险落 6 次',line:'蛋不说话，但它记账。它记的账比传真科整齐得多。',test:c=>c.near>=6},
+  {id:'skimread',emblem:'flask',tint:'#4a7c59',name:'黑化肥发灰会挥发办事员',hint:'到访绕口令办，一次都没踩对',line:'黑化肥发灰，灰化肥挥发。你倒是挥发了，题一道没答完。',test:c=>c.visitedTongue&&c.tongue===0},
+  {id:'lightsugar',emblem:'cup',tint:'#c9b27a',name:'三分糖 · 爬楼员',hint:'单局 300 到 599 米',line:'甜度适中，高度也适中。人事部管这个叫平衡，财务管这个叫没花钱。',test:c=>c.meters>=300&&c.meters<600},
+  {id:'fullsugar',emblem:'banana',tint:'#e0a21c',name:'全糖 · 香蕉本位制',hint:'单局入账 15 根香蕉',line:'财务不认这个本位制。香蕉认。香蕉说了算，香蕉现在就是财务。',test:c=>c.bananas>=15},
+  {id:'noice',emblem:'ice',tint:'#5aa9ff',name:'去冰 · 全程一声没吭',hint:'零险落上到 600 米',line:'全程没有惊呼，包括落地那一下。同层同事反映很不适应，已提交情况说明。',test:c=>c.near===0&&c.meters>=600},
+  {id:'roomtemp',emblem:'flat',tint:'#a7977c',name:'常温 · 混了一整天',hint:'累计完成 20 局',line:'既没上去，也没下来，非常稳定。物业已把你列入承重结构，禁止随意搬动。',test:c=>c.runs>=20},
+  {id:'nopb',emblem:'flat',tint:'#8d8272',name:'纪录保持者（保持不动）',hint:'连续 10 局没刷新最高高度',line:'纪录很稳。稳到没人再碰它，包括你，包括当初创造它的那位，也是你。',test:c=>c.tally.noPB>=10},
+  {id:'talker',emblem:'tower',tint:'#7d61cf',name:'谈话人可能真的存在',hint:'单局上到 1020 米',line:'你到了通知里说的那个高度。通知仍未说完。谈话人仍在路上，据说也在爬。',test:c=>c.meters>=1020},
+  {id:'archivist',emblem:'phoenix',tint:'#e0452c',name:'粉红墙上画凤凰全勤奖',hint:'集齐全部随机意外',line:'粉红墙上画凤凰，凤凰画完调去传真科。意外你全见过了，下一种正在开会。',test:c=>c.discoveries>=SURPRISES.length},
+  {id:'toolfree',emblem:'bench',tint:'#6b5b45',name:'扁担长板凳宽两手空空科',hint:'用空手上班完成 10 局',line:'扁担长，板凳宽，你两手空空上了十天班。预算部门表示满意，并未表示奖励。',test:c=>c.tally.bare>=10},
+  {id:'fake',emblem:'carp',tint:'#e0452c',name:'红鲤鱼绿鲤鱼驴 · 仿制品',hint:'',secret:true,line:'驴看了一眼：「仿的。」鱼小姐游过来看了一眼，没有形成看法。',test:c=>c.carpHat}
 ];
 // 奶茶图鉴（MYSKME 员工茶水间）。二十款，按「本局做过什么」解锁。
 // 与称号的分工：称号是身份、稀有、慢；奶茶是战利品、密集、快。条件不许和 HONORS 重复。
@@ -1071,7 +1141,11 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
-const TITLE_PAGE_SIZE=4,TEA_PAGE_SIZE=4,RANK_PAGE_SIZE=5;
+// 每页装几个。改成网格之后一页装得下的数量翻了两三倍，页数跟着掉：
+// 称号 16 个从 4 页变 2 页，奶茶 20 杯从 5 页变 2 页。
+// 王老师的判据是「上一页下一页还是多」——真正的解法不是把翻页做得好看，
+// 是**先让页数变少**；少到 2 页时连翻页按钮都不用要，点点/点空白/滑一下就够。
+const TITLE_PAGE_SIZE=8,TEA_PAGE_SIZE=12,RANK_PAGE_SIZE=5;
 let titlePage=0,teaPage=0,rankPage=0,resultPage=0;
 const WORLD_DEVICE_KEY='myskme_monkey_device_v1',WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1',WORLD_PENDING_KEY='myskme_monkey_pending_v1',WORLD_TOKEN_KEY='myskme_monkey_player_token_v1';
 const CULTURE_BAG_KEY='myskme_monkey_culture_bag_v1',CULTURE_LAST_KEY='myskme_monkey_culture_last_v1';
@@ -1215,12 +1289,15 @@ function renderPager(root,page,total,onPage){
   // 点数多了会把中间那一格撑爆，所以只在页数不多时用点，多了退回「3 / 12」的文字。
   // 阈值 6 是量出来的：中间格宽度按 6 个点 + 5 个间距算 = 89px，320px 宽屏上仍不挤。
   if(total<=DOT_PAGER_MAX){
-    const dots=document.createElement('div');dots.className='pager-dots';
+    // 页数少的时候**连上一页/下一页都不给**：点点能直达、点列表空白处能往下翻、
+    // 左右滑能翻、方向键能翻，四条路都比「点两次下一页」快。
+    // 留着那两颗按钮只会占掉一整行，还让人以为必须顺着翻。
+    const dots=document.createElement('div');dots.className='pager-dots solo';
     for(let i=0;i<total;i+=1){const dot=document.createElement('button');dot.type='button';
       dot.className='pager-dot'+(i===page?' on':'');dot.setAttribute('aria-label',`第 ${i+1} 页`);
       dot.setAttribute('aria-current',i===page?'true':'false');
       dot.addEventListener('click',()=>onPage(i));dots.append(dot);}
-    root.append(prev,dots,next);
+    root.append(dots);
   }else root.append(prev,label,next);
 }
 function wrap(v,max=W){return(v%max+max)%max;}
@@ -1826,9 +1903,18 @@ function resultToTitle(){state.over=false;showTitleScreen();}
 function activePager(){
   if(!el.result.classList.contains('hidden'))return{page:resultPage,total:3,go:page=>showResultPage(page)};
   if(!el.titles.classList.contains('hidden'))return{page:titlePage,total:Math.ceil(HONORS.length/TITLE_PAGE_SIZE),go:page=>{titlePage=page;renderTitlesScreen();}};
-  if(!el.teas.classList.contains('hidden'))return{page:teaPage,total:Math.ceil(TEAS.length/TEA_PAGE_SIZE),go:page=>{teaPage=page;renderTeaScreen();}};
+  if(!el.teas.classList.contains('hidden'))return{page:teaPage,total:Math.ceil(TEAS.length/teaPageSize()),go:page=>{teaPage=page;renderTeaScreen();}};
   if(!el.leaderboard.classList.contains('hidden'))return{page:rankPage,total:Math.max(1,Math.ceil(worldRows().length/RANK_PAGE_SIZE)),go:page=>{rankPage=page;renderLeaderboard();}};
   return null;
+}
+// 「再点一下就是下一页」：点在列表的空白处（不是格子上）就往下翻，翻到底再点回到第一页。
+// 这条是给拇指用的——手指本来就停在列表上，不用再往下够翻页控件。
+function bindTapToAdvance(node){
+  node.addEventListener('click',event=>{
+    if(event.target!==node)return;   // 点在格子上是「佩戴/端起」，不抢它
+    const pager=activePager();if(!pager||pager.total<=1)return;
+    pager.go((pager.page+1)%pager.total);sfx('select');
+  });
 }
 function stepPage(delta){
   const pager=activePager();if(!pager||pager.total<=1)return false;
@@ -1932,16 +2018,31 @@ function wearHonor(id){
   if(!career.titles.includes(id))return;
   career.worn=career.worn===id?'':id;saveCareer();renderTitlesScreen();renderCareer();sfx('select');
 }
+// 详情条：一次只读一条。笑点是这个作品的命根子，但 16 条台词同时铺在两列里谁也读不进去，
+// 摊开反而没人看。点一个才显示，读的人就真的会读。
+// 写进哪一条由「当前开着的是哪一屏」决定，不靠调用方传——传参迟早会传错屏。
+function showPickNote(html){
+  const node=!el.titles.classList.contains('hidden')?$('titlesPick')
+    :!el.teas.classList.contains('hidden')?$('teaPick'):null;
+  if(node)node.innerHTML=html;
+}
 function renderTitlesScreen(){
-  $('titlesNote').textContent=`已解锁 ${career.titles.length}/${HONORS.length}。点一个佩戴，它会印在成绩海报上；再点一次摘下。`;
+  $('titlesNote').textContent=`已解锁 ${career.titles.length}/${HONORS.length}。点一枚佩戴，它会印在成绩海报上；再点一次摘下。`;
   const total=Math.ceil(HONORS.length/TITLE_PAGE_SIZE);titlePage=clamp(titlePage,0,total-1);el.titlesList.innerHTML='';
   for(const h of HONORS.slice(titlePage*TITLE_PAGE_SIZE,(titlePage+1)*TITLE_PAGE_SIZE)){
     const got=career.titles.includes(h.id),b=document.createElement('button');
-    b.className=`honor-card${got?'':' locked'}${career.worn===h.id?' worn':''}`;b.disabled=!got;
-    b.innerHTML=got
-      ?`${career.worn===h.id?'<span class="honor-tag">佩戴中</span>':''}${escapeHTML(h.name)}<small>${escapeHTML(h.line)}</small>`
-      :`${h.secret?'<span class="honor-tag">隐藏</span>':''}未解锁称号<small>${h.secret?'条件不予公开。人事部称之为惊喜。':escapeHTML(h.hint)}</small>`;
-    b.addEventListener('click',()=>wearHonor(h.id));
+    b.className=`honor-card${got?'':' locked'}${career.worn===h.id?' worn':''}`;
+    // 锁着的也让点：点了不佩戴，只把解锁条件显示在详情条里。
+    // 原来 disabled 之后连「这个要怎么拿」都问不出来，等于把目标藏了起来。
+    b.innerHTML=(got?honorBadgeSvg(h,26):honorBadgeSvg({emblem:h.emblem,tint:'#cfc6b4'},26))
+      +`<span class="honor-name"><b>${got?escapeHTML(h.name):(h.secret?'未公开称号':'未解锁称号')}</b></span>`
+      +(career.worn===h.id?'<span class="honor-tag">佩戴中</span>':'');
+    b.addEventListener('click',()=>{
+      showPickNote(got
+        ?`<b>${escapeHTML(h.name)}</b>${escapeHTML(h.line)}`
+        :`<em>还没解锁：${h.secret?'条件不予公开，人事部称之为惊喜。':escapeHTML(h.hint)}</em>`);
+      if(got)wearHonor(h.id);
+    });
     el.titlesList.appendChild(b);
   }
   renderPager(el.titlesPager,titlePage,total,page=>{titlePage=page;renderTitlesScreen();});
@@ -1955,6 +2056,48 @@ function closeTitles(){el.titles.classList.add('hidden');if(state.over)el.result
 // 判据从 CSS 里读，不在这里再写一遍断点数字（见 --compact-result 那条媒体查询）。
 function compactResult(){
   return getComputedStyle(document.documentElement).getPropertyValue('--compact-result').trim()==='1';
+}
+// 最矮那一档：奶茶柜一页少放一行。判据同样从 CSS 读（见 --tight-grid 那条媒体查询）。
+function tightGrid(){
+  return getComputedStyle(document.documentElement).getPropertyValue('--tight-grid').trim()==='1';
+}
+// 一页装几杯是**跟着屏幕走**的，所以只能有一个取法，不许再有人直接用常量。
+function teaPageSize(){return tightGrid()?9:TEA_PAGE_SIZE;}
+// 称号徽章。和 teaCupSvg 同一套路：**一个函数 + 一张图形表**，加一个称号只加一行数据。
+// 全部平涂、自包含（不含 <image>、不引外部 href），所以导出器能原样导成可复用素材，
+// 将来做周边、卡面、表情包都能直接抠走——这就是「小成本、可复利」的那部分。
+// 一律不写字：徽章要能脱离中文语境使用，也免得跟「蛇蛋驴不靠文字牌解释」那条打架。
+const HONOR_GLYPHS={
+  stamp:'<circle cx="20" cy="22" r="8"/><rect x="17" y="8" width="6" height="7" rx="2"/>',
+  door:'<rect x="12" y="9" width="16" height="24" rx="2"/><circle cx="24" cy="21" r="1.6" fill="#fffdf6"/>',
+  lion:'<circle cx="20" cy="21" r="11" opacity=".55"/><circle cx="20" cy="21" r="7"/>'
+    +'<circle cx="17" cy="19" r="1.3" fill="#fffdf6"/><circle cx="23" cy="19" r="1.3" fill="#fffdf6"/>',
+  seal:'<rect x="10" y="11" width="20" height="20" rx="3"/><rect x="14" y="19" width="12" height="4" rx="2" fill="#fffdf6"/>',
+  monkey:'<circle cx="12" cy="17" r="4.5"/><circle cx="28" cy="17" r="4.5"/><circle cx="20" cy="21" r="9"/>'
+    +'<circle cx="17" cy="19" r="1.5" fill="#fffdf6"/><circle cx="23" cy="19" r="1.5" fill="#fffdf6"/>',
+  egg:'<ellipse cx="20" cy="21" rx="8" ry="10.5"/>',
+  flask:'<path d="M17 9h6v7l6 13a3 3 0 0 1-2.6 4.4H13.6A3 3 0 0 1 11 29l6-13z"/>'
+    +'<rect x="13.5" y="25" width="13" height="4" rx="2" fill="#fffdf6" opacity=".55"/>',
+  cup:'<path d="M12 12h16l-2.2 19a2 2 0 0 1-2 1.8h-7.6a2 2 0 0 1-2-1.8z"/>'
+    +'<rect x="10" y="8" width="20" height="4.5" rx="2"/>',
+  banana:'<path d="M11 12c1 11 8 18 18 18-3-3-4-6-4.5-10C24 15 18 11 11 12z"/>',
+  ice:'<rect x="11" y="11" width="18" height="18" rx="3" transform="rotate(12 20 20)"/>'
+    +'<rect x="15" y="15" width="5" height="5" rx="1.5" fill="#fffdf6" opacity=".7" transform="rotate(12 20 20)"/>',
+  flat:'<rect x="8" y="18" width="24" height="5" rx="2.5"/>',
+  tower:'<path d="M20 7l7 15h-14z"/><rect x="14" y="24" width="12" height="8" rx="2"/>',
+  phoenix:'<path d="M20 8c5 4 8 9 8 14 0 4-3 8-8 10-5-2-8-6-8-10 0-5 3-10 8-14z"/>'
+    +'<path d="M20 14c2 3 3 6 3 9s-1 5-3 6c-2-1-3-3-3-6s1-6 3-9z" fill="#fffdf6" opacity=".6"/>',
+  bench:'<rect x="9" y="16" width="22" height="5" rx="2"/><rect x="12" y="21" width="3.5" height="10" rx="1.5"/>'
+    +'<rect x="24.5" y="21" width="3.5" height="10" rx="1.5"/>',
+  carp:'<path d="M11 20c4-6 10-8 14-8 4 0 6 3 6 8s-2 8-6 8c-4 0-10-2-14-8z"/>'
+    +'<path d="M31 20l6-5v10z"/><circle cx="17" cy="18" r="1.7" fill="#fffdf6"/>'
+};
+function honorBadgeSvg(honor,size){
+  const glyph=HONOR_GLYPHS[honor&&honor.emblem]||HONOR_GLYPHS.stamp;
+  const tint=(honor&&honor.tint)||'#a7977c';
+  return `<svg viewBox="0 0 40 40" width="${size}" height="${size}" aria-hidden="true">`
+    +`<rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11" fill="${tint}" stroke="#28211a" stroke-width="2.6"/>`
+    +`<g fill="#28211a">${glyph}</g></svg>`;
 }
 function renderFreshHonors(fresh){
   if(!fresh.length){el.freshHonors.classList.add('is-hidden');el.freshHonors.innerHTML='';return;}
@@ -2082,20 +2225,24 @@ function teaCupSvg(tea,h=52){
 }
 function renderTeaScreen(){
   $('teaNote').textContent=`已点过 ${career.teas.length}/${TEAS.length}。点一杯端着，它会印在成绩海报上；再点一次放下。`;
-  const total=Math.ceil(TEAS.length/TEA_PAGE_SIZE);teaPage=clamp(teaPage,0,total-1);el.teaList.innerHTML='';
-  for(const t of TEAS.slice(teaPage*TEA_PAGE_SIZE,(teaPage+1)*TEA_PAGE_SIZE)){
+  const total=Math.ceil(TEAS.length/teaPageSize());teaPage=clamp(teaPage,0,total-1);el.teaList.innerHTML='';
+  for(const t of TEAS.slice(teaPage*teaPageSize(),(teaPage+1)*teaPageSize())){
     const got=career.teas.includes(t.id),b=document.createElement('button');
-    b.className=`tea-card${got?'':' locked'}${career.cup===t.id?' holding':''}`;b.disabled=!got;
-    b.innerHTML=(got?teaCupSvg(t,52):teaCupSvg({liquid:'#e2ddd0',pearl:'#c9c2b1'},52))
-      +`<div class="tea-txt"><b>${got?escapeHTML(t.name):'未点过'}</b>`
-      +`<small>${got?escapeHTML(t.note):(t.secret?'配方保密。茶水间说这叫惊喜。':escapeHTML(t.hint))}</small></div>`
+    b.className=`tea-card${got?'':' locked'}${career.cup===t.id?' holding':''}`;
+    b.innerHTML=(got?teaCupSvg(t,40):teaCupSvg({liquid:'#e2ddd0',pearl:'#c9c2b1'},40))
+      +`<div class="tea-txt"><b>${got?escapeHTML(t.name):'未点过'}</b></div>`
       +`<span class="tea-tier">${got&&career.cup===t.id?'端着':t.tier}</span>`;
-    b.addEventListener('click',()=>drinkTea(t.id));
+    b.addEventListener('click',()=>{
+      showPickNote(got
+        ?`<b>${escapeHTML(t.name)}</b>${escapeHTML(t.note)}`
+        :`<em>还没点过：${t.secret?'配方保密，茶水间说这叫惊喜。':escapeHTML(t.hint)}</em>`);
+      if(got)drinkTea(t.id);
+    });
     el.teaList.appendChild(b);
   }
   renderPager(el.teaPager,teaPage,total,page=>{teaPage=page;renderTeaScreen();});
 }
-function openTeas(){unlockAudio();const index=TEAS.findIndex(t=>t.id===career.cup);teaPage=index>=0?Math.floor(index/TEA_PAGE_SIZE):0;renderTeaScreen();el.teaClose.textContent=menuBackLabel('喝完了，继续上楼');hideMenuScreens();el.teas.classList.remove('hidden');}
+function openTeas(){unlockAudio();const index=TEAS.findIndex(t=>t.id===career.cup);teaPage=index>=0?Math.floor(index/teaPageSize()):0;renderTeaScreen();el.teaClose.textContent=menuBackLabel('喝完了，继续上楼');hideMenuScreens();el.teas.classList.remove('hidden');}
 function closeTeas(){el.teas.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else showTitleScreen();}
 function renderFreshTeas(fresh){
   // 记下「这一局到底有没有新东西」，给标签红点当判据。
@@ -2214,6 +2361,17 @@ function drawPosterQr(c,url,x,y,size,ink,paper){
   if(typeof qrcode!=='function')return 0;const qr=qrcode(0,'Q');qr.addData(url);qr.make();const n=qr.getModuleCount(),quiet=4,cell=size/(n+quiet*2);c.fillStyle=paper;c.fillRect(x,y,size,size);c.fillStyle=ink;for(let row=0;row<n;row++)for(let col=0;col<n;col++)if(qr.isDark(row,col))c.fillRect(x+(col+quiet)*cell,y+(row+quiet)*cell,Math.ceil(cell+.15),Math.ceil(cell+.15));return n;
 }
 function loadPosterIcon(){return new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src='./icons/monkey-100-512.png';});}
+// 把佩戴的称号徽章也画进海报。这是徽章最划算的一处落点：
+// 海报是玩家真会发出去的那张图，图案跟着一起传播，等于同一份小成本美术多用一次。
+// 走 data: URI，不联网（构建门禁盯着「只能有一个 fetch 出口、不许有外链」）。
+function loadHonorBadgeImage(honor){
+  return new Promise(resolve=>{
+    if(!honor)return resolve(null);
+    const markup=honorBadgeSvg(honor,240).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ');
+    const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(markup);
+  });
+}
 async function buildPoster(){
   const Wc=1080,Hc=1350,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const c=cv.getContext('2d',{alpha:false}),pair=choosePosterPair(),variant=pair.variant,motif=pair.motif,rank=posterRank(),floors=floorsFromMeters(state.maxMeters),dark=variant.id==='night';posterVariant=variant;posterMotif=motif;posterMark=receiptMark();
   c.fillStyle=variant.paper;c.fillRect(0,0,Wc,Hc);c.strokeStyle=variant.accent;c.lineWidth=8;c.strokeRect(36,36,Wc-72,Hc-72);c.globalAlpha=.45;c.lineWidth=3;c.strokeRect(54,54,Wc-108,Hc-108);c.globalAlpha=1;
@@ -2223,7 +2381,17 @@ async function buildPoster(){
   const icon=await loadPosterIcon();if(icon){roundRectPath(c,92,286,218,218,42);c.save();c.clip();c.drawImage(icon,92,286,218,218);c.restore();c.strokeStyle=variant.ink;c.lineWidth=5;roundRectPath(c,92,286,218,218,42);c.stroke();}
   c.fillStyle=variant.ink;c.font='900 44px "Songti SC",serif';c.fillText(cleanName(el.rankName.value||'猴先生'),354,326);c.fillStyle=variant.accent;c.font='900 70px "Songti SC",serif';c.fillText(rank.name,354,402);
   c.fillStyle=variant.ink;c.font='700 28px system-ui,sans-serif';c.fillText(`${state.maxMeters} 米 · 本局印记 ${posterMark}`,354,460);
-  const worn=wornHonor();posterHonorLabel='';if(worn){c.fillStyle=variant.accent;c.font='900 26px system-ui,sans-serif';posterHonorLabel=fitCanvasLine(c,`称号：${worn.name}`,600);c.fillText(posterHonorLabel,354,498);}
+  const worn=wornHonor();posterHonorLabel='';
+  if(worn){
+    const badge=await loadHonorBadgeImage(worn);
+    // 有徽章就把文字往右让 60px 给它腾位；画不出来（极旧浏览器不认 data:svg）就按原样只印文字，
+    // 不让一张画不出来的图把整条称号带没。
+    const textX=badge?354+58:354;
+    if(badge)c.drawImage(badge,354,470,48,48);
+    c.fillStyle=variant.accent;c.font='900 26px system-ui,sans-serif';
+    posterHonorLabel=fitCanvasLine(c,`称号：${worn.name}`,600-(badge?58:0));
+    c.fillText(posterHonorLabel,textX,498);
+  }
   c.textAlign='center';c.fillStyle=variant.ink;c.font='1000 162px system-ui,sans-serif';c.fillText(String(floors),540,690);c.font='900 35px system-ui,sans-serif';c.fillText('层',540,744);
   const stats=[['总分',state.score],['香蕉',state.bananas],['最高连跳',state.maxFlow],['意外',state.surpriseCount]];stats.forEach(([label,value],i)=>{const x=92+i*226;roundRectPath(c,x,786,198,118,20);c.fillStyle=dark?'#3a342d':'rgba(255,255,255,.55)';c.fill();c.strokeStyle=variant.ink;c.lineWidth=3;c.stroke();c.fillStyle=variant.accent;c.font='900 42px system-ui,sans-serif';c.textAlign='center';c.fillText(String(value),x+99,842);c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText(label,x+99,878);});
   const surprise=SURPRISES[Math.floor(randomUnit()*SURPRISES.length)];roundRectPath(c,92,936,610,250,24);c.fillStyle=dark?'#39332b':'rgba(255,255,255,.56)';c.fill();c.strokeStyle=variant.accent;c.lineWidth=4;c.stroke();c.textAlign='left';c.fillStyle=variant.accent;c.font='900 25px system-ui,sans-serif';c.fillText(`本次随机批注 · ${motif.name}`,126,988);c.fillStyle=variant.ink;c.font='800 31px "Songti SC",serif';wrapCanvasText(c,variant.line,126,1042,530,45,2);c.font='700 23px system-ui,sans-serif';c.globalAlpha=.78;wrapCanvasText(c,`海报附带：${surprise.text}`,126,1133,530,34,2);c.globalAlpha=1;
@@ -2301,6 +2469,20 @@ window.addEventListener('online',()=>{flushWorldQueue().finally(()=>{if(!el.lead
 window.addEventListener('contextmenu',e=>e.preventDefault());
 // 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，道具与多人赛倒计时白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
+// 竖屏锁定的行为面：横过来就把这一局暂停掉。
+// 玩家这时看不见台阶，时间照走就是白扣——走的是和切后台同一条 pauseGame 通道，
+// 所以所有绝对计时（火箭、磁卡、宽容尺……）会被整体后移，转回来分毫不差。
+// 媒体查询字符串只写一处，和 CSS 那条对着写；两处都改才生效，所以有一条自检盯着它俩一致。
+const LANDSCAPE_QUERY='(orientation:landscape) and (max-height:500px)';
+const landscapeGate=window.matchMedia(LANDSCAPE_QUERY);
+function syncRotateGate(){
+  if(!landscapeGate.matches)return;
+  input.left=input.right=false;
+  if(state.running&&!state.paused)pauseGame();
+}
+if(landscapeGate.addEventListener)landscapeGate.addEventListener('change',syncRotateGate);
+else if(landscapeGate.addListener)landscapeGate.addListener(syncRotateGate);
+syncRotateGate();
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     input.left=input.right=false;
@@ -2313,6 +2495,7 @@ el.start.addEventListener('click',startSolo);el.restart.addEventListener('click'
 el.resultTabs.addEventListener('click',event=>{const tab=event.target.closest('[data-result-tab]');if(tab)showResultPage(Number(tab.dataset.resultTab));});
 el.resultHome.addEventListener('click',resultToTitle);
 for(const node of [el.result,el.titles,el.teas,el.leaderboard])bindSwipePaging(node);
+for(const node of [el.titlesList,el.teaList,el.rankList])bindTapToAdvance(node);
 el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);
 el.rankClose.addEventListener('click',closeLeaderboard);el.rankBack.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
 el.worldTabs.addEventListener('click',event=>{const button=event.target.closest('[data-world-scope]');if(button)loadWorldBoard(button.dataset.worldScope);});
@@ -2373,7 +2556,7 @@ function measureMenuOverflow(){
   for(const [id,html] of resultBackup)$(id).innerHTML=html;
   el.freshHonors.innerHTML=honorBackup.html;el.freshHonors.classList.toggle('is-hidden',honorBackup.hidden);
   for(let p=0;p<Math.ceil(HONORS.length/TITLE_PAGE_SIZE);p+=1)probe(el.titles,`称号墙第${p+1}页`,()=>{titlePage=p;renderTitlesScreen();});
-  for(let p=0;p<Math.ceil(TEAS.length/TEA_PAGE_SIZE);p+=1)probe(el.teas,`奶茶第${p+1}页`,()=>{teaPage=p;renderTeaScreen();});
+  for(let p=0;p<Math.ceil(TEAS.length/teaPageSize());p+=1)probe(el.teas,`奶茶第${p+1}页`,()=>{teaPage=p;renderTeaScreen();});
   // 世界楼榜这一屏原来漏在门禁外面，于是 320x568 上「别人的化名太长把退出键裁掉」
   // 这条一直没人发现。量的时候要喂**最长的化名**，因为行高是被别人的名字决定的。
   const keepBoard=worldBoard,keepScope=worldScope,keepRank=rankPage;
@@ -2447,15 +2630,28 @@ function runQA(){
           node.dispatchEvent(event);
         }
       };
+      // 判据只看「翻没翻动」，**不写死页号**。上一版写的是 titlePage===1 / ===2，
+      // 称号墙从 4 页变 2 页当天就红了——那是把页数抄进了断言，又一份会过期的镜像。
       swipe(el.titles,-80);const swiped=titlePage===1;
+      const beforeKey=titlePage;
       window.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
-      const keyed=titlePage===2;
+      const titleTotal=Math.ceil(HONORS.length/TITLE_PAGE_SIZE);
+      // 已经在最后一页就没得再翻，这时「没动」才是对的。
+      const keyed=beforeKey>=titleTotal-1?titlePage===beforeKey:titlePage===beforeKey+1;
       el.titles.classList.add('hidden');el.result.classList.remove('hidden');showResultPage(0);
       el.resultTabs.querySelector('[data-result-tab="2"]').click();const tabbed=resultPage===2;
       titlePage=keepTitle;renderTitlesScreen();showResultPage(keepResult);
       for(const n of document.querySelectorAll('.screen'))n.classList.add('hidden');
       for(const n of shown)n.classList.remove('hidden');
       return swiped&&keyed&&tabbed;})()],
+    ['竖屏锁定：CSS 与 JS 用的是同一条媒体查询',(()=>{
+      // 这两处是同一个判据的两份写法，抄错一个就出现「提示层出来了但局没暂停」
+      // 或者反过来。所以直接拿 CSS 原文比一次。
+      const css=[...document.styleSheets].flatMap(sheet=>{try{return [...sheet.cssRules];}catch(_){return [];}})
+        .filter(rule=>rule.type===CSSRule.MEDIA_RULE).map(rule=>rule.conditionText||rule.media.mediaText);
+      const normalize=text=>text.replace(/\s+/g,'').toLowerCase();
+      return css.some(text=>normalize(text)===normalize(LANDSCAPE_QUERY))
+        &&typeof syncRotateGate==='function'&&!!el.rotateGate;})()],
     ['标签红点只在真有新东西时亮',(()=>{
       // 一个永远亮着的红点等于没有红点，玩家两局就学会无视它。
       // 第一版就是这么写坏的：判据用「teaOrder 有没有字」，而它每局都有字。

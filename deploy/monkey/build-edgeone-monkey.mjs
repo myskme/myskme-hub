@@ -335,6 +335,49 @@ const TABS_AT = html.indexOf('id="resultTabs"');
 assert(ACTIONS_AT > 0 && TABS_AT > 0 && ACTIONS_AT > TABS_AT,
   '再来一局/生成成绩海报必须常驻在分页标签之外。核心循环是「摔了再来」，这颗按钮不该会消失。');
 
+// ---- 竖屏锁定（2026-08-13 王老师定：这个作品只做竖屏）----
+assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时这栋楼只剩一条缝，得直说，别让人以为游戏坏了。');
+{
+  // CSS 与 JS 必须用同一条媒体查询，抄错一个就出现「提示层出来了但局没暂停」。
+  const jsQuery = (CODE.match(/const LANDSCAPE_QUERY='([^']+)'/) || [])[1];
+  assert(jsQuery, '取不到 LANDSCAPE_QUERY（写法变了？先修本门禁的取法）');
+  const cssQuery = new RegExp('@media' + jsQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'));
+  assert(cssQuery.test(html.replace(/\s+/g, ' ')) || html.includes('@media(' + jsQuery.slice(1)),
+    '竖屏锁定的 CSS 与 JS 用的不是同一条媒体查询');
+  assert(/\bsyncRotateGate\b/.test(CODE.replace(/function\s+syncRotateGate/, '')),
+    'syncRotateGate 只有定义没有接线，横过来不会自动暂停');
+}
+
+// ---- 称号徽章与存档契约 ----
+{
+  // 称号 id 是**存档契约**，不是镜像：career.titles 里存的就是这些字符串。
+  // 改一个 id，所有已经拿到该称号的玩家当场蒸发一枚，而且没有任何报错。
+  // 所以这一份写死在门里，和「鱼小姐必须青绿」是同一类立法。要改先想清楚迁移。
+  const HONOR_IDS = ['certified','zerofloor','grudge47','genuine','moremonkey','overdue','skimread',
+    'lightsugar','fullsugar','noice','roomtemp','nopb','talker','archivist','toolfree','fake'];
+  const found = [...html.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
+  assert(found.length === HONOR_IDS.length,
+    '称号条数或写法变了：扫到 ' + found.length + ' 条，期望 ' + HONOR_IDS.length);
+  for (const id of HONOR_IDS) {
+    assert(found.some(hit => hit[1] === id), '称号 id 「' + id + '」不见了。存档里存的就是它，改名等于让老玩家的称号蒸发');
+  }
+  // 每个徽章图形都必须真的在图形表里，否则会静默退化成默认的印章，16 枚看着像一枚。
+  const glyphBlock = (CODE.match(/const HONOR_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
+  for (const [, , emblem] of found.map(hit => [0, 0, hit[2]])) {
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 HONOR_GLYPHS 里，会静默退化成默认印章');
+  }
+  // 只在**取出来的那一段**里查。第一版写成从 HONOR_GLYPHS 一路 [\s\S]*? 找 href=，
+  // 结果匹到了文件后面 SVG <use href= 那一堆，构建当场误报——
+  // 这跟前面那个「不锚行首的 .card 正则」是同一类错：范围没圈住。
+  assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
+}
+
+// ---- 翻页：页数少时不许再出现上一页/下一页 ----
+assert(/function bindTapToAdvance\(/.test(CODE) && (CODE.match(/\bbindTapToAdvance\b/g) || []).length >= 2,
+  '「点列表空白处翻下一页」的接线没了。王老师 0813 明说上一页/下一页还是多，这是替代它的那条路。');
+assert(/pager-dots solo/.test(html),
+  '页数少时应该只留页码点、不给上一页/下一页——那两颗按钮会白占一整行。');
+
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
 await run(process.execPath, [path.join(projectRoot, 'tools/extract-assets.mjs'), '--check'], { cwd: repoRoot });
