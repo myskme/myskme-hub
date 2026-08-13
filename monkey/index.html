@@ -1376,6 +1376,9 @@ function updatePhysics(dt,now){
   let axis=(input.right?1:0)-(input.left?1:0);
   if(AUTO_PLAY||state.autopilot){
     let target=state.platforms.find(p=>p.id===state.autoTargetId&&p.alive&&p.solid);
+    // 这个 158 比实际能跳到的高度矮（香蕉板 955 能升 268）。0813 量过一次把它放到 275：
+    // 40 局中位高度 2081 -> 2113，其余指标基本不动，是噪声不是改进，所以维持原样——
+    // 不为一个不影响结果的小别扭去动 ?stress=1 依赖的代码。
     if(!target){const targets=state.platforms.filter(p=>p.alive&&p.solid&&p.y>pl.y+16&&p.y<pl.y+158&&!(p.type==='vapor'&&p.opacity<.36)).sort((a,b)=>a.y-b.y);target=targets[0];state.autoTargetId=target?.id||'';}
     if(target){let dx=target.x+target.w/2-pl.x;if(Math.abs(dx)>W/2)dx-=Math.sign(dx)*W;axis=Math.abs(dx)<12?0:Math.sign(dx);}
   }
