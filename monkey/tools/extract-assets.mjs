@@ -55,6 +55,51 @@ if (teas.some(tea => !/^[a-z0-9-]+$/.test(tea.id) || !tea.name || !tea.tier || !
   throw new Error('TEAS 缺少可复用素材所需字段');
 }
 
+// 称号徽章：和奶茶杯完全同一套做法——把正本的 HONORS 与 honorBadgeSvg 放进隔离上下文现画。
+// 加一个称号只需要在 index.html 里多写一行数据，素材库会在下一次构建里自己多出一枚。
+// 这就是「小成本、可复利」的落点：不另存一份、不维护第二套配方。
+const honorArraySource = sourceMatch(/const HONORS=(\[[\s\S]*?\n\]);/, 'HONORS');
+const honorGlyphSource = sourceMatch(/(const HONOR_GLYPHS=\{[\s\S]*?\n\};)/, 'HONOR_GLYPHS');
+const honorBadgeFunctionSource = sourceMatch(/(function honorBadgeSvg\(honor,size\)\{[\s\S]*?\n\})/, 'honorBadgeSvg');
+const honorRuntime = { result: null };
+vm.runInNewContext(
+  `const SURPRISES=[];\nconst HONORS=${honorArraySource};\n${honorGlyphSource}\n${honorBadgeFunctionSource}\nresult={`
+    + `honors:HONORS.map(({test,...honor})=>honor),badges:HONORS.map(honor=>honorBadgeSvg(honor,240))};`,
+  honorRuntime,
+  { timeout: 1000, filename: 'monkey-honor-assets.vm.js' },
+);
+const honors = honorRuntime.result?.honors || [];
+const honorBadges = honorRuntime.result?.badges || [];
+if (!honors.length || honors.length !== honorBadges.length) throw new Error('HONORS 数据与徽章导出数量不一致');
+if (new Set(honors.map(honor => honor.id)).size !== honors.length) throw new Error('HONORS 存在重复 id，无法安全导出');
+if (honors.some(honor => !/^[a-z0-9-]+$/.test(honor.id) || !honor.name || !honor.emblem || !honor.tint)) {
+  throw new Error('HONORS 缺少可复用素材所需字段（emblem / tint）');
+}
+
+// 十二种建筑立面语言。同样只认正本：把 FACADES 与 facadeMarkup 放进隔离上下文，
+// 导出的是一块三开间三层的「样板」——拿去做周边、卡面、说明页都能直接用。
+// 图形不含文字，所以将来出海不需要重画。
+const facadeArraySource = sourceMatch(/const FACADES=(\[[\s\S]*?\n\]);\nconst FACADE_BY_DEPT/, 'FACADES');
+const facadeConstSource = sourceMatch(/(const FACADE_BAYS=[^\n]*\n)/, 'FACADE 常量');
+const facadeFunctionSource = sourceMatch(/(function facadeMarkup\(facade\)\{[\s\S]*?\n\})/, 'facadeMarkup');
+const facadeRuntime = { result: null };
+vm.runInNewContext(
+  `const FACADES=${facadeArraySource};\n${facadeConstSource}\n${facadeFunctionSource}\n`
+    + `const SWATCH_ROWS=3;\nresult={facades:FACADES.map(({unit,...facade})=>facade),`
+    + `swatches:FACADES.map(facade=>{const left=62,width=(328-62)/FACADE_BAYS,parts=[];`
+    + `for(let row=0;row<SWATCH_ROWS;row+=1)for(let bay=0;bay<FACADE_BAYS;bay+=1)`
+    + `parts.push(facade.unit(left+bay*width,row*FACADE_STEP,width,FACADE_STEP));return parts.join('');})};`,
+  facadeRuntime,
+  { timeout: 1000, filename: 'monkey-facade-assets.vm.js' },
+);
+const facades = facadeRuntime.result?.facades || [];
+const facadeSwatches = facadeRuntime.result?.swatches || [];
+if (!facades.length || facades.length !== facadeSwatches.length) throw new Error('FACADES 数据与立面样板导出数量不一致');
+if (new Set(facades.map(facade => facade.id)).size !== facades.length) throw new Error('FACADES 存在重复 id，无法安全导出');
+if (facades.some(facade => !/^[a-z0-9-]+$/.test(facade.id) || !facade.name || !facade.era || !facade.fact || !facade.dept)) {
+  throw new Error('FACADES 缺少可复用素材所需字段（name / era / fact / dept）');
+}
+
 // 世界窗景也只认正本里的 CULTURE_MOTIFS 与 motifSvgMarkup()。导出器不维护第二套画面，
 // 这样游戏里换一根线，素材库与哈希总账会在同一次构建里跟着变化。
 const motifArraySource = sourceMatch(/const CULTURE_MOTIFS=(\[[\s\S]*?\n\]);\nfunction motifSvgMarkup/, 'CULTURE_MOTIFS');
@@ -83,6 +128,20 @@ function reusableTeaSvg(tea, markup) {
   return markup
     .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(tea.name)}" `)
     .replace(' aria-hidden="true"', '') + '\n';
+}
+
+function reusableHonorSvg(honor, markup) {
+  return markup
+    .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(honor.name)}" `)
+    .replace(' aria-hidden="true"', '') + '\n';
+}
+
+function reusableFacadeSvg(facade, markup) {
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -6 270 270" role="img" aria-label="${escapeXml(facade.name)}">`,
+    `<g fill="none" stroke="#2f5148" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">`,
+    markup, '</g>', '</svg>', '',
+  ].join('\n');
 }
 
 function reusableMotifSvg(motif, markup) {
@@ -168,6 +227,12 @@ function drawingStyle() {
 
 const outputs = new Map(exportsList.map(([file, id]) => [path.join(outputRoot, file), standalone(id)]));
 outputs.set(path.join(repoRoot, 'assets', 'cover-monkey-upstairs.svg'), cover());
+for (let index = 0; index < facades.length; index++) {
+  outputs.set(path.join(outputRoot, 'facades', facades[index].id + '.svg'), reusableFacadeSvg(facades[index], facadeSwatches[index]));
+}
+for (let index = 0; index < honors.length; index++) {
+  outputs.set(path.join(outputRoot, 'honors', honors[index].id + '.svg'), reusableHonorSvg(honors[index], honorBadges[index]));
+}
 for (let index = 0; index < teas.length; index++) {
   outputs.set(path.join(outputRoot, 'teas', teas[index].id + '.svg'), reusableTeaSvg(teas[index], teaCups[index]));
 }
@@ -195,6 +260,26 @@ for (const [file, id, role] of exportsList) {
     sha256: createHash('sha256').update(body).digest('hex'),
   });
 }
+const manifestFacades = facades.map(facade => {
+  const file = path.posix.join('facades', facade.id + '.svg');
+  const body = outputs.get(path.join(outputRoot, file));
+  return {
+    file, source: 'FACADES', id: facade.id, name: facade.name, era: facade.era,
+    department: facade.dept, fact: facade.fact, line: facade.line,
+    viewBox: '60 -6 270 270', width: 270, height: 270,
+    sha256: createHash('sha256').update(body).digest('hex'),
+  };
+});
+const manifestHonors = honors.map(honor => {
+  const file = path.posix.join('honors', honor.id + '.svg');
+  const body = outputs.get(path.join(outputRoot, file));
+  return {
+    file, source: 'HONORS', id: honor.id, name: honor.name, emblem: honor.emblem, tint: honor.tint,
+    hint: honor.hint, line: honor.line, secret: !!honor.secret,
+    viewBox: '0 0 40 40', width: 240, height: 240,
+    sha256: createHash('sha256').update(body).digest('hex'),
+  };
+});
 const manifestTeas = teas.map(tea => {
   const file = path.posix.join('teas', tea.id + '.svg');
   const body = outputs.get(path.join(outputRoot, file));
@@ -215,7 +300,7 @@ const manifestMotifs = motifs.map(motif => {
   };
 });
 const manifest = JSON.stringify({
-  schema: 4,
+  schema: 6,
   source: '../index.html',
   generator: 'monkey/tools/extract-assets.mjs',
   license: 'MYSKME original reusable asset',
@@ -224,6 +309,8 @@ const manifest = JSON.stringify({
   style: drawingStyle(),
   canon,
   assets: manifestAssets,
+  facades: manifestFacades,
+  honors: manifestHonors,
   teas: manifestTeas,
   worldWindows: manifestMotifs,
 }, null, 2) + '\n';

@@ -98,12 +98,76 @@ assert(html.includes('<link rel="manifest" href="./manifest.webmanifest">'), 'PW
 assert(html.includes('<script src="./vendor/qrcode-generator.js"></script>'), '本地二维码模块入口缺失');
 assert(!/<script\s+[^>]*src=["']https?:/i.test(html), '游戏包含外部脚本');
 assert(!/<link\s+[^>]*rel=["']stylesheet/i.test(html), '游戏包含外部样式');
+// 任何「数源码里出现几次」的门禁，**数之前必须先把注释与字符串剥掉**。
+// 0813 巡查两个方向都抓到了：
+//   假阴性：把 setTimeout(runStressQA,...) 整行注释掉，「自检入口必须被引用」照样绿，
+//           24000 帧压力测试静默消失、构建退出码 0。
+//   假阳性：注释里写一句「不要再加第二个 fetch(」，「联网出口只能有一个」当场误报。
+// 两头都错，根因是同一个：拿源码字面量当程序结构使。
+function stripComments(source) {
+  // 只剥注释，**不动字符串**。第一版连字符串一起剥，结果被正则字面量里的引号
+  // （例如 /['"]/）带偏，从那个引号一路吞到很远，CODE 直接残缺。
+  // 而 0813 巡查抓到的两个方向本来就都只关注释：
+  //   假阴性：把 setTimeout(runStressQA,...) 整行注释掉，「自检入口必须被引用」照样绿。
+  //   假阳性：注释里写一句「不要再加第二个 fetch(」，「联网出口只能有一个」当场误报。
+  // 要正确地找出注释，仍然必须认得字符串与正则（'https://x' 里那个 // 不是注释）。
+  let out = '', i = 0, prev = '';
+  const n = source.length;
+  const regexAllowedAfter = new Set(['', '(', ',', '=', ':', '[', '!', '&', '|', '?', '{', '}', ';', '+', '-', '*', '%', '<', '>', '~', '^', 'n']);
+  while (i < n) {
+    const ch = source[i], two = source.slice(i, i + 2);
+    if (two === '//') { while (i < n && source[i] !== '\n') i += 1; continue; }
+    if (two === '/*') { i += 2; while (i < n && source.slice(i, i + 2) !== '*/') i += 1; i += 2; continue; }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      out += ch; i += 1;
+      while (i < n && source[i] !== ch) {
+        if (source[i] === '\\') { out += source[i]; i += 1; }
+        if (i < n) { out += source[i]; i += 1; }
+      }
+      out += source[i] || ''; i += 1; prev = ch; continue;
+    }
+    if (ch === '/' && regexAllowedAfter.has(prev)) {
+      // 正则字面量：整段原样抄过去，里面的引号与斜杠都不许再被当成别的东西。
+      out += ch; i += 1;
+      let inClass = false;
+      while (i < n) {
+        const c = source[i];
+        if (c === '\\') { out += c + (source[i + 1] || ''); i += 2; continue; }
+        if (c === '[') inClass = true;
+        else if (c === ']') inClass = false;
+        else if (c === '/' && !inClass) break;
+        else if (c === '\n') break;
+        out += c; i += 1;
+      }
+      out += source[i] || ''; i += 1; prev = '/'; continue;
+    }
+    out += ch;
+    if (!/\s/.test(ch)) prev = ch;
+    i += 1;
+  }
+  return out;
+}
+// CSS 的 /* */ 也会被一起剥掉，正好——那些注释同样不该算作「接线」。
+const CODE = stripComments(html);
+
 // 世界楼榜只准从一个封装出口联网。数调用点而不是搜函数名，避免定义自己满足门禁。
 // 品牌网关是固定正门，客户端不直连 Worker，也不许另开 WebSocket 或 XHR 旁路。
-const FETCH_CALLS = (html.match(/\bfetch\s*\(/g) || []).length;
+const FETCH_CALLS = (CODE.match(/\bfetch\s*\(/g) || []).length;
 assert(FETCH_CALLS === 1 && html.includes('async function worldFetch('), '世界楼榜联网出口必须且只能有一个');
 assert(html.includes("MONKEY_API='https://myskme.com/api/monkey'"), '世界楼榜没有走 MYSKME 品牌网关');
-assert(!/\b(?:XMLHttpRequest|WebSocket)\s*\(/.test(html), '游戏出现未批准的网络旁路');
+// 黑名单原来只有 XHR 与 WebSocket，0813 巡查实测 sendBeacon / EventSource /
+// new Image().src / 动态 import 四种旁路全部畅通无阻——数 fetch( 根本挡不住它们。
+assert(!/\b(?:XMLHttpRequest|WebSocket|EventSource)\s*\(/.test(CODE), '游戏出现未批准的网络旁路');
+assert(!/navigator\s*\.\s*sendBeacon/.test(CODE), '出现 sendBeacon 旁路：它不经过 worldFetch，也不受品牌网关约束');
+assert(!/\bimport\s*\(/.test(CODE), '出现动态 import：本作是单文件离线包，不许运行时再拉代码');
+// 唯一那处 fetch 必须长在 worldFetch 里，不能是别处随手写的一个。
+const WORLD_FETCH_BODY = CODE.slice(CODE.indexOf('async function worldFetch('));
+assert(/\bfetch\s*\(/.test(WORLD_FETCH_BODY.slice(0, 900)), '唯一的 fetch 不在 worldFetch 里');
+// 代码里除了品牌网关，不许再出现别的外链地址（图片 src 那类旁路顺带一起挡）。
+const URLS = [...new Set((CODE.match(/https?:\/\/[A-Za-z0-9.-]+/g) || []))]
+  .filter(u => !u.startsWith('https://myskme.com') && !u.startsWith('https://monkey.myskme.com')
+    && !u.startsWith('http://www.w3.org') && !u.startsWith('https://www.w3.org'));
+assert(URLS.length === 0, '代码里出现了品牌网关以外的外链：' + URLS.join('、'));
 assert(html.includes('function queueWorldRun(') && html.includes('function flushWorldQueue(')
   && html.includes('acceptedRunId!==queued.runId') && html.includes("window.addEventListener('online'"),
   '世界榜本机先存、精确回执或联网补交链路不完整');
@@ -115,11 +179,32 @@ assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'P
 for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.replace(/^\.\//, '')));
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
 {
-  const screenCss=(html.match(/\.screen\{([^}]*)\}/)||[])[1]||'';
-  assert(/overflow\s*:\s*hidden/.test(screenCss), '菜单屏幕又开始依赖上下滚动了');
-  assert(!/#(?:title|result)Screen\{[^}]*overflow-y\s*:\s*auto/.test(html), '首页或结算页又恢复成上下滚动了');
+  // 2026-08-13 改了这一条守的东西，理由写清楚，别当成放松。
+  //
+  // 原来这里断言 .screen 必须是 overflow:hidden，意思是「菜单不许滚」。
+  // 但那天巡查实测：手机横过来（844x390）时首页的「单猴挑战，立即上楼」整颗被裁在卡片外，
+  // 玩家开不了局；进了称号墙/奶茶图鉴更糟——关闭键在屏外，触屏没有 Esc 的等价物，
+  // 八条出路逐个试过只有键盘 Esc 有效，也就是手机上**只能刷新页面**。
+  // 也就是说这条门把「装不下」变成了「出不去」，代价远大于它保住的那点洁癖。
+  //
+  // 真正要保证的从来不是「滚不动」，而是「**不需要滚**」。后者现在由两样东西真量：
+  //   页面里的 measureMenuOverflow（拿最坏档案逐屏逐页量 scrollHeight）
+  //   monkey/tools/qa-viewports.mjs（把它在 7 个视口上各跑一遍，含 320x568 / 375x553）
+  // 而 overflow-y:auto 在内容装得下时和 hidden 完全一样：不出滚动条、滚不动。
+  // 所以这里改成守「兜底能滚」，把「不需要滚」交给量出来的那两道。
+  // 取规则时要**锚在行首**：`.screen,.card{scrollbar-width:none}` 这种组合选择器
+  // 会让不带锚的 /\.card\{/ 先命中它，于是量到的是别人家的声明。
+  const screenCss=(html.match(/(?:^|\n)\.screen\{([^}]*)\}/)||[])[1]||'';
+  assert(/overflow-y\s*:\s*auto/.test(screenCss),
+    '菜单屏幕又被改回滚不动了。单屏是优化不是硬约束——装不下时必须还够得着，'
+    + '否则横屏进了子屏幕就只能刷新页面（0813 实测过）。「不需要滚」由 measureMenuOverflow '
+    + '与 monkey/tools/qa-viewports.mjs 保证，不靠把滚动关掉来假装。');
+  const cardCss=(html.match(/(?:^|\n)\.card\{([^}]*)\}/)||[])[1]||'';
+  assert(/overflow-y\s*:\s*auto/.test(cardCss), '卡片又被改回滚不动了，理由同上');
   assert(html.includes('function renderPager(') && html.includes('data-result-page="2"') && html.includes('id="titlesPager"') && html.includes('id="teaPager"'),
     '单屏分页结构不完整，长内容会重新把页面撑出屏幕');
+  // 「不需要滚」这件事必须有人真量。少了这个函数，上面那条就变成了单纯的放松。
+  assert(html.includes('function measureMenuOverflow('), '真量单屏溢出的那个函数没了，不许只留兜底滚动');
 }
 // 每个自检入口都必须有对应的函数定义，而且不许有悬空调用。
 // 0813 血泪：拆多人模式时「从 runPartyQA 一路删到 runPosterQA」，把夹在中间的
@@ -131,7 +216,10 @@ for (const fn of ['runQA', 'runStressQA', 'runPosterQA']) {
   assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(html), '自检入口 ' + fn + ' 的定义不见了（删整段时被夹带走了？）');
   // 光 includes(fn+'(') 会被函数定义自己满足，等于没查；而且调用点未必带括号
   // （`setTimeout(runQA,50)` 就是把函数本身传过去）。所以数裸标识符，要求至少两处：定义 + 引用。
-  const uses = (html.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
+  // **必须数剥过注释的 CODE**：0813 巡查实测，把 setTimeout(()=>runStressQA(),60) 整行
+  // 注释掉（而不是删掉），这条照样绿，24000 帧压力测试就此静默消失、构建退出码 0。
+  // 一条能被注释满足的门禁，和一条永远不会失败的门禁是同一个东西。
+  const uses = (CODE.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
   assert(uses >= 2, '自检入口 ' + fn + ' 只有定义没有任何引用，等于形同虚设');
 }
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
@@ -152,10 +240,15 @@ assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '戴帽子的状态类
 // 门守的是「意图」不是「那一行字」：≤699px 里外壳高度必须用 svh 且不许再出现 844 这个死高度。
 // 宽度写法允许调整（0813 晚上就从 100vw 改成了 min(100vw,460px)，为的是别把折叠屏/半屏窗口拉扁）。
 {
-  const m = html.match(/@media\(max-width:699px\)\{[\s\S]{0,600}?\n\}/);
-  assert(m, '手机铺满规则整块没了（0813 修过一次，别再退回 844 死高度）');
-  assert(/#gameShell\{[^}]*height:min\(100svh/.test(m[0]), '手机铺满规则里外壳高度没用 100svh');
-  assert(!/844/.test(m[0]), '手机铺满规则里又出现了 844 这个死高度——大屏手机会重新留出上下边');
+  // **每一块都要查**，不能只查第一块。0813 巡查实测：在后面再写一块
+  // @media(max-width:699px){#gameShell{height:844px}}，构建绿、?qa=1 绿，
+  // 而 430x932 上下各露 44px 底色——正是 0813 白天刚修过的那个毛病原样回来。
+  const blocks = [...html.matchAll(/@media\(max-width:699px\)\{[\s\S]{0,600}?\n\}/g)].map(hit => hit[0]);
+  assert(blocks.length >= 1, '手机铺满规则整块没了（0813 修过一次，别再退回 844 死高度）');
+  assert(blocks.some(block => /#gameShell\{[^}]*height:min\(100svh/.test(block)), '手机铺满规则里外壳高度没用 100svh');
+  for (const block of blocks) {
+    assert(!/844/.test(block), '某一块 @media(max-width:699px) 里又出现了 844 这个死高度——大屏手机会重新留出上下边');
+  }
 }
 assert(html.includes('html.wide-mobile-viewport #gameShell{width:min(100vw,460px)'), '安卓宽虚拟视口的固定盒兜底被铺满规则带偏了');
 assert(html.includes('<meta name="apple-mobile-web-app-capable" content="yes">')
@@ -176,7 +269,13 @@ assert(html.includes('viewport-fit=cover') && html.includes('env(safe-area-inset
     ...tableOf('PAUSE_TIME_FIELDS'), ...tableOf('PAUSE_PLAYER_TIME_FIELDS'),
     ...tableOf('PAUSE_ENTITY_TIME_FIELDS'), ...tableOf('PAUSE_NON_TIME_FIELDS'),
   ]);
-  const declared = [...new Set([...html.matchAll(/\b([A-Za-z_$][\w$]*(?:Until|At))\s*:/g)].map(m => m[1]))];
+  // 原来只认对象字面量里的「键:」，于是 state.windCooldownUntil=... 这种**懒创建**的字段
+  // 一个都扫不到——0813 实测：暂停 5 秒，windCooldownUntil 白白少了 5114ms，而两道门都是绿的。
+  // 所以成员赋值式也要扫。
+  const declared = [...new Set([
+    ...[...CODE.matchAll(/\b([A-Za-z_$][\w$]*(?:Until|At))\s*:/g)].map(hit => hit[1]),
+    ...[...CODE.matchAll(/\.([A-Za-z_$][\w$]*(?:Until|At))\s*=[^=]/g)].map(hit => hit[1]),
+  ])];
   assert(declared.length >= 14, '没从源码里扫到足够的计时字段，取法过时了（正则要跟着更新）');
   const missing = declared.filter(k => !registered.has(k));
   assert(missing.length === 0, '这些绝对计时字段没登记进 PAUSE_* 表，暂停会白送时间：' + missing.join('、'));
@@ -193,6 +292,143 @@ const PWA_ASSET_HASH = await pwaAssetHash();
 assert(SW_CACHE.endsWith('-' + PWA_ASSET_HASH),
   'icons/ 或 manifest.webmanifest 已变化，但 sw.js CACHE 没带当前哈希 -' + PWA_ASSET_HASH
   + '。只在这两类资源变化时更新 CACHE；index.html 不在本门禁范围内。');
+
+// ---- 导航的人性化底线（2026-08-13 王老师反馈：结算与首页的「下一页下一页」不够人性化）----
+// 这几条守的是**结论**，不是像素：线性翻页把去处藏起来、结算回不了首页、
+// 主操作会随翻页消失——三样都是玩家一分钟内就会撞上的。
+// 注意匹配的是真正的属性写法 data-page-step="…"，不是这五个字出现在任何地方——
+// 第一版写成 /data-page-step/ 当场被自己的运行期自检满足了（那条自检里有
+// querySelector('[data-page-step]')），检测器和检测目标同形，是这仓库里反复出现的一类坑。
+assert(!/data-page-step="/.test(html),
+  '结算又退回「上一页/下一页」了。线性翻页把去处藏了起来，玩家只能盲点，0813 已换成命名标签。');
+const RESULT_TABS = [...html.matchAll(/data-result-tab="(\d)">([^<]*)</g)];
+assert(RESULT_TABS.length === 3 && RESULT_TABS.every(([, , label]) => label.trim().length >= 2),
+  '结算的三个分页标签必须都在、且都要有名字——没名字的标签跟「下一页」是一回事。');
+assert(html.includes('id="resultHomeButton"') && /el\.resultHome\.addEventListener\('click',\s*resultToTitle\)/.test(html),
+  '结算页的「返回首页」没了。改之前这一屏根本没有回首页的路：玩过一局就再也换不了开工装备。');
+assert(/function resultToTitle\(\)\{state\.over=false;/.test(html),
+  'resultToTitle 必须清掉 state.over，否则回到首页后子屏幕的返回键会把玩家又弹回结算。');
+// 翻页只许有一处实现。手势和按钮各写一套，迟早出现「滑得到第 4 页、按钮只到第 3 页」。
+// 数的是**裸标识符**，不是带括号的调用——0813 踩过：setTimeout(runQA,50) 根本没有括号，
+// 而 html.includes('runQA(') 又会被函数定义自己满足。
+// 更要命的是第二层：**数之前必须先把自检代码切掉**。自检里写着
+// /stepPage\(/.test(bindSwipePaging.toString())，这一句本身就会被数成一次「引用」，
+// 于是把真正的接线整行删掉，门照样绿——0813 反向验证时当场撞到，检测器满足了检测目标。
+const QA_AT = CODE.indexOf('function measureMenuOverflow(');
+assert(QA_AT > 0, '取不到自检代码的起点（measureMenuOverflow 改名了？先修本门禁的取法）');
+// 用剥过注释与字符串的 CODE：一行注释不该算作一次「接线」。
+const PRODUCT_CODE = CODE.slice(0, QA_AT);
+// claimCultureMotif / choosePosterPair 原来只被断言「函数在不在」，不查调用点——
+// 0813 实测把 claimCultureMotif 的调用删掉，构建绿、?qa=1 绿，
+// 而八种世界窗景当场退化成四种死循环（前 8 局只出 4 种）。
+for (const fn of ['activePager', 'stepPage', 'bindSwipePaging', 'claimCultureMotif']) {
+  assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(PRODUCT_CODE), '导航函数 ' + fn + ' 不见了');
+  const uses = (PRODUCT_CODE.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
+  assert(uses >= 2, '导航函数 ' + fn + ' 在产品代码里只有定义、没有接线（自检里的引用不算数）');
+}
+// measureMenuOverflow 本身就是自检的一部分，所以单独查它确实被 runQA 调用了。
+assert(/measureMenuOverflow\(\)/.test(html.slice(html.indexOf('function runQA('))),
+  '「单屏菜单不溢出」那条自检没有被 runQA 调用，等于白写');
+// 主操作必须在三个 .result-page 之外。在里面就意味着翻到别的页它会消失。
+const ACTIONS_AT = html.indexOf('class="btn-row result-actions"');
+const TABS_AT = html.indexOf('id="resultTabs"');
+assert(ACTIONS_AT > 0 && TABS_AT > 0 && ACTIONS_AT > TABS_AT,
+  '再来一局/生成成绩海报必须常驻在分页标签之外。核心循环是「摔了再来」，这颗按钮不该会消失。');
+
+// ---- 竖屏锁定（2026-08-13 王老师定：这个作品只做竖屏）----
+assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时这栋楼只剩一条缝，得直说，别让人以为游戏坏了。');
+{
+  // CSS 与 JS 必须用同一条媒体查询，抄错一个就出现「提示层出来了但局没暂停」。
+  const jsQuery = (CODE.match(/const LANDSCAPE_QUERY='([^']+)'/) || [])[1];
+  assert(jsQuery, '取不到 LANDSCAPE_QUERY（写法变了？先修本门禁的取法）');
+  const cssQuery = new RegExp('@media' + jsQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'));
+  assert(cssQuery.test(html.replace(/\s+/g, ' ')) || html.includes('@media(' + jsQuery.slice(1)),
+    '竖屏锁定的 CSS 与 JS 用的不是同一条媒体查询');
+  assert(/\bsyncRotateGate\b/.test(CODE.replace(/function\s+syncRotateGate/, '')),
+    'syncRotateGate 只有定义没有接线，横过来不会自动暂停');
+}
+
+// ---- 称号徽章与存档契约 ----
+{
+  // 称号 id 是**存档契约**，不是镜像：career.titles 里存的就是这些字符串。
+  // 改一个 id，所有已经拿到该称号的玩家当场蒸发一枚，而且没有任何报错。
+  // 所以这一份写死在门里，和「鱼小姐必须青绿」是同一类立法。要改先想清楚迁移。
+  const HONOR_IDS = ['certified','zerofloor','grudge47','genuine','moremonkey','overdue','skimread',
+    'lightsugar','fullsugar','noice','roomtemp','nopb','talker','archivist','toolfree','fake'];
+  const found = [...html.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
+  assert(found.length === HONOR_IDS.length,
+    '称号条数或写法变了：扫到 ' + found.length + ' 条，期望 ' + HONOR_IDS.length);
+  for (const id of HONOR_IDS) {
+    assert(found.some(hit => hit[1] === id), '称号 id 「' + id + '」不见了。存档里存的就是它，改名等于让老玩家的称号蒸发');
+  }
+  // 每个徽章图形都必须真的在图形表里，否则会静默退化成默认的印章，16 枚看着像一枚。
+  const glyphBlock = (CODE.match(/const HONOR_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
+  for (const [, , emblem] of found.map(hit => [0, 0, hit[2]])) {
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 HONOR_GLYPHS 里，会静默退化成默认印章');
+  }
+  // 只在**取出来的那一段**里查。第一版写成从 HONOR_GLYPHS 一路 [\s\S]*? 找 href=，
+  // 结果匹到了文件后面 SVG <use href= 那一堆，构建当场误报——
+  // 这跟前面那个「不锚行首的 .card 正则」是同一类错：范围没圈住。
+  assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
+}
+
+// 部门清单提到块外，立面与调式两道门共用一份——同一个清单取两次，迟早取法不一致。
+const DEPT_IDS = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(hit => hit[1]);
+
+// ---- 建筑立面语言 ----
+{
+  // 十二个部门必须一一对应十二种立面。少一个就会有一段楼没有立面（静默变白墙），
+  // 多一个就有一种永远看不到——两种都不会报错，只能靠这道门。
+  const deptIds = DEPT_IDS;
+  // **先把 FACADES 那一段圈出来再匹配**。第一版直接在整个 html 上匹
+  // /\{id:'…',dept:'…',name:/，结果把结构完全相同的 MODES 也数了进去，报「立面数 24」。
+  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 HONOR_GLYPHS 一路找 href=）：
+  // **扫描之前先把范围圈死**，否则迟早匹到隔壁那张结构一样的表。
+  const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(facadeBlock, '取不到 FACADES 那一段（写法变了？先修本门禁的取法）');
+  const facadeDepts = [...facadeBlock.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(deptIds.length >= 12, '取不到部门清单（写法变了？先修本门禁的取法）');
+  assert(facadeDepts.length === deptIds.length,
+    '立面数（' + facadeDepts.length + '）与部门数（' + deptIds.length + '）对不上，会出现没有立面的楼层或永远看不到的立面');
+  for (const dept of deptIds) {
+    assert(facadeDepts.includes(dept), '部门 ' + dept + ' 没有对应的立面语言');
+  }
+  // 每一种都必须真带一句知识。没有 fact 的立面只是花纹，那就不是王老师要的那件事。
+  const facts = [...facadeBlock.matchAll(/fact:'([^']{20,})'/g)];
+  assert(facts.length === facadeDepts.length, '有立面缺 fact（或 fact 太短），立面就退化成纯花纹了');
+  // 立面是背景纹理，不许盖住台阶与猴子：必须压在 buildingBack 里，且有自己的减淡规则。
+  assert(html.indexOf('id="facadeLayer"') > html.indexOf('id="buildingBack"')
+    && html.indexOf('id="facadeLayer"') < html.indexOf('id="platformLayer"'),
+    '立面层必须在楼体背景里、且在台阶层之前，否则会盖住台阶');
+  assert(/#facadeLayer\{[^}]*opacity:/.test(html), '立面层没有减淡规则，会跟台阶抢视线（0813 截图实测过）');
+  // 不写字：出海时建筑语言不需要翻译，写了字就得重画。
+  assert(!/<text|<image|href=/.test(facadeBlock), '立面里出现了文字或外链，就没法当免翻译的可复用素材了');
+}
+
+// ---- 音乐调式 ----
+{
+  // 十二个部门一一对应十二种调式，理由与立面那条相同：少一个会有一段楼静默用回默认调，
+  // 多一个会有一种永远听不到，两种都不报错。
+  const modeBlock = (CODE.match(/const MODES=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(modeBlock, '取不到 MODES 那一段（写法变了？先修本门禁的取法）');
+  const modeDepts = [...modeBlock.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(modeDepts.length === DEPT_IDS.length,
+    '调式数（' + modeDepts.length + '）与部门数（' + DEPT_IDS.length + '）对不上');
+  for (const dept of DEPT_IDS) assert(modeDepts.includes(dept), '部门 ' + dept + ' 没有对应的调式');
+  // 每种都要带一句真的乐理，否则它只是换了个音阶名。
+  const modeFacts = [...modeBlock.matchAll(/fact:'([^']{20,})'/g)];
+  assert(modeFacts.length === modeDepts.length, '有调式缺 fact（或太短），那就只是换了个音阶名');
+  // 换调式的前提是「只换色彩、不换曲子」：旋律必须由级数生成，不许再写死半音数组。
+  assert(/const MELODY_DEGREES=/.test(CODE) && /function degreeToSemitone\(/.test(CODE),
+    '旋律又被写死成半音了。整套调式的前提是「旋律只记第几级」，写死半音就换不了调式了。');
+  assert(!/melodies=\[\[12,14,16/.test(CODE), '改版前那份写死的旋律又回来了');
+}
+
+// ---- 翻页：页数少时不许再出现上一页/下一页 ----
+assert(/function bindTapToAdvance\(/.test(CODE) && (CODE.match(/\bbindTapToAdvance\b/g) || []).length >= 2,
+  '「点列表空白处翻下一页」的接线没了。王老师 0813 明说上一页/下一页还是多，这是替代它的那条路。');
+assert(/pager-dots solo/.test(html),
+  '页数少时应该只留页码点、不给上一页/下一页——那两颗按钮会白占一整行。');
 
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
