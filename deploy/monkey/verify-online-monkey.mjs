@@ -44,6 +44,12 @@ async function verify() {
   assert(html.includes("const PARTY_KEY='myskme_monkey_party_v1'"), '线上多人比赛保存缺失');
   assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '线上海报或安卓宽视口修复缺失');
   assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '线上惊喜池或省电音频调度缺失');
+  assert(html.includes('function pauseGame(') && html.includes('function shiftDeadlines('), '线上暂停系统缺失');
+  assert(html.includes('const HONORS=['), '线上称号系统缺失');
+  assert(html.includes('id="art-carp-hat"'), '线上红鲤鱼帽美术缺失');
+  assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '线上戴帽子的状态类与资源类同名，会把整个画面藏掉');
+  assert(html.includes('#gameShell{width:100vw;height:100vh;height:min(100svh'), '线上手机铺满规则缺失，大屏手机会留出上下边');
+  assert(html.includes('<meta name="mobile-web-app-capable" content="yes">'), '线上 PWA 全屏声明缺失');
   const manifestResponse=await fetch('https://monkey.myskme.com/manifest.webmanifest?release-check='+stamp,{signal:AbortSignal.timeout(15000)});
   const manifest=await manifestResponse.json();assert(manifestResponse.status===200&&manifest.name==='是猴就上100层','线上 PWA 清单不匹配');
   const iconResponse=await fetch('https://monkey.myskme.com/icons/monkey-100-192.png?release-check='+stamp,{signal:AbortSignal.timeout(15000)});const icon=await iconResponse.arrayBuffer();assert(iconResponse.status===200&&icon.byteLength>1000,'线上桌面图标缺失');
