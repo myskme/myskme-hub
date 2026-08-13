@@ -1,4 +1,4 @@
-const CACHE='myskme-monkey-20260813-1';
+const CACHE='myskme-monkey-20260813-4';
 const CORE=['./','./index.html','./manifest.webmanifest','./vendor/qrcode-generator.js','./icons/monkey-100.svg','./icons/monkey-100-180.png','./icons/monkey-100-192.png','./icons/monkey-100-512.png','./icons/monkey-100-maskable-512.png'];
 
 // 安装时必须用 cache:'reload' 绕开浏览器自己的 HTTP 缓存。
@@ -15,7 +15,12 @@ self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET'||new URL(event.request.url).origin!==location.origin)return;
   if(event.request.mode==='navigate'){
-    event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put('./index.html',copy));return response;}).catch(()=>caches.match('./index.html')));
+    // 只有真正成功的响应才准覆盖离线副本。服务端抽一次风（5xx/错误页）就把
+    // 离线版永久换成错误页，玩家断网再打开只剩一张 503——下面静态资源那条一直有这道门，导航这条漏了。
+    event.respondWith(fetch(event.request).then(response=>{
+      if(response&&response.ok&&response.type!=='opaque'){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put('./index.html',copy));}
+      return response;
+    }).catch(()=>caches.match('./index.html')));
     return;
   }
   event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}return response;})));

@@ -2,7 +2,7 @@
   "id": "./",
   "name": "是猴就上100层",
   "short_name": "猴上100层",
-  "description": "MYSKME 荒诞休闲挑战，支持单人和 2–6 人同机公平赛。",
+  "description": "MYSKME 荒诞休闲挑战。左右两键往上爬，随机楼层每局不同，可安装到桌面离线玩。",
   "lang": "zh-CN",
   "dir": "ltr",
   "start_url": "./",

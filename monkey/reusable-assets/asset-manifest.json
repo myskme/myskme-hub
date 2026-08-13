@@ -77,7 +77,7 @@
       "viewBox": "0 0 120 120",
       "width": 120,
       "height": 120,
-      "sha256": "5085b199084211834c33e3c578c60afca9f61196b28aec48bea085f78935f81b"
+      "sha256": "8af5bb2e0c3994340c39e77a129536351efc0ebb7d7f05b2a3c0bed43323b190"
     },
     {
       "file": "egg.svg",
@@ -86,7 +86,7 @@
       "viewBox": "0 0 110 120",
       "width": 110,
       "height": 120,
-      "sha256": "5bbb564212febb556dac6cc93ca6ea4b46876cc8a212f644c8b7fffd42bc41b0"
+      "sha256": "7e27f1f571c18a6301f834401ce29da5be20d76ef6e39aea8d063eb692c0a51e"
     },
     {
       "file": "snake.svg",
@@ -95,7 +95,7 @@
       "viewBox": "0 0 120 100",
       "width": 120,
       "height": 100,
-      "sha256": "ce29a4b2ab90f56d48e2e19b0975f6b3fd9db7fa8fa1931698e933c663fdee00"
+      "sha256": "2759d74caaea0c855c4425e079fb1f3c3c8f53fef6baf8f271f07a57a1cab4dc"
     },
     {
       "file": "fertilizer.svg",

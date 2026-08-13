@@ -54,9 +54,9 @@ assert(html.includes('function repairPlayerState(now)'), '猴子可见性看门�
 assert(html.includes('function startMusic()'), '自适应音乐引擎缺失');
 assert(html.includes("const TOOL_POOL=['magnet','clip','waiver','rocket','wide']"), '帮助道具池不完整');
 assert(html.includes('const MISSIONS=['), '轮值任务系统缺失');
-assert(html.includes("const PARTY_KEY='myskme_monkey_party_v1'"), '2–6 人比赛保存缺失');
-assert(html.includes('function partyRoundSeed('), '多人同轮公平种子缺失');
-assert(html.includes('function finishPartyTurn('), '多人轮转结算缺失');
+// 2–6 人多人模式 0813 已按王老师要求整体拆除，原来守着它的三条断言一并撤掉。
+// 反过来加一条：别再被悄悄加回来（要加就是一次正式决定，不是顺手粘回来）。
+assert(!/\bparty\b/i.test(html), '多人模式的代码又出现了。0813 已明确拆除，要恢复请先跟王老师确认');
 assert(html.includes('<link rel="manifest" href="./manifest.webmanifest">'), 'PWA 清单入口缺失');
 assert(html.includes('<script src="./vendor/qrcode-generator.js"></script>'), '本地二维码模块入口缺失');
 assert(!/<script\s+[^>]*src=["']https?:/i.test(html), '游戏包含外部脚本');
@@ -67,6 +67,19 @@ assert(!html.includes('myskme.com/fun/monkey'), '仍含已废弃的目录地址'
 assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'PWA 清单或图标声明不完整');
 for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.replace(/^\.\//, '')));
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
+// 每个自检入口都必须有对应的函数定义，而且不许有悬空调用。
+// 0813 血泪：拆多人模式时「从 runPartyQA 一路删到 runPosterQA」，把夹在中间的
+// runStressQA 一起删掉了——而 ?qa=1 覆盖不到 ?stress=1，于是自检全绿、
+// 24000 帧压力测试其实已经没了（CLAUDE.md 里它是零容忍项）。
+// 同一类错这次是第二次：更早一次差点把主循环 loop() 删掉。
+// 教训写成门：**按函数名删整段之前，先确认区间中间夹着谁**。
+for (const fn of ['runQA', 'runStressQA', 'runPosterQA']) {
+  assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(html), '自检入口 ' + fn + ' 的定义不见了（删整段时被夹带走了？）');
+  // 光 includes(fn+'(') 会被函数定义自己满足，等于没查；而且调用点未必带括号
+  // （`setTimeout(runQA,50)` 就是把函数本身传过去）。所以数裸标识符，要求至少两处：定义 + 引用。
+  const uses = (html.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
+  assert(uses >= 2, '自检入口 ' + fn + ' 只有定义没有任何引用，等于形同虚设');
+}
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
 assert(html.includes('function pauseGame(') && html.includes('function resumeGame(') && html.includes('function shiftDeadlines('), '暂停系统缺失');
 assert(html.includes('const HONORS=['), '称号系统缺失');
@@ -78,8 +91,14 @@ assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '戴帽子的状态类
 // 手机上必须铺满屏幕。0813 之前 #gameShell 高度封顶 844（iPhone 13 时代的高度），
 // 于是 iPhone 15 Pro Max（932）、16 Pro Max（956）、Pixel 8（915）加到桌面全屏启动后
 // 上下各露一条底色，用户看到的就是「不是全屏」。这里守住铺满规则本身。
-assert(/@media\(max-width:699px\)\{[\s\S]{0,400}?#gameShell\{width:100vw;height:100vh;height:min\(100svh/.test(html),
-  '手机铺满规则没了：#gameShell 又会在大屏手机上留出上下边（0813 修过一次）');
+// 门守的是「意图」不是「那一行字」：≤699px 里外壳高度必须用 svh 且不许再出现 844 这个死高度。
+// 宽度写法允许调整（0813 晚上就从 100vw 改成了 min(100vw,460px)，为的是别把折叠屏/半屏窗口拉扁）。
+{
+  const m = html.match(/@media\(max-width:699px\)\{[\s\S]{0,600}?\n\}/);
+  assert(m, '手机铺满规则整块没了（0813 修过一次，别再退回 844 死高度）');
+  assert(/#gameShell\{[^}]*height:min\(100svh/.test(m[0]), '手机铺满规则里外壳高度没用 100svh');
+  assert(!/844/.test(m[0]), '手机铺满规则里又出现了 844 这个死高度——大屏手机会重新留出上下边');
+}
 assert(html.includes('html.wide-mobile-viewport #gameShell{width:min(100vw,460px)'), '安卓宽虚拟视口的固定盒兜底被铺满规则带偏了');
 assert(html.includes('<meta name="apple-mobile-web-app-capable" content="yes">')
   && html.includes('<meta name="mobile-web-app-capable" content="yes">'), 'PWA 全屏声明缺失，iOS 加到主屏幕后不会独立全屏');

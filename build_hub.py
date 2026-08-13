@@ -40,8 +40,8 @@ DEFAULT_DATA = {
              "desc": "64 关远征与无尽矿脉 · 90 秒双榜 · 十二层首领战的生命、战魂与肉鸽构筑 · 2–6 人聚会赛。六位同行各有灵技，成绩可生成带正版二维码的分享图。",
              "url": "https://play.myskme.com/", "featured": True},
             {"key": "monkey-upstairs", "glyph": "猴", "cat": "game", "rarity": "SSR", "cover": "assets/cover-monkey-upstairs.svg",
-             "tag": "荒诞休闲 · 多人百层挑战", "title": "是猴就上100层", "en": "MONKEY UP 100",
-             "desc": "左右两键冲上 100 层 · 全程物理可达的随机楼道 · 2–6 人同机公平赛 · 绕口令办与百层倒班随机营业。可安装到桌面，结算生成带游戏二维码的随机成绩海报。",
+             "tag": "荒诞休闲 · 百层挑战", "title": "是猴就上100层", "en": "MONKEY UP 100",
+             "desc": "左右两键冲上 100 层 · 全程物理可达的随机楼道 · 十六个称号与二十款奶茶图鉴 · 绕口令办与百层倒班随机营业。可随时暂停，可安装到桌面，结算生成带游戏二维码的随机成绩海报。",
              "url": "https://monkey.myskme.com/", "featured": True},
             {"key": "zimingqi", "glyph": "棋", "cat": "game", "rarity": "SSR", "cover": "assets/cover-zimingqi-20260810.webp",
              "coverSmall": "assets/cover-zimingqi-20260810-640.webp", "coverLegacy": "assets/cover-zimingqi.webp",
@@ -746,7 +746,8 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
         '学院谷地地底的灵石矿脉 · 64 关远征 + 无尽矿脉 + 90 秒限时 · 2–6 人聚会赛 · 六位同伴助战、疾风爆裂万象组合技，老少皆宜，扫码即玩。'
       ],
       'monkey-upstairs':[
-        '左右两键冲上 100 层 · 2–6 人同机公平赛 · 同轮同楼 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，还能添加到桌面反复挑战。'
+        '左右两键冲上 100 层 · 2–6 人同机公平赛 · 同轮同楼 · 本机坠楼榜 · 绕口令办与百层倒班随机营业，还能添加到桌面反复挑战。',
+        '左右两键冲上 100 层 · 全程物理可达的随机楼道 · 2–6 人同机公平赛 · 绕口令办与百层倒班随机营业。可安装到桌面，结算生成带游戏二维码的随机成绩海报。'
       ],
       zimingqi:[
         '课堂肉鸽自走棋 · 单人闯关直面叶王 + 无尽回廊爬层 + 课堂多人对战 · 37 位正典学员，扫码即玩。',
