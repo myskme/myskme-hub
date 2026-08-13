@@ -133,3 +133,22 @@ curl -s 'https://myskme-leaderboard.wzc1020.workers.dev/gf/board?scope=world'  #
 
 **部署前**：游戏里的矿脉榜会显示「连不上矿脉榜 —— 不影响你继续挖」，
 本体功能完全不受影响，化名也已存在本机、联网后自动补交。
+
+---
+
+## 是猴就上100层 · 世界楼榜
+
+猴子榜与词灵榜、矿脉榜完全隔离，使用独立的 `monkey_players` 与 `monkey_runs` 表；表由请求时的
+`monkeyEnsure()` 幂等创建，不改既有迁移。公开读榜不接收原始设备编号，只接受首次登记后返回的
+64 位匿名 `playerToken`，并且只公开化名、两位辨识码与榜单数值。
+
+| 路由 | 方法 | 说明 |
+|---|---|---|
+| `/monkey/board?scope=weekly\|alltime\|effort&limit=&playerToken=` | GET | 本周高度、生涯高度、不白摔三榜；带令牌时返回本人和附近名次 |
+| `/monkey/submit` | POST | `{deviceUUID, alias, run:{runId,height,score,bananas}}`；返回精确 `acceptedRunId` 与匿名令牌 |
+| `/monkey/admin` | POST | 管理员 list / hide / unhide / delete，继续使用 `LB_ADMIN_HASH` |
+
+本周榜按北京时间周一零点换周；生涯榜按最高高度；不白摔榜依次按正式局数、累计米数、最高高度。
+每个 `runId` 与匿名玩家哈希组合成唯一标记，同一局断线重传只更新化名，不重复增加局数或米数。
+客户端会先落本机队列，收到完全相同的 `acceptedRunId` 后才删除；回到在线状态自动补交。
+服务端另设每日 240 次技术上限和数值关系门槛，防止失控重试与明显脏数据。

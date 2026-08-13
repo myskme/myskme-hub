@@ -1,6 +1,6 @@
 # 品牌 API 网关
 
-MYSKME 全生态六个作品的后端调用都经这里转发到 Cloudflare。**Cloudflare 上的 Worker 与
+MYSKME 各作品的后端调用都经这里转发到 Cloudflare。**Cloudflare 上的 Worker 与
 数据库仍是唯一权威数据源——不迁移、不双写**，网关只做转发。
 
 ## 正本在哪
@@ -34,6 +34,7 @@ node deploy/gateway/check-parity.mjs
 | 自鸣棋 · 星灵远征 · 星徒地牢 · 远征录 | `https://myskme.com/api/game` |
 | 词灵对决 | `https://myskme.com/api/quiz/submit` |
 | 灵石远征 | `/api/gf/*`（同源，走 `play.myskme.com` 自己那份） |
+| 是猴就上100层 | `https://myskme.com/api/monkey/*` |
 
 **灵石远征刻意保持同源**：它本来就住在 `play.myskme.com`，用同源地址是最优解，
 改成跨域只会多一层依赖、没有收益。这样一来，灵石远征的手动发布出问题也只影响它自己。

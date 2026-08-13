@@ -25,6 +25,6 @@ export default function onRequest(context) {
     ok: true,
     service: 'myskme-edge-gateway',
     upstream: 'existing-databases',
-    namespaces: ['gf', 'quiz', 'game', 'publish'],
+    namespaces: ['gf', 'monkey', 'quiz', 'game', 'publish'],
   }), { status: 200, headers: headers() });
 }

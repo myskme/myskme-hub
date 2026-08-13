@@ -13,6 +13,9 @@ const ROUTES = new Map([
   ['/gf/month', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/month', methods: new Set(['GET']) }],
   ['/gf/submit', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/submit', methods: new Set(['POST']) }],
   ['/gf/admin', { origin: UPSTREAMS.leaderboard, upstreamPath: '/gf/admin', methods: new Set(['POST']) }],
+  ['/monkey/board', { origin: UPSTREAMS.leaderboard, upstreamPath: '/monkey/board', methods: new Set(['GET']) }],
+  ['/monkey/submit', { origin: UPSTREAMS.leaderboard, upstreamPath: '/monkey/submit', methods: new Set(['POST']) }],
+  ['/monkey/admin', { origin: UPSTREAMS.leaderboard, upstreamPath: '/monkey/admin', methods: new Set(['POST']) }],
   ['/quiz/board', { origin: UPSTREAMS.leaderboard, upstreamPath: '/board', methods: new Set(['GET']) }],
   ['/quiz/factions', { origin: UPSTREAMS.leaderboard, upstreamPath: '/factions', methods: new Set(['GET']) }],
   ['/quiz/hall', { origin: UPSTREAMS.leaderboard, upstreamPath: '/hall', methods: new Set(['GET']) }],
@@ -98,7 +101,7 @@ export default async function onRequest(context) {
   try {
     upstream = await fetch(upstreamUrl, init);
   } catch (_error) {
-    return json({ ok: false, err: '矿脉榜上游暂不可用', offline: true }, 502);
+    return json({ ok: false, err: '榜单上游暂不可用', offline: true }, 502);
   }
 
   const responseHeaders = baseHeaders(

@@ -98,7 +98,17 @@ assert(html.includes('<link rel="manifest" href="./manifest.webmanifest">'), 'PW
 assert(html.includes('<script src="./vendor/qrcode-generator.js"></script>'), '本地二维码模块入口缺失');
 assert(!/<script\s+[^>]*src=["']https?:/i.test(html), '游戏包含外部脚本');
 assert(!/<link\s+[^>]*rel=["']stylesheet/i.test(html), '游戏包含外部样式');
-assert(!/\b(fetch|XMLHttpRequest|WebSocket)\s*\(/.test(html), '游戏包含网络请求');
+// 世界楼榜只准从一个封装出口联网。数调用点而不是搜函数名，避免定义自己满足门禁。
+// 品牌网关是固定正门，客户端不直连 Worker，也不许另开 WebSocket 或 XHR 旁路。
+const FETCH_CALLS = (html.match(/\bfetch\s*\(/g) || []).length;
+assert(FETCH_CALLS === 1 && html.includes('async function worldFetch('), '世界楼榜联网出口必须且只能有一个');
+assert(html.includes("MONKEY_API='https://myskme.com/api/monkey'"), '世界楼榜没有走 MYSKME 品牌网关');
+assert(!/\b(?:XMLHttpRequest|WebSocket)\s*\(/.test(html), '游戏出现未批准的网络旁路');
+assert(html.includes('function queueWorldRun(') && html.includes('function flushWorldQueue(')
+  && html.includes('acceptedRunId!==queued.runId') && html.includes("window.addEventListener('online'"),
+  '世界榜本机先存、精确回执或联网补交链路不完整');
+assert(html.includes('id="recordLine"') && html.includes('personalBestAtStart=IS_TEST_RUN?0:saved.height')
+  && html.includes('state.maxMeters>state.personalBestAtStart'), '上次纪录目标线或越线庆祝不完整');
 assert(!html.includes('l1fr2z'), '仍含随机旧路径');
 assert(!html.includes('myskme.com/fun/monkey'), '仍含已废弃的目录地址');
 assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'PWA 清单或图标声明不完整');

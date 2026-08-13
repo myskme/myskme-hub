@@ -1362,6 +1362,198 @@ async function gfAdmin(req, env, origin) {
   return json({ ok: false, err: "unknown act" }, 400, origin);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   是猴就上100层 · 世界楼榜
+   独立表、独立路由 /monkey/*。三条榜分别量本周最好、生涯最好、
+   以及「不白摔」的累计局数；单局 runId 只记一次，断线重传不会重复加局。
+   ══════════════════════════════════════════════════════════════ */
+const MONKEY_CAP = { height: 500000, score: 10000000, bananas: 1000000 };
+const MONKEY_ALIAS_RE = /^[一-龥A-Za-z0-9·\-_ ]{2,12}$/;
+const MONKEY_SCOPES = new Set(["weekly", "alltime", "effort"]);
+let _monkeyReady = false, _monkeyAdminFails = 0, _monkeyAdminLockUntil = 0;
+
+function monkeyWeekKey(now) {
+  const d = new Date(now + 8 * 3600000);
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return "" + d.getUTCFullYear() + String(d.getUTCMonth() + 1).padStart(2, "0")
+    + String(d.getUTCDate()).padStart(2, "0");
+}
+function monkeyWeekLabel(key) {
+  const m = /^(\d{4})(\d{2})(\d{2})$/.exec(String(key || ""));
+  if (!m) return "本周";
+  const a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  const b = new Date(a.getTime() + 6 * 86400000);
+  return (a.getUTCMonth() + 1) + "月" + a.getUTCDate() + "日-"
+    + (b.getUTCMonth() + 1) + "月" + b.getUTCDate() + "日";
+}
+function monkeyDayKey(now) {
+  return new Date(now + 8 * 3600000).toISOString().slice(0, 10);
+}
+function monkeyCleanRun(body) {
+  const src = body && body.run || body || {};
+  const runId = String(src.runId || "").trim();
+  if (!/^[A-Za-z0-9_-]{8,80}$/.test(runId)) return { ok: false, err: "本局编号无效" };
+  const height = clampInt(src.height, 0, MONKEY_CAP.height);
+  const score = clampInt(src.score, 0, MONKEY_CAP.score);
+  const bananas = clampInt(src.bananas, 0, MONKEY_CAP.bananas);
+  if (score < height || bananas > score) return { ok: false, err: "本局数据关系不成立" };
+  return { ok: true, runId, height, score, bananas };
+}
+function monkeyOrder(scope) {
+  if (scope === "effort") return "runs DESC,total_meters DESC,best_height DESC,alias ASC";
+  if (scope === "weekly") return "week_height DESC,week_score DESC,runs DESC,alias ASC";
+  return "best_height DESC,best_score DESC,runs DESC,alias ASC";
+}
+async function monkeyEnsure(env) {
+  if (_monkeyReady) return;
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS monkey_players (
+       id TEXT PRIMARY KEY, alias TEXT NOT NULL,
+       best_height INTEGER DEFAULT 0, best_score INTEGER DEFAULT 0,
+       week_key TEXT DEFAULT '', week_height INTEGER DEFAULT 0, week_score INTEGER DEFAULT 0,
+       runs INTEGER DEFAULT 0, total_meters INTEGER DEFAULT 0,
+       day_key TEXT DEFAULT '', day_submits INTEGER DEFAULT 0,
+       first_seen TEXT DEFAULT '', last_write INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`
+  ).run();
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS monkey_runs (
+       run_hash TEXT PRIMARY KEY, player_id TEXT NOT NULL, at INTEGER DEFAULT 0)`
+  ).run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_monkey_all ON monkey_players(hidden,best_height,best_score)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_monkey_week ON monkey_players(week_key,hidden,week_height,week_score)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_monkey_effort ON monkey_players(hidden,runs,total_meters)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_monkey_runs_at ON monkey_runs(at)").run();
+  _monkeyReady = true;
+}
+function monkeyMapRow(r) {
+  if (!r) return null;
+  return {
+    rank: Number(r.rank) || 0, alias: r.alias, tag: String(r.id || "").slice(-2),
+    height: Number(r.best_height) || 0, score: Number(r.best_score) || 0,
+    weekHeight: Number(r.week_height) || 0, weekScore: Number(r.week_score) || 0,
+    runs: Number(r.runs) || 0, totalMeters: Number(r.total_meters) || 0,
+  };
+}
+async function monkeyRanked(env, scope, week, id, limit) {
+  const order = monkeyOrder(scope), where = scope === "weekly" ? "hidden=0 AND week_key=?" : "hidden=0";
+  const bindPrefix = scope === "weekly" ? [week] : [];
+  const cte = `WITH ranked AS (
+    SELECT id,alias,best_height,best_score,week_height,week_score,runs,total_meters,
+      ROW_NUMBER() OVER (ORDER BY ${order}) AS rank
+    FROM monkey_players WHERE ${where})`;
+  const top = await env.DB.prepare(`${cte} SELECT * FROM ranked ORDER BY rank LIMIT ?`).bind(...bindPrefix, limit).all();
+  let me = null, nearby = [];
+  if (id) {
+    me = await env.DB.prepare(`${cte} SELECT * FROM ranked WHERE id=?`).bind(...bindPrefix, id).first();
+    if (me) {
+      const lo = Math.max(1, Number(me.rank) - 2), hi = Number(me.rank) + 2;
+      const near = await env.DB.prepare(`${cte} SELECT * FROM ranked WHERE rank BETWEEN ? AND ? ORDER BY rank`).bind(...bindPrefix, lo, hi).all();
+      nearby = (near.results || []).map(monkeyMapRow);
+    }
+  }
+  return { rows: (top.results || []).map(monkeyMapRow), me: monkeyMapRow(me), nearby };
+}
+async function monkeyPlayerId(env, raw) {
+  const dev = String(raw || "");
+  if (dev.length < 12 || dev.length > 120) return "";
+  return sha256("monkey|" + dev + "|" + env.LB_SALT);
+}
+async function monkeyBoard(req, env, origin, url) {
+  await monkeyEnsure(env);
+  const scope = MONKEY_SCOPES.has(url.searchParams.get("scope")) ? url.searchParams.get("scope") : "weekly";
+  const limit = clampInt(url.searchParams.get("limit") || 20, 1, 50);
+  const week = monkeyWeekKey(Date.now());
+  const token = String(url.searchParams.get("playerToken") || "");
+  const id = /^[0-9a-f]{64}$/.test(token) ? token : "";
+  const board = await monkeyRanked(env, scope, week, id, limit);
+  return json({ ok: true, game: "monkey", scope, week, weekLabel: monkeyWeekLabel(week), ...board }, 200, origin);
+}
+async function monkeySubmitReport(env, id, runId, duplicate, origin) {
+  const week = monkeyWeekKey(Date.now());
+  const player = await env.DB.prepare(
+    "SELECT id,alias,best_height,best_score,week_height,week_score,runs,total_meters FROM monkey_players WHERE id=?"
+  ).bind(id).first();
+  const all = await monkeyRanked(env, "alltime", week, id, 1);
+  const weekly = await monkeyRanked(env, "weekly", week, id, 1);
+  const effort = await monkeyRanked(env, "effort", week, id, 1);
+  return json({ ok: true, game: "monkey", acceptedRunId: runId, duplicate, playerToken: id, player: monkeyMapRow(player),
+    ranks: { weekly: weekly.me?.rank || 0, alltime: all.me?.rank || 0, effort: effort.me?.rank || 0 },
+    week, weekLabel: monkeyWeekLabel(week) }, 200, origin);
+}
+async function monkeySubmit(req, env, origin) {
+  if ((env.LB_KILL || "0") === "1") return json({ ok: false, err: "榜单维护中" }, 503, origin);
+  await monkeyEnsure(env);
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false, err: "bad json" }, 400, origin); }
+  const id = await monkeyPlayerId(env, body.deviceUUID);
+  if (!id) return json({ ok: false, err: "缺少匿名设备编号" }, 400, origin);
+  let alias = String(body.alias || "").trim().slice(0, 12);
+  if (!MONKEY_ALIAS_RE.test(alias)) return json({ ok: false, err: "化名需 2-12 位中英文或数字" }, 400, origin);
+  if (hasBlocked(alias)) return json({ ok: false, err: "化名含保留词，请换一个" }, 400, origin);
+  const run = monkeyCleanRun(body);
+  if (!run.ok) return json({ ok: false, err: run.err }, 400, origin);
+  const runHash = await sha256(id + "|" + run.runId), now = Date.now();
+  const duplicate = await env.DB.prepare("SELECT run_hash FROM monkey_runs WHERE run_hash=?").bind(runHash).first();
+  if (duplicate) {
+    // 同一局重传只能更新公开化名，绝不能再增加局数与累计米数。
+    // 这样玩家可以改名，也让断网重试保持真正幂等。
+    await env.DB.prepare("UPDATE monkey_players SET alias=? WHERE id=?").bind(alias, id).run();
+    return monkeySubmitReport(env, id, run.runId, true, origin);
+  }
+
+  const prev = await env.DB.prepare("SELECT day_key,day_submits FROM monkey_players WHERE id=?").bind(id).first();
+  const day = monkeyDayKey(now), daySubmits = prev && prev.day_key === day ? Number(prev.day_submits) || 0 : 0;
+  if (daySubmits >= 240) return json({ ok: false, err: "今日补交过多，请明天再试" }, 429, origin);
+  const week = monkeyWeekKey(now), firstSeen = new Date(now).toISOString().slice(0, 10);
+  const update = env.DB.prepare(
+    `INSERT INTO monkey_players
+      (id,alias,best_height,best_score,week_key,week_height,week_score,runs,total_meters,day_key,day_submits,first_seen,last_write,hidden)
+     SELECT ?,?,?,?,?,?,?,1,?,?,1,?,?,0 WHERE NOT EXISTS (SELECT 1 FROM monkey_runs WHERE run_hash=?)
+     ON CONFLICT(id) DO UPDATE SET
+       alias=excluded.alias,
+       best_height=MAX(monkey_players.best_height,excluded.best_height),
+       best_score=MAX(monkey_players.best_score,excluded.best_score),
+       week_height=CASE WHEN monkey_players.week_key=excluded.week_key THEN MAX(monkey_players.week_height,excluded.week_height) ELSE excluded.week_height END,
+       week_score=CASE WHEN monkey_players.week_key=excluded.week_key THEN MAX(monkey_players.week_score,excluded.week_score) ELSE excluded.week_score END,
+       week_key=excluded.week_key,runs=monkey_players.runs+1,total_meters=monkey_players.total_meters+excluded.total_meters,
+       day_key=excluded.day_key,day_submits=CASE WHEN monkey_players.day_key=excluded.day_key THEN monkey_players.day_submits+1 ELSE 1 END,
+       last_write=excluded.last_write`
+  ).bind(id, alias, run.height, run.score, week, run.height, run.score, run.height, day, firstSeen, now, runHash);
+  const marker = env.DB.prepare("INSERT OR IGNORE INTO monkey_runs(run_hash,player_id,at) VALUES(?,?,?)").bind(runHash, id, now);
+  await env.DB.batch([update, marker]);
+  if (now % 31 === 0) {
+    try { await env.DB.prepare("DELETE FROM monkey_runs WHERE at<?").bind(now - 90 * 86400000).run(); } catch (e) {}
+  }
+  return monkeySubmitReport(env, id, run.runId, false, origin);
+}
+async function monkeyAdmin(req, env, origin) {
+  if (Date.now() < _monkeyAdminLockUntil) return json({ ok: false, err: "尝试过多，请稍后" }, 429, origin);
+  await monkeyEnsure(env);
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false }, 400, origin); }
+  if (await sha256(String(body.pw || "")) !== env.LB_ADMIN_HASH) {
+    if (++_monkeyAdminFails >= 8) { _monkeyAdminLockUntil = Date.now() + 60000; _monkeyAdminFails = 0; }
+    return json({ ok: false, err: "密码不正确" }, 403, origin);
+  }
+  _monkeyAdminFails = 0;
+  const act = String(body.action || "");
+  if (act === "list") {
+    const rows = await env.DB.prepare("SELECT id,alias,best_height,best_score,runs,total_meters,hidden FROM monkey_players ORDER BY best_height DESC LIMIT 300").all();
+    return json({ ok: true, rows: rows.results || [] }, 200, origin);
+  }
+  if (act === "hide" || act === "unhide") {
+    await env.DB.prepare("UPDATE monkey_players SET hidden=? WHERE id=?").bind(act === "hide" ? 1 : 0, String(body.id || "")).run();
+    return json({ ok: true }, 200, origin);
+  }
+  if (act === "delete") {
+    const id = String(body.id || "");
+    await env.DB.batch([env.DB.prepare("DELETE FROM monkey_players WHERE id=?").bind(id), env.DB.prepare("DELETE FROM monkey_runs WHERE player_id=?").bind(id)]);
+    return json({ ok: true }, 200, origin);
+  }
+  return json({ ok: false, err: "unknown action" }, 400, origin);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -1379,7 +1571,10 @@ export default {
       if (p === "/gf/month" && request.method === "GET") return await gfMonth(request, env, origin, url);
       if (p === "/gf/submit" && request.method === "POST") return await gfSubmit(request, env, origin);
       if (p === "/gf/admin" && request.method === "POST") return await gfAdmin(request, env, origin);
-      if (p === "/") return json({ ok: true, name: "名人天梯 · 词灵榜", v: 4, games: ["wordduel", "gemfall"], season: await getSeason(env) }, 200, origin);
+      if (p === "/monkey/board" && request.method === "GET") return await monkeyBoard(request, env, origin, url);
+      if (p === "/monkey/submit" && request.method === "POST") return await monkeySubmit(request, env, origin);
+      if (p === "/monkey/admin" && request.method === "POST") return await monkeyAdmin(request, env, origin);
+      if (p === "/") return json({ ok: true, name: "MYSKME 排行榜", v: 5, games: ["wordduel", "gemfall", "monkey"], season: await getSeason(env) }, 200, origin);
       return json({ ok: false, err: "not found" }, 404, origin);
     } catch (e) {
       console.error("LB worker error:", e && e.stack || e);
