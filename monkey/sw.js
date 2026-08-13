@@ -1,4 +1,4 @@
-const CACHE='myskme-monkey-20260813-2';
+const CACHE='myskme-monkey-20260813-3';
 const CORE=['./','./index.html','./manifest.webmanifest','./vendor/qrcode-generator.js','./icons/monkey-100.svg','./icons/monkey-100-180.png','./icons/monkey-100-192.png','./icons/monkey-100-512.png','./icons/monkey-100-maskable-512.png'];
 
 // 安装时必须用 cache:'reload' 绕开浏览器自己的 HTTP 缓存。

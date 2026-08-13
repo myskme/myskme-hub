@@ -2,12 +2,24 @@
 <defs>
 <symbol id="art-snake" viewBox="0 0 120 100">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 82 Q25 61 48 70 Q67 77 60 88 Q48 99 29 88 M57 73 Q80 67 81 46" fill="none" stroke="#2f5148" stroke-width="12"/>
-            <path d="M12 82 Q25 61 48 70 Q67 77 60 88 Q48 99 29 88 M57 73 Q80 67 81 46" fill="none" stroke="#77b879" stroke-width="7"/>
-            <ellipse cx="83" cy="39" rx="18" ry="16" fill="#77b879"/><ellipse cx="76" cy="36" rx="4" ry="5.5" fill="#fffdf6"/><ellipse cx="88" cy="36" rx="4" ry="5.5" fill="#fffdf6"/>
-            <circle cx="77" cy="37" r="2" fill="#2f5148" stroke="none"/><circle cx="89" cy="37" r="2" fill="#2f5148" stroke="none"/>
-            <path d="M96 46 Q106 49 109 45 M109 45 L114 41 M109 45 L115 49" stroke="#d75d51" stroke-width="2.4"/>
-            <path d="M69 23 Q82 14 96 22 L94 27 Q82 21 71 29 Z" fill="#2f5148" stroke-width="2.5"/><rect x="76" y="11" width="13" height="10" rx="3" fill="#2f5148" stroke-width="2"/>
+            <path d="M80 70 Q103 63 99 45" fill="none" stroke-width="14"/>
+            <path d="M80 70 Q103 63 99 45" fill="none" stroke="#6fb87b" stroke-width="9"/>
+            <path d="M44 15 Q69 15 76 34 Q80 48 72 55 Q74 65 94 62 Q100 68 99 77 Q97 91 72 94 Q46 97 31 88 Q20 82 21 72 Q22 63 26 58 Q20 52 15 45 Q10 26 25 17 Q33 15 44 15 Z" fill="#6fb87b"/>
+            <path d="M83 65 Q90 70 92 78" fill="none" stroke-width="1.7" opacity=".26"/>
+            <path d="M19 32 Q16 41 19 50" fill="none" stroke-width="1.6" opacity=".28"/>
+            <path d="M34 27 Q42 25 50 27 Q62 29 68 38 Q71 48 63 55 Q69 61 78 67 Q85 74 80 82 Q73 88 56 88 Q42 87 36 79 Q32 71 37 65 Q41 60 34.5 55 Q26 48 24 40 Q23 29 34 27 Z" fill="#fff5d1" stroke-width="2.4"/>
+            <path d="M58 68 Q64 68 64.8 76 Q65.5 84 58 84 Q50.5 84 51.2 76 Q52 68 58 68 Z" fill="#ffe9b8" stroke-width="2" stroke-opacity=".6"/>
+            <ellipse cx="35" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-14 35 41)"/>
+            <ellipse cx="57" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(14 57 41)"/>
+            <circle cx="33.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="55.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/>
+            <ellipse cx="30" cy="48" rx="6.2" ry="3.7" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="62" cy="48" rx="6.2" ry="3.7" fill="#ee9f9a" stroke="none" opacity=".8"/>
+            <path d="M40.5 53 Q46 57.5 51.5 53" fill="none" stroke-width="2.4"/>
+            <path d="M46 55.5 L46 58.5 M46 58.5 L43.2 61 M46 58.5 L48.8 61" fill="none" stroke="#d75d51" stroke-width="2.2"/>
+            <g transform="rotate(-8 46 16)">
+              <ellipse cx="46" cy="16" rx="22" ry="4.8" fill="#2f5148"/>
+              <path d="M35.5 16 L35.5 6 Q35.5 3 40.5 3 L51.5 3 Q56.5 3 56.5 6 L56.5 16 Z" fill="#2f5148"/>
+              <path d="M36.5 12.4 L55.5 12.4" fill="none" stroke="#e0452c" stroke-width="4" stroke-linecap="butt"/>
+            </g>
           </g>
         </symbol>
 </defs>
