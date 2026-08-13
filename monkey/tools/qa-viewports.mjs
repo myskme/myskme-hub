@@ -32,7 +32,9 @@ const ROOT = path.resolve(HERE, '..');
 // 视口清单。**每一条都要写清楚它代表什么**，否则下一个人会以为是随手挑的数字，
 // 然后在某次「顺手清理」里把最小的那个删掉——而最小的那个正是唯一会出事的那个。
 const VIEWPORTS = [
-  { w: 320, h: 568, note: 'iPhone SE 一代 / 5s，课堂上最旧的一档，也是唯一真正紧张的一档' },
+  { w: 320, h: 568, note: 'iPhone SE 一代 / 5s，课堂上最旧的一档' },
+  { w: 375, h: 553, note: 'iPhone SE2/8 在 Safari 里露着地址栏时的真实可视高度 —— 比 320x568 更紧，也更常见' },
+  { w: 360, h: 640, note: '安卓小屏' },
   { w: 360, h: 800, note: '安卓主流' },
   { w: 390, h: 844, note: 'iPhone 12/13/14，本作的设计基准' },
   { w: 430, h: 932, note: 'iPhone 15 Pro Max' },
@@ -110,4 +112,4 @@ if (failed) {
   console.log('而只在 390x844 跑自检是看不见的（0813 的世界楼榜退出键就是这么漏掉的）。');
   process.exit(1);
 }
-console.log('五个视口全部通过。');
+console.log(VIEWPORTS.length + ' 个视口全部通过。');

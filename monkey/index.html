@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.9-nav-humane">
+<meta name="myskme-release" content="20260813.10-reach-and-gates">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -220,10 +220,23 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .tea-order{border:2px solid var(--ink);border-radius:12px;background:#f3ece0;padding:8px 10px;margin:0 0 11px;
   font:900 10px/1.45 var(--sans)}
 .tea-order b{color:var(--teal);font-size:9px;letter-spacing:.08em;display:block;margin-bottom:3px}
-.screen{position:absolute;z-index:60;inset:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:calc(var(--safe-top) + 18px) 22px calc(var(--safe-bottom) + 18px);
+/* 兜底能滚。**单屏是优化，不是硬约束**——放不下的时候必须还能够得着，
+   否则「放不下」就变成「出不去」。0813 巡查实测：手机横过来（844x390）时
+   首页的「单猴挑战，立即上楼」整颗被裁在卡片外，玩家开不了局；
+   进了称号墙/奶茶图鉴更糟——关闭键在屏外，触屏没有 Esc 的等价物，
+   八条出路试了一遍只有键盘 Esc 有效，也就是手机上**只能刷新页面**。
+   overflow-y:auto 在内容装得下时和 hidden 完全一样（不出滚动条、滚不动），
+   只有装不下时才多给一条出路，所以竖屏的观感一点没变。
+   竖屏「不需要滚」这件事由 measureMenuOverflow + qa-viewports.mjs 保证，
+   不靠把滚动关掉来假装。 */
+.screen{position:absolute;z-index:60;inset:0;display:flex;flex-direction:column;justify-content:center;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(var(--safe-top) + 18px) 22px calc(var(--safe-bottom) + 18px);
   background:rgba(250,243,226,.94);backdrop-filter:blur(5px);transition:opacity .24s,visibility .24s}
 .screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.card{position:relative;width:100%;max-height:100%;overflow:hidden;background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(40,33,26,.22);padding:20px}
+/* 滚动条藏起来：装得下时本来就不会出现，装不下时也不想让它破坏这套手绘观感。
+   藏的是滚动条，不是滚动能力——手指照样能拖。 */
+.screen,.card{scrollbar-width:none}
+.screen::-webkit-scrollbar,.card::-webkit-scrollbar{width:0;height:0}
+.card{position:relative;width:100%;max-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(40,33,26,.22);padding:20px}
 .notice-no{position:absolute;right:12px;top:7px;background:var(--red);color:white;border:2.5px solid var(--ink);border-radius:999px;
   padding:4px 11px;font-size:10px;font-weight:1000;transform:rotate(4deg)}
 .eyebrow{font-size:10px;color:var(--muted);font-weight:1000;letter-spacing:.24em;text-align:center}
@@ -364,7 +377,10 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
    而首页会随档案变高：称号佩戴上、奶茶喝上、意外与窗景收满，文案就变长。
    满档案时实测卡片内容 560px、可见 520px——**溢出的 40px 不是能滚，是直接看不见**
    （卡片 overflow:hidden），玩家会以为最高分那一行没了。 */
-@media(max-height:620px){
+/* 断点写在这里，**只写这一处**。JS 那边靠下面这个 --compact-result 变量读它，
+   不再各写一个数字——同一个断点抄两份，迟早一边改了另一边没改。 */
+@media(max-height:700px){
+  :root{--compact-result:1}
   .title-art{width:62px;height:54px}h1{font-size:23px}.subtitle{font-size:9px;margin-bottom:4px}
   .career{padding:5px 8px;margin-bottom:4px}.career strong{font-size:17px}
   .mission-card,.kit-grid,.brief{margin-bottom:4px}.mission-card,.brief{padding:5px 7px}
@@ -372,6 +388,17 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
   .btn{padding:9px 12px}.btn-row{margin-top:5px}.best-row{margin-top:4px}
   .seg-tabs{margin-top:8px}.seg-tab{padding:7px 3px}
   .titles-list,.tea-list{gap:5px;margin-bottom:7px}.screen-note{margin-bottom:7px}
+  /* 「本局档案」这一页的内容是随本局战果变的，矮屏上最容易撑爆。
+     这里收的全是**装饰性**的余量：品牌块整块收起（那句会员梗在结算第 1 页的语气里已经有了）、
+     到访部门那段行距收紧、新奶茶的杯子画小一点。真正的信息一条没少。 */
+  #resultScreen .brand-box{display:none}
+  .visited{font-size:10px;line-height:1.5;padding:7px 9px;margin-bottom:7px}
+  .mission-result{padding:6px 9px;margin-bottom:7px}
+  .honor-fresh,.tea-order{padding:6px 9px;margin-bottom:7px}
+  .tea-fresh{gap:6px;margin-top:4px}.tea-fresh svg{width:30px;height:30px}
+  /* 图鉴与榜单在 375x553 这类「带地址栏的 SE2」上还差最后几像素。 */
+  .tea-card,.title-card{padding:6px 8px}.rank-list li{padding:5px 8px}.pager{margin-top:5px}
+  #resultScreen .screen-title{font-size:21px;margin:0 0 3px}
 }
 @media(max-width:699px){
   #gameShell{width:min(100vw,460px);height:100vh;height:min(100svh,calc(min(100vw,460px) * 2.5));max-height:none;border-inline:0;box-shadow:none}
@@ -796,7 +823,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.9-nav-humane',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.10-reach-and-gates',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1049,6 +1076,14 @@ let titlePage=0,teaPage=0,rankPage=0,resultPage=0;
 const WORLD_DEVICE_KEY='myskme_monkey_device_v1',WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1',WORLD_PENDING_KEY='myskme_monkey_pending_v1',WORLD_TOKEN_KEY='myskme_monkey_player_token_v1';
 const CULTURE_BAG_KEY='myskme_monkey_culture_bag_v1',CULTURE_LAST_KEY='myskme_monkey_culture_last_v1';
 let worldScope='weekly',worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false},worldBoardSeq=0,worldSyncPromise=null,worldSyncMessage='';
+// 服务端 400 是**永久退回**（比如化名撞上保留词），换成什么网络都不会好。
+// 0813 巡查抓到的现场：用「李老师」登记，客户端放行、服务端每次 400，
+// 队列一局一局堆上去，而界面只写「待联网」——玩家以为是网不好，其实永远传不上去。
+// 原因是 worldSyncMessage 会被 loadWorldBoard 清空（打开榜单就冲掉了），
+// 所以这里单独存一个**不会被清掉**的理由。
+// 注意：故意**不**在客户端抄一份服务端的保留词表——那就是一份必然过期的镜像。
+// 客户端要做的不是猜服务端的规则，是**如实转述服务端的回答**。
+let worldBlockedReason='';
 
 function loadRecord(){
   try{return {height:Number(localStorage.getItem('myskme_monkey_upstairs_height'))||0,score:Number(localStorage.getItem('myskme_monkey_upstairs_score'))||0};}
@@ -1113,6 +1148,8 @@ async function worldFetch(path,options={}){
 }
 function updateWorldStatus(){
   if(!el.worldStatus)return;const pending=pendingWorldCount(),suffix=pending?` · 待补交 ${pending} 局`:'';
+  // 永久退回优先显示，而且它不会被 loadWorldBoard 清掉——「待联网」会骗人，这条不会。
+  if(worldBlockedReason){el.worldStatus.textContent=`登记被退回：${worldBlockedReason}。换个化名再试。`+suffix;return;}
   if(worldSyncMessage){el.worldStatus.textContent=worldSyncMessage+suffix;return;}
   const me=worldBoard.me;if(worldBoard.connected&&me){const metric=worldScope==='weekly'?`${me.weekHeight} 米`:worldScope==='alltime'?`${me.height} 米`:`${me.runs} 局`;el.worldStatus.textContent=`你目前第 ${me.rank} 名 · ${metric}${suffix}`;return;}
   el.worldStatus.textContent=(worldBoard.connected?'榜单已接通。登记一局后，这里会出现你的附近名次。':'网络暂时没接上，先显示本机候补。')+suffix;
@@ -1122,13 +1159,37 @@ async function flushWorldQueue(){
   worldSyncPromise=(async()=>{
     if(!worldEnabled()||!navigator.onLine)return false;
     worldSyncMessage='正在补交本机成绩';updateWorldStatus();
+    // 一条卡住的记录不许把整个队列堵死。0813 巡查实测：第一局被退回之后，
+    // 后面两局**一个请求都没发过**，却都躺在待补交里——玩家看到「待补交 3 局」，
+    // 实际上只有第一局在反复撞墙。
+    // 但也不能见 400 就丢：化名撞保留词时**每一条都会 400**，丢光等于把成绩全扔了。
+    // 判据：先把每条都试一遍；**只有在至少有一条成功过**（证明化名本身没问题）时，
+    // 才把那些被永久退回的单独丢掉。全军覆没就一条都不丢，留着等玩家改名。
+    let anyAccepted=false;const rejected=[];
     for(const queued of loadWorldPending()){
       try{
         const data=await worldFetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceUUID:worldDeviceId(),alias:worldAlias(),run:queued})});
         if(data.acceptedRunId!==queued.runId)throw new Error('榜单回执与本局不一致');
         if(data.playerToken)worldStorageSet(WORLD_TOKEN_KEY,data.playerToken);
+        anyAccepted=true;worldBlockedReason='';
         saveWorldPending(loadWorldPending().filter(row=>row.runId!==queued.runId));
-      }catch(error){worldSyncMessage=error.status===400?`登记被退回：${error.message}`:'网络未完成，成绩仍在本机排队';updateWorldStatus();return false;}
+      }catch(error){
+        if(error.status===400){
+          rejected.push(queued.runId);
+          // 永久退回：记进不会被冲掉的字段，并且当场 toast 一次——
+          // 只写进 #worldStatus 的话，玩家一点开榜单就被 loadWorldBoard 冲掉了。
+          worldBlockedReason=error.message||'登记被退回';
+          toast(`世界楼榜退回了这个化名：${worldBlockedReason}。换一个再登记。`,'red');
+        }
+        worldSyncMessage=error.status===400?`登记被退回：${error.message}`:'网络未完成，成绩仍在本机排队';
+        updateWorldStatus();
+        // 永久退回就换下一条继续试；网络级失败才停这一趟（继续试也是白试）。
+        if(error.status===400)continue;
+        return false;}
+    }
+    if(anyAccepted&&rejected.length){
+      // 化名没问题却还是被退回的那几条，是记录本身有毛病，留着只会永远堵在队首。
+      saveWorldPending(loadWorldPending().filter(row=>!rejected.includes(row.runId)));
     }
     worldSyncMessage='补交完成';updateWorldStatus();return true;
   })().finally(()=>{worldSyncPromise=null;setTimeout(()=>{if(worldSyncMessage==='补交完成'){worldSyncMessage='';updateWorldStatus();}},1600);});
@@ -1887,10 +1948,18 @@ function renderTitlesScreen(){
 }
 function openTitles(){unlockAudio();const index=HONORS.findIndex(h=>h.id===career.worn);titlePage=index>=0?Math.floor(index/TITLE_PAGE_SIZE):0;renderTitlesScreen();el.titlesClose.textContent=menuBackLabel('看完了，继续上楼');hideMenuScreens();el.titles.classList.remove('hidden');}
 function closeTitles(){el.titles.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else showTitleScreen();}
+// 矮屏上「本局档案」这一页少展示几条。**少展示不等于少解锁**——
+// 详情一直都在称号墙/奶茶图鉴里，「另有 N 个已收入」这句话原本就在，这里只是让 N 大一点。
+// 320x568 实测：满内容这一页要 574px，而卡片只有 520px，溢出的部分是**看不见**的
+// （卡片 overflow:hidden），首当其冲被裁掉的正是常驻的「再来一局」。
+// 判据从 CSS 里读，不在这里再写一遍断点数字（见 --compact-result 那条媒体查询）。
+function compactResult(){
+  return getComputedStyle(document.documentElement).getPropertyValue('--compact-result').trim()==='1';
+}
 function renderFreshHonors(fresh){
   if(!fresh.length){el.freshHonors.classList.add('is-hidden');el.freshHonors.innerHTML='';return;}
   el.freshHonors.classList.remove('is-hidden');
-  const shown=fresh.slice(0,2);
+  const shown=fresh.slice(0,compactResult()?1:2);
   el.freshHonors.innerHTML=`<b>人事部临时下发 ${fresh.length} 个称号</b>`+shown.map(h=>`${escapeHTML(h.name)}<em>${escapeHTML(h.line)}</em>`).join('')
     +(fresh.length>shown.length?`<em>另有 ${fresh.length-shown.length} 个已收入称号墙。</em>`:'');
   toast(`新称号：${fresh[0].name}`,'gold');sfx('mission');
@@ -2040,7 +2109,7 @@ function renderFreshTeas(fresh){
       :`<b>本局茶水间</b>一杯都没点上。茶水间表示理解。`;
     return;
   }
-  const shown=fresh.slice(-3);
+  const shown=fresh.slice(compactResult()?-2:-3);
   el.teaOrder.innerHTML=`<b>茶水间新出 ${fresh.length} 杯</b>`
     +`<div class="tea-fresh">${shown.map(t=>`${teaCupSvg(t,40)}<span>${escapeHTML(t.name)}</span>`).join('')}</div>`
     +(fresh.length>shown.length?`<span>另有 ${fresh.length-shown.length} 杯已收入图鉴。</span>`:'');
@@ -2124,6 +2193,23 @@ function drawPosterMotif(c,motif,x,y,w,h){
   else{for(const [cx,cy] of [[32,28],[145,70]]){c.beginPath();c.moveTo(cx,cy-17);c.lineTo(cx+17,cy);c.lineTo(cx,cy+17);c.lineTo(cx-17,cy);c.closePath();c.stroke();}c.lineWidth=5;c.globalAlpha=.48;c.beginPath();c.moveTo(0,58);for(let i=0;i<6;i++)c.quadraticCurveTo(15+i*30,44,30+i*30,58);c.stroke();}
   c.restore();
 }
+// 二维码是拿来扫的，颜色是**约束不是装饰**。
+// 0813 巡查实测：夜班版的模块色 #fff4d5（浅奶油）画在 #fffaf0（近白）上，
+// 对比度 1.06:1，灰度只差 4/255——肉眼看得见图案，手机一扫什么都没有。出现率 5.5%。
+// 根因是「纸色写死、墨色跟着版式走」：一个是常量、一个是镜像，迟早对不上。
+// 所以这里**不枚举例外**，而是算一遍对比度、不够就换深色——以后新加版式自动受保护。
+function srgbChannel(v){const n=v/255;return n<=.04045?n/12.92:Math.pow((n+.055)/1.055,2.4);}
+function relativeLuminance(hex){
+  const h=hex.replace('#','');const to=i=>parseInt(h.length===3?h[i]+h[i]:h.slice(i*2,i*2+2),16);
+  return .2126*srgbChannel(to(0))+.7152*srgbChannel(to(1))+.0722*srgbChannel(to(2));
+}
+function contrastRatio(a,b){const x=relativeLuminance(a),y=relativeLuminance(b);
+  return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+// 4.5 是 WCAG 的正文对比度门槛，拿来当「扫得出来」的下限足够保守。
+const QR_MIN_CONTRAST=4.5;
+function posterQrInk(variant,paper){
+  return contrastRatio(variant.ink,paper)>=QR_MIN_CONTRAST?variant.ink:'#28211a';
+}
 function drawPosterQr(c,url,x,y,size,ink,paper){
   if(typeof qrcode!=='function')return 0;const qr=qrcode(0,'Q');qr.addData(url);qr.make();const n=qr.getModuleCount(),quiet=4,cell=size/(n+quiet*2);c.fillStyle=paper;c.fillRect(x,y,size,size);c.fillStyle=ink;for(let row=0;row<n;row++)for(let col=0;col<n;col++)if(qr.isDark(row,col))c.fillRect(x+(col+quiet)*cell,y+(row+quiet)*cell,Math.ceil(cell+.15),Math.ceil(cell+.15));return n;
 }
@@ -2141,7 +2227,7 @@ async function buildPoster(){
   c.textAlign='center';c.fillStyle=variant.ink;c.font='1000 162px system-ui,sans-serif';c.fillText(String(floors),540,690);c.font='900 35px system-ui,sans-serif';c.fillText('层',540,744);
   const stats=[['总分',state.score],['香蕉',state.bananas],['最高连跳',state.maxFlow],['意外',state.surpriseCount]];stats.forEach(([label,value],i)=>{const x=92+i*226;roundRectPath(c,x,786,198,118,20);c.fillStyle=dark?'#3a342d':'rgba(255,255,255,.55)';c.fill();c.strokeStyle=variant.ink;c.lineWidth=3;c.stroke();c.fillStyle=variant.accent;c.font='900 42px system-ui,sans-serif';c.textAlign='center';c.fillText(String(value),x+99,842);c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText(label,x+99,878);});
   const surprise=SURPRISES[Math.floor(randomUnit()*SURPRISES.length)];roundRectPath(c,92,936,610,250,24);c.fillStyle=dark?'#39332b':'rgba(255,255,255,.56)';c.fill();c.strokeStyle=variant.accent;c.lineWidth=4;c.stroke();c.textAlign='left';c.fillStyle=variant.accent;c.font='900 25px system-ui,sans-serif';c.fillText(`本次随机批注 · ${motif.name}`,126,988);c.fillStyle=variant.ink;c.font='800 31px "Songti SC",serif';wrapCanvasText(c,variant.line,126,1042,530,45,2);c.font='700 23px system-ui,sans-serif';c.globalAlpha=.78;wrapCanvasText(c,`海报附带：${surprise.text}`,126,1133,530,34,2);c.globalAlpha=1;
-  const shareUrl=`https://monkey.myskme.com/?from=poster&mark=${encodeURIComponent(posterMark)}&s=${variant.id}&m=${CULTURE_MOTIFS.indexOf(motif).toString(36)}`;const modules=drawPosterQr(c,shareUrl,746,944,242,variant.ink,dark?'#fffaf0':'#fffdf6');
+  const shareUrl=`https://monkey.myskme.com/?from=poster&mark=${encodeURIComponent(posterMark)}&s=${variant.id}&m=${CULTURE_MOTIFS.indexOf(motif).toString(36)}`;const qrPaper=dark?'#fffaf0':'#fffdf6';const modules=drawPosterQr(c,shareUrl,746,944,242,posterQrInk(variant,qrPaper),qrPaper);
   c.textAlign='center';c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText('扫码来挑战',867,1217);{const cup=currentCup();if(cup){c.fillStyle=variant.accent;c.font='800 19px system-ui,sans-serif';c.fillText(fitCanvasLine(c,'手里端着：'+cup.name,600),397,1232);}}
   c.fillStyle=variant.ink;c.font='700 17px system-ui,sans-serif';c.globalAlpha=.7;c.fillText('图片为本机生成，不代表云端认证',540,1265);c.fillText('monkey.myskme.com',540,1300);c.globalAlpha=1;
   posterQrModules=modules;return cv.toDataURL('image/jpeg',.91);
@@ -2265,7 +2351,27 @@ function measureMenuOverflow(){
     if(over>0)bad.push(`${label} 超出 ${over}px`);
   };
   renderCareer();probe(el.title,'首页');
+  // 结算三页必须**按打完一局的样子**量。0813 巡查抓到的盲区：
+  // ?qa=1 是「一局都还没打过」的状态，deathLine / visitedDepartments / missionResult /
+  // freshHonors / teaOrder 全是空的，量出来当然不溢出——而真打一局之后，
+  // 320x568（就在 qa-viewports 的清单里）第一局结算第 2 页会超出 42px，
+  // 裁掉的正是常驻的「再来一局 / 生成成绩海报」。
+  // 首局最容易撑爆，因为 freshHonors 与新奶茶只在**首次解锁**时出现，档案越空越多。
+  const resultBackup=new Map();
+  for(const id of ['deathLine','resultSub','visitedDepartments','missionResult','teaOrder','resultSlogan'])
+    resultBackup.set(id,$(id).innerHTML);
+  const honorBackup={html:el.freshHonors.innerHTML,hidden:el.freshHonors.classList.contains('is-hidden')};
+  $('deathLine').textContent=DEATH_LINES.reduce((a,b)=>b.length>a.length?b:a);
+  $('resultSub').textContent='新纪录已盖章。旧纪录已被调去别的部门，没有留下联系方式。';
+  $('visitedDepartments').textContent='本局到访：'+DEPARTMENTS.map(d=>d.name).join('、')
+    +`。本局窗景：${CULTURE_MOTIFS.reduce((a,b)=>b.name.length>a.name.length?b:a).name}。`
+    +'最高连跳 20，险落 99 次，随机意外 13 个，鱼式上顶约 20 米。';
+  $('missionResult').innerHTML='<b>轮值未完成</b>本局 0/2。任务不扣分，只负责再来一局。';
+  $('resultSlogan').textContent=SLOGANS.reduce((a,b)=>b.length>a.length?b:a);
+  renderFreshHonors(HONORS.slice(0,4));renderFreshTeas(TEAS.slice(0,5));
   for(let i=0;i<3;i+=1)probe(el.result,`结算第${i+1}页`,()=>showResultPage(i));
+  for(const [id,html] of resultBackup)$(id).innerHTML=html;
+  el.freshHonors.innerHTML=honorBackup.html;el.freshHonors.classList.toggle('is-hidden',honorBackup.hidden);
   for(let p=0;p<Math.ceil(HONORS.length/TITLE_PAGE_SIZE);p+=1)probe(el.titles,`称号墙第${p+1}页`,()=>{titlePage=p;renderTitlesScreen();});
   for(let p=0;p<Math.ceil(TEAS.length/TEA_PAGE_SIZE);p+=1)probe(el.teas,`奶茶第${p+1}页`,()=>{teaPage=p;renderTeaScreen();});
   // 世界楼榜这一屏原来漏在门禁外面，于是 320x568 上「别人的化名太长把退出键裁掉」
@@ -2387,6 +2493,11 @@ function runQA(){
       state.bonus=keep.bonus;state.goldRisks=keep.risks;state.nearMisses=keep.near;state.flow=keep.flow;
       state.lastLandingAt=keep.last;state.player.y=keep.y;state.player.vy=keep.vy;state.seen=keep.seen;
       return ok;})()],
+    ['六款海报的二维码都扫得出来（对比度不低于 4.5）',(()=>{
+      // 数模块个数拦不住任何配色错误——夜班版模块数一直是 41，照样扫不出来。
+      // 这里量的是**真正画上去的那两个颜色**，不是版式表里写的那个。
+      return POSTER_VARIANTS.every(v=>{const paper=v.id==='night'?'#fffaf0':'#fffdf6';
+        return contrastRatio(posterQrInk(v,paper),paper)>=QR_MIN_CONTRAST;});})()],
     ['奶茶图鉴完整且无重号',TEAS.length>=20&&new Set(TEAS.map(t=>t.id)).size===TEAS.length&&TEAS.every(t=>typeof t.test==='function'&&t.name&&t.note&&t.liquid&&t.pearl)],
     ['奶茶与称号的解锁条件不重叠',(()=>{const h=new Set(HONORS.map(x=>x.id));return TEAS.every(t=>!h.has(t.id));})()],
     ['杯子画得出来且是自包含 SVG',(()=>{const m=teaCupSvg(TEAS[0],40);return m.startsWith('<svg')&&m.includes(TEAS[0].liquid)&&!/href=|<image/.test(m);})()],
