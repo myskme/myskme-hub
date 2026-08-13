@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.7-world-goals">
+<meta name="myskme-release" content="20260813.8-world-windows">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -498,6 +498,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <symbol id="art-crate" viewBox="0 0 90 90"><g stroke="#2f5148" stroke-width="3" stroke-linejoin="round"><path d="M20 18 Q45 7 70 18 L66 26 Q45 19 24 26 Z" fill="#e8dfcc"/><rect x="18" y="29" width="54" height="49" rx="8" fill="#c8a66c"/><path d="M18 45 L72 45 M31 29 L31 78 M59 29 L59 78" opacity=".5"/><rect x="25" y="49" width="40" height="14" rx="6" fill="#f1bd3c" stroke-width="2.2"/><text x="45" y="59.5" text-anchor="middle" font-size="8" font-weight="700" fill="#2f5148" stroke="none">MYSKME</text></g></symbol>
       </defs>
       <rect id="bgMood" width="390" height="844" fill="#faf3e2"/>
+      <g id="worldWindow" aria-hidden="true"></g>
       <rect class="paper-dots" width="390" height="844" fill="url(#halftone)"/>
       <g id="buildingBack">
         <path class="wall" d="M0 0 H59 Q68 118 59 228 T61 456 T58 680 T62 844 H0 Z"/>
@@ -745,7 +746,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.7-world-goals',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.8-world-windows',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -761,7 +762,7 @@ syncViewportMode();window.addEventListener('resize',syncViewportMode,{passive:tr
 const el={
   shell:$('gameShell'),stage:$('stage'),platformLayer:$('platformLayer'),itemLayer:$('itemLayer'),playerGroup:$('playerGroup'),motion:$('monkeyMotion'),monkey:$('monkeyUse'),wrapLeft:$('playerWrapLeft'),wrapRight:$('playerWrapRight'),wrapLeftMotion:$('monkeyWrapLeftMotion'),wrapRightMotion:$('monkeyWrapRightMotion'),wrapLeftUse:$('monkeyWrapLeftUse'),wrapRightUse:$('monkeyWrapRightUse'),
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
-  bg:$('bgMood'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
+  bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
   start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultPager:$('resultPager'),
@@ -817,6 +818,29 @@ const SECRET_METERS=[
   {at:1314,text:'1314 米：驴表示这段路有点长。'},
   {at:2026,text:'2026 米：加盖工程部发现年份也能当楼层。'}
 ];
+// 世界窗景只改变气氛，不改变任何数值。八种视觉传统共用同一套轻线条画法，
+// 避免把文化做成贴纸或刻意解释的梗；正式局用洗牌袋轮换，一轮看完前不重复。
+const CULTURE_MOTIFS=[
+  {id:'jiangnan',name:'江南雨窗',line:'雨落在窗外，楼还在往上。',kind:'rain',sky:'#dcebe4',ink:'#4f7f75',accent:'#91b9a9'},
+  {id:'nordic',name:'北欧薄暮',line:'天色很慢，猴先生没有。',kind:'nordic',sky:'#dfe7ed',ink:'#526b7c',accent:'#aabccc'},
+  {id:'silkroad',name:'丝路晨光',line:'风从很远的地方来，流程仍在本楼。',kind:'dunes',sky:'#f1e4c9',ink:'#8a684c',accent:'#d7aa69'},
+  {id:'mediterranean',name:'地中海午后',line:'窗外有海，楼内仍然没有电梯。',kind:'arches',sky:'#e2edf0',ink:'#47778b',accent:'#d08362'},
+  {id:'washi',name:'和纸月夜',line:'月亮很圆，路线不一定。',kind:'moon',sky:'#ece8df',ink:'#5f665e',accent:'#c68173'},
+  {id:'bauhaus',name:'包豪斯清晨',line:'形状各有职责，猴先生暂时没有。',kind:'geometry',sky:'#eee9dc',ink:'#3e5664',accent:'#c45442'},
+  {id:'andes',name:'安第斯风带',line:'山在远处，目标线在近处。',kind:'mountains',sky:'#e5e8df',ink:'#5c7465',accent:'#b47b57'},
+  {id:'indigo',name:'靛蓝鼓点',line:'节拍从窗边经过，落脚要自己负责。',kind:'rhythm',sky:'#e3e6ec',ink:'#3f506e',accent:'#7789a6'}
+];
+function motifSvgMarkup(motif){
+  const sky=motif.sky,ink=motif.ink,accent=motif.accent,head=`<g data-motif="${motif.id}" opacity=".42"><rect width="390" height="844" fill="${sky}"/>`;
+  if(motif.kind==='rain')return head+`<g fill="none" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"><path d="M26 62v32m34-58v44m260-28v37m38-57v42M22 232v48m318-62v42M50 608v55m288-74v47" opacity=".54"/><path d="M22 650 Q92 590 162 650 T302 650 T442 650" stroke="${accent}" stroke-width="5"/><path d="M112 652 Q195 572 278 652"/></g></g>`;
+  if(motif.kind==='nordic')return head+`<circle cx="302" cy="128" r="53" fill="${accent}" opacity=".58"/><g fill="none" stroke="${ink}" stroke-width="3"><path d="M0 270 Q88 215 170 270 T350 266 T470 265"/><path d="M0 305 Q84 260 162 307 T330 300 T470 303" opacity=".58"/><path d="M18 690 H372 M52 716 H340" opacity=".42"/></g></g>`;
+  if(motif.kind==='dunes')return head+`<g fill="none" stroke="${ink}" stroke-width="3"><path d="M-30 254 Q75 166 186 250 T424 240"/><path d="M-20 310 Q96 220 218 305 T430 300" stroke="${accent}" stroke-width="7" opacity=".55"/><path d="M31 622 Q104 568 178 622 T327 620 T422 618" opacity=".48"/></g><g fill="${accent}" opacity=".52"><rect x="34" y="108" width="16" height="16" transform="rotate(45 42 116)"/><rect x="334" y="184" width="13" height="13" transform="rotate(45 340 190)"/></g></g>`;
+  if(motif.kind==='arches')return head+`<g fill="none" stroke="${ink}" stroke-width="4"><path d="M18 282 V214 Q62 151 106 214 V282 M142 282 V214 Q186 151 230 214 V282 M266 282 V214 Q310 151 354 214 V282"/><path d="M0 616 Q38 596 76 616 T152 616 T228 616 T304 616 T380 616 T456 616" stroke="${accent}" stroke-width="6"/><path d="M0 646 Q38 626 76 646 T152 646 T228 646 T304 646 T380 646 T456 646" opacity=".5"/></g></g>`;
+  if(motif.kind==='moon')return head+`<circle cx="292" cy="154" r="58" fill="${accent}" opacity=".48"/><g fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"><path d="M-8 578 Q64 520 136 584 T286 576 T418 574"/><path d="M22 112 Q82 172 118 246 M70 166 l38-18 M92 205 l42 4"/><path d="M44 642 Q108 602 172 642 T302 640 T430 638" opacity=".46"/></g></g>`;
+  if(motif.kind==='geometry')return head+`<g fill="none" stroke="${ink}" stroke-width="5"><circle cx="82" cy="162" r="48"/><rect x="260" y="96" width="84" height="84"/><path d="M40 300 H350 M195 240 V360"/></g><circle cx="195" cy="300" r="35" fill="${accent}" opacity=".56"/><g fill="${ink}" opacity=".3"><rect x="28" y="640" width="104" height="18"/><rect x="258" y="690" width="104" height="18"/></g></g>`;
+  if(motif.kind==='mountains')return head+`<g fill="none" stroke="${ink}" stroke-width="4" stroke-linejoin="round"><path d="M-20 318 L72 212 L132 282 L212 164 L292 278 L354 218 L430 318"/><path d="M-20 350 L92 274 L164 334 L248 252 L326 330 L430 280" stroke="${accent}" stroke-width="7" opacity=".52"/><path d="M24 650 H366 M24 674 H366 M62 640 v44m82-44v44m82-44v44m82-44v44" opacity=".38"/></g></g>`;
+  return head+`<g fill="none" stroke="${ink}" stroke-width="3"><path d="M36 126 l30-30 30 30-30 30z M294 188 l30-30 30 30-30 30z M22 650 l38-38 38 38-38 38z M286 686 l38-38 38 38-38 38z"/><path d="M0 290 Q48 250 96 290 T192 290 T288 290 T384 290 T480 290" stroke="${accent}" stroke-width="8" opacity=".55"/><path d="M0 324 Q48 284 96 324 T192 324 T288 324 T384 324 T480 324" opacity=".55"/></g></g>`;
+}
 const SURPRISES=[
   {id:'bonus11',rarity:'普通意外',text:'财务多按了一次加号。+11 分。',kind:'bonus'},
   {id:'banana',rarity:'普通意外',text:'一根香蕉主动补办了入职。+1 香蕉。',kind:'banana'},
@@ -962,7 +986,7 @@ const saved=loadRecord();
 const localBoard=loadBoard();
 const career=loadCareer();
 const state={running:false,over:false,seed:1,rng:Math.random,player:null,platforms:[],items:[],cameraY:0,nextY:0,lastX:195,
-  maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],
+  maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],motifId:'jiangnan',
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
   animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
@@ -973,6 +997,7 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
 const TITLE_PAGE_SIZE=4,TEA_PAGE_SIZE=4,RANK_PAGE_SIZE=5;
 let titlePage=0,teaPage=0,rankPage=0,resultPage=0;
 const WORLD_DEVICE_KEY='myskme_monkey_device_v1',WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1',WORLD_PENDING_KEY='myskme_monkey_pending_v1',WORLD_TOKEN_KEY='myskme_monkey_player_token_v1';
+const CULTURE_BAG_KEY='myskme_monkey_culture_bag_v1',CULTURE_LAST_KEY='myskme_monkey_culture_last_v1';
 let worldScope='weekly',worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false},worldBoardSeq=0,worldSyncPromise=null,worldSyncMessage='';
 
 function loadRecord(){
@@ -1000,12 +1025,23 @@ function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',
 function blankTally(){return {f47:0,noPB:0,bare:0};}
 function safeTally(raw){const t=blankTally();if(raw&&typeof raw==='object')for(const k of Object.keys(t))t[k]=Math.max(0,Math.floor(Number(raw[k])||0));return t;}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',tally:safeTally(raw.tally)};}
-  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',tally:blankTally()};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],tally:safeTally(raw.tally)};}
+  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],tally:blankTally()};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
 function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
 function worldStorageSet(key,value){try{localStorage.setItem(key,String(value));return true;}catch(_){return false;}}
+function cultureMotif(id=state.motifId){return CULTURE_MOTIFS.find(m=>m.id===id)||CULTURE_MOTIFS[0];}
+function applyCultureMotif(){const motif=cultureMotif();el.worldWindow.innerHTML=motifSvgMarkup(motif);el.worldWindow.dataset.motif=motif.id;}
+function freshCultureBag(){
+  const ids=CULTURE_MOTIFS.map(m=>m.id);for(let i=ids.length-1;i>0;i--){const j=Math.floor(randomUnit()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
+  const previous=worldStorageGet(CULTURE_LAST_KEY);if(ids.length>1&&ids[ids.length-1]===previous)[ids[0],ids[ids.length-1]]=[ids[ids.length-1],ids[0]];
+  return ids;
+}
+function claimCultureMotif(){
+  let bag=[];try{const raw=JSON.parse(worldStorageGet(CULTURE_BAG_KEY,'[]'));if(Array.isArray(raw))bag=[...new Set(raw.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))];}catch(_){}
+  if(!bag.length)bag=freshCultureBag();const id=bag.pop();worldStorageSet(CULTURE_BAG_KEY,JSON.stringify(bag));worldStorageSet(CULTURE_LAST_KEY,id);state.motifId=id;applyCultureMotif();return cultureMotif();
+}
 function worldDeviceId(){
   let id=worldStorageGet(WORLD_DEVICE_KEY);if(id.length>=12)return id;
   if(globalThis.crypto?.randomUUID)id=crypto.randomUUID();else{const a=new Uint32Array(4);if(globalThis.crypto?.getRandomValues)crypto.getRandomValues(a);else for(let i=0;i<a.length;i++)a[i]=Math.floor(Math.random()*4294967296);id=[...a].map(n=>n.toString(16).padStart(8,'0')).join('-');}
@@ -1080,7 +1116,7 @@ function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 图鉴 ${career.surprises.length}/${SURPRISES.length}`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length}`;
   el.wornTitle.textContent=career.worn?`称号 · ${wornHonor().name}`:`称号墙 ${career.titles.length}/${HONORS.length}`;
   el.teaOpen.textContent=career.cup?`在喝 · ${currentCup().name}`:`奶茶图鉴 ${career.teas.length}/${TEAS.length}`;
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
@@ -1198,6 +1234,7 @@ function sfx(kind){
 function resetWorld(seed=Date.now()&0xffffffff){
   const baseY=DEBUG_START*METER_SCALE+72;
   seed=DEBUG_SEED||seed;state.seed=seed;state.rng=mulberry32(seed);state.player={x:DEBUG_X,y:baseY,vy:680,vx:0,facing:1,bubble:true,waiver:0,rocketUntil:0,goldenUntil:0,stampedUntil:0};
+  state.motifId=CULTURE_MOTIFS[Math.abs(seed)%CULTURE_MOTIFS.length].id;applyCultureMotif();
   state.platforms=[];state.items=[];state.cameraY=Math.max(0,baseY-230);state.nextY=baseY+86;state.lastX=195;state.maxMeters=DEBUG_START;state.bananas=0;state.bonus=0;state.score=DEBUG_START;
   state.deptCache=[];state.randomBag=[];const startDept=departmentIdAt(DEBUG_START);state.visited=new Set([startDept]);state.deptId=startDept;state.deptIndex=Math.floor(DEBUG_START/300);state.majorCount=0;
   state.eventPool=shuffle(MAJOR_EVENTS);state.nextEventMeter=DEBUG_START+520+Math.floor(state.rng()*180);state.lowGravityUntil=0;state.windUntil=0;
@@ -1658,7 +1695,7 @@ function ensureGameLoop(){if(!state.running||state.paused||state.animationFrame)
 
 function startSolo(){startRun();}
 function startRun(seed=Date.now()&0xffffffff){
-  resetWorld(seed);state.running=true;state.over=false;unlockAudio();startMusic();hideMenuScreens();el.shell.classList.add('running');
+  resetWorld(seed);if(!IS_TEST_RUN)claimCultureMotif();state.running=true;state.over=false;unlockAudio();startMusic();hideMenuScreens();el.shell.classList.add('running');
   if(FORCE_FALL&&!forcedFallConsumed){forcedFallConsumed=true;state.player.bubble=false;state.player.y=state.cameraY-110;state.player.vy=-240;}
   else if(FORCE_RESCUE){state.player.y=state.cameraY-110;state.player.vy=-240;}
   input.left=input.right=false;lastFrame=performance.now();lastToolSignature='__start__';updateMissionUI();toast(`开工装备：${KITS.find(k=>k.id===state.kitId).name}。点左点右，往上。`,'gold');
@@ -1675,8 +1712,8 @@ function finishRun(reason='fall'){
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
-  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;$('resultSlogan').textContent=SLOGANS[si];
-  const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;career.totalMeters+=state.maxMeters;saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
+  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。本局窗景：${cultureMotif().name}。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;$('resultSlogan').textContent=SLOGANS[si];
+  const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;career.totalMeters+=state.maxMeters;if(!career.motifs.includes(state.motifId))career.motifs.push(state.motifId);saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
   // 跨局计数只在正式局累计；质检局（IS_TEST_RUN）不许写进长期档案。
   let fresh=[],freshTeas=[];
   if(!IS_TEST_RUN){
@@ -1933,10 +1970,15 @@ function submitRank(){
   flushWorldQueue().then(ok=>{state.rankSubmitted=false;el.rankSave.disabled=false;el.rankSave.textContent=ok?'已登记，可改名':'待联网';if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});
   toast('本局先写入本机。断网也会自动补交。','teal');
 }
-let posterData='',posterVariant=null,posterMark='',posterGenerating=false,posterQrModules=0,posterHonorLabel='';
+let posterData='',posterVariant=null,posterMotif=null,posterLastCombo='',posterMark='',posterGenerating=false,posterQrModules=0,posterHonorLabel='';
 function randomUnit(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296;}return Math.random();}
 function posterRank(){const floor=floorsFromMeters(state.maxMeters);return [...POSTER_RANKS].reverse().find(r=>floor>=r.min)||POSTER_RANKS[0];}
 function choosePosterVariant(){const roll=randomUnit();return POSTER_VARIANTS.find(v=>roll<=v.upto)||POSTER_VARIANTS[0];}
+function choosePosterPair(){
+  const variant=choosePosterVariant();let motif=CULTURE_MOTIFS[Math.floor(randomUnit()*CULTURE_MOTIFS.length)],combo=variant.id+'|'+motif.id;
+  if(combo===posterLastCombo){const index=CULTURE_MOTIFS.findIndex(item=>item.id===motif.id);motif=CULTURE_MOTIFS[(index+1)%CULTURE_MOTIFS.length];combo=variant.id+'|'+motif.id;}
+  posterLastCombo=combo;return {variant,motif};
+}
 function receiptMark(){const raw=[state.runId,state.seed,state.maxMeters,state.score,state.bananas,state.maxFlow,state.nearMisses,state.surpriseCount].join('|');let h=2166136261;for(let i=0;i<raw.length;i++)h=Math.imul(h^raw.charCodeAt(i),16777619);const code=(h>>>0).toString(36).toUpperCase().padStart(7,'0');return `${code.slice(0,4)}-${code.slice(4)}`;}
 function roundRectPath(c,x,y,w,h,r=18){const rr=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+rr,y);c.arcTo(x+w,y,x+w,y+h,rr);c.arcTo(x+w,y+h,x,y+h,rr);c.arcTo(x,y+h,x,y,rr);c.arcTo(x,y,x+w,y,rr);c.closePath();}
 function wrapCanvasText(c,text,x,y,maxWidth,lineHeight,maxLines=2){const chars=[...String(text)],lines=[];let line='';for(const ch of chars){const next=line+ch;if(c.measureText(next).width>maxWidth&&line){lines.push(line);line=ch;if(lines.length===maxLines-1)break;}else line=next;}let used=lines.join('').length;if(lines.length<maxLines){lines.push(used<chars.length?chars.slice(used).join(''):line);used=lines.join('').length;}if(lines.length===maxLines&&used<chars.length){while(c.measureText(lines[maxLines-1]+'…').width>maxWidth)lines[maxLines-1]=lines[maxLines-1].slice(0,-1);lines[maxLines-1]+='…';}lines.slice(0,maxLines).forEach((part,i)=>c.fillText(part,x,y+i*lineHeight));return y+Math.min(lines.length,maxLines)*lineHeight;}
@@ -1947,13 +1989,26 @@ function fitCanvasLine(c,text,maxWidth){
   while(out.length>1&&c.measureText(out+'…').width>maxWidth)out=out.slice(0,-1);
   return out+'…';
 }
+function drawPosterMotif(c,motif,x,y,w,h){
+  c.save();roundRectPath(c,x,y,w,h,24);c.clip();c.fillStyle=motif.sky;c.fillRect(x,y,w,h);c.translate(x,y);c.scale(w/180,h/110);c.strokeStyle=motif.ink;c.fillStyle=motif.accent;c.lineCap='round';c.lineJoin='round';c.lineWidth=2.2;c.globalAlpha=.72;
+  if(motif.kind==='rain'){for(let i=0;i<6;i++){c.beginPath();c.moveTo(18+i*29,10+(i%2)*9);c.lineTo(18+i*29,38+(i%2)*9);c.stroke();}c.beginPath();c.moveTo(8,94);c.quadraticCurveTo(45,58,82,94);c.quadraticCurveTo(119,58,172,94);c.stroke();}
+  else if(motif.kind==='nordic'){c.beginPath();c.arc(142,27,20,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(0,78);c.quadraticCurveTo(42,42,84,78);c.quadraticCurveTo(126,42,180,76);c.stroke();c.beginPath();c.moveTo(8,94);c.lineTo(172,94);c.stroke();}
+  else if(motif.kind==='dunes'){c.beginPath();c.moveTo(-10,74);c.quadraticCurveTo(38,28,88,73);c.quadraticCurveTo(132,33,190,68);c.stroke();c.lineWidth=5;c.globalAlpha=.46;c.beginPath();c.moveTo(-10,91);c.quadraticCurveTo(46,48,104,88);c.quadraticCurveTo(145,58,190,87);c.stroke();}
+  else if(motif.kind==='arches'){for(let i=0;i<3;i++){const left=12+i*58;c.beginPath();c.moveTo(left,76);c.lineTo(left,43);c.quadraticCurveTo(left+23,12,left+46,43);c.lineTo(left+46,76);c.stroke();}c.lineWidth=4;c.beginPath();c.moveTo(0,96);for(let i=0;i<6;i++)c.quadraticCurveTo(15+i*30,84,30+i*30,96);c.stroke();}
+  else if(motif.kind==='moon'){c.beginPath();c.arc(140,28,22,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(10,8);c.quadraticCurveTo(42,32,56,70);c.moveTo(31,31);c.lineTo(58,20);c.moveTo(43,49);c.lineTo(70,51);c.stroke();}
+  else if(motif.kind==='geometry'){c.strokeRect(123,13,38,38);c.beginPath();c.arc(36,35,23,0,Math.PI*2);c.stroke();c.beginPath();c.arc(90,72,18,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(10,88);c.lineTo(170,88);c.moveTo(90,51);c.lineTo(90,105);c.stroke();}
+  else if(motif.kind==='mountains'){c.beginPath();c.moveTo(-8,83);c.lineTo(34,32);c.lineTo(63,68);c.lineTo(99,21);c.lineTo(139,72);c.lineTo(164,39);c.lineTo(190,82);c.stroke();c.globalAlpha=.42;for(let i=0;i<4;i++){c.beginPath();c.moveTo(12,91+i*6);c.lineTo(168,91+i*6);c.stroke();}}
+  else{for(const [cx,cy] of [[32,28],[145,70]]){c.beginPath();c.moveTo(cx,cy-17);c.lineTo(cx+17,cy);c.lineTo(cx,cy+17);c.lineTo(cx-17,cy);c.closePath();c.stroke();}c.lineWidth=5;c.globalAlpha=.48;c.beginPath();c.moveTo(0,58);for(let i=0;i<6;i++)c.quadraticCurveTo(15+i*30,44,30+i*30,58);c.stroke();}
+  c.restore();
+}
 function drawPosterQr(c,url,x,y,size,ink,paper){
   if(typeof qrcode!=='function')return 0;const qr=qrcode(0,'Q');qr.addData(url);qr.make();const n=qr.getModuleCount(),quiet=4,cell=size/(n+quiet*2);c.fillStyle=paper;c.fillRect(x,y,size,size);c.fillStyle=ink;for(let row=0;row<n;row++)for(let col=0;col<n;col++)if(qr.isDark(row,col))c.fillRect(x+(col+quiet)*cell,y+(row+quiet)*cell,Math.ceil(cell+.15),Math.ceil(cell+.15));return n;
 }
 function loadPosterIcon(){return new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src='./icons/monkey-100-512.png';});}
 async function buildPoster(){
-  const Wc=1080,Hc=1350,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const c=cv.getContext('2d',{alpha:false}),variant=choosePosterVariant(),rank=posterRank(),floors=floorsFromMeters(state.maxMeters),dark=variant.id==='night';posterVariant=variant;posterMark=receiptMark();
+  const Wc=1080,Hc=1350,cv=document.createElement('canvas');cv.width=Wc;cv.height=Hc;const c=cv.getContext('2d',{alpha:false}),pair=choosePosterPair(),variant=pair.variant,motif=pair.motif,rank=posterRank(),floors=floorsFromMeters(state.maxMeters),dark=variant.id==='night';posterVariant=variant;posterMotif=motif;posterMark=receiptMark();
   c.fillStyle=variant.paper;c.fillRect(0,0,Wc,Hc);c.strokeStyle=variant.accent;c.lineWidth=8;c.strokeRect(36,36,Wc-72,Hc-72);c.globalAlpha=.45;c.lineWidth=3;c.strokeRect(54,54,Wc-108,Hc-108);c.globalAlpha=1;
+  drawPosterMotif(c,motif,742,68,246,64);
   c.textAlign='left';c.fillStyle=variant.ink;c.font='700 30px system-ui,sans-serif';c.fillText('M Y S K M E  ·  MONKEY UP 100',92,112);
   roundRectPath(c,92,145,896,106,26);c.fillStyle=variant.accent;c.fill();c.fillStyle=dark?'#28211a':'#fffdf6';c.font='900 46px system-ui,sans-serif';c.fillText(variant.rarity,124,211);
   const icon=await loadPosterIcon();if(icon){roundRectPath(c,92,286,218,218,42);c.save();c.clip();c.drawImage(icon,92,286,218,218);c.restore();c.strokeStyle=variant.ink;c.lineWidth=5;roundRectPath(c,92,286,218,218,42);c.stroke();}
@@ -1962,15 +2017,15 @@ async function buildPoster(){
   const worn=wornHonor();posterHonorLabel='';if(worn){c.fillStyle=variant.accent;c.font='900 26px system-ui,sans-serif';posterHonorLabel=fitCanvasLine(c,`称号：${worn.name}`,600);c.fillText(posterHonorLabel,354,498);}
   c.textAlign='center';c.fillStyle=variant.ink;c.font='1000 162px system-ui,sans-serif';c.fillText(String(floors),540,690);c.font='900 35px system-ui,sans-serif';c.fillText('层',540,744);
   const stats=[['总分',state.score],['香蕉',state.bananas],['最高连跳',state.maxFlow],['意外',state.surpriseCount]];stats.forEach(([label,value],i)=>{const x=92+i*226;roundRectPath(c,x,786,198,118,20);c.fillStyle=dark?'#3a342d':'rgba(255,255,255,.55)';c.fill();c.strokeStyle=variant.ink;c.lineWidth=3;c.stroke();c.fillStyle=variant.accent;c.font='900 42px system-ui,sans-serif';c.textAlign='center';c.fillText(String(value),x+99,842);c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText(label,x+99,878);});
-  const surprise=SURPRISES[Math.floor(randomUnit()*SURPRISES.length)];roundRectPath(c,92,936,610,250,24);c.fillStyle=dark?'#39332b':'rgba(255,255,255,.56)';c.fill();c.strokeStyle=variant.accent;c.lineWidth=4;c.stroke();c.textAlign='left';c.fillStyle=variant.accent;c.font='900 25px system-ui,sans-serif';c.fillText('本次随机批注',126,988);c.fillStyle=variant.ink;c.font='800 31px "Songti SC",serif';wrapCanvasText(c,variant.line,126,1042,530,45,2);c.font='700 23px system-ui,sans-serif';c.globalAlpha=.78;wrapCanvasText(c,`海报附带：${surprise.text}`,126,1133,530,34,2);c.globalAlpha=1;
-  const shareUrl=`https://monkey.myskme.com/?from=poster&mark=${encodeURIComponent(posterMark)}&skin=${variant.id}`;const modules=drawPosterQr(c,shareUrl,746,944,242,variant.ink,dark?'#fffaf0':'#fffdf6');
+  const surprise=SURPRISES[Math.floor(randomUnit()*SURPRISES.length)];roundRectPath(c,92,936,610,250,24);c.fillStyle=dark?'#39332b':'rgba(255,255,255,.56)';c.fill();c.strokeStyle=variant.accent;c.lineWidth=4;c.stroke();c.textAlign='left';c.fillStyle=variant.accent;c.font='900 25px system-ui,sans-serif';c.fillText(`本次随机批注 · ${motif.name}`,126,988);c.fillStyle=variant.ink;c.font='800 31px "Songti SC",serif';wrapCanvasText(c,variant.line,126,1042,530,45,2);c.font='700 23px system-ui,sans-serif';c.globalAlpha=.78;wrapCanvasText(c,`海报附带：${surprise.text}`,126,1133,530,34,2);c.globalAlpha=1;
+  const shareUrl=`https://monkey.myskme.com/?from=poster&mark=${encodeURIComponent(posterMark)}&s=${variant.id}&m=${CULTURE_MOTIFS.indexOf(motif).toString(36)}`;const modules=drawPosterQr(c,shareUrl,746,944,242,variant.ink,dark?'#fffaf0':'#fffdf6');
   c.textAlign='center';c.fillStyle=variant.ink;c.font='800 20px system-ui,sans-serif';c.fillText('扫码来挑战',867,1217);{const cup=currentCup();if(cup){c.fillStyle=variant.accent;c.font='800 19px system-ui,sans-serif';c.fillText(fitCanvasLine(c,'手里端着：'+cup.name,600),397,1232);}}
   c.fillStyle=variant.ink;c.font='700 17px system-ui,sans-serif';c.globalAlpha=.7;c.fillText('图片为本机生成，不代表云端认证',540,1265);c.fillText('monkey.myskme.com',540,1300);c.globalAlpha=1;
   posterQrModules=modules;return cv.toDataURL('image/jpeg',.91);
 }
 async function openSharePoster(){
   if(posterGenerating)return;posterGenerating=true;unlockAudio();hideMenuScreens();el.share.classList.remove('hidden');el.shareNote.textContent='正在从档案袋里抽一个随机版式……';el.shareImage.removeAttribute('src');
-  try{posterData=await buildPoster();el.shareImage.src=posterData;el.shareRarity.textContent=posterVariant.rarity;el.shareRarity.style.background=posterVariant.accent;el.shareNote.textContent=`${posterVariant.line} 本局印记 ${posterMark}。`;sfx('surprise');}
+  try{posterData=await buildPoster();el.shareImage.src=posterData;el.shareRarity.textContent=posterVariant.rarity;el.shareRarity.style.background=posterVariant.accent;el.shareNote.textContent=`${posterVariant.line} 窗景 ${posterMotif.name}，本局印记 ${posterMark}。`;sfx('surprise');}
   catch(_){el.shareNote.textContent='海报生成失败。传真科已经把错误传真走了。';toast('海报没画出来。请再抽一次。','red');}
   finally{posterGenerating=false;}
 }
@@ -2074,6 +2129,7 @@ function runQA(){
     ['桌面安装入口完整',!!document.querySelector('link[rel="manifest"]')&&!!$('installButton')&&'serviceWorker' in navigator],
     ['主猴与环屏副本完整',playerUses.length===3&&playerUses.every(use=>use.isConnected&&use.getAttribute('href'))],
     ['二维码模块仅从本站本地加载',assetsStayLocal&&typeof qrcode==='function'],['成绩海报与六档稀有版完整',typeof buildPoster==='function'&&POSTER_VARIANTS.length===6&&POSTER_RANKS.length>=7],
+    ['八种世界窗景、轮换袋与海报组合完整',CULTURE_MOTIFS.length===8&&new Set(CULTURE_MOTIFS.map(m=>m.id)).size===8&&CULTURE_MOTIFS.every(m=>motifSvgMarkup(m).includes(`data-motif="${m.id}"`)&&!/<text\b|<image\b/.test(motifSvgMarkup(m)))&&typeof claimCultureMotif==='function'&&typeof choosePosterPair==='function'&&el.worldWindow.dataset.motif===state.motifId],
     ['菜单采用单屏分页且不依赖滚动',getComputedStyle(el.title).overflowY==='hidden'&&typeof renderPager==='function'&&document.querySelectorAll('.result-page').length===3],
     ['上次纪录目标线与越线庆祝完整',!!el.recordLine&&state.personalBestAtStart===0&&/recordPassed/.test(updatePhysics.toString())],
     ['十三种随机意外与固定暗号完整',SURPRISES.length===13&&SECRET_METERS.length===5],
@@ -2121,7 +2177,7 @@ function runPosterQA(){
   const longestHonor=[...HONORS].sort((a,b)=>[...b.name].length-[...a.name].length)[0];career.titles=[...new Set([...career.titles,longestHonor.id])];career.worn=longestHonor.id;
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }
-Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
+Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,motif:state.motifId,motifDiscoveries:career.motifs.length,motifTotal:CULTURE_MOTIFS.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterMotif:posterMotif?.id||'',posterCombo:posterVariant&&posterMotif?posterVariant.id+'|'+posterMotif.id:'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
 Object.defineProperty(window,'MONKEY_UPSTAIRS_REPORT',{enumerable:true,get:()=>window.__MONKEY_UPSTAIRS_REPORT});
 setAudioMode(audioMode,false);el.rankName.value=worldAlias();renderCareer();updateBestLabels();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
 if(worldEnabled())setTimeout(()=>flushWorldQueue(),900);

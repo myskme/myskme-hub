@@ -55,6 +55,26 @@ if (teas.some(tea => !/^[a-z0-9-]+$/.test(tea.id) || !tea.name || !tea.tier || !
   throw new Error('TEAS 缺少可复用素材所需字段');
 }
 
+// 世界窗景也只认正本里的 CULTURE_MOTIFS 与 motifSvgMarkup()。导出器不维护第二套画面，
+// 这样游戏里换一根线，素材库与哈希总账会在同一次构建里跟着变化。
+const motifArraySource = sourceMatch(/const CULTURE_MOTIFS=(\[[\s\S]*?\n\]);\nfunction motifSvgMarkup/, 'CULTURE_MOTIFS');
+const motifFunctionSource = sourceMatch(/(function motifSvgMarkup\(motif\)\{[\s\S]*?\n\})\nconst SURPRISES=/, 'motifSvgMarkup');
+const motifRuntime = { result: null };
+vm.runInNewContext(
+  `const CULTURE_MOTIFS=${motifArraySource};\n${motifFunctionSource}\nresult={`
+    + 'motifs:CULTURE_MOTIFS,art:CULTURE_MOTIFS.map(motif=>motifSvgMarkup(motif))};',
+  motifRuntime,
+  { timeout: 1000, filename: 'monkey-world-window-assets.vm.js' },
+);
+const motifs = motifRuntime.result?.motifs || [];
+const motifArt = motifRuntime.result?.art || [];
+if (motifs.length !== 8 || motifArt.length !== motifs.length || new Set(motifs.map(motif => motif.id)).size !== motifs.length) {
+  throw new Error('世界窗景必须从正本现算出八种唯一素材');
+}
+if (motifs.some(motif => !/^[a-z0-9-]+$/.test(motif.id) || !motif.name || !motif.line || !motif.kind || !motif.sky || !motif.ink || !motif.accent)) {
+  throw new Error('CULTURE_MOTIFS 缺少可复用素材所需字段');
+}
+
 function escapeXml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]);
 }
@@ -63,6 +83,14 @@ function reusableTeaSvg(tea, markup) {
   return markup
     .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(tea.name)}" `)
     .replace(' aria-hidden="true"', '') + '\n';
+}
+
+function reusableMotifSvg(motif, markup) {
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" role="img" aria-label="${escapeXml(motif.name)}">`,
+    markup,
+    '</svg>', '',
+  ].join('\n');
 }
 
 // role 只是给下一个使用者看的：这张图在世界观里是谁、能不能改。
@@ -143,6 +171,9 @@ outputs.set(path.join(repoRoot, 'assets', 'cover-monkey-upstairs.svg'), cover())
 for (let index = 0; index < teas.length; index++) {
   outputs.set(path.join(outputRoot, 'teas', teas[index].id + '.svg'), reusableTeaSvg(teas[index], teaCups[index]));
 }
+for (let index = 0; index < motifs.length; index++) {
+  outputs.set(path.join(outputRoot, 'world-windows', motifs[index].id + '.svg'), reusableMotifSvg(motifs[index], motifArt[index]));
+}
 
 const palette = {
   paper: '#faf3e2', ink: '#28211a', outline: '#2f5148', teal: '#1f9e8e',
@@ -174,8 +205,17 @@ const manifestTeas = teas.map(tea => {
     sha256: createHash('sha256').update(body).digest('hex'),
   };
 });
+const manifestMotifs = motifs.map(motif => {
+  const file = path.posix.join('world-windows', motif.id + '.svg');
+  const body = outputs.get(path.join(outputRoot, file));
+  return {
+    file, source: 'CULTURE_MOTIFS', id: motif.id, name: motif.name, line: motif.line, kind: motif.kind,
+    sky: motif.sky, ink: motif.ink, accent: motif.accent, viewBox: '0 0 390 844', width: 390, height: 844,
+    sha256: createHash('sha256').update(body).digest('hex'),
+  };
+});
 const manifest = JSON.stringify({
-  schema: 3,
+  schema: 4,
   source: '../index.html',
   generator: 'monkey/tools/extract-assets.mjs',
   license: 'MYSKME original reusable asset',
@@ -185,6 +225,7 @@ const manifest = JSON.stringify({
   canon,
   assets: manifestAssets,
   teas: manifestTeas,
+  worldWindows: manifestMotifs,
 }, null, 2) + '\n';
 outputs.set(path.join(outputRoot, 'asset-manifest.json'), manifest);
 
@@ -213,6 +254,14 @@ const readme = [
   '| 文件 | 名称 | 档位 | 液体 | 珍珠 |',
   '| --- | --- | --- | --- | --- |',
   ...manifestTeas.map(tea => `| \`${tea.file}\` | ${tea.name} | ${tea.tier} | \`${tea.liquid}\` | \`${tea.pearl}\` |`),
+  '',
+  '## 世界窗景素材',
+  '',
+  '以下八种窗景由正本 `CULTURE_MOTIFS` 数据与 `motifSvgMarkup()` 逐幅现算。游戏内、分享海报与素材总账共用同一组名称和颜色。',
+  '',
+  '| 文件 | 名称 | 视觉结构 | 天空色 | 线条色 |',
+  '| --- | --- | --- | --- | --- |',
+  ...manifestMotifs.map(motif => `| \`${motif.file}\` | ${motif.name} | \`${motif.kind}\` | \`${motif.sky}\` | \`${motif.ink}\` |`),
   '',
   '## 画风参数',
   '',

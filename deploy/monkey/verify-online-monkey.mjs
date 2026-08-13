@@ -49,6 +49,9 @@ function checkHtml(html) {
   assert(!/\bparty\b/i.test(html), '又出现多人模式代码（0813 已拆除）');
   assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
   assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
+  assert(html.includes('id="worldWindow"') && html.includes('const CULTURE_MOTIFS=[')
+    && html.includes('function claimCultureMotif(') && html.includes('function choosePosterPair('),
+    '世界窗景或随机海报组合缺失');
   assert(html.includes('function pauseGame(') && html.includes('function shiftDeadlines('), '暂停系统缺失');
   assert(html.includes('const HONORS=[') && html.includes('const TEAS=['), '称号或奶茶图鉴缺失');
   assert(html.includes('id="art-carp-hat"'), '红鲤鱼帽美术缺失');
