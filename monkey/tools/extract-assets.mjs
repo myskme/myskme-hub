@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 
 // 把游戏正本里的 SVG symbol 导出成可以单独拿走用的矢量文件，并生成一份带哈希的总账。
 //
@@ -26,6 +27,42 @@ const symbols = new Map();
 
 for (const match of source.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)">([\s\S]*?)<\/symbol>/g)) {
   symbols.set(match[1], { id: match[1], viewBox: match[2], markup: match[0], body: match[3] });
+}
+
+function sourceMatch(pattern, label) {
+  const match = source.match(pattern);
+  if (!match) throw new Error('找不到正本数据：' + label);
+  return match[1];
+}
+
+// 奶茶不能在导出器里维护第二张表，也不能手抄二十段 SVG。
+// 直接把正本里的 TEAS 与 teaCupSvg 放进隔离上下文，让正本函数逐杯现画；test 函数只保留在
+// 临时上下文里，不进入生成物。这样增删、改名、改色和改杯型都只需要改 index.html。
+const teaArraySource = sourceMatch(/const TEAS=(\[[\s\S]*?\n\]);\nconst POSTER_RANKS=/, 'TEAS');
+const teaCupFunctionSource = sourceMatch(/(function teaCupSvg\(tea,h=52\)\{[\s\S]*?\n\})\nfunction renderTeaScreen/, 'teaCupSvg');
+const teaRuntime = { result: null };
+vm.runInNewContext(
+  `const TEAS=${teaArraySource};\n${teaCupFunctionSource}\nresult={`
+    + `teas:TEAS.map(({test,...tea})=>tea),cups:TEAS.map(tea=>teaCupSvg(tea,260))};`,
+  teaRuntime,
+  { timeout: 1000, filename: 'monkey-tea-assets.vm.js' },
+);
+const teas = teaRuntime.result?.teas || [];
+const teaCups = teaRuntime.result?.cups || [];
+if (!teas.length || teas.length !== teaCups.length) throw new Error('TEAS 数据与杯子导出数量不一致');
+if (new Set(teas.map(tea => tea.id)).size !== teas.length) throw new Error('TEAS 存在重复 id，无法安全导出');
+if (teas.some(tea => !/^[a-z0-9-]+$/.test(tea.id) || !tea.name || !tea.tier || !tea.liquid || !tea.pearl)) {
+  throw new Error('TEAS 缺少可复用素材所需字段');
+}
+
+function escapeXml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]);
+}
+
+function reusableTeaSvg(tea, markup) {
+  return markup
+    .replace('<svg ', `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escapeXml(tea.name)}" `)
+    .replace(' aria-hidden="true"', '') + '\n';
 }
 
 // role 只是给下一个使用者看的：这张图在世界观里是谁、能不能改。
@@ -103,6 +140,9 @@ function drawingStyle() {
 
 const outputs = new Map(exportsList.map(([file, id]) => [path.join(outputRoot, file), standalone(id)]));
 outputs.set(path.join(repoRoot, 'assets', 'cover-monkey-upstairs.svg'), cover());
+for (let index = 0; index < teas.length; index++) {
+  outputs.set(path.join(outputRoot, 'teas', teas[index].id + '.svg'), reusableTeaSvg(teas[index], teaCups[index]));
+}
 
 const palette = {
   paper: '#faf3e2', ink: '#28211a', outline: '#2f5148', teal: '#1f9e8e',
@@ -124,8 +164,18 @@ for (const [file, id, role] of exportsList) {
     sha256: createHash('sha256').update(body).digest('hex'),
   });
 }
+const manifestTeas = teas.map(tea => {
+  const file = path.posix.join('teas', tea.id + '.svg');
+  const body = outputs.get(path.join(outputRoot, file));
+  return {
+    file, source: 'TEAS', id: tea.id, name: tea.name, tier: tea.tier,
+    liquid: tea.liquid, pearl: tea.pearl, hint: tea.hint, note: tea.note,
+    secret: !!tea.secret, viewBox: '0 0 40 52', width: 200, height: 260,
+    sha256: createHash('sha256').update(body).digest('hex'),
+  };
+});
 const manifest = JSON.stringify({
-  schema: 2,
+  schema: 3,
   source: '../index.html',
   generator: 'monkey/tools/extract-assets.mjs',
   license: 'MYSKME original reusable asset',
@@ -134,6 +184,7 @@ const manifest = JSON.stringify({
   style: drawingStyle(),
   canon,
   assets: manifestAssets,
+  teas: manifestTeas,
 }, null, 2) + '\n';
 outputs.set(path.join(outputRoot, 'asset-manifest.json'), manifest);
 
@@ -154,6 +205,14 @@ const readme = [
   '',
   '另有 `../../assets/cover-monkey-upstairs.svg`（1280 × 720 封面，由猴先生与鱼小姐合成）。',
   '每个文件的 SHA-256 见 `asset-manifest.json`，用来判断某份拷贝是不是当前正本导出的。',
+  '',
+  '## 奶茶图鉴素材',
+  '',
+  '以下杯子由正本 `TEAS` 数据与 `teaCupSvg()` 逐杯现算，不在导出器里维护第二套配方或杯型。',
+  '',
+  '| 文件 | 名称 | 档位 | 液体 | 珍珠 |',
+  '| --- | --- | --- | --- | --- |',
+  ...manifestTeas.map(tea => `| \`${tea.file}\` | ${tea.name} | ${tea.tier} | \`${tea.liquid}\` | \`${tea.pearl}\` |`),
   '',
   '## 画风参数',
   '',

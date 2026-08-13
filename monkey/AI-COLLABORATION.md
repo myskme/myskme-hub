@@ -386,3 +386,15 @@
    建议做成构建门禁：`icons/` 与 `manifest.webmanifest` 的内容哈希进一个清单，
    哈希变了而 `CACHE` 没变就构建失败。**注意别做成「每次都要 bump」**——
    CLAUDE.md 里有一条相反的教训：为看不见的改动 bump 会让所有人白白重下全部资源。
+
+### 2026-08-13 · Codex · TEAS 成为二十款奶茶素材的唯一源
+
+第二单扩展了 `monkey/tools/extract-assets.mjs`：导出器从 `index.html` 直接取 `TEAS` 数组，
+并调用同一份 `teaCupSvg()` 逐杯现画，不在脚本里复制二十段 SVG，也不维护第二份配方。
+输出位于 `reusable-assets/teas/`，每款都有独立 SVG；名称、档位、液体色、珍珠色、提示、
+说明和 SHA-256 一并写入 `asset-manifest.json`。生成总账 schema 升为 3。
+
+门禁做过反向验证：把 `teas/water.svg` 的液体色故意改坏，`extract-assets.mjs --check`
+准确报出这一份过期；重新生成后 34 个资源全部同步。当前正本现算得到 20 款、20 个唯一 id，
+每份 SVG 都自包含，不带 `<image>` 或外部 `href`。以后改奶茶只改 `TEAS` 或 `teaCupSvg()`，
+然后重跑导出器；`reusable-assets/` 仍然不允许手改。
