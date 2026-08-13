@@ -6,11 +6,12 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。支持单人闯高与 2–6 人同机公平赛。">
-<meta name="myskme-release" content="20260813.1-pause-titles-carp-hat">
+<meta name="myskme-release" content="20260813.1-pause-titles-fullscreen">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://monkey.myskme.com/">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="是猴就上100层">
@@ -307,6 +308,14 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
 #gameShell:not(.running) .cloud,#gameShell:not(.running) #bubbleField circle,#gameShell:not(.running) #fogField path{animation-play-state:paused!important}
 @media(max-height:680px){.title-art{width:86px;height:76px}.brief{margin-bottom:8px;padding:7px 9px;line-height:1.45}.card{padding:15px}h1{font-size:26px}.subtitle{margin-bottom:8px}.career,.mission-card,.kit-grid{margin-bottom:7px}}
+@media(max-width:699px){
+  #gameShell{width:100vw;height:100vh;height:min(100svh,calc(100vw * 2.5));max-height:none;border-inline:0;box-shadow:none}
+  html,body{background:var(--paper)}
+  #app{background:var(--paper)}
+}
+/* 安卓宽虚拟视口那条兜底路径要保持固定盒再整体缩放，别被上面的铺满规则带偏 */
+html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,844px);border-inline:3px solid var(--ink);
+  box-shadow:0 0 0 1px rgba(255,255,255,.3),0 16px 50px rgba(40,33,26,.24)}
 @media(min-width:700px){#gameShell{border:3px solid var(--ink);border-radius:22px}.screen{border-radius:18px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.cloud,.title-art,#bubbleField circle{animation-duration:1ms!important;animation-iteration-count:1!important}}
 </style>
@@ -332,16 +341,17 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
         </symbol>
         <symbol id="art-carp-hat" viewBox="0 0 100 116">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M74 20 Q88 10 96 14 Q90 23 95 33 Q85 34 73 27 Z" fill="#f2836a"/>
-            <path d="M46 10 Q50 2 58 8 Q61 12 56 15" fill="#f2836a"/>
-            <path d="M18 22 Q30 8 52 10 Q72 12 78 24 Q80 33 68 37 Q46 43 28 37 Q14 32 18 22 Z" fill="#e0452c"/>
-            <path d="M24 28 Q40 36 62 33" fill="none" stroke="#fff5d1" stroke-width="2.4"/>
-            <path d="M31 14 Q27 24 32 36" fill="none" stroke-width="2.2"/>
-            <ellipse cx="26" cy="23" rx="4" ry="5" fill="#2f5148" stroke="none"/><circle cx="25" cy="21" r="1.4" fill="#fffdf6" stroke="none"/>
-            <path d="M17 27 Q13 30 16 33" fill="none" stroke-width="2.2"/>
-            <path d="M16 31 Q8 35 5 31 M17 34 Q10 40 6 38" fill="none" stroke-width="2"/>
-            <ellipse cx="36" cy="31" rx="4" ry="2.4" fill="#ee9f9a" stroke="none" opacity=".8"/>
-            <path d="M46 16 Q50 22 46 28 M56 17 Q60 23 56 29 M65 19 Q69 24 65 30" fill="none" stroke-width="1.8" opacity=".55"/>
+            <path d="M75 13 Q92 3 97 7 Q89 17 96 27 Q90 34 75 29 Z" fill="#f2836a"/>
+            <path d="M42 12 Q48 2 58 6 Q63 8 62 13 Z" fill="#f2836a"/>
+            <path d="M11 28 Q17 14 38 11 Q62 8 78 18 Q82 22 79 26 Q64 34 44 34 Q24 34 13 31 Q9 30 11 28 Z" fill="#e0452c"/>
+            <path d="M20 31 Q40 36 60 32" fill="none" stroke="#fff5d1" stroke-width="3.2"/>
+            <path d="M44 16 Q49 23 44 30 M55 15 Q60 22 55 30 M66 18 Q70 23 66 29" fill="none" stroke="#f2836a" stroke-width="2.4"/>
+            <path d="M37 14 Q33 21 35 28" fill="none" stroke-width="2.4"/>
+            <ellipse cx="25" cy="21" rx="6.2" ry="6.6" fill="#fff5d1" stroke-width="2.4"/>
+            <ellipse cx="25" cy="21" rx="4.2" ry="5" fill="#2f5148" stroke="none"/><circle cx="23.6" cy="19" r="1.6" fill="#fffdf6" stroke="none"/>
+            <path d="M11 29 Q7 31 9 34 Q12 36 14 34" fill="#fff5d1" stroke-width="2.4"/>
+            <path d="M10 34 Q4 36 1 32 M13 35 Q9 40 3 38" fill="none" stroke-width="2.2"/>
+            <ellipse cx="33" cy="29" rx="4" ry="2.4" fill="#ee9f9a" stroke="none" opacity=".85"/>
           </g>
         </symbol>
         <symbol id="art-monkey-rise" viewBox="0 0 100 116">
@@ -705,7 +715,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.1-pause-titles-carp-hat',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260813.1-pause-titles-fullscreen',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',PARTY_QA=TEST_PARAMS.get('partyqa')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||PARTY_QA||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1807,8 +1817,16 @@ let deferredInstallPrompt=null;
 function isStandalone(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
 function openInstallScreen(){
   unlockAudio();hideMenuScreens();const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=isStandalone();
-  el.installNote.textContent=standalone?'这只猴已经住在桌面上。':deferredInstallPrompt?'浏览器已准备好一键安装。':'不同浏览器的按钮位置略有差异，图标和存档不会变。';
-  el.installSteps.innerHTML=standalone?'<li>已在独立窗口运行，无需重复安装。</li>':ios?'<li>点浏览器底部或顶部的“分享”。</li><li>选择“添加到主屏幕”。</li><li>确认名称“是猴就上100层”。</li>':'<li>优先点下方“安装到这台设备”。</li><li>若没有弹窗，打开浏览器菜单。</li><li>选择“安装应用”或“添加到主屏幕”。</li>';
+  // iPhone 上只有 Safari 加出来的才是真的独立应用（全屏、无地址栏）。
+  // Chrome / Edge / 微信内置浏览器的「添加到主屏幕」加出来的只是书签，点开还是带地址栏的网页，
+  // 用户会以为是游戏没做全屏。这条一定要写在最前面。
+  const iosOtherBrowser=ios&&/CriOS|FxiOS|EdgiOS|OPiOS|MicroMessenger|QQ\/|Quark|UCBrowser|Baidu/i.test(navigator.userAgent);
+  el.installNote.textContent=standalone?'这只猴已经住在桌面上，正在独立窗口里全屏运行。'
+    :iosOtherBrowser?'当前不是 Safari。iPhone 上只有 Safari 加出来的才是全屏应用，别的浏览器加的只是书签。'
+    :deferredInstallPrompt?'浏览器已准备好一键安装。':'不同浏览器的按钮位置略有差异，图标和存档不会变。';
+  el.installSteps.innerHTML=standalone?'<li>已在独立窗口运行，无需重复安装。</li>'
+    :ios?'<li><b>先用 Safari 打开本页</b>。用 Chrome、微信等加到桌面的只是书签，点开仍带地址栏，不会全屏。</li><li>点 Safari 底部的“分享”。</li><li>选择“添加到主屏幕”。</li><li>确认名称“是猴就上100层”。</li><li>从桌面图标启动，应当没有地址栏、上下也没有留边。</li>'
+    :'<li>优先点下方“安装到这台设备”。</li><li>若没有弹窗，打开浏览器菜单。</li><li>选择“安装应用”或“添加到主屏幕”。</li>';
   el.installConfirm.classList.toggle('is-hidden',standalone);el.installConfirm.textContent=deferredInstallPrompt?'安装到这台设备':'我知道了，打开浏览器菜单';el.install.classList.remove('hidden');
 }
 async function confirmInstall(){
