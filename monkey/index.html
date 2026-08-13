@@ -1238,7 +1238,7 @@ function overlapsPlatform(p){
   const half=22+state.perks.wide*7+(performance.now()<state.wideUntil?13:0);return state.player.x+half>p.x&&state.player.x-half<p.x+p.w;
 }
 function landOn(p,now){
-  const pl=state.player;pl.y=p.y;p.landed=true;let bounce=680+state.perks.spring*45;
+  const pl=state.player;pl.y=p.y;const firstLanding=!p.landed;p.landed=true;let bounce=680+state.perks.spring*45;
   for(const node of playerMotions){node.classList.remove('landing');void node.getBBox();node.classList.add('landing');setTimeout(()=>node.classList.remove('landing'),210);}
   state.autoTargetId='';
   state.lastSafe={x:clamp(pl.x,p.x+8,p.x+p.w-8),y:p.y};
@@ -1246,7 +1246,7 @@ function landOn(p,now){
   if(state.flow>=3){state.bonus+=Math.min(4,Math.floor(state.flow/3));el.flow.textContent=`连跳 ${state.flow} · 流程居然顺了`;el.flow.classList.add('show');}
   else el.flow.classList.remove('show');
   const edge=Math.min(Math.max(0,pl.x-p.x),Math.max(0,p.x+p.w-pl.x));
-  if(edge<9&&!['bad','vapor','snake'].includes(p.type)){state.nearMisses++;state.bonus+=7;if(state.nearMisses<=3||state.nearMisses%5===0)toast('险落 +7：差一点就很有经验。','gold');}
+  if(firstLanding&&edge<9&&!['bad','vapor','snake'].includes(p.type)){state.nearMisses++;state.bonus+=7;if(state.nearMisses<=3||state.nearMisses%5===0)toast('险落 +7：差一点就很有经验。','gold');}
   state.seen.add('plat:'+p.type);
   if(state.clips>0&&['bad','vapor','snake'].includes(p.type)){state.clips--;state.toolsUsed++;state.seen.add('clip');p.type='good';p.label='回形针合格';p.opacity=1;p.breakAt=0;const node=platformEls.get(p.id);if(node)node.innerHTML=platformMarkup(p);toast('回形针批文：该危险暂按合格处理。','teal');sfx('tool');}
   if(p.type==='bad'){p.breakAt=now+110;pl.stampedUntil=now+2600;toast('质检结论：猴也不合格。','red');sfx('stamp');}
@@ -1258,13 +1258,14 @@ function landOn(p,now){
   if(p.type==='snake'){bounce=770;pl.vx=(state.rng()<.5?-1:1)*(340+state.rng()*90)*(state.perks.calm?0.58:1);toast('嘶——方向仅供参考。','teal');}
   if(p.type==='tongue'){
     const pack=TONGUE_PACKS[state.tonguePack];
-    if(p.tongueCorrect){state.tongueCombo++;state.tongueHits++;state.bonus+=5+state.tongueCombo*2;bounce=Math.max(bounce,815);toast(`${p.label}。舌头尚未离职。`,'teal');
-      if(state.tongueCombo%pack.words.length===0){state.bonus+=35;celebrate(TONGUE_JOKES[state.tonguePack]);}}
+    if(p.tongueCorrect){bounce=Math.max(bounce,815);
+      if(firstLanding){state.tongueCombo++;state.tongueHits++;state.bonus+=5+state.tongueCombo*2;toast(`${p.label}。舌头尚未离职。`,'teal');
+        if(state.tongueCombo%pack.words.length===0){state.bonus+=35;celebrate(TONGUE_JOKES[state.tonguePack]);}}}
     else{state.tongueCombo=0;bounce=610;pl.vx=(state.rng()<.5?-1:1)*260;toast('绕错了。舌头已进入工伤审批。','red');}
   }
   if(p.type==='bubble')bounce=735;
   if(p.type==='conveyor'){pl.vx=p.direction*(state.perks.calm?170:310);toast('流程把你运走了。本人意见不重要。','teal');}
-  if(p.type==='goldRisk'){state.goldRisks++;state.bonus+=p.riskBonus||25;pl.goldenUntil=now+1600;bounce=Math.max(bounce,825);toast('险字平台：危险已折算成 25 分。','gold');}
+  if(p.type==='goldRisk'){if(firstLanding){state.goldRisks++;state.bonus+=p.riskBonus||25;toast('险字平台：危险已折算成 25 分。','gold');}pl.goldenUntil=now+1600;bounce=Math.max(bounce,825);}
   if(now<state.shaftUntil&&p.type==='good'&&state.shaftFace<3){state.shaftFace++;updateFaceMeter();toast('普通平台恢复一点脸面。','teal');}
   pl.vy=bounce;sfx('jump');
 }
@@ -1889,6 +1890,19 @@ function runQA(){
     ['十三种随机意外与固定暗号完整',SURPRISES.length===13&&SECRET_METERS.length===5],
     ['暂停计时字段登记齐全',unregisteredTimerFields().length===0],
     ['暂停会把所有绝对计时整体后移',pauseShiftSelfTest()],
+    ['同一块台反复落地不重复计分',(()=>{
+      // 0813 的坑：landOn 每次落地都照发分，反复弹在同一块险字台上能刷到几十次 +25，
+      // 顺带把险落数/险字数刷爆——而这些计数正是轮值任务与奶茶、称号的判据。
+      const keep={bonus:state.bonus,risks:state.goldRisks,near:state.nearMisses,flow:state.flow,last:state.lastLandingAt,
+        y:state.player.y,vy:state.player.vy,seen:new Set(state.seen)};
+      const p=addPlatform({x:150,y:state.player.y+40,w:120,type:'goldRisk',dept:state.deptId,solid:true,label:''});
+      const t=performance.now();
+      landOn(p,t);const risksA=state.goldRisks,bonusA=state.bonus;
+      landOn(p,t+2600);const ok=risksA===keep.risks+1&&state.goldRisks===risksA&&state.bonus===bonusA;
+      p.alive=false;
+      state.bonus=keep.bonus;state.goldRisks=keep.risks;state.nearMisses=keep.near;state.flow=keep.flow;
+      state.lastLandingAt=keep.last;state.player.y=keep.y;state.player.vy=keep.vy;state.seen=keep.seen;
+      return ok;})()],
     ['奶茶图鉴完整且无重号',TEAS.length>=20&&new Set(TEAS.map(t=>t.id)).size===TEAS.length&&TEAS.every(t=>typeof t.test==='function'&&t.name&&t.note&&t.liquid&&t.pearl)],
     ['奶茶与称号的解锁条件不重叠',(()=>{const h=new Set(HONORS.map(x=>x.id));return TEAS.every(t=>!h.has(t.id));})()],
     ['杯子画得出来且是自包含 SVG',(()=>{const m=teaCupSvg(TEAS[0],40);return m.startsWith('<svg')&&m.includes(TEAS[0].liquid)&&!/href=|<image/.test(m);})()],
