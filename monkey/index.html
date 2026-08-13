@@ -278,6 +278,12 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 #installScreen .notice-no,#shareScreen .notice-no,#pauseScreen .notice-no,#titlesScreen .notice-no,#teaScreen .notice-no{top:7px;right:12px}
 .screen-title{text-align:center;font-family:var(--serif);font-size:28px;margin:3px 0 4px}.screen-note{text-align:center;color:var(--muted);font-size:10px;font-weight:800;margin:0 0 12px}
 .rank-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+/* 榜单行的高度不许由别人的化名决定。化名上限 12 字（#rankName maxlength），
+   320x568 上 8 个字就够把 5 行撑到卡片外——而卡片是 overflow:hidden，
+   裁掉的正好是「看完了，继续上楼」这颗唯一的退出键，手机上又没有 Esc。
+   这跟首页那两颗按钮是同一条：**卡片高度不许随内容增长**。 */
+.rank-list li>div:first-child{min-width:0}
+.rank-list li>div:first-child>b,.rank-list li>div:first-child>small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rank-list li{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:7px;padding:8px 9px;
   border:2px solid var(--ink);border-radius:11px;background:#f4ead3;font-size:11px}
 .rank-list li::before{content:attr(data-rank);width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:var(--card);font-weight:1000}
@@ -737,6 +743,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <ol id="rankList" class="rank-list"></ol>
         <div id="rankPager" class="pager"></div>
         <button id="leaderboardCloseButton" class="btn secondary">看完了，继续上楼</button>
+        <button id="leaderboardBackButton" class="corner-back" type="button">返回</button>
       </div>
     </section>
 
@@ -808,7 +815,7 @@ const el={
   bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),
-  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
+  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
   titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
   installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
@@ -2220,7 +2227,8 @@ el.start.addEventListener('click',startSolo);el.restart.addEventListener('click'
 el.resultTabs.addEventListener('click',event=>{const tab=event.target.closest('[data-result-tab]');if(tab)showResultPage(Number(tab.dataset.resultTab));});
 el.resultHome.addEventListener('click',resultToTitle);
 for(const node of [el.result,el.titles,el.teas,el.leaderboard])bindSwipePaging(node);
-el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);el.rankClose.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
+el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);
+el.rankClose.addEventListener('click',closeLeaderboard);el.rankBack.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
 el.worldTabs.addEventListener('click',event=>{const button=event.target.closest('[data-world-scope]');if(button)loadWorldBoard(button.dataset.worldScope);});
 el.sound.addEventListener('click',cycleAudioMode);
 el.pauseBtn.addEventListener('click',()=>pauseGame());el.pauseResume.addEventListener('click',()=>resumeGame());
@@ -2260,6 +2268,16 @@ function measureMenuOverflow(){
   for(let i=0;i<3;i+=1)probe(el.result,`结算第${i+1}页`,()=>showResultPage(i));
   for(let p=0;p<Math.ceil(HONORS.length/TITLE_PAGE_SIZE);p+=1)probe(el.titles,`称号墙第${p+1}页`,()=>{titlePage=p;renderTitlesScreen();});
   for(let p=0;p<Math.ceil(TEAS.length/TEA_PAGE_SIZE);p+=1)probe(el.teas,`奶茶第${p+1}页`,()=>{teaPage=p;renderTeaScreen();});
+  // 世界楼榜这一屏原来漏在门禁外面，于是 320x568 上「别人的化名太长把退出键裁掉」
+  // 这条一直没人发现。量的时候要喂**最长的化名**，因为行高是被别人的名字决定的。
+  const keepBoard=worldBoard,keepScope=worldScope,keepRank=rankPage;
+  const longAlias='猴'.repeat(12);
+  worldBoard={connected:true,me:{rank:3},nearby:[],weekLabel:'本周',rows:Array.from({length:RANK_PAGE_SIZE+2},(_,i)=>({
+    rank:i+1,alias:longAlias,tag:'ZZZZ',height:99999,score:99999,weekHeight:99999,weekScore:99999,
+    runs:999,totalMeters:999999}))};
+  for(const scope of ['weekly','alltime','effort'])
+    probe(el.leaderboard,`世界楼榜(${scope})`,()=>{worldScope=scope;rankPage=0;renderLeaderboard();});
+  worldBoard=keepBoard;worldScope=keepScope;rankPage=keepRank;renderLeaderboard();
   for(const key of KEYS)career[key]=backup[key];
   titlePage=pageBefore.title;teaPage=pageBefore.tea;
   renderCareer();renderTitlesScreen();renderTeaScreen();showResultPage(pageBefore.result);
