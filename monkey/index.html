@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.11-portrait-badges">
+<meta name="myskme-release" content="20260813.12-architecture">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -58,6 +58,10 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 @keyframes cloudDrift{from{transform:translateX(-90px)}to{transform:translateX(470px)}}
 #bgMood{transition:fill .8s ease}
 #buildingBack{opacity:.62;pointer-events:none}
+/* 立面是**背景纹理，不是画面主角**。第一版按 .detail 的默认权重画，实测截图里
+   尖券跟台阶抢视线，读起来像杂纹而不像建筑。判据：站着看能认出是哪种语言，
+   在跳的时候不该注意到它。所以笔画更细、更淡，并且只在楼体内侧那一段出现。 */
+#facadeLayer{stroke-width:1.2;opacity:.34}
 #buildingBack .wall{fill:#e6d9bd;stroke:#2f5148;stroke-width:2.2}
 #buildingBack .inside{fill:#fffaf0;stroke:#7e927e;stroke-width:1.6}
 #buildingBack .detail{fill:none;stroke:#2f5148;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
@@ -637,6 +641,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <path class="detail" d="M76 0 V844 M314 0 V844 M91 0 V844 M298 0 V844"/>
         <path class="detail" d="M74 76 Q95 64 111 77 M279 75 Q299 63 318 78 M74 650 Q94 635 111 649 M279 650 Q300 634 318 650"/>
         <g id="buildingParallax">
+          <g id="facadeLayer" class="detail" aria-hidden="true"></g>
           <g transform="translate(0 -120)">
             <path class="detail" d="M59 92 H332 M59 178 H332 M59 264 H332 M59 350 H332 M59 436 H332 M59 522 H332 M59 608 H332 M59 694 H332 M59 780 H332 M59 866 H332 M59 952 H332"/>
             <g class="window">
@@ -893,7 +898,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.11-portrait-badges',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.12-architecture',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -909,7 +914,7 @@ syncViewportMode();window.addEventListener('resize',syncViewportMode,{passive:tr
 const el={
   shell:$('gameShell'),stage:$('stage'),platformLayer:$('platformLayer'),itemLayer:$('itemLayer'),playerGroup:$('playerGroup'),motion:$('monkeyMotion'),monkey:$('monkeyUse'),wrapLeft:$('playerWrapLeft'),wrapRight:$('playerWrapRight'),wrapLeftMotion:$('monkeyWrapLeftMotion'),wrapRightMotion:$('monkeyWrapRightMotion'),wrapLeftUse:$('monkeyWrapLeftUse'),wrapRightUse:$('monkeyWrapRightUse'),
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
-  bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
+  bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),facade:$('facadeLayer'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),rotateGate:$('rotateGate'),
   start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
@@ -934,6 +939,86 @@ const DEPARTMENTS=[
 ];
 const DEPT=Object.fromEntries(DEPARTMENTS.map(d=>[d.id,d]));
 const FIXED_ORDER=DEPARTMENTS.map(d=>d.id);
+// 十二种立面语言，对应十二个部门（部门每 300 米换一次，立面跟着换）。
+// 每一条都带**一句真的建筑学知识**：不是装饰性的科普口号，是这套语言之所以长成这样的原因。
+// unit(x,y,w,h) 只画一个开间，由 facadeMarkup 平铺——所以加一种语言只写一个函数。
+// 全部走 .detail 的细线，压在楼体里、在台阶层之下，**不遮猴先生、不改任何数值**。
+const FACADES=[
+  {id:'gothic',dept:'lobby',name:'哥特尖券',era:'12 世纪 · 法兰西岛',
+   fact:'飞扶壁把屋顶的侧推力传到墙外，墙才敢被掏空成整面彩窗——结构先松手，采光才有位置。',
+   line:'大堂挑高十二米，据说是为了让人一进门就觉得自己很小。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.5} ${y+h*.12} L${x+w*.86} ${y+h*.52} V${y+h*.92} H${x+w*.14} V${y+h*.52} Z"/>`
+     +`<path d="M${x+w*.5} ${y+h*.2} V${y+h*.92}"/>`},
+  {id:'classical',dept:'quality',name:'古典柱式',era:'公元前 5 世纪 · 雅典',
+   fact:'柱式先定比例再谈装饰：柱径决定柱高、柱高决定开间，一栋楼的所有尺寸都从一个数长出来。',
+   line:'质检科认为比例即合规。不合比例的，先按不合规处理。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.22} ${y+h*.22} V${y+h*.9} M${x+w*.5} ${y+h*.22} V${y+h*.9} M${x+w*.78} ${y+h*.22} V${y+h*.9}"/>`
+     +`<path d="M${x+w*.1} ${y+h*.22} H${x+w*.9} M${x+w*.06} ${y+h*.12} H${x+w*.94}"/>`},
+  {id:'deco',dept:'fax',name:'装饰艺术退台',era:'1916 年 · 纽约',
+   fact:'纽约 1916 年区划法规定楼越高越要往里收，否则街道见不到天——今天的摩天楼轮廓是采光法规画出来的。',
+   line:'传真科因此获得了一个不通风的三角形角落，并以此为荣。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.14} ${y+h*.9} V${y+h*.5} H${x+w*.3} V${y+h*.3} H${x+w*.7} V${y+h*.5} H${x+w*.86} V${y+h*.9}"/>`
+     +`<path d="M${x+w*.5} ${y+h*.12} V${y+h*.3}"/>`},
+  {id:'curtain',dept:'rent',name:'现代幕墙',era:'1951 年 · 芝加哥',
+   fact:'结构与围护分家之后，墙不再承重，于是可以整面做成玻璃——「自由立面」是把承重任务交给柱子换来的。',
+   line:'房租科据此认为，既然墙不承重，就该由租户承重。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.12} ${y+h*.16} H${x+w*.88} V${y+h*.9} H${x+w*.12} Z"/>`
+     +`<path d="M${x+w*.37} ${y+h*.16} V${y+h*.9} M${x+w*.63} ${y+h*.16} V${y+h*.9} M${x+w*.12} ${y+h*.53} H${x+w*.88}"/>`},
+  {id:'brutal',dept:'monkey',name:'粗野主义',era:'1950 年代 · 马赛',
+   fact:'béton brut 就是「生混凝土」：拆模后不再修饰，连木纹与气泡都留着——把施工过程当成饰面。',
+   line:'驯猴办喜欢这种墙。它说这种墙不掩饰任何事，猴子也别想掩饰。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.18} ${y+h*.24} H${x+w*.82} V${y+h*.86} H${x+w*.18} Z"/>`
+     +`<path d="M${x+w*.28} ${y+h*.34} H${x+w*.72} V${y+h*.76} H${x+w*.28} Z"/>`},
+  {id:'islamic',dept:'redundancy',name:'伊斯兰几何',era:'14 世纪 · 格拉纳达',
+   fact:'一套有限的作图规则（等分圆周、连线、再等分）能生成永不重复的镶嵌——图案的复杂来自规则的重复，不来自设计者的即兴。',
+   line:'冗余科对此极为认同：规则重复得越多，越显得部门必要。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.5} ${y+h*.16} L${x+w*.84} ${y+h*.53} L${x+w*.5} ${y+h*.9} L${x+w*.16} ${y+h*.53} Z"/>`
+     +`<path d="M${x+w*.5} ${y+h*.3} L${x+w*.7} ${y+h*.53} L${x+w*.5} ${y+h*.76} L${x+w*.3} ${y+h*.53} Z"/>`},
+  {id:'shoji',dept:'fertilizer',name:'日式格子',era:'室町时代 · 京都',
+   fact:'房间尺寸由一张榻榻米反推：先定模数，再定房间，最后定房子——尺寸链是从人身上开始算的。',
+   line:'黑化肥科表示，它们的模数是一袋。一切按袋计算，包括加班。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.14} ${y+h*.2} H${x+w*.86} V${y+h*.88} H${x+w*.14} Z"/>`
+     +`<path d="M${x+w*.38} ${y+h*.2} V${y+h*.88} M${x+w*.62} ${y+h*.2} V${y+h*.88} M${x+w*.14} ${y+h*.43} H${x+w*.86} M${x+w*.14} ${y+h*.66} H${x+w*.86}"/>`},
+  {id:'dougong',dept:'puzzle',name:'中式斗拱',era:'唐代 · 五台山',
+   fact:'斗与拱层层出跳，把屋檐一步步挑出去，全靠榫卯咬合不用一根钉——悬挑不是靠强度，是靠层数。',
+   line:'谜题科认为这正是它的工作方式：一层一层出跳，谁也说不清挑出去多远。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.5} ${y+h*.88} V${y+h*.6}"/>`
+     +`<path d="M${x+w*.3} ${y+h*.6} H${x+w*.7} M${x+w*.2} ${y+h*.44} H${x+w*.8} M${x+w*.1} ${y+h*.28} H${x+w*.9}"/>`
+     +`<path d="M${x+w*.3} ${y+h*.6} V${y+h*.44} M${x+w*.7} ${y+h*.6} V${y+h*.44} M${x+w*.2} ${y+h*.44} V${y+h*.28} M${x+w*.8} ${y+h*.44} V${y+h*.28}"/>`},
+  {id:'hightech',dept:'tongue',name:'高技派',era:'1977 年 · 巴黎',
+   fact:'把结构与管线全翻到外立面上，内部才能空出一整层无柱空间——外面越乱，里面越自由。',
+   line:'绕口令办的管线也在外面。它说这样念错了容易查。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.16} ${y+h*.2} L${x+w*.84} ${y+h*.88} M${x+w*.84} ${y+h*.2} L${x+w*.16} ${y+h*.88}"/>`
+     +`<path d="M${x+w*.16} ${y+h*.2} V${y+h*.88} M${x+w*.84} ${y+h*.2} V${y+h*.88}"/>`},
+  {id:'catenary',dept:'observation',name:'悬链线拱',era:'1900 年代 · 巴塞罗那',
+   fact:'把链子倒挂，它自然垂成的曲线翻过来就是最省力的拱——形状不是画出来的，是称出来的。',
+   line:'观景台把这条挂在墙上，作为「不要硬撑」的官方依据。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.12} ${y+h*.88} Q${x+w*.5} ${y+h*.1} ${x+w*.88} ${y+h*.88}"/>`
+     +`<path d="M${x+w*.3} ${y+h*.88} Q${x+w*.5} ${y+h*.42} ${x+w*.7} ${y+h*.88}"/>`},
+  {id:'prairie',dept:'punctuation',name:'草原式',era:'1910 年 · 芝加哥郊外',
+   fact:'把屋檐压低挑远、让横线一路拉长，房子就显得贴着地面——用水平线抵消高度，是刻意的反纪念性。',
+   line:'标点科很喜欢横线。它们认为句号也是一种把话压下去的方式。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.06} ${y+h*.3} H${x+w*.94} M${x+w*.02} ${y+h*.42} H${x+w*.98} M${x+w*.1} ${y+h*.74} H${x+w*.9}"/>`
+     +`<path d="M${x+w*.28} ${y+h*.42} V${y+h*.74} M${x+w*.72} ${y+h*.42} V${y+h*.74}"/>`},
+  {id:'parametric',dept:'construction',name:'参数化表皮',era:'21 世纪 · 全球',
+   fact:'表皮的每一格由算法按受力与日照算出来，所以每一格都不一样——设计的对象从「形状」变成了「生成形状的规则」。',
+   line:'加盖工程部因此宣布：楼层数也由规则生成，恕不提前公布。',
+   unit:(x,y,w,h)=>`<path d="M${x+w*.5} ${y+h*.14} L${x+w*.9} ${y+h*.5} L${x+w*.5} ${y+h*.86} L${x+w*.1} ${y+h*.5} Z"/>`
+     +`<path d="M${x+w*.5} ${y+h*.14} V${y+h*.86} M${x+w*.1} ${y+h*.5} H${x+w*.9}"/>`}
+];
+const FACADE_BY_DEPT=Object.fromEntries(FACADES.map(f=>[f.dept,f]));
+// 平铺：楼体内墙 x 从 62 到 328，三个开间；纵向覆盖视差层的行距。
+// 数量是量出来的——再密就压过台阶，再疏就看不出是同一种语言。
+const FACADE_BAYS=3,FACADE_ROWS=13,FACADE_TOP=-140,FACADE_STEP=86;
+function facadeMarkup(facade){
+  if(!facade)return '';
+  const left=62,width=(328-62)/FACADE_BAYS,parts=[];
+  for(let row=0;row<FACADE_ROWS;row+=1){
+    const y=FACADE_TOP+row*FACADE_STEP;
+    for(let bay=0;bay<FACADE_BAYS;bay+=1)parts.push(facade.unit(left+bay*width,y,width,FACADE_STEP));
+  }
+  return parts.join('');
+}
 const RANDOM_POOL=['quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','punctuation','construction'];
 const MECHANICS=['good','bad','fax','rent','bananaBoard','fakeBanana','redundant','egg','vapor','stamp','snake','tongue','bubble','punctuation','construction','conveyor','goldRisk'];
 const DEATH_LINES=[
@@ -1136,7 +1221,7 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],motifId:'jiangnan',
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
-  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,freshTeaCount:0,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
+  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
   perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
@@ -1184,8 +1269,8 @@ function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',
 function blankTally(){return {f47:0,noPB:0,bare:0};}
 function safeTally(raw){const t=blankTally();if(raw&&typeof raw==='object')for(const k of Object.keys(t))t[k]=Math.max(0,Math.floor(Number(raw[k])||0));return t;}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],tally:safeTally(raw.tally)};}
-  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],tally:blankTally()};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],tally:safeTally(raw.tally)};}
+  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],tally:blankTally()};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
 function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
@@ -1315,7 +1400,7 @@ function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length}`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length} · 立面 ${career.facades.length}/${FACADES.length}`;
   el.wornTitle.textContent=career.worn?`称号 · ${wornHonor().name}`:`称号墙 ${career.titles.length}/${HONORS.length}`;
   el.teaOpen.textContent=career.cup?`在喝 · ${currentCup().name}`:`奶茶图鉴 ${career.teas.length}/${TEAS.length}`;
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
@@ -1446,7 +1531,7 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.mission=MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun();state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=unlockedKit(career.kit)?career.kit:'bare';
   state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
-  state.over=false;state.paused=false;state.pausedAt=0;state.choiceOpenedAt=0;state.carpHat=false;state.freshTeaCount=0;state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
+  state.over=false;state.paused=false;state.pausedAt=0;state.choiceOpenedAt=0;state.carpHat=false;state.freshTeaCount=0;state.facadeId='';state.facadesSeen=new Set();state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
   platformEls.forEach(node=>node.remove());platformEls.clear();itemEls.forEach(node=>node.remove());itemEls.clear();
   el.audit.classList.remove('show');el.elevator.classList.remove('show');el.flow.classList.remove('show');el.tongue.classList.remove('show');el.choice.classList.add('hidden');
   for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');
@@ -1736,6 +1821,20 @@ function updateDepartment(force=false,announce=true){
   if(!force&&id===state.deptId)return;
   state.deptId=id;state.deptIndex=idx;state.visited.add(id);const d=DEPT[id];
   el.bg.setAttribute('fill',d.color);el.dept.textContent=d.short;el.banner.querySelector('strong').textContent=d.name;el.banner.querySelector('span').textContent=d.line;
+  // 立面跟着部门换。知识挂在本来就会弹的这条横幅上——不新增任何一屏。
+  const facade=FACADE_BY_DEPT[id];state.facadeId=facade?facade.id:'';
+  el.facade.innerHTML=facadeMarkup(facade);
+  if(facade){
+    el.banner.querySelector('.kicker').textContent=`${facade.name} · ${facade.era}`;
+    // 知识**只在第一次见到这种立面时**送出来。一局最多路过 12 个部门，
+    // 每次都弹就成了噪音，第二局起玩家会连横幅一起无视——
+    // 那条知识本身也就白写了。第一次是发现，第十次是打扰。
+    const firstTime=!career.facades.includes(facade.id);
+    if(!IS_TEST_RUN&&firstTime){career.facades.push(facade.id);saveCareer();}
+    state.facadesSeen.add(facade.id);
+    // 晚一步再送：横幅上塞两行会把笑点和知识挤成一团，而且玩家这会儿正在跳，读不了长句。
+    if(announce&&firstTime)setTimeout(()=>{if(state.running&&state.deptId===id)toast(facade.fact,'teal');},2400);
+  }
   if(announce){el.banner.classList.toggle('avoid-left',state.player&&state.player.x<195);el.banner.style.top=getPlayerScreenY()<250?'calc(100% - 168px)':'116px';el.banner.classList.remove('show');void el.banner.offsetWidth;el.banner.classList.add('show');}
   if(id==='fax')state.faxNextAt=performance.now()+2600;
   el.fog.classList.toggle('show',id==='fertilizer');el.fertilizer.classList.toggle('show',id==='fertilizer');

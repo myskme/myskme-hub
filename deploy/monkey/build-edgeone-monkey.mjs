@@ -372,6 +372,31 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
 }
 
+// ---- 建筑立面语言 ----
+{
+  // 十二个部门必须一一对应十二种立面。少一个就会有一段楼没有立面（静默变白墙），
+  // 多一个就有一种永远看不到——两种都不会报错，只能靠这道门。
+  const deptIds = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(hit => hit[1]);
+  const facadeDepts = [...html.matchAll(/\{id:'[a-z0-9]+',dept:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(deptIds.length >= 12, '取不到部门清单（写法变了？先修本门禁的取法）');
+  assert(facadeDepts.length === deptIds.length,
+    '立面数（' + facadeDepts.length + '）与部门数（' + deptIds.length + '）对不上，会出现没有立面的楼层或永远看不到的立面');
+  for (const dept of deptIds) {
+    assert(facadeDepts.includes(dept), '部门 ' + dept + ' 没有对应的立面语言');
+  }
+  // 每一种都必须真带一句知识。没有 fact 的立面只是花纹，那就不是王老师要的那件事。
+  const facts = [...html.matchAll(/fact:'([^']{20,})'/g)];
+  assert(facts.length === facadeDepts.length, '有立面缺 fact（或 fact 太短），立面就退化成纯花纹了');
+  // 立面是背景纹理，不许盖住台阶与猴子：必须压在 buildingBack 里，且有自己的减淡规则。
+  assert(html.indexOf('id="facadeLayer"') > html.indexOf('id="buildingBack"')
+    && html.indexOf('id="facadeLayer"') < html.indexOf('id="platformLayer"'),
+    '立面层必须在楼体背景里、且在台阶层之前，否则会盖住台阶');
+  assert(/#facadeLayer\{[^}]*opacity:/.test(html), '立面层没有减淡规则，会跟台阶抢视线（0813 截图实测过）');
+  // 不写字：出海时建筑语言不需要翻译，写了字就得重画。
+  const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(!/<text|<image|href=/.test(facadeBlock), '立面里出现了文字或外链，就没法当免翻译的可复用素材了');
+}
+
 // ---- 翻页：页数少时不许再出现上一页/下一页 ----
 assert(/function bindTapToAdvance\(/.test(CODE) && (CODE.match(/\bbindTapToAdvance\b/g) || []).length >= 2,
   '「点列表空白处翻下一页」的接线没了。王老师 0813 明说上一页/下一页还是多，这是替代它的那条路。');
