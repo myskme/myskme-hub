@@ -856,12 +856,12 @@ const TEAS=[
   {id:'wide',name:'宽容卷尺奶盖',tier:'限定',liquid:'#efe0c4',pearl:'#b9a077',hint:'用一次宽容卷尺',note:'杯口判定暂时学会了做人。',test:c=>c.seen.has('tool:wide')},
   {id:'fertilizer',name:'黑化肥特调',tier:'限定',liquid:'#7f8a6a',pearl:'#3f4634',hint:'到访黑化肥仓库',note:'本饮品正在办理挥发手续。',test:c=>c.visited.has('fertilizer')},
   {id:'tongue',name:'绕口令四季春',tier:'限定',liquid:'#d9e3b0',pearl:'#8ba05c',hint:'单局绕口令踩对 3 次',note:'点单请念完整。念完整的没几个。',test:c=>c.tongue>=3},
-  {id:'observation',name:'观景台海盐',tier:'限定',liquid:'#cfe6e6',pearl:'#7fa8a8',hint:'到访观景台',note:'站得高，咸得远。',test:c=>c.visited.has('observation')},
-  {id:'construction',name:'加盖工程部 · 水泥灰拿铁',tier:'限定',liquid:'#a9a79c',pearl:'#6b6a62',hint:'到访加盖工程部',note:'先盖了再说。先喝了再说。',test:c=>c.visited.has('construction')},
+  {id:'observation',name:'观景台海盐',tier:'隐藏',liquid:'#cfe6e6',pearl:'#7fa8a8',hint:'',secret:true,note:'站得高，咸得远。观景台在 2700 米，风大。',test:c=>c.visited.has('observation')},
+  {id:'construction',name:'加盖工程部 · 水泥灰拿铁',tier:'隐藏',liquid:'#a9a79c',pearl:'#6b6a62',hint:'',secret:true,note:'先盖了再说。先喝了再说。工程部在 3300 米，还在加盖。',test:c=>c.visited.has('construction')},
   {id:'rescue',name:'鱼小姐推荐 · 青提乌龙',tier:'隐藏',liquid:'#8fcf9e',pearl:'#3f8a58',hint:'',secret:true,note:'她推的。她没解释。',test:c=>c.rescue>0},
   {id:'carp',name:'红鲤鱼冰萃（仿的）',tier:'隐藏',liquid:'#e0452c',pearl:'#8d2417',hint:'',secret:true,note:'驴看了一眼：「仿的。」',test:c=>c.carpHat},
   {id:'donkey',name:'驴认证 · 纯茶不加料',tier:'隐藏',liquid:'#a58d72',pearl:'#6b5844',hint:'',secret:true,note:'不加料。驴很满意。驴不说话。',test:c=>c.tools===0&&c.meters>=200},
-  {id:'ghost',name:'谈话人特饮（无人认领）',tier:'隐藏',liquid:'#b9a3d8',pearl:'#5f4b86',hint:'',secret:true,note:'谈话人点的。他没来。杯子还在。',test:c=>c.seen.has('secret')}
+  {id:'ghost',name:'谈话人特饮（无人认领）',tier:'限定',liquid:'#b9a3d8',pearl:'#5f4b86',hint:'撞上任意一个固定暗号',note:'谈话人点的。他没来。杯子还在。',test:c=>c.seen.has('secret')}
 ];
 const POSTER_RANKS=[
   {min:0,name:'门口观察猴'},{min:30,name:'楼梯试用猴'},{min:60,name:'半层代理员'},{min:100,name:'百层猴王'},
