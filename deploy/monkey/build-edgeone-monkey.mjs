@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { access, cp, mkdir, mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { access, cp, mkdir, mkdtemp, readFile, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +25,35 @@ function run(command, args, options) {
       new Error(command + ' 退出码 ' + code + (stderr ? '：' + stderr.trim() : '')),
     ));
   });
+}
+
+async function filesUnder(root) {
+  const files = [];
+  for (const entry of await readdir(root, { withFileTypes: true })) {
+    if (entry.name.startsWith('.')) continue;
+    const target = path.join(root, entry.name);
+    if (entry.isDirectory()) files.push(...await filesUnder(target));
+    else if (entry.isFile()) files.push(target);
+  }
+  return files;
+}
+
+async function pwaAssetHash() {
+  // 这里只盯安装清单与桌面图标。index.html 是导航网络优先，不属于这道缓存换代门；
+  // 把它算进来会导致每次改文案或玩法都让所有玩家白白重下静态资源。
+  const files = [
+    path.join(projectRoot, 'manifest.webmanifest'),
+    ...await filesUnder(path.join(projectRoot, 'icons')),
+  ].sort((a, b) => a.localeCompare(b, 'en'));
+  assert(files.length >= 6, 'PWA 哈希输入不完整：manifest.webmanifest 加 icons/ 至少应有 6 个文件');
+  const hash = createHash('sha256');
+  for (const file of files) {
+    hash.update(path.relative(projectRoot, file).split(path.sep).join('/'));
+    hash.update('\0');
+    hash.update(await readFile(file));
+    hash.update('\0');
+  }
+  return hash.digest('hex').slice(0, 12);
 }
 
 try { await access(output); throw new Error('输出文件已存在，拒绝覆盖：' + output); } catch (error) {
@@ -131,6 +160,10 @@ const swSource = await readFile(path.join(projectRoot, 'sw.js'), 'utf8');
 assert(/cache:\s*'reload'/.test(swSource), "sw.js 安装没用 cache:'reload'，新版缓存会被旧的 HTTP 缓存污染（0812 海报金鱼就是这么来的）");
 const SW_CACHE = (swSource.match(/const CACHE='([^']+)'/) || [])[1];
 assert(SW_CACHE, '取不到 sw.js 的缓存版本名（const CACHE 的写法变了？）');
+const PWA_ASSET_HASH = await pwaAssetHash();
+assert(SW_CACHE.endsWith('-' + PWA_ASSET_HASH),
+  'icons/ 或 manifest.webmanifest 已变化，但 sw.js CACHE 没带当前哈希 -' + PWA_ASSET_HASH
+  + '。只在这两类资源变化时更新 CACHE；index.html 不在本门禁范围内。');
 
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
