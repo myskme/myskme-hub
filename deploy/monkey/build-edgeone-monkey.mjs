@@ -67,6 +67,16 @@ assert(!html.includes('myskme.com/fun/monkey'), '仍含已废弃的目录地址'
 assert(manifest.name === '是猴就上100层' && manifest.icons?.length >= 3, 'PWA 清单或图标声明不完整');
 for (const icon of manifest.icons) await access(path.join(projectRoot, icon.src.replace(/^\.\//, '')));
 assert(html.includes('function buildPoster()') && html.includes('function syncViewportMode()'), '海报或安卓宽视口修复缺失');
+// 每个自检入口都必须有对应的函数定义，而且不许有悬空调用。
+// 0813 血泪：拆多人模式时「从 runPartyQA 一路删到 runPosterQA」，把夹在中间的
+// runStressQA 一起删掉了——而 ?qa=1 覆盖不到 ?stress=1，于是自检全绿、
+// 24000 帧压力测试其实已经没了（CLAUDE.md 里它是零容忍项）。
+// 同一类错这次是第二次：更早一次差点把主循环 loop() 删掉。
+// 教训写成门：**按函数名删整段之前，先确认区间中间夹着谁**。
+for (const fn of ['runQA', 'runStressQA', 'runPosterQA']) {
+  assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(html), '自检入口 ' + fn + ' 的定义不见了（删整段时被夹带走了？）');
+  assert(html.includes(fn + '('), '自检入口 ' + fn + ' 没有被调用，等于形同虚设');
+}
 assert(html.includes('const SURPRISES=[') && html.includes('MUSIC_TICK_MS=70'), '惊喜池或省电音频调度缺失');
 assert(html.includes('function pauseGame(') && html.includes('function resumeGame(') && html.includes('function shiftDeadlines('), '暂停系统缺失');
 assert(html.includes('const HONORS=['), '称号系统缺失');

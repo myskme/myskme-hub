@@ -1916,6 +1916,18 @@ function runQA(){
   ];
   const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n未登记计时字段：${unregisteredTimerFields().join(' / ')||'无'}\n称号：${career.titles.length}/${HONORS.length}　奶茶：${career.teas.length}/${TEAS.length}\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n不可达主路：${unreachable.length}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
 }
+function runStressQA(steps=24000){
+  resetWorld(0x5a17);state.running=true;state.autopilot=true;state.stressMode=true;let now=performance.now(),minSy=Infinity,maxSy=-Infinity,maxHeight=0,fail='';
+  for(let i=0;i<steps;i++){
+    if(i>0&&i%220===0){state.player.y+=260;state.player.vy=820;}
+    if(i>0&&i%1800===0){state.player.y=state.cameraY-50;state.player.vy=-280;}
+    now+=16;updateMovingPlatforms(now);updatePhysics(.016,now);updateDepartment(false,false);if(i%30===0)renderAll(now);
+    const pl=state.player,sy=H-(pl.y-state.cameraY)-108;minSy=Math.min(minSy,sy);maxSy=Math.max(maxSy,sy);maxHeight=Math.max(maxHeight,state.maxMeters);
+    if(![pl.x,pl.y,pl.vx,pl.vy,state.cameraY,sy].every(Number.isFinite)){fail=`第 ${i} 步出现非数值`;break;}
+    if(sy<54||sy>H-150){fail=`第 ${i} 步角色离开安全画面：${sy.toFixed(1)}`;break;}
+  }
+  state.running=false;state.autopilot=false;state.stressMode=false;renderAll(now);$('qaReport').style.display='block';$('qaReport').textContent=`${fail?'FAIL':'PASS'} · 角色长局可见性压力测试\n\n模拟帧：${steps}\n模拟时长：${Math.round(steps*16/1000)} 秒\n最高高度：${maxHeight} 米\n鱼式接回：${state.stressRescues} 次\n画面纵坐标：${minSy.toFixed(1)} 至 ${maxSy.toFixed(1)}\n坐标修复：${state.playerRepairs} 次${fail?`\n失败：${fail}`:'\n结论：猴先生全程保持在安全画面内。'}`;
+}
 function runPosterQA(){
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }
