@@ -2,17 +2,17 @@
 <defs>
 <symbol id="art-donkey" viewBox="0 0 120 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#8d7259" transform="rotate(24 22 33)"/>
+            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(24 22 33)"/>
             <ellipse cx="22" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(24 22 33)"/>
-            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#8d7259" transform="rotate(-24 86 33)"/>
+            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(-24 86 33)"/>
             <ellipse cx="86" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(-24 86 33)"/>
-            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#8d7259"/>
-            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#8d7259"/>
-            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#8d7259"/>
+            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
+            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
+            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#7b6248"/>
             <ellipse cx="54" cy="110" rx="13.5" ry="8" fill="#fff5d1" stroke-width="2.3"/>
-            <circle cx="45.5" cy="23.5" r="4.6" fill="#8d7259" stroke-width="2.5"/>
-            <circle cx="55" cy="20" r="5.4" fill="#8d7259" stroke-width="2.5"/>
-            <circle cx="64.5" cy="23" r="4.8" fill="#8d7259" stroke-width="2.5"/>
+            <circle cx="45.5" cy="23.5" r="4.6" fill="#7b6248" stroke-width="2.5"/>
+            <circle cx="55" cy="20" r="5.4" fill="#7b6248" stroke-width="2.5"/>
+            <circle cx="64.5" cy="23" r="4.8" fill="#7b6248" stroke-width="2.5"/>
             <path d="M20 55 Q20 29 40 22 Q54 18 68 22 Q88 29 88 55 Q88 77 72 87 Q54 95 36 87 Q20 77 20 55 Z" fill="#a58d72"/>
             <ellipse cx="54" cy="70" rx="19.5" ry="13.5" fill="#fff5d1" stroke-width="2.4"/>
             <ellipse cx="41" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-12 41 49)"/>

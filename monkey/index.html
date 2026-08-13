@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.3-solo-tea-newart">
+<meta name="myskme-release" content="20260813.4-solo-tea-newart-bugfix">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -308,7 +308,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 #gameShell:not(.running) .cloud,#gameShell:not(.running) #bubbleField circle,#gameShell:not(.running) #fogField path{animation-play-state:paused!important}
 @media(max-height:680px){.title-art{width:86px;height:76px}.brief{margin-bottom:8px;padding:7px 9px;line-height:1.45}.card{padding:15px}h1{font-size:26px}.subtitle{margin-bottom:8px}.career,.mission-card,.kit-grid{margin-bottom:7px}}
 @media(max-width:699px){
-  #gameShell{width:100vw;height:100vh;height:min(100svh,calc(100vw * 2.5));max-height:none;border-inline:0;box-shadow:none}
+  #gameShell{width:min(100vw,460px);height:100vh;height:min(100svh,calc(min(100vw,460px) * 2.5));max-height:none;border-inline:0;box-shadow:none}
   html,body{background:var(--paper)}
   #app{background:var(--paper)}
 }
@@ -409,17 +409,17 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         </symbol>
         <symbol id="art-donkey" viewBox="0 0 120 120">
           <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#8d7259" transform="rotate(24 22 33)"/>
+            <ellipse cx="22" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(24 22 33)"/>
             <ellipse cx="22" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(24 22 33)"/>
-            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#8d7259" transform="rotate(-24 86 33)"/>
+            <ellipse cx="86" cy="33" rx="10.2" ry="24.5" fill="#7b6248" transform="rotate(-24 86 33)"/>
             <ellipse cx="86" cy="33" rx="5" ry="16" fill="#f0d3a4" stroke-width="2.2" transform="rotate(-24 86 33)"/>
-            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#8d7259"/>
-            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#8d7259"/>
-            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#8d7259"/>
+            <ellipse cx="25" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
+            <ellipse cx="83" cy="113" rx="9" ry="6.8" fill="#7b6248"/>
+            <path d="M42 94 C33 100 29 108 28 120 L80 120 C79 108 75 100 66 94 Z" fill="#7b6248"/>
             <ellipse cx="54" cy="110" rx="13.5" ry="8" fill="#fff5d1" stroke-width="2.3"/>
-            <circle cx="45.5" cy="23.5" r="4.6" fill="#8d7259" stroke-width="2.5"/>
-            <circle cx="55" cy="20" r="5.4" fill="#8d7259" stroke-width="2.5"/>
-            <circle cx="64.5" cy="23" r="4.8" fill="#8d7259" stroke-width="2.5"/>
+            <circle cx="45.5" cy="23.5" r="4.6" fill="#7b6248" stroke-width="2.5"/>
+            <circle cx="55" cy="20" r="5.4" fill="#7b6248" stroke-width="2.5"/>
+            <circle cx="64.5" cy="23" r="4.8" fill="#7b6248" stroke-width="2.5"/>
             <path d="M20 55 Q20 29 40 22 Q54 18 68 22 Q88 29 88 55 Q88 77 72 87 Q54 95 36 87 Q20 77 20 55 Z" fill="#a58d72"/>
             <ellipse cx="54" cy="70" rx="19.5" ry="13.5" fill="#fff5d1" stroke-width="2.4"/>
             <ellipse cx="41" cy="49" rx="5.4" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-12 41 49)"/>
@@ -450,12 +450,12 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
             <path d="M37.4 36 Q42 33.7 46.6 35.6 M72.6 36 Q68 33.7 63.4 35.6" fill="none" stroke-width="2.1" opacity=".7"/>
             <ellipse cx="42" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(14 42 45)"/><ellipse cx="68" cy="45" rx="6" ry="7.4" fill="#2f5148" stroke="none" transform="rotate(-14 68 45)"/>
             <circle cx="39.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/><circle cx="65.8" cy="41.9" r="2.05" fill="#fffdf6" stroke="none"/>
-            <ellipse cx="39" cy="57" rx="5.8" ry="3.6" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="71" cy="57" rx="5.8" ry="3.6" fill="#ee9f9a" stroke="none" opacity=".8"/>
+            <ellipse cx="41" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/><ellipse cx="69" cy="57" rx="5" ry="3.4" fill="#ee9f9a" stroke="none" opacity=".8"/>
             <path d="M52.3 59.6 Q55 62.5 57.7 59.6" fill="none" stroke-width="2.5"/>
             <g transform="rotate(-2 55 81)">
               <rect x="34" y="70" width="42" height="22" rx="7" fill="#f1bd3c" stroke-width="2.5"/>
               <text x="45.5" y="85.4" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#7e7f68" stroke="none">egg</text>
-              <path d="M36.5 84.1 L55 82.1" stroke="#d94b32" stroke-width="2.4"/>
+              <path d="M36.5 83.3 L55 82.5" stroke="#d94b32" stroke-width="2.4"/>
               <text x="66" y="86.3" text-anchor="middle" font-family="sans-serif" font-size="14.5" font-weight="700" fill="#2f5148" stroke="none">蛋</text>
             </g>
           </g>
@@ -468,7 +468,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
             <path d="M83 65 Q90 70 92 78" fill="none" stroke-width="1.7" opacity=".26"/>
             <path d="M19 32 Q16 41 19 50" fill="none" stroke-width="1.6" opacity=".28"/>
             <path d="M34 27 Q42 25 50 27 Q62 29 68 38 Q71 48 63 55 Q69 61 78 67 Q85 74 80 82 Q73 88 56 88 Q42 87 36 79 Q32 71 37 65 Q41 60 34.5 55 Q26 48 24 40 Q23 29 34 27 Z" fill="#fff5d1" stroke-width="2.4"/>
-            <path d="M58 68 Q64 68 64.8 76 Q65.5 84 58 84 Q50.5 84 51.2 76 Q52 68 58 68 Z" fill="#ffe9b8" stroke-width="2" stroke-opacity=".6"/>
+            <path d="M58 66.5 Q62.6 68.4 64.2 76 Q65.4 85 58 85.5 Q50.6 85 51.8 76 Q53.4 68.4 58 66.5 Z" fill="#f8dca2" stroke-width="2.1" stroke-opacity=".85"/>
             <ellipse cx="35" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(-14 35 41)"/>
             <ellipse cx="57" cy="41" rx="5.8" ry="6.8" fill="#2f5148" stroke="none" transform="rotate(14 57 41)"/>
             <circle cx="33.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="55.2" cy="38.1" r="1.8" fill="#fffdf6" stroke="none"/>
@@ -728,7 +728,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.3-solo-tea-newart',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
+const RELEASE='20260813.4-solo-tea-newart-bugfix',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -809,7 +809,7 @@ const SURPRISES=[
   {id:'quiet',rarity:'稀有意外',text:'全楼安静了两秒，因为没人知道下一句。',kind:'quiet'},
   {id:'refund',rarity:'稀有意外',text:'房租稽查科第一次退款。虽然只有 18 分。',kind:'refund'},
   {id:'fish',rarity:'稀有意外',text:'鱼小姐把一个备用泡泡藏进了档案袋。',kind:'fish'},
-  {id:'overtime',rarity:'少见意外',text:'多人赛收到三秒加班；单猴赛收到十三分。',kind:'overtime'},
+  {id:'overtime',rarity:'少见意外',text:'单猴赛收到十三分。',kind:'overtime'},
   {id:'confetti',rarity:'普通意外',text:'没有原因。突然庆祝。',kind:'confetti'},
   {id:'platform',rarity:'稀有意外',text:'空气临时被认定为平台，保质三秒。',kind:'platform'},
   {id:'secret',rarity:'极怪意外',text:'谈话人来过。只留下一个问号和 52 分。',kind:'secret'},
@@ -822,7 +822,7 @@ const SURPRISES=[
 // 否则自检没法喂假数据，这张表就变成没人验得了的东西。
 const HONORS=[
   {id:'certified',name:'专业坠落员（MYSKME 认证）',hint:'完成第一局',line:'认证方式：摔了一次。认证机构：也是我们。',test:c=>c.runs>=1},
-  {id:'zerofloor',name:'零层劝退',hint:'一层都没上到就结束一局',line:'前台还没抬头，你已经回来了。',test:c=>c.floors<1},
+  {id:'zerofloor',name:'零层劝退',hint:'几乎没离开大堂就结束一局（不超过 45 米）',line:'前台还没抬头，你已经回来了。',test:c=>c.meters<=45},
   {id:'grudge47',name:'和 47 层有私人恩怨',hint:'在第 47 层结束 3 次',line:'那层什么也没有。所以更可疑。',test:c=>c.tally.f47>=3},
   {id:'genuine',name:'正版猴（驴颁发）',hint:'单局到访 8 个部门',line:'驴看了很久，然后盖了章。它平时不盖章。',test:c=>c.depts>=8},
   {id:'moremonkey',name:'比猴先生还猴',hint:'单局最高连跳 12',line:'猴先生本人已就此提出异议。',test:c=>c.flow>=12},
@@ -927,7 +927,7 @@ const MISSIONS=[
 // 那不叫暂停，那叫作弊入口。切后台同理（原来只停 rAF、不停计时，就是这个漏）。
 // **新加计时字段一定要登记进下面三张表**，runQA 的「暂停计时字段登记齐全」会当场抓漏。
 const PAUSE_TIME_FIELDS=['lowGravityUntil','windUntil','faxNextAt','shaftUntil','shaftLastHit','shaftStartedAt',
-  'faxRainUntil','deathFreezeUntil','magnetUntil','wideUntil','lastLandingAt'];
+  'faxRainUntil','deathFreezeUntil','magnetUntil','wideUntil','lastLandingAt','choiceOpenedAt'];
 const PAUSE_PLAYER_TIME_FIELDS=['rocketUntil','goldenUntil','stampedUntil'];
 const PAUSE_ENTITY_TIME_FIELDS=['expireAt','breakAt'];
 // 这几个名字也以 At 结尾，但不在 performance.now() 这条时间轴上，别跟着移。
@@ -948,7 +948,7 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
-  animationFrame:0,paused:false,pausedAt:0,carpHat:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
+  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
   perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
@@ -1040,7 +1040,7 @@ function unlockAudio(){
     if(audioSuspendTimer)clearTimeout(audioSuspendTimer),audioSuspendTimer=0;
     if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)();buildAudioGraph();}
     if(audioCtx.state==='suspended')audioCtx.resume();
-    if(state.running&&audioMode==='full')startMusic();
+    if(state.running&&!state.paused&&audioMode==='full')startMusic();
     if(!state.running)scheduleAudioSuspend(900);
   }catch(_){}
 }
@@ -1130,14 +1130,14 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.eventPool=shuffle(MAJOR_EVENTS);state.nextEventMeter=DEBUG_START+520+Math.floor(state.rng()*180);state.lowGravityUntil=0;state.windUntil=0;
   state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;
   state.milestones=new Set(MILESTONES.filter(m=>m<=DEBUG_START));state.lucky=DEBUG_START>=1020;state.fertilizerCoughed=false;
-  state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
+  state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.lastLandingId='';state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
   state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.choiceOpen=false;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
   state.runId=makeRunId();state.rankSubmitted=false;state.lastSafe={x:DEBUG_X,y:baseY};state.playerRepairs=0;state.faxRainUntil=0;
   state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
   state.mission=MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun();state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=unlockedKit(career.kit)?career.kit:'bare';
   state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
-  state.over=false;state.paused=false;state.pausedAt=0;state.carpHat=false;state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
+  state.over=false;state.paused=false;state.pausedAt=0;state.choiceOpenedAt=0;state.carpHat=false;state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
   platformEls.forEach(node=>node.remove());platformEls.clear();itemEls.forEach(node=>node.remove());itemEls.clear();
   el.audit.classList.remove('show');el.elevator.classList.remove('show');el.flow.classList.remove('show');el.tongue.classList.remove('show');el.choice.classList.add('hidden');
   for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');
@@ -1285,7 +1285,10 @@ function landOn(p,now){
   for(const node of playerMotions){node.classList.remove('landing');void node.getBBox();node.classList.add('landing');setTimeout(()=>node.classList.remove('landing'),210);}
   state.autoTargetId='';
   state.lastSafe={x:clamp(pl.x,p.x+8,p.x+p.w-8),y:p.y};
-  state.flow=now-state.lastLandingAt<1450?Math.min(FLOW_CAP,state.flow+1):1;state.lastLandingAt=now;state.maxFlow=Math.max(state.maxFlow,state.flow);
+  // 连跳只认「换了一块台」。原地在同一块台上反复弹不是连跳，既不加也不断，
+  // 否则什么都不按就能把连跳刷到上限（0813 查 bug 抓到的挂机刷分）。
+  if(p.id!==state.lastLandingId)state.flow=now-state.lastLandingAt<1450?Math.min(FLOW_CAP,state.flow+1):1;
+  state.lastLandingId=p.id;state.lastLandingAt=now;state.maxFlow=Math.max(state.maxFlow,state.flow);
   if(state.flow>=3){state.bonus+=Math.min(4,Math.floor(state.flow/3));el.flow.textContent=`连跳 ${state.flow} · 流程居然顺了`;el.flow.classList.add('show');}
   else el.flow.classList.remove('show');
   const edge=Math.min(Math.max(0,pl.x-p.x),Math.max(0,p.x+p.w-pl.x));
@@ -1489,12 +1492,15 @@ function triggerMajorEvent(type,now){
   if(type==='elevator'){state.player.rocketUntil=Math.max(state.player.rocketUntil,now+1700);state.bonus+=18;el.elevator.classList.add('show');setTimeout(()=>el.elevator.classList.remove('show'),2600);toast('电梯终于赶上了猴先生，并把他弹了出去。+18。','gold');sfx('elevator');}
 }
 function openPerkChoice(){
-  state.choiceOpen=true;input.left=input.right=false;const choices=shuffle(PERK_POOL).slice(0,3);el.choiceGrid.innerHTML='';
+  state.choiceOpen=true;state.choiceOpenedAt=performance.now();input.left=input.right=false;const choices=shuffle(PERK_POOL).slice(0,3);el.choiceGrid.innerHTML='';
   for(const perk of choices){const b=document.createElement('button');b.className='choice-card';b.dataset.perk=perk.id;b.innerHTML=`<b>${perk.name}</b><span>${perk.line}</span>`;b.addEventListener('click',()=>choosePerk(perk));el.choiceGrid.appendChild(b);}
   el.choice.classList.remove('hidden');sfx('quiet');if(AUTO_PLAY)setTimeout(()=>{if(state.choiceOpen)choosePerk(choices[0]);},180);
 }
 function choosePerk(perk){
-  if(!state.choiceOpen)return;state.choiceOpen=false;if(perk.id==='insurance')state.player.waiver++;else state.perks[perk.id]=(state.perks[perk.id]||0)+1;
+  if(!state.choiceOpen)return;state.choiceOpen=false;
+  // 选卡这段时间不算数：整体后移，和暂停走同一条通道。切后台读了五分钟也一样补得回来。
+  if(state.choiceOpenedAt)shiftDeadlines(Math.max(0,performance.now()-state.choiceOpenedAt));state.choiceOpenedAt=0;
+  if(perk.id==='insurance')state.player.waiver++;else state.perks[perk.id]=(state.perks[perk.id]||0)+1;
   el.choice.classList.add('hidden');lastFrame=performance.now();toast(`临时任命：${perk.name}。离职时间：本局结束。`,'gold');sfx('boost');
 }
 function celebrate(message){spawnConfetti(26);toast(message,'gold');sfx('boost');}
@@ -1576,7 +1582,10 @@ function startRun(seed=Date.now()&0xffffffff){
 }
 function finishRun(reason='fall'){
   if(!state.running)return;state.running=false;state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.choiceOpen=false;state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.choice.classList.add('hidden');el.shell.classList.remove('running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
-  const oldHeight=saved.height,oldScore=saved.score;saved.height=Math.max(saved.height,state.maxMeters);saved.score=Math.max(saved.score,state.score);saveRecord();
+  // 调试参数跑出来的成绩不许进本机纪录。原来只挡了 career，漏了 saved——
+  // ?start=1200 之类一开，假高度就永久盖进玩家的最高纪录了。
+  const oldHeight=saved.height,oldScore=saved.score;
+  if(!IS_TEST_RUN){saved.height=Math.max(saved.height,state.maxMeters);saved.score=Math.max(saved.score,state.score);saveRecord();}
   const di=chooseNonRepeat(DEATH_LINES,lastDeathIndex);lastDeathIndex=di;const si=chooseNonRepeat(SLOGANS,lastSloganIndex);lastSloganIndex=si;
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
@@ -1672,7 +1681,9 @@ function resumeGame(now=performance.now()){
   state.paused=false;state.pausedAt=0;input.left=input.right=false;
   el.pause.classList.add('hidden');
   lastFrame=now;lastRenderedFrame=0;
-  if(audioMode==='full'){unlockAudio();startMusic();}
+  // 不管哪一档都要把 AudioContext 唤回来（暂停时把它挂起了），否则「仅音效」档恢复后整局静音。
+  if(audioMode!=='off')unlockAudio();
+  if(audioMode==='full')startMusic();
   ensureGameLoop();
   return true;
 }
@@ -1732,7 +1743,7 @@ function evaluateTeas(ctx){
     let ok=false;try{ok=!!t.test(ctx);}catch(_){ok=false;}
     if(ok){career.teas.push(t.id);fresh.push(t);}
   }
-  if(fresh.length){career.cup=fresh[fresh.length-1].id;saveCareer();}
+  if(fresh.length){if(!career.cup)career.cup=fresh[fresh.length-1].id;saveCareer();}
   return fresh;
 }
 function currentCup(){return TEAS.find(t=>t.id===career.cup)||null;}
@@ -1789,7 +1800,7 @@ function renderLeaderboard(){
 function openLeaderboard(){renderLeaderboard();el.leaderboard.classList.remove('hidden');}
 function closeLeaderboard(){el.leaderboard.classList.add('hidden');}
 function submitRank(){
-  if(!state.over||state.rankSubmitted)return;const row={id:state.runId,name:cleanName(el.rankName.value),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
+  if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const row={id:state.runId,name:cleanName(el.rankName.value),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
   localBoard.push(row);localBoard.sort((a,b)=>b.score-a.score||b.height-a.height||b.at-a.at);localBoard.splice(30);saveBoard();state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='已登记';renderLeaderboard();toast('榜单已写入本机。云端对此一无所知。','teal');
 }
 let posterData='',posterVariant=null,posterMark='',posterGenerating=false,posterQrModules=0;
@@ -1798,7 +1809,7 @@ function posterRank(){const floor=floorsFromMeters(state.maxMeters);return [...P
 function choosePosterVariant(){const roll=randomUnit();return POSTER_VARIANTS.find(v=>roll<=v.upto)||POSTER_VARIANTS[0];}
 function receiptMark(){const raw=[state.runId,state.seed,state.maxMeters,state.score,state.bananas,state.maxFlow,state.nearMisses,state.surpriseCount].join('|');let h=2166136261;for(let i=0;i<raw.length;i++)h=Math.imul(h^raw.charCodeAt(i),16777619);const code=(h>>>0).toString(36).toUpperCase().padStart(7,'0');return `${code.slice(0,4)}-${code.slice(4)}`;}
 function roundRectPath(c,x,y,w,h,r=18){const rr=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+rr,y);c.arcTo(x+w,y,x+w,y+h,rr);c.arcTo(x+w,y+h,x,y+h,rr);c.arcTo(x,y+h,x,y,rr);c.arcTo(x,y,x+w,y,rr);c.closePath();}
-function wrapCanvasText(c,text,x,y,maxWidth,lineHeight,maxLines=2){const chars=[...String(text)],lines=[];let line='';for(const ch of chars){const next=line+ch;if(c.measureText(next).width>maxWidth&&line){lines.push(line);line=ch;if(lines.length===maxLines-1)break;}else line=next;}const used=lines.join('').length;if(lines.length<maxLines)lines.push(used<chars.length?chars.slice(used).join(''):line);if(lines.length===maxLines&&used<chars.length){while(c.measureText(lines[maxLines-1]+'…').width>maxWidth)lines[maxLines-1]=lines[maxLines-1].slice(0,-1);lines[maxLines-1]+='…';}lines.slice(0,maxLines).forEach((part,i)=>c.fillText(part,x,y+i*lineHeight));return y+Math.min(lines.length,maxLines)*lineHeight;}
+function wrapCanvasText(c,text,x,y,maxWidth,lineHeight,maxLines=2){const chars=[...String(text)],lines=[];let line='';for(const ch of chars){const next=line+ch;if(c.measureText(next).width>maxWidth&&line){lines.push(line);line=ch;if(lines.length===maxLines-1)break;}else line=next;}let used=lines.join('').length;if(lines.length<maxLines){lines.push(used<chars.length?chars.slice(used).join(''):line);used=lines.join('').length;}if(lines.length===maxLines&&used<chars.length){while(c.measureText(lines[maxLines-1]+'…').width>maxWidth)lines[maxLines-1]=lines[maxLines-1].slice(0,-1);lines[maxLines-1]+='…';}lines.slice(0,maxLines).forEach((part,i)=>c.fillText(part,x,y+i*lineHeight));return y+Math.min(lines.length,maxLines)*lineHeight;}
 // 单行、按宽度截断。放得下就原样，放不下才补省略号——
 // 别用 wrapCanvasText(...,maxLines=1) 代替它，那条路径会给放得下的文本也补一个省略号。
 function fitCanvasLine(c,text,maxWidth){
