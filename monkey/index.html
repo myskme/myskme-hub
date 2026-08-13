@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.13-modes">
+<meta name="myskme-release" content="20260813.14-palette">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -294,6 +294,9 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .stat{background:#f4ead3;border:2px solid var(--ink);border-radius:12px;padding:8px 5px;text-align:center}
 .stat b{display:block;font-size:19px}.stat span{display:block;font-size:9px;color:var(--muted);font-weight:900;letter-spacing:.08em}
 .visited{font-size:11px;line-height:1.7;color:var(--muted);padding:10px 12px;border:2px dashed #a7977c;border-radius:12px;margin-bottom:11px}
+/* 配色说明只在初见那扇窗景时出现，所以它必须是可以整块消失的——
+   常驻的话既占地方，也把「初见」这件事的价值稀释掉。 */
+.palette-note{border-style:solid;border-color:#c9bfa6;background:#f8efd9;color:var(--ink)}
 .brand-box{background:var(--ink);color:var(--paper);border-radius:13px;padding:12px 14px;margin-bottom:13px}
 .brand-box b{font-size:18px;letter-spacing:.12em}.brand-box p{font-family:var(--serif);font-size:12px;line-height:1.55;margin:5px 0 0;color:#f1d99f}
 .result-stamp{position:absolute;right:9px;top:93px;width:76px;height:76px;border:5px double var(--red);border-radius:50%;display:grid;place-items:center;
@@ -769,6 +772,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="result-page hidden" data-result-page="1">
           <h2 class="screen-title">本局档案</h2>
           <div id="visitedDepartments" class="visited"></div>
+          <div id="motifPalette" class="visited palette-note is-hidden"></div>
           <div id="missionResult" class="mission-result"></div>
           <div id="freshHonors" class="honor-fresh is-hidden"></div>
           <div id="teaOrder" class="tea-order"></div>
@@ -898,7 +902,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.13-modes',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260813.14-palette',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1058,6 +1062,42 @@ const FACADES=[
      +`<path d="M${x+w*.5} ${y+h*.14} V${y+h*.86} M${x+w*.1} ${y+h*.5} H${x+w*.9}"/>`}
 ];
 const FACADE_BY_DEPT=Object.fromEntries(FACADES.map(f=>[f.dept,f]));
+// 配色学。第三个「一个部门一门学问」的领域，挂在八种世界窗景上。
+//
+// 和立面、调式最大的不同：**这一次的知识是可校验的**。
+// 每种窗景声明自己属于哪一档色相关系，下面的分类器再从真实色值算一遍，两者必须对上
+// （见 ?qa=1 的「窗景配色声明与实际色值对得上」）。谁改了一个 hex 让配色不再成立，
+// 自检立刻红——说法不是贴上去的标签，是一条被盯着的断言。
+function hexToHsl(hex){
+  const raw=hex.replace('#','');
+  const r=parseInt(raw.slice(0,2),16)/255,g=parseInt(raw.slice(2,4),16)/255,b=parseInt(raw.slice(4,6),16)/255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2;
+  let h=0,sat=0;
+  if(max!==min){
+    const d=max-min;sat=l>.5?d/(2-max-min):d/(max+min);
+    h=max===r?((g-b)/d+(g<b?6:0)):max===g?((b-r)/d+2):((r-g)/d+4);h*=60;
+  }
+  return {h:Math.round(h),s:Math.round(sat*100),l:Math.round(l*100)};
+}
+// 色相差取环上最短距离，所以永远落在 0..180。
+function hueGap(a,b){const raw=Math.abs(hexToHsl(a).h-hexToHsl(b).h)%360;return Math.round(raw>180?360-raw:raw);}
+// 通用的色相差分级。边界写在一处，声明与校验共用同一张表——
+// 分两处写迟早出现「声明按这张表、校验按那张表」。
+const HUE_BANDS=[[15,'同类色'],[45,'类似色'],[75,'邻近色'],[105,'中差色'],[165,'对比色'],[180,'互补色']];
+function classifyScheme(a,b){const gap=hueGap(a,b);return (HUE_BANDS.find(([limit])=>gap<=limit)||HUE_BANDS[HUE_BANDS.length-1])[1];}
+// 每一档「为什么这么配就成立」。写的是原理，不是名词解释。
+const SCHEME_FACTS={
+  同类色:'色相差不到 15 度，画面靠明暗和浓淡拉层次，不靠颜色——所以最容易统一，也最容易平淡；救它的永远是明度差。',
+  类似色:'色相挨着但认得出彼此，是自然界最常见的配法（同一片叶子的向光面与背光面就是）。',
+  邻近色:'差到四五十度，两边都还保有自己的性格，又不至于争——最稳的一档。',
+  中差色:'差到八九十度，谁也压不住谁，全靠面积和明度分主次——最难调，调对了也最耐看。',
+  对比色:'差到一百二十度上下，冲击力来了，通常得靠面积悬殊压住：大面积低纯度，小面积高纯度。',
+  互补色:'接近 180 度，两色相邻时会互相把对方的饱和度顶上去（同时对比），所以几乎从不各占一半，一定一主一辅。'
+};
+function motifPaletteFact(motif){
+  const scheme=motif.scheme||classifyScheme(motif.ink,motif.accent);
+  return `${motif.name}用的是${scheme}（线条与点缀相差 ${hueGap(motif.ink,motif.accent)} 度）：${SCHEME_FACTS[scheme]||''}`;
+}
 // 平铺：楼体内墙 x 从 62 到 328，三个开间；纵向覆盖视差层的行距。
 // 数量是量出来的——再密就压过台阶，再疏就看不出是同一种语言。
 const FACADE_BAYS=3,FACADE_ROWS=13,FACADE_TOP=-140,FACADE_STEP=86;
@@ -1104,14 +1144,14 @@ const SECRET_METERS=[
 // 世界窗景只改变气氛，不改变任何数值。八种视觉传统共用同一套轻线条画法，
 // 避免把文化做成贴纸或刻意解释的梗；正式局用洗牌袋轮换，一轮看完前不重复。
 const CULTURE_MOTIFS=[
-  {id:'jiangnan',name:'江南雨窗',line:'雨落在窗外，楼还在往上。',kind:'rain',sky:'#dcebe4',ink:'#4f7f75',accent:'#91b9a9'},
-  {id:'nordic',name:'北欧薄暮',line:'天色很慢，猴先生没有。',kind:'nordic',sky:'#dfe7ed',ink:'#526b7c',accent:'#aabccc'},
-  {id:'silkroad',name:'丝路晨光',line:'风从很远的地方来，流程仍在本楼。',kind:'dunes',sky:'#f1e4c9',ink:'#8a684c',accent:'#d7aa69'},
-  {id:'mediterranean',name:'地中海午后',line:'窗外有海，楼内仍然没有电梯。',kind:'arches',sky:'#e2edf0',ink:'#47778b',accent:'#d08362'},
-  {id:'washi',name:'和纸月夜',line:'月亮很圆，路线不一定。',kind:'moon',sky:'#ece8df',ink:'#5f665e',accent:'#c68173'},
-  {id:'bauhaus',name:'包豪斯清晨',line:'形状各有职责，猴先生暂时没有。',kind:'geometry',sky:'#eee9dc',ink:'#3e5664',accent:'#c45442'},
-  {id:'andes',name:'安第斯风带',line:'山在远处，目标线在近处。',kind:'mountains',sky:'#e5e8df',ink:'#5c7465',accent:'#b47b57'},
-  {id:'indigo',name:'靛蓝鼓点',line:'节拍从窗边经过，落脚要自己负责。',kind:'rhythm',sky:'#e3e6ec',ink:'#3f506e',accent:'#7789a6'}
+  {id:'jiangnan',scheme:'同类色',name:'江南雨窗',line:'雨落在窗外，楼还在往上。',kind:'rain',sky:'#dcebe4',ink:'#4f7f75',accent:'#91b9a9'},
+  {id:'nordic',scheme:'同类色',name:'北欧薄暮',line:'天色很慢，猴先生没有。',kind:'nordic',sky:'#dfe7ed',ink:'#526b7c',accent:'#aabccc'},
+  {id:'silkroad',scheme:'同类色',name:'丝路晨光',line:'风从很远的地方来，流程仍在本楼。',kind:'dunes',sky:'#f1e4c9',ink:'#8a684c',accent:'#d7aa69'},
+  {id:'mediterranean',scheme:'互补色',name:'地中海午后',line:'窗外有海，楼内仍然没有电梯。',kind:'arches',sky:'#e2edf0',ink:'#47778b',accent:'#d08362'},
+  {id:'washi',scheme:'中差色',name:'和纸月夜',line:'月亮很圆，路线不一定。',kind:'moon',sky:'#ece8df',ink:'#5f665e',accent:'#c68173'},
+  {id:'bauhaus',scheme:'互补色',name:'包豪斯清晨',line:'形状各有职责，猴先生暂时没有。',kind:'geometry',sky:'#eee9dc',ink:'#3e5664',accent:'#c45442'},
+  {id:'andes',scheme:'对比色',name:'安第斯风带',line:'山在远处，目标线在近处。',kind:'mountains',sky:'#e5e8df',ink:'#5c7465',accent:'#b47b57'},
+  {id:'indigo',scheme:'同类色',name:'靛蓝鼓点',line:'节拍从窗边经过，落脚要自己负责。',kind:'rhythm',sky:'#e3e6ec',ink:'#3f506e',accent:'#7789a6'}
 ];
 function motifSvgMarkup(motif){
   const sky=motif.sky,ink=motif.ink,accent=motif.accent,head=`<g data-motif="${motif.id}" opacity=".42"><rect width="390" height="844" fill="${sky}"/>`;
@@ -1272,7 +1312,7 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],motifId:'jiangnan',
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
-  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
+  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),motifFirstTime:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
   perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
@@ -1335,7 +1375,13 @@ function freshCultureBag(){
 }
 function claimCultureMotif(){
   let bag=[];try{const raw=JSON.parse(worldStorageGet(CULTURE_BAG_KEY,'[]'));if(Array.isArray(raw))bag=[...new Set(raw.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))];}catch(_){}
-  if(!bag.length)bag=freshCultureBag();const id=bag.pop();worldStorageSet(CULTURE_BAG_KEY,JSON.stringify(bag));worldStorageSet(CULTURE_LAST_KEY,id);state.motifId=id;applyCultureMotif();return cultureMotif();
+  if(!bag.length)bag=freshCultureBag();const id=bag.pop();worldStorageSet(CULTURE_BAG_KEY,JSON.stringify(bag));worldStorageSet(CULTURE_LAST_KEY,id);
+  // 记下这一局的窗景是不是头一回见。配色那条知识只在初见时讲，
+  // 而且讲的地方是**结算的「本局档案」页**，不是局内 toast——
+  // 建筑与音乐是「你正在看/正在听」的东西，配色是要停下来端详的，
+  // 放在结算页玩家才读得进去，也不跟局内那两条抢。
+  state.motifFirstTime=!career.motifs.includes(id);
+  state.motifId=id;applyCultureMotif();return cultureMotif();
 }
 function worldDeviceId(){
   let id=worldStorageGet(WORLD_DEVICE_KEY);if(id.length>=12)return id;
@@ -2137,7 +2183,12 @@ function finishRun(reason='fall'){
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
-  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。本局窗景：${cultureMotif().name}。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;$('resultSlogan').textContent=SLOGANS[si];
+  state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。本局窗景：${cultureMotif().name}。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;
+  // 初见这扇窗景时，在档案页多讲一句它的配色是怎么成立的。
+  const motifNote=$('motifPalette');
+  if(motifNote){const fresh=state.motifFirstTime&&!IS_TEST_RUN;
+    motifNote.classList.toggle('is-hidden',!fresh);
+    if(fresh)motifNote.textContent=motifPaletteFact(cultureMotif());}$('resultSlogan').textContent=SLOGANS[si];
   const completed=missionDone();if(!IS_TEST_RUN){if(completed&&!state.missionRewarded){career.stamps+=state.mission.reward;state.missionRewarded=true;}career.runs++;career.totalMeters+=state.maxMeters;if(!career.motifs.includes(state.motifId))career.motifs.push(state.motifId);saveCareer();}$('missionResult').innerHTML=IS_TEST_RUN?`<b>质检局</b>：${completed?'轮值条件通过':'轮值条件未通过'}。测试参数不计入长期档案。`:completed?`<b>轮值完成</b>：${state.mission.label}<br>档案章 +${state.mission.reward}，现有 ${career.stamps} 枚。`:`<b>轮值未完成</b>：${state.mission.label}<br>本局 ${missionValue()}/${state.mission.target}。任务不扣分，只负责再来一局。`;
   // 跨局计数只在正式局累计；质检局（IS_TEST_RUN）不许写进长期档案。
   let fresh=[],freshTeas=[];
@@ -2803,6 +2854,16 @@ function runQA(){
       for(const n of document.querySelectorAll('.screen'))n.classList.add('hidden');
       for(const n of shown)n.classList.remove('hidden');
       return swiped&&keyed&&tabbed;})()],
+    ['窗景配色：声明的色相关系与实际色值对得上',(()=>{
+      // 这一条是配色这个领域的**全部价值所在**：说法不是贴上去的标签，是被盯着的断言。
+      // 谁改了一个 hex 让配色不再成立，这里立刻红——不然文案会慢慢变成一句谎话。
+      return CULTURE_MOTIFS.every(m=>m.scheme&&m.scheme===classifyScheme(m.ink,m.accent));})()],
+    ['窗景明度序：天光最亮、线条最暗、点缀居中',(()=>{
+      // 背景要能压在游戏底下而不抢台阶，靠的就是这个明度序。
+      // 它比色相更要紧：色相错了只是不好看，明度错了台阶就看不清。
+      return CULTURE_MOTIFS.every(m=>{
+        const sky=hexToHsl(m.sky).l,ink=hexToHsl(m.ink).l,accent=hexToHsl(m.accent).l;
+        return sky>accent&&accent>ink;});})()],
     ['十二种调式两两听得出区别（量的是排程器真排出来的音）',(()=>{
       // 这一条抓到过两拨真问题，两次都是**判据本身**的问题，值得原样留着：
       //  1) 一开始给谜题科放利底亚、加盖工程部放利底亚属七，实测与大调、混合利底亚
