@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.1-appointments">
+<meta name="myskme-release" content="20260814.3-doors">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -222,6 +222,16 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .shop-card.locked svg{opacity:.5}
 .shop-card.worn{background:#fff0af;box-shadow:inset 0 -3px 0 rgba(40,33,26,.13)}
 .shop-tag{font-size:8.5px;color:var(--muted);letter-spacing:.02em}
+/* 香蕉钱包：商店唯一的入口原来是收藏条上一枚 22 像素的图标——
+   那是给已经知道有这东西的人用的。**一个新系统的门必须比它的图标大。**
+   顺带补上首页从来没显示过的香蕉余额：香蕉这一版起是货币，看不见余额就不像商店。 */
+.wallet{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 9px;padding:7px 10px;flex:none;
+  border:2.5px solid var(--ink);border-radius:12px;background:#fff0af;cursor:pointer;
+  font:1000 12px/1.2 var(--sans);color:var(--ink);box-shadow:0 3px 0 rgba(40,33,26,.18);text-align:left}
+.wallet:active{transform:translateY(2px);box-shadow:none}
+.wallet svg{display:block;flex:none}
+.wallet b{font-size:15px;color:var(--red)}
+.wallet span{margin-left:auto;font-size:10px;color:var(--muted)}
 .shop-card.worn .shop-tag{color:var(--red)}
 .tea-txt{width:100%;min-width:0}
 /* 名字最多两行、超出省略：杯名长短不一（「加盖工程部 · 水泥灰拿铁」对「白开水（免费）」），
@@ -267,6 +277,15 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
    藏的是滚动条，不是滚动能力——手指照样能拖。 */
 .screen,.card{scrollbar-width:none}
 .screen::-webkit-scrollbar,.card::-webkit-scrollbar{width:0;height:0}
+/* 首页那张卡长到与屏幕等高，多出来的高度分给各块之间的间隙。
+   量出来的问题：430x932 上卡片只有 635 高，上下各空 149px 底色——
+   外壳确实铺满了视口，但玩家看到的是一张浮在空白纸上的小卡片，
+   「不是全屏」说的是这个。**全屏不是 html 铺满了，是这一屏看着是满的。**
+   只给首页：结算与图鉴是内容驱动的，撑开反而散。 */
+#titleScreen .card{height:100%;display:flex;flex-direction:column;justify-content:space-between}
+/* 只给首页。结算页试过同样撑满——截图一看，内容本来就少，space-between 一撑，
+   钱包条与标签之间、标签与按钮之间各裂出一百多像素空白，比居中的卡片更像没做完。
+   别再试第二次。 */
 .card{position:relative;width:100%;max-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(40,33,26,.22);padding:20px}
 .notice-no{position:absolute;right:12px;top:7px;background:var(--red);color:white;border:2.5px solid var(--ink);border-radius:999px;
   padding:4px 11px;font-size:10px;font-weight:1000;transform:rotate(4deg)}
@@ -288,7 +307,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .btn.install{background:#dff3ef}.btn.resume{background:#f0d8ef}.btn.danger{background:#f8ded7}.is-hidden{display:none!important}
 .best-row{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-weight:900;margin-top:9px}
 #titleScreen{justify-content:center}#titleScreen .card{margin:0;flex:0 1 auto}
-.career{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center;margin:0 0 11px;padding:9px 11px;
+.career{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center;margin:0 0 11px;padding:9px 11px;flex:none;
   border:2px dashed #a7977c;border-radius:12px;background:#f8efd9}.career b{font-size:12px}.career span{font-size:9px;color:var(--muted);font-weight:900}
 .career strong{grid-row:1/3;grid-column:2;font-size:23px;color:var(--red)}
 .collect-strip{grid-column:1/3;display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-top:2px}
@@ -779,6 +798,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <p id="subtitle" class="subtitle">电梯在等他。他没看见。</p>
         <div class="career"><b>长期档案</b><span id="careerCopy">档案章可解锁开工装备</span><strong id="careerStamps">0</strong>
           <div id="collectStrip" class="collect-strip" aria-label="收藏进度"></div></div>
+        <button id="walletButton" class="wallet" type="button"></button>
         <div id="titleMission" class="mission-card"><b>本局轮值</b><span>正在从传真机里抽一张任务。</span></div>
         <div class="kit-label">选择开工装备</div>
         <div id="kitGrid" class="kit-grid"></div>
@@ -804,6 +824,10 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
             <div class="stat"><b id="resultScore">0</b><span>总分</span></div>
             <div class="stat"><b id="resultFloors">1</b><span>到访部门</span></div>
           </div>
+          <!-- 商店的门必须在**第一页**。原来放在第三个标签页里，而玩家落地在第一页——
+               要翻两下才看得见的门等于没有门，跟「商店没找到」是同一个毛病。
+               紧挨着刚入账的香蕉：那一刻购买冲动最高。 -->
+          <button id="resultShopButton" class="wallet" type="button"></button>
         </div>
         <div class="result-page hidden" data-result-page="1">
           <h2 class="screen-title">本局档案</h2>
@@ -941,7 +965,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.1-appointments',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.3-doors',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -962,7 +986,7 @@ const el={
   flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),rotateGate:$('rotateGate'),
   start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
-  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),shop:$('shopScreen'),shopList:$('shopList'),shopPager:$('shopPager'),shopClose:$('shopCloseButton'),collectStrip:$('collectStrip'),resultTeaOpen:$('resultTeaButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
+  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),shop:$('shopScreen'),shopList:$('shopList'),shopPager:$('shopPager'),shopClose:$('shopCloseButton'),collectStrip:$('collectStrip'),wallet:$('walletButton'),resultShop:$('resultShopButton'),resultTeaOpen:$('resultTeaButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
   installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
 };
 
@@ -1563,8 +1587,11 @@ function saveWorldPending(rows){worldStorageSet(WORLD_PENDING_KEY,JSON.stringify
 function pendingWorldCount(){return loadWorldPending().length;}
 function cleanWorldRun(run){const row={runId:String(run.runId||''),height:Math.max(0,Math.floor(Number(run.height)||0)),score:Math.max(0,Math.floor(Number(run.score)||0)),bananas:Math.max(0,Math.floor(Number(run.bananas)||0))};return /^[A-Za-z0-9_-]{8,80}$/.test(row.runId)&&row.score>=row.height&&row.bananas<=row.score?row:null;}
 function queueWorldRun(run){const row=cleanWorldRun(run);if(!row)return false;const rows=loadWorldPending(),index=rows.findIndex(item=>item.runId===row.runId);if(index>=0)rows[index]=row;else rows.push(row);saveWorldPending(rows);return true;}
+// 6.5 秒对移动网络偏紧（地铁、电梯里一次握手就不止这么久），放到 9 秒。
+// 这个数字是**超时上限，不是性能目标**——放宽不会让正常情况变慢，只会少冤枉几次慢网。
+const WORLD_TIMEOUT_MS=9000;
 async function worldFetch(path,options={}){
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),WORLD_TIMEOUT_MS);
   try{const response=await fetch(MONKEY_API+path,{...options,signal:controller.signal,headers:{Accept:'application/json',...(options.headers||{})}});let data={};try{data=await response.json();}catch(_){}if(!response.ok||!data.ok){const error=new Error(data.err||`榜单响应 ${response.status}`);error.status=response.status;throw error;}return data;}finally{clearTimeout(timer);}
 }
 function updateWorldStatus(){
@@ -1572,8 +1599,39 @@ function updateWorldStatus(){
   // 永久退回优先显示，而且它不会被 loadWorldBoard 清掉——「待联网」会骗人，这条不会。
   if(worldBlockedReason){el.worldStatus.textContent=`登记被退回：${worldBlockedReason}。换个化名再试。`+suffix;return;}
   if(worldSyncMessage){el.worldStatus.textContent=worldSyncMessage+suffix;return;}
+  // **一个不动的状态和一个假的状态一样糟。** 原来失败之后就一直挂着「待联网」，
+  // 玩家没法判断它还在不在努力。现在把「第几次重试、还有多久」直接写出来。
+  if(pending&&worldRetryTimer){
+    // **不写秒数。** 第一版写了「将在 X 秒后」，可它只在有人调本函数时才刷新，
+    // 于是屏幕上挂着一个不动的倒计时——正是我要治的那种「不动的状态」，比不写还糟。
+    // 这句话什么时候看都是真的。
+    el.worldStatus.textContent=`网络没接上，正在自动重试（第 ${worldRetryRound} 次）。成绩已存在本机，不会丢。`+suffix;return;
+  }
   const me=worldBoard.me;if(worldBoard.connected&&me){const metric=worldScope==='weekly'?`${me.weekHeight} 米`:worldScope==='alltime'?`${me.height} 米`:`${me.runs} 局`;el.worldStatus.textContent=`你目前第 ${me.rank} 名 · ${metric}${suffix}`;return;}
   el.worldStatus.textContent=(worldBoard.connected?'榜单已接通。登记一局后，这里会出现你的附近名次。':'网络暂时没接上，先显示本机候补。')+suffix;
+}
+// 自动退避重试。**这是「上传成绩不咋地」的正主**：改之前 flushWorldQueue
+// 一遇网络级失败就收工，而它只被「打完一局 / 点登记 / 打开楼榜 / online 事件 / 开局 900ms」
+// 叫醒——手机上一次很常见的抖动，就让这一局躺在队列里等到玩家哪天碰巧再打开楼榜。
+// 玩家看到的是「待联网」三个字挂在那儿不动。
+// 退避间隔按秒：4 / 10 / 25 / 60 / 120，之后维持 120。成功即停。
+// 400（化名被退回）不进这条路——重试一万次也没用，那要玩家改名。
+const WORLD_RETRY_STEPS=[4000,10000,25000,60000,120000];
+let worldRetryTimer=0,worldRetryRound=0,worldRetryAt=0;
+function cancelWorldRetry(){if(worldRetryTimer)clearTimeout(worldRetryTimer),worldRetryTimer=0;worldRetryRound=0;worldRetryAt=0;}
+function scheduleWorldRetry(){
+  if(worldRetryTimer||!pendingWorldCount())return;
+  const wait=WORLD_RETRY_STEPS[Math.min(worldRetryRound,WORLD_RETRY_STEPS.length-1)];
+  worldRetryRound+=1;worldRetryAt=Date.now()+wait;
+  worldRetryTimer=setTimeout(()=>{worldRetryTimer=0;flushWorldQueue();},wait);
+  // 让位：「网络未完成，成绩仍在本机排队」排在重试提示前面，不清掉就永远轮不到它显示。
+  worldSyncMessage='';updateWorldStatus();
+}
+// 回到前台、或者刚恢复联网，就别再等那个定时器了——玩家正看着呢。
+function retryWorldNow(){
+  if(!pendingWorldCount())return;
+  if(worldRetryTimer)clearTimeout(worldRetryTimer),worldRetryTimer=0;
+  worldRetryAt=0;flushWorldQueue();
 }
 async function flushWorldQueue(){
   if(worldSyncPromise)return worldSyncPromise;
@@ -1589,7 +1647,11 @@ async function flushWorldQueue(){
     let anyAccepted=false;const rejected=[];
     for(const queued of loadWorldPending()){
       try{
-        const data=await worldFetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceUUID:worldDeviceId(),alias:worldAlias(),run:queued})});
+        // 同一条先当场再试一次。移动网络的抖动多半一次就过去了，
+        // 而退避重试最快也要等四秒——那四秒里玩家正盯着「待联网」。
+        // 400 不重试：那是判定，不是抖动。
+        const send=()=>worldFetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceUUID:worldDeviceId(),alias:worldAlias(),run:queued})});
+        const data=await send().catch(err=>{if(err.status===400)throw err;return send();});
         if(data.acceptedRunId!==queued.runId)throw new Error('榜单回执与本局不一致');
         if(data.playerToken)worldStorageSet(WORLD_TOKEN_KEY,data.playerToken);
         anyAccepted=true;worldBlockedReason='';
@@ -1604,15 +1666,18 @@ async function flushWorldQueue(){
         }
         worldSyncMessage=error.status===400?`登记被退回：${error.message}`:'网络未完成，成绩仍在本机排队';
         updateWorldStatus();
-        // 永久退回就换下一条继续试；网络级失败才停这一趟（继续试也是白试）。
+        // 永久退回就换下一条继续试；网络级失败才停这一趟（同一趟里继续试也是白试），
+        // 但**这一趟停了不等于放弃**：挂一个退避重试，别再让成绩躺着等玩家想起来。
         if(error.status===400)continue;
+        scheduleWorldRetry();
         return false;}
     }
     if(anyAccepted&&rejected.length){
       // 化名没问题却还是被退回的那几条，是记录本身有毛病，留着只会永远堵在队首。
       saveWorldPending(loadWorldPending().filter(row=>!rejected.includes(row.runId)));
     }
-    worldSyncMessage='补交完成';updateWorldStatus();return true;
+    cancelWorldRetry();
+    worldSyncMessage=pendingWorldCount()?'':'补交完成';updateWorldStatus();return true;
   })().finally(()=>{worldSyncPromise=null;setTimeout(()=>{if(worldSyncMessage==='补交完成'){worldSyncMessage='';updateWorldStatus();}},1600);});
   return worldSyncPromise;
 }
@@ -1686,6 +1751,15 @@ const COLLECTIONS=[
   {id:'modes',label:'调式',emblem:'note',tint:'#8e6fd8',got:()=>career.modes.length,all:()=>MODES.length,
    last:()=>{const m=MODES.find(x=>x.id===career.modes[career.modes.length-1]);return m&&`${m.name}（${m.origin}）：${m.fact}`;}}
 ];
+// 钱包同时是余额显示与商店入口。差一件最便宜的行头就直说差多少——
+// 「还差 6 根」比「去看看」更能让人再打一局。
+function renderWallet(){
+  const cheapest=Math.min(...SHOP_ITEMS.filter(i=>!career.owned.includes(i.id)).map(shopPrice).concat([Infinity]));
+  const tail=career.owned.length>=SHOP_ITEMS.length?'全套已入库'
+    :career.bananas>=cheapest?'有能买的了':`还差 ${cheapest-career.bananas} 根`;
+  el.wallet.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
+    +`香蕉 <b>${career.bananas}</b> 根 · 逛香蕉商店<span>${tail}</span>`;
+}
 function renderCollectStrip(){
   el.collectStrip.innerHTML='';
   for(const c of COLLECTIONS){
@@ -1724,6 +1798,7 @@ function renderCareer(){
   // 六种收藏从这行小字里搬走了——它们现在在收藏条上，一眼看得完。
   $('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米`;
   renderCollectStrip();
+  renderWallet();
   // 行头也在这里刷。挂在 renderCareer 上是因为它已经是「档案变了就重画」的那个入口，
   // 另起一条调用链迟早出现「买完没穿上」或者「开局没穿上」。
   renderWorn();
@@ -2481,6 +2556,8 @@ function finishRun(reason='fall'){
     if(worldEnabled()){queueWorldRun(currentWorldRun());flushWorldQueue();}
   }
   renderFreshHonors(fresh);renderFreshTeas(freshTeas);
+  el.resultShop.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
+    +`本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店<span>余额 ${career.bananas} 根</span>`;
   el.rankName.value=worldAlias();el.rankSave.disabled=false;el.rankSave.textContent=worldEnabled()?'更新化名':'登记';showResultPage(0);markResultNews();el.result.classList.remove('hidden');updateBestLabels();
   renderCareer();
   el.shell.dataset.careerStamps=String(career.stamps);el.shell.dataset.careerRuns=String(career.runs);el.shell.dataset.missionDone=String(completed);
@@ -2918,7 +2995,9 @@ function submitRank(){
   worldStorageSet(WORLD_ALIAS_KEY,alias);worldStorageSet(WORLD_ENABLED_KEY,'1');el.rankName.value=alias;
   rememberLocalRun({id:state.runId,name:alias,height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false});queueWorldRun(currentWorldRun());
   state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='补交中';worldSyncMessage='本局已写入本机，正在补交';updateWorldStatus();
-  flushWorldQueue().then(ok=>{state.rankSubmitted=false;el.rankSave.disabled=false;el.rankSave.textContent=ok?'已登记，可改名':'待联网';if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});
+  flushWorldQueue().then(ok=>{state.rankSubmitted=false;el.rankSave.disabled=false;
+    // 「待联网」听着像放弃了。实际上退避重试正在跑，说清楚它会自己再试。
+    el.rankSave.textContent=ok?'已登记，可改名':'排队中，会自动重试';if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});
   toast('本局先写入本机。断网也会自动补交。','teal');
 }
 let posterData='',posterVariant=null,posterMotif=null,posterLastCombo='',posterMark='',posterGenerating=false,posterQrModules=0,posterHonorLabel='';
@@ -3091,7 +3170,9 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;});
 window.addEventListener('blur',()=>{input.left=input.right=false;});
-window.addEventListener('online',()=>{flushWorldQueue().finally(()=>{if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});});
+window.addEventListener('online',()=>{retryWorldNow();if(!el.leaderboard.classList.contains('hidden'))setTimeout(()=>loadWorldBoard(worldScope),300);});
+// 切回前台立刻再试一次：定时器在后台常被系统压住，而玩家这会儿正看着屏幕。
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryWorldNow();});
 window.addEventListener('contextmenu',e=>e.preventDefault());
 // 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，道具与多人赛倒计时白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
@@ -3133,6 +3214,7 @@ el.pauseExit.addEventListener('click',pauseExit);
 el.resultTitles.addEventListener('click',openTitles);el.titlesClose.addEventListener('click',closeTitles);
 el.resultTeaOpen.addEventListener('click',openTeas);el.teaClose.addEventListener('click',closeTeas);
 el.shopClose.addEventListener('click',closeShop);
+el.wallet.addEventListener('click',openShop);el.resultShop.addEventListener('click',openShop);
 el.installOpen.addEventListener('click',openInstallScreen);el.installConfirm.addEventListener('click',confirmInstall);el.installClose.addEventListener('click',showTitleScreen);
 function hideSplash(){el.splash.classList.add('hidden');}
 el.splash.addEventListener('click',hideSplash);setTimeout(hideSplash,1650);
@@ -3444,6 +3526,25 @@ function runQA(){
       const blocked=!layers[0].innerHTML;
       career.owned=keep.owned;career.wearing=keep.wearing;renderWorn();
       return enough&&same&&drew&&blocked;})()],
+    ['退避重试器：排得上、取消得掉、空队列不空排',(()=>{
+      // 只验退避器本身，**不碰 fetch**：换全局 fetch 会和别的自检抢东西，
+      // 而且异步结论在同步的 runQA 里没人断言，等于没验。
+      // 「网络抖动时到底会不会自己补交」在 tools/qa-network.mjs 里用假网络真跑。
+      const keepPending=worldStorageGet(WORLD_PENDING_KEY,'[]');
+      cancelWorldRetry();
+      // 空队列不许排——没东西要补交还挂个定时器，等于白耗电。
+      worldStorageSet(WORLD_PENDING_KEY,'[]');scheduleWorldRetry();
+      const idleQuiet=!worldRetryTimer;
+      // 有东西要补交就必须排上，而且轮次要往前走（否则退避永远停在第一档）。
+      worldStorageSet(WORLD_PENDING_KEY,JSON.stringify([{runId:'qaprobe0001',height:1,score:2,bananas:0}]));
+      scheduleWorldRetry();const armed=!!worldRetryTimer&&worldRetryRound===1;
+      scheduleWorldRetry();const noDouble=worldRetryRound===1;
+      cancelWorldRetry();const cleared=!worldRetryTimer&&worldRetryRound===0;
+      worldStorageSet(WORLD_PENDING_KEY,keepPending);
+      // 退避必须是递增的，且上限不小于一分钟——一直四秒一次是在骚扰服务器。
+      const stepsOk=WORLD_RETRY_STEPS.length>=4&&WORLD_RETRY_STEPS.every((v,i)=>i===0||v>WORLD_RETRY_STEPS[i-1])
+        &&WORLD_RETRY_STEPS[WORLD_RETRY_STEPS.length-1]>=60000&&WORLD_TIMEOUT_MS>=8000;
+      return idleQuiet&&armed&&noDouble&&cleared&&stepsOk&&typeof retryWorldNow==='function';})()],
     ['海报字号全在模块化比例上（1.25 等比数列）',(()=>{
       // 排版学这门知识的可校验之处：**每一级都必须是数列上的一格**。
       // 谁往里塞一个 33px，这条当场红——说法不再是贴上去的标签，是一条被盯着的断言。

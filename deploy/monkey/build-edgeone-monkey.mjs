@@ -560,6 +560,59 @@ assert(/pager-dots solo/.test(html),
   assert(!/state\.bananas\s*-=/.test(CODE), '花的是局内香蕉而不是长期账户：那会把已经算过的分数改掉，历史成绩必须不可变');
 }
 
+// ---- 世界楼榜补交必须会自己重试（2026-08-14 王老师：上传成绩不咋地）----
+{
+  // 改之前 flushWorldQueue 一遇网络级失败就 return false 收工，而它只被
+  // 「打完一局 / 点登记 / 打开楼榜 / online 事件 / 开局 900ms」叫醒——
+  // 手机上一次很常见的抖动就让这一局躺到玩家哪天碰巧再打开楼榜。这道门盯着别再退回去。
+  assert(/const WORLD_RETRY_STEPS=\[[^\]]+\];/.test(CODE), '退避重试表没了：补交失败之后就再也没人管了');
+  const steps = ((CODE.match(/const WORLD_RETRY_STEPS=\[([^\]]+)\]/) || ['', ''])[1] || '')
+    .split(',').map(Number).filter(Number.isFinite);
+  assert(steps.length >= 4, '退避档位少于四档');
+  for (let i = 1; i < steps.length; i += 1) {
+    assert(steps[i] > steps[i - 1], '退避不是递增的：一直用同一个间隔重试是在骚扰服务器');
+  }
+  assert(steps[steps.length - 1] >= 60000, '退避上限不到一分钟，长时间断网时会一直空撞');
+
+  const flushFn = (CODE.match(/async function flushWorldQueue\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(flushFn, '取不到 flushWorldQueue（写法变了？先修本门禁的取法）');
+  assert(/scheduleWorldRetry\(\)/.test(flushFn), '网络级失败之后没有挂上重试，成绩会一直躺在队列里');
+  // 400（化名被退回）必须换下一条继续，而不是把整趟停掉——重试一万次也没用，那要玩家改名。
+  assert(flushFn.includes('if(error.status===400)continue;'),
+    '化名被退回时不再换下一条继续了：一条卡住会把整个队列堵死（0813 修过，别回归）');
+  // **一趟跑完必须调 cancelWorldRetry。** 它在成功路径上观察得到的作用只有一个：
+  // 把退避轮次清零。不清的话，下一次断网会直接从最长的那一档开始等
+  // （打完一局想看名次，却要干等两分钟）。
+  //
+  // 这句话是改过两遍的。前两版我先想好一个听着吓人的后果再写门——
+  // 「400 也会去无谓重试」「永不停歇地空转」——反向验证两次都不红，因为那两个后果根本到不了。
+  // **给门写理由时，理由本身也要能被反向验证；顺序是先弄清楚拆掉它会怎样，再动笔。**
+  assert(/cancelWorldRetry\(\);[\s\S]{0,120}return true;/.test(flushFn),
+    '补交跑完没有取消重试：退避轮次不清零，下一次断网会直接从最长那一档开始等');
+  assert(/status===400\)throw err;return send\(\)/.test(flushFn),
+    '单条的当场重试没了：移动网络的抖动多半一次就过去，而退避最快也要等四秒');
+
+  assert(/WORLD_TIMEOUT_MS=(\d+)/.test(CODE) && Number(CODE.match(/WORLD_TIMEOUT_MS=(\d+)/)[1]) >= 8000,
+    '联网超时短于 8 秒：地铁电梯里一次握手就不止这么久，会把慢网冤枉成断网');
+  assert(/visibilitychange[\s\S]{0,120}retryWorldNow/.test(CODE),
+    '回到前台不再立刻重试：后台定时器常被系统压住，而玩家这会儿正看着屏幕');
+  assert(/addEventListener\('online'[\s\S]{0,80}retryWorldNow/.test(CODE), '恢复联网时没有立刻重试');
+}
+
+// ---- 香蕉商店的入口必须找得到（2026-08-14 王老师：那个商店没找到）----
+{
+  // 原来唯一的入口是收藏条上一枚 22 像素的图标。**一个新系统的门必须比它的图标大。**
+  assert(/id="walletButton"/.test(CODE) && /class="wallet"/.test(CODE),
+    '首页的香蕉钱包没了：它既是商店的门，也是首页唯一显示香蕉余额的地方');
+  assert(/id="resultShopButton"/.test(CODE), '结算页的商店入口没了：刚捡完香蕉那一刻购买冲动最高');
+  const wired = (CODE.match(/\bopenShop\b/g) || []).length;
+  assert(wired >= 4, '商店的入口少于三处（收藏条 / 首页钱包 / 结算页），openShop 只被引用了 ' + (wired - 1) + ' 次');
+  // 首页那张卡要长到与屏幕等高，否则大屏上是一张浮在空白纸上的小卡片。
+  assert(/#titleScreen \.card\{height:100%/.test(CODE),
+    '首页卡不再撑满屏幕了。王老师 0814 明说「首页不是全屏，感觉像是少了什么」——'
+    + '量出来是 430x932 上卡片只有 635 高，上下各空 149px');
+}
+
 // ---- 排版学：海报的字号只准从模块化比例上取（2026-08-14）----
 {
   const posterFn = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
