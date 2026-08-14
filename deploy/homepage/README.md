@@ -9,6 +9,7 @@
 
 ```bash
 python3 build_hub.py
+node deploy/homepage/verify-layout-contract.mjs
 node deploy/homepage/build-edgeone-homepage.mjs /private/tmp/myskme-homepage.zip
 ```
 
@@ -122,4 +123,4 @@ node deploy/homepage/verify-online-homepage.mjs
 - `https://myskme.com/og-cover.png`、`/assets/hero-wolf.webp` 返回 200。
 - `/banks/`、`/listen/`、`/write/`、`/daily/`、`/wall/`、`/print/` 均可打开。
 - 总目中的《灵石远征》指向 `https://play.myskme.com/`。
-- 手机 390×844、iPad 768×1024 与桌面端无横向溢出，控制台无脚本错误。
+- iPhone 390×844、安卓手机 412×915、iPad 768×1024、安卓平板 800×1280、平板横屏 1024×768 与桌面端无横向溢出，控制台无脚本错误。
