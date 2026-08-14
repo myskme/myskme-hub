@@ -1,0 +1,112 @@
+{
+  "grids": [
+    {
+      "ids": [
+        "cap",
+        "shades",
+        "lanyard",
+        "satchel",
+        "peelwig",
+        "trifocal",
+        "goldchain",
+        "scooter",
+        "watch"
+      ],
+      "names": [
+        "工牌鸭舌帽",
+        "反光墨镜",
+        "食堂挂绳",
+        "帆布公文包",
+        "香蕉皮假发",
+        "三层老花镜",
+        "粗金链",
+        "共享电动驴",
+        "捞力仕大金表"
+      ],
+      "fit": true
+    },
+    {
+      "ids": [
+        "walkie",
+        "faxneck",
+        "crown",
+        "ring",
+        "donkeybag",
+        "maybach",
+        "lambo",
+        "rocket",
+        "lift"
+      ],
+      "names": [
+        "镀金对讲机",
+        "传真机项链",
+        "加盖工程部王冠",
+        "质检部钻戒",
+        "爱驴仕手袋",
+        "迈8赫轿车",
+        "懒博基尼跑车",
+        "私人火箭",
+        "私人电梯"
+      ],
+      "fit": true
+    }
+  ],
+  "carpCheck": {
+    "shell": "block",
+    "player": "inline",
+    "carp": "inline",
+    "boughtHead": "none",
+    "ride": true
+  },
+  "liftCheck": {
+    "ride": true,
+    "monkey": [
+      104,
+      113
+    ],
+    "platforms": 10,
+    "playerDisplay": "inline"
+  },
+  "rocketCheck": {
+    "pose": "#art-monkey-fall",
+    "ride": true,
+    "playerDisplay": "inline"
+  },
+  "fullCheck": {
+    "layers": [
+      "wear-head",
+      "wear-eye",
+      "wear-neck",
+      "wear-hand",
+      "wear-back",
+      "wear-ride"
+    ],
+    "wearing": {
+      "head": "crown",
+      "eye": "trifocal",
+      "neck": "faxneck",
+      "hand": "ring",
+      "back": "donkeybag",
+      "ride": "lambo"
+    }
+  },
+  "fullWearing": {
+    "head": "crown",
+    "eye": "trifocal",
+    "neck": "faxneck",
+    "hand": "ring",
+    "back": "donkeybag",
+    "ride": "lambo"
+  },
+  "poster": {
+    "variant": "night",
+    "rarity": "特批夜班版",
+    "qrModules": 41,
+    "decoded": [
+      "https://monkey.myskme.com/?from=poster&mark=1S3O-S0P&s=night&m=1"
+    ],
+    "honor": "称号：红鲤鱼绿鲤鱼驴 · 仿制品",
+    "combo": "night|nordic"
+  },
+  "errors": []
+}
