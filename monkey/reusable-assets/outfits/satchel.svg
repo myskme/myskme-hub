@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -6 118 132" role="img" aria-label="帆布公文包">
+<defs>
+<symbol id="art-monkey-land" viewBox="0 0 100 116">
+          <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M34 84 Q16 79 13 93 Q11 104 4 104" fill="none" stroke-width="7"/><path d="M34 84 Q16 79 13 93 Q11 104 4 104" fill="none" stroke="#9a6a47" stroke-width="3.5"/>
+            <path d="M35 78 Q25 87 18 85 M65 78 Q75 87 83 85" fill="none" stroke-width="6"/>
+            <path d="M39 94 Q29 106 22 105 M61 94 Q71 106 79 105" fill="none" stroke-width="6"/>
+            <path d="M34 65 Q50 57 66 66 Q72 82 66 99 Q60 108 48 107 Q36 107 30 98 Q27 81 34 65 Z" fill="#9a6a47"/>
+            <ellipse cx="50" cy="84" rx="9" ry="14" fill="#edcf9e" stroke-width="2.3"/>
+            <use href="#art-monkey-head-base" width="100" height="74"/>
+            <path d="M44 57 Q51 62 58 56" fill="none" stroke-width="2.4"/>
+            <path d="M78 80 Q87 66 89 57 Q96 68 91 81 Q85 88 78 80 Z" fill="#f1bd3c"/>
+          </g>
+        </symbol>
+<symbol id="art-monkey-head-base" viewBox="0 0 100 74">
+          <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M43 12 Q47 4 51 12 Q57 3 60 13" fill="#765039"/>
+            <path d="M25 27 Q13 22 12 36 Q12 49 26 48 Z" fill="#9a6a47"/><path d="M75 27 Q87 22 88 36 Q88 49 74 48 Z" fill="#9a6a47"/>
+            <path d="M26 23 Q47 9 69 21 Q83 31 78 49 Q75 65 58 70 Q39 76 24 63 Q12 52 18 36 Q19 29 26 23 Z" fill="#9a6a47"/>
+            <path d="M31 34 Q34 22 45 25 Q51 18 58 26 Q70 24 72 38 Q77 49 68 59 Q59 69 45 67 Q31 66 25 55 Q21 43 31 34 Z" fill="#f0d3a4" stroke-width="2.6"/>
+            <ellipse cx="42" cy="43" rx="4.2" ry="6" fill="#2f5148" stroke="none"/><ellipse cx="60" cy="43" rx="4.2" ry="6" fill="#2f5148" stroke="none"/>
+            <circle cx="41" cy="41" r="1.3" fill="#fffdf6" stroke="none"/><circle cx="59" cy="41" r="1.3" fill="#fffdf6" stroke="none"/>
+            <ellipse cx="51" cy="51" rx="3.7" ry="2.7" fill="#b97d5b" stroke-width="2"/>
+            <ellipse cx="30" cy="52" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".72"/><ellipse cx="72" cy="52" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".72"/>
+            <path d="M33 31 Q38 28 43 31 M59 30 Q64 27 69 30" fill="none" stroke-width="2" opacity=".75"/>
+          </g>
+        </symbol>
+</defs>
+<use href="#art-monkey-land" width="100" height="116"/>
+<path d="M44 66L26 82" fill="none" stroke="#8d6a3f" stroke-width="3"/><rect x="12" y="80" width="24" height="18" rx="3" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M12 86h24" stroke="#8d6a3f" stroke-width="2.6"/><rect x="20" y="84" width="8" height="5" rx="1.5" fill="#755436" stroke="#28211a" stroke-width="2"/>
+</svg>

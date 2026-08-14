@@ -484,7 +484,7 @@ assert(/pager-dots solo/.test(html),
   assert(stripBlock, '取不到 COLLECTIONS（写法变了？先修本门禁的取法）');
   const ids = [...stripBlock.matchAll(/\{id:'([a-z]+)',label:/g)].map(hit => hit[1]);
   // 长期档案里每一条收集线都该在首页有个格子。少一格＝那条线收集了也没人看得见。
-  for (const line of ['titles', 'teas', 'perks', 'surprises', 'motifs', 'facades', 'modes']) {
+  for (const line of ['titles', 'teas', 'outfit', 'perks', 'surprises', 'motifs', 'facades', 'modes']) {
     assert(ids.includes(line), '收藏条少了「' + line + '」这一格：收集了没地方看，等于没做');
   }
   assert(new RegExp('grid-template-columns:repeat\\(' + ids.length + ',1fr\\)').test(CODE),
@@ -496,6 +496,103 @@ assert(/pager-dots solo/.test(html),
     '首页又多出一行按钮了。收藏条当初是拿那一行的高度换来的，两个都留就白换了');
   assert(/career\.perks/.test(CODE),
     '任命没进长期档案：一局作废的增益如果不留收集线，收集控就没有跨局的理由去凑齐它们');
+}
+
+// ---- 香蕉商店（2026-08-14 王老师：香蕉没什么用，做成能兑换的行头，像当年的 QQ 秀）----
+{
+  const shopBlock = (CODE.match(/const SHOP_ITEMS=\[[\s\S]*?\n\];/) || [''])[0];
+  const wearBlock = (CODE.match(/const WEAR_ART=\{[\s\S]*?\n\};/) || [''])[0];
+  const slotBlock = (CODE.match(/const SHOP_SLOTS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(shopBlock && wearBlock && slotBlock, '取不到商店那几段（写法变了？先修本门禁的取法）');
+
+  const items = [...shopBlock.matchAll(/\{id:'([a-z0-9]+)',slot:'([a-z]+)',tier:([1-5]),/g)]
+    .map(hit => ({ id: hit[1], slot: hit[2], tier: Number(hit[3]) }));
+  const slots = [...slotBlock.matchAll(/\{id:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(items.length >= 16, '行头少于 16 件。王老师要的是「种类多一些、可以比较难获得」，货架太空撑不起那件事');
+  assert(new Set(items.map(i => i.id)).size === items.length, '行头 id 有重号——id 是存档契约，重号会让存档指错东西');
+
+  // **最重要的一条：行头是纯外观。**
+  // 一旦某件行头开始改数值，「买得起的人更强」就成立了，整个商店从装饰品变成付费墙。
+  // 红鲤鱼帽当初也是这么定的，同一条立法。判据是字段名，不是善意：
+  // 数据表里只准出现 id/slot/tier/name/line 这五个键。
+  const keys = new Set([...shopBlock.matchAll(/[,{]([a-z][a-zA-Z0-9]*):/g)].map(hit => hit[1]));
+  for (const key of keys) {
+    assert(['id', 'slot', 'tier', 'name', 'line'].includes(key),
+      '行头数据里出现了字段「' + key + '」。行头必须是纯外观：一件行头开始改数值，'
+      + '商店就从装饰品变成付费墙了。要加玩法请另起一套，别挂在这张表上');
+  }
+  assert(!/SHOP_ITEMS[\s\S]{0,400}?(?:speed|gravity|bonus|score|damage|shield|multiplier)/.test(shopBlock),
+    '行头表里出现了玩法字眼，同上：外观归外观');
+
+  for (const item of items) {
+    assert(slots.includes(item.slot), '行头 ' + item.id + ' 的槽位 ' + item.slot + ' 不在 SHOP_SLOTS 里');
+    assert(new RegExp('(^|\\n)\\s*' + item.id + ':').test(wearBlock),
+      '行头 ' + item.id + ' 没有穿戴图，买了会什么都不显示——那这件东西就等于不存在');
+  }
+  // 每个槽位都得有货，否则「同槽位只能戴一件」这条规则里会有一个永远空着的位置。
+  for (const slot of slots) {
+    assert(items.some(i => i.slot === slot), '槽位 ' + slot + ' 一件行头都没有');
+  }
+  // 档位必须真的越贵越高，否则「五档」只是标签。
+  const prices = (CODE.match(/const TIER_PRICE=\{([^}]*)\}/) || ['', ''])[1];
+  const tiers = [...prices.matchAll(/([1-5]):(\d+)/g)].map(hit => [Number(hit[1]), Number(hit[2])]);
+  assert(tiers.length === 5, '价格档位不是五档了');
+  for (let i = 1; i < tiers.length; i += 1) {
+    assert(tiers[i][1] > tiers[i - 1][1], '第 ' + tiers[i][0] + ' 档不比第 ' + tiers[i - 1][0] + ' 档贵，分档就没意义了');
+  }
+  // 穿戴图不许写字：出海要翻译的话，一张带字的图就得重画一遍。
+  assert(!/<text\b|<image\b/.test(wearBlock), '穿戴图里出现了 <text> 或 <image>，就不是免翻译素材了');
+
+  // 三处落点必须共用同一段 WEAR_ART：局内的猴子、货架上的试衣镜、海报上的名片照。
+  // 分成三份迟早出现「货架上是这样、穿上是那样」。
+  assert(/function wornMarkup\(/.test(CODE) && /WEAR_ART\[id\]/.test(CODE), '穿戴图不再是从同一张表取的');
+  assert(/function shopPreviewSvg\([\s\S]{0,400}?WEAR_ART\[id\]/.test(CODE), '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
+  assert(/loadDressedMonkeyImage/.test(CODE) && /dressedMonkeySvg/.test(CODE),
+    '海报不印穿戴了。名片是「攀比」真正发生的地方，行头必须上那张图');
+  assert(/querySelectorAll\('\.wear-layer'\)/.test(CODE),
+    '穿戴层不再是一次刷全部了：局内三个环屏副本加首页那只，分开写迟早穿得不一致');
+  // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
+  assert(/#gameShell\.carp-hat-on \.wear-head\{display:none\}/.test(CODE),
+    '买来的帽子会和局内的红鲤鱼帽叠在一起。注意状态类名与资源类名必须分开——0813 撞过一次，整个画面消失');
+
+  // 货币来自已经拿到手的成绩，不是新资源；花掉也不回溯改分。
+  assert(/career\.bananas\+=state\.bananas/.test(CODE), '这一局的香蕉没有存进长期账户，商店就没有收入来源');
+  assert(!/state\.bananas\s*-=/.test(CODE), '花的是局内香蕉而不是长期账户：那会把已经算过的分数改掉，历史成绩必须不可变');
+}
+
+// ---- 排版学：海报的字号只准从模块化比例上取（2026-08-14）----
+{
+  const posterFn = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(posterFn, '取不到 buildPoster（写法变了？先修本门禁的取法）');
+  // 海报上一个字面量字号都不许有。原来是十四处（30/46/44/70/28/26/162/35/42/20/25/31/23/19/17），
+  // 看着「差不多有层次」，实际相邻级差忽多忽少，眼睛读不出稳定的秩序。
+  // 现在全部走 TYPE，谁塞一个 33px 进去，这条当场红。
+  const literals = [...posterFn.matchAll(/font\s*=\s*[`'"][^`'"]*?\b(\d+)px/g)].map(hit => hit[1]);
+  assert(literals.length === 0,
+    '海报里又出现了写死的字号：' + literals.join('、') + '。字号必须从 TYPE 取——'
+    + '整版只用一条等比数列，层级关系才固定得下来');
+  assert((posterFn.match(/\$\{TYPE\.[a-z]+\}px/g) || []).length >= 12,
+    '海报用到 TYPE 的地方太少，多半是有一批字号绕过了比例');
+
+  const typeBlock = (CODE.match(/const TYPE=\{[\s\S]*?\n\};/) || [''])[0];
+  assert(typeBlock, '取不到 TYPE（写法变了？先修本门禁的取法）');
+  // TYPE 里的每一级都得是 typeStep() 算出来的，不许直接写数字。
+  const steps = [...typeBlock.matchAll(/:\s*typeStep\(-?\d+\)/g)];
+  const entries = [...typeBlock.matchAll(/^\s{2}([a-z]+):/gm)];
+  assert(steps.length === entries.length,
+    'TYPE 里有直接写死的字号（' + entries.length + ' 级里只有 ' + steps.length + ' 级走了 typeStep）');
+  assert(/const TYPE_BASE=\d+,TYPE_RATIO=[\d.]+;/.test(CODE), '模块化比例的基准与比率没了');
+
+  // 六种纸型各带一条排版学，和立面/调式/配色一个规格：讲原理，不讲名词。
+  const factBlock = (CODE.match(/const TYPE_FACTS=\{[\s\S]*?\n\};/) || [''])[0];
+  const factIds = [...factBlock.matchAll(/^\s{2}([a-z]+):/gm)].map(hit => hit[1]);
+  const variantBlock = (CODE.match(/const POSTER_VARIANTS=\[[\s\S]*?\n\];/) || [''])[0];
+  const variantIds = [...variantBlock.matchAll(/\{id:'([a-z]+)',upto:/g)].map(hit => hit[1]);
+  assert(variantIds.length >= 6, '取不到海报纸型清单（写法变了？先修本门禁的取法）');
+  for (const id of variantIds) {
+    assert(factIds.includes(id), '纸型 ' + id + ' 没有对应的排版学，那它就只是个配色，不是一门学问');
+  }
+  assert(/career\.posters/.test(CODE), '纸型没进长期档案：知识只在第一次遇见时讲一遍，收藏条得留得住它');
 }
 
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
