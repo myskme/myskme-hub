@@ -162,6 +162,10 @@ if (motifs.some(motif => !/^[a-z0-9-]+$/.test(motif.id) || !motif.name || !motif
 // 照旧只认正本：WEAR_ART 与猴子的 symbol 都从 index.html 现取。
 const shopArraySource = sourceMatch(/const SHOP_ITEMS=(\[[\s\S]*?\n\]);/, 'SHOP_ITEMS');
 const wearArtSource = sourceMatch(/(const WEAR_ART=\{[\s\S]*?\n\};)/, 'WEAR_ART');
+// 有的行头**跨在猴子前后两层**（目前只有私人电梯：实心的车厢与门在身后，
+// 楼层显示牌在身前）。断点标记也从正本现取，不在这里抄一份字面量——
+// 抄一份就是又一个「改了源、镜像没跟上」的入口。
+const wearSplit = sourceMatch(/const WEAR_SPLIT='([^']+)'/, 'WEAR_SPLIT');
 const shopRuntime = { result: null };
 vm.runInNewContext(
   `const SHOP_ITEMS=${shopArraySource};\n${wearArtSource}\nresult={`
@@ -216,11 +220,18 @@ function reusableMotifSvg(motif, markup) {
 function reusableOutfitSvg(item, markup) {
   // 猴子用「落地」那一姿，和货架、海报保持一致（三处同一姿势，看着才像同一只猴）。
   const defs = [...dependencies('art-monkey-land')].map(dep => symbols.get(dep).markup).join('\n');
+  const at = markup.indexOf(wearSplit);
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -6 118 132" role="img" aria-label="${escapeXml(item.name)}">`,
     '<defs>', defs, '</defs>',
+    // 导出的是「穿着这件的猴先生」，所以**前后顺序也要跟着游戏里一样**，
+    // 否则素材库里那张图是坏的那一版：电梯的两扇门盖住猴子下半身。
+    // 断点两边各自成行，没有断点时身后那行整行不写——
+    // 注意不能顺手 filter 掉所有空串：最后那个空串是文件末尾的换行，
+    // 一起滤掉会让十八个文件全都多出一条「无换行」的假改动。
+    ...(at >= 0 ? [markup.slice(0, at)] : []),
     '<use href="#art-monkey-land" width="100" height="116"/>',
-    markup,
+    at >= 0 ? markup.slice(at + wearSplit.length) : markup,
     '</svg>', '',
   ].join('\n');
 }

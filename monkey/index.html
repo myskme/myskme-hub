@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.6-truegates">
+<meta name="myskme-release" content="20260814.10-final">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -23,19 +23,27 @@
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/monkey-100-180.png">
 <title>是猴就上100层 · MYSKME</title>
 <!--
-  《是猴就上100层》完整内容清单
-  部门楼层：大堂、质检部、传真科、房租稽查科、驯猴办、冗余检查科、黑化肥仓库、谜题管理局、绕口令办、观景台、标点维修科、加盖工程部。
-  惊喜事件：七类大事件、十二类可发现小意外、随机海报稀有版与隐藏彩蛋。
+  《是猴就上100层》内容清单（只列有什么，不抄数量——数量以代码里的表为准，抄在这儿只会过期。
+  上一版这里自称「完整清单」还写着「死亡台词 18 条、称号 5 档」，三轮更新之后全成了过期镜像。）
+  部门楼层：大堂、质检部、传真科、房租稽查科、驯猴办、冗余检查科、黑化肥仓库、谜题管理局、绕口令办、观景台、标点维修科、加盖工程部（出场顺序见 FIXED_ORDER）。
+  局内选择：任命排（一排三块台，落到哪块拿哪份）、开工装备、帮助道具。
+  收藏系统：首页九格收藏条——称号、奶茶、行头、任命、纸型、意外、窗景、立面、调式，各自的表就是事实源。
+  香蕉商店：行头六槽位，猴子真的穿上开上，印上名片海报；全部纯外观，一个数值都不碰。
+  气氛系统：十二部门各配一种建筑立面与一种调式（一个部门一门学问）、八种世界窗景、六种海报纸型各带一条排版学。
+  惊喜事件：大事件、可发现小意外、随机海报稀有版与隐藏彩蛋。
   声音系统：自适应手绘玩具爵士、分层编曲、事件音标与全声/仅音效/静音三档。
-  复玩系统：轮值任务、档案章、四套开工装备、香蕉磁铁、回形针批文、减免券与电梯欠条。
-  死亡台词：18 条，抽取时防连续重复。
-  称号分档：5 档。
+  世界楼榜：品牌网关读写，正式局先写本机队列再自动退避补交，断网不影响游玩。
   技术约束：核心游戏单文件可运行、本地 MIT 二维码模块、PWA 渐进增强、触屏与键盘双支持、安卓宽虚拟视口兜底、智能省电调度。
 -->
 <style>
 :root{
   --paper:#faf3e2;--paper-2:#f0e3c4;--card:#fffdf6;--ink:#28211a;--muted:#6b5f4e;
   --banana:#f5b731;--teal:#1f9e8e;--red:#e0452c;--purple:#8e6fd8;--green:#63b06b;
+  /* 盖章的大小与它在分数行两侧占的槽宽，是**同一个数**推出来的：
+     改大小不用记得同时改留白，两边不会走散。窄屏上一起缩。
+     用 vw 而不是断点：断点是一串写死的设备宽度，而写死的设备尺寸这个仓库栽过一次
+     （0813 那个 #gameShell 高度封顶 844）。clamp 让它跟着实际宽度连续变。 */
+  --stamp-size:clamp(52px,17vw,76px);--stamp-slot:calc(var(--stamp-size) + 6px);
   --shadow:0 5px 0 rgba(40,33,26,.22);--safe-top:max(12px,env(safe-area-inset-top));
   --safe-bottom:max(10px,env(safe-area-inset-bottom));
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
@@ -83,8 +91,13 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 @keyframes monkeySquash{0%{transform:scale(1.06,.94)}48%{transform:scale(1.16,.78)}100%{transform:scale(1)}}
 @keyframes monkeyDoom{to{transform:scale(.92) rotate(7deg);opacity:.76}}
 #playerGroup.gold #monkeyUse{filter:sepia(1) saturate(5) hue-rotate(355deg) brightness(1.18)}
-#goldAura{opacity:0;fill:none;stroke:#f5b731;stroke-width:5;stroke-dasharray:8 7;animation:aura 1s linear infinite}
-#playerGroup.gold #goldAura{opacity:.95}
+/* 金光描边**只在看得见的时候转**。原来动画写在基础规则上，opacity:0 也照转，
+   于是首页、结算页、暂停页什么都不动，它仍每秒触发几十次样式重算。
+   461 行那条「不在局中就暂停」的名单漏了它，而它比名单里那三个更糟：那三个只在局外浪费，
+   它是不分场合永远跑。把动画挪到 .gold 那条规则里，可见与开销就绑在一起了——
+   **比往暂停名单里再补一个名字更可靠：名单会漏，绑在一起不会。** */
+#goldAura{opacity:0;fill:none;stroke:#f5b731;stroke-width:5;stroke-dasharray:8 7}
+#playerGroup.gold #goldAura{opacity:.95;animation:aura 1s linear infinite}
 @keyframes aura{to{stroke-dashoffset:-30}}
 #fishScene,#fertilizerScene,#bubbleField,#fogField{opacity:0;transition:opacity .8s ease;pointer-events:none}
 #fishScene.show,#fertilizerScene.show,#bubbleField.show,#fogField.show{opacity:1}
@@ -149,7 +162,11 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 #departmentBanner strong{display:block;font-family:var(--serif);font-size:16px;line-height:1.12;margin:2px 0 3px}
 #departmentBanner span{display:block;color:var(--muted);font-size:9px;font-weight:700;line-height:1.35}
 @keyframes banner{0%{opacity:0;transform:translateY(-12px) scale(.84)}15%,75%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-22px) scale(.96)}}
-#toastLayer{position:absolute;z-index:40;inset:0;pointer-events:none;overflow:hidden}
+/* toast 必须**盖在菜单屏之上**。原来是 40，而 .screen 是 60、子屏是 76——
+   于是首页收藏条那九格里，凡是用 toast 回话的都点了没反应，玩家会以为按钮坏了。
+   90 这个值不是随手挑的：要高过子屏（76），低过开场遮罩（100）与横屏闸（200），
+   也低过自检报告（120），免得盖住那三件必须压住一切的东西。 */
+#toastLayer{position:absolute;z-index:90;inset:0;pointer-events:none;overflow:hidden}
 .toast{position:absolute;width:156px;max-width:42%;transform:translateY(10px) scale(.88);opacity:0;
   background:var(--card);border:2.5px solid var(--ink);border-radius:12px;box-shadow:0 4px 0 rgba(40,33,26,.2);padding:8px 10px;
   text-align:left;font-weight:1000;font-size:11px;line-height:1.38;animation:toast 1.55s cubic-bezier(.2,.8,.2,1) both}
@@ -225,9 +242,17 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 /* 香蕉钱包：商店唯一的入口原来是收藏条上一枚 22 像素的图标——
    那是给已经知道有这东西的人用的。**一个新系统的门必须比它的图标大。**
    顺带补上首页从来没显示过的香蕉余额：香蕉这一版起是货币，看不见余额就不像商店。 */
+/* 三段信息挤在一行里，320 宽上会断成四行，连「香」「蕉」都拆开了（实测）。
+   分主次：**余额与入口是主文案，一个字都不许换行**；右边那句提示是次要的，
+   放不下就让它先消失——这比让主文案断行强，也比缩字号强（缩字号会一路缩到看不清）。
+   `min-width:0` 是 flex 子项能收缩的前提，少了它 ellipsis 根本不生效。 */
 .wallet{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 9px;padding:7px 10px;flex:none;
   border:2.5px solid var(--ink);border-radius:12px;background:#fff0af;cursor:pointer;
   font:1000 12px/1.2 var(--sans);color:var(--ink);box-shadow:0 3px 0 rgba(40,33,26,.18);text-align:left}
+.wallet-main{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wallet-tail{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--muted);font-weight:900}
+@media (max-width:349px){.wallet-tail{display:none}}
 .wallet:active{transform:translateY(2px);box-shadow:none}
 .wallet svg{display:block;flex:none}
 .wallet b{font-size:15px;color:var(--red)}
@@ -263,7 +288,7 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .tea-order b{color:var(--teal);font-size:9px;letter-spacing:.08em;display:block;margin-bottom:3px}
 /* 兜底能滚。**单屏是优化，不是硬约束**——放不下的时候必须还能够得着，
    否则「放不下」就变成「出不去」。0813 巡查实测：手机横过来（844x390）时
-   首页的「单猴挑战，立即上楼」整颗被裁在卡片外，玩家开不了局；
+   首页的开工按钮（当时叫「单猴挑战，立即上楼」，多人拆除后已改名）整颗被裁在卡片外，玩家开不了局；
    进了称号墙/奶茶图鉴更糟——关闭键在屏外，触屏没有 Esc 的等价物，
    八条出路试了一遍只有键盘 Esc 有效，也就是手机上**只能刷新页面**。
    overflow-y:auto 在内容装得下时和 hidden 完全一样（不出滚动条、滚不动），
@@ -354,12 +379,44 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .palette-note{border-style:solid;border-color:#c9bfa6;background:#f8efd9;color:var(--ink)}
 .brand-box{background:var(--ink);color:var(--paper);border-radius:13px;padding:12px 14px;margin-bottom:13px}
 .brand-box b{font-size:18px;letter-spacing:.12em}.brand-box p{font-family:var(--serif);font-size:12px;line-height:1.55;margin:5px 0 0;color:#f1d99f}
-.result-stamp{position:absolute;right:9px;top:93px;width:76px;height:76px;border:5px double var(--red);border-radius:50%;display:grid;place-items:center;
-  color:var(--red);background:rgba(255,253,246,.88);font:1000 14px/1.15 var(--serif);text-align:center;transform:rotate(11deg);letter-spacing:.08em;pointer-events:none}
+/* 盖章**进到布局里**，不再用绝对定位悬在数字上。
+   它原来是 `top:93px`——那个 93 镜像的是「当时标题占多高」，是 0813 那个
+   写死 844 屏高的同族错：标题改字号、屏一窄，它就压到数字上。实测五个视口全中，
+   320 宽上盖掉了 1888 的最后一位。中间还试过「两边留等宽的槽」，
+   仍然不行：数字是 58px 的定值，槽一留它就溢出来，照样被压。
+   **只要它还悬在别人头上，就总有一个视口会撞。** 现在整行改成 flex，
+   数字、单位、印章三个都是流里的东西，谁也压不到谁——代价是印章不再压着数字，
+   但「看得清数字」比「看着像盖上去的」重要。旋转与双圈边保住了盖章的样子。 */
+/* 旋转 11 度之后，正方形的外接盒会比它自己大：边长 S 的方块转 11 度，
+   外接盒是 S*(cos11+sin11) = 1.172*S，四边各多出 0.086*S。
+   这一圈多出来的角就是最后那点重叠（实测每边 4 到 183 平方像素）。
+   **多出来多少是算得出来的，就别去试**——上下留白与左右间距都按 0.09*S 给。 */
+.result-score{display:flex;align-items:center;justify-content:center;
+  gap:calc(5px + var(--stamp-size) * .09);
+  padding-block:calc(var(--stamp-size) * .09)}
+.result-stamp{flex:none;margin-left:auto;width:var(--stamp-size);height:var(--stamp-size);
+  transform:rotate(11deg);border:5px double var(--red);border-radius:50%;display:grid;place-items:center;
+  color:var(--red);background:rgba(255,253,246,.88);font:1000 calc(var(--stamp-size) * .185)/1.15 var(--serif);
+  text-align:center;letter-spacing:.08em;pointer-events:none}
+/* 印章不在场时，数字仍然要在整行的中间——否则有没有盖章会让数字左右跳。
+   **但这个占位必须能被压扁**（flex:0 1，不是 flex:none）：320 宽上
+   「占位 + 四位数 + 米 + 印章」本来就排不下，占位若不肯让，挤没地方的就轮到数字，
+   而数字是 min-width:0 的——它的**盒子**缩小、**字形**照样溢出去压在印章底下。
+   盒子不重叠、像素重叠，只量矩形的判据完全看不见（当时报的是「0 处重叠」），
+   是靠截图才发现的。压扁顺序：先牺牲这个纯装饰的占位，再谈别的。 */
+.result-score::before{content:'';flex:0 1 var(--stamp-size);margin-right:auto}
+/* 数字**一格都不让**：它是这一屏的主角，让它缩就等于让字形跑到盒子外面去
+   （flex 子项默认 flex-shrink:1，盒子缩了、overflow 是 visible，字照样画出来压住印章）。
+   让位的顺序写死在这里：先压扁上面那个纯装饰的占位，再没地方就整行超出去——
+   而不是先牺牲主角。 */
+.result-score>b{flex:none}
 .rank-entry{margin:12px 0;padding:11px;border:2px dashed #a7977c;border-radius:13px;background:#f8efd9}
 .rank-entry label{display:block;font-size:10px;color:var(--muted);font-weight:1000;margin-bottom:6px}
 .rank-form{display:grid;grid-template-columns:1fr auto;gap:7px}.rank-input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;
-  background:var(--card);padding:9px 10px;font:900 13px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
+  /* **字号不能小于 16px。** iOS Safari 对小于 16px 的输入框会在聚焦时自动放大整页，
+     而这个游戏是 user-scalable=no 的单屏应用，放大之后缩不回去，玩家等于被卡在放大的榜单里。
+     这不是审美取舍，是 Safari 的硬行为；想显小要用 transform，不能靠 font-size。 */
+  background:var(--card);padding:9px 10px;font:900 16px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
 .rank-save{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);padding:8px 12px;font-weight:1000;cursor:pointer}
 #leaderboardScreen,#installScreen,#shareScreen,#teaScreen,#shopScreen{z-index:76}
 #leaderboardScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card,#shopScreen .card{max-height:100%;overflow:hidden}
@@ -759,10 +816,10 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       <g id="itemLayer"></g>
       <g id="playerGroup" transform="translate(145 660)">
         <circle id="goldAura" cx="50" cy="55" r="52"/>
-        <g id="monkeyMotion" class="monkey-motion"><use id="monkeyUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g>
+        <g id="monkeyMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g>
       </g>
-      <g id="playerWrapLeft"><g id="monkeyWrapLeftMotion" class="monkey-motion"><use id="monkeyWrapLeftUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
-      <g id="playerWrapRight"><g id="monkeyWrapRightMotion" class="monkey-motion"><use id="monkeyWrapRightUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
+      <g id="playerWrapLeft"><g id="monkeyWrapLeftMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyWrapLeftUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
+      <g id="playerWrapRight"><g id="monkeyWrapRightMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyWrapRightUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
     </svg>
 
     <header id="hud" aria-live="polite">
@@ -793,7 +850,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       <div class="card">
         <span class="notice-no">约谈通知第 0001 号</span>
         <div class="eyebrow">MYSKME 驯猴办直属项目</div>
-        <svg class="title-art" viewBox="-4 0 108 120"><use href="#art-monkey-rise"/><g class="wear-layer"></g></svg>
+        <svg class="title-art" viewBox="-4 0 108 120"><g class="wear-behind"></g><use href="#art-monkey-rise"/><g class="wear-layer"></g></svg>
         <h1>是猴就上<strong>100层</strong></h1>
         <p id="subtitle" class="subtitle">电梯在等他。他没看见。</p>
         <div class="career"><b>长期档案</b><span id="careerCopy">档案章可解锁开工装备</span><strong id="careerStamps">0</strong>
@@ -803,7 +860,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="kit-label">选择开工装备</div>
         <div id="kitGrid" class="kit-grid"></div>
         <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。他已出发；通知还剩 418 字。</div>
-        <button id="startButton" class="btn">单猴挑战，立即上楼</button>
+        <button id="startButton" class="btn">打卡上班，立即上楼</button>
         <div class="btn-row"><button id="leaderboardButton" class="btn secondary">世界楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
         <div class="best-row"><span>最高高度 <b id="bestHeight">0</b> 米</span><span>最高分 <b id="bestScore">0</b></span></div>
       </div>
@@ -816,8 +873,12 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="result-page" data-result-page="0">
           <p id="deathLine" class="death-line"></p>
           <div id="resultTitle" class="result-title"></div>
-          <div id="resultStamp" class="result-stamp">已阅</div>
-          <div class="result-score"><b id="resultHeight">0</b><small>米</small></div>
+          <!-- 印章挪进分数那一行里：它原来是 `top:93px` 绝对定位，而 93 镜像的是
+               「那时候标题占多高」——标题一改、字号一改、屏一窄，它就压到数字上。
+               实测五个视口全部压住正文，320 宽上盖掉了 1888 的最后一位。
+               现在它是分数行的子元素，靠 right/居中定位，正文那边留出等宽的槽，
+               **位置由布局决定，不再由一个会过期的数字决定**。 -->
+          <div class="result-score"><b id="resultHeight">0</b><small>米</small><div id="resultStamp" class="result-stamp">已阅</div></div>
           <div id="resultSub" class="result-sub"></div>
           <div class="stats">
             <div class="stat"><b id="resultBananas">0</b><span>香蕉</span></div>
@@ -965,7 +1026,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.6-truegates',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.10-final',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1005,7 +1066,18 @@ const DEPARTMENTS=[
   {id:'construction',name:'加盖工程部',short:'加盖工程部',color:'#e7ecf2',line:'本层施工依据：先盖了再说。'}
 ];
 const DEPT=Object.fromEntries(DEPARTMENTS.map(d=>[d.id,d]));
-const FIXED_ORDER=DEPARTMENTS.map(d=>d.id);
+// 玩家**遇见部门的顺序**，和「一共有哪些部门」是两回事，所以分开写。
+// 原来是 `DEPARTMENTS.map(d=>d.id)`——名单顺序即出场顺序，于是最有意思的几个机关
+// 排在了没人走得到的高度：0814 实测自动驾驶 8 局，**蛇台一次都没踩到**（0/603 次落脚），
+// 蛋台平均每局 1 次。因为蛇在谜题管理局，而那是第 8 个部门 = 2100 米起，
+// 而自动驾驶 50 秒的中位高度只有 1768 米。**一半的手写内容排在没人到得了的地方。**
+// 王老师的原话：「蛇和蛋基本没什么作用就是装饰一样」——他说得对，它们确实几乎不出现。
+//
+// 现在按「教什么」排：前五个各教一件事（安全 -> 会塌 -> 有假的 -> 弹更高 -> 会甩你），
+// 第六个观景台是喘口气，后面才是气氛与进阶。跑者类游戏的通例就是**把词汇前置**——
+// 绝大多数局都很短，玩家得在头两三局里见全这套词汇，否则那些机关等于没做。
+const FIXED_ORDER=['lobby','quality','monkey','redundancy','puzzle','observation',
+  'fax','rent','tongue','fertilizer','punctuation','construction'];
 // 十二种调式，一个部门一种。和立面同一条线：一个部门一门学问。
 // 每条 fact 是**这套音阶为什么听起来是那个味道**的原因，不是名词解释。
 // steps 是半音级差；音乐引擎只用它来把旋律级数换算成音高，节奏与配器一律不变。
@@ -1173,6 +1245,8 @@ function facadeMarkup(facade){
   }
   return parts.join('');
 }
+// 走完固定的十二个之后进入随机轮换。观景台不在池子里，它由下面那 32% 的插队规则
+// 单独安排——喘气的节奏要留给随机，但不能连着两次都是喘气。
 const RANDOM_POOL=['quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','punctuation','construction'];
 const MECHANICS=['good','bad','fax','rent','bananaBoard','fakeBanana','redundant','egg','vapor','stamp','snake','tongue','bubble','punctuation','construction','conveyor','goldRisk'];
 const DEATH_LINES=[
@@ -1236,7 +1310,7 @@ const SURPRISES=[
   {id:'quiet',rarity:'稀有意外',text:'全楼安静了两秒，因为没人知道下一句。',kind:'quiet'},
   {id:'refund',rarity:'稀有意外',text:'房租稽查科第一次退款。虽然只有 18 分。',kind:'refund'},
   {id:'fish',rarity:'稀有意外',text:'鱼小姐把一个备用泡泡藏进了档案袋。',kind:'fish'},
-  {id:'overtime',rarity:'少见意外',text:'单猴赛收到十三分。',kind:'overtime'},
+  {id:'overtime',rarity:'少见意外',text:'加时赛收到十三分。',kind:'overtime'},
   {id:'confetti',rarity:'普通意外',text:'没有原因。突然庆祝。',kind:'confetti'},
   {id:'platform',rarity:'稀有意外',text:'空气临时被认定为平台，保质三秒。',kind:'platform'},
   {id:'secret',rarity:'极怪意外',text:'谈话人来过。只留下一个问号和 52 分。',kind:'secret'},
@@ -1318,7 +1392,7 @@ function typeStep(step){return Math.round(TYPE_BASE*Math.pow(TYPE_RATIO,step));}
 // 海报用到的那几级，取好名字再用——`typeStep(9)` 读不出是什么，`TYPE.floors` 读得出。
 // 层级之间至少隔一格，隔太近的两级在视觉上会打架（这条有自检盯着）。
 const TYPE={
-  floors:typeStep(11),   // 232 楼层数：整张海报的主角，一眼就该看到
+  floors:typeStep(11),   // 186 楼层数：整张海报的主角，一眼就该看到
   rank:typeStep(7),      // 76  职级
   name:typeStep(5),      // 49  名字
   rarity:typeStep(5),    // 49  稀有度
@@ -1334,7 +1408,9 @@ const TYPE={
 const TYPE_FACTS={
   paper:'字号不是随手定的，是一条等比数列上的格子（这里是 1.25）。整版只用一个数列，相邻两级的关系就固定了，眼睛才读得出稳定的层级。',
   fish:'字号差得不够就不叫层级，只叫「大小不一」。同一条数列上隔开两格以上，两行字才会被读成主次，而不是并列。',
-  banana:'标题用大字、正文用小字，这只是一半；另一半是**大字要收紧、小字要放松**——字号越大，字与字之间的空隙看着越松，所以越大的字越要往回收。',
+  // 这一条曾经把 Markdown 的 ** 原样印在海报上给玩家看（TYPE_FACTS 是**玩家可见文案**，
+  // 不是源码注释，不能用注释里的记号）。玩家读到的是「另一半是**大字要收紧**」。
+  banana:'标题用大字、正文用小字，这只是一半；另一半是「大字要收紧、小字要放松」——字号越大，字与字之间的空隙看着越松，所以越大的字越要往回收。',
   purple:'一行排多少字是有上限的：中文一行超过四十来字，眼睛从行尾折回行首就容易串行。这张海报的批注框按它的字号只排得下十七八个字，是刻意留在上限之内的——窄一点没关系，宽过头就会开始串行。',
   night:'深底浅字比浅底深字看着更粗（同一个字号，白字在黑底上会「胀」）。所以夜班版的正文并没有加粗，是底色替它加的。',
   odd:'留白不是没排东西的地方，是排版的一部分：四周那圈边距把整张图框成一件「公示件」，去掉之后所有内容都会显得在往外挤。'
@@ -1357,6 +1433,35 @@ const NPC_RANKS=[
 ];
 // 任命各配一枚图标：它们现在长在台子上，玩家在跳的过程中要**一眼认出**是哪一份，
 // 没有时间读字。图标走的是全作通用的 ICON_GLYPHS，风格与称号徽章一致。
+// 一排任命台什么时候来。0814 实测：第一排原在 1200 米，间隔 1500 米，
+// 而自动驾驶 50 秒的中位高度是 1768 米——**8 局共只生成 8 排，一局一排**。
+// 命中率其实很高（88%），所以王老师说的「三选一挺难触发碰到」不是难踩，是**几乎不出现**。
+//
+// 改成 500 米开张、每 1100 米一排：中位那一局能碰到 2 排，
+// 而一局只走 600 米的新手也至少碰得到 1 排——肉鸽式选择必须在第一局就发生，
+// 否则玩家根本不知道这个系统存在。
+const FIRST_CHOICE_METER=500,CHOICE_GAP_METER=1100;
+// ---- 香蕉经济 ----
+// 沿途密度恒定，收入的「变化」全部交给结算时这道超线性的高度奖金。
+// 为什么是超线性：跑者类的通例是**走得远要按超过比例地划算**，否则玩家没有理由去冒险，
+// 反正多跑一倍只多赚一倍，还多担一次摔死的风险。指数 1.3 是常见档位——
+// 翻一倍距离拿到约 2.5 倍奖金，够明显，又不至于让高手一局顶新手三十局。
+//
+// 锚点（游戏自己的口径：3 米一层，所以「100 层」=300 米）：
+//   300 米（标题那个 100 层）  +1 根      新手第一次通过标题目标，给个响
+//   500 米                    +2 根
+//  1000 米                    +6 根
+//  1768 米（实测中位）        +13 根     ~ 和沿途捡到的量相当，等于一局收入翻倍
+//  3000 米                    +25 根
+//  5000 米                    +49 根
+// 密度取 .18——就是原来那条衰减曲线的**起点值**。
+// 改成 .16 试过一轮，实测每局中位收入从 11 根掉到 9 根：因为实测那几局都在 1800 米以下，
+// 正好是老曲线还没怎么衰减的区段，压低起点等于只惩罚了前期。
+// **要拿掉的是那条下降的斜率，不是把整条线往下压。**
+const BANANA_RATE=.18,HEIGHT_BONUS_BASE=6,HEIGHT_BONUS_POWER=1.3;
+function heightBananas(meters){
+  return Math.round(HEIGHT_BONUS_BASE*Math.pow(Math.max(0,meters)/1000,HEIGHT_BONUS_POWER));
+}
 const PERK_POOL=[
   {id:'wide',emblem:'widen',tint:'#c9b27a',name:'宽容落脚点',line:'判定左右各放宽一点。质检部对此睁一只眼。'},
   {id:'spring',emblem:'spring',tint:'#e0a21c',name:'弹性批文',line:'以后每次起跳更高。批文没有写上限。'},
@@ -1384,7 +1489,28 @@ const SHOP_SLOTS=[
 // 四档 340（约三十局，第一辆车）
 // 五档 750（约六十局；私人电梯是全作最贵的一件，也是那句副标题的终点）
 // 改价格之前请重测一次收入——这是一份会过期的镜像。
-const TIER_PRICE={1:18,2:60,3:150,4:340,5:750};
+// 定价按**实测密度**推，不是拍脑袋，也不抄上一次的读数。
+// 0814 重测（自动驾驶 8 局，按每千米比，把「这局跑多远」除掉）：
+//   沿途密度 7.1 根/千米（改之前是 8.5——降是因为蛋台/审讫台这些弹得高的
+//   被排到了前面，玩家同样的米数里落脚次数变少，路过而没靠近的台子变多。
+//   这是「把有意思的机关前置」的代价，认了，用结算奖金补回来。）
+// 于是一局的收入 = 7.1 * 千米 + 6 * 千米^1.3：
+//   1000 米 -> 7 + 6  = 13 根
+//   1768 米 -> 13 + 13 = 25 根   <- 定价按这一档锚
+//   2500 米 -> 18 + 20 = 38 根
+// 改之前同样 1768 米只有约 12 根（没有奖金那一半），**总收入涨了四成**。
+//
+// **这里有一个说明白的假设**：1768 米是自动驾驶 50 秒的中位高度，
+// 不是真人一局的中位高度——自动驾驶不会死，这台机器上量不到真人的局长。
+// 定价锚在「一局约 25 根」上；真人局若明显短于这个，整条阶梯要按同样的方法重推一次，
+// 别单独挪某一档（挪一档就把阶梯的形状破坏了）。
+//
+// 目标局数按跑者类的常见节奏排：第一件一局内到手（第一次进商店就买得起东西），
+// 下一件三局，中段七局，高段十五局，顶级三十局出头（一个真的要惦记着的目标）。
+//   25 x1 ｜ 70 x3 ｜ 170 x7 ｜ 360 x15 ｜ 780 x31
+// 全套 4480 根 ≈ 180 局；上一版是 4182 根 / 每局约 12 根 ≈ 350 局——够不着，
+// 于是十八件里最贵那几件基本没人见过，而它们正是拿来攀比的那几件。
+const TIER_PRICE={1:25,2:70,3:170,4:360,5:780};
 const SHOP_ITEMS=[
   {id:'cap',slot:'head',tier:1,name:'工牌鸭舌帽',line:'帽檐上别着自己的工牌，方便别人认出你是谁的下属。'},
   {id:'shades',slot:'eye',tier:1,name:'反光墨镜',line:'戴上之后没人看得出你在看第几层，包括你自己。'},
@@ -1429,15 +1555,47 @@ const WEAR_ART={
   maybach:'<path d="M6 112V99q0-4 5-5l10-9q3-3 8-3h40q5 0 8 3l10 9q5 1 5 5v13z" fill="#28211a" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 88h48l7 7H17z" fill="#9fb8c8"/><circle cx="24" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><circle cx="76" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><path d="M10 100h12M78 100h12" stroke="#f1bd3c" stroke-width="3" stroke-linecap="round"/>',
   lambo:'<path d="M2 112v-6l22-6 14-10h26l22 16v6z" fill="#e0a21c" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M40 92h22l14 10H32z" fill="#3a332a"/><path d="M62 90l16-14" stroke="#e0a21c" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="110" r="7" fill="#28211a"/><circle cx="76" cy="110" r="7" fill="#28211a"/>',
   rocket:'<path d="M50 78q13 12 13 28H37q0-16 13-28z" fill="#f5f0e2" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M37 100l-12 8h12zM63 100l12 8H63z" fill="#e0452c" stroke="#28211a" stroke-width="2.4" stroke-linejoin="round"/><circle cx="50" cy="92" r="5" fill="#6f86c9" stroke="#28211a" stroke-width="2"/><path d="M42 108q8 12 16 0z" fill="#f1bd3c" stroke="#e0452c" stroke-width="2"/>',
-  lift:'<rect x="14" y="74" width="72" height="42" rx="3" fill="none" stroke="#a7977c" stroke-width="3"/><path d="M20 80h26v34H20zM54 80h26v34H54z" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M50 74v42" stroke="#28211a" stroke-width="2.6"/><rect x="36" y="62" width="28" height="10" rx="2" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M44 67h3M53 67h3" stroke="#e0452c" stroke-width="2.6" stroke-linecap="round"/>'
+  // 电梯是唯一一件跨在猴子前后两层的行头，断点写在字符串里（见 WEAR_SPLIT）：
+  // 车厢与两扇门在**身后**——它们是实心的，画在前面会把猴子下半身整个盖住；
+  // 楼层显示牌与那两位红字在**身前**——它才是「这是电梯」的那个记号，
+  // 全塞到身后就只剩一个空框，750 根香蕉买回来看着像个纸箱。
+  lift:'<rect x="14" y="74" width="72" height="42" rx="3" fill="none" stroke="#a7977c" stroke-width="3"/><path d="M20 80h26v34H20zM54 80h26v34H54z" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M50 74v42" stroke="#28211a" stroke-width="2.6"/><!--前--><rect x="36" y="62" width="28" height="10" rx="2" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M44 67h3M53 67h3" stroke="#e0452c" stroke-width="2.6" stroke-linecap="round"/>'
 };
 const SHOP_BY_ID=Object.fromEntries(SHOP_ITEMS.map(i=>[i.id,i]));
 function shopPrice(item){return TIER_PRICE[item.tier];}
 // 穿戴顺序按槽位固定，不按购买顺序——否则先买车后买帽子会把帽子画到车底下。
-function wornMarkup(){
+// 穿戴画两层：猴子身后一层，猴子身前一层。0814 Codex 真机复核报出来的毛病是
+// 私人电梯两扇门叠在猴子前方，把下半身整个盖住——它是全套里唯一体积比猴子还大的一件。
+//
+// **修法是给穿戴分前后，不是给电梯挪坐标。** 挪坐标只是把这一件改到「刚好不挡」，
+// 下一件大件又会重犯；分层把「谁该在身后」变成画法里的一个断点，
+// 以后加轿子、加热气球都不用再想这件事。
+//
+// 断点写在画法字符串里，而不是另开一张「谁在身后」的表：**另开一张表就是又一份会漂的镜像**，
+// 美术改了那张表不会跟着改。没有断点的行头整件画在前面，也就是原来的行为。
+//
+// 为什么不按槽位一刀切：座驾里的车与滑板车画在**前面**反而对——
+// 猴子看着像坐在车里（下半身被车身挡住，正是「坐进去」的视觉）。
+// 而电梯是**跨着两层**的：实心的车厢与门在身后，楼层显示牌在身前。
+// 一刀切成「整件在前」或「整件在后」都得不到对的画面——
+// 整件在后那版拍出来是个空框子，看着像纸箱，这是靠截图才看出来的，数值断言全绿。
+// 图层类名必须叫 wear-behind，**不能叫 wear-back**：槽位的类名是 `wear-<槽位id>`，
+// 而「背上」这个槽位的 id 就是 back——撞名之后 querySelectorAll('.wear-back')
+// 会把背上槽位那个 <g> 也当成图层刷，电梯的图形被写进前面的图层，又画到猴子前面去了。
+// 这是 AGENTS.md 那条 canon 锁警告的同一族错（carp-hat-on 与 carp-hat 撞名，0813 整个画面消失），
+// 同样是数值判据全绿、靠截图才看见。下面那道自检把「别撞名」变成断言。
+const WEAR_SPLIT='<!--前-->';
+function wearPart(id,where){
+  const art=WEAR_ART[id]||'',at=art.indexOf(WEAR_SPLIT);
+  if(at<0)return where==='front'?art:'';
+  return where==='back'?art.slice(0,at):art.slice(at+WEAR_SPLIT.length);
+}
+function wornMarkup(where='front'){
   return SHOP_SLOTS.map(slot=>{
     const id=career.wearing[slot.id];
-    return id&&WEAR_ART[id]?`<g class="wear-${slot.id}">${WEAR_ART[id]}</g>`:'';
+    if(!id||!WEAR_ART[id])return '';
+    const part=wearPart(id,where);
+    return part?`<g class="wear-${slot.id}">${part}</g>`:'';
   }).join('');
 }
 const MAJOR_EVENTS=['stamp','donkey','gravity','wind','shaft','faxRain','elevator'];
@@ -1466,7 +1624,7 @@ const MISSIONS=[
   {id:'risk',kind:'risk',target:2,reward:2,label:'踩中 2 块险字平台，危险可报销。'}
 ];
 // 暂停必须是真暂停。这局里所有「到某个绝对时刻为止」的计时都得整体后移，
-// 否则暂停十秒回来，磁卡、宽容尺、电梯欠条、多人赛倒计时全被白吃掉十秒——
+// 否则暂停十秒回来，磁卡、宽容尺、电梯欠条这些限时道具全被白吃掉十秒——
 // 那不叫暂停，那叫作弊入口。切后台同理（原来只停 rAF、不停计时，就是这个漏）。
 // **新加计时字段一定要登记进下面三张表**，runQA 的「暂停计时字段登记齐全」会当场抓漏。
 const PAUSE_TIME_FIELDS=['lowGravityUntil','windUntil','faxNextAt','shaftUntil','shaftLastHit','shaftStartedAt',
@@ -1492,8 +1650,8 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
   animationFrame:0,paused:false,pausedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),motifFirstTime:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
-  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,perkGroup:0,perksTaken:0,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
-  runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
+  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:FIRST_CHOICE_METER,perkGroup:0,perksTaken:0,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
+  runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,heightBonus:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
 // 每页装几个。改成网格之后一页装得下的数量翻了两三倍，页数跟着掉：
@@ -1787,14 +1945,16 @@ const COLLECTIONS=[
 function renderResultWallet(){
   if(!el.resultShop)return;
   el.resultShop.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
-    +`本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店<span>余额 ${career.bananas} 根</span>`;
+    +`<span class="wallet-main">本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店</span>`
+    +`<span class="wallet-tail">余额 ${career.bananas} 根</span>`;
 }
 function renderWallet(){
   const cheapest=Math.min(...SHOP_ITEMS.filter(i=>!career.owned.includes(i.id)).map(shopPrice).concat([Infinity]));
   const tail=career.owned.length>=SHOP_ITEMS.length?'全套已入库'
     :career.bananas>=cheapest?'有能买的了':`还差 ${cheapest-career.bananas} 根`;
   el.wallet.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
-    +`香蕉 <b>${career.bananas}</b> 根 · 逛香蕉商店<span>${tail}</span>`;
+    +`<span class="wallet-main">香蕉 <b>${career.bananas}</b> 根 · 逛香蕉商店</span>`
+    +`<span class="wallet-tail">${tail}</span>`;
 }
 function renderCollectStrip(){
   el.collectStrip.innerHTML='';
@@ -1850,8 +2010,13 @@ function updateMissionUI(){
   const m=state.mission;if(!m)return;const value=Math.min(m.target,missionValue(m)),done=value>=m.target;el.missionBadge.classList.toggle('done',done);el.missionBadgeText.textContent=`${m.label} ${value}/${m.target}`;
 }
 
+// 一个部门管多少米。300 是最早拍的数，配上十二个固定顺序的部门＝要走 3600 米
+// 才能见全，而实测中位只有 1768 米。降到 240：见全一轮需 2880 米，
+// 中位那一局能走到第 8 个部门。**不再降是因为再降就没时间看清一个部门的立面与调式了**
+// （240 米在实测速度下约 6.9 秒，已经是一屏景色能被认出来的下限）。
+const DEPT_BAND=240;
 function departmentIdAt(meters){
-  const idx=Math.max(0,Math.floor(meters/300));
+  const idx=Math.max(0,Math.floor(meters/DEPT_BAND));
   while(state.deptCache.length<=idx){
     if(state.deptCache.length<FIXED_ORDER.length){state.deptCache.push(FIXED_ORDER[state.deptCache.length]);continue;}
     if(!state.randomBag.length){
@@ -1965,9 +2130,9 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;state.personalBestAtStart=IS_TEST_RUN?0:saved.height;state.recordPassed=false;
   state.milestones=new Set(MILESTONES.filter(m=>m<=DEBUG_START));state.lucky=DEBUG_START>=1020;state.fertilizerCoughed=false;
   state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.lastLandingId='';state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
-  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.perkGroup=0;state.perksTaken=0;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
+  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<FIRST_CHOICE_METER?FIRST_CHOICE_METER:FIRST_CHOICE_METER+(Math.floor((DEBUG_START-FIRST_CHOICE_METER)/CHOICE_GAP_METER)+1)*CHOICE_GAP_METER;state.perkGroup=0;state.perksTaken=0;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
   state.runId=makeRunId();state.rankSubmitted=false;state.lastSafe={x:DEBUG_X,y:baseY};state.playerRepairs=0;state.faxRainUntil=0;
-  state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
+  state.heightBonus=0;state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
   state.mission=MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun();state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=unlockedKit(career.kit)?career.kit:'bare';
   state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
@@ -2009,10 +2174,18 @@ function addAppointmentRow(meters,y,dept){
   const bw=Math.min(safeWidth(meters),94),span=(W-12-bw)/2;
   const perks=shuffle(PERK_POOL).slice(0,3);
   state.perkGroup+=1;
+  // 收取半径**从这一排的实际间距现算**，不写死。三块台子中心间距就是 span，
+  // 所以离最近那一份最远也只有 span/2——band 取 span/2 再加 4 像素的富余，
+  // 穿过这一层时必然命中一份。
+  // 第一版写死了 70：而 span 在 bw=94 时是 142，半格 71，**刚好差 1 像素**，
+  // 于是屏幕上留下两条细缝，从缝里穿过去就什么都拿不到。
+  // 更要命的是 bw 会随高度变窄（safeWidth），span 跟着变大，写死的数只会越来越不够。
+  // **写死的数镜像的是「当时那一排有多宽」，那是个会变的量。**
+  const reach=span/2+4;
   const row=perks.map((perk,i)=>{
     const p=addPlatform({x:6+span*i,y,w:bw,type:'good',dept,label:'任命'});
     p.route=true;p.appointment=true;
-    const item=addItem('perk',p);item.perk=perk.id;item.perkGroup=state.perkGroup;
+    const item=addItem('perk',p);item.perk=perk.id;item.perkGroup=state.perkGroup;item.reach=reach;
     return p;
   });
   state.lastX=W/2;
@@ -2023,7 +2196,7 @@ function generatePlatforms(targetY){
     const meters=metersFromY(state.nextY),dept=departmentIdAt(meters),width=safeWidth(meters),gap=88+state.rng()*19+Math.min(22,meters/230);
     if(meters>=state.nextChoiceMeter){
       const row=addAppointmentRow(meters,state.nextY,dept);
-      state.nextChoiceMeter=meters+1500;
+      state.nextChoiceMeter=meters+CHOICE_GAP_METER;
       // 上限现取 platformRiseCap，不抄字面量——台子类型哪天改了弹力，这里自动跟。
       state.nextY+=Math.min(gap,Math.min(...row.map(platformRiseCap)));
       continue;
@@ -2071,7 +2244,13 @@ function generatePlatforms(targetY){
       addPlatform({x:riskX,y:y+32,w:riskW,type:'goldRisk',dept,label:'险',riskBonus:25});
     }
     if(primary&&primary.solid&&dept!=='observation'){
-      if(state.rng()<clamp(.18-meters/30000,.1,.18)&&primary.type!=='snake')addItem('banana',primary);
+      // 香蕉密度**不随高度衰减**。原来写的是 `clamp(.18-meters/30000,.1,.18)`——
+      // 从 18% 一路掉到 10%，也就是**玩得越好，每米赚得越少**。
+      // 这把「变强」和「变富」拧成了反向关系，是跑者类里最不该出现的一条曲线：
+      // 玩家看得见的直接现象就是「越往上香蕉越少」，而他明明打得更好了。
+      // 控制长局收入该用的是**结算时那道超线性的高度奖金**（见 heightBananas），
+      // 不是让沿途的密度掉下去。密度保持恒定，玩家读得懂；奖金给长局，长局才划算。
+      if(state.rng()<BANANA_RATE&&primary.type!=='snake')addItem('banana',primary);
       const forceCrate=!state.crateGiven&&meters>430;
       if((forceCrate||state.rng()<.026)&&meters>300){addItem('crate',primary);state.crateGiven=true;}
       if(meters>=state.nextToolMeter&&!state.items.some(item=>item.platformId===primary.id)){addItem(TOOL_POOL[Math.floor(state.rng()*TOOL_POOL.length)],primary);state.nextToolMeter=meters+390+Math.floor(state.rng()*310);}
@@ -2192,7 +2371,18 @@ function collectItems(now){
   for(const item of state.items){
     if(item.collected)continue;
     const rawDx=Math.abs(pl.x-item.x),dx=Math.min(rawDx,W-rawDx),dy=Math.abs(pl.y-(item.y+6)),magnet=item.kind==='banana'&&now<state.magnetUntil;
-    if((dx<(magnet?132:34)&&dy<(magnet?108:62))){
+    // 任命的收取范围要比别的道具宽得多，**因为它不是「捡到」，是「穿过那一层时选了哪边」**。
+    // 0814 量出来的毛病：把任命排从「一局 1 排」加密到「一局 1.8 排」之后，
+    // 每局真正拿到的份数**一点没涨**（都是 0.8 份）——因为一次弹跳能上升 790，
+    // 而两排台子只隔 90 到 130 像素，玩家常常直接从三块台子中间飞过去，
+    // 34x62 的收取框根本碰不到。加密度治不了「飞过去」。
+    //
+    // 三块台子横排全宽，中心间距 142，所以横向取 70（正好半格）：
+    // 穿过那一层时**必然且只会**命中离你最近的那一份，选哪份由你当时在左边还是右边决定，
+    // 这正是这个游戏本来就在做的事（点左点右）。纵向取 100，比一次弹跳的排间距大，
+    // 保证不会从两排中间溜过去。其余道具维持原样：香蕉就该是「捡到」。
+    const perkBand=item.kind==='perk';
+    if(perkBand?(dx<(item.reach||70)&&dy<100):(dx<(magnet?132:34)&&dy<(magnet?108:62))){
       item.collected=true;
       if(item.kind==='banana'){const gain=1+state.perks.banana;state.bananas+=gain;toast(gain>1?'香蕉发生复利：一根按两根入账。':'香蕉已入账。下班后可在香蕉商店消费。','gold');sfx('banana');}
       else if(item.kind==='crate')openCrate(now);
@@ -2436,8 +2626,16 @@ function renderAll(now){
   for(const [id,node]of platformEls){if(!liveIds.has(id)){node.remove();platformEls.delete(id);}}
   const liveItems=new Set();
   for(const item of state.items){
-    const sy=H-(item.y-state.cameraY),fade=item.declined?1-(now-item.declinedAt)/520:1;
-    if((item.collected&&fade<=0)||sy<-90||sy>H+80)continue;
+    // fade 一个变量要同时表达两件事，所以两件事都得写全：
+    //   作废的任命 -> 520ms 淡出；被收集的东西 -> **当帧就不画了**。
+    // 0814 王老师报的「香蕉吃了怎么还有」就是这里：a65f9bd 给作废任命加淡出时，
+    // 把 fade 写成了 `declined ? 淡出值 : 1`，于是普通被收集的道具 fade 恒为 1，
+    // `collected && fade<=0` 永远不成立，唯一的退出路径只剩「滑出视野」——
+    // 香蕉入了账、计数器涨了、toast 也弹了，那根香蕉还在原地飘三四秒。
+    // 更糟的是它和没吃的香蕉长得一模一样，玩家会再扑一次，扑了个空。
+    // **数值全对，只有画面是错的**——三十条断言全绿，是靠逐帧跟踪和截图看出来的。
+    const sy=H-(item.y-state.cameraY),fade=item.declined?1-(now-item.declinedAt)/520:(item.collected?0:1);
+    if(fade<=0||sy<-90||sy>H+80)continue;
     liveItems.add(item.id);const node=ensureItemNode(item);node.setAttribute('transform',`translate(${item.x.toFixed(1)} ${(sy+Math.sin(now*.004+item.phase)*5).toFixed(1)})`);
     if(item.declined)node.style.opacity=String(Math.max(0,fade));
   }
@@ -2516,8 +2714,12 @@ function stepPage(delta){
   pager.go(target);sfx('select');return true;
 }
 // 当前开着的子屏幕怎么关。Esc 与角落返回键共用这一张表。
+// 每开一个新子屏都要往这里加一条，否则那一屏 Esc 关不掉。
+// 香蕉商店上线时就漏了——它是十八件行头的入口，却是唯一一个键盘关不掉的屏。
+// 下面那条自检把「.screen 里每一个子屏都要在这张表里」变成断言，靠人记是记不住的。
 function activeMenuClose(){
   if(!el.titles.classList.contains('hidden'))return closeTitles;
+  if(!el.shop.classList.contains('hidden'))return closeShop;
   if(!el.teas.classList.contains('hidden'))return closeTeas;
   if(!el.leaderboard.classList.contains('hidden'))return closeLeaderboard;
   if(!el.install.classList.contains('hidden'))return showTitleScreen;
@@ -2570,12 +2772,19 @@ function finishRun(reason='fall'){
   el.shell.classList.remove('carp-hat-on');state.carpHat=false;input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
   // 调试参数跑出来的成绩不许进本机纪录。原来只挡了 career，漏了 saved——
   // ?start=1200 之类一开，假高度就永久盖进玩家的最高纪录了。
+  // 高度奖金在**记录成绩之前**结算，否则海报、楼榜、钱包各读各的，
+  // 又会变成一份对不上的镜像（结算页写一个数、名片上另一个数）。
+  // 加完立刻重算总分：总分的定义就是 高度 + 香蕉 + 加成。
+  state.heightBonus=IS_TEST_RUN?0:heightBananas(state.maxMeters);
+  state.bananas+=state.heightBonus;state.score=state.maxMeters+state.bananas+state.bonus;
   const oldHeight=saved.height,oldScore=saved.score;
   if(!IS_TEST_RUN){saved.height=Math.max(saved.height,state.maxMeters);saved.score=Math.max(saved.score,state.score);saveRecord();}
   const di=chooseNonRepeat(DEATH_LINES,lastDeathIndex);lastDeathIndex=di;const si=chooseNonRepeat(SLOGANS,lastSloganIndex);lastSloganIndex=si;
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
+  // 奖金要**说出来**。不说的话玩家只看到香蕉数比刚才多，会以为是数错了。
+  if(state.heightBonus>0)$('resultSub').textContent+=`（高度奖金 +${state.heightBonus} 根）`;
   state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。本局窗景：${cultureMotif().name}。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;
   // 初见这扇窗景时，在档案页多讲一句它的配色是怎么成立的。
   const motifNote=$('motifPalette');
@@ -2884,6 +3093,8 @@ function teaCupSvg(tea,h=52){
 function renderWorn(){
   const markup=wornMarkup();
   for(const node of document.querySelectorAll('.wear-layer'))node.innerHTML=markup;
+  const behind=wornMarkup('back');
+  for(const node of document.querySelectorAll('.wear-behind'))node.innerHTML=behind;
 }
 // 穿好行头的猴子，画成一张独立 SVG（不依赖页面里的 defs），给海报用。
 // symbol 整段抄进去，所以里面的 <use href="#art-monkey-head-base"> 在这张图内部就能解析。
@@ -2891,7 +3102,8 @@ function dressedMonkeySvg(size){
   const defs=['art-monkey-head-base','art-monkey-land'].map(id=>{const node=$(id);return node?node.outerHTML:'';}).join('');
   // 视框比猴子大一圈：海报那格是圆角方块，贴边画的话座驾的轮子会被切掉。
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -6 118 132" width="${size}" height="${size}">`
-    +`<defs>${defs}</defs><use href="#art-monkey-land" width="100" height="116"/>${wornMarkup()}</svg>`;
+    +`<defs>${defs}</defs>${wornMarkup('back')}`
+    +`<use href="#art-monkey-land" width="100" height="116"/>${wornMarkup('front')}</svg>`;
 }
 function loadDressedMonkeyImage(){
   return new Promise(resolve=>{
@@ -2911,8 +3123,12 @@ const SLOT_VIEW={
 function shopPreviewSvg(id,size){
   const item=SHOP_BY_ID[id],view=SLOT_VIEW[item&&item.slot]||'-4 0 108 120';
   const box=view.split(' ').map(Number),ratio=box[3]/box[2];
+  // 试衣镜走的是同一个 wearPart，不是另抄一遍判断——
+  // 抄一遍就意味着「买之前看到的」与「穿上之后的」迟早对不上。
   return `<svg viewBox="${view}" width="${size}" height="${Math.round(size*ratio)}" aria-hidden="true">`
-    +`<use href="#art-monkey-land" width="100" height="116"/>${WEAR_ART[id]||''}</svg>`;
+    +wearPart(id,'back')
+    +`<use href="#art-monkey-land" width="100" height="116"/>`
+    +wearPart(id,'front')+`</svg>`;
 }
 function ownedCount(){return career.owned.length;}
 function renderShopScreen(){
@@ -3216,7 +3432,7 @@ window.addEventListener('online',()=>{retryWorldNow();if(!el.leaderboard.classLi
 // 切回前台立刻再试一次：定时器在后台常被系统压住，而玩家这会儿正看着屏幕。
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryWorldNow();});
 window.addEventListener('contextmenu',e=>e.preventDefault());
-// 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，道具与多人赛倒计时白白少十秒；
+// 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，限时道具白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
 // 竖屏锁定的行为面：横过来就把这一局暂停掉。
 // 玩家这时看不见台阶，时间照走就是白扣——走的是和切后台同一条 pauseGame 通道，
@@ -3559,17 +3775,65 @@ function runQAInner(){
       const swapOk=career.wearing.head===second.id&&career.owned.length===2&&career.bananas===0;
       career.bananas=keep.bananas;career.owned=keep.owned;career.wearing=keep.wearing;saveCareer();renderWorn();
       return poorOk&&buyOk&&offOk&&onOk&&swapOk;}))()],
+    ['穿戴分前后：断点两边都画得出来，图层类名不与槽位类名撞车',(()=>withCareerSandbox(()=>{
+      // 这一条守的是**机制**，不是画面：画面归 monkey/tools/qa-wear-layers.mjs
+      // （它在真浏览器里对猴子身上打网格做命中测试，问「谁画在上面」）。
+      // 分工的理由很实在——数值断言看不见画面，0813 加红鲤鱼帽时整个画面消失，
+      // 三十条断言照样全过；反过来，画面工具跑不了 CI。两边各守各的。
+      //
+      // 图层类名撞车是 0814 现场栽出来的：图层原来叫 `wear-back`，而「背上」槽位的类名
+      // 也是 `wear-back`（槽位类名是 wear-<槽位id>）。querySelectorAll 把槽位那个 <g>
+      // 也当成图层刷，电梯的图形被写进前面的图层，又画到猴子前面去了。
+      // **和 canon 锁里 carp-hat-on 撞 carp-hat 是同一族错。**
+      const slotClasses=new Set(SHOP_SLOTS.map(s=>'wear-'+s.id));
+      if(slotClasses.has('wear-behind')||slotClasses.has('wear-layer'))return false;
+      // 每一只猴子都要有「身后」层，而且它必须排在猴子本体前面（SVG 里先画的在下面）。
+      const holders=[...document.querySelectorAll('.wear-behind')];
+      if(holders.length<4)return false;
+      for(const back of holders){
+        const parent=back.parentNode,kids=[...parent.children];
+        const body=kids.find(n=>n.tagName==='use'&&(n.getAttribute('href')||'').includes('art-monkey'));
+        if(!body||kids.indexOf(back)>kids.indexOf(body))return false;
+      }
+      // 带断点的行头**两层都要画得出东西**，而且拼回去必须等于原画法：
+      // 少一半、或者顺序错了，都会在这里被抓到，而不必抄任何一段坐标。
+      const split=SHOP_ITEMS.map(i=>i.id).filter(id=>(WEAR_ART[id]||'').includes(WEAR_SPLIT));
+      if(!split.length)return false;
+      const partsOk=split.every(id=>{
+        const back=wearPart(id,'back'),front=wearPart(id,'front');
+        return back&&front&&back+front===WEAR_ART[id].replace(WEAR_SPLIT,'');
+      });
+      // 没有断点的行头整件在前面，身后层一个字都不能有——这是原来的行为，不许被改掉。
+      const plain=SHOP_ITEMS.map(i=>i.id).filter(id=>WEAR_ART[id]&&!WEAR_ART[id].includes(WEAR_SPLIT));
+      const plainOk=plain.every(id=>wearPart(id,'front')===WEAR_ART[id]&&wearPart(id,'back')==='');
+      // 真穿一次电梯：两层都得有它。
+      career.owned=SHOP_ITEMS.map(i=>i.id);career.wearing={ride:'lift',back:'donkeybag'};renderWorn();
+      const liftBoth=holders.every(n=>n.innerHTML.includes('wear-ride'))
+        &&[...document.querySelectorAll('.wear-layer')].every(n=>n.innerHTML.includes('wear-ride'));
+      // 反过来：车必须**整件**留在前面（那是「坐进车里」的视觉，一刀切会毁掉它）。
+      career.wearing={ride:'maybach'};renderWorn();
+      const carUpFront=[...document.querySelectorAll('.wear-layer')].every(n=>n.innerHTML.includes('wear-ride'))
+        &&holders.every(n=>!n.innerHTML.includes('wear-ride'));
+      // 自己收拾干净：不还原的话下一条自检拿到的就不是它自己设的那套。
+      // 「一条会把邻居弄红的门，和一条永远绿的门一样害人」——上一轮刚写进注释，这轮又犯了一次。
+      career.wearing={};renderWorn();
+      return partsOk&&plainOk&&liftBoth&&carUpFront;}))()],
     ['行头四处同步：局内三只加首页那只，穿的是同一套',(()=>withCareerSandbox(()=>{
       const keep={owned:[...career.owned],wearing:{...career.wearing}};
       career.owned=SHOP_ITEMS.map(i=>i.id);career.wearing={head:'crown',ride:'lift'};
       renderWorn();
+      // **不变量是「四只猴子穿的是同一套」，跟分在哪一层无关**，所以看两层的合并结果。
+      // 原来只看 .wear-layer，电梯挪到身后层之后这条就过期了。
       const layers=[...document.querySelectorAll('.wear-layer')];
-      const enough=layers.length>=4,same=new Set(layers.map(n=>n.innerHTML)).size===1;
-      const drew=layers.length&&layers[0].innerHTML.includes('wear-head')&&layers[0].innerHTML.includes('wear-ride');
+      const backs=[...document.querySelectorAll('.wear-behind')];
+      const enough=layers.length>=4&&backs.length===layers.length;
+      const same=new Set(layers.map(n=>n.innerHTML)).size===1&&new Set(backs.map(n=>n.innerHTML)).size===1;
+      const whole=layers.length?layers[0].innerHTML+backs[0].innerHTML:'';
+      const drew=whole.includes('wear-head')&&whole.includes('wear-ride');
       // 没买过的东西穿不上：存档被手改过也不该画出一个不存在的洞。
       career.owned=[];career.wearing=safeWearing({head:'crown'},[]);
       renderWorn();
-      const blocked=!layers[0].innerHTML;
+      const blocked=!layers[0].innerHTML&&!backs[0].innerHTML;
       career.owned=keep.owned;career.wearing=keep.wearing;renderWorn();
       return enough&&same&&drew&&blocked;}))()],
     ['退避重试器：排得上、取消得掉、空队列不空排',(()=>{
