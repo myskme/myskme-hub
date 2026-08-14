@@ -39,7 +39,9 @@ function sourceMatch(pattern, label) {
 // 直接把正本里的 TEAS 与 teaCupSvg 放进隔离上下文，让正本函数逐杯现画；test 函数只保留在
 // 临时上下文里，不进入生成物。这样增删、改名、改色和改杯型都只需要改 index.html。
 const teaArraySource = sourceMatch(/const TEAS=(\[[\s\S]*?\n\]);\nconst POSTER_RANKS=/, 'TEAS');
-const teaCupFunctionSource = sourceMatch(/(function teaCupSvg\(tea,h=52\)\{[\s\S]*?\n\})\nfunction renderTeaScreen/, 'teaCupSvg');
+// 认它自己顶格的收尾，不认「后面紧跟着谁」。0814 在中间插了商店的渲染函数，
+// 原来那个「\nfunction renderTeaScreen」锚点当场失效——隔壁是谁不是这段代码的性质。
+const teaCupFunctionSource = sourceMatch(/(function teaCupSvg\(tea,h=52\)\{[\s\S]*?\n\})/, 'teaCupSvg');
 const teaRuntime = { result: null };
 vm.runInNewContext(
   `const TEAS=${teaArraySource};\n${teaCupFunctionSource}\nresult={`
@@ -59,11 +61,16 @@ if (teas.some(tea => !/^[a-z0-9-]+$/.test(tea.id) || !tea.name || !tea.tier || !
 // 加一个称号只需要在 index.html 里多写一行数据，素材库会在下一次构建里自己多出一枚。
 // 这就是「小成本、可复利」的落点：不另存一份、不维护第二套配方。
 const honorArraySource = sourceMatch(/const HONORS=(\[[\s\S]*?\n\]);/, 'HONORS');
-const honorGlyphSource = sourceMatch(/(const HONOR_GLYPHS=\{[\s\S]*?\n\};)/, 'HONOR_GLYPHS');
-const honorBadgeFunctionSource = sourceMatch(/(function honorBadgeSvg\(honor,size\)\{[\s\S]*?\n\})/, 'honorBadgeSvg');
+const honorGlyphSource = sourceMatch(/(const ICON_GLYPHS=\{[\s\S]*?\n\};)/, 'ICON_GLYPHS');
+// honorBadgeSvg 0814 缩成了 iconSvg 的一层薄包装，所以这里要连 iconSvg 一起取。
+// 而且它现在是**单行函数**：还按 /[\s\S]*?\n\}/ 去匹会一路吞到下一个换行加右括号，
+// 把中间几百行全卷进来。这跟 hueGap 那次一模一样——
+// **先看清楚目标是几行，再决定用哪种匹配。**
+const iconFunctionSource = sourceMatch(/(function iconSvg\(emblem,tint,size\)\{[\s\S]*?\n\})/, 'iconSvg');
+const honorBadgeFunctionSource = sourceMatch(/(function honorBadgeSvg\(honor,size\)\{[^\n]*\})/, 'honorBadgeSvg');
 const honorRuntime = { result: null };
 vm.runInNewContext(
-  `const SURPRISES=[];\nconst HONORS=${honorArraySource};\n${honorGlyphSource}\n${honorBadgeFunctionSource}\nresult={`
+  `const SURPRISES=[];\nconst HONORS=${honorArraySource};\n${honorGlyphSource}\n${iconFunctionSource}\n${honorBadgeFunctionSource}\nresult={`
     + `honors:HONORS.map(({test,...honor})=>honor),badges:HONORS.map(honor=>honorBadgeSvg(honor,240))};`,
   honorRuntime,
   { timeout: 1000, filename: 'monkey-honor-assets.vm.js' },
@@ -150,6 +157,30 @@ if (motifs.some(motif => !/^[a-z0-9-]+$/.test(motif.id) || !motif.name || !motif
   throw new Error('CULTURE_MOTIFS 缺少可复用素材所需字段');
 }
 
+// 十八件行头。导出的是「穿着这件的猴先生」整只，不是孤零零一件配饰——
+// 行头的价值在于穿上之后是什么样，一只戴着王冠开着车的猴子才是能直接拿去用的东西。
+// 照旧只认正本：WEAR_ART 与猴子的 symbol 都从 index.html 现取。
+const shopArraySource = sourceMatch(/const SHOP_ITEMS=(\[[\s\S]*?\n\]);/, 'SHOP_ITEMS');
+const wearArtSource = sourceMatch(/(const WEAR_ART=\{[\s\S]*?\n\};)/, 'WEAR_ART');
+const shopRuntime = { result: null };
+vm.runInNewContext(
+  `const SHOP_ITEMS=${shopArraySource};\n${wearArtSource}\nresult={`
+    + 'items:SHOP_ITEMS,art:SHOP_ITEMS.map(item=>WEAR_ART[item.id]||\'\')};',
+  shopRuntime,
+  { timeout: 1000, filename: 'monkey-outfit-assets.vm.js' },
+);
+const outfits = shopRuntime.result?.items || [];
+const outfitArt = shopRuntime.result?.art || [];
+if (!outfits.length || outfits.length !== outfitArt.length) throw new Error('SHOP_ITEMS 与穿戴图导出数量不一致');
+if (new Set(outfits.map(item => item.id)).size !== outfits.length) throw new Error('SHOP_ITEMS 存在重复 id，无法安全导出');
+if (outfitArt.some(markup => !markup)) throw new Error('有行头没有穿戴图，导出会得到一只没穿的猴子');
+// 行头是纯外观，数据表里不该出现任何玩法字段。导出器与构建门禁各查一遍：
+// 导出器管的是「素材库里的东西描述准不准」，构建门禁管的是「游戏里会不会失衡」。
+for (const item of outfits) {
+  const extra = Object.keys(item).filter(key => !['id', 'slot', 'tier', 'name', 'line'].includes(key));
+  if (extra.length) throw new Error('行头 ' + item.id + ' 带了额外字段：' + extra.join('、') + '（行头必须是纯外观）');
+}
+
 function escapeXml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]);
 }
@@ -177,6 +208,18 @@ function reusableFacadeSvg(facade, markup) {
 function reusableMotifSvg(motif, markup) {
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" role="img" aria-label="${escapeXml(motif.name)}">`,
+    markup,
+    '</svg>', '',
+  ].join('\n');
+}
+
+function reusableOutfitSvg(item, markup) {
+  // 猴子用「落地」那一姿，和货架、海报保持一致（三处同一姿势，看着才像同一只猴）。
+  const defs = [...dependencies('art-monkey-land')].map(dep => symbols.get(dep).markup).join('\n');
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -6 118 132" role="img" aria-label="${escapeXml(item.name)}">`,
+    '<defs>', defs, '</defs>',
+    '<use href="#art-monkey-land" width="100" height="116"/>',
     markup,
     '</svg>', '',
   ].join('\n');
@@ -270,6 +313,10 @@ for (let index = 0; index < motifs.length; index++) {
   outputs.set(path.join(outputRoot, 'world-windows', motifs[index].id + '.svg'), reusableMotifSvg(motifs[index], motifArt[index]));
 }
 
+for (let index = 0; index < outfits.length; index++) {
+  outputs.set(path.join(outputRoot, 'outfits', outfits[index].id + '.svg'), reusableOutfitSvg(outfits[index], outfitArt[index]));
+}
+
 const palette = {
   paper: '#faf3e2', ink: '#28211a', outline: '#2f5148', teal: '#1f9e8e',
   fish: '#3fab84', fishFin: '#6cd0af', banana: '#f5b731', red: '#e0452c',
@@ -334,8 +381,18 @@ const manifestMotifs = motifs.map(motif => {
     sha256: createHash('sha256').update(body).digest('hex'),
   };
 });
+const manifestOutfits = outfits.map(item => {
+  const file = path.posix.join('outfits', item.id + '.svg');
+  const body = outputs.get(path.join(outputRoot, file));
+  return {
+    file, source: 'SHOP_ITEMS', id: item.id, name: item.name, slot: item.slot, tier: item.tier, line: item.line,
+    cosmeticOnly: true,
+    viewBox: '-9 -6 118 132', width: 118, height: 132,
+    sha256: createHash('sha256').update(body).digest('hex'),
+  };
+});
 const manifest = JSON.stringify({
-  schema: 6,
+  schema: 7,
   source: '../index.html',
   generator: 'monkey/tools/extract-assets.mjs',
   license: 'MYSKME original reusable asset',
@@ -348,6 +405,7 @@ const manifest = JSON.stringify({
   honors: manifestHonors,
   teas: manifestTeas,
   worldWindows: manifestMotifs,
+  outfits: manifestOutfits,
 }, null, 2) + '\n';
 outputs.set(path.join(outputRoot, 'asset-manifest.json'), manifest);
 

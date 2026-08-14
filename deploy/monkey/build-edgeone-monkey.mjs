@@ -355,18 +355,24 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   // 所以这一份写死在门里，和「鱼小姐必须青绿」是同一类立法。要改先想清楚迁移。
   const HONOR_IDS = ['certified','zerofloor','grudge47','genuine','moremonkey','overdue','skimread',
     'lightsugar','fullsugar','noice','roomtemp','nopb','talker','archivist','toolfree','fake'];
-  const found = [...html.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
+  // **先把 HONORS 那一段圈出来再匹配。** 原来直接在整个 html 上匹
+  // /\{id:'…',emblem:'…',tint:'…'/，0814 给 PERK_POOL 也配了 emblem+tint 之后当场误报
+  // 「扫到 21 条，期望 16」。这是同一类错的第五次（.card 正则、ICON_GLYPHS 找 href=、
+  // FACADES 匹到 MODES、hueGap 当多行函数取）：**扫描之前先把范围圈死。**
+  const honorBlock = (CODE.match(/const HONORS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(honorBlock, '取不到 HONORS 那一段（写法变了？先修本门禁的取法）');
+  const found = [...honorBlock.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
   assert(found.length === HONOR_IDS.length,
     '称号条数或写法变了：扫到 ' + found.length + ' 条，期望 ' + HONOR_IDS.length);
   for (const id of HONOR_IDS) {
     assert(found.some(hit => hit[1] === id), '称号 id 「' + id + '」不见了。存档里存的就是它，改名等于让老玩家的称号蒸发');
   }
   // 每个徽章图形都必须真的在图形表里，否则会静默退化成默认的印章，16 枚看着像一枚。
-  const glyphBlock = (CODE.match(/const HONOR_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
+  const glyphBlock = (CODE.match(/const ICON_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
   for (const [, , emblem] of found.map(hit => [0, 0, hit[2]])) {
-    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 HONOR_GLYPHS 里，会静默退化成默认印章');
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 ICON_GLYPHS 里，会静默退化成默认印章');
   }
-  // 只在**取出来的那一段**里查。第一版写成从 HONOR_GLYPHS 一路 [\s\S]*? 找 href=，
+  // 只在**取出来的那一段**里查。第一版写成从 ICON_GLYPHS 一路 [\s\S]*? 找 href=，
   // 结果匹到了文件后面 SVG <use href= 那一堆，构建当场误报——
   // 这跟前面那个「不锚行首的 .card 正则」是同一类错：范围没圈住。
   assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
@@ -382,7 +388,7 @@ const DEPT_IDS = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(
   const deptIds = DEPT_IDS;
   // **先把 FACADES 那一段圈出来再匹配**。第一版直接在整个 html 上匹
   // /\{id:'…',dept:'…',name:/，结果把结构完全相同的 MODES 也数了进去，报「立面数 24」。
-  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 HONOR_GLYPHS 一路找 href=）：
+  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 ICON_GLYPHS 一路找 href=）：
   // **扫描之前先把范围圈死**，否则迟早匹到隔壁那张结构一样的表。
   const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
   assert(facadeBlock, '取不到 FACADES 那一段（写法变了？先修本门禁的取法）');
@@ -429,6 +435,218 @@ assert(/function bindTapToAdvance\(/.test(CODE) && (CODE.match(/\bbindTapToAdvan
   '「点列表空白处翻下一页」的接线没了。王老师 0813 明说上一页/下一页还是多，这是替代它的那条路。');
 assert(/pager-dots solo/.test(html),
   '页数少时应该只留页码点、不给上一页/下一页——那两颗按钮会白占一整行。');
+
+// ---- 局内任命：不许退回模态三选一（2026-08-14 王老师定：弹窗打断连贯性）----
+{
+  // 弹窗那一套整套拔掉了。留一道门盯着它别被谁「顺手加回来」——
+  // 三选一在这个游戏里必须是**一次落点选择**，不是一次读字。
+  // 查的是剥过注释的 CODE：反向验证时发现，光是在注释里提一句 openPerkChoice
+  // 就能把这道门弄红。一条会被注释误伤的门，用不了几次就会被人当噪音忽略。
+  assert(!/choiceScreen|choice-card|openPerkChoice|choosePerk/.test(CODE),
+    '模态三选一回来了。它在这个心流型爬楼里有四重代价，最要命的是选择本身没有游戏性：'
+    + '这个游戏的动词是「位置」，卡片的动词是「文字」。要改先跟王老师说。');
+  assert(!/\bstate\.choiceOpen\b/.test(CODE),
+    'state.choiceOpen 回来了。弹窗拆了之后它恒为 false，恒为 false 的开关比没有开关更害人');
+
+  // 任命排的三块台是自己造的，不是挑现成的——第一版挑现成的那排，量下来关卡生成器
+  // 极少一排造三块台，三选一常年退化成二选一甚至发不出去。
+  const rowFn = (CODE.match(/function addAppointmentRow\([\s\S]*?\n\}/) || [''])[0];
+  assert(rowFn, '取不到 addAppointmentRow（写法变了？先修本门禁的取法）');
+  assert(/slice\(0,\s*3\)/.test(rowFn), '任命排不再是一次发三份了');
+  assert(/addPlatform\(/.test(rowFn) && /addItem\('perk'/.test(rowFn),
+    '任命排必须自己造台子再挂任命：挑现成的排会让三选一退化成一选一');
+  assert(/state\.perkGroup\s*\+=\s*1/.test(rowFn),
+    '同一批任命要有共同的 perkGroup，否则「拿一份、废另两份」认不出同批');
+
+  const takeFn = (CODE.match(/function takePerk\([\s\S]*?\n\}/) || [''])[0];
+  assert(takeFn, '取不到 takePerk（写法变了？先修本门禁的取法）');
+  assert(/other\.perkGroup!==item\.perkGroup/.test(takeFn) && /other\.declined=true/.test(takeFn),
+    '拿一份之后同批的另外两份必须当场作废并淡出，否则摔回去还能把三份都捡了，三选一就名存实亡');
+
+  // 任命图标必须真在图形表里，否则会静默退化成默认印章，五份看着一模一样。
+  const glyphs = (CODE.match(/const ICON_GLYPHS=\{([\s\S]*?)\n\};/) || ['', ''])[1];
+  const perkBlock = (CODE.match(/const PERK_POOL=\[[\s\S]*?\n\];/) || [''])[0];
+  const perkEmblems = [...perkBlock.matchAll(/emblem:'([a-z]+)'/g)].map(hit => hit[1]);
+  assert(perkEmblems.length >= 5, '任命少于五份，或不再各带一枚图标');
+  for (const emblem of perkEmblems) {
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphs), '任命图形 ' + emblem + ' 不在 ICON_GLYPHS 里');
+  }
+  // 局内实体一律不靠文字牌解释（台阶只有绕口令与标点例外，那两处另有门禁盯着）。
+  // 道具卡原来拿 <text> 画「U / @ / 免 / 梯 / 宽」五个字符，出海要重画，0814 换成图形。
+  const itemFn = (CODE.match(/function ensureItemNode\([\s\S]*?\n\}/) || [''])[0];
+  assert(itemFn, '取不到 ensureItemNode（写法变了？先修本门禁的取法）');
+  assert(!/<text\b/.test(itemFn), '局内道具/任命又开始用 <text> 写字了：那既不是图标风格，也没法当免翻译素材导出');
+}
+
+// ---- 首页收藏条（2026-08-14 王老师：首页缺少这些位置）----
+{
+  const stripBlock = (CODE.match(/const COLLECTIONS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(stripBlock, '取不到 COLLECTIONS（写法变了？先修本门禁的取法）');
+  const ids = [...stripBlock.matchAll(/\{id:'([a-z]+)',label:/g)].map(hit => hit[1]);
+  // 长期档案里每一条收集线都该在首页有个格子。少一格＝那条线收集了也没人看得见。
+  for (const line of ['titles', 'teas', 'outfit', 'perks', 'surprises', 'motifs', 'facades', 'modes']) {
+    assert(ids.includes(line), '收藏条少了「' + line + '」这一格：收集了没地方看，等于没做');
+  }
+  assert(new RegExp('grid-template-columns:repeat\\(' + ids.length + ',1fr\\)').test(CODE),
+    '收藏条的列数（CSS）与收集线条数（' + ids.length + '）对不上，会换行，把首页顶出一屏');
+  // 首页原来那两个按钮（称号墙/奶茶图鉴）被收藏条吃掉了，入口必须还在。
+  assert(/openTitles\(\)/.test(stripBlock) && /openTeas\(\)/.test(stripBlock),
+    '称号墙与奶茶图鉴的首页入口没了：那一整行按钮是被收藏条换掉的，入口得跟着搬过来');
+  assert(!/id="wornTitleButton"|id="teaButton"/.test(CODE),
+    '首页又多出一行按钮了。收藏条当初是拿那一行的高度换来的，两个都留就白换了');
+  assert(/career\.perks/.test(CODE),
+    '任命没进长期档案：一局作废的增益如果不留收集线，收集控就没有跨局的理由去凑齐它们');
+}
+
+// ---- 香蕉商店（2026-08-14 王老师：香蕉没什么用，做成能兑换的行头，像当年的 QQ 秀）----
+{
+  const shopBlock = (CODE.match(/const SHOP_ITEMS=\[[\s\S]*?\n\];/) || [''])[0];
+  const wearBlock = (CODE.match(/const WEAR_ART=\{[\s\S]*?\n\};/) || [''])[0];
+  const slotBlock = (CODE.match(/const SHOP_SLOTS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(shopBlock && wearBlock && slotBlock, '取不到商店那几段（写法变了？先修本门禁的取法）');
+
+  const items = [...shopBlock.matchAll(/\{id:'([a-z0-9]+)',slot:'([a-z]+)',tier:([1-5]),/g)]
+    .map(hit => ({ id: hit[1], slot: hit[2], tier: Number(hit[3]) }));
+  const slots = [...slotBlock.matchAll(/\{id:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  assert(items.length >= 16, '行头少于 16 件。王老师要的是「种类多一些、可以比较难获得」，货架太空撑不起那件事');
+  assert(new Set(items.map(i => i.id)).size === items.length, '行头 id 有重号——id 是存档契约，重号会让存档指错东西');
+
+  // **最重要的一条：行头是纯外观。**
+  // 一旦某件行头开始改数值，「买得起的人更强」就成立了，整个商店从装饰品变成付费墙。
+  // 红鲤鱼帽当初也是这么定的，同一条立法。判据是字段名，不是善意：
+  // 数据表里只准出现 id/slot/tier/name/line 这五个键。
+  const keys = new Set([...shopBlock.matchAll(/[,{]([a-z][a-zA-Z0-9]*):/g)].map(hit => hit[1]));
+  for (const key of keys) {
+    assert(['id', 'slot', 'tier', 'name', 'line'].includes(key),
+      '行头数据里出现了字段「' + key + '」。行头必须是纯外观：一件行头开始改数值，'
+      + '商店就从装饰品变成付费墙了。要加玩法请另起一套，别挂在这张表上');
+  }
+  assert(!/SHOP_ITEMS[\s\S]{0,400}?(?:speed|gravity|bonus|score|damage|shield|multiplier)/.test(shopBlock),
+    '行头表里出现了玩法字眼，同上：外观归外观');
+
+  for (const item of items) {
+    assert(slots.includes(item.slot), '行头 ' + item.id + ' 的槽位 ' + item.slot + ' 不在 SHOP_SLOTS 里');
+    assert(new RegExp('(^|\\n)\\s*' + item.id + ':').test(wearBlock),
+      '行头 ' + item.id + ' 没有穿戴图，买了会什么都不显示——那这件东西就等于不存在');
+  }
+  // 每个槽位都得有货，否则「同槽位只能戴一件」这条规则里会有一个永远空着的位置。
+  for (const slot of slots) {
+    assert(items.some(i => i.slot === slot), '槽位 ' + slot + ' 一件行头都没有');
+  }
+  // 档位必须真的越贵越高，否则「五档」只是标签。
+  const prices = (CODE.match(/const TIER_PRICE=\{([^}]*)\}/) || ['', ''])[1];
+  const tiers = [...prices.matchAll(/([1-5]):(\d+)/g)].map(hit => [Number(hit[1]), Number(hit[2])]);
+  assert(tiers.length === 5, '价格档位不是五档了');
+  for (let i = 1; i < tiers.length; i += 1) {
+    assert(tiers[i][1] > tiers[i - 1][1], '第 ' + tiers[i][0] + ' 档不比第 ' + tiers[i - 1][0] + ' 档贵，分档就没意义了');
+  }
+  // 穿戴图不许写字：出海要翻译的话，一张带字的图就得重画一遍。
+  assert(!/<text\b|<image\b/.test(wearBlock), '穿戴图里出现了 <text> 或 <image>，就不是免翻译素材了');
+
+  // 三处落点必须共用同一段 WEAR_ART：局内的猴子、货架上的试衣镜、海报上的名片照。
+  // 分成三份迟早出现「货架上是这样、穿上是那样」。
+  assert(/function wornMarkup\(/.test(CODE) && /WEAR_ART\[id\]/.test(CODE), '穿戴图不再是从同一张表取的');
+  assert(/function shopPreviewSvg\([\s\S]{0,400}?WEAR_ART\[id\]/.test(CODE), '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
+  assert(/loadDressedMonkeyImage/.test(CODE) && /dressedMonkeySvg/.test(CODE),
+    '海报不印穿戴了。名片是「攀比」真正发生的地方，行头必须上那张图');
+  assert(/querySelectorAll\('\.wear-layer'\)/.test(CODE),
+    '穿戴层不再是一次刷全部了：局内三个环屏副本加首页那只，分开写迟早穿得不一致');
+  // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
+  assert(/#gameShell\.carp-hat-on \.wear-head\{display:none\}/.test(CODE),
+    '买来的帽子会和局内的红鲤鱼帽叠在一起。注意状态类名与资源类名必须分开——0813 撞过一次，整个画面消失');
+
+  // 货币来自已经拿到手的成绩，不是新资源；花掉也不回溯改分。
+  assert(/career\.bananas\+=state\.bananas/.test(CODE), '这一局的香蕉没有存进长期账户，商店就没有收入来源');
+  assert(!/state\.bananas\s*-=/.test(CODE), '花的是局内香蕉而不是长期账户：那会把已经算过的分数改掉，历史成绩必须不可变');
+}
+
+// ---- 世界楼榜补交必须会自己重试（2026-08-14 王老师：上传成绩不咋地）----
+{
+  // 改之前 flushWorldQueue 一遇网络级失败就 return false 收工，而它只被
+  // 「打完一局 / 点登记 / 打开楼榜 / online 事件 / 开局 900ms」叫醒——
+  // 手机上一次很常见的抖动就让这一局躺到玩家哪天碰巧再打开楼榜。这道门盯着别再退回去。
+  assert(/const WORLD_RETRY_STEPS=\[[^\]]+\];/.test(CODE), '退避重试表没了：补交失败之后就再也没人管了');
+  const steps = ((CODE.match(/const WORLD_RETRY_STEPS=\[([^\]]+)\]/) || ['', ''])[1] || '')
+    .split(',').map(Number).filter(Number.isFinite);
+  assert(steps.length >= 4, '退避档位少于四档');
+  for (let i = 1; i < steps.length; i += 1) {
+    assert(steps[i] > steps[i - 1], '退避不是递增的：一直用同一个间隔重试是在骚扰服务器');
+  }
+  assert(steps[steps.length - 1] >= 60000, '退避上限不到一分钟，长时间断网时会一直空撞');
+
+  const flushFn = (CODE.match(/async function flushWorldQueue\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(flushFn, '取不到 flushWorldQueue（写法变了？先修本门禁的取法）');
+  assert(/scheduleWorldRetry\(\)/.test(flushFn), '网络级失败之后没有挂上重试，成绩会一直躺在队列里');
+  // 400（化名被退回）必须换下一条继续，而不是把整趟停掉——重试一万次也没用，那要玩家改名。
+  assert(flushFn.includes('if(error.status===400)continue;'),
+    '化名被退回时不再换下一条继续了：一条卡住会把整个队列堵死（0813 修过，别回归）');
+  // **一趟跑完必须调 cancelWorldRetry。** 它在成功路径上观察得到的作用只有一个：
+  // 把退避轮次清零。不清的话，下一次断网会直接从最长的那一档开始等
+  // （打完一局想看名次，却要干等两分钟）。
+  //
+  // 这句话是改过两遍的。前两版我先想好一个听着吓人的后果再写门——
+  // 「400 也会去无谓重试」「永不停歇地空转」——反向验证两次都不红，因为那两个后果根本到不了。
+  // **给门写理由时，理由本身也要能被反向验证；顺序是先弄清楚拆掉它会怎样，再动笔。**
+  assert(/cancelWorldRetry\(\);[\s\S]{0,120}return true;/.test(flushFn),
+    '补交跑完没有取消重试：退避轮次不清零，下一次断网会直接从最长那一档开始等');
+  assert(/status===400\)throw err;return send\(\)/.test(flushFn),
+    '单条的当场重试没了：移动网络的抖动多半一次就过去，而退避最快也要等四秒');
+
+  assert(/WORLD_TIMEOUT_MS=(\d+)/.test(CODE) && Number(CODE.match(/WORLD_TIMEOUT_MS=(\d+)/)[1]) >= 8000,
+    '联网超时短于 8 秒：地铁电梯里一次握手就不止这么久，会把慢网冤枉成断网');
+  assert(/visibilitychange[\s\S]{0,120}retryWorldNow/.test(CODE),
+    '回到前台不再立刻重试：后台定时器常被系统压住，而玩家这会儿正看着屏幕');
+  assert(/addEventListener\('online'[\s\S]{0,80}retryWorldNow/.test(CODE), '恢复联网时没有立刻重试');
+}
+
+// ---- 香蕉商店的入口必须找得到（2026-08-14 王老师：那个商店没找到）----
+{
+  // 原来唯一的入口是收藏条上一枚 22 像素的图标。**一个新系统的门必须比它的图标大。**
+  assert(/id="walletButton"/.test(CODE) && /class="wallet"/.test(CODE),
+    '首页的香蕉钱包没了：它既是商店的门，也是首页唯一显示香蕉余额的地方');
+  assert(/id="resultShopButton"/.test(CODE), '结算页的商店入口没了：刚捡完香蕉那一刻购买冲动最高');
+  const wired = (CODE.match(/\bopenShop\b/g) || []).length;
+  assert(wired >= 4, '商店的入口少于三处（收藏条 / 首页钱包 / 结算页），openShop 只被引用了 ' + (wired - 1) + ' 次');
+  // 首页那张卡要长到与屏幕等高，否则大屏上是一张浮在空白纸上的小卡片。
+  assert(/#titleScreen \.card\{height:100%/.test(CODE),
+    '首页卡不再撑满屏幕了。王老师 0814 明说「首页不是全屏，感觉像是少了什么」——'
+    + '量出来是 430x932 上卡片只有 635 高，上下各空 149px');
+}
+
+// ---- 排版学：海报的字号只准从模块化比例上取（2026-08-14）----
+{
+  const posterFn = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(posterFn, '取不到 buildPoster（写法变了？先修本门禁的取法）');
+  // 海报上一个字面量字号都不许有。原来是十四处（30/46/44/70/28/26/162/35/42/20/25/31/23/19/17），
+  // 看着「差不多有层次」，实际相邻级差忽多忽少，眼睛读不出稳定的秩序。
+  // 现在全部走 TYPE，谁塞一个 33px 进去，这条当场红。
+  const literals = [...posterFn.matchAll(/font\s*=\s*[`'"][^`'"]*?\b(\d+)px/g)].map(hit => hit[1]);
+  assert(literals.length === 0,
+    '海报里又出现了写死的字号：' + literals.join('、') + '。字号必须从 TYPE 取——'
+    + '整版只用一条等比数列，层级关系才固定得下来');
+  assert((posterFn.match(/\$\{TYPE\.[a-z]+\}px/g) || []).length >= 12,
+    '海报用到 TYPE 的地方太少，多半是有一批字号绕过了比例');
+
+  const typeBlock = (CODE.match(/const TYPE=\{[\s\S]*?\n\};/) || [''])[0];
+  assert(typeBlock, '取不到 TYPE（写法变了？先修本门禁的取法）');
+  // TYPE 里的每一级都得是 typeStep() 算出来的，不许直接写数字。
+  const steps = [...typeBlock.matchAll(/:\s*typeStep\(-?\d+\)/g)];
+  const entries = [...typeBlock.matchAll(/^\s{2}([a-z]+):/gm)];
+  assert(steps.length === entries.length,
+    'TYPE 里有直接写死的字号（' + entries.length + ' 级里只有 ' + steps.length + ' 级走了 typeStep）');
+  assert(/const TYPE_BASE=\d+,TYPE_RATIO=[\d.]+;/.test(CODE), '模块化比例的基准与比率没了');
+
+  // 六种纸型各带一条排版学，和立面/调式/配色一个规格：讲原理，不讲名词。
+  const factBlock = (CODE.match(/const TYPE_FACTS=\{[\s\S]*?\n\};/) || [''])[0];
+  const factIds = [...factBlock.matchAll(/^\s{2}([a-z]+):/gm)].map(hit => hit[1]);
+  const variantBlock = (CODE.match(/const POSTER_VARIANTS=\[[\s\S]*?\n\];/) || [''])[0];
+  const variantIds = [...variantBlock.matchAll(/\{id:'([a-z]+)',upto:/g)].map(hit => hit[1]);
+  assert(variantIds.length >= 6, '取不到海报纸型清单（写法变了？先修本门禁的取法）');
+  for (const id of variantIds) {
+    assert(factIds.includes(id), '纸型 ' + id + ' 没有对应的排版学，那它就只是个配色，不是一门学问');
+  }
+  assert(/career\.posters/.test(CODE), '纸型没进长期档案：知识只在第一次遇见时讲一遍，收藏条得留得住它');
+}
 
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
