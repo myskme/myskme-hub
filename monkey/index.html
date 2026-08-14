@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.9-economy">
+<meta name="myskme-release" content="20260814.10-final">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -23,13 +23,16 @@
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/monkey-100-180.png">
 <title>是猴就上100层 · MYSKME</title>
 <!--
-  《是猴就上100层》完整内容清单
-  部门楼层：大堂、质检部、传真科、房租稽查科、驯猴办、冗余检查科、黑化肥仓库、谜题管理局、绕口令办、观景台、标点维修科、加盖工程部。
-  惊喜事件：七类大事件、十二类可发现小意外、随机海报稀有版与隐藏彩蛋。
+  《是猴就上100层》内容清单（只列有什么，不抄数量——数量以代码里的表为准，抄在这儿只会过期。
+  上一版这里自称「完整清单」还写着「死亡台词 18 条、称号 5 档」，三轮更新之后全成了过期镜像。）
+  部门楼层：大堂、质检部、传真科、房租稽查科、驯猴办、冗余检查科、黑化肥仓库、谜题管理局、绕口令办、观景台、标点维修科、加盖工程部（出场顺序见 FIXED_ORDER）。
+  局内选择：任命排（一排三块台，落到哪块拿哪份）、开工装备、帮助道具。
+  收藏系统：首页九格收藏条——称号、奶茶、行头、任命、纸型、意外、窗景、立面、调式，各自的表就是事实源。
+  香蕉商店：行头六槽位，猴子真的穿上开上，印上名片海报；全部纯外观，一个数值都不碰。
+  气氛系统：十二部门各配一种建筑立面与一种调式（一个部门一门学问）、八种世界窗景、六种海报纸型各带一条排版学。
+  惊喜事件：大事件、可发现小意外、随机海报稀有版与隐藏彩蛋。
   声音系统：自适应手绘玩具爵士、分层编曲、事件音标与全声/仅音效/静音三档。
-  复玩系统：轮值任务、档案章、四套开工装备、香蕉磁铁、回形针批文、减免券与电梯欠条。
-  死亡台词：18 条，抽取时防连续重复。
-  称号分档：5 档。
+  世界楼榜：品牌网关读写，正式局先写本机队列再自动退避补交，断网不影响游玩。
   技术约束：核心游戏单文件可运行、本地 MIT 二维码模块、PWA 渐进增强、触屏与键盘双支持、安卓宽虚拟视口兜底、智能省电调度。
 -->
 <style>
@@ -285,7 +288,7 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 .tea-order b{color:var(--teal);font-size:9px;letter-spacing:.08em;display:block;margin-bottom:3px}
 /* 兜底能滚。**单屏是优化，不是硬约束**——放不下的时候必须还能够得着，
    否则「放不下」就变成「出不去」。0813 巡查实测：手机横过来（844x390）时
-   首页的「单猴挑战，立即上楼」整颗被裁在卡片外，玩家开不了局；
+   首页的开工按钮（当时叫「单猴挑战，立即上楼」，多人拆除后已改名）整颗被裁在卡片外，玩家开不了局；
    进了称号墙/奶茶图鉴更糟——关闭键在屏外，触屏没有 Esc 的等价物，
    八条出路试了一遍只有键盘 Esc 有效，也就是手机上**只能刷新页面**。
    overflow-y:auto 在内容装得下时和 hidden 完全一样（不出滚动条、滚不动），
@@ -857,7 +860,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="kit-label">选择开工装备</div>
         <div id="kitGrid" class="kit-grid"></div>
         <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。他已出发；通知还剩 418 字。</div>
-        <button id="startButton" class="btn">单猴挑战，立即上楼</button>
+        <button id="startButton" class="btn">打卡上班，立即上楼</button>
         <div class="btn-row"><button id="leaderboardButton" class="btn secondary">世界楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
         <div class="best-row"><span>最高高度 <b id="bestHeight">0</b> 米</span><span>最高分 <b id="bestScore">0</b></span></div>
       </div>
@@ -1023,7 +1026,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.9-economy',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.10-final',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1307,7 +1310,7 @@ const SURPRISES=[
   {id:'quiet',rarity:'稀有意外',text:'全楼安静了两秒，因为没人知道下一句。',kind:'quiet'},
   {id:'refund',rarity:'稀有意外',text:'房租稽查科第一次退款。虽然只有 18 分。',kind:'refund'},
   {id:'fish',rarity:'稀有意外',text:'鱼小姐把一个备用泡泡藏进了档案袋。',kind:'fish'},
-  {id:'overtime',rarity:'少见意外',text:'单猴赛收到十三分。',kind:'overtime'},
+  {id:'overtime',rarity:'少见意外',text:'加时赛收到十三分。',kind:'overtime'},
   {id:'confetti',rarity:'普通意外',text:'没有原因。突然庆祝。',kind:'confetti'},
   {id:'platform',rarity:'稀有意外',text:'空气临时被认定为平台，保质三秒。',kind:'platform'},
   {id:'secret',rarity:'极怪意外',text:'谈话人来过。只留下一个问号和 52 分。',kind:'secret'},
@@ -1621,7 +1624,7 @@ const MISSIONS=[
   {id:'risk',kind:'risk',target:2,reward:2,label:'踩中 2 块险字平台，危险可报销。'}
 ];
 // 暂停必须是真暂停。这局里所有「到某个绝对时刻为止」的计时都得整体后移，
-// 否则暂停十秒回来，磁卡、宽容尺、电梯欠条、多人赛倒计时全被白吃掉十秒——
+// 否则暂停十秒回来，磁卡、宽容尺、电梯欠条这些限时道具全被白吃掉十秒——
 // 那不叫暂停，那叫作弊入口。切后台同理（原来只停 rAF、不停计时，就是这个漏）。
 // **新加计时字段一定要登记进下面三张表**，runQA 的「暂停计时字段登记齐全」会当场抓漏。
 const PAUSE_TIME_FIELDS=['lowGravityUntil','windUntil','faxNextAt','shaftUntil','shaftLastHit','shaftStartedAt',
@@ -3429,7 +3432,7 @@ window.addEventListener('online',()=>{retryWorldNow();if(!el.leaderboard.classLi
 // 切回前台立刻再试一次：定时器在后台常被系统压住，而玩家这会儿正看着屏幕。
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryWorldNow();});
 window.addEventListener('contextmenu',e=>e.preventDefault());
-// 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，道具与多人赛倒计时白白少十秒；
+// 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，限时道具白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
 // 竖屏锁定的行为面：横过来就把这一局暂停掉。
 // 玩家这时看不见台阶，时间照走就是白扣——走的是和切后台同一条 pauseGame 通道，
