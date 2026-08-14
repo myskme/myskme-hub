@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1f6f66">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>驯猴办 · 课堂点名器</title>
+  <style>
+    :root{
+      --paper:#faf3e2;--paper-2:#fffaf0;--ink:#28211a;--outline:#2f5148;
+      --teal:#1f9e8e;--teal-dark:#1f6f66;--fish:#3fab84;--fish-fin:#6cd0af;
+      --banana:#f5b731;--red:#e0452c;--cream:#fff5d1;--blush:#ee9f9a;
+      --muted:#786f62;--line:#c9bc9f;--wall:#dce7df;--black-fertilizer:#5b5a50;
+      --header-h:64px;--radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--wall);color:var(--ink)}
+    body{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:650}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button,select,input,textarea{border:2px solid var(--outline);background:var(--paper-2)}
+    button{min-height:44px;border-radius:10px;padding:8px 14px;font-weight:850;cursor:pointer;touch-action:manipulation}
+    button:hover{background:#fffdf6}
+    button:active{transform:translateY(1px)}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--banana);outline-offset:2px}
+    button:disabled{cursor:not-allowed;opacity:.45;transform:none}
+    .btn-primary{background:var(--teal-dark);color:#fffdf6}
+    .btn-primary:hover{background:#195e57}
+    .btn-red{background:var(--red);color:#fffdf6}
+    .btn-red:hover{background:#c73928}
+    .btn-warm{background:var(--banana)}
+    .btn-warm:hover{background:#dda31f}
+    .btn-quiet{background:transparent;border-color:var(--line)}
+    .btn-small{min-height:34px;padding:5px 10px;font-size:13px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .hidden{display:none!important}
+    .svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+
+    #app{height:100dvh;display:grid;grid-template-rows:var(--header-h) minmax(0,1fr)}
+    .topbar{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--paper);border-bottom:3px solid var(--outline);z-index:30}
+    .brand{display:flex;align-items:center;gap:9px;min-width:max-content}
+    .brand-mark{display:grid;place-items:center;width:42px;height:42px;border:3px solid var(--outline);border-radius:50%;background:var(--red);color:#fffdf6;font-family:Georgia,serif;font-size:24px;font-weight:900}
+    .brand-copy{line-height:1.02}
+    .brand-copy strong{display:block;font-family:Georgia,"Songti SC",serif;font-size:19px;letter-spacing:.05em}
+    .brand-copy span{display:block;margin-top:4px;color:var(--muted);font-size:11px;letter-spacing:.12em}
+    .top-select{height:42px;min-width:160px;border-radius:9px;padding:0 34px 0 11px;font-weight:850}
+    .top-spacer{flex:1}
+    .top-actions{display:flex;align-items:center;gap:7px}
+    .storage-note{display:flex;align-items:center;gap:6px;color:var(--teal-dark);font-size:12px;white-space:nowrap}
+    .storage-dot{width:9px;height:9px;border:2px solid var(--teal-dark);border-radius:50%;background:var(--fish-fin)}
+
+    .workspace{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:12px;padding:12px}
+    .panel{min-width:0;min-height:0;background:var(--paper);border:3px solid var(--outline);border-radius:var(--radius);overflow:hidden}
+    .building-panel{display:grid;grid-template-rows:auto minmax(0,1fr)}
+    .building-head{display:flex;align-items:center;gap:16px;padding:10px 14px;border-bottom:2px solid var(--outline);background:var(--paper-2)}
+    .building-title{min-width:155px}
+    .building-title small{display:block;color:var(--red);font-size:11px;letter-spacing:.15em}
+    .building-title strong{display:block;margin-top:2px;font-family:Georgia,"Songti SC",serif;font-size:18px}
+    .metric-row{display:flex;gap:8px;margin-left:auto}
+    .metric{min-width:88px;padding:5px 9px;border-left:2px solid var(--line)}
+    .metric span{display:block;color:var(--muted);font-size:10px}
+    .metric b{display:block;font-size:18px;line-height:1.15}
+    .building-body{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 214px;background:#e7efe9}
+    .floor-stage{position:relative;min-height:0;overflow:hidden;background:var(--paper-2);isolation:isolate}
+    .floor-stage:before,.floor-stage:after{content:"";position:absolute;z-index:0;top:0;bottom:0;width:16px;background:#b98a63;border-left:3px solid var(--outline);border-right:3px solid var(--outline)}
+    .floor-stage:before{left:0}.floor-stage:after{right:0}
+    .floor-grid,.monkey-layer{position:absolute;inset:0}
+    .floor-grid{z-index:1}
+    .floor-line{position:absolute;left:16px;right:16px;height:0;border-top:2px solid #a7977c}
+    .floor-line:before{content:"";position:absolute;left:0;right:0;top:-23px;height:21px;border-bottom:1px solid rgba(47,81,72,.14)}
+    .floor-label{position:absolute;left:22px;top:-20px;display:flex;align-items:center;gap:5px;padding:2px 7px;background:var(--paper);border:1.5px solid var(--outline);border-radius:7px;font-size:10px;white-space:nowrap}
+    .monkey-layer{z-index:4}
+    .monkey-token{position:absolute;width:48px;height:61px;padding:0;border:0;background:transparent;transform:translate(-50%,-50%);transition:left .55s cubic-bezier(.2,.85,.2,1),top .55s cubic-bezier(.2,.85,.2,1);overflow:visible}
+    .monkey-token:hover{background:transparent;z-index:9}
+    .token-aura{position:absolute;inset:2px 4px 10px;border:3px dashed var(--banana);border-radius:50%;opacity:0;pointer-events:none}
+    .monkey-token.has-gold-aura .token-aura{opacity:.95;animation:auraSpin 1s linear infinite}
+    @keyframes auraSpin{to{transform:rotate(360deg)}}
+    .asset-monkey-art,.asset-character-art{position:absolute;left:8px;top:0;width:34px;height:42px;overflow:visible}
+    .token-name{position:absolute;left:50%;bottom:0;max-width:70px;transform:translateX(-50%);padding:1px 4px;border:1.5px solid var(--outline);border-radius:5px;background:var(--paper-2);font-size:10px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .monkey-token.is-current .token-name{background:var(--red);color:#fffdf6}
+    .monkey-token.is-absent{opacity:.28;filter:grayscale(1)}
+    .rank-rail{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;border-left:2px solid var(--outline);background:var(--paper)}
+    .rank-head{padding:9px 10px;border-bottom:1.5px solid var(--line);font-size:12px;letter-spacing:.08em}
+    .rank-list{min-height:0;overflow:auto;padding:4px 8px;scrollbar-width:thin}
+    .rank-row{display:grid;grid-template-columns:24px minmax(0,1fr) 44px;align-items:center;gap:5px;min-height:35px;border-bottom:1px solid #ded4bd;font-size:12px}
+    .rank-no{display:grid;place-items:center;width:22px;height:22px;border:1.5px solid var(--outline);border-radius:50%;background:var(--paper-2);font-size:10px}
+    .rank-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .rank-score{text-align:right;font-variant-numeric:tabular-nums}
+    .rank-score b{display:block;color:var(--teal-dark)}
+    .rank-score span{font-size:9px;color:var(--muted)}
+    .round-note{padding:8px 10px;border-top:1.5px solid var(--line);color:var(--muted);font-size:11px}
+
+    .control-panel{display:flex;flex-direction:column;padding:12px;overflow:auto;background:var(--paper)}
+    .control-kicker{color:var(--red);font-size:11px;letter-spacing:.17em}
+    .control-title{margin:4px 0 10px;font-family:Georgia,"Songti SC",serif;font-size:24px;line-height:1.1}
+    .status-card{padding:12px;border:2px solid var(--outline);border-radius:12px;background:var(--paper-2)}
+    .status-card p{margin:5px 0;color:var(--muted);font-size:13px;line-height:1.5}
+    .big-action{width:100%;min-height:62px;margin-top:10px;font-size:18px;letter-spacing:.06em}
+    .lesson-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px}
+    .lesson-stat{padding:7px 5px;border:1.5px solid var(--line);border-radius:8px;text-align:center;background:var(--paper-2)}
+    .lesson-stat span{display:block;color:var(--muted);font-size:10px}
+    .lesson-stat b{display:block;margin-top:2px;font-size:17px}
+    .notice{position:relative;min-height:240px;padding:18px 16px 14px;border:3px double var(--red);background:#fffaf0;overflow:hidden}
+    .notice:before{content:"";position:absolute;inset:7px;border:1px solid rgba(224,69,44,.4);pointer-events:none}
+    .notice-no{position:relative;color:var(--red);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.12em}
+    .notice-body{position:relative;display:grid;grid-template-columns:96px minmax(0,1fr);align-items:center;gap:10px;margin-top:8px}
+    .notice-portrait{width:92px;height:108px;border:2px solid var(--outline);border-radius:10px;background:var(--paper);overflow:hidden}
+    .notice-portrait svg{width:100%;height:100%}
+    .notice-copy small{display:block;color:var(--muted);font-size:11px}
+    .notice-copy strong{display:block;margin:4px 0;font-family:Georgia,"Songti SC",serif;font-size:30px;line-height:1.05;word-break:break-all}
+    .notice-copy p{margin:0;font-size:14px;line-height:1.45}
+    .notice-stamp{position:absolute;right:12px;bottom:12px;display:grid;place-items:center;width:78px;height:78px;border:5px double var(--red);border-radius:50%;color:var(--red);font-family:Georgia,"Songti SC",serif;font-size:15px;font-weight:900;line-height:1.05;text-align:center;transform:rotate(-11deg) scale(2.2);opacity:0}
+    .notice.is-stamped .notice-stamp{animation:stampIn .32s cubic-bezier(.2,1.45,.45,1) forwards}
+    @keyframes stampIn{65%{opacity:1;transform:rotate(-8deg) scale(.88)}100%{opacity:.88;transform:rotate(-8deg) scale(1)}}
+    .event-ribbon{position:relative;margin-top:9px;padding:8px 9px;border-left:5px solid var(--teal-dark);background:#dcebe4;font-size:12px;line-height:1.4}
+    .event-ribbon.is-snake{border-color:#6fb87b;background:#e2efdd}
+    .event-ribbon.is-fish{border-color:var(--fish);background:#d9efe6}
+    .event-ribbon.is-fertilizer{border-color:var(--black-fertilizer);background:#e1e0d6}
+    .timer-line{display:flex;justify-content:space-between;align-items:center;margin:9px 0 5px;color:var(--muted);font-size:12px}
+    .timer-value{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);font-size:17px}
+    .target-row{display:grid;grid-template-columns:88px minmax(0,1fr);align-items:center;gap:8px;margin:7px 0}
+    .target-row label{font-size:12px;color:var(--muted)}
+    .target-row select{height:38px;min-width:0;border-radius:8px;padding:0 8px}
+    .score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+    .score-btn{min-height:54px;padding:6px 4px}
+    .score-btn b{display:block;font-size:15px}.score-btn span{display:block;margin-top:2px;font-size:10px;opacity:.8}
+    .score-correct{background:var(--teal-dark);color:#fffdf6}.score-partial{background:var(--banana)}.score-wrong{background:var(--red);color:#fffdf6}
+    .follow-actions{display:flex;gap:7px;margin-top:8px}.follow-actions button{flex:1}
+    .ready-actions{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:7px;margin-top:10px}.ready-actions .big-action{margin-top:0}
+    .airdrop-pending{margin-top:8px;padding:7px 9px;border:1.5px dashed var(--outline);border-radius:8px;background:#fff0af;font-size:11px;line-height:1.4}
+    .airdrop-banner{margin-top:5px;padding:6px 8px;border:1.5px solid #9a6a47;border-radius:7px;background:#f4e2bd;font-size:11px;line-height:1.4}
+    .passive-banner{margin-top:5px;padding:6px 8px;border:1.5px solid var(--teal-dark);border-radius:7px;background:#dcebe4;font-size:11px;line-height:1.4}
+    .last-result{margin-top:9px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:#f2ead7;font-size:12px;line-height:1.4}
+    .group-board{margin-top:9px;padding-top:9px;border-top:2px solid var(--line)}
+    .group-board h3{margin:0 0 7px;font-size:12px;letter-spacing:.08em}
+    .group-list{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+    .group-chip{display:flex;justify-content:space-between;gap:6px;padding:5px 7px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper-2);font-size:11px}
+
+    .suspense{position:absolute;z-index:12;inset:0;display:grid;place-items:center;background:rgba(40,33,26,.88);color:var(--cream)}
+    .elevator-box{width:min(360px,80%);padding:22px;border:4px solid var(--cream);text-align:center;background:#3a332a}
+    .elevator-box small{display:block;color:#d2c7b2;letter-spacing:.2em}
+    .elevator-digits{margin:10px 0;color:var(--banana);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:72px;font-weight:900;line-height:1}
+    .elevator-lights{display:flex;justify-content:center;gap:10px}
+    .elevator-lights i{width:15px;height:15px;border:2px solid var(--cream);border-radius:50%;background:transparent}
+    .elevator-lights i.is-lit{background:var(--red)}
+    .suspense-line{margin-top:13px;font-family:Georgia,"Songti SC",serif;font-size:18px}
+
+    .character-pop{position:fixed;z-index:90;right:20px;bottom:20px;display:grid;grid-template-columns:116px minmax(0,260px);align-items:end;gap:8px;pointer-events:none;transform:translateX(120%);transition:transform .25s ease}
+    .character-pop.is-showing{transform:translateX(0)}
+    .character-pop svg{width:116px;height:116px}
+    .speech{align-self:start;margin-top:12px;padding:11px 13px;border:3px solid var(--outline);border-radius:13px;background:var(--paper-2);font-family:Georgia,"Songti SC",serif;font-size:16px;line-height:1.45}
+    .toast{position:fixed;z-index:100;left:50%;bottom:18px;max-width:min(580px,calc(100vw - 28px));padding:10px 16px;border:2px solid var(--outline);border-radius:9px;background:var(--ink);color:#fffdf6;font-size:13px;transform:translate(-50%,130%);transition:transform .22s ease}
+    .toast.is-showing{transform:translate(-50%,0)}
+
+    .modal{position:fixed;z-index:70;inset:0;display:grid;place-items:center;padding:16px;background:rgba(40,33,26,.66)}
+    .modal-panel{width:min(980px,100%);max-height:calc(100dvh - 32px);display:grid;grid-template-rows:auto minmax(0,1fr);border:3px solid var(--outline);border-radius:15px;background:var(--paper);overflow:hidden}
+    .modal-head{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:2px solid var(--outline);background:var(--paper-2)}
+    .modal-head h2{margin:0;font-family:Georgia,"Songti SC",serif;font-size:21px}.modal-head p{margin:0;color:var(--muted);font-size:11px}.modal-head button{margin-left:auto}
+    .modal-body{min-height:0;overflow:auto;padding:14px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .field{display:grid;gap:5px}.field label{font-size:12px;color:var(--muted)}
+    .field input,.field select,.field textarea{width:100%;border-radius:8px;padding:9px}
+    .field textarea{min-height:150px;resize:vertical;line-height:1.55}
+    .wide{grid-column:1/-1}
+    .toolbar{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+    .privacy-note{padding:8px 10px;border-left:5px solid var(--red);background:#f5e2d9;color:#68463e;font-size:12px;line-height:1.45}
+    .roster-table{margin-top:12px;border-top:2px solid var(--outline)}
+    .student-row{display:grid;grid-template-columns:48px minmax(100px,1fr) minmax(120px,1.2fr) minmax(100px,1fr) 86px 62px;align-items:center;gap:6px;min-height:58px;padding:5px 0;border-bottom:1px solid var(--line)}
+    .student-row .mini-art{width:46px;height:50px}.student-row input,.student-row select{width:100%;height:38px;border-radius:7px;padding:0 7px;min-width:0}
+    .presence-btn.is-absent{background:#d9d4ca;color:#6a6258}
+    .section-note{margin:10px 0;color:var(--muted);font-size:12px;line-height:1.5}
+    .setting-card{padding:11px;border:1.5px solid var(--line);border-radius:9px;background:var(--paper-2)}
+    .setting-card h3{margin:0 0 8px;font-size:14px}.setting-card p{margin:5px 0;color:var(--muted);font-size:11px;line-height:1.4}
+    .toggle-line{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px}
+    .toggle-line input{width:22px;height:22px;accent-color:var(--teal-dark)}
+    .history-list{display:grid;gap:8px}
+    .history-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper-2)}
+    .history-item strong{display:block}.history-item span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+    .csv-box{width:100%;min-height:180px;border-radius:9px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.45;resize:vertical}
+    .airdrop-card{display:grid;grid-template-columns:170px minmax(0,1fr);align-items:center;gap:18px;max-width:620px;margin:auto;padding:18px;border:3px double var(--outline);background:var(--paper-2)}
+    .ritual-art{display:grid;place-items:center;width:160px;height:160px;border:2px dashed var(--line);border-radius:18px;background:#fff8e8;overflow:hidden}
+    .ritual-art svg{width:138px;height:138px}.airdrop-card.is-revealing .ritual-art{animation:ritualShake .16s linear 5}
+    @keyframes ritualShake{25%{transform:rotate(-3deg) scale(.98)}75%{transform:rotate(3deg) scale(1.02)}}
+    .airdrop-copy small{display:block;color:var(--red);letter-spacing:.14em}.airdrop-copy h3{margin:5px 0;font-family:Georgia,"Songti SC",serif;font-size:25px}.airdrop-copy p{margin:7px 0;color:var(--muted);font-size:13px;line-height:1.55}.airdrop-copy button{margin-top:7px}
+    .lesson-setup-note{margin:0 0 10px;padding:9px 11px;border-left:5px solid var(--teal-dark);background:#dcebe4;font-size:12px;line-height:1.45}
+    .seat-list{display:grid;gap:8px;margin-top:10px}
+    .seat-row{display:grid;grid-template-columns:42px minmax(110px,1fr) minmax(120px,1fr) minmax(220px,1.8fr);align-items:center;gap:8px;padding:8px;border:1.5px solid var(--line);border-radius:9px;background:var(--paper-2)}
+    .seat-art{width:40px;height:48px}.seat-art svg{width:100%;height:100%}
+    .seat-row select{width:100%;height:42px;border-radius:8px;padding:0 8px;min-width:0}
+    .seat-passive{color:var(--muted);font-size:11px;line-height:1.4}.seat-passive b{display:block;color:var(--teal-dark);font-size:12px}
+
+    .settlement{position:fixed;z-index:65;inset:0;display:grid;place-items:center;padding:12px;background:#dce7df}
+    .settlement-sheet{width:min(1120px,100%);height:min(720px,calc(100dvh - 24px));display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;border:4px solid var(--outline);background:var(--paper);overflow:hidden}
+    .settlement-head{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:3px double var(--red);background:var(--paper-2)}
+    .settlement-head small{display:block;color:var(--red);letter-spacing:.14em}.settlement-head h2{margin:2px 0 0;font-family:Georgia,"Songti SC",serif;font-size:27px}.settlement-head .settlement-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:12px}
+    .award-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:11px 14px}
+    .award-card{position:relative;min-height:104px;padding:11px 12px 9px;border:2px solid var(--outline);background:var(--paper-2);overflow:hidden}
+    .award-card small{display:block;color:var(--red);font-size:10px;letter-spacing:.1em}.award-card strong{display:block;margin:4px 0;font-family:Georgia,"Songti SC",serif;font-size:19px;line-height:1.1}.award-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
+    .settlement-table-wrap{min-height:0;overflow:auto;margin:0 14px;border:2px solid var(--outline)}
+    .settlement-table{width:100%;border-collapse:collapse;font-size:12px}
+    .settlement-table th{position:sticky;top:0;background:#dcebe4;z-index:1}.settlement-table th,.settlement-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}.settlement-table td.num,.settlement-table th.num{text-align:right;font-variant-numeric:tabular-nums}
+    .settlement-actions{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:2px solid var(--outline);background:var(--paper-2)}
+
+    .qa-panel{position:fixed;z-index:120;left:8px;top:8px;width:min(500px,calc(100vw - 16px));max-height:calc(100dvh - 16px);display:grid;grid-template-rows:auto minmax(0,1fr);border:3px solid var(--outline);background:#fffdf6;overflow:hidden}
+    .qa-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--ink);color:#fffdf6}.qa-head strong{font-size:13px}.qa-head button{margin-left:auto;min-height:30px;border-color:#fffdf6;background:transparent;color:#fffdf6;font-size:11px}
+    .qa-output{margin:0;padding:10px;overflow:auto;white-space:pre-wrap;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+    .qa-output.has-failure{background:#f8d9d2;color:#641f18}
+
+    @media(max-width:1100px){
+      :root{--header-h:94px}
+      .topbar{align-content:center;flex-wrap:wrap;gap:6px 8px;padding:6px 8px}
+      .brand-mark{width:36px;height:36px;font-size:20px}.brand-copy strong{font-size:16px}.brand-copy span{display:none}
+      .top-select{height:36px;min-width:140px;flex:1}.top-spacer{display:none}.top-actions{width:100%;justify-content:flex-end}.top-actions button{min-height:34px;padding:5px 9px;font-size:12px}.storage-note{margin-right:auto}
+      .workspace{grid-template-columns:minmax(0,1fr) 330px;gap:7px;padding:7px}
+      .building-body{grid-template-columns:minmax(0,1fr) 174px}.metric{min-width:72px}.metric b{font-size:16px}
+      .award-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:820px) and (min-width:701px){
+      .workspace{height:calc(100dvh - var(--header-h));grid-template-columns:1fr;grid-template-rows:minmax(0,42%) minmax(0,58%);gap:7px;padding:7px}
+      .building-body{grid-template-columns:1fr}.rank-rail{display:none}
+      .control-panel{padding:10px}.control-title{font-size:20px;margin-bottom:7px}.notice{min-height:180px}.notice-body{grid-template-columns:74px minmax(0,1fr)}.notice-portrait{width:70px;height:82px}.notice-copy strong{font-size:26px}
+      .score-btn{min-height:50px}
+    }
+    @media(max-width:700px){
+      :root{--header-h:96px}
+      .brand{min-width:0}.brand-mark{width:34px;height:34px}.brand-copy strong{font-size:14px}.top-select{min-width:115px;font-size:12px}.storage-note{font-size:10px}
+      .workspace{height:calc(100dvh - var(--header-h));grid-template-columns:1fr;grid-template-rows:minmax(0,52%) minmax(0,48%);gap:5px;padding:5px}
+      .panel{border-width:2px;border-radius:10px}.building-head{padding:5px 8px;gap:5px}.building-title{min-width:112px}.building-title small{font-size:8px}.building-title strong{font-size:13px}
+      .metric-row{gap:0}.metric{min-width:54px;padding:3px 5px}.metric span{font-size:8px}.metric b{font-size:13px}
+      .building-body{grid-template-columns:1fr}.rank-rail{display:none}.floor-stage:before,.floor-stage:after{width:9px}.floor-stage:before{left:0}.floor-stage:after{right:0}.floor-line{left:9px;right:9px}.floor-label{left:12px}
+      .monkey-token{width:40px;height:48px}.asset-monkey-art,.asset-character-art{left:7px;width:28px;height:35px}.token-name{max-width:48px;font-size:8px;line-height:11px}.token-aura{inset:0 3px 7px}
+      .control-panel{padding:7px}.control-kicker{font-size:9px}.control-title{display:none}.status-card{padding:8px}.status-card p{font-size:11px}.big-action{min-height:50px;margin-top:6px;font-size:15px}.lesson-strip{margin-bottom:5px}.lesson-stat{padding:4px}.lesson-stat b{font-size:14px}
+      .notice{min-height:0;padding:10px 10px 8px}.notice:before{inset:4px}.notice-body{grid-template-columns:68px minmax(0,1fr);margin-top:3px}.notice-portrait{width:64px;height:75px}.notice-copy strong{font-size:22px}.notice-copy p{font-size:11px}.notice-stamp{width:56px;height:56px;right:7px;bottom:7px;border-width:4px;font-size:11px}.event-ribbon{margin-top:5px;padding:5px 7px;font-size:10px}.timer-line{margin:4px 0 2px}.timer-value{font-size:14px}.target-row{margin:3px 0;grid-template-columns:68px}.target-row select{height:32px;font-size:11px}.score-grid{gap:4px;margin-top:4px}.score-btn{min-height:42px}.score-btn b{font-size:12px}.follow-actions{margin-top:4px}.follow-actions button{min-height:34px;font-size:11px}.ready-actions{gap:4px;margin-top:6px}.ready-actions button{min-height:46px;padding:5px;font-size:12px}.last-result{display:none}.group-board{display:none}
+      .elevator-box{padding:14px}.elevator-digits{font-size:54px}.suspense-line{font-size:14px}.character-pop{right:5px;bottom:5px;grid-template-columns:82px minmax(0,230px)}.character-pop svg{width:82px;height:82px}.speech{font-size:12px}
+      .modal{padding:0;align-items:end}.modal-panel{max-height:92dvh;border-radius:14px 14px 0 0;border-bottom:0}.modal-body{padding:10px}.form-grid{grid-template-columns:1fr}.wide{grid-column:auto}.student-row{grid-template-columns:40px minmax(74px,1fr) minmax(98px,1.15fr) 78px;gap:4px}.student-row .group-select{display:none}.student-row .presence-btn,.student-row .delete-student{grid-column:auto}.student-row .mini-art{width:38px;height:44px}.student-row input,.student-row select{height:34px;font-size:11px}.student-row button{min-height:32px;padding:4px;font-size:10px}
+      .airdrop-card{grid-template-columns:92px minmax(0,1fr);gap:8px;padding:10px}.ritual-art{width:88px;height:88px}.ritual-art svg{width:78px;height:78px}.airdrop-copy h3{font-size:18px}.airdrop-copy p{font-size:11px}
+      .seat-row{grid-template-columns:38px minmax(0,1fr) minmax(0,1fr);gap:5px;padding:6px}.seat-art{width:36px;height:44px}.seat-row select{height:36px;font-size:11px}.seat-passive{grid-column:2/-1;font-size:10px}
+      .settlement{padding:4px}.settlement-sheet{height:calc(100dvh - 8px);border-width:2px}.settlement-head{padding:8px 9px}.settlement-head h2{font-size:20px}.settlement-head .settlement-meta{font-size:9px}.award-grid{grid-template-columns:1fr;gap:4px;padding:6px}.award-card{min-height:61px;padding:6px 8px}.award-card strong{font-size:14px;margin:2px 0}.award-card p{font-size:9px}.settlement-table-wrap{margin:0 6px}.settlement-table{font-size:10px}.settlement-table th,.settlement-table td{padding:5px 4px}.settlement-actions{padding:6px}.settlement-actions button{min-height:34px;padding:5px 8px;font-size:11px}
+    }
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="asset-monkey-head" viewBox="0 0 100 74">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M43 12Q47 4 51 12Q57 3 60 13" fill="#765039"/>
+          <path d="M25 27Q13 22 12 36Q12 49 26 48Z" fill="#9a6a47"/><path d="M75 27Q87 22 88 36Q88 49 74 48Z" fill="#9a6a47"/>
+          <path d="M26 23Q47 9 69 21Q83 31 78 49Q75 65 58 70Q39 76 24 63Q12 52 18 36Q19 29 26 23Z" fill="#9a6a47"/>
+          <path d="M31 34Q34 22 45 25Q51 18 58 26Q70 24 72 38Q77 49 68 59Q59 69 45 67Q31 66 25 55Q21 43 31 34Z" fill="#f0d3a4" stroke-width="2.6"/>
+          <ellipse cx="42" cy="43" rx="4.2" ry="6" fill="#2f5148" stroke="none"/><ellipse cx="60" cy="43" rx="4.2" ry="6" fill="#2f5148" stroke="none"/>
+          <circle cx="41" cy="41" r="1.3" fill="#fffdf6" stroke="none"/><circle cx="59" cy="41" r="1.3" fill="#fffdf6" stroke="none"/>
+          <ellipse cx="51" cy="51" rx="3.7" ry="2.7" fill="#b97d5b" stroke-width="2"/>
+          <ellipse cx="30" cy="52" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".72"/><ellipse cx="72" cy="52" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".72"/>
+          <path d="M33 31Q38 28 43 31M59 30Q64 27 69 30" fill="none" stroke-width="2" opacity=".75"/>
+        </g>
+      </symbol>
+      <symbol id="asset-monkey-land" viewBox="0 0 100 116">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 84Q16 79 13 93Q11 104 4 104" fill="none" stroke-width="7"/><path d="M34 84Q16 79 13 93Q11 104 4 104" fill="none" stroke="#9a6a47" stroke-width="3.5"/>
+          <path d="M35 78Q25 87 18 85M65 78Q75 87 83 85" fill="none" stroke-width="6"/><path d="M39 94Q29 106 22 105M61 94Q71 106 79 105" fill="none" stroke-width="6"/>
+          <path d="M34 65Q50 57 66 66Q72 82 66 99Q60 108 48 107Q36 107 30 98Q27 81 34 65Z" fill="#9a6a47"/>
+          <ellipse cx="50" cy="84" rx="9" ry="14" fill="#edcf9e" stroke-width="2.3"/><use href="#asset-monkey-head" width="100" height="74"/>
+          <path d="M44 57Q51 62 58 56" fill="none" stroke-width="2.4"/><path d="M78 80Q87 66 89 57Q96 68 91 81Q85 88 78 80Z" fill="#f1bd3c"/>
+        </g>
+      </symbol>
+      <symbol id="asset-fish" viewBox="0 0 120 120">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="99" cy="25" r="5" fill="none" stroke="#3fa27a" stroke-width="2.4"/><circle cx="109" cy="13" r="3" fill="none" stroke="#3fa27a" stroke-width="2"/>
+          <path d="M24 42Q37 27 61 30Q83 31 94 48Q104 66 92 82Q78 98 53 93Q28 96 18 77Q8 58 24 42Z" fill="#3fab84"/>
+          <path d="M91 57Q106 45 116 49Q110 63 117 77Q106 81 92 72Z" fill="#6cd0af"/><path d="M56 32Q61 18 69 25Q73 30 66 36" fill="#6cd0af"/><path d="M35 73Q20 77 19 90Q32 89 43 78" fill="#6cd0af"/>
+          <path d="M23 48Q31 35 45 37Q57 39 59 54Q62 68 50 77Q37 83 25 73Q15 63 23 48Z" fill="#fff5d1" stroke-width="2.4"/>
+          <ellipse cx="40" cy="54" rx="7" ry="10" fill="#2f5148" stroke="none"/><circle cx="38" cy="51" r="2" fill="#fffdf6" stroke="none"/><ellipse cx="40" cy="54" rx="10" ry="13" fill="none" stroke-width="2.2"/>
+          <path d="M50 53Q59 50 68 52" fill="none" stroke-width="2.2"/><ellipse cx="27" cy="67" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".8"/><path d="M29 68Q36 72 43 68" fill="none" stroke-width="2.2"/>
+          <path d="M73 73Q84 77 87 87" fill="none" stroke="#6cd0af" stroke-width="7"/><path d="M19 37L15 31M29 31L27 25" fill="none" stroke-width="2" opacity=".6"/>
+        </g>
+      </symbol>
+      <symbol id="asset-donkey" viewBox="0 0 120 120">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M28 73Q24 92 31 107L82 107Q91 94 85 73Z" fill="#9d8a74"/><path d="M36 101L34 116M73 101L75 116" fill="none" stroke-width="10"/><path d="M36 101L34 116M73 101L75 116" fill="none" stroke="#9d8a74" stroke-width="6"/>
+          <path d="M29 116H40M69 116H80" fill="none" stroke-width="5"/><path d="M84 80Q103 78 99 93" fill="none" stroke-width="4"/><path d="M96 92Q103 95 99 100Q93 98 96 92Z" fill="#5f5146"/>
+          <path d="M34 40Q17 24 20 5Q35 7 44 33Z" fill="#9d8a74"/><path d="M29 29Q24 18 25 12Q33 16 38 31Z" fill="#e8bea9" stroke-width="2"/><path d="M70 34Q78 9 95 6Q98 24 79 42Z" fill="#9d8a74"/><path d="M77 31Q84 17 91 13Q91 22 82 35Z" fill="#e8bea9" stroke-width="2"/>
+          <path d="M43 30Q48 20 53 29Q58 18 63 29Q68 21 72 33" fill="#5f5146"/><path d="M27 56Q27 34 49 29Q70 25 84 42Q94 54 87 72Q79 89 57 91Q34 91 26 74Q22 65 27 56Z" fill="#aa9780"/>
+          <ellipse cx="57" cy="69" rx="22" ry="15" fill="#f5dfbc" stroke-width="2.5"/><path d="M38 50Q44 46 50 49M66 49Q73 46 79 51" fill="none" stroke-width="2.5"/>
+          <ellipse cx="45" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/><ellipse cx="73" cy="52" rx="4.6" ry="5.5" fill="#2f5148" stroke="none"/><circle cx="43.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/><circle cx="71.5" cy="50.5" r="1.6" fill="#fffdf6" stroke="none"/>
+          <ellipse cx="51" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/><ellipse cx="64" cy="67" rx="2.3" ry="1.8" fill="#2f5148" stroke="none"/><path d="M50 77Q57 81 65 76" fill="none" stroke-width="2.5"/><ellipse cx="33" cy="64" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".65"/>
+        </g>
+      </symbol>
+      <symbol id="asset-snake" viewBox="0 0 120 100">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M38 49C27 59 27 76 41 84C55 93 73 84 78 70C83 55 91 46 101 51C111 56 108 72 98 78" fill="none" stroke-width="20"/><path d="M38 49C27 59 27 76 41 84C55 93 73 84 78 70C83 55 91 46 101 51C111 56 108 72 98 78" fill="none" stroke="#6fb87b" stroke-width="14"/>
+          <path d="M42 14Q57 14 66 25Q72 36 64 49Q56 58 40 57Q23 57 16 46Q9 34 17 24Q26 14 42 14Z" fill="#6fb87b"/><ellipse cx="31" cy="33" rx="5.4" ry="6.4" fill="#2f5148" stroke="none"/><ellipse cx="51" cy="33" rx="5.4" ry="6.4" fill="#2f5148" stroke="none"/><circle cx="29.5" cy="31" r="1.7" fill="#fffdf6" stroke="none"/><circle cx="49.5" cy="31" r="1.7" fill="#fffdf6" stroke="none"/>
+          <path d="M35 45Q41 49 47 45" fill="none" stroke-width="2.4"/><path d="M41 48V52M41 52L37.5 55M41 52L44.5 55" fill="none" stroke="#d75d51" stroke-width="2.2"/><ellipse cx="22" cy="43" rx="5" ry="3" fill="#ee9f9a" stroke="none" opacity=".65"/>
+        </g>
+      </symbol>
+      <symbol id="asset-fertilizer" viewBox="0 0 120 120">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 29Q59 18 86 29L81 41Q89 58 86 86Q83 102 61 104Q37 103 33 87Q29 58 39 41Z" fill="#5b5a50"/><path d="M37 30Q60 36 83 30" fill="none" stroke-width="2.4"/>
+          <ellipse cx="49" cy="58" rx="3.2" ry="4.2" fill="#eef3df" stroke="none"/><ellipse cx="70" cy="58" rx="3.2" ry="4.2" fill="#eef3df" stroke="none"/><path d="M50 71Q60 67 70 71" fill="none" stroke="#eef3df" stroke-width="2.2"/><rect x="38" y="80" width="44" height="15" rx="6" fill="#d9d8c8" stroke-width="2.2"/>
+        </g>
+      </symbol>
+      <symbol id="asset-egg" viewBox="0 0 110 120">
+        <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 69 Q12 75 10 88 M86 69 Q98 75 100 88" fill="none" stroke-width="5"/>
+          <path d="M41 99 Q38 108 34 114 M69 99 Q72 108 76 114" fill="none" stroke-width="6"/>
+          <path d="M55 10 Q77 11 89 42 Q103 78 82 98 Q70 108 55 108 Q39 108 27 98 Q7 78 21 42 Q33 11 55 10 Z" fill="#f5e0b0"/>
+          <path d="M31 45 Q40 31 55 31 Q72 31 80 46 Q84 60 75 72 Q67 82 53 81 Q38 80 30 68 Q23 56 31 45 Z" fill="#fff9e8" stroke-width="2.4"/>
+          <path d="M35 46 Q41 40 48 43 M63 42 Q72 39 78 46" fill="none" stroke-width="2.3"/>
+          <ellipse cx="43" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(10 43 53)"/><ellipse cx="69" cy="53" rx="5.5" ry="7" fill="#2f5148" stroke="none" transform="rotate(-10 69 53)"/>
+          <circle cx="41.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/><circle cx="67.5" cy="50.5" r="1.8" fill="#fffdf6" stroke="none"/>
+          <path d="M50 66 Q55 63 60 66" fill="none" stroke-width="2.5"/><ellipse cx="34" cy="63" rx="5" ry="3" fill="#e8aa9f" stroke="none" opacity=".65"/>
+          <path d="M16 87 Q11 90 8 86 M94 87 Q99 90 102 86" fill="none" stroke-width="2.5"/><path d="M28 114 H40 M70 114 H82" fill="none" stroke-width="5"/>
+        </g>
+      </symbol>
+      <symbol id="asset-banana" viewBox="0 0 54 54"><g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16Q15 41 37 39Q48 36 46 22Q40 31 29 31Q18 31 15 15Z" fill="#f1bd3c"/><path d="M13 15L12 10M45 23L48 18"/></g></symbol>
+      <symbol id="asset-crate" viewBox="0 0 90 90"><g stroke="#2f5148" stroke-width="3" stroke-linejoin="round"><path d="M20 18Q45 7 70 18L66 26Q45 19 24 26Z" fill="#e8dfcc"/><rect x="18" y="29" width="54" height="49" rx="8" fill="#c8a66c"/><path d="M18 45L72 45M31 29V78M59 29V78" opacity=".5"/><rect x="25" y="49" width="40" height="14" rx="6" fill="#f1bd3c" stroke-width="2.2"/></g></symbol>
+    </defs>
+  </svg>
+
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">M</div><div class="brand-copy"><strong>驯猴办 · 课堂点名器</strong><span>本机离线课堂工具</span></div></div>
+      <label class="sr-only" for="classSelect">当前班级</label><select id="classSelect" class="top-select"></select>
+      <div class="top-spacer"></div>
+      <div class="storage-note"><span class="storage-dot"></span><span id="storageText">仅存本机</span></div>
+      <nav class="top-actions" aria-label="课堂工具">
+        <button class="btn-quiet" data-open-modal="rosterModal">名册与行头</button>
+        <button class="btn-quiet" data-open-modal="settingsModal">计分设置</button>
+        <button class="btn-quiet" data-open-modal="historyModal">历史与成绩</button>
+        <button id="liveSettlement" class="btn-warm hidden">随时结算</button>
+        <button id="sessionToggle" class="btn-primary">开始本节</button>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <section class="panel building-panel" aria-label="全班楼层看板">
+        <header class="building-head">
+          <div class="building-title"><small>同一栋楼 · 各爬各的</small><strong id="buildingName">驯猴办联合办公楼</strong></div>
+          <div class="metric-row">
+            <div class="metric"><span id="presentLabel">名册在岗</span><b id="presentMetric">0</b></div>
+            <div class="metric"><span>本节最高</span><b id="topFloorMetric">0F</b></div>
+            <div class="metric"><span>香蕉流通</span><b id="bananaMetric">0</b></div>
+          </div>
+        </header>
+        <div class="building-body">
+          <div id="floorStage" class="floor-stage">
+            <div id="floorGrid" class="floor-grid" aria-hidden="true"></div>
+            <div id="monkeyLayer" class="monkey-layer"></div>
+            <div id="suspense" class="suspense hidden" aria-live="assertive">
+              <div class="elevator-box"><small>驯猴办内部电梯检索中</small><div id="elevatorDigits" class="elevator-digits">000</div><div class="elevator-lights"><i></i><i></i><i></i><i></i><i></i></div><div id="suspenseLine" class="suspense-line">约谈对象正在办理上楼手续</div></div>
+            </div>
+          </div>
+          <aside class="rank-rail">
+            <div class="rank-head">楼层实时清点</div>
+            <div id="rankList" class="rank-list"></div>
+            <div id="roundNote" class="round-note">洗牌袋尚未开封</div>
+          </aside>
+        </div>
+      </section>
+
+      <aside class="panel control-panel" aria-label="点名与记分控制台">
+        <div class="control-kicker">驯猴办当值窗口</div><h1 class="control-title">课堂约谈签发台</h1>
+        <div id="idleControl" class="status-card">
+          <strong id="idleHeading">本节课尚未开始</strong>
+          <p id="idleCopy">题目与回答发生在设备外；老师在这台平板上点名、逐次判定并记分。</p>
+          <button id="startLesson" class="btn-primary big-action">开始一堂课</button>
+        </div>
+        <div id="activeControl" class="hidden">
+          <div class="lesson-strip">
+            <div class="lesson-stat"><span>通知号</span><b id="noticeMetric">000</b></div>
+            <div class="lesson-stat"><span>本轮剩余</span><b id="bagMetric">0</b></div>
+            <div class="lesson-stat"><span>答题记录</span><b id="answerMetric">0</b></div>
+          </div>
+          <div id="readyControl" class="status-card">
+            <strong id="readyHeading">可以签发下一张通知</strong>
+            <p id="readyCopy">一轮内每位在岗同学恰好出现一次；刷新页面也不会重洗。</p>
+            <div class="ready-actions"><button id="drawStudent" class="btn-red big-action">发布约谈通知</button><button id="openAirdrop" class="btn-warm">启动惊喜机</button></div>
+            <div id="airdropPending" class="airdrop-pending hidden"></div>
+          </div>
+          <div id="callControl" class="hidden">
+            <article id="notice" class="notice">
+              <div id="noticeNo" class="notice-no">约谈通知第 001 号</div>
+              <div class="notice-body">
+                <div id="noticePortrait" class="notice-portrait"></div>
+                <div class="notice-copy"><small id="noticeDept">驯猴办签发</small><strong id="calledName">海</strong><p id="noticeSentence">请该同学即刻上楼答题。</p></div>
+              </div>
+              <div class="notice-stamp">驯猴办<br>已约谈</div>
+            </article>
+            <div id="eventRibbon" class="event-ribbon hidden"></div>
+            <div id="airdropBanner" class="airdrop-banner hidden"></div>
+            <div id="passiveBanner" class="passive-banner"></div>
+            <div class="timer-line"><span id="timerHint">答题计时，十秒内答对有快答香蕉</span><span id="answerTimer" class="timer-value">00:00</span></div>
+            <div id="targetRow" class="target-row hidden"><label for="awardTarget">记分归属</label><select id="awardTarget"></select></div>
+            <div id="scoreGrid" class="score-grid">
+              <button class="score-btn score-correct" data-outcome="correct"><b>答对</b><span id="correctValue">+3 香蕉</span></button>
+              <button class="score-btn score-partial" data-outcome="partial"><b>部分对</b><span id="partialValue">+1 香蕉</span></button>
+              <button class="score-btn score-wrong" data-outcome="wrong"><b>答错</b><span id="wrongValue">-1 香蕉</span></button>
+            </div>
+            <div class="follow-actions"><button id="exemptCall" class="btn-quiet">免答，登记后继续</button><button id="undoScore" class="btn-quiet">撤销上一笔</button></div>
+          </div>
+          <div id="lastResult" class="last-result hidden"></div>
+          <section id="groupBoard" class="group-board hidden"><h3>部门香蕉汇总</h3><div id="groupList" class="group-list"></div></section>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="lessonSetupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="lessonSetupTitle">
+    <section class="modal-panel" style="width:min(900px,100%)"><header class="modal-head"><div><h2 id="lessonSetupTitle">本节参战名单与角色</h2><p>每堂课选择 2～6 人，六种角色当堂不可重复</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body">
+        <p class="lesson-setup-note">完整班级名册与长期成绩不会改变。本节公平洗牌袋只在下列参战同学中抽取，刷新页面后仍延续原袋。</p>
+        <div class="field" style="max-width:240px"><label for="participantCount">本节参战人数</label><select id="participantCount"><option value="2">2 人</option><option value="3">3 人</option><option value="4">4 人</option><option value="5">5 人</option><option value="6">6 人</option></select></div>
+        <div id="lessonSeats" class="seat-list"></div>
+        <div class="toolbar"><button id="confirmStartLesson" class="btn-primary">确认角色并开始</button><span class="section-note">角色被动会在每次计分后明确显示，也会进入当堂结算。</span></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="rosterModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rosterTitle">
+    <section class="modal-panel"><header class="modal-head"><div><h2 id="rosterTitle">名册与猴子</h2><p>真实姓名只写入当前浏览器 localStorage</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body">
+        <div class="privacy-note">隐私说明：本工具没有上传、下载或云端接口。真实学生名册只留在本机浏览器；CSV 也只复制成文本。</div>
+        <div class="form-grid" style="margin-top:10px">
+          <div class="field"><label for="classNameInput">班级名称</label><input id="classNameInput" maxlength="24"></div>
+          <div class="field"><label>班级操作</label><div class="toolbar" style="margin:0"><button id="renameClass" class="btn-small">保存班名</button><button id="newClass" class="btn-small">新建班级</button><button id="deleteClass" class="btn-small btn-red">删除当前班</button></div></div>
+          <div class="field wide"><label for="rosterTextarea">批量名册，一行一个名字</label><textarea id="rosterTextarea" spellcheck="false"></textarea></div>
+        </div>
+        <div class="toolbar"><button id="saveRoster" class="btn-primary">按这一列保存名册</button><span class="section-note">同名同学会保留长期成绩；改名请用下方单行编辑。</span></div>
+        <div id="rosterTable" class="roster-table"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="settingsTitle">计分与课堂规则</h2><p>数值随时可改，下一次判定起生效</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="setting-card"><h3>答题香蕉</h3><div class="form-grid"><div class="field"><label for="setCorrect">答对</label><input id="setCorrect" type="number" min="-20" max="50"></div><div class="field"><label for="setPartial">部分对</label><input id="setPartial" type="number" min="-20" max="50"></div><div class="field"><label for="setWrong">答错</label><input id="setWrong" type="number" min="-20" max="50"></div></div><p>蛇台事件会让答对总香蕉翻倍，答错不扣。</p></div>
+          <div class="setting-card"><h3>速度与连对</h3><div class="form-grid"><div class="field"><label for="setFastSeconds">快答秒数</label><input id="setFastSeconds" type="number" min="1" max="120"></div><div class="field"><label for="setFastBonus">快答加成</label><input id="setFastBonus" type="number" min="0" max="20"></div><div class="field"><label for="setStreakAt">连对起算</label><input id="setStreakAt" type="number" min="2" max="20"></div><div class="field"><label for="setStreakBonus">连对加成</label><input id="setStreakBonus" type="number" min="0" max="20"></div></div></div>
+          <div class="setting-card"><h3>课堂显示</h3><div class="toggle-line"><label for="setGroupMode">启用小组部门汇总</label><input id="setGroupMode" type="checkbox"></div><div class="toggle-line"><label for="setSound">盖章与反馈音效</label><input id="setSound" type="checkbox"></div><p>小组名称固定使用世界观部门名，学生可在名册中换组。</p></div>
+          <div class="setting-card"><h3>随机彩蛋</h3><div class="toggle-line"><label for="setEvents">启用鱼小姐、蛇台、黑化肥</label><input id="setEvents" type="checkbox"></div><p>彩蛋只改变题目情境与香蕉规则，不会公开评价或羞辱学生。</p></div>
+        </div>
+        <div class="toolbar"><button id="saveSettings" class="btn-primary">保存设置</button><button id="resetSettings" class="btn-quiet">恢复建议值</button></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <section class="modal-panel" style="width:min(820px,100%)"><header class="modal-head"><div><h2 id="historyTitle">历史课次与长期成绩</h2><p id="historySubtitle">本机留档，可复制 CSV 文本</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="toolbar"><button id="copyCsv" class="btn-primary">复制 CSV 文本</button><button id="refreshCsv" class="btn-quiet">重新生成</button></div><textarea id="csvBox" class="csv-box" readonly></textarea><h3 style="font-size:14px">课次回看</h3><div id="historyList" class="history-list"></div></div>
+    </section>
+  </div>
+
+  <div id="airdropModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="airdropTitle">
+    <section class="modal-panel" style="width:min(700px,100%)"><header class="modal-head"><div><h2 id="airdropTitle">课堂随机惊喜机</h2><p>揭晓仪式与结果双重随机，规则会写入本机课次</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><article id="airdropCard" class="airdrop-card"><div id="ritualArt" class="ritual-art"></div><div class="airdrop-copy"><small id="airdropKind">驯猴办随机仪式</small><h3 id="airdropName">下一秒仍未备案</h3><p id="airdropLine">盲盒、公文签筒、怪骰子都可能出勤。</p><button id="revealAirdrop" class="btn-primary">开始揭晓</button><button id="acceptAirdrop" class="btn-primary hidden" data-close-modal>确认收件</button></div></article></div>
+    </section>
+  </div>
+
+  <section id="settlement" class="settlement hidden" aria-label="课堂结算页">
+    <div class="settlement-sheet">
+      <header class="settlement-head"><div><small>驯猴办课堂结算公示</small><h2 id="settlementTitle">本节课楼层清点完毕</h2></div><div id="settlementMeta" class="settlement-meta"></div></header>
+      <div id="awardGrid" class="award-grid"></div>
+      <div class="settlement-table-wrap"><table class="settlement-table"><thead><tr><th>名次</th><th>同学</th><th>角色</th><th>部门</th><th class="num">楼层</th><th class="num">香蕉</th><th class="num">答题</th><th class="num">答对率</th><th class="num">最佳连对</th></tr></thead><tbody id="settlementBody"></tbody></table></div>
+      <div class="settlement-actions"><button id="settlementCsv" class="btn-quiet">复制长期 CSV</button><button id="closeSettlement" class="btn-primary">返回课堂看板</button></div>
+    </div>
+  </section>
+
+  <aside id="characterPop" class="character-pop" aria-live="polite"><svg id="popArt" viewBox="0 0 120 120"><use href="#asset-donkey"></use></svg><div id="popSpeech" class="speech">仿的。答案已传真，正文略。</div></aside>
+  <div id="toast" class="toast" role="status"></div>
+  <aside id="qaPanel" class="qa-panel hidden"><header class="qa-head"><strong>课堂答题器 QA 自检</strong><button id="closeQa">收起</button></header><pre id="qaOutput" class="qa-output"></pre></aside>
+
+  <script>
+  'use strict';
+  const STORAGE_KEY='myskme_classroom_clicker_v1';
+  const QA_STORAGE_KEY='myskme_classroom_clicker_qa_v1';
+  const QA_MODE=new URLSearchParams(location.search).get('qa')==='1';
+  const SAMPLE_NAMES=['海','浩','瑾','琳','诺','睿','澄','岚','乔','安','川','砚','朔','昕','岳','宁','若','言','星','竹','舟','景','苏','沐','祺','珂','予','清','原','展','颂','芝','越','玄','迟','洛','亭','知','远'];
+  const GROUPS=['大堂','质检部','传真科','驯猴办','黑化肥科','加盖工程部'];
+  const FLOOR_DEPARTMENTS=['大堂','质检部','传真科','房租科','驯猴办','冗余科','黑化肥科','谜题科','绕口令办','观景台','标点科','加盖工程部'];
+  const CHARACTERS=[
+    {id:'monkey',name:'猴先生',passive:'上楼本能',line:'在快答时答对，额外上 1 层。'},
+    {id:'fish',name:'鱼小姐',passive:'青鳞缓冲',line:'本节第一次答错不扣香蕉。'},
+    {id:'egg',name:'蛋',passive:'蛋壳补录',line:'部分对时额外获得 1 根香蕉。'},
+    {id:'snake',name:'蛇',passive:'方向加码',line:'蛇台事件答对时，翻倍后再加 1 根香蕉。'},
+    {id:'fertilizer',name:'黑化肥',passive:'错后挥发',line:'答错后蓄力，下一次答对额外获得 2 根香蕉。'},
+    {id:'donkey',name:'驴',passive:'正版盖章',line:'每次达到双数连对时，额外获得 1 根香蕉。'}
+  ];
+  const OUTFITS=[
+    {id:'cap',name:'工牌鸭舌帽'},{id:'shades',name:'反光墨镜'},{id:'lanyard',name:'食堂挂绳'},{id:'satchel',name:'帆布公文包'},
+    {id:'peelwig',name:'香蕉皮假发'},{id:'trifocal',name:'三层老花镜'},{id:'goldchain',name:'粗金链'},{id:'scooter',name:'共享电动驴'},
+    {id:'watch',name:'捞力仕大金表'},{id:'walkie',name:'镀金对讲机'},{id:'faxneck',name:'传真机项链'},{id:'crown',name:'加盖工程部王冠'},
+    {id:'ring',name:'质检部钻戒'},{id:'donkeybag',name:'爱驴仕手袋'},{id:'maybach',name:'迈8赫轿车'},{id:'lambo',name:'懒博基尼跑车'},
+    {id:'rocket',name:'私人火箭'},{id:'lift',name:'私人电梯'}
+  ];
+  const WEAR_ART={
+    cap:'<path d="M28 26q0-13 22-13t22 13z" fill="#3f6fa8" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M26 26h30q4 5-2 6H27q-3-2-1-6z" fill="#2c527d" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><rect x="44" y="16" width="10" height="7" rx="1.5" fill="#fffdf6" stroke="#28211a" stroke-width="2"/>',
+    crown:'<path d="M27 26l-3-16 11 7 6-11 6 11 11-7-3 16z" fill="#f1bd3c" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><circle cx="41" cy="20" r="2.4" fill="#e0452c"/><circle cx="50" cy="17" r="2.4" fill="#3fab84"/><circle cx="59" cy="20" r="2.4" fill="#6f86c9"/>',
+    peelwig:'<path d="M24 24q2-14 26-14t26 14q-6-4-10 2-5-6-10 0-5-6-10 0-5-6-10-2z" fill="#f5b731" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/>',
+    shades:'<path d="M26 40h48" stroke="#28211a" stroke-width="3"/><rect x="26" y="36" width="20" height="12" rx="4" fill="#28211a"/><rect x="54" y="36" width="20" height="12" rx="4" fill="#28211a"/><path d="M46 41h8" stroke="#28211a" stroke-width="3"/><path d="M29 39l6 3M57 39l6 3" stroke="#fffdf6" stroke-width="2"/>',
+    trifocal:'<circle cx="37" cy="42" r="11" fill="#dff3ef" fill-opacity=".85" stroke="#28211a" stroke-width="2.6"/><circle cx="63" cy="42" r="11" fill="#dff3ef" fill-opacity=".85" stroke="#28211a" stroke-width="2.6"/><path d="M48 42h4M26 40l-5-3M74 40l5-3" stroke="#28211a" stroke-width="2.6"/><path d="M28 38h18M28 46h18M54 38h18M54 46h18" stroke="#9fb8c8" stroke-width="1.5"/>',
+    lanyard:'<path d="M40 62q10 10 20 0" fill="none" stroke="#e0452c" stroke-width="3.4"/><rect x="43" y="70" width="14" height="11" rx="2" fill="#fffdf6" stroke="#28211a" stroke-width="2.4"/><path d="M46 74h8M46 78h5" stroke="#8d8272" stroke-width="1.8"/>',
+    goldchain:'<path d="M38 62q12 16 24 0" fill="none" stroke="#f1bd3c" stroke-width="5" stroke-linecap="round"/><path d="M38 62q12 16 24 0" fill="none" stroke="#28211a" stroke-width="1.4" stroke-dasharray="3 3"/><path d="M50 74l5 7h-10z" fill="#f1bd3c" stroke="#28211a" stroke-width="2"/>',
+    faxneck:'<path d="M39 62q11 13 22 0" fill="none" stroke="#a7977c" stroke-width="3"/><rect x="42" y="70" width="16" height="10" rx="2" fill="#d9f3ef" stroke="#28211a" stroke-width="2.4"/><path d="M44 74h12" stroke="#1f9e8e" stroke-width="2"/><path d="M45 80h10l-2 5h-6z" fill="#fffdf6" stroke="#28211a" stroke-width="1.8"/>',
+    watch:'<rect x="17" y="84" width="15" height="8" rx="2" fill="#f1bd3c" stroke="#28211a" stroke-width="2.4"/><circle cx="24.5" cy="88" r="6.5" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M24.5 88v-3.5M24.5 88l2.6 2" stroke="#28211a" stroke-width="1.6"/>',
+    ring:'<circle cx="24" cy="93" r="4.6" fill="none" stroke="#f1bd3c" stroke-width="3"/><path d="M24 85l4 4-4 4-4-4z" fill="#d9f3ef" stroke="#28211a" stroke-width="2"/>',
+    walkie:'<rect x="16" y="80" width="12" height="18" rx="3" fill="#f1bd3c" stroke="#28211a" stroke-width="2.4"/><path d="M25 80v-9" stroke="#28211a" stroke-width="2.6" stroke-linecap="round"/><rect x="19" y="84" width="6" height="4" rx="1" fill="#fffdf6"/><path d="M19 92h6M19 95h6" stroke="#28211a" stroke-width="1.6"/>',
+    satchel:'<path d="M44 66L26 82" fill="none" stroke="#8d6a3f" stroke-width="3"/><rect x="12" y="80" width="24" height="18" rx="3" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M12 86h24" stroke="#8d6a3f" stroke-width="2.6"/><rect x="20" y="84" width="8" height="5" rx="1.5" fill="#755436" stroke="#28211a" stroke-width="2"/>',
+    donkeybag:'<path d="M44 66L26 80" fill="none" stroke="#f2836a" stroke-width="3"/><path d="M13 80h26v18H13z" fill="#f2a994" stroke="#28211a" stroke-width="2.6"/><path d="M17 80q9-9 18 0" fill="none" stroke="#28211a" stroke-width="2.6"/><path d="M22 86h8v7h-8z" fill="#f1bd3c" stroke="#28211a" stroke-width="2"/>',
+    scooter:'<circle cx="24" cy="108" r="8" fill="#28211a"/><circle cx="24" cy="108" r="3" fill="#a7977c"/><circle cx="74" cy="108" r="8" fill="#28211a"/><circle cx="74" cy="108" r="3" fill="#a7977c"/><path d="M24 108h44l6-14" fill="none" stroke="#3fab84" stroke-width="5" stroke-linecap="round"/><path d="M68 94h12" stroke="#28211a" stroke-width="4" stroke-linecap="round"/>',
+    maybach:'<path d="M6 112V99q0-4 5-5l10-9q3-3 8-3h40q5 0 8 3l10 9q5 1 5 5v13z" fill="#28211a" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 88h48l7 7H17z" fill="#9fb8c8"/><circle cx="24" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><circle cx="76" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><path d="M10 100h12M78 100h12" stroke="#f1bd3c" stroke-width="3" stroke-linecap="round"/>',
+    lambo:'<path d="M2 112v-6l22-6 14-10h26l22 16v6z" fill="#e0a21c" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M40 92h22l14 10H32z" fill="#3a332a"/><path d="M62 90l16-14" stroke="#e0a21c" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="110" r="7" fill="#28211a"/><circle cx="76" cy="110" r="7" fill="#28211a"/>',
+    rocket:'<path d="M50 78q13 12 13 28H37q0-16 13-28z" fill="#f5f0e2" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M37 100l-12 8h12zM63 100l12 8H63z" fill="#e0452c" stroke="#28211a" stroke-width="2.4" stroke-linejoin="round"/><circle cx="50" cy="92" r="5" fill="#6f86c9" stroke="#28211a" stroke-width="2"/><path d="M42 108q8 12 16 0z" fill="#f1bd3c" stroke="#e0452c" stroke-width="2"/>',
+    lift:'<rect x="14" y="74" width="72" height="42" rx="3" fill="none" stroke="#a7977c" stroke-width="3"/><path d="M20 80h26v34H20zM54 80h26v34H54z" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M50 74v42" stroke="#28211a" stroke-width="2.6"/><!--front--><rect x="36" y="62" width="28" height="10" rx="2" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M44 67h3M53 67h3" stroke="#e0452c" stroke-width="2.6" stroke-linecap="round"/>'
+  };
+  const DEFAULT_SETTINGS={correct:3,partial:1,wrong:-1,fastSeconds:10,fastBonus:1,streakAt:3,streakBonus:1,groupMode:true,sound:true,events:true};
+  const AIRDROPS=[
+    {id:'banana-rush',kind:'惊喜',name:'香蕉加急件',line:'下一题若答对，额外入账 2 根香蕉。',effect:'bonusCorrect',value:2},
+    {id:'extra-floor',kind:'惊喜',name:'加盖工程批文',line:'下一题若答对，连续上两层。',effect:'extraFloor',value:1},
+    {id:'wrong-guard',kind:'惊喜',name:'宽容卷尺',line:'下一题若答错，不扣香蕉。',effect:'wrongGuard',value:0},
+    {id:'fax-delay',kind:'陷阱',name:'传真延迟单',line:'下一题的快答加成暂缓办理。',effect:'noFast',value:0},
+    {id:'rent-tax',kind:'陷阱',name:'房租科抽成',line:'下一题若答对，香蕉结算少 1 根，楼层照常。',effect:'taxCorrect',value:-1},
+    {id:'nested-empty',kind:'情况',name:'空箱套娃',line:'箱子里还是一个箱子。本次没有数值变化。',effect:'empty',value:0}
+  ];
+  const SURPRISE_RITUALS=[
+    {id:'blind-box',name:'盲盒拆件',action:'拆开盲盒',line:'箱内装的是奖励、陷阱，还是另一只箱子，目前无人签字。'},
+    {id:'crack-egg',name:'砸彩蛋',action:'敲开彩蛋',line:'蛋壳已经同意配合调查，内容物仍拒绝透露。'},
+    {id:'cylinder',name:'左轮签筒',action:'转动签筒',line:'六格公文签筒开始空转，只出签，不出危险。'},
+    {id:'odd-dice',name:'酷帅无厘头骰子',action:'掷出怪骰',line:'点数不负责解释结果，只负责制造气氛。'},
+    {id:'scratch',name:'刮奖公文',action:'刮开奖封',line:'银色保密层下藏着下一题的临时规定。'}
+  ];
+  const $=id=>document.getElementById(id);
+  const deepClone=value=>JSON.parse(JSON.stringify(value));
+  const esc=value=>String(value??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+  const pad=(value,size=3)=>String(value).padStart(size,'0');
+  const makeId=prefix=>prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+  const formatDate=value=>new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value));
+  const answerRate=stats=>stats.totalAnswers?Math.round(stats.correct/stats.totalAnswers*100)+'%':'0%';
+
+  function monkeySvg(outfitId,className='asset-monkey-art'){
+    const art=WEAR_ART[outfitId]||WEAR_ART.cap;
+    const marker='<!--front-->';
+    const splitAt=art.indexOf(marker);
+    const behind=splitAt>=0?art.slice(0,splitAt):'';
+    const front=splitAt>=0?art.slice(splitAt+marker.length):art;
+    return '<svg class="'+className+'" viewBox="-9 -6 118 132" aria-hidden="true"><g class="asset-wear-behind">'+behind+'</g><use href="#asset-monkey-land" width="100" height="116"></use><g class="asset-wear-front">'+front+'</g></svg>';
+  }
+  function characterInfo(id){return CHARACTERS.find(item=>item.id===id)||CHARACTERS[0];}
+  function characterSvg(characterId,outfitId,className='asset-character-art'){
+    if(characterId==='monkey')return monkeySvg(outfitId,className);
+    const boxes={fish:'0 0 120 120',egg:'0 0 110 120',snake:'0 0 120 100',fertilizer:'0 0 120 120',donkey:'0 0 120 120'};
+    const safe=boxes[characterId]?characterId:'monkey';
+    return safe==='monkey'?monkeySvg(outfitId,className):'<svg class="'+className+'" viewBox="'+boxes[safe]+'" aria-hidden="true"><use href="#asset-'+safe+'"></use></svg>';
+  }
+  function ritualSvg(id){
+    if(id==='blind-box')return '<svg viewBox="0 0 90 90" aria-hidden="true"><use href="#asset-crate"></use></svg>';
+    if(id==='crack-egg')return '<svg viewBox="0 0 110 120" aria-hidden="true"><use href="#asset-egg"></use><path d="M49 18l8 12-7 8 8 10" fill="none" stroke="#e0452c" stroke-width="4" stroke-linejoin="round"/></svg>';
+    if(id==='cylinder')return '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#2f5148" stroke-width="4"><circle cx="60" cy="60" r="46" fill="#d9d8c8"/><circle cx="60" cy="60" r="12" fill="#f1bd3c"/><circle cx="60" cy="31" r="8"/><circle cx="85" cy="46" r="8"/><circle cx="85" cy="75" r="8"/><circle cx="60" cy="89" r="8"/><circle cx="35" cy="75" r="8"/><circle cx="35" cy="46" r="8"/></g></svg>';
+    if(id==='odd-dice')return '<svg viewBox="0 0 120 120" aria-hidden="true"><g stroke="#2f5148" stroke-width="4" stroke-linejoin="round"><path d="M27 22l67 13-9 64-68-12z" fill="#6f86c9"/><g fill="#fff5d1" stroke="none"><circle cx="43" cy="43" r="6"/><circle cx="73" cy="49" r="6"/><circle cx="39" cy="73" r="6"/><circle cx="70" cy="79" r="6"/></g><path d="M87 24l12-11M94 30l15-2" fill="none" stroke-linecap="round"/></g></svg>';
+    return '<svg viewBox="0 0 120 120" aria-hidden="true"><g stroke="#2f5148" stroke-width="3"><rect x="18" y="16" width="84" height="88" rx="8" fill="#fffaf0"/><rect x="28" y="37" width="64" height="36" rx="7" fill="#a7977c"/><path d="M31 68l55-28M40 73l52-27M29 55l37-19" stroke="#d9d8c8" stroke-width="5"/><path d="M31 86h40"/></g></svg>';
+  }
+  function emptyStats(){return {totalBananas:0,totalAnswers:0,correct:0,partial:0,wrong:0,bestStreak:0,lessons:0};}
+  function emptyLessonStudent(student,characterId=student.character||'monkey'){return {id:student.id,name:student.name,group:student.group,outfit:student.outfit,character:characterInfo(characterId).id,absentAtStart:Boolean(student.absent),bananas:0,floors:0,answers:0,correct:0,partial:0,wrong:0,exempt:0,streak:0,bestStreak:0,passiveUsed:false,fertilizerCharge:false};}
+  function createStudent(name,index=0){return {id:makeId('stu'),name:String(name).slice(0,16),outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS[index%GROUPS.length],absent:false,stats:emptyStats()};}
+  function createClass(name,names=[]){const students=names.map((studentName,index)=>createStudent(studentName,index));return {id:makeId('class'),name:String(name).slice(0,24)||'新班级',students,bag:{round:0,remaining:[],served:[],last:null},sessions:[]};}
+  function defaultState(){const sample=createClass('正典演示班',SAMPLE_NAMES);return {version:1,currentClassId:sample.id,classes:[sample],settings:deepClone(DEFAULT_SETTINGS),activeSession:null};}
+  function repairStats(stats){return Object.assign(emptyStats(),stats&&typeof stats==='object'?stats:{});}
+  function repairState(candidate){
+    if(!candidate||!Array.isArray(candidate.classes)||!candidate.classes.length)return defaultState();
+    const clean={version:1,currentClassId:candidate.currentClassId,classes:[],settings:Object.assign({},DEFAULT_SETTINGS,candidate.settings||{}),activeSession:candidate.activeSession||null};
+    candidate.classes.forEach((rawClass,classIndex)=>{
+      const cls={id:rawClass.id||makeId('class'),name:String(rawClass.name||('班级 '+(classIndex+1))).slice(0,24),students:[],bag:rawClass.bag||{round:0,remaining:[],served:[],last:null},sessions:Array.isArray(rawClass.sessions)?rawClass.sessions.slice(-80):[]};
+      (Array.isArray(rawClass.students)?rawClass.students:[]).forEach((rawStudent,index)=>{
+        if(!rawStudent||!String(rawStudent.name||'').trim())return;
+        cls.students.push({id:rawStudent.id||makeId('stu'),name:String(rawStudent.name).trim().slice(0,16),outfit:OUTFITS.some(item=>item.id===rawStudent.outfit)?rawStudent.outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS.some(item=>item.id===rawStudent.character)?rawStudent.character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS.includes(rawStudent.group)?rawStudent.group:GROUPS[index%GROUPS.length],absent:Boolean(rawStudent.absent),stats:repairStats(rawStudent.stats)});
+      });
+      clean.classes.push(cls);
+    });
+    if(!clean.classes.some(cls=>cls.id===clean.currentClassId))clean.currentClassId=clean.classes[0].id;
+    if(clean.activeSession){
+      const owner=clean.classes.find(cls=>cls.id===clean.activeSession.classId);
+      if(!owner)clean.activeSession=null;
+      else{
+        const active=clean.activeSession;
+        const validIds=new Set(owner.students.map(student=>student.id));
+        const storedParticipants=[...new Set((Array.isArray(active.participantIds)?active.participantIds:[]).filter(id=>validIds.has(id)))];
+        const preferred=[active.currentCall?.studentId,active.pendingCall?.studentId,...Object.keys(active.studentResults||{})].filter(id=>validIds.has(id));
+        const participantIds=storedParticipants.length>=2&&storedParticipants.length<=6?storedParticipants:[...new Set(preferred.concat(owner.students.filter(student=>!student.absent).map(student=>student.id)))].slice(0,6);
+        if(participantIds.length<2)clean.activeSession=null;
+        else{
+          active.participantIds=participantIds;
+          active.bag=active.bag&&typeof active.bag==='object'?active.bag:{round:0,remaining:[],served:[],last:null};
+          active.studentResults=active.studentResults&&typeof active.studentResults==='object'?active.studentResults:{};
+          const usedRoles=new Set();
+          participantIds.forEach((id,index)=>{
+            const student=owner.students.find(item=>item.id===id);const row=active.studentResults[id]||emptyLessonStudent(student,CHARACTERS[index].id);
+            const role=CHARACTERS.some(item=>item.id===row.character)&&!usedRoles.has(row.character)?row.character:CHARACTERS.find(item=>!usedRoles.has(item.id)).id;
+            usedRoles.add(role);Object.assign(row,{name:student.name,group:student.group,outfit:student.outfit,character:role,passiveUsed:Boolean(row.passiveUsed),fertilizerCharge:Boolean(row.fertilizerCharge)});active.studentResults[id]=row;student.character=role;
+          });
+        }
+        if(clean.activeSession){
+          clean.activeSession.airdropEffect=clean.activeSession.airdropEffect||null;
+          clean.activeSession.airdropLog=Array.isArray(clean.activeSession.airdropLog)?clean.activeSession.airdropLog:[];
+          clean.activeSession.surpriseLog=Array.isArray(clean.activeSession.surpriseLog)?clean.activeSession.surpriseLog:[];
+          clean.activeSession.surpriseReveal=clean.activeSession.surpriseReveal||null;
+          if(clean.activeSession.pendingCall&&!clean.activeSession.currentCall){clean.activeSession.currentCall=Object.assign({},clean.activeSession.pendingCall,{startedAt:Date.now()});clean.activeSession.pendingCall=null;}
+        }
+      }
+    }
+    return clean;
+  }
+  function loadState(){try{return repairState(JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'));}catch(_){return defaultState();}}
+  let state=loadState();
+  let drawing=false;
+  let drawingInterval=0;
+  let answerClock=0;
+  let viewedSession=null;
+  let toastTimer=0;
+  let popTimer=0;
+  let audioContext=null;
+  let lessonSetupDraft=[];
+
+  function saveState(){
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('storageText').textContent='已存本机 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});return true;}
+    catch(_){$('storageText').textContent='本机存档失败';return false;}
+  }
+  function currentClass(){return state.classes.find(cls=>cls.id===state.currentClassId)||state.classes[0];}
+  function activeSession(){return state.activeSession&&state.activeSession.classId===currentClass().id?state.activeSession:null;}
+  function studentById(id){return currentClass().students.find(student=>student.id===id);}
+  function sessionStudents(cls,session){const ids=new Set(session?.participantIds||[]);return session?cls.students.filter(student=>ids.has(student.id)):cls.students.slice(0,6);}
+  function sessionPool(cls,session){return {students:sessionStudents(cls,session),bag:session.bag};}
+  function shuffle(values,rng=Math.random){const list=values.slice();for(let i=list.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[list[i],list[j]]=[list[j],list[i]];}return list;}
+  function reconcileBag(cls,rng=Math.random){
+    if(!cls.bag||typeof cls.bag!=='object')cls.bag={round:0,remaining:[],served:[],last:null};
+    const validIds=new Set(cls.students.map(student=>student.id));
+    const presentIds=cls.students.filter(student=>!student.absent).map(student=>student.id);
+    const presentSet=new Set(presentIds);
+    const dedupe=list=>[...new Set(Array.isArray(list)?list:[])];
+    cls.bag.served=dedupe(cls.bag.served).filter(id=>validIds.has(id));
+    const servedSet=new Set(cls.bag.served);
+    cls.bag.remaining=dedupe(cls.bag.remaining).filter(id=>presentSet.has(id)&&!servedSet.has(id));
+    const known=new Set([...cls.bag.served,...cls.bag.remaining]);
+    const joining=shuffle(presentIds.filter(id=>!known.has(id)),rng);
+    if(joining.length)cls.bag.remaining=shuffle(cls.bag.remaining.concat(joining),rng);
+    return cls.bag;
+  }
+  function startBagRound(cls,rng=Math.random){
+    reconcileBag(cls,rng);
+    const presentIds=cls.students.filter(student=>!student.absent).map(student=>student.id);
+    if(!presentIds.length)return cls.bag;
+    if(!cls.bag.remaining.length){
+      cls.bag.round=Math.max(0,Number(cls.bag.round)||0)+1;
+      cls.bag.served=[];
+      cls.bag.remaining=shuffle(presentIds,rng);
+      if(cls.bag.remaining.length>1&&cls.bag.remaining[0]===cls.bag.last)[cls.bag.remaining[0],cls.bag.remaining[1]]=[cls.bag.remaining[1],cls.bag.remaining[0]];
+    }
+    return cls.bag;
+  }
+  function claimFromBag(cls,rng=Math.random){
+    const bag=startBagRound(cls,rng);
+    const id=bag.remaining.shift()||null;
+    if(id){bag.served.push(id);bag.last=id;}
+    return id;
+  }
+  function sanitizeNames(text){const seen=new Set();return String(text||'').split(/\r?\n/).map(name=>name.trim().replace(/\s+/g,' ')).filter(name=>name&&!seen.has(name)&&(seen.add(name),true)).map(name=>name.slice(0,16));}
+  function mergeRoster(oldStudents,names){
+    const byName=new Map(oldStudents.map(student=>[student.name,student]));
+    return names.map((name,index)=>byName.has(name)?byName.get(name):createStudent(name,index));
+  }
+  function syncActiveRoster(cls){
+    const session=activeSession();if(!session)return;
+    session.participantIds.forEach(id=>{const student=cls.students.find(item=>item.id===id);if(!student)return;if(!session.studentResults[id])session.studentResults[id]=emptyLessonStudent(student,student.character);else Object.assign(session.studentResults[id],{name:student.name,group:student.group,outfit:student.outfit});});
+  }
+  function validLessonSetup(configs,cls=currentClass()){
+    if(!Array.isArray(configs)||configs.length<2||configs.length>6)return false;
+    const presentIds=new Set(cls.students.filter(student=>!student.absent).map(student=>student.id));
+    return new Set(configs.map(item=>item.studentId)).size===configs.length&&new Set(configs.map(item=>item.character)).size===configs.length&&configs.every(item=>presentIds.has(item.studentId)&&CHARACTERS.some(role=>role.id===item.character));
+  }
+  function defaultLessonConfigs(count){
+    const present=currentClass().students.filter(student=>!student.absent);const total=clamp(Number(count)||Math.min(6,present.length),2,Math.min(6,present.length));
+    return present.slice(0,total).map((student,index)=>({studentId:student.id,character:CHARACTERS[index].id}));
+  }
+  function openLessonSetup(){
+    const cls=currentClass();
+    const present=cls.students.filter(student=>!student.absent);
+    if(present.length<2){showToast('开始一堂课至少需要 2 位在岗同学。');openModal('rosterModal');return;}
+    lessonSetupDraft=defaultLessonConfigs(Math.min(6,present.length));$('participantCount').value=String(lessonSetupDraft.length);renderLessonSeats();openModal('lessonSetupModal');
+  }
+  function renderLessonSeats(){
+    const cls=currentClass();const present=cls.students.filter(student=>!student.absent);const count=clamp(Number($('participantCount').value)||2,2,Math.min(6,present.length));
+    while(lessonSetupDraft.length<count){const usedStudents=new Set(lessonSetupDraft.map(item=>item.studentId));const usedRoles=new Set(lessonSetupDraft.map(item=>item.character));lessonSetupDraft.push({studentId:present.find(student=>!usedStudents.has(student.id))?.id||present[0].id,character:CHARACTERS.find(role=>!usedRoles.has(role.id))?.id||CHARACTERS[0].id});}
+    lessonSetupDraft=lessonSetupDraft.slice(0,count);
+    const studentOptions=selected=>present.map(student=>'<option value="'+esc(student.id)+'"'+(student.id===selected?' selected':'')+'>'+esc(student.name)+' · '+esc(student.group)+'</option>').join('');
+    const roleOptions=selected=>CHARACTERS.map(role=>'<option value="'+role.id+'"'+(role.id===selected?' selected':'')+'>'+esc(role.name)+'</option>').join('');
+    $('lessonSeats').innerHTML=lessonSetupDraft.map((seat,index)=>{const student=cls.students.find(item=>item.id===seat.studentId)||present[0];const role=characterInfo(seat.character);return '<div class="seat-row" data-seat="'+index+'"><div class="seat-art">'+characterSvg(role.id,student.outfit,'')+'</div><select class="seat-student" aria-label="第 '+(index+1)+' 位参战同学">'+studentOptions(student.id)+'</select><select class="seat-character" aria-label="第 '+(index+1)+' 位角色">'+roleOptions(role.id)+'</select><div class="seat-passive"><b>'+esc(role.passive)+'</b>'+esc(role.line)+'</div></div>';}).join('');
+  }
+  function startLesson(configs){
+    if(!Array.isArray(configs)){openLessonSetup();return;}
+    const cls=currentClass();if(!validLessonSetup(configs,cls)){showToast('参战同学和角色都不能重复，请重新选择。');return;}
+    const previous=cls.sessions[cls.sessions.length-1]||null;
+    const studentResults={};configs.forEach(item=>{const student=cls.students.find(row=>row.id===item.studentId);student.character=item.character;studentResults[student.id]=emptyLessonStudent(student,item.character);});
+    state.activeSession={id:makeId('lesson'),classId:cls.id,participantIds:configs.map(item=>item.studentId),bag:{round:0,remaining:[],served:[],last:null},startedAt:Date.now(),noticeNo:0,globalWrongChain:0,rushNext:false,currentCall:null,pendingCall:null,lastResult:null,events:[],airdropEffect:null,airdropLog:[],surpriseLog:[],surpriseReveal:null,undoStack:[],previousFloors:Object.fromEntries((previous?.studentResults||[]).map(item=>[item.id,item.floors||0])),studentResults};
+    closeModals();saveState();render();playTone('start');showToast('本节 '+configs.length+' 位同学已带角色入场，公平袋现已封存。');
+  }
+  function chooseEvent(session,rng=Math.random,hasAirdrop=false){
+    if(!state.settings.events)return 'standard';
+    if(session.rushNext){session.rushNext=false;return 'fertilizer';}
+    const roll=rng();
+    if(roll<.04)return hasAirdrop?'standard':'fish';
+    if(roll<.13)return 'snake';
+    return 'standard';
+  }
+  function drawStudent(){
+    const session=activeSession();const cls=currentClass();
+    if(!session||drawing)return;
+    if(session.currentCall){showToast('上一张约谈通知还没有登记结果。');return;}
+    const pool=sessionPool(cls,session);const id=claimFromBag(pool);
+    if(!id){showToast('本节参战同学当前都标记为缺席。请在名册里取消缺席标记。');render();return;}
+    session.noticeNo+=1;
+    const event=chooseEvent(session,Math.random,Boolean(session.airdropEffect));
+    session.pendingCall={studentId:id,event,airdrop:session.airdropEffect?deepClone(session.airdropEffect):null,noticeNo:session.noticeNo,createdAt:Date.now()};
+    session.airdropEffect=null;
+    drawing=true;saveState();render();
+    $('suspense').classList.remove('hidden');
+    const students=pool.students.filter(student=>!student.absent);
+    let tick=0;
+    clearInterval(drawingInterval);
+    drawingInterval=setInterval(()=>{
+      tick+=1;$('elevatorDigits').textContent=pad((tick*17+Math.floor(Math.random()*83))%1000);
+      const lights=[...$('suspense').querySelectorAll('i')];lights.forEach((light,index)=>light.classList.toggle('is-lit',index===tick%lights.length));
+      const candidate=students[tick%students.length];$('suspenseLine').textContent=(candidate?candidate.name:'驯猴办')+' 的楼层手续正在核对';
+    },86);
+    const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    setTimeout(()=>finishDraw(),reduced?320:1450);
+  }
+  function finishDraw(){
+    const session=activeSession();if(!session||!session.pendingCall){drawing=false;$('suspense').classList.add('hidden');return;}
+    clearInterval(drawingInterval);
+    session.currentCall=Object.assign({},session.pendingCall,{startedAt:Date.now()});session.pendingCall=null;drawing=false;$('suspense').classList.add('hidden');
+    saveState();render();playTone('stamp');
+    requestAnimationFrame(()=>{const notice=$('notice');notice.classList.remove('is-stamped');void notice.offsetWidth;notice.classList.add('is-stamped');});
+  }
+  function applyOutcome(result,outcome,elapsedSeconds,event,settings,airdrop=null){
+    const next=deepClone(result);let delta=0;let fast=0;let streak=0;let airdropNote='';let passiveNote='';const role=characterInfo(next.character);
+    next.passiveUsed=Boolean(next.passiveUsed);next.fertilizerCharge=Boolean(next.fertilizerCharge);
+    next.answers+=1;
+    if(outcome==='correct'){
+      next.correct+=1;next.floors+=1;next.streak+=1;next.bestStreak=Math.max(next.bestStreak,next.streak);
+      fast=elapsedSeconds<=settings.fastSeconds&&airdrop?.effect!=='noFast'?settings.fastBonus:0;
+      streak=next.streak>=settings.streakAt?settings.streakBonus:0;
+      delta=settings.correct+fast+streak;if(event==='snake')delta*=2;
+      if(role.id==='monkey'&&fast){next.floors+=1;passiveNote=role.passive+'：快答额外上 1 层';}
+      if(role.id==='snake'&&event==='snake'){delta+=1;passiveNote=role.passive+'：翻倍后再加 1';}
+      if(role.id==='fertilizer'&&next.fertilizerCharge){delta+=2;next.fertilizerCharge=false;passiveNote=role.passive+'：蓄力香蕉 +2';}
+      if(role.id==='donkey'&&next.streak%2===0){delta+=1;passiveNote=role.passive+'：双数连对 +1';}
+      if(airdrop?.effect==='bonusCorrect'){delta+=airdrop.value;airdropNote='空投额外 +'+airdrop.value;}
+      if(airdrop?.effect==='extraFloor'){next.floors+=airdrop.value;airdropNote='空投加盖 +'+airdrop.value+' 层';}
+      if(airdrop?.effect==='taxCorrect'){delta+=airdrop.value;airdropNote='房租科抽成 '+airdrop.value;}
+      if(airdrop?.effect==='noFast')airdropNote='快答加成暂缓';
+    }else if(outcome==='partial'){
+      next.partial+=1;next.streak=0;delta=settings.partial;
+      if(role.id==='egg'){delta+=1;passiveNote=role.passive+'：部分对补录 +1';}
+    }else{
+      next.wrong+=1;next.streak=0;delta=event==='snake'||airdrop?.effect==='wrongGuard'?0:settings.wrong;
+      if(role.id==='fish'&&!next.passiveUsed){delta=0;next.passiveUsed=true;passiveNote=role.passive+'：本节首次免扣';}
+      if(role.id==='fertilizer'){next.fertilizerCharge=true;passiveNote=role.passive+'：下一次答对已蓄力';}
+      if(airdrop?.effect==='wrongGuard')airdropNote='宽容卷尺免扣';
+    }
+    next.bananas+=delta;
+    return {next,delta,fast,streak,airdropNote,passiveNote};
+  }
+  function pushUndo(session,targetId,call){
+    const target=studentById(targetId);
+    session.undoStack.push({targetId,beforeLong:deepClone(target?.stats||emptyStats()),beforeResult:deepClone(session.studentResults[targetId]),beforeGlobalWrongChain:session.globalWrongChain,beforeRushNext:session.rushNext,beforeEventsLength:session.events.length,call:deepClone(call),beforeLastResult:session.lastResult?deepClone(session.lastResult):null});
+    if(session.undoStack.length>12)session.undoStack.shift();
+  }
+  function judge(outcome){
+    const session=activeSession();if(!session||!session.currentCall)return;
+    const call=session.currentCall;
+    const targetId=call.event==='fertilizer'?$('awardTarget').value:call.studentId;
+    const target=studentById(targetId);const result=session.studentResults[targetId];
+    if(!target||!result){showToast('找不到记分对象，请检查名册。');return;}
+    const elapsed=Math.max(0,(Date.now()-call.startedAt)/1000);
+    pushUndo(session,targetId,call);
+    const applied=applyOutcome(result,outcome,elapsed,call.event,state.settings,call.airdrop);session.studentResults[targetId]=applied.next;
+    target.stats.totalBananas+=applied.delta;target.stats.totalAnswers+=1;target.stats[outcome]+=1;target.stats.bestStreak=Math.max(target.stats.bestStreak,applied.next.bestStreak);
+    if(outcome==='wrong')session.globalWrongChain+=1;else session.globalWrongChain=0;
+    if(session.globalWrongChain>=3){session.rushNext=true;session.globalWrongChain=0;}
+    const labels={correct:'答对',partial:'部分对',wrong:'答错'};
+    const bonusParts=[];if(applied.fast)bonusParts.push('快答 +'+applied.fast);if(applied.streak)bonusParts.push('连对 +'+applied.streak);if(call.event==='snake'&&outcome==='correct')bonusParts.push('蛇台翻倍');if(applied.airdropNote)bonusParts.push(applied.airdropNote);if(applied.passiveNote)bonusParts.push(applied.passiveNote);
+    const message=target.name+' '+labels[outcome]+'，香蕉 '+(applied.delta>=0?'+':'')+applied.delta+(bonusParts.length?'；'+bonusParts.join('，'):'');
+    session.events.push({at:Date.now(),studentId:targetId,name:target.name,character:result.character,outcome,delta:applied.delta,event:call.event,passiveNote:applied.passiveNote,elapsed:Math.round(elapsed)});
+    session.lastResult={message,at:Date.now()};session.currentCall=null;
+    saveState();render();
+    if(outcome==='wrong')showCharacter('donkey','仿的。答案已传真，正文略。');
+    else if(applied.next.streak>=state.settings.streakAt)showToast(message+'。连对金光已备案。');
+    else showToast(message+'。');
+    playTone(outcome);
+  }
+  function openAirdrop(){
+    const session=activeSession();if(!session)return;
+    if(session.currentCall||drawing){showToast('惊喜机只能在两张约谈通知之间启动。');return;}
+    if(session.surpriseReveal){showAirdropRitual(session.surpriseReveal);return;}
+    if(session.airdropEffect){showAirdropResult(session.airdropEffect,session.airdropEffect.ritualId);return;}
+    const ritual=deepClone(SURPRISE_RITUALS[Math.floor(Math.random()*SURPRISE_RITUALS.length)]);const drop=deepClone(AIRDROPS[Math.floor(Math.random()*AIRDROPS.length)]);
+    session.surpriseReveal={ritual,drop,createdAt:Date.now()};saveState();showAirdropRitual(session.surpriseReveal);
+  }
+  function showAirdropRitual(reveal){
+    $('airdropCard').classList.remove('is-revealing');$('ritualArt').innerHTML=ritualSvg(reveal.ritual.id);$('airdropKind').textContent='本次揭晓方式 · '+reveal.ritual.name;$('airdropName').textContent='结果仍在保密层内';$('airdropLine').textContent=reveal.ritual.line;$('revealAirdrop').textContent=reveal.ritual.action;$('revealAirdrop').disabled=false;$('revealAirdrop').classList.remove('hidden');$('acceptAirdrop').classList.add('hidden');openModal('airdropModal');
+  }
+  function revealAirdrop(){
+    const session=activeSession();const reveal=session?.surpriseReveal;if(!reveal)return;
+    $('revealAirdrop').disabled=true;$('airdropCard').classList.add('is-revealing');playTone('airdrop');
+    setTimeout(()=>{
+      const current=activeSession();if(!current?.surpriseReveal)return;const ritual=current.surpriseReveal.ritual;const drop=Object.assign({},current.surpriseReveal.drop,{ritualId:ritual.id,ritualName:ritual.name,openedAt:Date.now()});
+      current.airdropLog.push(deepClone(drop));current.surpriseLog.push({ritualId:ritual.id,ritualName:ritual.name,dropName:drop.name,kind:drop.kind,at:drop.openedAt});if(drop.effect!=='empty')current.airdropEffect=deepClone(drop);current.surpriseReveal=null;saveState();render();showAirdropResult(drop,ritual.id);
+    },720);
+  }
+  function showAirdropResult(drop,ritualId='blind-box'){
+    $('airdropCard').classList.remove('is-revealing');$('ritualArt').innerHTML=ritualSvg(ritualId);$('airdropKind').textContent=(drop.ritualName||'驯猴办旧式揭晓')+' · '+drop.kind+' · '+(drop.effect==='empty'?'当场结案':'下一题生效');$('airdropName').textContent=drop.name;$('airdropLine').textContent=drop.line;$('revealAirdrop').classList.add('hidden');$('acceptAirdrop').classList.remove('hidden');openModal('airdropModal');
+  }
+  function exemptCurrent(){
+    const session=activeSession();if(!session||!session.currentCall)return;
+    const call=session.currentCall;const target=studentById(call.studentId);if(!target)return;
+    pushUndo(session,call.studentId,call);
+    session.studentResults[call.studentId].exempt+=1;
+    const reason=call.event==='fish'?'鱼小姐代答，原约谈对象免答一次':'本题登记免答';
+    session.events.push({at:Date.now(),studentId:call.studentId,name:target.name,outcome:'exempt',delta:0,event:call.event,elapsed:0});
+    session.lastResult={message:target.name+'：'+reason,at:Date.now()};session.currentCall=null;
+    saveState();render();
+    if(call.event==='fish')showCharacter('fish','鱼小姐已完成代答。她没有解释答案从哪来。');else showToast(reason+'。');
+  }
+  function undoLast(){
+    const session=activeSession();if(!session||!session.undoStack.length){showToast('当前没有可撤销的记分。');return;}
+    if(session.currentCall){showToast('请先处理当前通知，再撤销上一笔。');return;}
+    const undo=session.undoStack.pop();const target=studentById(undo.targetId);
+    if(target)target.stats=undo.beforeLong;
+    session.studentResults[undo.targetId]=undo.beforeResult;session.globalWrongChain=undo.beforeGlobalWrongChain;session.rushNext=undo.beforeRushNext;session.events.length=undo.beforeEventsLength;session.currentCall=undo.call;session.lastResult=undo.beforeLastResult;
+    saveState();render();showToast('上一笔已撤销，可以重新判定。');
+  }
+  function buildAwards(session){
+    const rows=Object.values(session.studentResults);const answered=rows.filter(row=>row.answers>0||row.exempt>0);const top=Math.max(0,...rows.map(row=>row.floors));const kings=rows.filter(row=>row.floors===top&&top>0).map(row=>row.name);
+    const gains=rows.map(row=>({name:row.name,gain:row.floors-(session.previousFloors?.[row.id]||0)}));const bestGain=Math.max(0,...gains.map(item=>item.gain));const improvers=gains.filter(item=>item.gain===bestGain&&bestGain>0).map(item=>item.name);
+    const attendance=rows.filter(row=>!row.absentAtStart&&row.answers>0).map(row=>row.name);
+    const specialEvents=(session.events||[]).filter(event=>event.event&&event.event!=='standard');const donkeyCount=(session.events||[]).filter(event=>event.outcome==='wrong').length;const airdrops=session.airdropLog||[];const rituals=session.surpriseLog||[];
+    const surpriseNames=[...new Set(specialEvents.map(event=>({fish:'鱼小姐代答',snake:'蛇台方向',fertilizer:'黑化肥专场'}[event.event])).filter(Boolean).concat(rituals.map(item=>item.ritualName),airdrops.map(drop=>drop.name),donkeyCount?['驴的鉴定意见']:[]))];
+    return [
+      {label:'本日楼王，电梯仍未批准',names:kings.length?kings.join('、'):'本节尚无人上楼',line:kings.length?top+' 层，楼梯间已形成传说。':'大堂保持了令人安心的稳定。'},
+      {label:'加盖速度超出图纸',names:improvers.length?improvers.join('、'):'本节从零起步',line:improvers.length?'比上一次多爬 '+bestGain+' 层。加盖工程部正在补图。':'下一节课将拥有第一条进步基线。'},
+      {label:'红鲤鱼绿鲤鱼驴全勤答题员',names:attendance.length?attendance.join('、'):'本节暂无符合对象',line:attendance.length?attendance.length+' 位在岗同学完成了答题登记。':'全勤科仍在等待第一份材料。'},
+      {label:'彩蛋科中场归档',names:surpriseNames.length?surpriseNames.join('、'):'彩蛋科本节尚未出勤',line:surpriseNames.length?'特殊事件 '+specialEvents.length+' 次，惊喜机 '+rituals.length+' 次，驴探头 '+donkeyCount+' 次。':'排行照常，惊喜仍在下一秒。'}
+    ];
+  }
+  function finishLesson(){
+    const session=activeSession();if(!session)return;
+    if(session.currentCall&&!confirm('当前约谈通知尚未登记。仍要结束本节课吗？'))return;
+    const cls=currentClass();const endedAt=Date.now();
+    session.participantIds.forEach(id=>{const student=cls.students.find(item=>item.id===id);const row=session.studentResults[id];if(student&&row&&!row.absentAtStart)student.stats.lessons+=1;});
+    const archived={id:session.id,classId:session.classId,participantIds:deepClone(session.participantIds),startedAt:session.startedAt,endedAt,noticeNo:session.noticeNo,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog||[]),surpriseLog:deepClone(session.surpriseLog||[]),previousFloors:deepClone(session.previousFloors||{}),studentResults:session.participantIds.map(id=>deepClone(session.studentResults[id])).filter(Boolean),awards:buildAwards(session)};
+    cls.sessions.push(archived);if(cls.sessions.length>80)cls.sessions=cls.sessions.slice(-80);
+    state.activeSession=null;saveState();render();showSettlement(archived);playTone('finish');
+  }
+  function showLiveSettlement(){
+    const session=activeSession();if(!session)return;
+    const snapshot={id:session.id,classId:session.classId,participantIds:deepClone(session.participantIds),startedAt:session.startedAt,endedAt:null,live:true,noticeNo:session.noticeNo,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog||[]),surpriseLog:deepClone(session.surpriseLog||[]),previousFloors:deepClone(session.previousFloors||{}),studentResults:Object.fromEntries(session.participantIds.map(id=>[id,deepClone(session.studentResults[id])]))};
+    snapshot.awards=buildAwards(snapshot);showSettlement(snapshot);
+  }
+  function showSettlement(session){
+    viewedSession=session;$('settlement').classList.remove('hidden');
+    $('settlementTitle').textContent=currentClass().name+(session.live?' · 课堂中场即时结算':' · 本节课楼层清点完毕');
+    $('settlementMeta').innerHTML=esc(formatDate(session.startedAt))+' 开始<br>'+(session.live?'即时快照 · 尚未封存':esc(formatDate(session.endedAt||Date.now()))+' 结束')+' · '+session.noticeNo+' 份通知';
+    const awards=session.awards||buildAwards(session);
+    $('awardGrid').innerHTML=awards.map((award,index)=>'<article class="award-card"><small>课堂称号 '+pad(index+1,2)+'</small><strong>'+esc(award.label)+'</strong><p><b>'+esc(award.names)+'</b><br>'+esc(award.line)+'</p></article>').join('');
+    const rows=(Array.isArray(session.studentResults)?session.studentResults:Object.values(session.studentResults||{})).slice().sort((a,b)=>b.floors-a.floors||b.bananas-a.bananas||a.name.localeCompare(b.name,'zh-CN'));
+    $('settlementBody').innerHTML=rows.map((row,index)=>'<tr><td>'+pad(index+1,2)+'</td><td><b>'+esc(row.name)+'</b></td><td>'+esc(characterInfo(row.character).name)+'</td><td>'+esc(row.group)+'</td><td class="num">'+row.floors+'</td><td class="num">'+row.bananas+'</td><td class="num">'+row.answers+'</td><td class="num">'+(row.answers?Math.round(row.correct/row.answers*100):0)+'%</td><td class="num">'+(row.bestStreak||0)+'</td></tr>').join('');
+  }
+  function closeSettlement(){$('settlement').classList.add('hidden');viewedSession=null;}
+  function playTone(kind){
+    if(!state.settings.sound)return;
+    try{
+      audioContext=audioContext||new (window.AudioContext||window.webkitAudioContext)();if(audioContext.state==='suspended')audioContext.resume();
+      const now=audioContext.currentTime;const oscillator=audioContext.createOscillator();const gain=audioContext.createGain();oscillator.connect(gain);gain.connect(audioContext.destination);
+      const frequencies={stamp:92,correct:520,partial:330,wrong:145,start:260,finish:390,airdrop:610};oscillator.frequency.setValueAtTime(frequencies[kind]||220,now);oscillator.type=kind==='stamp'||kind==='wrong'?'square':'sine';
+      gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(kind==='stamp'?.12:.07,now+.012);gain.gain.exponentialRampToValueAtTime(.0001,now+(kind==='stamp'?.14:.22));oscillator.start(now);oscillator.stop(now+.24);
+    }catch(_){/* 音效不可用时不影响课堂主流程。 */}
+  }
+  function showToast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').classList.add('is-showing');toastTimer=setTimeout(()=>$('toast').classList.remove('is-showing'),2400);}
+  function showCharacter(character,speech){clearTimeout(popTimer);$('popArt').innerHTML='<use href="#asset-'+character+'"></use>';$('popSpeech').textContent=speech;$('characterPop').classList.add('is-showing');popTimer=setTimeout(()=>$('characterPop').classList.remove('is-showing'),2600);}
+
+  function lessonRows(cls,session){return sessionStudents(cls,session).map(student=>session?.studentResults?.[student.id]||emptyLessonStudent(student,student.character));}
+  function render(){
+    const cls=currentClass();const session=activeSession();
+    if(!drawing)$('suspense').classList.add('hidden');
+    $('classSelect').innerHTML=state.classes.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===cls.id?' selected':'')+'>'+esc(item.name)+'</option>').join('');$('classSelect').disabled=Boolean(session);
+    $('buildingName').textContent=cls.name+' · 联合办公楼';
+    const present=cls.students.filter(student=>!student.absent);const participants=sessionStudents(cls,session);const activePresent=participants.filter(student=>!student.absent);$('presentLabel').textContent=session?'本节在岗':'名册在岗';$('presentMetric').textContent=session?activePresent.length+'/'+participants.length:present.length+'/'+cls.students.length;
+    $('sessionToggle').textContent=session?'结束本节':'开始本节';$('sessionToggle').className=session?'btn-red':'btn-primary';
+    $('liveSettlement').classList.toggle('hidden',!session);
+    $('idleControl').classList.toggle('hidden',Boolean(session));$('activeControl').classList.toggle('hidden',!session);
+    $('idleHeading').textContent=cls.students.length?cls.name+' 已就位':'当前班级还没有名册';$('idleCopy').textContent=cls.students.length?'题目与回答发生在设备外；老师在这台平板上逐次登记。当前 '+present.length+'/'+cls.students.length+' 位在岗。':'点击“名册与猴子”，粘贴一列名字即可建班。';
+    renderBuilding(cls,session);
+    if(session)renderActiveControl(cls,session);
+    if(!$('rosterModal').classList.contains('hidden'))renderRosterModal();
+    if(!$('historyModal').classList.contains('hidden'))renderHistory();
+  }
+  function renderBuilding(cls,session){
+    const rows=lessonRows(cls,session);const topFloor=Math.max(0,...rows.map(row=>row.floors||0));const bananas=rows.reduce((sum,row)=>sum+(row.bananas||0),0);
+    $('topFloorMetric').textContent=topFloor+'F';$('bananaMetric').textContent=bananas;
+    const currentId=session?.currentCall?.studentId||null;
+    const displayStudents=sessionStudents(cls,session);
+    $('monkeyLayer').innerHTML=displayStudents.map(student=>{
+      const row=session?.studentResults?.[student.id]||emptyLessonStudent(student);
+      const classes=['monkey-token'];if(student.absent)classes.push('is-absent');if(currentId===student.id)classes.push('is-current');if(row.streak>=state.settings.streakAt)classes.push('has-gold-aura');
+      return '<button class="'+classes.join(' ')+'" data-student-id="'+esc(student.id)+'" data-floor="'+Number(row.floors||0)+'" title="'+esc(student.name)+'，'+esc(characterInfo(row.character).name)+'，'+Number(row.floors||0)+' 层，'+Number(row.bananas||0)+' 香蕉"><span class="token-aura"></span>'+characterSvg(row.character,student.outfit)+'<span class="token-name">'+esc(student.name)+'</span></button>';
+    }).join('');
+    const ranked=displayStudents.map(student=>({student,row:session?.studentResults?.[student.id]||emptyLessonStudent(student)})).sort((a,b)=>b.row.floors-a.row.floors||b.row.bananas-a.row.bananas||a.student.name.localeCompare(b.student.name,'zh-CN'));
+    $('rankList').innerHTML=ranked.map((item,index)=>'<div class="rank-row"><span class="rank-no">'+pad(index+1,2)+'</span><span class="rank-name">'+esc(item.student.name)+(item.student.absent?' · 缺席':'')+'</span><span class="rank-score"><b>'+item.row.floors+'F</b><span>'+item.row.bananas+' 香蕉</span></span></div>').join('');
+    if(session){const pool=sessionPool(cls,session);reconcileBag(pool);const bag=pool.bag;$('roundNote').textContent=bag.round?'本节公平袋第 '+bag.round+' 轮：已点 '+bag.served.length+'，剩余 '+bag.remaining.length:'本节公平袋待首次签发时开封';}
+    else $('roundNote').textContent='开始本节后，从 2～6 位参战同学中开封公平袋';
+    requestAnimationFrame(()=>layoutBuilding(topFloor));
+  }
+  function layoutBuilding(topFloor){
+    const stage=$('floorStage');if(!stage.clientWidth||!stage.clientHeight)return;
+    const narrow=innerWidth<=700;
+    const bands=narrow?6:8;
+    const maximum=Math.max(bands,Math.ceil((topFloor+1)/5)*5);
+    $('floorGrid').innerHTML=Array.from({length:bands+1},(_,index)=>{
+      const floor=Math.round(maximum*index/bands);const bottom=8+(stage.clientHeight-36)*index/bands;const dept=FLOOR_DEPARTMENTS[floor%FLOOR_DEPARTMENTS.length];
+      return '<div class="floor-line" style="bottom:'+bottom+'px"><span class="floor-label">'+floor+'F · '+esc(dept)+'</span></div>';
+    }).join('');
+    const tokens=[...$('monkeyLayer').children];const groups=new Map();tokens.forEach(token=>{const floor=Number(token.dataset.floor||0);if(!groups.has(floor))groups.set(floor,[]);groups.get(floor).push(token);});
+    const horizontalInset=narrow?18:29;const topInset=narrow?28:34;const bottomInset=narrow?26:34;const tokenWidth=narrow?34:46;const usableWidth=Math.max(40,stage.clientWidth-horizontalInset*2);
+    groups.forEach((floorTokens,floor)=>{
+      const perRow=Math.max(1,Math.floor(usableWidth/tokenWidth));const rowCount=Math.ceil(floorTokens.length/perRow);const baseTop=stage.clientHeight-bottomInset-(floor/maximum)*(stage.clientHeight-topInset-bottomInset);
+      floorTokens.sort((a,b)=>a.dataset.studentId.localeCompare(b.dataset.studentId)).forEach((token,index)=>{
+        const row=Math.floor(index/perRow);const inRow=index%perRow;const count=Math.min(perRow,floorTokens.length-row*perRow);const x=horizontalInset+(inRow+.5)*usableWidth/count;const rowOffset=(row-(rowCount-1)/2)*(narrow?22:29);
+        token.style.left=x+'px';token.style.top=clamp(baseTop-rowOffset,topInset,stage.clientHeight-bottomInset)+'px';
+      });
+    });
+  }
+  function renderActiveControl(cls,session){
+    const pool=sessionPool(cls,session);reconcileBag(pool);$('noticeMetric').textContent=pad(session.noticeNo);$('bagMetric').textContent=pool.bag.remaining.length;$('answerMetric').textContent=session.events.filter(event=>event.outcome!=='exempt').length;
+    const hasCall=Boolean(session.currentCall);$('readyControl').classList.toggle('hidden',hasCall);$('callControl').classList.toggle('hidden',!hasCall);
+    $('readyHeading').textContent=session.rushNext?'黑化肥专场已经备案':'可以签发下一张通知';$('readyCopy').textContent=session.rushNext?'下一题进入全班抢答，记分归属可在通知下方选择。':'本节 '+session.participantIds.length+' 人公平袋第 '+Math.max(1,pool.bag.round)+' 轮已点 '+pool.bag.served.length+' 位，刷新页面不会重洗。';
+    const pendingDrop=session.airdropEffect;$('airdropPending').classList.toggle('hidden',!pendingDrop);if(pendingDrop)$('airdropPending').innerHTML='<b>待生效空投：</b>'+esc(pendingDrop.name)+'。'+esc(pendingDrop.line);
+    if(hasCall)renderCall(cls,session);
+    const last=session.lastResult;$('lastResult').classList.toggle('hidden',!last);if(last)$('lastResult').innerHTML='<b>上一笔：</b>'+esc(last.message)+' <button class="btn-small btn-quiet" data-action="undo-last">撤销</button>';
+    renderGroups(session);
+  }
+  function renderCall(cls,session){
+    const call=session.currentCall;const student=studentById(call.studentId);if(!student)return;
+    const result=session.studentResults[student.id];const role=characterInfo(result.character);
+    $('noticeNo').textContent='约谈通知第 '+pad(call.noticeNo)+' 号';$('calledName').textContent=student.name;$('noticePortrait').innerHTML=characterSvg(result.character,student.outfit,'');
+    const rules={
+      standard:{dept:'驯猴办签发',sentence:'请 '+student.name+' 同学即刻上楼答题。',text:'常规约谈：答对上一层，香蕉按设置入账。',className:''},
+      fish:{dept:'鱼小姐临时代办',sentence:'鱼小姐已经代答，'+student.name+' 同学本次免答。',text:'鱼小姐代答：全班笑一次，原约谈对象不加分也不扣分。',className:'is-fish'},
+      snake:{dept:'蛇台方向处',sentence:'请 '+student.name+' 同学参考方向后自行判断。',text:'方向仅供参考：答对香蕉翻倍，答错不扣。',className:'is-snake'},
+      fertilizer:{dept:'黑化肥专场',sentence:'全班抢答，'+student.name+' 同学保留优先权。',text:'连续三次答错已触发全班抢答。谁抢到，就把记分归属改成谁。',className:'is-fertilizer'}
+    };
+    const rule=rules[call.event]||rules.standard;$('noticeDept').textContent=rule.dept;$('noticeSentence').textContent=rule.sentence;
+    $('eventRibbon').className='event-ribbon '+rule.className;$('eventRibbon').textContent=rule.text;$('eventRibbon').classList.toggle('hidden',call.event==='standard');
+    $('airdropBanner').classList.toggle('hidden',!call.airdrop);if(call.airdrop)$('airdropBanner').innerHTML='<b>本题空投规则：</b>'+esc(call.airdrop.name)+'。'+esc(call.airdrop.line);
+    $('passiveBanner').innerHTML='<b>'+esc(role.name)+' · '+esc(role.passive)+'：</b>'+esc(role.line);
+    $('scoreGrid').classList.toggle('hidden',call.event==='fish');$('targetRow').classList.toggle('hidden',call.event!=='fertilizer');
+    $('exemptCall').textContent=call.event==='fish'?'登记鱼小姐代答':'免答，登记后继续';$('undoScore').classList.add('hidden');
+    const present=sessionStudents(cls,session).filter(item=>!item.absent);$('awardTarget').innerHTML=present.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===student.id?' selected':'')+'>'+esc(item.name)+' · '+esc(characterInfo(session.studentResults[item.id].character).name)+'</option>').join('');
+    $('correctValue').textContent=(state.settings.correct>=0?'+':'')+state.settings.correct+' 香蕉';$('partialValue').textContent=(state.settings.partial>=0?'+':'')+state.settings.partial+' 香蕉';$('wrongValue').textContent=(call.event==='snake'?'0':(state.settings.wrong>=0?'+':'')+state.settings.wrong)+' 香蕉';
+    updateAnswerClock();clearInterval(answerClock);answerClock=setInterval(updateAnswerClock,1000);
+  }
+  function updateAnswerClock(){const call=activeSession()?.currentCall;if(!call){clearInterval(answerClock);return;}const seconds=Math.floor((Date.now()-call.startedAt)/1000);$('answerTimer').textContent=pad(Math.floor(seconds/60),2)+':'+pad(seconds%60,2);}
+  function renderGroups(session){
+    const show=Boolean(state.settings.groupMode);$('groupBoard').classList.toggle('hidden',!show);if(!show)return;
+    const totals=Object.fromEntries(GROUPS.map(group=>[group,0]));Object.values(session.studentResults).forEach(row=>{totals[row.group]=(totals[row.group]||0)+row.bananas;});
+    $('groupList').innerHTML=GROUPS.map(group=>'<div class="group-chip"><span>'+esc(group)+'</span><b>'+totals[group]+'</b></div>').join('');
+  }
+  function openModal(id){document.querySelectorAll('.modal').forEach(modal=>modal.classList.add('hidden'));$(id).classList.remove('hidden');if(id==='rosterModal')renderRosterModal();if(id==='lessonSetupModal')renderLessonSeats();if(id==='settingsModal')fillSettings();if(id==='historyModal')renderHistory();}
+  function closeModals(){document.querySelectorAll('.modal').forEach(modal=>modal.classList.add('hidden'));}
+  function outfitOptions(selected){return OUTFITS.map(item=>'<option value="'+item.id+'"'+(item.id===selected?' selected':'')+'>'+esc(item.name)+'</option>').join('');}
+  function groupOptions(selected){return GROUPS.map(group=>'<option value="'+esc(group)+'"'+(group===selected?' selected':'')+'>'+esc(group)+'</option>').join('');}
+  function renderRosterModal(){
+    const cls=currentClass();$('classNameInput').value=cls.name;$('rosterTextarea').value=cls.students.map(student=>student.name).join('\n');
+    $('rosterTable').innerHTML=cls.students.map(student=>'<div class="student-row" data-id="'+esc(student.id)+'"><div class="mini-art">'+monkeySvg(student.outfit,'')+'</div><input class="student-name-input" value="'+esc(student.name)+'" maxlength="16" aria-label="学生姓名"><select class="outfit-select" aria-label="猴子行头">'+outfitOptions(student.outfit)+'</select><select class="group-select" aria-label="小组部门">'+groupOptions(student.group)+'</select><button class="presence-btn '+(student.absent?'is-absent':'')+'" data-action="toggle-absent">'+(student.absent?'缺席':'在岗')+'</button><button class="delete-student btn-red" data-action="delete-student">删除</button></div>').join('');
+  }
+  function fillSettings(){const settings=state.settings;$('setCorrect').value=settings.correct;$('setPartial').value=settings.partial;$('setWrong').value=settings.wrong;$('setFastSeconds').value=settings.fastSeconds;$('setFastBonus').value=settings.fastBonus;$('setStreakAt').value=settings.streakAt;$('setStreakBonus').value=settings.streakBonus;$('setGroupMode').checked=settings.groupMode;$('setSound').checked=settings.sound;$('setEvents').checked=settings.events;}
+  function readNumber(id,min,max,fallback){const value=Number($(id).value);return Number.isFinite(value)?clamp(Math.round(value),min,max):fallback;}
+  function saveSettings(){state.settings={correct:readNumber('setCorrect',-20,50,3),partial:readNumber('setPartial',-20,50,1),wrong:readNumber('setWrong',-20,50,-1),fastSeconds:readNumber('setFastSeconds',1,120,10),fastBonus:readNumber('setFastBonus',0,20,1),streakAt:readNumber('setStreakAt',2,20,3),streakBonus:readNumber('setStreakBonus',0,20,1),groupMode:$('setGroupMode').checked,sound:$('setSound').checked,events:$('setEvents').checked};saveState();render();closeModals();showToast('计分规则已保存。');}
+  function csvText(){
+    const cls=currentClass();const headers=['班级','姓名','部门','行头','累计香蕉','累计答题','答对','部分对','答错','答对率','最佳连对','参与课次'];
+    const quote=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
+    return [headers,...cls.students.map(student=>[cls.name,student.name,student.group,OUTFITS.find(item=>item.id===student.outfit)?.name||student.outfit,student.stats.totalBananas,student.stats.totalAnswers,student.stats.correct,student.stats.partial,student.stats.wrong,answerRate(student.stats),student.stats.bestStreak,student.stats.lessons])].map(row=>row.map(quote).join(',')).join('\n');
+  }
+  async function copyCsv(){const text=csvText();$('csvBox').value=text;await copyText(text);}
+  async function copyText(text){
+    try{await navigator.clipboard.writeText(text);showToast('CSV 文本已复制，可直接粘贴进表格。');}
+    catch(_){const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();showToast('CSV 文本已复制，可直接粘贴进表格。');}
+  }
+  function renderHistory(){
+    const cls=currentClass();$('historySubtitle').textContent=cls.name+' · '+cls.sessions.length+' 节历史课';$('csvBox').value=csvText();
+    const sessions=cls.sessions.slice().reverse();$('historyList').innerHTML=sessions.length?sessions.map(session=>'<article class="history-item"><div><strong>'+esc(formatDate(session.startedAt))+' 课堂结算</strong><span>'+session.noticeNo+' 份约谈通知 · '+session.events.filter(event=>event.outcome!=='exempt').length+' 次答题记录</span></div><button class="btn-small" data-view-session="'+esc(session.id)+'">回看结算</button></article>').join(''):'<p class="section-note">还没有结束过一堂课。第一份课堂结算会留在这里。</p>';
+  }
+  function showSessionById(id){const session=currentClass().sessions.find(item=>item.id===id);if(!session)return;closeModals();showSettlement(session);}
+
+  function stripCommentsAndStrings(source){
+    return String(source).replace(/<!--[\s\S]*?-->/g,'').replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n\r]*/g,'').replace(/(['"`])(?:\\.|(?!\1)[\s\S])*?\1/g,'');
+  }
+  function networkGate(source){
+    const code=stripCommentsAndStrings(source);
+    const blocked=[['fet','ch'],['XML','HttpRequest'],['Web','Socket'],['Event','Source'],['send','Beacon']].map(parts=>parts.join(''));
+    if(blocked.some(token=>new RegExp('\\b'+token+'\\s*\\(').test(code)))return false;
+    const dynamicWord=['im','port'].join('');
+    return !new RegExp('\\b'+dynamicWord+'\\s*\\(').test(code);
+  }
+  function seededRandom(seed=1){let value=seed>>>0;return ()=>{value=(value*1664525+1013904223)>>>0;return value/4294967296;};}
+  function runQa(){
+    const lines=[];const tests=[];
+    function record(name,positive,negativeBlocked){const pass=Boolean(positive&&negativeBlocked);lines.push((pass?'[过] ':'[败] ')+name+'：正向'+(positive?'通过':'失败')+'；反向破坏'+(negativeBlocked?'已拦截':'未拦截'));tests.push({name,pass,positive:Boolean(positive),negativeBlocked:Boolean(negativeBlocked)});}
+    const fixture=createClass('QA公平袋',['甲','乙','丙','丁','戊','己']);const rng=seededRandom(7);const draws=fixture.students.map(()=>claimFromBag(fixture,rng));const ids=fixture.students.map(student=>student.id);const fair=draws.length===ids.length&&new Set(draws).size===ids.length&&ids.every(id=>draws.includes(id));const brokenDraws=ids.map(()=>ids[0]);const brokenFair=brokenDraws.length===ids.length&&new Set(brokenDraws).size===ids.length&&ids.every(id=>brokenDraws.includes(id));record('洗牌袋一轮无重复且全员覆盖',fair,!brokenFair);
+    const scoreStudent=createStudent('甲');scoreStudent.character='egg';const result=emptyLessonStudent(scoreStudent,'egg');const scored=applyOutcome(result,'correct',3,'standard',DEFAULT_SETTINGS);let persisted=false;let brokenPersisted=true;try{localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(scored.next));persisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(result));brokenPersisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.removeItem(QA_STORAGE_KEY);}catch(_){persisted=false;brokenPersisted=true;}record('分数增减与 localStorage 持久化',scored.delta===4&&scored.next.floors===1&&persisted,!brokenPersisted);
+    const absentClass=createClass('QA缺席',['甲','乙','丙']);absentClass.students[1].absent=true;const absentId=absentClass.students[1].id;const absentDraws=[claimFromBag(absentClass,seededRandom(2)),claimFromBag(absentClass,seededRandom(3))];const skipsAbsent=absentDraws.every(id=>id!==absentId);const brokenAbsent=[absentId,absentClass.students[0].id].every(id=>id!==absentId);record('缺席同学自动跳过',skipsAbsent,!brokenAbsent);
+    const oldRoster=[createStudent('甲',0),createStudent('乙',1)];const merged=mergeRoster(oldRoster,['乙','丙']);const rosterOk=merged.length===2&&merged[0].id===oldRoster[1].id&&!merged.some(student=>student.name==='甲')&&merged.some(student=>student.name==='丙');const brokenRoster=oldRoster;const brokenRosterOk=brokenRoster.length===2&&brokenRoster[0].id===oldRoster[1].id&&!brokenRoster.some(student=>student.name==='甲')&&brokenRoster.some(student=>student.name==='丙');record('名册新增与删除保持身份边界',rosterOk,!brokenRosterOk);
+    const setupClass=createClass('QA参战',['甲','乙','丙','丁','戊','己','庚']);const setup=setupClass.students.slice(0,6).map((student,index)=>({studentId:student.id,character:CHARACTERS[index].id}));const brokenSetup=setup.map(item=>deepClone(item));brokenSetup[1].character=brokenSetup[0].character;record('每节 2～6 人且角色唯一',validLessonSetup(setup,setupClass),!validLessonSetup(brokenSetup,setupClass)&&!validLessonSetup(setup.slice(0,1),setupClass));
+    const persistClass=createClass('QA刷新',['甲','乙','丙','丁']);const persistIds=persistClass.students.slice(0,2).map(student=>student.id);const persistResults=Object.fromEntries(persistClass.students.slice(0,2).map((student,index)=>[student.id,emptyLessonStudent(student,CHARACTERS[index].id)]));const persistCandidate={currentClassId:persistClass.id,classes:[persistClass],settings:DEFAULT_SETTINGS,activeSession:{id:'qa_lesson',classId:persistClass.id,participantIds:persistIds,bag:{round:1,remaining:persistIds.slice(),served:[],last:null},studentResults:persistResults,events:[],airdropLog:[]}};const repairedTwo=repairState(deepClone(persistCandidate));const brokenCandidate=deepClone(persistCandidate);brokenCandidate.activeSession.participantIds=persistClass.students.map(student=>student.id);const repairedBroken=repairState(brokenCandidate);record('两人课堂刷新后仍保持两人边界',repairedTwo.activeSession.participantIds.length===2,repairedBroken.activeSession.participantIds.length!==2);
+    const fishStudent=createStudent('鱼');fishStudent.character='fish';const fishBase=emptyLessonStudent(fishStudent,'fish');const fishFirst=applyOutcome(fishBase,'wrong',20,'standard',DEFAULT_SETTINGS);const fishSecond=applyOutcome(fishFirst.next,'wrong',20,'standard',DEFAULT_SETTINGS);const eggStudent=createStudent('蛋');eggStudent.character='egg';const eggPartial=applyOutcome(emptyLessonStudent(eggStudent,'egg'),'partial',20,'standard',DEFAULT_SETTINGS);const brokenFish=applyOutcome(Object.assign({},fishBase,{character:'monkey'}),'wrong',20,'standard',DEFAULT_SETTINGS);record('六角色被动按角色触发且不串线',fishFirst.delta===0&&fishSecond.delta===DEFAULT_SETTINGS.wrong&&eggPartial.delta===DEFAULT_SETTINGS.partial+1,brokenFish.delta!==0);
+    const ritualIds=SURPRISE_RITUALS.map(item=>item.id);const ritualOk=ritualIds.length===5&&new Set(ritualIds).size===5&&ritualIds.every(id=>ritualSvg(id).includes('<svg'));const brokenRituals=[ritualIds[0],ritualIds[0],...ritualIds.slice(2)];record('五种惊喜仪式双重随机入口',ritualOk,new Set(brokenRituals).size!==brokenRituals.length);
+    const crateBase=emptyLessonStudent(createStudent('箱',0));const crateApplied=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,AIRDROPS.find(item=>item.effect==='extraFloor'));const crateBroken=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,null);const crateEventSafe=chooseEvent({rushNext:false},()=>.01,true)==='standard';const crateWouldBeSkipped=chooseEvent({rushNext:false},()=>.01,false)==='fish';record('惊喜结果只作用于下一题',crateApplied.next.floors===2&&crateBroken.next.floors===1&&crateEventSafe,crateBroken.next.floors!==2&&crateWouldBeSkipped);
+    const source=document.documentElement.outerHTML;const badCall=['fet','ch'].join('')+'("/qa-break")';record('单文件零联网出口',networkGate(source),!networkGate(source+'\n'+badCall));
+    const pictographic=/\p{Extended_Pictographic}/u;const flavored=/[\u2190-\u21ff\u2460-\u24ff]/u;const emojiFree=!pictographic.test(source)&&!flavored.test(source);const brokenEmoji=pictographic.test(source+' '+String.fromCodePoint(0x1f600));record('emoji 与装饰符号全局禁令',emojiFree,brokenEmoji);
+    const passed=tests.every(test=>test.pass);lines.unshift((passed?'[过]':'[败]')+' QA 总结：'+tests.filter(test=>test.pass).length+'/'+tests.length+' 项完整通过');$('qaOutput').textContent=lines.join('\n');$('qaOutput').classList.toggle('has-failure',!passed);$('qaPanel').classList.remove('hidden');
+    window.__CLASSROOM_QA__={done:true,passed,tests,output:lines.join('\n'),showFixture};
+  }
+  function showFixture(kind){
+    closeModals();closeSettlement();
+    if(!activeSession())startLesson(defaultLessonConfigs(6));
+    const session=activeSession();const cls=currentClass();
+    if(kind==='notice'){
+      const student=cls.students.find(item=>!item.absent);session.noticeNo=7;session.currentCall={studentId:student.id,event:'snake',noticeNo:7,startedAt:Date.now()-6200};session.pendingCall=null;render();requestAnimationFrame(()=>$('notice').classList.add('is-stamped'));
+    }else if(kind==='settlement'){
+      Object.values(session.studentResults).forEach((row,index)=>{row.floors=Math.max(0,9-index%8);row.bananas=row.floors*3+(index%3);row.answers=Math.max(1,row.floors);row.correct=Math.max(0,row.answers-(index%3));row.partial=index%2;row.wrong=Math.max(0,row.answers-row.correct-row.partial);});
+      session.noticeNo=24;session.events=[{event:'snake',outcome:'correct'},{event:'fish',outcome:'exempt'},{event:'standard',outcome:'wrong'}];session.airdropLog=[Object.assign({},AIRDROPS[0],{openedAt:Date.now()})];const fixture={id:'qa_settlement',startedAt:Date.now()-2700000,endedAt:Date.now(),noticeNo:24,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog),previousFloors:deepClone(session.previousFloors||{}),studentResults:Object.values(session.studentResults)};fixture.awards=buildAwards(fixture);showSettlement(fixture);
+    }else if(kind==='suspense'){
+      $('suspense').classList.remove('hidden');$('elevatorDigits').textContent='027';$('suspenseLine').textContent='约谈对象正在办理上楼手续';const lights=[...$('suspense').querySelectorAll('i')];lights.forEach((light,index)=>light.classList.toggle('is-lit',index===2));
+    }
+  }
+
+  document.addEventListener('click',event=>{
+    const openButton=event.target.closest('[data-open-modal]');if(openButton){openModal(openButton.dataset.openModal);return;}
+    if(event.target.closest('[data-close-modal]')){closeModals();return;}
+    const outcome=event.target.closest('[data-outcome]');if(outcome){judge(outcome.dataset.outcome);return;}
+    const undo=event.target.closest('[data-action="undo-last"]');if(undo){undoLast();return;}
+    const historyButton=event.target.closest('[data-view-session]');if(historyButton){showSessionById(historyButton.dataset.viewSession);return;}
+  });
+  $('classSelect').addEventListener('change',event=>{if(activeSession())return;state.currentClassId=event.target.value;saveState();render();});
+  $('sessionToggle').addEventListener('click',()=>activeSession()?finishLesson():startLesson());$('startLesson').addEventListener('click',startLesson);$('drawStudent').addEventListener('click',drawStudent);
+  $('participantCount').addEventListener('change',renderLessonSeats);
+  $('lessonSeats').addEventListener('change',event=>{const row=event.target.closest('.seat-row');if(!row)return;const seat=lessonSetupDraft[Number(row.dataset.seat)];if(event.target.matches('.seat-student'))seat.studentId=event.target.value;if(event.target.matches('.seat-character'))seat.character=event.target.value;renderLessonSeats();});
+  $('confirmStartLesson').addEventListener('click',()=>startLesson(deepClone(lessonSetupDraft)));
+  $('liveSettlement').addEventListener('click',showLiveSettlement);$('openAirdrop').addEventListener('click',openAirdrop);
+  $('revealAirdrop').addEventListener('click',revealAirdrop);
+  $('exemptCall').addEventListener('click',exemptCurrent);$('undoScore').addEventListener('click',undoLast);$('closeSettlement').addEventListener('click',closeSettlement);$('settlementCsv').addEventListener('click',copyCsv);
+  $('renameClass').addEventListener('click',()=>{const name=$('classNameInput').value.trim().slice(0,24);if(!name){showToast('班级名称不能为空。');return;}currentClass().name=name;saveState();render();showToast('班级名称已保存。');});
+  $('newClass').addEventListener('click',()=>{if(activeSession()){showToast('请先结束当前课堂，再新建班级。');return;}const cls=createClass('新班级 '+(state.classes.length+1),[]);state.classes.push(cls);state.currentClassId=cls.id;saveState();render();showToast('新班级已建立，请粘贴名册。');});
+  $('deleteClass').addEventListener('click',()=>{if(activeSession()){showToast('请先结束当前课堂，再删除班级。');return;}if(state.classes.length===1){showToast('至少保留一个班级。');return;}if(!confirm('确定删除“'+currentClass().name+'”及其本机历史成绩吗？'))return;const id=currentClass().id;state.classes=state.classes.filter(cls=>cls.id!==id);state.currentClassId=state.classes[0].id;saveState();render();showToast('班级已从本机删除。');});
+  $('saveRoster').addEventListener('click',()=>{const cls=currentClass();if(activeSession()){showToast('本节课中可逐行改名或标缺席；批量重建请在结算后进行。');return;}const names=sanitizeNames($('rosterTextarea').value);if(!names.length){showToast('名册至少需要一位同学。');return;}cls.students=mergeRoster(cls.students,names);reconcileBag(cls);saveState();render();showToast('名册已保存，共 '+names.length+' 位同学。');});
+  $('rosterTable').addEventListener('change',event=>{
+    const row=event.target.closest('.student-row');if(!row)return;const student=studentById(row.dataset.id);if(!student)return;
+    if(event.target.matches('.student-name-input')){const name=event.target.value.trim().slice(0,16);if(name&&!currentClass().students.some(item=>item.id!==student.id&&item.name===name))student.name=name;else{showToast(name?'姓名不能重复。':'姓名不能为空。');event.target.value=student.name;}}
+    if(event.target.matches('.outfit-select'))student.outfit=event.target.value;
+    if(event.target.matches('.group-select'))student.group=event.target.value;
+    syncActiveRoster(currentClass());saveState();render();
+  });
+  $('rosterTable').addEventListener('click',event=>{
+    const button=event.target.closest('[data-action]');if(!button)return;const row=button.closest('.student-row');const cls=currentClass();const student=studentById(row.dataset.id);if(!student)return;
+    if(button.dataset.action==='toggle-absent'){student.absent=!student.absent;const session=activeSession();reconcileBag(session?sessionPool(cls,session):cls);showToast(student.name+(student.absent?' 已标记缺席，公平袋会自动跳过。':' 已返回课堂，自动归队。'));}
+    if(button.dataset.action==='delete-student'){if(activeSession()?.participantIds.includes(student.id)){showToast('这位同学正在本节参战，请结算后再从名册删除。');return;}if(!confirm('从本机名册删除“'+student.name+'”及其长期成绩吗？'))return;cls.students=cls.students.filter(item=>item.id!==student.id);reconcileBag(cls);}
+    saveState();render();
+  });
+  $('saveSettings').addEventListener('click',saveSettings);$('resetSettings').addEventListener('click',()=>{state.settings=deepClone(DEFAULT_SETTINGS);fillSettings();showToast('建议值已恢复，点击保存后生效。');});
+  $('copyCsv').addEventListener('click',copyCsv);$('refreshCsv').addEventListener('click',()=>{$('csvBox').value=csvText();showToast('CSV 文本已重新生成。');});
+  $('closeQa').addEventListener('click',()=>$('qaPanel').classList.add('hidden'));
+  addEventListener('resize',()=>requestAnimationFrame(()=>layoutBuilding(Math.max(0,...lessonRows(currentClass(),activeSession()).map(row=>row.floors||0)))));
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInterval(answerClock);else if(activeSession()?.currentCall){updateAnswerClock();clearInterval(answerClock);answerClock=setInterval(updateAnswerClock,1000);}});
+
+  render();
+  if(QA_MODE)setTimeout(runQa,80);
+  </script>
+</body>
+</html>
