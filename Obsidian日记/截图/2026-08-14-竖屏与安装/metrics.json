@@ -1,0 +1,420 @@
+{
+  "iosInstallText": "\n      \n        正版猴图标\n        \n        把猴放到桌面\n        不同浏览器的按钮位置略有差异，图标和存档不会变。\n        先用 Safari 打开本页。用 Chrome、微信等加到桌面的只是书签，点开仍带地址栏，不会全屏。点 Safari 底部的“分享”。选择“添加到主屏幕”。确认名称“是猴就上100层”。从桌面图标启动，应当没有地址栏、上下也没有留边。\n        我知道了，打开浏览器菜单\n        暂时不放猴\n      \n    ",
+  "androidInstallText": "\n      \n        正版猴图标\n        \n        把猴放到桌面\n        不同浏览器的按钮位置略有差异，图标和存档不会变。\n        优先点下方“安装到这台设备”。若没有弹窗，打开浏览器菜单。选择“安装应用”或“添加到主屏幕”。\n        我知道了，打开浏览器菜单\n        暂时不放猴\n      \n    ",
+  "results": [
+    {
+      "label": "iphone-390x844-01-首页",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "titleScreen"
+      ],
+      "cards": [
+        {
+          "id": "titleScreen",
+          "top": 30,
+          "bottom": 816,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-02-局内",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [],
+      "cards": [],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-03-结算成绩",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "resultScreen"
+      ],
+      "cards": [
+        {
+          "id": "resultScreen",
+          "top": 203,
+          "bottom": 643,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-04-结算档案",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "resultScreen"
+      ],
+      "cards": [
+        {
+          "id": "resultScreen",
+          "top": 177,
+          "bottom": 669,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-05-结算登记收藏",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "resultScreen"
+      ],
+      "cards": [
+        {
+          "id": "resultScreen",
+          "top": 196,
+          "bottom": 650,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-06-称号墙",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "titlesScreen"
+      ],
+      "cards": [
+        {
+          "id": "titlesScreen",
+          "top": 202,
+          "bottom": 644,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-07-奶茶图鉴",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "teaScreen"
+      ],
+      "cards": [
+        {
+          "id": "teaScreen",
+          "top": 89,
+          "bottom": 757,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-08-香蕉商店",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "shopScreen"
+      ],
+      "cards": [
+        {
+          "id": "shopScreen",
+          "top": 122,
+          "bottom": 724,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-09-世界楼榜",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "leaderboardScreen"
+      ],
+      "cards": [
+        {
+          "id": "leaderboardScreen",
+          "top": 143,
+          "bottom": 703,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-10-分享海报",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "shareScreen"
+      ],
+      "cards": [
+        {
+          "id": "shareScreen",
+          "top": 81,
+          "bottom": 765,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "iphone-390x844-11-iOS安装说明",
+      "viewport": [
+        390,
+        844
+      ],
+      "document": [
+        390,
+        844
+      ],
+      "shell": [
+        390,
+        844,
+        0,
+        844
+      ],
+      "visible": [
+        "installScreen"
+      ],
+      "cards": [
+        {
+          "id": "installScreen",
+          "top": 183,
+          "bottom": 663,
+          "left": 22,
+          "right": 368
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "android-360x800-01-首页",
+      "viewport": [
+        360,
+        800
+      ],
+      "document": [
+        360,
+        800
+      ],
+      "shell": [
+        360,
+        800,
+        0,
+        800
+      ],
+      "visible": [
+        "titleScreen"
+      ],
+      "cards": [
+        {
+          "id": "titleScreen",
+          "top": 30,
+          "bottom": 772,
+          "left": 22,
+          "right": 338
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "android-360x800-02-局内",
+      "viewport": [
+        360,
+        800
+      ],
+      "document": [
+        360,
+        800
+      ],
+      "shell": [
+        360,
+        800,
+        0,
+        800
+      ],
+      "visible": [],
+      "cards": [],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    },
+    {
+      "label": "android-360x800-03-安装说明",
+      "viewport": [
+        360,
+        800
+      ],
+      "document": [
+        360,
+        800
+      ],
+      "shell": [
+        360,
+        800,
+        0,
+        800
+      ],
+      "visible": [
+        "installScreen"
+      ],
+      "cards": [
+        {
+          "id": "installScreen",
+          "top": 190,
+          "bottom": 612,
+          "left": 22,
+          "right": 338
+        }
+      ],
+      "horizontalOverflow": false,
+      "bodyOverflow": "hidden"
+    }
+  ]
+}
