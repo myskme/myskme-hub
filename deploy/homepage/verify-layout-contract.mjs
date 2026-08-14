@@ -16,6 +16,10 @@ const checks = [
   ['动态视口高度', 'height:100svh;height:100dvh'],
   ['刘海与圆角安全区', 'env(safe-area-inset-left)'],
   ['触控翻页尺寸', '.page-button{width:44px;height:44px'],
+  ['唯一浅色品牌主题', '<html lang="zh-CN" data-theme="light">'],
+  ['浅色系统控件声明', '<meta name="color-scheme" content="light">'],
+  ['现代界面字体', '--ui-sans:-apple-system,BlinkMacSystemFont'],
+  ['手机详情保留电影感', ':root[data-theme="light"] .project-stage{background:#101114'],
   ['详情图首屏高优先级', "loading=\"'+(eager?'eager':'lazy')+'\" fetchpriority=\"'+(eager?'high':'low')+'\""],
   ['首张详情图预加载', '<link rel="preload" as="image" href="assets/cover-gemfall.webp" fetchpriority="high">'],
 ];
@@ -26,6 +30,18 @@ if (failures.length) {
   process.exit(1);
 }
 
+const forbiddenChecks = [
+  ['主题切换按钮', 'id="themeBtn"'],
+  ['旧主题偏好存储', 'myskme-theme'],
+  ['系统深色主题分支', 'prefers-color-scheme: dark'],
+  ['旧主题初始化调用', 'applyTheme('],
+];
+const forbidden = forbiddenChecks.filter(([, token]) => html.includes(token)).map(([label]) => label);
+if (forbidden.length) {
+  console.error(`主页唯一浅色契约发现旧分支：${forbidden.join('、')}`);
+  process.exit(1);
+}
+
 const priorityAt = html.indexOf("var HOME_PRIORITY=['gemfall','zimingqi','monkey-upstairs','star-dungeon']");
 const recentAt = html.indexOf('recentKeys().some(function(k)');
 if (priorityAt < 0 || recentAt < priorityAt) {
@@ -33,4 +49,4 @@ if (priorityAt < 0 || recentAt < priorityAt) {
   process.exit(1);
 }
 
-console.log(`主页布局契约：${checks.length + 1}/${checks.length + 1} 通过`);
+console.log(`主页布局契约：${checks.length + forbiddenChecks.length + 1}/${checks.length + forbiddenChecks.length + 1} 通过`);

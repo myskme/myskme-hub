@@ -5,16 +5,10 @@
   要改内容：先改 build_hub.py，再重新运行它生成本文件。
   页面里的「导出 index.html」按钮同理，导出物只作备份，不要当作源文件回填仓库。
 -->
-<html lang="zh-CN" data-theme="dark" data-themepref="auto">
+<html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>
-/* 预解析主题，避免首屏闪烁：auto 跟随系统，否则用上次选择 */
-(function(){try{var p=localStorage.getItem('myskme-theme')||'auto';
-var d=p==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;
-var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('data-themepref',p);}catch(err){}})();
-</script>
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="canonical" href="https://myskme.com/">
 <link rel="manifest" href="manifest.webmanifest">
@@ -22,9 +16,10 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="MYSKME">
-<meta name="theme-color" content="#0a0a0c">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#e8e7e3">
 <meta name="description" content="王老师的原创作品启动台：灵石远征 / 自鸣棋 / 是猴就上100层 / 星徒地牢 / 远征录 / 世界编年史——手机与平板直接打开。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
@@ -55,24 +50,24 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
   --bar-bg:linear-gradient(180deg,#15110a,rgba(20,16,10,.97));
   --nav-bg:linear-gradient(180deg,rgba(9,8,11,.95),rgba(9,8,11,.8));
 }
-/* ---- 浅色（羊皮纸）主题：data-theme 由脚本按 跟随系统/浅/深 解析后写入 ---- */
+/* ---- 唯一品牌主题：象牙矿石、黑曜石与克制金属金 ---- */
 :root[data-theme="light"]{
-  --bg:#ece2cc; --bg2:#e4d8bc; --bg3:#f8f2e4; --bg4:#e0d3b3;
-  --ink:#2a2218; --ink2:#574b37; --ink3:#635943; --ink4:#b6a988;
-  --gold:#7e6014; --gold2:#5f470e; --gold3:#b89a52;
-  --red:#9a271d; --red2:#7a1c14;
-  --line:rgba(120,90,20,.30); --line2:rgba(120,90,20,.13);
-  --glow-gold:0 4px 16px rgba(120,90,20,.18);
-  --glow-red:0 4px 16px rgba(150,40,30,.2);
-  --page-grad:radial-gradient(1200px 700px at 50% -8%,rgba(190,160,80,.18),transparent 60%),radial-gradient(900px 760px at 100% 100%,rgba(150,120,60,.12),transparent 60%);
-  --noise-op:.16; --noise-blend:multiply;
-  --vignette:radial-gradient(ellipse at 50% 40%,transparent 60%,rgba(120,90,30,.12));
-  --feat-bg:linear-gradient(160deg,#fbf4e2,#f2e8d2);
-  --card-bg:linear-gradient(160deg,var(--bg3),#f1e9d6);
-  --card-hover-shadow:0 14px 36px rgba(120,90,30,.20),inset 0 0 40px rgba(201,166,74,.06);
-  --plate-shadow:0 4px 14px rgba(120,90,30,.25);
-  --bar-bg:linear-gradient(180deg,#f2e8d2,rgba(242,232,210,.97));
-  --nav-bg:linear-gradient(180deg,rgba(236,226,204,.96),rgba(236,226,204,.86));
+  --bg:#e8e7e3; --bg2:#f1f0ec; --bg3:#fbfaf7; --bg4:#deddd8;
+  --ink:#191a1c; --ink2:#4e5053; --ink3:#74736f; --ink4:#b7b4ac;
+  --gold:#9b761e; --gold2:#6c5010; --gold3:#c3a45d;
+  --red:#8f2d27; --red2:#6f211c;
+  --line:rgba(25,26,28,.16); --line2:rgba(25,26,28,.075);
+  --glow-gold:0 8px 24px rgba(117,86,18,.16);
+  --glow-red:0 6px 18px rgba(128,38,30,.16);
+  --page-grad:radial-gradient(900px 540px at 74% 8%,rgba(187,154,80,.14),transparent 64%),linear-gradient(135deg,#f3f2ee 0%,#e8e7e3 56%,#dededa 100%);
+  --noise-op:0; --noise-blend:normal;
+  --vignette:radial-gradient(ellipse at 50% 38%,transparent 62%,rgba(45,43,38,.07));
+  --feat-bg:linear-gradient(150deg,#ffffff,#f0efeb);
+  --card-bg:linear-gradient(150deg,#fcfbf8,#efeeea);
+  --card-hover-shadow:0 16px 38px rgba(31,29,25,.13),inset 0 1px 0 rgba(255,255,255,.9);
+  --plate-shadow:0 8px 24px rgba(33,30,24,.12);
+  --bar-bg:rgba(248,247,243,.96);
+  --nav-bg:rgba(246,245,241,.94);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -471,6 +466,7 @@ footer b{color:var(--ink2);font-weight:400;}
   --panel:color-mix(in srgb,var(--bg3) 90%,transparent);
   --panel-soft:color-mix(in srgb,var(--bg2) 76%,transparent);
   --focus:0 0 0 2px var(--bg),0 0 0 4px var(--gold);
+  --ui-sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
 }
 html,body{height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none;}
 html{scroll-behavior:auto;scroll-padding-top:0;}
@@ -597,6 +593,45 @@ body.admin .admin-add{display:block;}
 .admin-bar .ab-title{white-space:nowrap;}.admin-bar button{white-space:nowrap;flex:0 0 auto;}
 body.admin .launchpad-shell{padding-top:calc(52px + env(safe-area-inset-top));height:100dvh;}
 
+/* 浅色不是纸张阅读器，而是一座安静的游戏展馆：现代 UI 承载，宋体只留给作品名。 */
+.launchpad-shell,.tools-pop,.toast{font-family:var(--ui-sans);}
+.brand-copy b,.library-heading h1,.tile-copy strong,.stage-titles h2,.stage-qr-copy b{font-family:var(--serif);}
+:root[data-theme="light"]{--panel:rgba(252,251,248,.94);--panel-soft:rgba(246,245,241,.9);--focus:0 0 0 2px #f3f2ee,0 0 0 4px #9b761e;}
+:root[data-theme="light"] body::before{opacity:.52;background:
+  linear-gradient(90deg,transparent 49.7%,rgba(29,30,32,.055) 50%,transparent 50.3%),
+  linear-gradient(0deg,transparent 49.7%,rgba(29,30,32,.055) 50%,transparent 50.3%);
+  background-size:96px 96px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.52),transparent 78%);}
+:root[data-theme="light"] body::after{background:radial-gradient(860px 560px at 76% 12%,rgba(176,139,54,.11),transparent 67%),var(--vignette);}
+:root[data-theme="light"] .brand-seal{background:#fff;border-color:rgba(27,28,30,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.85),0 7px 20px rgba(32,29,23,.12);}
+:root[data-theme="light"] .brand-copy b{color:#272217;}:root[data-theme="light"] .brand-copy b::after{content:'';display:inline-block;width:5px;height:5px;margin-left:10px;border-radius:50%;background:var(--gold);vertical-align:.18em;}
+:root[data-theme="light"] .top-controls .ctrl-btn,:root[data-theme="light"] .tools-menu summary,:root[data-theme="light"] .admin-fab{background:rgba(255,255,255,.82);border-color:rgba(27,28,30,.14);color:#393a3d;box-shadow:0 6px 18px rgba(34,31,25,.08),inset 0 1px 0 rgba(255,255,255,.9);}
+:root[data-theme="light"] .top-controls .ctrl-btn:hover,:root[data-theme="light"] .tools-menu summary:hover,:root[data-theme="light"] .admin-fab:hover{background:#fff;border-color:rgba(155,118,30,.5);color:var(--gold2);box-shadow:0 9px 22px rgba(34,31,25,.11);}
+:root[data-theme="light"] .tools-pop{background:rgba(252,251,248,.98);border-color:rgba(27,28,30,.14);box-shadow:0 24px 60px rgba(32,29,23,.18);}
+:root[data-theme="light"] .category-rail,:root[data-theme="light"] .library-panel,:root[data-theme="light"] .project-stage{border-color:rgba(27,28,30,.13);box-shadow:0 18px 48px rgba(35,32,26,.09),inset 0 1px 0 rgba(255,255,255,.92);}
+:root[data-theme="light"] .category-rail{background:rgba(247,246,242,.92);}
+:root[data-theme="light"] .library-panel{background:rgba(252,251,248,.95);}
+:root[data-theme="light"] .project-stage{background:#f8f7f4;}
+:root[data-theme="light"] .rail-brand{background:#1c1d1f;border-color:#1c1d1f;color:#e5c46d;box-shadow:0 8px 22px rgba(25,25,25,.16);}
+:root[data-theme="light"] .nav-button{font-family:var(--ui-sans);color:#6e6d69;}
+:root[data-theme="light"] .nav-button:hover{background:rgba(255,255,255,.72);color:#242528;}
+:root[data-theme="light"] .nav-button.on{color:#1d1e20;border-color:rgba(27,28,30,.13);background:#fff;box-shadow:0 8px 20px rgba(36,33,26,.08);}
+:root[data-theme="light"] .nav-button.on::before{background:var(--gold);box-shadow:none;}
+:root[data-theme="light"] .search-box{background:#f0efeb;border-color:rgba(27,28,30,.1);box-shadow:inset 0 1px 2px rgba(30,29,27,.035);}
+:root[data-theme="light"] .search-box:focus-within{background:#fff;border-color:rgba(155,118,30,.55);box-shadow:0 0 0 3px rgba(155,118,30,.1);}
+:root[data-theme="light"] .app-tile{background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(240,239,235,.9));border-color:rgba(27,28,30,.09);}
+:root[data-theme="light"] .app-tile:hover{border-color:rgba(155,118,30,.42);box-shadow:0 10px 24px rgba(34,31,25,.08);}
+:root[data-theme="light"] .app-tile.selected{border-color:rgba(155,118,30,.72);background:#fff;box-shadow:inset 3px 0 0 var(--gold),0 12px 28px rgba(44,37,22,.1);}
+:root[data-theme="light"] .tile-cover{background:#e3e2de;border-color:rgba(27,28,30,.1);box-shadow:0 5px 14px rgba(31,29,25,.1);}
+:root[data-theme="light"] .tile-copy strong{color:#202124;}:root[data-theme="light"] .tile-kicker{color:#7c5c14;}:root[data-theme="light"] .tile-copy small{color:#777570;}
+:root[data-theme="light"] .page-button{background:#fff;border-color:rgba(27,28,30,.11);color:#3f4043;box-shadow:0 5px 14px rgba(34,31,25,.06);}
+:root[data-theme="light"] .stage-content{background:linear-gradient(180deg,#f2f1ed 0%,#fbfaf7 42%);border-top:1px solid rgba(27,28,30,.09);}
+:root[data-theme="light"] .stage-mark{background:#fff;border-color:rgba(27,28,30,.12);color:var(--gold2);box-shadow:0 7px 18px rgba(34,31,25,.08);}
+:root[data-theme="light"] .stage-actions .btn{background:#fff;border-color:rgba(27,28,30,.13);color:#313235;box-shadow:0 6px 16px rgba(34,31,25,.07);}
+:root[data-theme="light"] .stage-actions .btn-primary{background:linear-gradient(135deg,#242529,#141517);border-color:#141517;color:#f8f5ec;box-shadow:0 11px 26px rgba(20,21,23,.2),inset 0 1px 0 rgba(255,255,255,.12);}
+:root[data-theme="light"] .stage-actions .btn-primary:hover{background:#050607;color:#fff;border-color:#050607;box-shadow:0 14px 30px rgba(20,21,23,.24);}
+:root[data-theme="light"] .stage-qr{background:#fbfaf7;border-color:rgba(155,118,30,.55);box-shadow:0 22px 54px rgba(31,29,25,.2);}
+:root[data-theme="light"] .mobile-tabs{background:rgba(250,249,246,.96);border-color:rgba(27,28,30,.13);box-shadow:0 12px 32px rgba(35,32,26,.14);}
+
 @media (max-width:1180px){
   :root{--shell-gap:8px;}
   .launchpad-workspace{grid-template-columns:68px minmax(230px,.72fr) minmax(0,1.28fr);}
@@ -640,6 +675,12 @@ body.admin .launchpad-shell{padding-top:calc(52px + env(safe-area-inset-top));he
   .mobile-tabs .nav-button{min-height:0;height:46px;padding:3px;gap:2px;border-radius:10px;}.mobile-tabs .nav-button .icon{width:17px;height:17px;}.mobile-tabs .nav-button span{font-size:8px;}.mobile-tabs .nav-button.on::before{display:none;}
   .tools-pop{position:fixed;left:9px;right:9px;top:60px;width:auto;}
   .toast{bottom:76px;}.admin-bar{height:48px;}.admin-bar .ab-title{display:none;}body.admin .launchpad-shell{padding-top:calc(48px + env(safe-area-inset-top));}
+  :root[data-theme="light"] .project-stage{background:#101114;border-color:rgba(155,118,30,.48);box-shadow:0 18px 40px rgba(31,29,25,.16);}
+  :root[data-theme="light"] .stage-visual::after{background:linear-gradient(to top,rgba(13,14,16,.98) 3%,rgba(14,15,17,.82) 43%,rgba(9,10,12,.16) 88%),linear-gradient(90deg,rgba(0,0,0,.32),transparent 70%);}
+  :root[data-theme="light"] .stage-content{background:transparent;border-top:0;}
+  :root[data-theme="light"] .stage-mark{background:rgba(13,14,16,.72);border-color:rgba(218,181,85,.42);color:#e5bf58;box-shadow:none;}
+  :root[data-theme="light"] .stage-actions .btn{background:rgba(13,14,16,.8);border-color:rgba(218,181,85,.32);color:#f3eee3;box-shadow:none;}
+  :root[data-theme="light"] .stage-actions .btn-primary{background:linear-gradient(135deg,#e7c45e,#c99c32);border-color:transparent;color:#17130a;box-shadow:0 9px 22px rgba(0,0,0,.24);}
 }
 @media (max-height:680px) and (max-width:699px){
   :root{--shell-top:52px;}.brand-copy span{display:none;}.brand-seal{width:36px;height:36px;}.top-controls .ctrl-btn,.tools-menu summary{width:40px;height:40px;}
@@ -654,6 +695,12 @@ body.admin .launchpad-shell{padding-top:calc(52px + env(safe-area-inset-top));he
   .tile-button{grid-template-columns:42px minmax(0,1fr);padding:6px;gap:6px;}.tile-cover{width:42px;height:42px;}.tile-kicker,.tile-copy small{display:none;}.tile-copy strong{font-size:11px;}
   .stage-card{grid-template-rows:100%;display:block;}.stage-visual{position:absolute;inset:0;}.stage-visual::after{background:linear-gradient(to top,var(--bg2),rgba(17,17,20,.8) 58%,rgba(10,10,12,.12));}
   .stage-content{height:100%;z-index:2;background:transparent;justify-content:flex-end;padding:12px;gap:5px;}.stage-titles h2{font-size:21px;color:#f0e6d2;text-shadow:0 2px 14px #000;}.stage-en{color:#e8c768;}.stage-desc,.stage-badges,.stage-links,.url{display:none;}.stage-actions{margin-top:3px;flex-wrap:nowrap;}.stage-actions .btn{background:rgba(10,10,12,.78);color:#f0e6d2;}.stage-actions .btn-primary{background:linear-gradient(135deg,#e8c768,#c9a64a);color:#191207;}
+  :root[data-theme="light"] .project-stage{background:#101114;border-color:rgba(155,118,30,.48);}
+  :root[data-theme="light"] .stage-visual::after{background:linear-gradient(to top,rgba(13,14,16,.97),rgba(14,15,17,.8) 58%,rgba(9,10,12,.1));}
+  :root[data-theme="light"] .stage-content{background:transparent;border-top:0;}
+  :root[data-theme="light"] .stage-mark{background:rgba(13,14,16,.72);border-color:rgba(218,181,85,.42);color:#e5bf58;box-shadow:none;}
+  :root[data-theme="light"] .stage-actions .btn{background:rgba(13,14,16,.8);border-color:rgba(218,181,85,.32);color:#f3eee3;box-shadow:none;}
+  :root[data-theme="light"] .stage-actions .btn-primary{background:linear-gradient(135deg,#e7c45e,#c99c32);border-color:transparent;color:#17130a;box-shadow:0 9px 22px rgba(0,0,0,.24);}
 }
 @media (max-width:350px){.brand-copy span{display:none;}.brand-copy b{font-size:14px;}.top-controls #shareBtn{display:none;}.launchpad-shell{padding-left:6px;padding-right:6px;}.mobile-tabs{left:6px;right:6px;}}
 
@@ -690,7 +737,6 @@ body.admin .launchpad-shell{padding-top:calc(52px + env(safe-area-inset-top));he
     <div class="topbar-motto" data-h="motto">Make Yourself Special & Kind — 狼先生与他的学生们的远征编年</div>
     <div class="topbar-count"><b id="stat-total">0</b><span>原创入口</span></div>
     <div class="top-controls">
-      <button class="ctrl-btn" id="themeBtn" title="切换主题" aria-label="切换深浅主题"></button>
       <button class="ctrl-btn" id="printBtn" title="打印二维码总目" aria-label="打印二维码总目"></button>
       <button class="ctrl-btn" id="shareBtn" title="分享本页" aria-label="分享本页"></button>
       <details class="tools-menu"><summary id="moreSummary" aria-label="更多工具"></summary><div class="tools-pop">
@@ -3403,9 +3449,6 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     scan:'<path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/><path d="M9 9h6v6H9z"/>',
     print:'<path d="M7 8V3h10v5M7 17H5a2 2 0 01-2-2v-4a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2h-2"/><path d="M7 14h10v7H7z"/>',
     share:'<circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="M8 11l8-5M8 13l8 5"/>',
-    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
-    moon:'<path d="M20 15.5A8.5 8.5 0 118.5 4 7 7 0 0020 15.5z"/>',
-    auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z"/>',
     edit:'<path d="M4 20l4.5-1 10-10a2.1 2.1 0 00-3-3l-10 10z"/><path d="M14.5 7.5l3 3M4 20h6"/>',
     links:'<path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1"/>',
     poster:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M7 16l3-3 2 2 3-4 2 3M8 7h5"/>',
@@ -3777,26 +3820,11 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   });
   document.getElementById('abExit').addEventListener('click',function(){setAdmin(false);toast('已退出管理员模式');});
 
-  // ---- 主题：跟随系统 / 浅色 / 深色 ----
-  var TLS='myskme-theme', tOrder=['auto','light','dark'],
-      tName={auto:'跟随系统',light:'浅色',dark:'深色'}, tIcon={auto:'auto',light:'sun',dark:'moon'};
-  var mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
-  function getPref(){try{return localStorage.getItem(TLS)||'auto';}catch(e){return 'auto';}}
-  function resolveTheme(p){return p==='auto'?((mq&&mq.matches)?'dark':'light'):p;}
-  function applyTheme(p){var e=document.documentElement;
-    e.setAttribute('data-theme',resolveTheme(p));e.setAttribute('data-themepref',p);
-    var b=document.getElementById('themeBtn');if(b){b.innerHTML=uiIcon(tIcon[p])+'<span class="sr-only">切换主题</span>';b.title='主题：'+tName[p]+'（点按切换）';}}
-  function cycleTheme(){var nxt=tOrder[(tOrder.indexOf(getPref())+1)%tOrder.length];
-    try{localStorage.setItem(TLS,nxt);}catch(e){}applyTheme(nxt);toast('主题：'+tName[nxt]);}
-  if(mq){var mqh=function(){if(getPref()==='auto')applyTheme('auto');};
-    if(mq.addEventListener)mq.addEventListener('change',mqh);else if(mq.addListener)mq.addListener(mqh);}
-
   // ---- 打印 / 分享 ----
   function doShare(){var u=location.href,t=document.title;
     if(navigator.share){navigator.share({title:t,text:'MYSKME · 作品总目',url:u}).catch(function(){});}
     else{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(null,function(){fallback(u);});}else fallback(u);toast('已复制本页链接');}}
 
-  document.getElementById('themeBtn').addEventListener('click',cycleTheme);
   document.getElementById('printBtn').addEventListener('click',function(){window.print();});
   document.getElementById('shareBtn').addEventListener('click',doShare);
   var cab=document.getElementById('copyAllBtn'); if(cab)cab.addEventListener('click',function(){closeTools();copyAll();});
@@ -3812,7 +3840,6 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   var searchIcon=document.getElementById('searchIcon');if(searchIcon)searchIcon.innerHTML=uiIcon('search');
   var pagePrev=document.getElementById('pagePrev');if(pagePrev)pagePrev.innerHTML=uiIcon('prev');
   var pageNext=document.getElementById('pageNext');if(pageNext)pageNext.innerHTML=uiIcon('next');
-  applyTheme(getPref());
   var sq=document.getElementById('shareQr'); if(sq)sq.innerHTML='<div class="qr-box">'+qrSVG(DATA.hubUrl||location.href)+'</div>';
   var su=document.getElementById('shareUrl'); if(su)su.textContent=(DATA.hubUrl||'').replace(/^https?:\/\//,'').replace(/\/$/,'');
   renderHeader();
