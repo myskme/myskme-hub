@@ -1,7 +1,20 @@
 import { readFileSync } from 'node:fs';
 
 const attempts = Number.parseInt(process.env.VERIFY_ATTEMPTS || '12', 10);
+// 重试间隔按失败的**种类**给，不是一刀切 5 秒。
+// 0814 收官发布当场栽的：EdgeOne 发布成功后，源站有一个几分钟的传播/回源窗口，
+// 12 次 x 5 秒只铺了不到 4 分钟，全程都落在窗口里——超时、502、fetch failed 打满 12 次，
+// 最后一次仍是 502，于是**发布其实成功、验收判失败**（和 0812/0813 那两次同一个结论，
+// 但根因不同：那两次是验收器自己过期，这次是重试窗口太窄）。
+// 断言不匹配（版本不对、缺节点）5 秒重试是对的——CDN 刷新是秒级的；
+// 网络层失败（超时/5xx/连不上）要退避着等——传播是分钟级的，密集打 5 秒一次全是白问。
+// 退避序列与楼榜补交用同一个思路（4/10/25/60/120），总窗口拉到 13 分钟以上。
 const delayMs = Number.parseInt(process.env.VERIFY_DELAY_MS || '5000', 10);
+const NETWORK_BACKOFF_MS = [5000, 10000, 20000, 40000, 60000, 90000, 120000];
+const isNetworkFailure = (error) => {
+  const text = String(error && error.message || error);
+  return /timeout|aborted|fetch failed|ECONN|ETIMEDOUT|ENOTFOUND|状态码 5\d\d/.test(text);
+};
 
 // 期望值一律从仓库源文件里现取，**不要在这里硬写任何会跟着代码变的字符串**。
 // 这个坑已经踩过两次，两次死法一模一样：
@@ -98,8 +111,14 @@ for (let attempt = 1; attempt <= attempts; attempt += 1) {
     process.exit(0);
   } catch (error) {
     lastError = error;
-    console.error('FAIL ' + error.message);
-    if (attempt < attempts) await new Promise(resolve => setTimeout(resolve, delayMs));
+    const network = isNetworkFailure(error);
+    console.error('FAIL ' + error.message + (network ? '（网络层，退避重试）' : ''));
+    if (attempt < attempts) {
+      const wait = network
+        ? NETWORK_BACKOFF_MS[Math.min(attempt - 1, NETWORK_BACKOFF_MS.length - 1)]
+        : delayMs;
+      await new Promise(resolve => setTimeout(resolve, wait));
+    }
   }
 }
 console.error(lastError?.stack || lastError);
