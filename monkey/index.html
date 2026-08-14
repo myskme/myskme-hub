@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.7-liftbehind">
+<meta name="myskme-release" content="20260814.8-collectfix">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -36,6 +36,11 @@
 :root{
   --paper:#faf3e2;--paper-2:#f0e3c4;--card:#fffdf6;--ink:#28211a;--muted:#6b5f4e;
   --banana:#f5b731;--teal:#1f9e8e;--red:#e0452c;--purple:#8e6fd8;--green:#63b06b;
+  /* 盖章的大小与它在分数行两侧占的槽宽，是**同一个数**推出来的：
+     改大小不用记得同时改留白，两边不会走散。窄屏上一起缩。
+     用 vw 而不是断点：断点是一串写死的设备宽度，而写死的设备尺寸这个仓库栽过一次
+     （0813 那个 #gameShell 高度封顶 844）。clamp 让它跟着实际宽度连续变。 */
+  --stamp-size:clamp(52px,17vw,76px);--stamp-slot:calc(var(--stamp-size) + 6px);
   --shadow:0 5px 0 rgba(40,33,26,.22);--safe-top:max(12px,env(safe-area-inset-top));
   --safe-bottom:max(10px,env(safe-area-inset-bottom));
   --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
@@ -83,8 +88,13 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 @keyframes monkeySquash{0%{transform:scale(1.06,.94)}48%{transform:scale(1.16,.78)}100%{transform:scale(1)}}
 @keyframes monkeyDoom{to{transform:scale(.92) rotate(7deg);opacity:.76}}
 #playerGroup.gold #monkeyUse{filter:sepia(1) saturate(5) hue-rotate(355deg) brightness(1.18)}
-#goldAura{opacity:0;fill:none;stroke:#f5b731;stroke-width:5;stroke-dasharray:8 7;animation:aura 1s linear infinite}
-#playerGroup.gold #goldAura{opacity:.95}
+/* 金光描边**只在看得见的时候转**。原来动画写在基础规则上，opacity:0 也照转，
+   于是首页、结算页、暂停页什么都不动，它仍每秒触发几十次样式重算。
+   461 行那条「不在局中就暂停」的名单漏了它，而它比名单里那三个更糟：那三个只在局外浪费，
+   它是不分场合永远跑。把动画挪到 .gold 那条规则里，可见与开销就绑在一起了——
+   **比往暂停名单里再补一个名字更可靠：名单会漏，绑在一起不会。** */
+#goldAura{opacity:0;fill:none;stroke:#f5b731;stroke-width:5;stroke-dasharray:8 7}
+#playerGroup.gold #goldAura{opacity:.95;animation:aura 1s linear infinite}
 @keyframes aura{to{stroke-dashoffset:-30}}
 #fishScene,#fertilizerScene,#bubbleField,#fogField{opacity:0;transition:opacity .8s ease;pointer-events:none}
 #fishScene.show,#fertilizerScene.show,#bubbleField.show,#fogField.show{opacity:1}
@@ -149,7 +159,11 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 #departmentBanner strong{display:block;font-family:var(--serif);font-size:16px;line-height:1.12;margin:2px 0 3px}
 #departmentBanner span{display:block;color:var(--muted);font-size:9px;font-weight:700;line-height:1.35}
 @keyframes banner{0%{opacity:0;transform:translateY(-12px) scale(.84)}15%,75%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-22px) scale(.96)}}
-#toastLayer{position:absolute;z-index:40;inset:0;pointer-events:none;overflow:hidden}
+/* toast 必须**盖在菜单屏之上**。原来是 40，而 .screen 是 60、子屏是 76——
+   于是首页收藏条那九格里，凡是用 toast 回话的都点了没反应，玩家会以为按钮坏了。
+   90 这个值不是随手挑的：要高过子屏（76），低过开场遮罩（100）与横屏闸（200），
+   也低过自检报告（120），免得盖住那三件必须压住一切的东西。 */
+#toastLayer{position:absolute;z-index:90;inset:0;pointer-events:none;overflow:hidden}
 .toast{position:absolute;width:156px;max-width:42%;transform:translateY(10px) scale(.88);opacity:0;
   background:var(--card);border:2.5px solid var(--ink);border-radius:12px;box-shadow:0 4px 0 rgba(40,33,26,.2);padding:8px 10px;
   text-align:left;font-weight:1000;font-size:11px;line-height:1.38;animation:toast 1.55s cubic-bezier(.2,.8,.2,1) both}
@@ -225,9 +239,17 @@ html.wide-mobile-viewport #gameShell{transform:scale(var(--wide-mobile-scale,1))
 /* 香蕉钱包：商店唯一的入口原来是收藏条上一枚 22 像素的图标——
    那是给已经知道有这东西的人用的。**一个新系统的门必须比它的图标大。**
    顺带补上首页从来没显示过的香蕉余额：香蕉这一版起是货币，看不见余额就不像商店。 */
+/* 三段信息挤在一行里，320 宽上会断成四行，连「香」「蕉」都拆开了（实测）。
+   分主次：**余额与入口是主文案，一个字都不许换行**；右边那句提示是次要的，
+   放不下就让它先消失——这比让主文案断行强，也比缩字号强（缩字号会一路缩到看不清）。
+   `min-width:0` 是 flex 子项能收缩的前提，少了它 ellipsis 根本不生效。 */
 .wallet{display:flex;align-items:center;gap:8px;width:100%;margin:0 0 9px;padding:7px 10px;flex:none;
   border:2.5px solid var(--ink);border-radius:12px;background:#fff0af;cursor:pointer;
   font:1000 12px/1.2 var(--sans);color:var(--ink);box-shadow:0 3px 0 rgba(40,33,26,.18);text-align:left}
+.wallet-main{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wallet-tail{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--muted);font-weight:900}
+@media (max-width:349px){.wallet-tail{display:none}}
 .wallet:active{transform:translateY(2px);box-shadow:none}
 .wallet svg{display:block;flex:none}
 .wallet b{font-size:15px;color:var(--red)}
@@ -354,12 +376,44 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .palette-note{border-style:solid;border-color:#c9bfa6;background:#f8efd9;color:var(--ink)}
 .brand-box{background:var(--ink);color:var(--paper);border-radius:13px;padding:12px 14px;margin-bottom:13px}
 .brand-box b{font-size:18px;letter-spacing:.12em}.brand-box p{font-family:var(--serif);font-size:12px;line-height:1.55;margin:5px 0 0;color:#f1d99f}
-.result-stamp{position:absolute;right:9px;top:93px;width:76px;height:76px;border:5px double var(--red);border-radius:50%;display:grid;place-items:center;
-  color:var(--red);background:rgba(255,253,246,.88);font:1000 14px/1.15 var(--serif);text-align:center;transform:rotate(11deg);letter-spacing:.08em;pointer-events:none}
+/* 盖章**进到布局里**，不再用绝对定位悬在数字上。
+   它原来是 `top:93px`——那个 93 镜像的是「当时标题占多高」，是 0813 那个
+   写死 844 屏高的同族错：标题改字号、屏一窄，它就压到数字上。实测五个视口全中，
+   320 宽上盖掉了 1888 的最后一位。中间还试过「两边留等宽的槽」，
+   仍然不行：数字是 58px 的定值，槽一留它就溢出来，照样被压。
+   **只要它还悬在别人头上，就总有一个视口会撞。** 现在整行改成 flex，
+   数字、单位、印章三个都是流里的东西，谁也压不到谁——代价是印章不再压着数字，
+   但「看得清数字」比「看着像盖上去的」重要。旋转与双圈边保住了盖章的样子。 */
+/* 旋转 11 度之后，正方形的外接盒会比它自己大：边长 S 的方块转 11 度，
+   外接盒是 S*(cos11+sin11) = 1.172*S，四边各多出 0.086*S。
+   这一圈多出来的角就是最后那点重叠（实测每边 4 到 183 平方像素）。
+   **多出来多少是算得出来的，就别去试**——上下留白与左右间距都按 0.09*S 给。 */
+.result-score{display:flex;align-items:center;justify-content:center;
+  gap:calc(5px + var(--stamp-size) * .09);
+  padding-block:calc(var(--stamp-size) * .09)}
+.result-stamp{flex:none;margin-left:auto;width:var(--stamp-size);height:var(--stamp-size);
+  transform:rotate(11deg);border:5px double var(--red);border-radius:50%;display:grid;place-items:center;
+  color:var(--red);background:rgba(255,253,246,.88);font:1000 calc(var(--stamp-size) * .185)/1.15 var(--serif);
+  text-align:center;letter-spacing:.08em;pointer-events:none}
+/* 印章不在场时，数字仍然要在整行的中间——否则有没有盖章会让数字左右跳。
+   **但这个占位必须能被压扁**（flex:0 1，不是 flex:none）：320 宽上
+   「占位 + 四位数 + 米 + 印章」本来就排不下，占位若不肯让，挤没地方的就轮到数字，
+   而数字是 min-width:0 的——它的**盒子**缩小、**字形**照样溢出去压在印章底下。
+   盒子不重叠、像素重叠，只量矩形的判据完全看不见（当时报的是「0 处重叠」），
+   是靠截图才发现的。压扁顺序：先牺牲这个纯装饰的占位，再谈别的。 */
+.result-score::before{content:'';flex:0 1 var(--stamp-size);margin-right:auto}
+/* 数字**一格都不让**：它是这一屏的主角，让它缩就等于让字形跑到盒子外面去
+   （flex 子项默认 flex-shrink:1，盒子缩了、overflow 是 visible，字照样画出来压住印章）。
+   让位的顺序写死在这里：先压扁上面那个纯装饰的占位，再没地方就整行超出去——
+   而不是先牺牲主角。 */
+.result-score>b{flex:none}
 .rank-entry{margin:12px 0;padding:11px;border:2px dashed #a7977c;border-radius:13px;background:#f8efd9}
 .rank-entry label{display:block;font-size:10px;color:var(--muted);font-weight:1000;margin-bottom:6px}
 .rank-form{display:grid;grid-template-columns:1fr auto;gap:7px}.rank-input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;
-  background:var(--card);padding:9px 10px;font:900 13px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
+  /* **字号不能小于 16px。** iOS Safari 对小于 16px 的输入框会在聚焦时自动放大整页，
+     而这个游戏是 user-scalable=no 的单屏应用，放大之后缩不回去，玩家等于被卡在放大的榜单里。
+     这不是审美取舍，是 Safari 的硬行为；想显小要用 transform，不能靠 font-size。 */
+  background:var(--card);padding:9px 10px;font:900 16px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
 .rank-save{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);padding:8px 12px;font-weight:1000;cursor:pointer}
 #leaderboardScreen,#installScreen,#shareScreen,#teaScreen,#shopScreen{z-index:76}
 #leaderboardScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card,#shopScreen .card{max-height:100%;overflow:hidden}
@@ -816,8 +870,12 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="result-page" data-result-page="0">
           <p id="deathLine" class="death-line"></p>
           <div id="resultTitle" class="result-title"></div>
-          <div id="resultStamp" class="result-stamp">已阅</div>
-          <div class="result-score"><b id="resultHeight">0</b><small>米</small></div>
+          <!-- 印章挪进分数那一行里：它原来是 `top:93px` 绝对定位，而 93 镜像的是
+               「那时候标题占多高」——标题一改、字号一改、屏一窄，它就压到数字上。
+               实测五个视口全部压住正文，320 宽上盖掉了 1888 的最后一位。
+               现在它是分数行的子元素，靠 right/居中定位，正文那边留出等宽的槽，
+               **位置由布局决定，不再由一个会过期的数字决定**。 -->
+          <div class="result-score"><b id="resultHeight">0</b><small>米</small><div id="resultStamp" class="result-stamp">已阅</div></div>
           <div id="resultSub" class="result-sub"></div>
           <div class="stats">
             <div class="stat"><b id="resultBananas">0</b><span>香蕉</span></div>
@@ -965,7 +1023,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.7-liftbehind',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.8-collectfix',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1318,7 +1376,7 @@ function typeStep(step){return Math.round(TYPE_BASE*Math.pow(TYPE_RATIO,step));}
 // 海报用到的那几级，取好名字再用——`typeStep(9)` 读不出是什么，`TYPE.floors` 读得出。
 // 层级之间至少隔一格，隔太近的两级在视觉上会打架（这条有自检盯着）。
 const TYPE={
-  floors:typeStep(11),   // 232 楼层数：整张海报的主角，一眼就该看到
+  floors:typeStep(11),   // 186 楼层数：整张海报的主角，一眼就该看到
   rank:typeStep(7),      // 76  职级
   name:typeStep(5),      // 49  名字
   rarity:typeStep(5),    // 49  稀有度
@@ -1334,7 +1392,9 @@ const TYPE={
 const TYPE_FACTS={
   paper:'字号不是随手定的，是一条等比数列上的格子（这里是 1.25）。整版只用一个数列，相邻两级的关系就固定了，眼睛才读得出稳定的层级。',
   fish:'字号差得不够就不叫层级，只叫「大小不一」。同一条数列上隔开两格以上，两行字才会被读成主次，而不是并列。',
-  banana:'标题用大字、正文用小字，这只是一半；另一半是**大字要收紧、小字要放松**——字号越大，字与字之间的空隙看着越松，所以越大的字越要往回收。',
+  // 这一条曾经把 Markdown 的 ** 原样印在海报上给玩家看（TYPE_FACTS 是**玩家可见文案**，
+  // 不是源码注释，不能用注释里的记号）。玩家读到的是「另一半是**大字要收紧**」。
+  banana:'标题用大字、正文用小字，这只是一半；另一半是「大字要收紧、小字要放松」——字号越大，字与字之间的空隙看着越松，所以越大的字越要往回收。',
   purple:'一行排多少字是有上限的：中文一行超过四十来字，眼睛从行尾折回行首就容易串行。这张海报的批注框按它的字号只排得下十七八个字，是刻意留在上限之内的——窄一点没关系，宽过头就会开始串行。',
   night:'深底浅字比浅底深字看着更粗（同一个字号，白字在黑底上会「胀」）。所以夜班版的正文并没有加粗，是底色替它加的。',
   odd:'留白不是没排东西的地方，是排版的一部分：四周那圈边距把整张图框成一件「公示件」，去掉之后所有内容都会显得在往外挤。'
@@ -1819,14 +1879,16 @@ const COLLECTIONS=[
 function renderResultWallet(){
   if(!el.resultShop)return;
   el.resultShop.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
-    +`本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店<span>余额 ${career.bananas} 根</span>`;
+    +`<span class="wallet-main">本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店</span>`
+    +`<span class="wallet-tail">余额 ${career.bananas} 根</span>`;
 }
 function renderWallet(){
   const cheapest=Math.min(...SHOP_ITEMS.filter(i=>!career.owned.includes(i.id)).map(shopPrice).concat([Infinity]));
   const tail=career.owned.length>=SHOP_ITEMS.length?'全套已入库'
     :career.bananas>=cheapest?'有能买的了':`还差 ${cheapest-career.bananas} 根`;
   el.wallet.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
-    +`香蕉 <b>${career.bananas}</b> 根 · 逛香蕉商店<span>${tail}</span>`;
+    +`<span class="wallet-main">香蕉 <b>${career.bananas}</b> 根 · 逛香蕉商店</span>`
+    +`<span class="wallet-tail">${tail}</span>`;
 }
 function renderCollectStrip(){
   el.collectStrip.innerHTML='';
@@ -2468,8 +2530,16 @@ function renderAll(now){
   for(const [id,node]of platformEls){if(!liveIds.has(id)){node.remove();platformEls.delete(id);}}
   const liveItems=new Set();
   for(const item of state.items){
-    const sy=H-(item.y-state.cameraY),fade=item.declined?1-(now-item.declinedAt)/520:1;
-    if((item.collected&&fade<=0)||sy<-90||sy>H+80)continue;
+    // fade 一个变量要同时表达两件事，所以两件事都得写全：
+    //   作废的任命 -> 520ms 淡出；被收集的东西 -> **当帧就不画了**。
+    // 0814 王老师报的「香蕉吃了怎么还有」就是这里：a65f9bd 给作废任命加淡出时，
+    // 把 fade 写成了 `declined ? 淡出值 : 1`，于是普通被收集的道具 fade 恒为 1，
+    // `collected && fade<=0` 永远不成立，唯一的退出路径只剩「滑出视野」——
+    // 香蕉入了账、计数器涨了、toast 也弹了，那根香蕉还在原地飘三四秒。
+    // 更糟的是它和没吃的香蕉长得一模一样，玩家会再扑一次，扑了个空。
+    // **数值全对，只有画面是错的**——三十条断言全绿，是靠逐帧跟踪和截图看出来的。
+    const sy=H-(item.y-state.cameraY),fade=item.declined?1-(now-item.declinedAt)/520:(item.collected?0:1);
+    if(fade<=0||sy<-90||sy>H+80)continue;
     liveItems.add(item.id);const node=ensureItemNode(item);node.setAttribute('transform',`translate(${item.x.toFixed(1)} ${(sy+Math.sin(now*.004+item.phase)*5).toFixed(1)})`);
     if(item.declined)node.style.opacity=String(Math.max(0,fade));
   }
@@ -2548,8 +2618,12 @@ function stepPage(delta){
   pager.go(target);sfx('select');return true;
 }
 // 当前开着的子屏幕怎么关。Esc 与角落返回键共用这一张表。
+// 每开一个新子屏都要往这里加一条，否则那一屏 Esc 关不掉。
+// 香蕉商店上线时就漏了——它是十八件行头的入口，却是唯一一个键盘关不掉的屏。
+// 下面那条自检把「.screen 里每一个子屏都要在这张表里」变成断言，靠人记是记不住的。
 function activeMenuClose(){
   if(!el.titles.classList.contains('hidden'))return closeTitles;
+  if(!el.shop.classList.contains('hidden'))return closeShop;
   if(!el.teas.classList.contains('hidden'))return closeTeas;
   if(!el.leaderboard.classList.contains('hidden'))return closeLeaderboard;
   if(!el.install.classList.contains('hidden'))return showTitleScreen;

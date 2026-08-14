@@ -613,6 +613,146 @@ assert(/pager-dots solo/.test(html),
       + "querySelectorAll('." + layer + "') 会把槽位那个 <g> 也当成图层刷");
   }
 
+  // ---- 0814 王老师报的三条，加门盯住 ----
+
+  // ① 「香蕉吃了怎么还有」：被收集的道具必须**当帧就不画了**。
+  //    a65f9bd 给作废任命加淡出时，把 fade 写成 `declined ? 淡出值 : 1`，
+  //    于是普通被收集的道具 fade 恒为 1，`collected && fade<=0` 永远不成立，
+  //    唯一的退出路径只剩「滑出视野」——实测滞留中位 3916 ms、最长 8333 ms，
+  //    同屏最多同时挂着 7 个已经入了账的道具。数值全对，只有画面是错的。
+  //    这里认的是「collected 这一支有没有落到 0」，不是抄那一整行。
+  {
+    const fadeLine = (CODE.match(/const sy=H-\(item\.y-state\.cameraY\),fade=[^;]+;/) || [''])[0];
+    assert(/item\.collected\?0:/.test(fadeLine),
+      '被收集的道具没有当帧停画：香蕉入了账、计数器涨了，那根香蕉还在原地飘几秒，'
+      + '玩家会把它当成还能捡的再扑一次');
+    assert(/if\(fade<=0\|\|sy<-90/.test(CODE),
+      '道具的绘制条件不再由 fade 统一决定了，collected 与 declined 会各走各的路');
+  }
+
+  // ② toast 必须盖在菜单屏之上。原来 40 < .screen 的 60 < 子屏的 76，
+  //    于是首页收藏条九格里凡是用 toast 回话的都点了没反应。
+  //    两个数都**从 CSS 现取**，不抄字面量。
+  {
+    const zOf = (sel) => {
+      const rule = new RegExp(sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\{[^}]*z-index:(\\d+)');
+      const hit = CODE.match(rule);
+      return hit ? Number(hit[1]) : NaN;
+    };
+    const toastZ = zOf('#toastLayer'), screenZ = zOf('.screen');
+    const subZ = Number((CODE.match(/#leaderboardScreen,#installScreen,#shareScreen,#teaScreen,#shopScreen\{z-index:(\d+)\}/) || [])[1]);
+    assert(Number.isFinite(toastZ) && Number.isFinite(screenZ) && Number.isFinite(subZ),
+      'toast 或菜单屏的 z-index 取不到，这道门等于没跑');
+    assert(toastZ > screenZ && toastZ > subZ,
+      'toast 层（' + toastZ + '）没盖过菜单屏（' + screenZ + ' / ' + subZ + '）：'
+      + '首页收藏条里用 toast 回话的那几格会点了没反应');
+  }
+
+  // ③ 金光描边只在看得见的时候转。原来动画写在基础规则上，opacity:0 也照转——
+  //    首页/结算/暂停页什么都不动却每秒触发几十次样式重算。
+  // 取「行首那条 #goldAura 规则」——不锚行首的话，`#playerGroup.gold #goldAura{...}`
+  // 也会被这个模式吃进去，负向断言当场变成永远为假的假门。
+  // **这个仓库里「范围没圈住」已经栽了六次**，所以先取出那一条，再在那一条里问。
+  {
+    const baseRule = (CODE.match(/\n#goldAura\{[^}]*\}/) || [''])[0];
+    assert(baseRule, '取不到 #goldAura 的基础规则，这道门等于没跑');
+    assert(!/animation:aura/.test(baseRule),
+      '金光描边的动画又写回了基础规则：它在 opacity:0 时照样转，静止的页面白烧 CPU');
+  }
+  assert(/#playerGroup\.gold #goldAura\{[^}]*animation:aura/.test(CODE),
+    '金光描边不转了：动画得跟着 .gold 那条规则走，可见与开销才绑在一起');
+
+  // ④ 每一个子屏都要能用 Esc / 返回键关掉。香蕉商店上线时漏了，
+  //    它是十八件行头的入口，却是唯一一个键盘关不掉的屏。
+  //    **两边都从源码现取**：子屏清单从 HTML 里数，名单从 activeMenuClose 里读。
+  {
+    const subScreens = [...html.matchAll(/id="([a-zA-Z]+Screen)" class="screen hidden"/g)].map(hit => hit[1])
+      .filter(id => id !== 'resultScreen' && id !== 'pauseScreen');  // 这两个有自己的关法
+    const body = (CODE.match(/function activeMenuClose\(\)\{[\s\S]*?\n\}/) || [''])[0];
+    assert(subScreens.length >= 5 && body, '子屏清单或 activeMenuClose 取不到，这道门等于没跑');
+    // el 映射里 shopScreen -> el.shop，所以按 el.<名> 反查：名字取 id 去掉 Screen 之后的词根。
+    const elFor = { titlesScreen: 'titles', teaScreen: 'teas', shopScreen: 'shop',
+      leaderboardScreen: 'leaderboard', installScreen: 'install', shareScreen: 'share' };
+    for (const id of subScreens) {
+      const key = elFor[id];
+      assert(key, '新子屏 ' + id + ' 还没登记到这道门的对照表里，先补上再说');
+      assert(body.includes('el.' + key + '.classList.contains'),
+        id + ' 没登记进 activeMenuClose：这一屏用 Esc / 安卓返回键关不掉');
+    }
+  }
+
+  // ⑤ 输入框字号不得小于 16px。iOS Safari 对小于 16px 的输入框会在聚焦时放大整页，
+  //    而这是个 user-scalable=no 的单屏应用，放大之后缩不回来。
+  {
+    const inputs = [...CODE.matchAll(/\.([a-z-]*input)\{[^}]*font:\d+ (\d+)px/g)];
+    assert(inputs.length >= 1, '找不到任何输入框的字号，这道门等于没跑');
+    for (const [, name, size] of inputs) {
+      assert(Number(size) >= 16,
+        '.' + name + ' 的字号是 ' + size + 'px：iOS Safari 会在聚焦时放大整页，玩家缩不回来');
+    }
+  }
+
+  // ⑥ 排版表注释里的数字是镜像，得跟计算值对上。floors 那一级曾经写着 232、实际 186，
+  //    因为有人把 typeStep(12) 改成了 (11) 而没动注释。
+  //    **不删注释**——它读起来有用；改成让它受检。
+  {
+    // **这一条必须查 html，不能查 CODE**：CODE 是剥过注释的，
+    // 而这道门要查的正是注释本身——查 CODE 只会得到「取不到」。
+    // （反过来，凡是查「代码里有没有写某句」的门都必须用 CODE，
+    //   否则注释里提一嘴就能把门弄绿或弄红，0813 两个方向都栽过。）
+    const base = Number((html.match(/const TYPE_BASE=(\d+)/) || [])[1]);
+    const ratio = Number((html.match(/TYPE_RATIO=([\d.]+)/) || [])[1]);
+    const rows = [...html.matchAll(/(\w+):typeStep\((-?\d+)\),\s*\/\/ (\d+)/g)];
+    assert(base && ratio && rows.length >= 5, '排版表取不到，这道门等于没跑');
+    for (const [, name, step, said] of rows) {
+      const real = Math.round(base * Math.pow(ratio, Number(step)));
+      assert(Number(said) === real,
+        '排版表 ' + name + ' 的注释写着 ' + said + '，实际算出来是 ' + real + '（typeStep(' + step + ')）');
+    }
+  }
+
+  // ⑦ emoji 全局禁令：monkey 这条发布管线一直一条门都没有。
+  //    禁的不只是彩色 emoji，还有「emoji 味」的装饰符——箭头、装饰星、带圈数字、几何块。
+  //    例外：`->` 是明文批准的写法（ASCII，不在下面任何一段里）。
+  {
+    const BANNED = [[0x2190, 0x21FF, '箭头'], [0x2460, 0x24FF, '带圈数字'],
+      [0x25A0, 0x25FF, '几何块'], [0x2600, 0x27BF, '杂项符号与装饰'],
+      [0x2B00, 0x2BFF, '箭头与几何'], [0x1F300, 0x1FAFF, 'emoji'], [0xFE0F, 0xFE0F, '变体选择符']];
+    const found = [];
+    for (const ch of html) {
+      const cp = ch.codePointAt(0);
+      for (const [a, b, name] of BANNED) {
+        if (cp >= a && cp <= b) { found.push(JSON.stringify(ch) + '（U+' + cp.toString(16).toUpperCase() + '，' + name + '）'); break; }
+      }
+    }
+    assert(!found.length, 'emoji 全局禁令（0725 起）：发现 ' + [...new Set(found)].join('、')
+      + '。装饰符也算——箭头写成 ->，自测输出写 [过]/[败]');
+  }
+
+  // ⑧ 结算页那枚印章不许再用写死的 px 定位。原来是 `top:93px`——
+  //    那个 93 镜像的是「当时标题占多高」，和 0813 写死 844 屏高是同族错。
+  //    实测五个视口全部被它压住正文，320 宽上盖掉了 1888 的最后一位。
+  {
+    const rule = (CODE.match(/\n\.result-stamp\{[^}]*\}/) || [''])[0];
+    assert(rule, '取不到 .result-stamp 的规则，这道门等于没跑');
+    assert(!/(^|;)(top|bottom):\s*-?\d+px/.test(rule),
+      '结算印章又用写死的 px 定位了：标题改字号、屏一窄它就压到数字上，'
+      + '位置得由布局给（现在它是 .result-score 里的 flex 子项）');
+    // 数字是这一屏的主角，不许它让位——一让位就是「盒子缩小、字形溢出去压住印章」，
+    // 而只量矩形的判据看不见那种压法。
+    assert(/\.result-score>b\{flex:none\}/.test(CODE),
+      '结算页那个数字又能被压缩了：它的盒子会缩、字形会溢出去压在印章底下，'
+      + '而量矩形重叠的判据看不见这种压法（靠截图才发现的）');
+  }
+
+  // ⑨ 钱包按钮的主文案不许换行：320 宽上它曾经把「香」「蕉」都拆成两行。
+  //    让步的是右边那句提示，不是主文案。
+  assert(/\.wallet-main\{[^}]*white-space:nowrap/.test(CODE),
+    '香蕉钱包的主文案又能换行了：320 宽上它会断成三四行，连「香蕉」两个字都拆开');
+  assert(/\.wallet-main/.test(CODE) && /\.wallet-tail/.test(CODE)
+    && /class="wallet-main"/.test(CODE) && /class="wallet-tail"/.test(CODE),
+    '钱包按钮的主次两段没有同时接上：CSS 与写入点必须成对，少一边就是没生效');
+
   // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
   assert(/#gameShell\.carp-hat-on \.wear-head\{display:none\}/.test(CODE),
     '买来的帽子会和局内的红鲤鱼帽叠在一起。注意状态类名与资源类名必须分开——0813 撞过一次，整个画面消失');
