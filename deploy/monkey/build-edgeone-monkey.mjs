@@ -596,6 +596,15 @@ assert(/pager-dots solo/.test(html),
     '联网超时短于 8 秒：地铁电梯里一次握手就不止这么久，会把慢网冤枉成断网');
   assert(/visibilitychange[\s\S]{0,120}retryWorldNow/.test(CODE),
     '回到前台不再立刻重试：后台定时器常被系统压住，而玩家这会儿正看着屏幕');
+  // 手动重试必须节流。实测没节流时，2.1 秒内猛切 30 次前后台会发出 60 个请求，
+  // 并把退避轮次顶到 30（下一次自动重试要等满两分钟）——手动重试反而让自动重试变慢。
+  const manualFn = (CODE.match(/function retryWorldNow\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(manualFn, '取不到 retryWorldNow（写法变了？先修本门禁的取法）');
+  assert(/WORLD_MANUAL_GAP_MS/.test(manualFn),
+    '手动重试没有节流：口袋里反复亮屏就会持续打请求（实测 2 秒能发 60 个）');
+  const gap = Number((CODE.match(/WORLD_MANUAL_GAP_MS=(\d+)/) || [])[1] || 0);
+  assert(gap >= 1500 && gap <= 10000,
+    '手动重试的节流窗口 ' + gap + 'ms 不合理：太短挡不住风暴，太长会让「切回来立刻重试」失效');
   assert(/addEventListener\('online'[\s\S]{0,80}retryWorldNow/.test(CODE), '恢复联网时没有立刻重试');
 }
 

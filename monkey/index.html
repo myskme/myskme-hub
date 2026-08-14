@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.3-doors">
+<meta name="myskme-release" content="20260814.4-throttle">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -965,7 +965,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.3-doors',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.4-throttle',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1628,8 +1628,18 @@ function scheduleWorldRetry(){
   worldSyncMessage='';updateWorldStatus();
 }
 // 回到前台、或者刚恢复联网，就别再等那个定时器了——玩家正看着呢。
+// **但必须节流。** 实测：2.1 秒内猛切 30 次前后台会发出 60 个请求
+// （每次一趟，每趟还含当场重试那一次），而且把退避轮次顶到 30，
+// 下一次自动重试要等满两分钟——手动重试反而让自动重试变慢，跟设计意图正好相反。
+// worldSyncPromise 挡不住它：断网时 fetch 立即失败，上一趟早结束了，下一趟照发。
+// 三秒的门槛：真人隔十秒切回来照样立刻重试，而口袋里反复亮屏只算一次。
+const WORLD_MANUAL_GAP_MS=3000;
+let worldManualAt=0;
 function retryWorldNow(){
   if(!pendingWorldCount())return;
+  const now=Date.now();
+  if(now-worldManualAt<WORLD_MANUAL_GAP_MS)return;
+  worldManualAt=now;
   if(worldRetryTimer)clearTimeout(worldRetryTimer),worldRetryTimer=0;
   worldRetryAt=0;flushWorldQueue();
 }
