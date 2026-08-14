@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.4-throttle">
+<meta name="myskme-release" content="20260814.5-final">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -965,7 +965,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.4-throttle',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.5-final',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1486,7 +1486,7 @@ let platformSeq=0,itemSeq=0,forcedFallConsumed=false;
 const input={left:false,right:false};
 const saved=loadRecord();
 const localBoard=loadBoard();
-const career=loadCareer();
+let career=loadCareer();
 const state={running:false,over:false,seed:1,rng:Math.random,player:null,platforms:[],items:[],cameraY:0,nextY:0,lastX:195,
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],motifId:'jiangnan',
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
@@ -1549,10 +1549,27 @@ function safeWearing(raw,owned){
   return out;
 }
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],modes:Array.isArray(raw.modes)?[...new Set(raw.modes.filter(id=>MODES.some(m=>m.id===id)))]:[],perks:Array.isArray(raw.perks)?[...new Set(raw.perks.filter(id=>PERK_POOL.some(p=>p.id===id)))]:[],bananas:Math.max(0,Math.floor(Number(raw.bananas)||0)),owned:Array.isArray(raw.owned)?[...new Set(raw.owned.filter(id=>SHOP_BY_ID[id]))]:[],posters:Array.isArray(raw.posters)?[...new Set(raw.posters.filter(id=>POSTER_VARIANTS.some(v=>v.id===id)))]:[],wearing:safeWearing(raw.wearing,raw.owned),tally:safeTally(raw.tally)};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');
+    // 先把「解锁了什么」算出来，再拿它去过滤「戴着什么」——
+    // 和同一行里 wearing 走 safeWearing 是同一条规矩：**没解锁就戴不上**。
+    // 原来 worn / cup 只查 id 在不在表里，于是手改存档就能戴一枚没打出来的称号、
+    // 端一杯没点过的隐藏款，还会印上成绩海报。同一个函数里两套规矩，迟早有人照着松的那套抄。
+    const okTitles=Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[];
+    const okTeas=Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[];
+    return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:okTitles,worn:okTitles.includes(raw.worn)?raw.worn:'',teas:okTeas,cup:okTeas.includes(raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],modes:Array.isArray(raw.modes)?[...new Set(raw.modes.filter(id=>MODES.some(m=>m.id===id)))]:[],perks:Array.isArray(raw.perks)?[...new Set(raw.perks.filter(id=>PERK_POOL.some(p=>p.id===id)))]:[],bananas:Math.max(0,Math.floor(Number(raw.bananas)||0)),owned:Array.isArray(raw.owned)?[...new Set(raw.owned.filter(id=>SHOP_ITEMS.some(i=>i.id===id)))]:[],posters:Array.isArray(raw.posters)?[...new Set(raw.posters.filter(id=>POSTER_VARIANTS.some(v=>v.id===id)))]:[],wearing:safeWearing(raw.wearing,raw.owned),tally:safeTally(raw.tally)};}
   catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],modes:[],perks:[],bananas:0,owned:[],wearing:{},posters:[],tally:blankTally()};}
 }
-function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
+// 自检期间不许写盘。**这是一道总闸，不是逐处 keep/restore**——
+// 逐处还原要求每个写自检的人都记得还原，而且中途抛异常就停在半路上；
+// 0814 审计抓到两处：?posterqa=1 往真档案注入一枚没赚到的称号且从不还原，
+// 商店自检把 career 清空后调 tapShopItem（会写盘），中间抛异常玩家的行头就没了。
+let careerWriteLocked=false;
+function saveCareer(){if(careerWriteLocked)return;try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
+// 自检统一走这个壳子：进来上锁、出去解锁并把档案原样读回来，异常也不例外。
+function withCareerSandbox(fn){
+  const before=careerWriteLocked;careerWriteLocked=true;
+  try{return fn();}finally{careerWriteLocked=before;if(!before)career=loadCareer();}
+}
 function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
 function worldStorageSet(key,value){try{localStorage.setItem(key,String(value));return true;}catch(_){return false;}}
 function cultureMotif(id=state.motifId){return CULTURE_MOTIFS.find(m=>m.id===id)||CULTURE_MOTIFS[0];}
@@ -1763,6 +1780,15 @@ const COLLECTIONS=[
 ];
 // 钱包同时是余额显示与商店入口。差一件最便宜的行头就直说差多少——
 // 「还差 6 根」比「去看看」更能让人再打一局。
+// 结算页那颗按钮与首页钱包显示的是**同一个事实**（香蕉余额），所以必须走同一条刷新链。
+// 第一版把它写在 finishRun 里，于是在商店花完钱回到结算页，它还写着花之前的数——
+// 同一个事实在两处显示、其中一处不在刷新链上，就是一份会漂的镜像。
+// 「本局 +N」用 state.bananas（那是这一局的事实，结算之后不再变），余额用 career.bananas。
+function renderResultWallet(){
+  if(!el.resultShop)return;
+  el.resultShop.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
+    +`本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店<span>余额 ${career.bananas} 根</span>`;
+}
 function renderWallet(){
   const cheapest=Math.min(...SHOP_ITEMS.filter(i=>!career.owned.includes(i.id)).map(shopPrice).concat([Infinity]));
   const tail=career.owned.length>=SHOP_ITEMS.length?'全套已入库'
@@ -1808,7 +1834,7 @@ function renderCareer(){
   // 六种收藏从这行小字里搬走了——它们现在在收藏条上，一眼看得完。
   $('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米`;
   renderCollectStrip();
-  renderWallet();
+  renderWallet();renderResultWallet();
   // 行头也在这里刷。挂在 renderCareer 上是因为它已经是「档案变了就重画」的那个入口，
   // 另起一条调用链迟早出现「买完没穿上」或者「开局没穿上」。
   renderWorn();
@@ -2537,7 +2563,11 @@ function startRun(seed=Date.now()&0xffffffff){
   if(MAJOR_EVENTS.includes(DEBUG_EVENT))setTimeout(()=>triggerMajorEvent(DEBUG_EVENT,performance.now()),260);
 }
 function finishRun(reason='fall'){
-  if(!state.running)return;state.running=false;state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.shell.classList.remove('running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
+  if(!state.running)return;state.running=false;state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.shell.classList.remove('running');
+  // 红鲤鱼帽是**局内**状态，一局结束就得摘。不摘的话 `.wear-head{display:none}`
+  // 会一直生效，玩家在首页看到的是一只光头猴（买来的帽子被藏了，而首页没有红鲤鱼帽节点），
+  // 他的结论会是「我花钱买的帽子丢了」。原来只有 resetWorld 清它，那要等下一局才开始。
+  el.shell.classList.remove('carp-hat-on');state.carpHat=false;input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
   // 调试参数跑出来的成绩不许进本机纪录。原来只挡了 career，漏了 saved——
   // ?start=1200 之类一开，假高度就永久盖进玩家的最高纪录了。
   const oldHeight=saved.height,oldScore=saved.score;
@@ -2566,8 +2596,7 @@ function finishRun(reason='fall'){
     if(worldEnabled()){queueWorldRun(currentWorldRun());flushWorldQueue();}
   }
   renderFreshHonors(fresh);renderFreshTeas(freshTeas);
-  el.resultShop.innerHTML=`<svg viewBox="0 0 44 44" width="22" height="22" aria-hidden="true"><use href="#art-banana" width="44" height="44"/></svg>`
-    +`本局 +<b>${state.bananas}</b> 根 · 逛香蕉商店<span>余额 ${career.bananas} 根</span>`;
+  renderResultWallet();
   el.rankName.value=worldAlias();el.rankSave.disabled=false;el.rankSave.textContent=worldEnabled()?'更新化名':'登记';showResultPage(0);markResultNews();el.result.classList.remove('hidden');updateBestLabels();
   renderCareer();
   el.shell.dataset.careerStamps=String(career.stamps);el.shell.dataset.careerRuns=String(career.runs);el.shell.dataset.missionDone=String(completed);
@@ -3300,7 +3329,11 @@ function measureMenuOverflow(){
   for(const node of shownBefore)node.classList.remove('hidden');
   return bad;
 }
-function runQA(){
+// **整个自检都不许写盘。** 它会 resetWorld + generatePlatforms，沿途把「发现的立面」
+// 之类推进 career——玩家跑一次 ?qa=1 就白得一堆没打出来的收集品。
+// 裹整个函数而不是逐条裹：以后谁再往里加自检，不用记得还原。
+function runQA(){return withCareerSandbox(()=>runQAInner());}
+function runQAInner(){
   resetWorld(1020);generatePlatforms(26000);
   const sorted=[...new Set(state.platforms.map(p=>Math.round(p.y)))].sort((a,b)=>a-b),gaps=sorted.slice(1).map((y,i)=>y-sorted[i]);
   const clusters=new Map();for(const p of state.platforms){const y=Math.round(p.y/5)*5;if(!clusters.has(y))clusters.set(y,[]);clusters.get(y).push(p);}
@@ -3465,7 +3498,7 @@ function runQA(){
       // 每一格都得点得动：没有图鉴页的那几格也要有反应，否则玩家点两下就当它是装饰。
       const allClickable=[...el.collectStrip.children].every(node=>node.tagName==='BUTTON'&&!node.disabled);
       return changed&&back&&allClickable;})()],
-    ['行头是纯外观：十八件逐件单穿，轨迹、落脚判定、弹跳力全都不变',(()=>{
+    ['行头是纯外观：十八件逐件单穿，轨迹、落脚判定、弹跳力全都不变',(()=>withCareerSandbox(()=>{
       // 判据要跟「玩家实际感知到的是什么」走：外观会不会影响玩法，只有真跑物理才知道。
       // 数据表里没有可疑字段（构建门禁查的那条）不等于代码里没人偷偷读 career.wearing。
       const keepOwned=[...career.owned],keepWearing={...career.wearing};
@@ -3501,8 +3534,8 @@ function runQA(){
       // 把 runQA 一开始铺的那个世界原样恢复。不恢复的话，后面那条「同一块台反复落地
       // 不重复计分」会莫名其妙变红——**一条会把邻居弄红的门，和一条永远绿的门一样害人**。
       resetWorld(1020);generatePlatforms(26000);
-      return same;})()],
-    ['香蕉商店：账目对得上，同槽位只能戴一件',(()=>{
+      return same;}))()],
+    ['香蕉商店：账目对得上，同槽位只能戴一件',(()=>withCareerSandbox(()=>{
       const keep={bananas:career.bananas,owned:[...career.owned],wearing:{...career.wearing}};
       career.bananas=0;career.owned=[];career.wearing={};
       const hats=SHOP_ITEMS.filter(i=>i.slot==='head');
@@ -3522,8 +3555,8 @@ function runQA(){
       tapShopItem(second);
       const swapOk=career.wearing.head===second.id&&career.owned.length===2&&career.bananas===0;
       career.bananas=keep.bananas;career.owned=keep.owned;career.wearing=keep.wearing;saveCareer();renderWorn();
-      return poorOk&&buyOk&&offOk&&onOk&&swapOk;})()],
-    ['行头四处同步：局内三只加首页那只，穿的是同一套',(()=>{
+      return poorOk&&buyOk&&offOk&&onOk&&swapOk;}))()],
+    ['行头四处同步：局内三只加首页那只，穿的是同一套',(()=>withCareerSandbox(()=>{
       const keep={owned:[...career.owned],wearing:{...career.wearing}};
       career.owned=SHOP_ITEMS.map(i=>i.id);career.wearing={head:'crown',ride:'lift'};
       renderWorn();
@@ -3535,7 +3568,7 @@ function runQA(){
       renderWorn();
       const blocked=!layers[0].innerHTML;
       career.owned=keep.owned;career.wearing=keep.wearing;renderWorn();
-      return enough&&same&&drew&&blocked;})()],
+      return enough&&same&&drew&&blocked;}))()],
     ['退避重试器：排得上、取消得掉、空队列不空排',(()=>{
       // 只验退避器本身，**不碰 fetch**：换全局 fetch 会和别的自检抢东西，
       // 而且异步结论在同步的 runQA 里没人断言，等于没验。
@@ -3639,7 +3672,8 @@ function runQA(){
   ];
   const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n未登记计时字段：${unregisteredTimerFields().join(' / ')||'无'}\n称号：${career.titles.length}/${HONORS.length}　奶茶：${career.teas.length}/${TEAS.length}\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n不可达主路：${unreachable.length}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
 }
-function runStressQA(steps=24000){
+function runStressQA(steps=24000){return withCareerSandbox(()=>runStressQAInner(steps));}
+function runStressQAInner(steps=24000){
   resetWorld(0x5a17);state.running=true;state.autopilot=true;state.stressMode=true;let now=performance.now(),minSy=Infinity,maxSy=-Infinity,maxHeight=0,fail='';
   for(let i=0;i<steps;i++){
     if(i>0&&i%220===0){state.player.y+=260;state.player.vy=820;}
@@ -3652,6 +3686,9 @@ function runStressQA(steps=24000){
   state.running=false;state.autopilot=false;state.stressMode=false;renderAll(now);$('qaReport').style.display='block';$('qaReport').textContent=`${fail?'FAIL':'PASS'} · 角色长局可见性压力测试\n\n模拟帧：${steps}\n模拟时长：${Math.round(steps*16/1000)} 秒\n最高高度：${maxHeight} 米\n鱼式接回：${state.stressRescues} 次\n画面纵坐标：${minSy.toFixed(1)} 至 ${maxSy.toFixed(1)}\n坐标修复：${state.playerRepairs} 次${fail?`\n失败：${fail}`:'\n结论：猴先生全程保持在安全画面内。'}`;
 }
 function runPosterQA(){
+  // 上锁：这个函数会往 career 里注入一枚「名字最长的称号」来试海报排版，
+  // 原来从不还原——玩家看完排版随手买件东西（会写盘），那枚没打出来的称号就永久落盘了。
+  careerWriteLocked=true;
   const longestHonor=[...HONORS].sort((a,b)=>[...b.name].length-[...a.name].length)[0];career.titles=[...new Set([...career.titles,longestHonor.id])];career.worn=longestHonor.id;
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }

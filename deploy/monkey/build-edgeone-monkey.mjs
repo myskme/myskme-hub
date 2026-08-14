@@ -622,6 +622,49 @@ assert(/pager-dots solo/.test(html),
     + '量出来是 430x932 上卡片只有 635 高，上下各空 149px');
 }
 
+// ---- 0814 收官自审抓到的五条（每条都亲手复现过）----
+{
+  // 1. 结算页那颗「余额 N 根」与首页钱包显示的是同一个事实，必须走同一条刷新链。
+  //    第一版把它写在 finishRun 里，于是在商店花完钱回到结算页，它还写着花之前的数
+  //    （实测 134 -> 花 18 -> 仍显示 134）。同一个事实两处显示、一处不在刷新链上，就是会漂的镜像。
+  assert(/function renderResultWallet\(/.test(CODE), '结算页余额没有独立的渲染函数，又要变成写死在 finishRun 里的镜像了');
+  const careerFn = (CODE.match(/function renderCareer\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(/renderResultWallet\(\)/.test(careerFn),
+    '结算页余额没接进 renderCareer 那条刷新链：在商店花完钱回到结算页会看到花之前的数');
+  // 不变量是**窄的**：结算页那颗按钮只能有一个写入点，且它在刷新链上。
+  // 商店说明与购买提示也显示余额，但那两处是现算的，不在问题范围里——
+  // 第一版把「余额」出现的次数全数了，拦到了无辜的东西（断言比它想守的东西更宽）。
+  const resultWrites = (CODE.match(/el\.resultShop\.innerHTML\s*=/g) || []).length;
+  assert(resultWrites === 1,
+    '结算页那颗按钮有 ' + resultWrites + ' 个写入点。只能有一个，而且必须在 renderCareer 的刷新链上，'
+    + '否则在商店花完钱回到结算页会看到花之前的数');
+
+  // 2. 红鲤鱼帽是局内状态，一局结束必须摘。不摘的话 .wear-head{display:none} 会一直生效，
+  //    玩家在首页看到一只光头猴（买的帽子被藏了，而首页没有红鲤鱼帽节点）。
+  const finishFn = (CODE.match(/function finishRun\([\s\S]*?\n\}/) || [''])[0];
+  assert(finishFn, '取不到 finishRun（写法变了？先修本门禁的取法）');
+  assert(/classList\.remove\('carp-hat-on'\)/.test(finishFn),
+    '一局结束没摘红鲤鱼帽：.wear-head{display:none} 会一直生效，玩家买的帽子在首页被藏掉');
+
+  // 3. 已购清单不许用 SHOP_BY_ID[id] 判定——原型链上的键会被当成已购（实测塞三个就显示 3/18）。
+  assert(!/raw\.owned\.filter\(id=>SHOP_BY_ID\[id\]\)/.test(CODE),
+    'owned 用 SHOP_BY_ID[id] 判定，constructor / toString 这类原型链上的键会被当成已购行头');
+
+  // 4. 戴着的必须是解锁过的。原来 worn / cup 只查 id 在不在表里，
+  //    手改存档就能戴一枚没打出来的称号并印上海报——和同一行里 wearing 走 safeWearing 的规矩不一致。
+  assert(/worn:okTitles\.includes\(raw\.worn\)/.test(CODE) && /cup:okTeas\.includes\(raw\.cup\)/.test(CODE),
+    'worn / cup 只校验 id 存在、不校验解锁：没打出来的称号能戴上，还会印进成绩海报');
+
+  // 5. 自检期间不许写盘。?posterqa=1 原来往真档案注入一枚没赚到的称号且从不还原；
+  //    runQA 本身也会沿途把「发现的立面」推进 career。自检是诊断，任何一步都不该写盘。
+  assert(/function saveCareer\(\)\{if\(careerWriteLocked\)return;/.test(CODE),
+    'saveCareer 上没有自检总闸：跑一次 ?qa=1 就会把自检造出来的收集品写进玩家档案');
+  assert(/function runQA\(\)\{return withCareerSandbox\(/.test(CODE), 'runQA 没有裹进存档沙箱');
+  assert(/function runStressQA\([\s\S]{0,60}withCareerSandbox\(/.test(CODE), '压力测试没有裹进存档沙箱');
+  assert(/function runPosterQA\(\)\{[\s\S]{0,200}careerWriteLocked=true;/.test(CODE),
+    '海报自检没上锁：它注入一枚「名字最长的称号」试排版，玩家随手买件东西就永久落盘了');
+}
+
 // ---- 排版学：海报的字号只准从模块化比例上取（2026-08-14）----
 {
   const posterFn = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
