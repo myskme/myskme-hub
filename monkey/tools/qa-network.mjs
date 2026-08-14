@@ -17,6 +17,7 @@
 //   3. 化名被退回（HTTP 400）-> 一次都不许重试，重试一万次也没用
 //   4. 队列里有一条被退回 -> 不许堵住后面那几条（0813 修过，别回归）
 //   5. 回到前台 -> 立刻再试，不用干等退避到点
+//   6. 反复切前后台 -> 不许打出请求风暴（实测没节流时 2 秒能发 60 个）
 //
 // 用法（需要本机有 Playwright 与 Chromium；CI 里没有浏览器，所以这是收工前手动跑的）：
 //   node monkey/tools/qa-network.mjs
@@ -143,7 +144,34 @@ s = await snap();
 check('一条被退回：后面两条照样发出去了',
   s.calls.length === 3 && new Set(s.calls).size === 3, s);
 
+// 6. 反复切前后台不许打出请求风暴
+// 这条是量出来才加的：没有节流时，2.1 秒内猛切 30 次会发 60 个请求，
+// 而且把退避轮次顶到 30（下一次自动重试要等满两分钟）——**手动重试反而让自动重试变慢**。
+await arm([run('storm00001')], []);
+await page.evaluate(() => { window.__net.script = []; window.fetch = async () => { window.__net.calls.push({ runId: 'storm00001' }); throw new TypeError('Failed to fetch'); }; });
+const storm = await page.evaluate(async () => {
+  window.__net.calls = [];
+  for (let i = 0; i < 30; i++) { retryWorldNow(); await new Promise(r => setTimeout(r, 30)); }
+  await new Promise(r => setTimeout(r, 900));
+  return { calls: window.__net.calls.length, round: worldRetryRound };
+});
+check('猛切 30 次前后台：请求不超过 4 个、退避轮次不被顶飞',
+  storm.calls <= 4 && storm.round <= 2, storm);
+// 假网络还原成按剧本走的那个，后面的用例才不受影响。
+await page.evaluate(() => {
+  window.fetch = async (url, options) => {
+    const body = options && options.body ? JSON.parse(options.body) : null;
+    window.__net.calls.push({ runId: body && body.run && body.run.runId });
+    const verdict = window.__net.script.length ? window.__net.script.shift() : 'ok';
+    if (verdict === 'net') throw new TypeError('Failed to fetch');
+    if (verdict === '400') return { ok: false, status: 400, json: async () => ({ ok: false, err: '化名是保留词' }) };
+    return { ok: true, status: 200, json: async () => ({ ok: true, acceptedRunId: body.run.runId, playerToken: 'a'.repeat(64) }) };
+  };
+});
+
 // 5. 回到前台立刻再试
+// 注意：上一条刚用掉一次手动重试的额度，等过节流窗口再验，否则会被自己的节流挡住。
+await new Promise(r => setTimeout(r, 3200));
 await arm([run('fore000001')], ['net', 'net']);
 await page.evaluate(() => flushWorldQueue());
 const before = await snap();
@@ -159,4 +187,4 @@ server.close();
 console.log('');
 if (pageErrors.length) { failed += 1; for (const line of pageErrors) console.log('[败] ' + line); }
 if (failed) { console.log('有 ' + failed + ' 条没过。'); process.exit(1); }
-console.log('假网络五种抖法全部通过。');
+console.log('假网络六种抖法全部通过。');

@@ -243,7 +243,11 @@ assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '戴帽子的状态类
   // **每一块都要查**，不能只查第一块。0813 巡查实测：在后面再写一块
   // @media(max-width:699px){#gameShell{height:844px}}，构建绿、?qa=1 绿，
   // 而 430x932 上下各露 44px 底色——正是 0813 白天刚修过的那个毛病原样回来。
-  const blocks = [...html.matchAll(/@media\(max-width:699px\)\{[\s\S]{0,600}?\n\}/g)].map(hit => hit[0]);
+  // **写法归一之后再匹配。** 原来只认不带空格的 `@media(max-width:699px)`，
+  // 按 CSS 常规写法补一块 `@media (max-width: 699px) { … 844px … }` 就能绕过去，
+  // 而它同优先级又写在后面，层叠上赢——0813 白天刚修过的毛病原样回来。
+  const FLAT = html.replace(/\s+/g, '');
+  const blocks = [...FLAT.matchAll(/@media\(max-width:699px\)\{[\s\S]{0,600}?\}\}/g)].map(hit => hit[0]);
   assert(blocks.length >= 1, '手机铺满规则整块没了（0813 修过一次，别再退回 844 死高度）');
   assert(blocks.some(block => /#gameShell\{[^}]*height:min\(100svh/.test(block)), '手机铺满规则里外壳高度没用 100svh');
   for (const block of blocks) {
@@ -321,7 +325,14 @@ const PRODUCT_CODE = CODE.slice(0, QA_AT);
 // claimCultureMotif / choosePosterPair 原来只被断言「函数在不在」，不查调用点——
 // 0813 实测把 claimCultureMotif 的调用删掉，构建绿、?qa=1 绿，
 // 而八种世界窗景当场退化成四种死循环（前 8 局只出 4 种）。
-for (const fn of ['activePager', 'stepPage', 'bindSwipePaging', 'claimCultureMotif']) {
+// syncRotateGate 与 choosePosterPair 0814 补进来：
+// 前者原来写的是 `CODE.replace(/function\\s+syncRotateGate/,'')` 再 test 名字，
+// **被 runQA 自己那句 `typeof syncRotateGate==='function'` 满足了**——
+// 把三行接线全删光，构建照样绿，而横屏时局在后台继续跑、方向键卡在按下状态。
+// 后者原来只断言「函数在不在」，把唯一调用点换成写死的第一档，
+// 六种纸型退化成一种、纸型收藏线整条死掉，构建与 ?qa=1 双绿。
+for (const fn of ['activePager', 'stepPage', 'bindSwipePaging', 'claimCultureMotif',
+  'syncRotateGate', 'choosePosterPair', 'loadDressedMonkeyImage', 'renderResultWallet']) {
   assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(PRODUCT_CODE), '导航函数 ' + fn + ' 不见了');
   const uses = (PRODUCT_CODE.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
   assert(uses >= 2, '导航函数 ' + fn + ' 在产品代码里只有定义、没有接线（自检里的引用不算数）');
@@ -344,8 +355,8 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   const cssQuery = new RegExp('@media' + jsQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'));
   assert(cssQuery.test(html.replace(/\s+/g, ' ')) || html.includes('@media(' + jsQuery.slice(1)),
     '竖屏锁定的 CSS 与 JS 用的不是同一条媒体查询');
-  assert(/\bsyncRotateGate\b/.test(CODE.replace(/function\s+syncRotateGate/, '')),
-    'syncRotateGate 只有定义没有接线，横过来不会自动暂停');
+  // syncRotateGate 的接线由上面那一圈「必须有调用点」统一守（它原来在这里，
+  // 写法是 replace 掉定义再 test 名字，被 runQA 自己的 typeof 检查满足了）。
 }
 
 // ---- 称号徽章与存档契约 ----
@@ -547,8 +558,13 @@ assert(/pager-dots solo/.test(html),
   // 分成三份迟早出现「货架上是这样、穿上是那样」。
   assert(/function wornMarkup\(/.test(CODE) && /WEAR_ART\[id\]/.test(CODE), '穿戴图不再是从同一张表取的');
   assert(/function shopPreviewSvg\([\s\S]{0,400}?WEAR_ART\[id\]/.test(CODE), '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
-  assert(/loadDressedMonkeyImage/.test(CODE) && /dressedMonkeySvg/.test(CODE),
+  // **要求调用点在 buildPoster 里面**，不是「名字在文件里出现过」——
+  // 后者被函数定义自己满足：把 buildPoster 里那句换成 `const dressed=null`，
+  // 十八件行头从名片上消失，构建照样绿。
+  const posterFn2 = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(/await loadDressedMonkeyImage\(\)/.test(posterFn2),
     '海报不印穿戴了。名片是「攀比」真正发生的地方，行头必须上那张图');
+  assert(/dressedMonkeySvg\(/.test(CODE), '穿好行头的猴子画不出来了');
   assert(/querySelectorAll\('\.wear-layer'\)/.test(CODE),
     '穿戴层不再是一次刷全部了：局内三个环屏副本加首页那只，分开写迟早穿得不一致');
   // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
@@ -596,6 +612,15 @@ assert(/pager-dots solo/.test(html),
     '联网超时短于 8 秒：地铁电梯里一次握手就不止这么久，会把慢网冤枉成断网');
   assert(/visibilitychange[\s\S]{0,120}retryWorldNow/.test(CODE),
     '回到前台不再立刻重试：后台定时器常被系统压住，而玩家这会儿正看着屏幕');
+  // 手动重试必须节流。实测没节流时，2.1 秒内猛切 30 次前后台会发出 60 个请求，
+  // 并把退避轮次顶到 30（下一次自动重试要等满两分钟）——手动重试反而让自动重试变慢。
+  const manualFn = (CODE.match(/function retryWorldNow\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(manualFn, '取不到 retryWorldNow（写法变了？先修本门禁的取法）');
+  assert(/WORLD_MANUAL_GAP_MS/.test(manualFn),
+    '手动重试没有节流：口袋里反复亮屏就会持续打请求（实测 2 秒能发 60 个）');
+  const gap = Number((CODE.match(/WORLD_MANUAL_GAP_MS=(\d+)/) || [])[1] || 0);
+  assert(gap >= 1500 && gap <= 10000,
+    '手动重试的节流窗口 ' + gap + 'ms 不合理：太短挡不住风暴，太长会让「切回来立刻重试」失效');
   assert(/addEventListener\('online'[\s\S]{0,80}retryWorldNow/.test(CODE), '恢复联网时没有立刻重试');
 }
 
@@ -611,6 +636,49 @@ assert(/pager-dots solo/.test(html),
   assert(/#titleScreen \.card\{height:100%/.test(CODE),
     '首页卡不再撑满屏幕了。王老师 0814 明说「首页不是全屏，感觉像是少了什么」——'
     + '量出来是 430x932 上卡片只有 635 高，上下各空 149px');
+}
+
+// ---- 0814 收官自审抓到的五条（每条都亲手复现过）----
+{
+  // 1. 结算页那颗「余额 N 根」与首页钱包显示的是同一个事实，必须走同一条刷新链。
+  //    第一版把它写在 finishRun 里，于是在商店花完钱回到结算页，它还写着花之前的数
+  //    （实测 134 -> 花 18 -> 仍显示 134）。同一个事实两处显示、一处不在刷新链上，就是会漂的镜像。
+  assert(/function renderResultWallet\(/.test(CODE), '结算页余额没有独立的渲染函数，又要变成写死在 finishRun 里的镜像了');
+  const careerFn = (CODE.match(/function renderCareer\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(/renderResultWallet\(\)/.test(careerFn),
+    '结算页余额没接进 renderCareer 那条刷新链：在商店花完钱回到结算页会看到花之前的数');
+  // 不变量是**窄的**：结算页那颗按钮只能有一个写入点，且它在刷新链上。
+  // 商店说明与购买提示也显示余额，但那两处是现算的，不在问题范围里——
+  // 第一版把「余额」出现的次数全数了，拦到了无辜的东西（断言比它想守的东西更宽）。
+  const resultWrites = (CODE.match(/el\.resultShop\.innerHTML\s*=/g) || []).length;
+  assert(resultWrites === 1,
+    '结算页那颗按钮有 ' + resultWrites + ' 个写入点。只能有一个，而且必须在 renderCareer 的刷新链上，'
+    + '否则在商店花完钱回到结算页会看到花之前的数');
+
+  // 2. 红鲤鱼帽是局内状态，一局结束必须摘。不摘的话 .wear-head{display:none} 会一直生效，
+  //    玩家在首页看到一只光头猴（买的帽子被藏了，而首页没有红鲤鱼帽节点）。
+  const finishFn = (CODE.match(/function finishRun\([\s\S]*?\n\}/) || [''])[0];
+  assert(finishFn, '取不到 finishRun（写法变了？先修本门禁的取法）');
+  assert(/classList\.remove\('carp-hat-on'\)/.test(finishFn),
+    '一局结束没摘红鲤鱼帽：.wear-head{display:none} 会一直生效，玩家买的帽子在首页被藏掉');
+
+  // 3. 已购清单不许用 SHOP_BY_ID[id] 判定——原型链上的键会被当成已购（实测塞三个就显示 3/18）。
+  assert(!/raw\.owned\.filter\(id=>SHOP_BY_ID\[id\]\)/.test(CODE),
+    'owned 用 SHOP_BY_ID[id] 判定，constructor / toString 这类原型链上的键会被当成已购行头');
+
+  // 4. 戴着的必须是解锁过的。原来 worn / cup 只查 id 在不在表里，
+  //    手改存档就能戴一枚没打出来的称号并印上海报——和同一行里 wearing 走 safeWearing 的规矩不一致。
+  assert(/worn:okTitles\.includes\(raw\.worn\)/.test(CODE) && /cup:okTeas\.includes\(raw\.cup\)/.test(CODE),
+    'worn / cup 只校验 id 存在、不校验解锁：没打出来的称号能戴上，还会印进成绩海报');
+
+  // 5. 自检期间不许写盘。?posterqa=1 原来往真档案注入一枚没赚到的称号且从不还原；
+  //    runQA 本身也会沿途把「发现的立面」推进 career。自检是诊断，任何一步都不该写盘。
+  assert(/function saveCareer\(\)\{if\(careerWriteLocked\)return;/.test(CODE),
+    'saveCareer 上没有自检总闸：跑一次 ?qa=1 就会把自检造出来的收集品写进玩家档案');
+  assert(/function runQA\(\)\{return withCareerSandbox\(/.test(CODE), 'runQA 没有裹进存档沙箱');
+  assert(/function runStressQA\([\s\S]{0,60}withCareerSandbox\(/.test(CODE), '压力测试没有裹进存档沙箱');
+  assert(/function runPosterQA\(\)\{[\s\S]{0,200}careerWriteLocked=true;/.test(CODE),
+    '海报自检没上锁：它注入一枚「名字最长的称号」试排版，玩家随手买件东西就永久落盘了');
 }
 
 // ---- 排版学：海报的字号只准从模块化比例上取（2026-08-14）----
@@ -630,8 +698,11 @@ assert(/pager-dots solo/.test(html),
   const typeBlock = (CODE.match(/const TYPE=\{[\s\S]*?\n\};/) || [''])[0];
   assert(typeBlock, '取不到 TYPE（写法变了？先修本门禁的取法）');
   // TYPE 里的每一级都得是 typeStep() 算出来的，不许直接写数字。
+  // **不许靠缩进宽度取键名。** 原来 entries 匹的是「行首恰好两个空格」，
+  // 于是新加一行写死字号时多敲一个空格就绕过去了（实测三个空格构建绿、两个空格才红）。
+  // 一道拦不拦得住取决于敲了几个空格的门，等于没门。
   const steps = [...typeBlock.matchAll(/:\s*typeStep\(-?\d+\)/g)];
-  const entries = [...typeBlock.matchAll(/^\s{2}([a-z]+):/gm)];
+  const entries = [...typeBlock.matchAll(/[{,]\s*([a-z][a-zA-Z0-9]*)\s*:/g)];
   assert(steps.length === entries.length,
     'TYPE 里有直接写死的字号（' + entries.length + ' 级里只有 ' + steps.length + ' 级走了 typeStep）');
   assert(/const TYPE_BASE=\d+,TYPE_RATIO=[\d.]+;/.test(CODE), '模块化比例的基准与比率没了');
