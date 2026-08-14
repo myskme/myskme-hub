@@ -753,6 +753,57 @@ assert(/pager-dots solo/.test(html),
     && /class="wallet-main"/.test(CODE) && /class="wallet-tail"/.test(CODE),
     '钱包按钮的主次两段没有同时接上：CSS 与写入点必须成对，少一边就是没生效');
 
+  // ---- 香蕉经济：这几条守的是**曲线的形状**，不是具体数字 ----
+  // 具体定价会随实测收入调，写死一个价钱在门禁里就又是一份会过期的镜像。
+
+  // ⑩ 沿途香蕉密度不许随高度衰减。原来是 clamp(.18-meters/30000,.1,.18)——
+  //    18% 一路掉到 10%，也就是玩得越好每米赚得越少，把「变强」和「变富」拧成了反向关系。
+  {
+    // 取「生成香蕉那一整句」，不去猜条件里长什么样——猜出来的模式一改写法就取不到，
+    // 而取不到时这道门只会说「等于没跑」，不会替你把关。
+    const spawn = (CODE.match(/^.*addItem\('banana',primary\).*$/m) || [''])[0];
+    assert(spawn, '找不到香蕉的生成点，这道门等于没跑');
+    assert(!/meters/.test(spawn),
+      '香蕉密度又跟高度挂上钩了：玩得越好每米赚得越少，是跑者类里最不该出现的曲线。'
+      + '控制长局收入要用结算时那道超线性的高度奖金，不是让沿途密度掉下去');
+  }
+
+  // ⑪ 高度奖金必须是**超线性**的：走远要按超过比例地划算，否则没人有理由冒险。
+  {
+    const power = Number((CODE.match(/HEIGHT_BONUS_POWER=([\d.]+)/) || [])[1]);
+    const base = Number((CODE.match(/HEIGHT_BONUS_BASE=([\d.]+)/) || [])[1]);
+    assert(Number.isFinite(power) && Number.isFinite(base), '取不到高度奖金的参数，这道门等于没跑');
+    assert(power > 1, '高度奖金的指数是 ' + power + '（不超过 1）：'
+      + '那就成了「多跑一倍只多赚一倍」，玩家没有理由为了钱去冒摔死的风险');
+    assert(base > 0, '高度奖金的系数是 0，等于这道奖金不存在');
+    // 奖金必须真的发出去，而且要在**记录成绩之前**发——否则结算页、海报、楼榜
+    // 各读各的香蕉数，又是一份对不上的镜像。
+    const fin = (CODE.match(/function finishRun\([\s\S]*?\n\}/) || [''])[0];
+    const bonusAt = fin.indexOf('heightBananas(');
+    const recordAt = fin.indexOf('saved.score=Math.max');
+    assert(bonusAt >= 0, '高度奖金没在 finishRun 里发出去：函数写了但没人调用');
+    assert(recordAt >= 0 && bonusAt < recordAt,
+      '高度奖金发得比记录成绩晚：结算页与本机纪录会差出这一笔');
+    assert(/state\.bananas\+=state\.heightBonus;state\.score=/.test(fin),
+      '加完奖金没有重算总分：总分的定义是 高度 + 香蕉 + 加成，少算一笔就对不上了');
+  }
+
+  // ⑫ 价钱阶梯的**形状**：每一档要比上一档贵，但别贵过头。
+  //    2 到 4 倍是这类游戏的常见档位——低于 2 倍分不出档次，高于 4 倍会出现
+  //    「攒了很久还差一大截」的断层，玩家在断层前就放弃了。
+  {
+    const tiers = [...CODE.matchAll(/(\d+):(\d+)/g)];
+    const priceBlock = (CODE.match(/const TIER_PRICE=\{[^}]*\}/) || [''])[0];
+    const prices = [...priceBlock.matchAll(/\d+:(\d+)/g)].map(hit => Number(hit[1]));
+    assert(prices.length >= 5, '取不到定价阶梯，这道门等于没跑');
+    for (let i = 1; i < prices.length; i += 1) {
+      const ratio = prices[i] / prices[i - 1];
+      assert(ratio >= 2 && ratio <= 4,
+        '第 ' + (i + 1) + ' 档是第 ' + i + ' 档的 ' + ratio.toFixed(2) + ' 倍，'
+        + '落在 2 到 4 倍之外：低于 2 倍分不出档次，高于 4 倍会出现攒不到的断层');
+    }
+  }
+
   // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
   assert(/#gameShell\.carp-hat-on \.wear-head\{display:none\}/.test(CODE),
     '买来的帽子会和局内的红鲤鱼帽叠在一起。注意状态类名与资源类名必须分开——0813 撞过一次，整个画面消失');

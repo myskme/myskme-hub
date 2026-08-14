@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.8-collectfix">
+<meta name="myskme-release" content="20260814.9-economy">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -1023,7 +1023,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.8-collectfix',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.9-economy',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1063,7 +1063,18 @@ const DEPARTMENTS=[
   {id:'construction',name:'加盖工程部',short:'加盖工程部',color:'#e7ecf2',line:'本层施工依据：先盖了再说。'}
 ];
 const DEPT=Object.fromEntries(DEPARTMENTS.map(d=>[d.id,d]));
-const FIXED_ORDER=DEPARTMENTS.map(d=>d.id);
+// 玩家**遇见部门的顺序**，和「一共有哪些部门」是两回事，所以分开写。
+// 原来是 `DEPARTMENTS.map(d=>d.id)`——名单顺序即出场顺序，于是最有意思的几个机关
+// 排在了没人走得到的高度：0814 实测自动驾驶 8 局，**蛇台一次都没踩到**（0/603 次落脚），
+// 蛋台平均每局 1 次。因为蛇在谜题管理局，而那是第 8 个部门 = 2100 米起，
+// 而自动驾驶 50 秒的中位高度只有 1768 米。**一半的手写内容排在没人到得了的地方。**
+// 王老师的原话：「蛇和蛋基本没什么作用就是装饰一样」——他说得对，它们确实几乎不出现。
+//
+// 现在按「教什么」排：前五个各教一件事（安全 -> 会塌 -> 有假的 -> 弹更高 -> 会甩你），
+// 第六个观景台是喘口气，后面才是气氛与进阶。跑者类游戏的通例就是**把词汇前置**——
+// 绝大多数局都很短，玩家得在头两三局里见全这套词汇，否则那些机关等于没做。
+const FIXED_ORDER=['lobby','quality','monkey','redundancy','puzzle','observation',
+  'fax','rent','tongue','fertilizer','punctuation','construction'];
 // 十二种调式，一个部门一种。和立面同一条线：一个部门一门学问。
 // 每条 fact 是**这套音阶为什么听起来是那个味道**的原因，不是名词解释。
 // steps 是半音级差；音乐引擎只用它来把旋律级数换算成音高，节奏与配器一律不变。
@@ -1231,6 +1242,8 @@ function facadeMarkup(facade){
   }
   return parts.join('');
 }
+// 走完固定的十二个之后进入随机轮换。观景台不在池子里，它由下面那 32% 的插队规则
+// 单独安排——喘气的节奏要留给随机，但不能连着两次都是喘气。
 const RANDOM_POOL=['quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','punctuation','construction'];
 const MECHANICS=['good','bad','fax','rent','bananaBoard','fakeBanana','redundant','egg','vapor','stamp','snake','tongue','bubble','punctuation','construction','conveyor','goldRisk'];
 const DEATH_LINES=[
@@ -1417,6 +1430,35 @@ const NPC_RANKS=[
 ];
 // 任命各配一枚图标：它们现在长在台子上，玩家在跳的过程中要**一眼认出**是哪一份，
 // 没有时间读字。图标走的是全作通用的 ICON_GLYPHS，风格与称号徽章一致。
+// 一排任命台什么时候来。0814 实测：第一排原在 1200 米，间隔 1500 米，
+// 而自动驾驶 50 秒的中位高度是 1768 米——**8 局共只生成 8 排，一局一排**。
+// 命中率其实很高（88%），所以王老师说的「三选一挺难触发碰到」不是难踩，是**几乎不出现**。
+//
+// 改成 500 米开张、每 1100 米一排：中位那一局能碰到 2 排，
+// 而一局只走 600 米的新手也至少碰得到 1 排——肉鸽式选择必须在第一局就发生，
+// 否则玩家根本不知道这个系统存在。
+const FIRST_CHOICE_METER=500,CHOICE_GAP_METER=1100;
+// ---- 香蕉经济 ----
+// 沿途密度恒定，收入的「变化」全部交给结算时这道超线性的高度奖金。
+// 为什么是超线性：跑者类的通例是**走得远要按超过比例地划算**，否则玩家没有理由去冒险，
+// 反正多跑一倍只多赚一倍，还多担一次摔死的风险。指数 1.3 是常见档位——
+// 翻一倍距离拿到约 2.5 倍奖金，够明显，又不至于让高手一局顶新手三十局。
+//
+// 锚点（游戏自己的口径：3 米一层，所以「100 层」=300 米）：
+//   300 米（标题那个 100 层）  +1 根      新手第一次通过标题目标，给个响
+//   500 米                    +2 根
+//  1000 米                    +6 根
+//  1768 米（实测中位）        +13 根     ~ 和沿途捡到的量相当，等于一局收入翻倍
+//  3000 米                    +25 根
+//  5000 米                    +49 根
+// 密度取 .18——就是原来那条衰减曲线的**起点值**。
+// 改成 .16 试过一轮，实测每局中位收入从 11 根掉到 9 根：因为实测那几局都在 1800 米以下，
+// 正好是老曲线还没怎么衰减的区段，压低起点等于只惩罚了前期。
+// **要拿掉的是那条下降的斜率，不是把整条线往下压。**
+const BANANA_RATE=.18,HEIGHT_BONUS_BASE=6,HEIGHT_BONUS_POWER=1.3;
+function heightBananas(meters){
+  return Math.round(HEIGHT_BONUS_BASE*Math.pow(Math.max(0,meters)/1000,HEIGHT_BONUS_POWER));
+}
 const PERK_POOL=[
   {id:'wide',emblem:'widen',tint:'#c9b27a',name:'宽容落脚点',line:'判定左右各放宽一点。质检部对此睁一只眼。'},
   {id:'spring',emblem:'spring',tint:'#e0a21c',name:'弹性批文',line:'以后每次起跳更高。批文没有写上限。'},
@@ -1444,7 +1486,28 @@ const SHOP_SLOTS=[
 // 四档 340（约三十局，第一辆车）
 // 五档 750（约六十局；私人电梯是全作最贵的一件，也是那句副标题的终点）
 // 改价格之前请重测一次收入——这是一份会过期的镜像。
-const TIER_PRICE={1:18,2:60,3:150,4:340,5:750};
+// 定价按**实测密度**推，不是拍脑袋，也不抄上一次的读数。
+// 0814 重测（自动驾驶 8 局，按每千米比，把「这局跑多远」除掉）：
+//   沿途密度 7.1 根/千米（改之前是 8.5——降是因为蛋台/审讫台这些弹得高的
+//   被排到了前面，玩家同样的米数里落脚次数变少，路过而没靠近的台子变多。
+//   这是「把有意思的机关前置」的代价，认了，用结算奖金补回来。）
+// 于是一局的收入 = 7.1 * 千米 + 6 * 千米^1.3：
+//   1000 米 -> 7 + 6  = 13 根
+//   1768 米 -> 13 + 13 = 25 根   <- 定价按这一档锚
+//   2500 米 -> 18 + 20 = 38 根
+// 改之前同样 1768 米只有约 12 根（没有奖金那一半），**总收入涨了四成**。
+//
+// **这里有一个说明白的假设**：1768 米是自动驾驶 50 秒的中位高度，
+// 不是真人一局的中位高度——自动驾驶不会死，这台机器上量不到真人的局长。
+// 定价锚在「一局约 25 根」上；真人局若明显短于这个，整条阶梯要按同样的方法重推一次，
+// 别单独挪某一档（挪一档就把阶梯的形状破坏了）。
+//
+// 目标局数按跑者类的常见节奏排：第一件一局内到手（第一次进商店就买得起东西），
+// 下一件三局，中段七局，高段十五局，顶级三十局出头（一个真的要惦记着的目标）。
+//   25 x1 ｜ 70 x3 ｜ 170 x7 ｜ 360 x15 ｜ 780 x31
+// 全套 4480 根 ≈ 180 局；上一版是 4182 根 / 每局约 12 根 ≈ 350 局——够不着，
+// 于是十八件里最贵那几件基本没人见过，而它们正是拿来攀比的那几件。
+const TIER_PRICE={1:25,2:70,3:170,4:360,5:780};
 const SHOP_ITEMS=[
   {id:'cap',slot:'head',tier:1,name:'工牌鸭舌帽',line:'帽檐上别着自己的工牌，方便别人认出你是谁的下属。'},
   {id:'shades',slot:'eye',tier:1,name:'反光墨镜',line:'戴上之后没人看得出你在看第几层，包括你自己。'},
@@ -1584,8 +1647,8 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
   animationFrame:0,paused:false,pausedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),motifFirstTime:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
-  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,perkGroup:0,perksTaken:0,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
-  runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
+  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:FIRST_CHOICE_METER,perkGroup:0,perksTaken:0,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
+  runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,heightBonus:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
 // 每页装几个。改成网格之后一页装得下的数量翻了两三倍，页数跟着掉：
@@ -1944,8 +2007,13 @@ function updateMissionUI(){
   const m=state.mission;if(!m)return;const value=Math.min(m.target,missionValue(m)),done=value>=m.target;el.missionBadge.classList.toggle('done',done);el.missionBadgeText.textContent=`${m.label} ${value}/${m.target}`;
 }
 
+// 一个部门管多少米。300 是最早拍的数，配上十二个固定顺序的部门＝要走 3600 米
+// 才能见全，而实测中位只有 1768 米。降到 240：见全一轮需 2880 米，
+// 中位那一局能走到第 8 个部门。**不再降是因为再降就没时间看清一个部门的立面与调式了**
+// （240 米在实测速度下约 6.9 秒，已经是一屏景色能被认出来的下限）。
+const DEPT_BAND=240;
 function departmentIdAt(meters){
-  const idx=Math.max(0,Math.floor(meters/300));
+  const idx=Math.max(0,Math.floor(meters/DEPT_BAND));
   while(state.deptCache.length<=idx){
     if(state.deptCache.length<FIXED_ORDER.length){state.deptCache.push(FIXED_ORDER[state.deptCache.length]);continue;}
     if(!state.randomBag.length){
@@ -2059,9 +2127,9 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;state.personalBestAtStart=IS_TEST_RUN?0:saved.height;state.recordPassed=false;
   state.milestones=new Set(MILESTONES.filter(m=>m<=DEBUG_START));state.lucky=DEBUG_START>=1020;state.fertilizerCoughed=false;
   state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.lastLandingId='';state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
-  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.perkGroup=0;state.perksTaken=0;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
+  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<FIRST_CHOICE_METER?FIRST_CHOICE_METER:FIRST_CHOICE_METER+(Math.floor((DEBUG_START-FIRST_CHOICE_METER)/CHOICE_GAP_METER)+1)*CHOICE_GAP_METER;state.perkGroup=0;state.perksTaken=0;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
   state.runId=makeRunId();state.rankSubmitted=false;state.lastSafe={x:DEBUG_X,y:baseY};state.playerRepairs=0;state.faxRainUntil=0;
-  state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
+  state.heightBonus=0;state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
   state.mission=MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun();state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=unlockedKit(career.kit)?career.kit:'bare';
   state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
@@ -2103,10 +2171,18 @@ function addAppointmentRow(meters,y,dept){
   const bw=Math.min(safeWidth(meters),94),span=(W-12-bw)/2;
   const perks=shuffle(PERK_POOL).slice(0,3);
   state.perkGroup+=1;
+  // 收取半径**从这一排的实际间距现算**，不写死。三块台子中心间距就是 span，
+  // 所以离最近那一份最远也只有 span/2——band 取 span/2 再加 4 像素的富余，
+  // 穿过这一层时必然命中一份。
+  // 第一版写死了 70：而 span 在 bw=94 时是 142，半格 71，**刚好差 1 像素**，
+  // 于是屏幕上留下两条细缝，从缝里穿过去就什么都拿不到。
+  // 更要命的是 bw 会随高度变窄（safeWidth），span 跟着变大，写死的数只会越来越不够。
+  // **写死的数镜像的是「当时那一排有多宽」，那是个会变的量。**
+  const reach=span/2+4;
   const row=perks.map((perk,i)=>{
     const p=addPlatform({x:6+span*i,y,w:bw,type:'good',dept,label:'任命'});
     p.route=true;p.appointment=true;
-    const item=addItem('perk',p);item.perk=perk.id;item.perkGroup=state.perkGroup;
+    const item=addItem('perk',p);item.perk=perk.id;item.perkGroup=state.perkGroup;item.reach=reach;
     return p;
   });
   state.lastX=W/2;
@@ -2117,7 +2193,7 @@ function generatePlatforms(targetY){
     const meters=metersFromY(state.nextY),dept=departmentIdAt(meters),width=safeWidth(meters),gap=88+state.rng()*19+Math.min(22,meters/230);
     if(meters>=state.nextChoiceMeter){
       const row=addAppointmentRow(meters,state.nextY,dept);
-      state.nextChoiceMeter=meters+1500;
+      state.nextChoiceMeter=meters+CHOICE_GAP_METER;
       // 上限现取 platformRiseCap，不抄字面量——台子类型哪天改了弹力，这里自动跟。
       state.nextY+=Math.min(gap,Math.min(...row.map(platformRiseCap)));
       continue;
@@ -2165,7 +2241,13 @@ function generatePlatforms(targetY){
       addPlatform({x:riskX,y:y+32,w:riskW,type:'goldRisk',dept,label:'险',riskBonus:25});
     }
     if(primary&&primary.solid&&dept!=='observation'){
-      if(state.rng()<clamp(.18-meters/30000,.1,.18)&&primary.type!=='snake')addItem('banana',primary);
+      // 香蕉密度**不随高度衰减**。原来写的是 `clamp(.18-meters/30000,.1,.18)`——
+      // 从 18% 一路掉到 10%，也就是**玩得越好，每米赚得越少**。
+      // 这把「变强」和「变富」拧成了反向关系，是跑者类里最不该出现的一条曲线：
+      // 玩家看得见的直接现象就是「越往上香蕉越少」，而他明明打得更好了。
+      // 控制长局收入该用的是**结算时那道超线性的高度奖金**（见 heightBananas），
+      // 不是让沿途的密度掉下去。密度保持恒定，玩家读得懂；奖金给长局，长局才划算。
+      if(state.rng()<BANANA_RATE&&primary.type!=='snake')addItem('banana',primary);
       const forceCrate=!state.crateGiven&&meters>430;
       if((forceCrate||state.rng()<.026)&&meters>300){addItem('crate',primary);state.crateGiven=true;}
       if(meters>=state.nextToolMeter&&!state.items.some(item=>item.platformId===primary.id)){addItem(TOOL_POOL[Math.floor(state.rng()*TOOL_POOL.length)],primary);state.nextToolMeter=meters+390+Math.floor(state.rng()*310);}
@@ -2286,7 +2368,18 @@ function collectItems(now){
   for(const item of state.items){
     if(item.collected)continue;
     const rawDx=Math.abs(pl.x-item.x),dx=Math.min(rawDx,W-rawDx),dy=Math.abs(pl.y-(item.y+6)),magnet=item.kind==='banana'&&now<state.magnetUntil;
-    if((dx<(magnet?132:34)&&dy<(magnet?108:62))){
+    // 任命的收取范围要比别的道具宽得多，**因为它不是「捡到」，是「穿过那一层时选了哪边」**。
+    // 0814 量出来的毛病：把任命排从「一局 1 排」加密到「一局 1.8 排」之后，
+    // 每局真正拿到的份数**一点没涨**（都是 0.8 份）——因为一次弹跳能上升 790，
+    // 而两排台子只隔 90 到 130 像素，玩家常常直接从三块台子中间飞过去，
+    // 34x62 的收取框根本碰不到。加密度治不了「飞过去」。
+    //
+    // 三块台子横排全宽，中心间距 142，所以横向取 70（正好半格）：
+    // 穿过那一层时**必然且只会**命中离你最近的那一份，选哪份由你当时在左边还是右边决定，
+    // 这正是这个游戏本来就在做的事（点左点右）。纵向取 100，比一次弹跳的排间距大，
+    // 保证不会从两排中间溜过去。其余道具维持原样：香蕉就该是「捡到」。
+    const perkBand=item.kind==='perk';
+    if(perkBand?(dx<(item.reach||70)&&dy<100):(dx<(magnet?132:34)&&dy<(magnet?108:62))){
       item.collected=true;
       if(item.kind==='banana'){const gain=1+state.perks.banana;state.bananas+=gain;toast(gain>1?'香蕉发生复利：一根按两根入账。':'香蕉已入账。下班后可在香蕉商店消费。','gold');sfx('banana');}
       else if(item.kind==='crate')openCrate(now);
@@ -2676,12 +2769,19 @@ function finishRun(reason='fall'){
   el.shell.classList.remove('carp-hat-on');state.carpHat=false;input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
   // 调试参数跑出来的成绩不许进本机纪录。原来只挡了 career，漏了 saved——
   // ?start=1200 之类一开，假高度就永久盖进玩家的最高纪录了。
+  // 高度奖金在**记录成绩之前**结算，否则海报、楼榜、钱包各读各的，
+  // 又会变成一份对不上的镜像（结算页写一个数、名片上另一个数）。
+  // 加完立刻重算总分：总分的定义就是 高度 + 香蕉 + 加成。
+  state.heightBonus=IS_TEST_RUN?0:heightBananas(state.maxMeters);
+  state.bananas+=state.heightBonus;state.score=state.maxMeters+state.bananas+state.bonus;
   const oldHeight=saved.height,oldScore=saved.score;
   if(!IS_TEST_RUN){saved.height=Math.max(saved.height,state.maxMeters);saved.score=Math.max(saved.score,state.score);saveRecord();}
   const di=chooseNonRepeat(DEATH_LINES,lastDeathIndex);lastDeathIndex=di;const si=chooseNonRepeat(SLOGANS,lastSloganIndex);lastSloganIndex=si;
   const title=[...TITLES].reverse().find(t=>state.maxMeters>=t.min).name;
   $('deathLine').textContent=DEATH_LINES[di];$('resultTitle').textContent=title;$('resultHeight').textContent=state.maxMeters;$('resultBananas').textContent=state.bananas;
   $('resultScore').textContent=state.score;$('resultFloors').textContent=state.visited.size;$('resultSub').textContent=(state.maxMeters>oldHeight||state.score>oldScore)?'新纪录已盖章。旧纪录已被调去基层。':state.lucky?'高度加香蕉，再加解释不清的 52 分。':'高度加香蕉。解释权仍在楼上。';
+  // 奖金要**说出来**。不说的话玩家只看到香蕉数比刚才多，会以为是数错了。
+  if(state.heightBonus>0)$('resultSub').textContent+=`（高度奖金 +${state.heightBonus} 根）`;
   state.resultStamp=OFFICIAL_STAMPS[Math.floor(state.rng()*OFFICIAL_STAMPS.length)];$('resultStamp').textContent=state.resultStamp;$('visitedDepartments').textContent='本局到访：'+[...state.visited].map(id=>DEPT[id].name).join('、')+`。本局窗景：${cultureMotif().name}。最高连跳 ${state.maxFlow}，险落 ${state.nearMisses} 次，随机意外 ${state.surpriseCount} 个${state.rescueLift?'，鱼式上顶约 20 米':''}。`;
   // 初见这扇窗景时，在档案页多讲一句它的配色是怎么成立的。
   const motifNote=$('motifPalette');

@@ -159,6 +159,21 @@ for (const view of VIEWS) {
   // 进到局内：任命台、平台、猴子都在这一屏，也是玩家真正看见行头的地方。
   await page.evaluate(() => { startRun(); });
   await page.waitForTimeout(400);
+  // **把猴子钉在固定位置，再停掉主循环。**
+  // 不钉的话每次跑到的镜头位置都不同，采样网格落在不同的背景上，
+  // 控制组的命中数会在 10 到 14 之间飘——而门槛是按控制组的四分之一算的，
+  // 于是同一份源码时红时绿。**一条时红时绿的门，和一条永远绿的门一样害人**：
+  // 大家会开始忽略它。这里只是规定「猴子站在屏幕中间」，
+  // 没有制造游戏里到不了的状态（那是另一类假 bug，用例改过 state 就先怀疑用例）。
+  await page.evaluate(() => {
+    const pl = state.player;
+    pl.x = 195; pl.vx = 0; pl.vy = 0;
+    pl.y = state.cameraY + 300;
+    state.running = false;
+    if (state.animationFrame) { cancelAnimationFrame(state.animationFrame); state.animationFrame = 0; }
+    renderAll(performance.now());
+  });
+  await page.waitForTimeout(120);
 
   const tag = view.w + 'x' + view.h;
   console.log('\n=== ' + tag + '（' + view.note + '）===');
