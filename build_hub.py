@@ -563,8 +563,8 @@ body::before{opacity:.58;mix-blend-mode:normal;background:
   background-size:72px 72px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 76%);}
 body::after{background:radial-gradient(900px 620px at 72% 18%,rgba(201,166,74,.08),transparent 68%),var(--vignette);}
 
-.launchpad-shell{position:relative;z-index:2;height:100dvh;min-height:560px;display:grid;
-  grid-template-rows:var(--shell-top) minmax(0,1fr);padding:0 var(--shell-gap) var(--shell-gap);}
+.launchpad-shell{position:relative;z-index:2;height:100vh;height:100svh;height:100dvh;min-height:0;display:grid;
+  grid-template-rows:var(--shell-top) minmax(0,1fr);padding:max(0px,env(safe-area-inset-top)) max(var(--shell-gap),env(safe-area-inset-right)) max(var(--shell-gap),env(safe-area-inset-bottom)) max(var(--shell-gap),env(safe-area-inset-left));}
 .app-topbar{height:var(--shell-top);display:flex;align-items:center;gap:16px;padding:10px 2px;min-width:0;}
 .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:var(--ink);}
 .brand-seal{width:46px;height:46px;border-radius:14px;border:1px solid var(--line);padding:4px;
@@ -586,7 +586,7 @@ body::after{background:radial-gradient(900px 620px at 72% 18%,rgba(201,166,74,.0
 .tools-menu{position:relative;}.tools-menu summary{list-style:none;}.tools-menu summary::-webkit-details-marker{display:none;}
 .tools-pop{position:absolute;right:0;top:48px;width:230px;padding:10px;border:1px solid var(--line);border-radius:14px;
   background:color-mix(in srgb,var(--bg3) 96%,transparent);box-shadow:0 22px 60px rgba(0,0,0,.45);z-index:90;display:grid;gap:6px;}
-.tools-pop button{width:100%;min-height:42px;display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid transparent;border-radius:9px;
+.tools-pop button{width:100%;min-height:44px;display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid transparent;border-radius:9px;
   background:transparent;color:var(--ink2);font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;text-align:left;}
 .tools-pop button:hover{background:var(--bg4);border-color:var(--line);color:var(--gold2);}.tools-pop .admin-fab{width:100%;height:42px;justify-content:flex-start;}
 
@@ -595,6 +595,7 @@ body::after{background:radial-gradient(900px 620px at 72% 18%,rgba(201,166,74,.0
 .category-rail,.library-panel,.project-stage{min-width:0;min-height:0;border:1px solid var(--line);border-radius:var(--shell-radius);
   background:var(--panel-soft);box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 18px 54px rgba(0,0,0,.18);overflow:hidden;}
 .category-rail{padding:12px 8px;display:flex;flex-direction:column;align-items:stretch;gap:7px;}
+.category-rail>div{width:100%;height:100%;display:flex;flex-direction:column;align-items:stretch;gap:inherit;}
 .rail-brand{width:42px;height:42px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);
   color:var(--gold2);font-size:13px;letter-spacing:0;background:var(--bg3);}
 .nav-button{appearance:none;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--ink3);font-family:var(--serif);
@@ -636,8 +637,8 @@ body::after{background:radial-gradient(900px 620px at 72% 18%,rgba(201,166,74,.0
 .app-tile.selected .tile-state{background:var(--gold);box-shadow:0 0 12px rgba(201,166,74,.65);}
 .empty-grid{grid-column:1/-1;grid-row:1/-1;display:grid;place-items:center;text-align:center;color:var(--ink3);font-size:13px;letter-spacing:.08em;border:1px dashed var(--line);border-radius:13px;}
 
-.library-foot{height:32px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.pager{display:flex;align-items:center;gap:7px;}.page-button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:var(--bg3);color:var(--ink2);display:grid;place-items:center;cursor:pointer;}
+.library-foot{height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pager{display:flex;align-items:center;gap:7px;}.page-button{width:44px;height:44px;border-radius:11px;border:1px solid var(--line2);background:var(--bg3);color:var(--ink2);display:grid;place-items:center;cursor:pointer;}
 .page-button:hover:not(:disabled){border-color:var(--gold3);color:var(--gold2);}.page-button:disabled{opacity:.28;cursor:default;}.page-button .icon{width:15px;height:15px;}
 .page-label{font-size:10px;color:var(--ink3);min-width:46px;text-align:center;letter-spacing:.08em;}
 .shortcut-hint{font-size:9px;color:var(--ink3);letter-spacing:.08em;white-space:nowrap;}.shortcut-hint kbd{border:1px solid var(--line);border-radius:5px;padding:2px 5px;background:var(--bg3);font:inherit;color:var(--ink2);}
@@ -660,9 +661,9 @@ body.admin .admin-add{display:block;}
 .stage-titles{min-width:0;}.stage-titles h2{font-size:clamp(23px,2.4vw,38px);line-height:1.12;letter-spacing:.07em;font-weight:520;margin:0;color:var(--ink);}
 .stage-en{display:block;margin-top:5px;color:var(--gold);font-size:9px;letter-spacing:.2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .stage-desc{margin:0;color:var(--ink2);font-size:13px;line-height:1.72;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-width:68ch;}
-.stage-actions{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}.stage-actions .btn{min-height:40px;border-radius:10px;}
+.stage-actions{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}.stage-actions .btn{min-height:44px;border-radius:10px;}
 .stage-actions .btn-primary{background:linear-gradient(135deg,var(--gold2),var(--gold));border-color:transparent;color:#191207;font-weight:700;min-width:128px;justify-content:center;}
-.stage-actions .btn-primary:hover{color:#080603;box-shadow:0 10px 28px rgba(201,166,74,.2);}.stage-actions .btn-icon{width:42px;padding:0;justify-content:center;}
+.stage-actions .btn-primary:hover{color:#080603;box-shadow:0 10px 28px rgba(201,166,74,.2);}.stage-actions .btn-icon{width:44px;padding:0;justify-content:center;}
 .stage-actions .btn-icon span{display:none;}.stage-links{display:flex;gap:6px;flex-wrap:wrap;max-height:31px;overflow:hidden;}
 .stage-links a{font-size:10px;color:var(--ink2);text-decoration:none;padding:6px 8px;border:1px solid var(--line2);border-radius:8px;white-space:nowrap;}
 .stage-links a:hover{border-color:var(--gold3);color:var(--gold2);}
@@ -676,16 +677,29 @@ body.admin .admin-add{display:block;}
 .mobile-tabs{display:none;}.print-catalog{display:none;}
 .admin-bar{position:fixed;inset:0 0 auto 0;height:52px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;padding:7px 12px;z-index:120;}
 .admin-bar .ab-title{white-space:nowrap;}.admin-bar button{white-space:nowrap;flex:0 0 auto;}
-body.admin .launchpad-shell{padding-top:52px;height:100dvh;}
+body.admin .launchpad-shell{padding-top:calc(52px + env(safe-area-inset-top));height:100dvh;}
 
 @media (max-width:1180px){
-  .launchpad-workspace{grid-template-columns:76px minmax(340px,.9fr) minmax(390px,1.1fr);}
-  .app-grid{grid-template-rows:repeat(3,minmax(0,1fr));}.stage-card{grid-template-rows:minmax(190px,44%) minmax(0,1fr);}
-  .topbar-motto{display:none;}.tile-button{grid-template-columns:minmax(48px,31%) minmax(0,1fr);}
+  :root{--shell-gap:8px;}
+  .launchpad-workspace{grid-template-columns:68px minmax(230px,.72fr) minmax(0,1.28fr);}
+  .category-rail{padding:9px 6px;}.rail-brand{width:40px;height:40px;}.nav-button{min-height:62px;}
+  .library-panel{padding:10px;gap:8px;}.app-grid{grid-template-rows:repeat(3,minmax(0,1fr));}.stage-card{grid-template-rows:minmax(190px,52%) minmax(0,1fr);}
+  .topbar-motto{display:none;}.top-controls .ctrl-btn,.tools-menu summary{width:44px;height:44px;}.tile-button{grid-template-columns:minmax(48px,31%) minmax(0,1fr);}
+  .stage-content{padding:clamp(14px,2vw,20px);}.stage-titles h2{font-size:clamp(23px,3.2vw,32px);}
 }
-@media (max-width:820px){
+@media (min-width:700px) and (max-width:900px){
+  .app-grid{grid-template-columns:1fr;grid-template-rows:repeat(6,minmax(0,1fr));gap:7px;}
+  .app-grid.grid-compact{grid-template-rows:repeat(4,minmax(0,1fr));}
+  .tile-button{grid-template-columns:54px minmax(0,1fr);padding:7px;gap:8px;}.tile-cover{height:54px;width:54px;}
+  .tile-kicker{font-size:7.5px;}.tile-copy strong{font-size:12.5px;}.tile-copy small{font-size:7.5px;}
+  .library-heading h1{font-size:17px;}.library-heading p{font-size:9px;}.search-box{height:44px;}
+  .stage-card{grid-template-rows:minmax(260px,58%) minmax(0,1fr);}
+  .shortcut-hint{display:none;}.stage-desc{-webkit-line-clamp:4;}.stage-links{max-height:29px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
+  .stage-links::-webkit-scrollbar{display:none;}
+}
+@media (max-width:699px){
   :root{--shell-top:60px;--shell-gap:9px;}
-  .launchpad-shell{padding:0 9px calc(68px + env(safe-area-inset-bottom));}
+  .launchpad-shell{padding:max(0px,env(safe-area-inset-top)) max(9px,env(safe-area-inset-right)) calc(68px + env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left));}
   .app-topbar{gap:9px;padding:6px 0;}.brand-seal{width:40px;height:40px;border-radius:12px;}.brand-copy b{font-size:16px;}.brand-copy span{font-size:8px;max-width:36vw;}
   .topbar-count{display:none;}.top-controls{margin-left:auto;gap:5px;}.top-controls .ctrl-btn,.tools-menu summary{width:44px;height:44px;border-radius:12px;}
   #printBtn{display:none;}
@@ -699,19 +713,29 @@ body.admin .launchpad-shell{padding-top:52px;height:100dvh;}
   .stage-actions .btn-primary{min-width:105px;background:linear-gradient(135deg,#e8c768,#c9a64a);color:#191207;border:0;}.stage-links{display:flex;flex-wrap:nowrap;overflow-x:auto;max-height:29px;scrollbar-width:none;}.stage-links::-webkit-scrollbar{display:none;}
   .stage-qr{right:10px;bottom:10px;left:10px;justify-content:center;background:rgba(17,17,20,.97);}.stage-qr .qr-box,.stage-qr .qr{width:96px;height:96px;}
   .library-head{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;}.library-eyebrow,.library-heading p{display:none;}.library-heading h1{font-size:15px;}.view-count{font-size:9px;}.view-count b{font-size:13px;}
-  .search-box{grid-column:auto;width:min(138px,35vw);height:38px;padding:0 9px;justify-content:flex-start;}.search-box input{width:100%;padding:0;opacity:1;font-size:10px;}
+  .search-box{grid-column:auto;width:min(138px,35vw);height:44px;padding:0 9px;justify-content:flex-start;}.search-box input{width:100%;padding:0;opacity:1;font-size:10px;}
   .app-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:7px;}.tile-button{padding:7px;grid-template-columns:minmax(44px,34%) minmax(0,1fr);gap:7px;}
   .tile-kicker{font-size:7.5px;}.tile-copy strong{font-size:12.5px;}.tile-copy small{font-size:7px;}.tile-state{right:5px;top:5px;}
-  .library-foot{height:32px;}.page-button{width:32px;height:32px;}.shortcut-hint{display:none;}.admin-add{height:32px;}
-  .mobile-tabs{position:fixed;z-index:50;left:9px;right:9px;bottom:max(7px,env(safe-area-inset-bottom));height:58px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
+  .library-foot{height:44px;}.page-button{width:44px;height:44px;}.shortcut-hint{display:none;}.admin-add{height:44px;}
+  .mobile-tabs{position:fixed;z-index:50;left:max(9px,env(safe-area-inset-left));right:max(9px,env(safe-area-inset-right));bottom:max(7px,env(safe-area-inset-bottom));height:58px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
     padding:5px;border:1px solid var(--line);border-radius:17px;background:color-mix(in srgb,var(--bg3) 96%,transparent);box-shadow:0 12px 40px rgba(0,0,0,.38);}
   .mobile-tabs .nav-button{min-height:0;height:46px;padding:3px;gap:2px;border-radius:10px;}.mobile-tabs .nav-button .icon{width:17px;height:17px;}.mobile-tabs .nav-button span{font-size:8px;}.mobile-tabs .nav-button.on::before{display:none;}
   .tools-pop{position:fixed;left:9px;right:9px;top:60px;width:auto;}
-  .toast{bottom:76px;}.admin-bar{height:48px;}.admin-bar .ab-title{display:none;}body.admin .launchpad-shell{padding-top:48px;}
+  .toast{bottom:76px;}.admin-bar{height:48px;}.admin-bar .ab-title{display:none;}body.admin .launchpad-shell{padding-top:calc(48px + env(safe-area-inset-top));}
 }
-@media (max-height:680px) and (max-width:820px){
+@media (max-height:680px) and (max-width:699px){
   :root{--shell-top:52px;}.brand-copy span{display:none;}.brand-seal{width:36px;height:36px;}.top-controls .ctrl-btn,.tools-menu summary{width:40px;height:40px;}
   .launchpad-workspace{grid-template-rows:minmax(0,.82fr) minmax(0,1.18fr);}.stage-desc{display:none;}.stage-badges{display:none;}.tile-copy small{display:none;}
+}
+@media (max-height:520px) and (min-width:700px) and (max-width:1000px){
+  :root{--shell-top:52px;}
+  .launchpad-workspace{grid-template-columns:56px minmax(250px,.8fr) minmax(0,1.2fr);}.category-rail{padding:5px 4px;gap:3px;}.rail-brand{display:none;}.nav-button{min-height:49px;gap:2px;padding:3px;}.nav-button span{font-size:8px;}.nav-button .icon{width:17px;height:17px;}
+  .library-head{grid-template-columns:minmax(0,1fr) auto;}.library-heading p,.library-eyebrow{display:none;}.library-heading h1{font-size:14px;}
+  .search-box{display:flex;grid-column:1/-1;width:100%;height:44px;}
+  .app-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));}.app-grid.grid-compact{grid-template-rows:repeat(2,minmax(0,1fr));}
+  .tile-button{grid-template-columns:42px minmax(0,1fr);padding:6px;gap:6px;}.tile-cover{width:42px;height:42px;}.tile-kicker,.tile-copy small{display:none;}.tile-copy strong{font-size:11px;}
+  .stage-card{grid-template-rows:100%;display:block;}.stage-visual{position:absolute;inset:0;}.stage-visual::after{background:linear-gradient(to top,var(--bg2),rgba(17,17,20,.8) 58%,rgba(10,10,12,.12));}
+  .stage-content{height:100%;z-index:2;background:transparent;justify-content:flex-end;padding:12px;gap:5px;}.stage-titles h2{font-size:21px;color:#f0e6d2;text-shadow:0 2px 14px #000;}.stage-en{color:#e8c768;}.stage-desc,.stage-badges,.stage-links,.url{display:none;}.stage-actions{margin-top:3px;flex-wrap:nowrap;}.stage-actions .btn{background:rgba(10,10,12,.78);color:#f0e6d2;}.stage-actions .btn-primary{background:linear-gradient(135deg,#e8c768,#c9a64a);color:#191207;}
 }
 @media (max-width:350px){.brand-copy span{display:none;}.brand-copy b{font-size:14px;}.top-controls #shareBtn{display:none;}.launchpad-shell{padding-left:6px;padding-right:6px;}.mobile-tabs{left:6px;right:6px;}}
 
@@ -874,11 +898,12 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     return '<span class="cat-icon" title="'+(CAT_NAME[cat]||'作品')+'" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg><small>'+esc(CAT_NAME[cat]||'作品')+'</small></span>';}
   function workMark(it){var d=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
     return '<span class="work-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></span>';}
-  var VIEW_STORE='myskme-hub-view-v2',RECENT_STORE='myskme-hub-recent-v2';
+  var VIEW_STORE='myskme-hub-view-v3',RECENT_STORE='myskme-hub-recent-v2';
+  var HOME_PRIORITY=['gemfall','zimingqi','monkey-upstairs','star-dungeon'];
   var viewKey='home',viewPage=0,selectedKey='',query='';
-  try{var oldView=JSON.parse(localStorage.getItem(VIEW_STORE)||'{}');viewKey=oldView.view||'home';viewPage=+oldView.page||0;selectedKey=oldView.selected||'';}catch(e){}
+  // 每次重新进入主域都回到精选第一屏，避免上次停留的深层分类让代表作藏起来。
   var VIEW_DEFS={
-    home:{label:'精选',eyebrow:'MYSKME NOW',desc:'主推与最近打开的作品',icon:'home'},
+    home:{label:'精选',eyebrow:'MYSKME NOW',desc:'代表作固定在前，最近打开只补一个位置',icon:'home'},
     games:{label:'游戏',eyebrow:'PLAY',desc:'远征、养成与策略世界',icon:'game'},
     learn:{label:'学习',eyebrow:'LEARN',desc:'中考修行与课堂器物',icon:'book'},
     world:{label:'世界',eyebrow:'LORE',desc:'正典、角色与远征源头',icon:'world'}
@@ -892,26 +917,33 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
   function entriesForView(){
     var all=allEntries(),q=query.trim().toLowerCase();
     if(q)return all.filter(function(e){var it=e.it,s=[it.title,it.en,it.tag,it.desc,it.glyph].join(' ').toLowerCase();return s.indexOf(q)>=0;});
-    if(viewKey==='games')return all.filter(function(e){return e.it.cat==='game';});
+    if(viewKey==='games'){
+      var games=all.filter(function(e){return e.it.cat==='game';}),gameOrder=[],gameSeen={};
+      HOME_PRIORITY.forEach(function(k){games.some(function(e){if(e.it.key===k){gameSeen[k]=1;gameOrder.push(e);return true;}return false;});});
+      games.forEach(function(e){var k=e.it.key||('x'+e.si+'-'+e.ii);if(!gameSeen[k])gameOrder.push(e);});
+      return gameOrder;
+    }
     if(viewKey==='learn')return all.filter(function(e){return e.si===1;});
     if(viewKey==='world')return all.filter(function(e){return e.it.cat==='lore'||['expedition','starling','zimingqi'].indexOf(e.it.key)>=0;});
     var order=[],seen={};
-    recentKeys().forEach(function(k){var e=entryByKey(k);if(e&&!seen[k]){seen[k]=1;order.push(e);}});
+    HOME_PRIORITY.forEach(function(k){var e=entryByKey(k);if(e&&!seen[k]){seen[k]=1;order.push(e);}});
+    recentKeys().some(function(k){var e=entryByKey(k);if(e&&!seen[k]){seen[k]=1;order.push(e);return true;}return false;});
     all.filter(function(e){return !!e.it.featured;}).forEach(function(e){var k=e.it.key||('x'+e.si+'-'+e.ii);if(!seen[k]){seen[k]=1;order.push(e);}});
     all.forEach(function(e){var k=e.it.key||('x'+e.si+'-'+e.ii);if(!seen[k]){seen[k]=1;order.push(e);}});
     return order;
   }
-  function pageSize(){return matchMedia('(max-width:820px)').matches?4:(matchMedia('(max-width:1180px)').matches?6:8);}
+  function pageSize(){return matchMedia('(max-width:699px)').matches||matchMedia('(max-height:520px) and (min-width:700px) and (max-width:1000px)').matches?4:(matchMedia('(max-width:1180px)').matches?6:8);}
   function targetAttr(url){return (url||'').indexOf('https://myskme.com/')===0?'':' target="_blank" rel="noopener"';}
-  function itemCover(it,cls){
+  function itemCover(it,cls,eager){
     var cover=it.cover||'',small=it.coverSmall||'',srcset=small?' srcset="'+esc(small)+' 640w, '+esc(cover)+' 1280w"':'';
     if(!cover)return '<div class="tile-fallback">'+esc(it.glyph||'作')+'</div>';
-    return '<img class="'+(cls||'')+'" src="'+esc(cover)+'"'+srcset+' alt="" loading="eager" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="tile-fallback" style="display:none">'+esc(it.glyph||'作')+'</div>';
+    var sizes=eager?' sizes="(max-width:699px) 100vw, (max-width:1180px) 56vw, 46vw"':' sizes="(max-width:699px) 28vw, (max-width:900px) 92px, (max-width:1180px) 17vw, 12vw"';
+    return '<img class="'+(cls||'')+'" src="'+esc(cover)+'"'+srcset+sizes+' alt="" loading="'+(eager?'eager':'lazy')+'" fetchpriority="'+(eager?'high':'low')+'" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'"><div class="tile-fallback" style="display:none">'+esc(it.glyph||'作')+'</div>';
   }
   function tileHTML(entry){var it=entry.it,key=it.key||('x'+entry.si+'-'+entry.ii),sel=key===selectedKey;
     return '<article class="app-tile'+(sel?' selected':'')+'" data-key="'+esc(key)+'">'
       +'<button class="tile-button" data-select="'+esc(key)+'" aria-pressed="'+(sel?'true':'false')+'" aria-label="查看 '+esc(it.title)+'">'
-      +'<span class="tile-cover">'+itemCover(it,'')+'</span><span class="tile-copy"><span class="tile-kicker">'+esc(it.tag||CAT_NAME[it.cat]||'MYSKME')+'</span>'
+      +'<span class="tile-cover">'+itemCover(it,'',false)+'</span><span class="tile-copy"><span class="tile-kicker">'+esc(it.tag||CAT_NAME[it.cat]||'MYSKME')+'</span>'
       +'<strong>'+esc(it.title)+'</strong><small>'+esc(it.en||'MYSKME ORIGINAL')+'</small></span><span class="tile-state"></span></button></article>';
   }
   function secondaryLinks(it,key){var h='';for(var i=2;i<=6;i++){var u=it['url'+i],lab=it['url'+i+'label'];if(u)h+='<a href="'+esc(u)+'"'+targetAttr(u)+' data-launch="'+esc(key)+'">'+uiIcon('external')+esc(lab||'更多入口')+'</a>';}
@@ -921,7 +953,7 @@ function sha256hex(s){return crypto.subtle.digest('SHA-256',new TextEncoder().en
     var it=entry.it,key=it.key||('x'+entry.si+'-'+entry.ii),rar=esc(it.rarity||'N');
     var path=ITEM_PATH[it.icon||it.key]||CAT_PATH[it.cat]||CAT_PATH.tool;
     return '<article class="stage-card card" data-sec="'+entry.si+'" data-idx="'+entry.ii+'">'
-      +'<div class="stage-visual">'+itemCover(it,'stage-cover')+'<div class="stage-badges"><span class="stage-badge" data-bind="tag">'+esc(it.tag||CAT_NAME[it.cat]||'原创作品')+'</span><span class="stage-badge rarity">'+rar+'</span></div>'
+      +'<div class="stage-visual">'+itemCover(it,'stage-cover',true)+'<div class="stage-badges"><span class="stage-badge" data-bind="tag">'+esc(it.tag||CAT_NAME[it.cat]||'原创作品')+'</span><span class="stage-badge rarity">'+rar+'</span></div>'
       +'<span class="stage-index">'+String(absoluteIndex+1).padStart(2,'0')+' / '+String(total).padStart(2,'0')+'</span></div>'
       +'<div class="stage-content"><div class="stage-titleline"><span class="stage-mark"><svg viewBox="0 0 24 24">'+path+'</svg></span><div class="stage-titles">'
       +'<h2 data-bind="title">'+esc(it.title)+'</h2><span class="stage-en" data-bind="en">'+esc(it.en||'MYSKME ORIGINAL')+'</span></div></div>'
@@ -1319,16 +1351,17 @@ var e=document.documentElement;e.setAttribute('data-theme',d);e.setAttribute('da
 <title>狼先生与他的学生们 · 作品总目 | MYSKME</title>
 <link rel="canonical" href="https://myskme.com/">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" as="image" href="assets/cover-gemfall.webp" fetchpriority="high">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MYSKME">
 <meta name="theme-color" content="#0a0a0c">
-<meta name="description" content="王老师的原创作品启动台：灵石远征 / 是猴就上100层 / 自鸣棋 / 星徒地牢 / 远征录 / 世界编年史——手机直接打开。">
+<meta name="description" content="王老师的原创作品启动台：灵石远征 / 自鸣棋 / 是猴就上100层 / 星徒地牢 / 远征录 / 世界编年史——手机与平板直接打开。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="MYSKME · 作品总目 — 狼先生与他的学生们">
-<meta property="og:description" content="灵石远征、是猴就上100层、自鸣棋等 MYSKME 原创作品的统一手机入口。">
+<meta property="og:description" content="灵石远征、自鸣棋、是猴就上100层等 MYSKME 原创作品的统一手机与平板入口。">
 <meta property="og:image" content="https://myskme.com/og-cover.png">
 <meta property="og:image:alt" content="MYSKME · 狼先生与他的学生们作品总目">
 <meta property="og:url" content="https://myskme.com/">

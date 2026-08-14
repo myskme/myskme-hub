@@ -110,6 +110,9 @@ jobs:
             exit 1
           fi
 
+      - name: 校验手机与平板布局契约
+        run: node deploy/homepage/verify-layout-contract.mjs
+
       - name: 构建 EdgeOne ZIP
         run: node deploy/homepage/build-edgeone-homepage.mjs "$RUNNER_TEMP/myskme-homepage.zip"
 
