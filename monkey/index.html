@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260813.14-palette">
+<meta name="myskme-release" content="20260814.1-appointments">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -278,6 +278,15 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .career{display:grid;grid-template-columns:1fr auto;gap:7px 12px;align-items:center;margin:0 0 11px;padding:9px 11px;
   border:2px dashed #a7977c;border-radius:12px;background:#f8efd9}.career b{font-size:12px}.career span{font-size:9px;color:var(--muted);font-weight:900}
 .career strong{grid-row:1/3;grid-column:2;font-size:23px;color:var(--red)}
+.collect-strip{grid-column:1/3;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:2px}
+.collect-chip{display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 0 2px;border:2px solid var(--ink);border-radius:9px;
+  background:#fffdf6;font-size:8.5px;font-weight:1000;line-height:1;color:var(--muted);cursor:pointer;min-width:0}
+.collect-chip svg{display:block;height:22px;width:auto}
+.collect-chip em{font-style:normal;font-size:9px;color:var(--ink);letter-spacing:-.02em}
+.collect-chip[data-full="1"]{background:#fff0af}
+.collect-chip[data-full="1"] em{color:var(--red)}
+.collect-chip[data-none="1"] svg{opacity:.3}
+.collect-chip:active{transform:translateY(2px)}
 .mission-card{margin:0 0 8px;padding:7px 9px;border:2px solid var(--ink);border-radius:11px;background:#dff3ef;font-size:10px;line-height:1.4;font-weight:900}
 .mission-card b{color:var(--red);margin-right:5px}.kit-label{font-size:9px;color:var(--muted);font-weight:1000;letter-spacing:.12em;margin:0 0 6px}
 .kit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}.kit-card{min-width:0;border:2px solid var(--ink);border-radius:10px;
@@ -306,9 +315,9 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 .rank-form{display:grid;grid-template-columns:1fr auto;gap:7px}.rank-input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;
   background:var(--card);padding:9px 10px;font:900 13px var(--sans);user-select:text;-webkit-user-select:text;touch-action:auto}
 .rank-save{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);padding:8px 12px;font-weight:1000;cursor:pointer}
-#leaderboardScreen,#choiceScreen,#installScreen,#shareScreen,#teaScreen{z-index:76}
-#leaderboardScreen .card,#choiceScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{max-height:100%;overflow:hidden}
-#titleScreen .card,#resultScreen .card,#leaderboardScreen .card,#choiceScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{padding-top:32px}
+#leaderboardScreen,#installScreen,#shareScreen,#teaScreen{z-index:76}
+#leaderboardScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{max-height:100%;overflow:hidden}
+#titleScreen .card,#resultScreen .card,#leaderboardScreen .card,#installScreen .card,#shareScreen .card,#pauseScreen .card,#titlesScreen .card,#teaScreen .card{padding-top:32px}
 #installScreen .notice-no,#shareScreen .notice-no,#pauseScreen .notice-no,#titlesScreen .notice-no,#teaScreen .notice-no{top:7px;right:12px}
 .screen-title{text-align:center;font-family:var(--serif);font-size:28px;margin:3px 0 4px}.screen-note{text-align:center;color:var(--muted);font-size:10px;font-weight:800;margin:0 0 12px}
 .rank-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
@@ -369,8 +378,6 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
    这种长串，一换行就把整张首页顶出屏幕（320x568 上实测溢出 54px，而卡片是 overflow:hidden，
    溢出的部分不是能滚，是**直接看不见**）。所以一律单行截断。 */
 .btn-row .btn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.choice-grid{display:grid;gap:9px;margin-top:13px}.choice-card{border:3px solid var(--ink);border-radius:14px;background:#f4ead3;padding:12px;text-align:left;cursor:pointer;box-shadow:0 4px 0 rgba(40,33,26,.18)}
-.choice-card b{display:block;font-size:15px}.choice-card span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.45}.choice-card:active{transform:translateY(3px);box-shadow:none}
 .install-steps{margin:12px 0;padding-left:20px;font-size:11px;line-height:1.75;color:var(--muted);font-weight:800}.install-icon{width:92px;height:92px;display:block;margin:4px auto 10px;border:3px solid var(--ink);border-radius:23px;box-shadow:var(--shadow)}
 .share-card{width:100%;max-height:min(54svh,520px);object-fit:contain;display:block;margin:6px auto 10px;border:3px solid var(--ink);border-radius:13px;background:#efe1c5;box-shadow:var(--shadow);touch-action:auto;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto}
 .share-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.share-actions .btn{margin:0;padding:10px 7px;font-size:10px;letter-spacing:.03em}
@@ -415,6 +422,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 @media(max-height:760px){
   .screen{padding-top:calc(var(--safe-top) + 10px);padding-bottom:calc(var(--safe-bottom) + 10px)}.card{padding:14px}
   .title-art{width:78px;height:68px}.eyebrow{font-size:8px}h1{font-size:26px;margin-bottom:3px}.subtitle{font-size:10px;margin-bottom:6px}
+  .collect-chip{padding:2px 0 1px;font-size:8px;border-radius:8px}.collect-strip{gap:3px}
   .career{padding:6px 9px;margin-bottom:6px}.career strong{font-size:19px}.mission-card,.kit-grid{margin-bottom:6px}.kit-card{padding-block:4px}
   .brief{margin-bottom:6px;padding:5px 8px}.btn{padding:10px 13px}.btn-row{margin-top:7px}.btn-row .btn{padding:8px 6px}.best-row{margin-top:6px}
   .screen-title{font-size:23px}.screen-note{margin-bottom:8px}.death-line{margin-bottom:7px}.result-title{font-size:21px}.result-score{font-size:48px;margin-top:4px}
@@ -431,6 +439,7 @@ h1 strong{font-size:1.18em;color:var(--red);margin-left:3px;font-variant-numeric
 @media(max-height:700px){
   :root{--compact-result:1}
   .title-art{width:62px;height:54px}h1{font-size:23px}.subtitle{font-size:9px;margin-bottom:4px}
+  .collect-chip{padding:1px 0 0;font-size:7.5px;border-width:1.5px}.collect-chip svg{height:19px}.collect-strip{gap:2px;margin-top:1px}
   .career{padding:5px 8px;margin-bottom:4px}.career strong{font-size:17px}
   .mission-card,.kit-grid,.brief{margin-bottom:4px}.mission-card,.brief{padding:5px 7px}
   .kit-label{margin-bottom:2px}.kit-card{padding-block:3px}
@@ -741,8 +750,8 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <svg class="title-art" viewBox="0 0 100 116"><use href="#art-monkey-rise"/></svg>
         <h1>是猴就上<strong>100层</strong></h1>
         <p class="subtitle">电梯在等他。他没看见。</p>
-        <div class="career"><b>长期档案</b><span id="careerCopy">档案章可解锁开工装备</span><strong id="careerStamps">0</strong></div>
-        <div class="btn-row"><button id="wornTitleButton" class="btn compact secondary" style="margin-top:0">称号墙</button><button id="teaButton" class="btn compact secondary" style="margin-top:0">奶茶图鉴</button></div>
+        <div class="career"><b>长期档案</b><span id="careerCopy">档案章可解锁开工装备</span><strong id="careerStamps">0</strong>
+          <div id="collectStrip" class="collect-strip" aria-label="收藏进度"></div></div>
         <div id="titleMission" class="mission-card"><b>本局轮值</b><span>正在从传真机里抽一张任务。</span></div>
         <div class="kit-label">选择开工装备</div>
         <div id="kitGrid" class="kit-grid"></div>
@@ -840,15 +849,6 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       </div>
     </section>
 
-    <section id="choiceScreen" class="screen hidden" aria-label="局内临时任命">
-      <div class="card">
-        <span class="notice-no">人事部临时决定</span>
-        <h2 class="screen-title">三选一，不许都要</h2>
-        <p class="screen-note">每项任命都很正式，正式到本局结束立即失效。</p>
-        <div id="choiceGrid" class="choice-grid"></div>
-      </div>
-    </section>
-
     <section id="installScreen" class="screen hidden" aria-label="添加到桌面说明">
       <div class="card">
         <span class="notice-no">正版猴图标</span>
@@ -902,7 +902,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260813.14-palette',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.1-appointments',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -920,10 +920,10 @@ const el={
   floor:$('floorValue'),height:$('heightValue'),bananas:$('bananaValue'),score:$('scoreValue'),dept:$('deptPill'),banner:$('departmentBanner'),toast:$('toastLayer'),
   bg:$('bgMood'),worldWindow:$('worldWindow'),building:$('buildingParallax'),facade:$('facadeLayer'),fish:$('fishScene'),fertilizer:$('fertilizerScene'),bubbles:$('bubbleField'),fog:$('fogField'),elevator:$('elevatorScene'),recordLine:$('recordLine'),recordLineText:$('recordLineText'),
   fax:$('faxFly'),broadcast:$('broadcast'),stamps:$('stampStorm'),donkey:$('donkeyPeek'),rescue:$('rescueBubble'),audit:$('auditCeiling'),auditCopy:$('auditCopy'),face:$('faceMeter'),
-  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),choice:$('choiceScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),rotateGate:$('rotateGate'),
-  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),choiceGrid:$('choiceGrid'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
+  flow:$('flowBadge'),tongue:$('tonguePrompt'),missionBadge:$('missionBadge'),missionBadgeText:$('missionBadgeText'),toolDock:$('toolDock'),title:$('titleScreen'),result:$('resultScreen'),leaderboard:$('leaderboardScreen'),install:$('installScreen'),share:$('shareScreen'),splash:$('splash'),rotateGate:$('rotateGate'),
+  start:$('startButton'),restart:$('restartButton'),copy:$('copyButton'),sound:$('soundButton'),rankOpen:$('leaderboardButton'),resultRankOpen:$('resultLeaderboardButton'),rankClose:$('leaderboardCloseButton'),rankBack:$('leaderboardBackButton'),rankList:$('rankList'),rankPager:$('rankPager'),worldTabs:$('worldTabs'),worldStatus:$('worldStatus'),rankName:$('rankName'),rankSave:$('rankSaveButton'),resultTabs:$('resultTabs'),resultHome:$('resultHomeButton'),
   pause:$('pauseScreen'),pauseBtn:$('pauseButton'),pauseResume:$('pauseResumeButton'),pauseSound:$('pauseSoundButton'),pauseExit:$('pauseExitButton'),pauseExitHint:$('pauseExitHint'),pauseNote:$('pauseNote'),pauseStats:$('pauseStats'),
-  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),teaOpen:$('teaButton'),resultTeaOpen:$('resultTeaButton'),wornTitle:$('wornTitleButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
+  titles:$('titlesScreen'),titlesList:$('titlesList'),titlesPager:$('titlesPager'),titlesClose:$('titlesCloseButton'),teas:$('teaScreen'),teaList:$('teaList'),teaPager:$('teaPager'),teaClose:$('teaCloseButton'),collectStrip:$('collectStrip'),resultTeaOpen:$('resultTeaButton'),resultTitles:$('resultTitlesButton'),freshHonors:$('freshHonors'),teaOrder:$('teaOrder'),
   installOpen:$('installButton'),installConfirm:$('installConfirmButton'),installClose:$('installCloseButton'),installSteps:$('installSteps'),installNote:$('installNote'),shareImage:$('shareCardImage'),shareSend:$('shareImageButton'),shareReroll:$('rerollPosterButton'),shareClose:$('shareCloseButton'),shareRarity:$('shareRarity'),shareNote:$('shareNote')
 };
 
@@ -1254,13 +1254,16 @@ const NPC_RANKS=[
   {id:'npc-fertilizer',name:'黑化肥',height:666,score:672,bananas:6,npc:true},
   {id:'npc-404',name:'该用户已注销',height:404,score:404,bananas:0,npc:true}
 ];
+// 任命各配一枚图标：它们现在长在台子上，玩家在跳的过程中要**一眼认出**是哪一份，
+// 没有时间读字。图标走的是全作通用的 ICON_GLYPHS，风格与称号徽章一致。
 const PERK_POOL=[
-  {id:'wide',name:'宽容落脚点',line:'判定左右各放宽一点。质检部对此睁一只眼。'},
-  {id:'spring',name:'弹性批文',line:'以后每次起跳更高。批文没有写上限。'},
-  {id:'banana',name:'香蕉复利',line:'每根香蕉额外长出一根财务意义上的香蕉。'},
-  {id:'insurance',name:'安全科补充意见',line:'增加一次坠落减免。安全科称这叫回头复习。'},
-  {id:'calm',name:'反通风科外套',line:'横风和蛇的意见对你少生效一点。'}
+  {id:'wide',emblem:'widen',tint:'#c9b27a',name:'宽容落脚点',line:'判定左右各放宽一点。质检部对此睁一只眼。'},
+  {id:'spring',emblem:'spring',tint:'#e0a21c',name:'弹性批文',line:'以后每次起跳更高。批文没有写上限。'},
+  {id:'banana',emblem:'banana',tint:'#f1bd3c',name:'香蕉复利',line:'每根香蕉额外长出一根财务意义上的香蕉。'},
+  {id:'insurance',emblem:'seal',tint:'#e0452c',name:'安全科补充意见',line:'增加一次坠落减免。安全科称这叫回头复习。'},
+  {id:'calm',emblem:'coat',tint:'#4a7c59',name:'反通风科外套',line:'横风和蛇的意见对你少生效一点。'}
 ];
+const PERK_BY_ID=Object.fromEntries(PERK_POOL.map(p=>[p.id,p]));
 const MAJOR_EVENTS=['stamp','donkey','gravity','wind','shaft','faxRain','elevator'];
 const TOOL_POOL=['magnet','clip','waiver','rocket','wide'];
 const TOOL_INFO={
@@ -1291,9 +1294,9 @@ const MISSIONS=[
 // 那不叫暂停，那叫作弊入口。切后台同理（原来只停 rAF、不停计时，就是这个漏）。
 // **新加计时字段一定要登记进下面三张表**，runQA 的「暂停计时字段登记齐全」会当场抓漏。
 const PAUSE_TIME_FIELDS=['lowGravityUntil','windUntil','faxNextAt','shaftUntil','shaftLastHit','shaftStartedAt',
-  'faxRainUntil','deathFreezeUntil','magnetUntil','wideUntil','lastLandingAt','choiceOpenedAt'];
+  'faxRainUntil','deathFreezeUntil','magnetUntil','wideUntil','lastLandingAt'];
 const PAUSE_PLAYER_TIME_FIELDS=['rocketUntil','goldenUntil','stampedUntil'];
-const PAUSE_ENTITY_TIME_FIELDS=['expireAt','breakAt'];
+const PAUSE_ENTITY_TIME_FIELDS=['expireAt','breakAt','declinedAt'];
 // 这几个名字也以 At 结尾，但不在 performance.now() 这条时间轴上，别跟着移。
 const PAUSE_NON_TIME_FIELDS=['pausedAt','nextEventMeter','nextChoiceMeter','nextToolMeter','nextSurpriseMeter'];
 
@@ -1312,8 +1315,8 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
   maxMeters:0,bananas:0,bonus:0,score:0,visited:new Set(),deptId:'lobby',deptIndex:0,deptCache:[],randomBag:[],motifId:'jiangnan',
   majorCount:0,eventPool:[],nextEventMeter:620,lowGravityUntil:0,windUntil:0,windDirection:0,faxNextAt:0,
   lastTime:0,unsafeStreak:0,crateGiven:false,recordToast:false,personalBestAtStart:0,recordPassed:false,milestones:new Set(),lucky:false,fertilizerCoughed:false,
-  animationFrame:0,paused:false,pausedAt:0,choiceOpenedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),motifFirstTime:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
-  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,choiceOpen:false,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
+  animationFrame:0,paused:false,pausedAt:0,carpHat:false,freshTeaCount:0,facadeId:'',facadesSeen:new Set(),motifFirstTime:false,seen:new Set(),flow:0,maxFlow:0,lastLandingAt:0,nearMisses:0,tonguePack:0,tongueGenerated:0,tongueExpected:0,tongueCombo:0,
+  perks:{wide:0,spring:0,banana:0,calm:0},nextChoiceMeter:1200,perkGroup:0,perksTaken:0,shaftUntil:0,shaftFace:3,shaftLastHit:0,shaftStartedAt:0,
   runId:'',rankSubmitted:false,lastSafe:null,playerRepairs:0,faxRainUntil:0,autopilot:false,autoTargetId:'',stressMode:false,stressRescues:0,deathFreezeUntil:0,resultStamp:'',
   mission:null,missionRewarded:false,missionAnnounced:false,toolsUsed:0,tongueHits:0,goldRisks:0,clips:0,magnetUntil:0,wideUntil:0,nextToolMeter:0,kitId:'bare',
   surpriseCount:0,surpriseBag:[],nextSurpriseMeter:0,lastSurprise:'',secretMeters:new Set(),rescueLift:0};
@@ -1360,8 +1363,8 @@ function saveBoard(){try{localStorage.setItem('myskme_monkey_upstairs_board_v2',
 function blankTally(){return {f47:0,noPB:0,bare:0};}
 function safeTally(raw){const t=blankTally();if(raw&&typeof raw==='object')for(const k of Object.keys(t))t[k]=Math.max(0,Math.floor(Number(raw[k])||0));return t;}
 function loadCareer(){
-  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],modes:Array.isArray(raw.modes)?[...new Set(raw.modes.filter(id=>MODES.some(m=>m.id===id)))]:[],tally:safeTally(raw.tally)};}
-  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],modes:[],tally:blankTally()};}
+  try{const raw=JSON.parse(localStorage.getItem('myskme_monkey_career_v1')||'{}');return {stamps:Math.max(0,Math.floor(Number(raw.stamps)||0)),runs:Math.max(0,Math.floor(Number(raw.runs)||0)),totalMeters:Math.max(0,Math.floor(Number(raw.totalMeters)||0)),kit:KITS.some(k=>k.id===raw.kit)?raw.kit:'bare',surprises:Array.isArray(raw.surprises)?[...new Set(raw.surprises.filter(id=>SURPRISES.some(s=>s.id===id)))]:[],titles:Array.isArray(raw.titles)?[...new Set(raw.titles.filter(id=>HONORS.some(h=>h.id===id)))]:[],worn:HONORS.some(h=>h.id===raw.worn)?raw.worn:'',teas:Array.isArray(raw.teas)?[...new Set(raw.teas.filter(id=>TEAS.some(t=>t.id===id)))]:[],cup:TEAS.some(t=>t.id===raw.cup)?raw.cup:'',motifs:Array.isArray(raw.motifs)?[...new Set(raw.motifs.filter(id=>CULTURE_MOTIFS.some(m=>m.id===id)))]:[],facades:Array.isArray(raw.facades)?[...new Set(raw.facades.filter(id=>FACADES.some(f=>f.id===id)))]:[],modes:Array.isArray(raw.modes)?[...new Set(raw.modes.filter(id=>MODES.some(m=>m.id===id)))]:[],perks:Array.isArray(raw.perks)?[...new Set(raw.perks.filter(id=>PERK_POOL.some(p=>p.id===id)))]:[],tally:safeTally(raw.tally)};}
+  catch(_){return {stamps:0,runs:0,totalMeters:0,kit:'bare',surprises:[],titles:[],worn:'',teas:[],cup:'',motifs:[],facades:[],modes:[],perks:[],tally:blankTally()};}
 }
 function saveCareer(){try{localStorage.setItem('myskme_monkey_career_v1',JSON.stringify(career));}catch(_){}}
 function worldStorageGet(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(_){return fallback;}}
@@ -1496,10 +1499,50 @@ function missionValue(m=state.mission){
 function missionDone(m=state.mission){return !!m&&missionValue(m)>=m.target;}
 function unlockedKit(id){const kit=KITS.find(k=>k.id===id);return !!kit&&career.stamps>=kit.cost;}
 function selectKit(id){if(!unlockedKit(id))return;career.kit=id;saveCareer();renderCareer();sfx('select');}
+// 首页收藏条。**又是「一个函数 + 一张表」**：加一条收集线只加一行，
+// 图标现取 ICON_GLYPHS，所以边际成本是一行数据，不是一张新图。
+// last 取的是「最近解锁的那一条的学问」——点一下就能重看，不必再打一局撞运气。
+const COLLECTIONS=[
+  // 这两格自带 art()：戴了称号就画那枚称号，选了杯子就画那只杯子。
+  // 「戴着什么」原来写在按钮文字上，现在画在格子里——省掉一整行字，信息一点不少。
+  {id:'titles',label:'称号',emblem:'seal',tint:'#e0452c',got:()=>career.titles.length,all:()=>HONORS.length,open:()=>openTitles(),
+   art:size=>career.worn?honorBadgeSvg(wornHonor(),size):''},
+  {id:'teas',label:'奶茶',emblem:'cup',tint:'#c98c4a',got:()=>career.teas.length,all:()=>TEAS.length,open:()=>openTeas(),
+   art:size=>career.cup?teaCupSvg(currentCup(),size):''},
+  {id:'perks',label:'任命',emblem:'order',tint:'#e0452c',got:()=>career.perks.length,all:()=>PERK_POOL.length,
+   last:()=>{const p=PERK_BY_ID[career.perks[career.perks.length-1]];return p&&`${p.name}：${p.line}`;}},
+  {id:'surprises',label:'意外',emblem:'bolt',tint:'#e0a21c',got:()=>career.surprises.length,all:()=>SURPRISES.length,
+   last:()=>{const s=SURPRISES.find(x=>x.id===career.surprises[career.surprises.length-1]);return s&&s.line;}},
+  {id:'motifs',label:'窗景',emblem:'window',tint:'#3fab84',got:()=>career.motifs.length,all:()=>CULTURE_MOTIFS.length,
+   last:()=>{const m=CULTURE_MOTIFS.find(x=>x.id===career.motifs[career.motifs.length-1]);return m&&motifPaletteFact(m);}},
+  {id:'facades',label:'立面',emblem:'facade',tint:'#6f86c9',got:()=>career.facades.length,all:()=>FACADES.length,
+   last:()=>{const f=FACADES.find(x=>x.id===career.facades[career.facades.length-1]);return f&&`${f.name}（${f.era}）：${f.fact}`;}},
+  {id:'modes',label:'调式',emblem:'note',tint:'#8e6fd8',got:()=>career.modes.length,all:()=>MODES.length,
+   last:()=>{const m=MODES.find(x=>x.id===career.modes[career.modes.length-1]);return m&&`${m.name}（${m.origin}）：${m.fact}`;}}
+];
+function renderCollectStrip(){
+  el.collectStrip.innerHTML='';
+  for(const c of COLLECTIONS){
+    const got=c.got(),all=c.all(),b=document.createElement('button');
+    b.type='button';b.className='collect-chip';b.dataset.collect=c.id;
+    if(got>=all)b.dataset.full='1';if(!got)b.dataset.none='1';
+    b.setAttribute('aria-label',`${c.label} ${got}/${all}`);
+    b.innerHTML=(c.art&&c.art(22)||iconSvg(c.emblem,c.tint,22))+`<em>${got}/${all}</em>${c.label}`;
+    b.addEventListener('click',()=>{
+      sfx('select');
+      if(c.open)return c.open();
+      // 没有图鉴页的那几格：就地讲一句。一格都没解锁时说清楚去哪儿拿，别只给个 0。
+      const line=got?c.last():'';
+      toast(line||`${c.label}还一个都没有。上楼时留意——它们只在第一次遇见时讲一遍。`,got?'teal':'gold');
+    });
+    el.collectStrip.appendChild(b);
+  }
+}
 function renderCareer(){
-  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;$('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米 · 意外 ${career.surprises.length}/${SURPRISES.length} · 窗景 ${career.motifs.length}/${CULTURE_MOTIFS.length} · 立面 ${career.facades.length}/${FACADES.length} · 调式 ${career.modes.length}/${MODES.length}`;
-  el.wornTitle.textContent=career.worn?`称号 · ${wornHonor().name}`:`称号墙 ${career.titles.length}/${HONORS.length}`;
-  el.teaOpen.textContent=career.cup?`在喝 · ${currentCup().name}`:`奶茶图鉴 ${career.teas.length}/${TEAS.length}`;
+  const mission=state.running&&state.mission?state.mission:missionForRun();$('careerStamps').textContent=career.stamps;
+  // 六种收藏从这行小字里搬走了——它们现在在收藏条上，一眼看得完。
+  $('careerCopy').textContent=`已上班 ${career.runs} 局 · 累计 ${career.totalMeters} 米`;
+  renderCollectStrip();
   $('titleMission').innerHTML=`<b>本局轮值</b><span>${mission.label} 完成盖 ${mission.reward} 枚章。</span>`;el.kitGrid=$('kitGrid');el.kitGrid.innerHTML='';
   if(!unlockedKit(career.kit))career.kit='bare';
   for(const kit of KITS){const b=document.createElement('button'),open=unlockedKit(kit.id);b.className=`kit-card${career.kit===kit.id?' selected':''}`;b.disabled=!open;b.innerHTML=`${kit.name}<small>${open?kit.line:`需 ${kit.cost} 枚章`}</small>`;b.addEventListener('click',()=>selectKit(kit.id));el.kitGrid.appendChild(b);}
@@ -1624,15 +1667,15 @@ function resetWorld(seed=Date.now()&0xffffffff){
   state.windDirection=0;state.faxNextAt=0;state.unsafeStreak=0;state.crateGiven=DEBUG_START>430;state.recordToast=false;state.personalBestAtStart=IS_TEST_RUN?0:saved.height;state.recordPassed=false;
   state.milestones=new Set(MILESTONES.filter(m=>m<=DEBUG_START));state.lucky=DEBUG_START>=1020;state.fertilizerCoughed=false;
   state.flow=0;state.maxFlow=0;state.lastLandingAt=0;state.lastLandingId='';state.nearMisses=0;state.tonguePack=Math.floor(state.rng()*TONGUE_PACKS.length);state.tongueGenerated=0;state.tongueExpected=0;state.tongueCombo=0;
-  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.choiceOpen=false;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
+  state.perks={wide:0,spring:0,banana:0,calm:0};state.nextChoiceMeter=DEBUG_START<1200?1200:1200+(Math.floor((DEBUG_START-1200)/1500)+1)*1500;state.perkGroup=0;state.perksTaken=0;state.shaftUntil=0;state.shaftFace=3;state.shaftLastHit=0;state.shaftStartedAt=0;
   state.runId=makeRunId();state.rankSubmitted=false;state.lastSafe={x:DEBUG_X,y:baseY};state.playerRepairs=0;state.faxRainUntil=0;
   state.autopilot=false;state.autoTargetId='';state.stressMode=false;state.stressRescues=0;state.deathFreezeUntil=0;state.resultStamp='';
   state.mission=MISSIONS.find(m=>m.id===DEBUG_MISSION)||missionForRun();state.missionRewarded=false;state.missionAnnounced=false;state.toolsUsed=0;state.tongueHits=0;state.goldRisks=0;state.clips=0;state.magnetUntil=0;state.wideUntil=0;state.nextToolMeter=DEBUG_START+230+Math.floor(state.rng()*120);state.kitId=unlockedKit(career.kit)?career.kit:'bare';
   state.surpriseCount=0;state.surpriseBag=shuffle(SURPRISES);state.nextSurpriseMeter=DEBUG_START+150+Math.floor(state.rng()*170);state.lastSurprise='';state.secretMeters=new Set(SECRET_METERS.filter(s=>s.at<=DEBUG_START).map(s=>s.at));state.rescueLift=0;
   if(state.kitId==='magnet')state.magnetUntil=performance.now()+10000;if(state.kitId==='clip')state.clips=1;if(state.kitId==='fish')state.player.waiver=1;
-  state.over=false;state.paused=false;state.pausedAt=0;state.choiceOpenedAt=0;state.carpHat=false;state.freshTeaCount=0;state.facadeId='';state.facadesSeen=new Set();state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
+  state.over=false;state.paused=false;state.pausedAt=0;state.carpHat=false;state.freshTeaCount=0;state.facadeId='';state.facadesSeen=new Set();state.seen=new Set();el.shell.classList.remove('carp-hat-on');platformSeq=0;itemSeq=0;lastPose='';
   platformEls.forEach(node=>node.remove());platformEls.clear();itemEls.forEach(node=>node.remove());itemEls.clear();
-  el.audit.classList.remove('show');el.elevator.classList.remove('show');el.flow.classList.remove('show');el.tongue.classList.remove('show');el.choice.classList.add('hidden');
+  el.audit.classList.remove('show');el.elevator.classList.remove('show');el.flow.classList.remove('show');el.tongue.classList.remove('show');
   for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');
   addPlatform({x:132,y:baseY-2,w:126,type:'good',dept:startDept,solid:true,route:true,label:DEBUG_START?'临时起点':'接待台'});
   generatePlatforms(baseY+7600);
@@ -1660,9 +1703,33 @@ function platformBounceValue(p){
   if(p.type==='snake')return 770;if(p.type==='bubble')return 735;if(p.type==='tongue'&&!p.tongueCorrect)return 610;return 790;
 }
 function platformRiseCap(p){const v=platformBounceValue(p);return Math.floor(clamp(v*v/(2*1700)*.78,86,132));}
+// 一排三块任命台。三选一从此不是弹窗，而是**一次落点选择**——
+// 这个游戏的动词只有「位置」一个，任命就该用这个动词来拿。
+// 造一整排而不是挂在现成的排上：多数排根本没有三块台，而部门自己的排型
+// （绕口令双词牌、冗余幻影、限时计租）会让玩家分不清在选任命还是在躲坑。
+function addAppointmentRow(meters,y,dept){
+  const bw=Math.min(safeWidth(meters),94),span=(W-12-bw)/2;
+  const perks=shuffle(PERK_POOL).slice(0,3);
+  state.perkGroup+=1;
+  const row=perks.map((perk,i)=>{
+    const p=addPlatform({x:6+span*i,y,w:bw,type:'good',dept,label:'任命'});
+    p.route=true;p.appointment=true;
+    const item=addItem('perk',p);item.perk=perk.id;item.perkGroup=state.perkGroup;
+    return p;
+  });
+  state.lastX=W/2;
+  return row;
+}
 function generatePlatforms(targetY){
   while(state.nextY<targetY){
     const meters=metersFromY(state.nextY),dept=departmentIdAt(meters),width=safeWidth(meters),gap=88+state.rng()*19+Math.min(22,meters/230);
+    if(meters>=state.nextChoiceMeter){
+      const row=addAppointmentRow(meters,state.nextY,dept);
+      state.nextChoiceMeter=meters+1500;
+      // 上限现取 platformRiseCap，不抄字面量——台子类型哪天改了弹力，这里自动跟。
+      state.nextY+=Math.min(gap,Math.min(...row.map(platformRiseCap)));
+      continue;
+    }
     const y=state.nextY,x=nextPlatformX(width),before=state.platforms.length;let primary=null;
     if(dept==='lobby')primary=addPlatform({x,y,w:width+12,type:'good',dept,label:state.rng()<.4?'访客请跳':'这边上楼'});
     if(dept==='quality'){
@@ -1749,7 +1816,21 @@ function ensureItemNode(item){
   node=document.createElementNS(SVG_NS,'g');
   if(item.kind==='banana')node.innerHTML='<use href="#art-banana" x="-22" y="-46" width="44" height="44"/>';
   else if(item.kind==='crate')node.innerHTML='<use href="#art-crate" x="-30" y="-58" width="60" height="60"/>';
-  else{const info=TOOL_INFO[item.kind],glyph=item.kind==='magnet'?'U':item.kind==='clip'?'@':item.kind==='waiver'?'免':item.kind==='rocket'?'梯':'宽';node.innerHTML=`<g transform="translate(-24 -52)"><path d="M5 13 Q24 1 43 13 L41 43 Q24 51 7 43 Z" fill="#d9f3ef" stroke="#28211a" stroke-width="3"/><path d="M7 17 H41" stroke="#1f9e8e" stroke-width="3"/><circle cx="24" cy="30" r="12" fill="#fffdf6" stroke="#28211a" stroke-width="2"/><text x="24" y="35" text-anchor="middle" font-size="14" font-weight="1000" fill="#e0452c">${glyph}</text><title>${info.name}</title></g>`;}
+  else if(item.kind==='perk'){
+    // 任命：一枚图标 + 一条挂绳，摆在台子正上方。**不写字**——玩家在跳，没空读。
+    const perk=PERK_BY_ID[item.perk]||PERK_POOL[0];
+    node.innerHTML=`<path d="M0 -12 V-24" stroke="#28211a" stroke-width="3" stroke-linecap="round"/>`
+      +iconStageMarkup(perk.emblem,perk.tint,40)+`<title>${perk.name}</title>`;
+  }
+  else{
+    // 五件道具原来是拿 <text> 画「U / @ / 免 / 梯 / 宽」五个字符——
+    // 既不是图标风格，也不能当免翻译素材导出（出海要重画），
+    // 还跟「蛇蛋驴不靠文字牌解释」那条自相矛盾。0814 全换成图形。
+    const info=TOOL_INFO[item.kind];
+    const emblem=item.kind==='magnet'?'magnet':item.kind==='clip'?'clip':item.kind==='waiver'?'waiver':item.kind==='rocket'?'ladder':'widen';
+    node.innerHTML=`<g transform="translate(-24 -52)"><path d="M5 13 Q24 1 43 13 L41 43 Q24 51 7 43 Z" fill="#d9f3ef" stroke="#28211a" stroke-width="3"/><path d="M7 17 H41" stroke="#1f9e8e" stroke-width="3"/></g>`
+      +iconStageMarkup(emblem,'#fffdf6',26)+`<title>${info.name}</title>`;
+  }
   el.itemLayer.appendChild(node);itemEls.set(item.id,node);return node;
 }
 
@@ -1816,9 +1897,29 @@ function collectItems(now){
     if((dx<(magnet?132:34)&&dy<(magnet?108:62))){
       item.collected=true;
       if(item.kind==='banana'){const gain=1+state.perks.banana;state.bananas+=gain;toast(gain>1?'香蕉发生复利：一根按两根入账。':'香蕉已入账。用途：香蕉。','gold');sfx('banana');}
-      else if(item.kind==='crate')openCrate(now);else useTool(item.kind,now);
+      else if(item.kind==='crate')openCrate(now);
+      else if(item.kind==='perk')takePerk(item,now);
+      else useTool(item.kind,now);
     }
   }
+}
+// 拿到一份任命。**同一批的另外两份当场作废**——三选一还是三选一，
+// 不是「摔回去再上来把三份都捡了」。作废不删节点，让它们淡出，玩家能看见自己放弃了什么。
+function takePerk(item,now){
+  const perk=PERK_BY_ID[item.perk];if(!perk)return;
+  if(perk.id==='insurance')state.player.waiver++;else state.perks[perk.id]=(state.perks[perk.id]||0)+1;
+  state.perksTaken++;
+  for(const other of state.items){
+    if(other===item||other.perkGroup!==item.perkGroup||other.collected)continue;
+    // 作废不是直接抹掉：让它淡出一下，玩家要看得见自己刚放弃了什么。
+    // 直接消失的话，三选一在体感上就退化成「捡到一个东西」，选择的分量全没了。
+    other.collected=true;other.declined=true;other.declinedAt=now;
+  }
+  state.seen.add('perk:'+perk.id);
+  // 任命本身一局作废，但「拿到过」是长期的：五种凑齐是收集线，不给任何数值，纯收集。
+  const firstEver=!IS_TEST_RUN&&!career.perks.includes(perk.id);
+  if(firstEver){career.perks.push(perk.id);saveCareer();}
+  toast(`临时任命：${perk.name}。离职时间：本局结束。`+(firstEver?`（人事档案 ${career.perks.length}/${PERK_POOL.length}）`:''),'gold');sfx('boost');
 }
 function useTool(kind,now){
   state.toolsUsed++;state.seen.add('tool:'+kind);sfx('tool');
@@ -1972,7 +2073,7 @@ function triggerSurprise(entry,now){
   toast(`${entry.rarity}：${entry.text}` ,entry.rarity==='极怪意外'?'red':entry.rarity==='稀有意外'?'gold':'teal');sfx('surprise');
 }
 function maybeSurprise(now){
-  if(state.choiceOpen||state.maxMeters<state.nextSurpriseMeter||state.stressMode)return;
+  if(state.maxMeters<state.nextSurpriseMeter||state.stressMode)return;
   if(!state.surpriseBag.length)state.surpriseBag=shuffle(SURPRISES);
   const entry=state.surpriseBag.shift();state.nextSurpriseMeter=state.maxMeters+145+Math.floor(state.rng()*190);triggerSurprise(entry,now);
 }
@@ -1988,7 +2089,6 @@ function maybeDepartmentEffects(now){
   for(const m of MILESTONES){if(state.maxMeters>=m&&!state.milestones.has(m)){state.milestones.add(m);celebrate(m===300?'100层已到。谈话人刚好又上了一层。':`${m} 米：加盖工程部被迫更新了楼层目录。`);}}
   for(const secret of SECRET_METERS){if(state.maxMeters>=secret.at&&!state.secretMeters.has(secret.at)){state.secretMeters.add(secret.at);state.seen.add('secret');state.bonus+=secret.at===555?5:0;celebrate(secret.text);}}
   maybeSurprise(now);
-  if(state.maxMeters>=state.nextChoiceMeter&&!state.choiceOpen){state.nextChoiceMeter+=1500;openPerkChoice();}
   if(state.shaftUntil&&now>=state.shaftUntil)endShaftEvent('百层倒班结束。你一层也没下，但脸面受到了锻炼。');
   if(!state.recordToast&&saved.score>0&&state.score>saved.score){state.recordToast=true;el.shell.classList.add('shake');setTimeout(()=>el.shell.classList.remove('shake'),420);toast('破纪录：谜题管理局为你重新盖了一个章。','gold');}
   updateMissionUI();
@@ -2008,18 +2108,6 @@ function triggerMajorEvent(type,now){
   if(type==='shaft'){state.shaftUntil=now+7800;state.shaftStartedAt=now;state.shaftLastHit=0;state.shaftFace=3;updateFaceMeter();el.audit.classList.add('show');toast('临时插播：是猴就上完再下。百层倒班启动。','red');sfx('stamp');}
   if(type==='faxRain'){state.faxRainUntil=now+4800;for(let i=0;i<4;i++)setTimeout(()=>{if(state.running&&performance.now()<state.faxRainUntil){el.fax.classList.remove('show');void el.fax.offsetWidth;el.fax.classList.add('show');sfx('fax');}},i*1050);toast('传真科天气：局部有纸，正文略。','teal');}
   if(type==='elevator'){state.player.rocketUntil=Math.max(state.player.rocketUntil,now+1700);state.bonus+=18;el.elevator.classList.add('show');setTimeout(()=>el.elevator.classList.remove('show'),2600);toast('电梯终于赶上了猴先生，并把他弹了出去。+18。','gold');sfx('elevator');}
-}
-function openPerkChoice(){
-  state.choiceOpen=true;state.choiceOpenedAt=performance.now();input.left=input.right=false;const choices=shuffle(PERK_POOL).slice(0,3);el.choiceGrid.innerHTML='';
-  for(const perk of choices){const b=document.createElement('button');b.className='choice-card';b.dataset.perk=perk.id;b.innerHTML=`<b>${perk.name}</b><span>${perk.line}</span>`;b.addEventListener('click',()=>choosePerk(perk));el.choiceGrid.appendChild(b);}
-  el.choice.classList.remove('hidden');sfx('quiet');if(AUTO_PLAY)setTimeout(()=>{if(state.choiceOpen)choosePerk(choices[0]);},180);
-}
-function choosePerk(perk){
-  if(!state.choiceOpen)return;state.choiceOpen=false;
-  // 选卡这段时间不算数：整体后移，和暂停走同一条通道。切后台读了五分钟也一样补得回来。
-  if(state.choiceOpenedAt)shiftDeadlines(Math.max(0,performance.now()-state.choiceOpenedAt));state.choiceOpenedAt=0;
-  if(perk.id==='insurance')state.player.waiver++;else state.perks[perk.id]=(state.perks[perk.id]||0)+1;
-  el.choice.classList.add('hidden');lastFrame=performance.now();toast(`临时任命：${perk.name}。离职时间：本局结束。`,'gold');sfx('boost');
 }
 function celebrate(message){spawnConfetti(26);toast(message,'gold');sfx('boost');}
 function spawnConfetti(count){
@@ -2050,8 +2138,10 @@ function renderAll(now){
   for(const [id,node]of platformEls){if(!liveIds.has(id)){node.remove();platformEls.delete(id);}}
   const liveItems=new Set();
   for(const item of state.items){
-    const sy=H-(item.y-state.cameraY);if(item.collected||sy<-90||sy>H+80)continue;
+    const sy=H-(item.y-state.cameraY),fade=item.declined?1-(now-item.declinedAt)/520:1;
+    if((item.collected&&fade<=0)||sy<-90||sy>H+80)continue;
     liveItems.add(item.id);const node=ensureItemNode(item);node.setAttribute('transform',`translate(${item.x.toFixed(1)} ${(sy+Math.sin(now*.004+item.phase)*5).toFixed(1)})`);
+    if(item.declined)node.style.opacity=String(Math.max(0,fade));
   }
   for(const [id,node]of itemEls){if(!liveItems.has(id)){node.remove();itemEls.delete(id);}}
   if(state.player){
@@ -2078,7 +2168,7 @@ function renderToolDock(now){
 }
 
 function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function hideMenuScreens(){for(const screen of [el.title,el.result,el.leaderboard,el.choice,el.install,el.share,el.pause,el.titles,el.teas])screen.classList.add('hidden');}
+function hideMenuScreens(){for(const screen of [el.title,el.result,el.leaderboard,el.install,el.share,el.pause,el.titles,el.teas])screen.classList.add('hidden');}
 function showResultPage(next=0){
   resultPage=clamp(next,0,2);
   for(const page of el.result.querySelectorAll('.result-page'))page.classList.toggle('hidden',Number(page.dataset.resultPage)!==resultPage);
@@ -2157,9 +2247,9 @@ function loop(now){
   state.animationFrame=0;if(!state.running||state.paused)return;
   if(now-lastRenderedFrame<FRAME_INTERVAL){state.animationFrame=requestAnimationFrame(loop);return;}lastRenderedFrame=now;
   const dt=Math.min(.034,Math.max(0,(now-lastFrame)/1000));lastFrame=now;
-  if(state.running&&!state.choiceOpen){
-    updateMovingPlatforms(now);updatePhysics(dt,now);updateDepartment();maybeDepartmentEffects(now);maybeMajorEvent(now);renderAll(now);
-  }else if(state.player&&state.choiceOpen)renderAll(now);
+  // 0814 起主循环没有「开着弹窗只渲染不推进」这条岔路了：任命长在台子上，
+  // 玩家从头到尾都在跑，帧循环也就只剩一条路。
+  updateMovingPlatforms(now);updatePhysics(dt,now);updateDepartment();maybeDepartmentEffects(now);maybeMajorEvent(now);renderAll(now);
   if(state.running)state.animationFrame=requestAnimationFrame(loop);
 }
 function ensureGameLoop(){if(!state.running||state.paused||state.animationFrame)return;lastFrame=performance.now();lastRenderedFrame=0;state.animationFrame=requestAnimationFrame(loop);}
@@ -2174,7 +2264,7 @@ function startRun(seed=Date.now()&0xffffffff){
   if(MAJOR_EVENTS.includes(DEBUG_EVENT))setTimeout(()=>triggerMajorEvent(DEBUG_EVENT,performance.now()),260);
 }
 function finishRun(reason='fall'){
-  if(!state.running)return;state.running=false;state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.choiceOpen=false;state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.choice.classList.add('hidden');el.shell.classList.remove('running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
+  if(!state.running)return;state.running=false;state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');state.over=true;if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;stopMusic(.1);state.shaftUntil=0;state.deathFreezeUntil=0;el.audit.classList.remove('show');el.elevator.classList.remove('show');el.shell.classList.remove('running');input.left=input.right=false;for(const node of playerMotions)node.classList.remove('rising','falling','landing','doomed');sfx(reason==='timeout'?'mission':'fall');scheduleAudioSuspend(1200);
   // 调试参数跑出来的成绩不许进本机纪录。原来只挡了 career，漏了 saved——
   // ?start=1200 之类一开，假高度就永久盖进玩家的最高纪录了。
   const oldHeight=saved.height,oldScore=saved.score;
@@ -2273,11 +2363,14 @@ function tightGrid(){
 }
 // 一页装几杯是**跟着屏幕走**的，所以只能有一个取法，不许再有人直接用常量。
 function teaPageSize(){return tightGrid()?9:TEA_PAGE_SIZE;}
-// 称号徽章。和 teaCupSvg 同一套路：**一个函数 + 一张图形表**，加一个称号只加一行数据。
+// 全作通用的图标表。原名 ICON_GLYPHS，0814 改名——它已经不只给称号用了，
+// 道具与局内任命也吃这张表。**名字要说实话**，否则下一个人会以为它只跟称号有关，
+// 然后另起一张表，于是同一套画风裂成两份。
+// 和 teaCupSvg 同一套路：**一个函数 + 一张图形表**，加一个图标只加一行数据。
 // 全部平涂、自包含（不含 <image>、不引外部 href），所以导出器能原样导成可复用素材，
 // 将来做周边、卡面、表情包都能直接抠走——这就是「小成本、可复利」的那部分。
 // 一律不写字：徽章要能脱离中文语境使用，也免得跟「蛇蛋驴不靠文字牌解释」那条打架。
-const HONOR_GLYPHS={
+const ICON_GLYPHS={
   stamp:'<circle cx="20" cy="22" r="8"/><rect x="17" y="8" width="6" height="7" rx="2"/>',
   door:'<rect x="12" y="9" width="16" height="24" rx="2"/><circle cx="24" cy="21" r="1.6" fill="#fffdf6"/>',
   lion:'<circle cx="20" cy="21" r="11" opacity=".55"/><circle cx="20" cy="21" r="7"/>'
@@ -2299,16 +2392,54 @@ const HONOR_GLYPHS={
     +'<path d="M20 14c2 3 3 6 3 9s-1 5-3 6c-2-1-3-3-3-6s1-6 3-9z" fill="#fffdf6" opacity=".6"/>',
   bench:'<rect x="9" y="16" width="22" height="5" rx="2"/><rect x="12" y="21" width="3.5" height="10" rx="1.5"/>'
     +'<rect x="24.5" y="21" width="3.5" height="10" rx="1.5"/>',
+  // 0814 新增：局内任命（弹簧/外套）与五件道具（磁卡/回形针/免责/梯/宽）。
+  // 全部同一画风、同一 40x40 画布，所以哪一枚拿去做贴纸都不用重画。
+  spring:'<path d="M13 31h14M13 25h14M13 19h14M13 13h14" stroke="#28211a" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+    +'<rect x="11" y="7" width="18" height="4" rx="2"/><rect x="11" y="33" width="18" height="4" rx="2"/>',
+  coat:'<path d="M20 9l-8 4-3 15h5l1 4h10l1-4h5l-3-15z"/>'
+    +'<path d="M20 9v19" stroke="#fffdf6" stroke-width="2" fill="none"/>',
+  magnet:'<path d="M11 27a9 9 0 0 1 18 0v3h-6v-3a3 3 0 0 0-6 0v3h-6z"/>'
+    +'<rect x="11" y="30" width="6" height="5" rx="1.5" fill="#fffdf6"/>'
+    +'<rect x="23" y="30" width="6" height="5" rx="1.5" fill="#fffdf6"/>',
+  clip:'<path d="M15 30V15a5 5 0 0 1 10 0v16a8 8 0 0 1-16 0V16" fill="none" stroke="#28211a" stroke-width="3.4" stroke-linecap="round"/>',
+  waiver:'<rect x="11" y="8" width="18" height="24" rx="3"/>'
+    +'<path d="M15 15h10M15 20h10M15 25h6" stroke="#fffdf6" stroke-width="2" fill="none" stroke-linecap="round"/>'
+    +'<path d="M12 30l16-16" stroke="#fffdf6" stroke-width="3" fill="none" stroke-linecap="round"/>',
+  ladder:'<path d="M14 8v25M26 8v25M14 13h12M14 20h12M14 27h12" fill="none" stroke="#28211a" stroke-width="3.2" stroke-linecap="round"/>',
+  widen:'<path d="M8 20h24" stroke="#28211a" stroke-width="3.4" stroke-linecap="round" fill="none"/>'
+    +'<path d="M13 14l-6 6 6 6M27 14l6 6-6 6" fill="none" stroke="#28211a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>',
+  // 0814 再添五枚，专供首页收藏条：意外、窗景、调式、任命、立面。
+  // 后两枚不复用 stamp / tower：那两枚是给称号徽章画的，缩到 22 像素高就认不出了
+  // （放大四倍看才发现，一个糊成一坨，一个像弹出符号）。也不去改它们——
+  // 它们还挂在老玩家已解锁的称号上，动了等于改人家的收藏品。
+  order:'<rect x="9" y="7" width="22" height="26" rx="2"/>'
+    +'<path d="M14 13h12M14 18h12M14 23h7" stroke="#fffdf6" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+    +'<circle cx="26" cy="27" r="5" fill="#fffdf6"/><circle cx="26" cy="27" r="2.2"/>',
+  facade:'<path d="M8 34V18h6v-4h4V8h4v6h4v4h6v16z"/>'
+    +'<path d="M13 24h3M18.5 24h3M24 24h3M13 29h14" stroke="#fffdf6" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
+  bolt:'<path d="M23 6l-11 16h6l-2 12 11-16h-6z"/>',
+  window:'<rect x="9" y="8" width="22" height="24" rx="2"/>'
+    +'<path d="M20 8v24M9 20h22" stroke="#fffdf6" stroke-width="2.6" fill="none"/>',
+  note:'<path d="M26 8v16a5 5 0 1 1-3-4.6V12l-9 2v14a5 5 0 1 1-3-4.6V13z"/>',
   carp:'<path d="M11 20c4-6 10-8 14-8 4 0 6 3 6 8s-2 8-6 8c-4 0-10-2-14-8z"/>'
     +'<path d="M31 20l6-5v10z"/><circle cx="17" cy="18" r="1.7" fill="#fffdf6"/>'
 };
-function honorBadgeSvg(honor,size){
-  const glyph=HONOR_GLYPHS[honor&&honor.emblem]||HONOR_GLYPHS.stamp;
-  const tint=(honor&&honor.tint)||'#a7977c';
+// 通用画法：给一个 emblem 与底色就出一枚图标。徽章、道具、任命全走这里，
+// 所以风格天然一致，也天然可导出。
+function iconSvg(emblem,tint,size){
+  const glyph=ICON_GLYPHS[emblem]||ICON_GLYPHS.stamp;
   return `<svg viewBox="0 0 40 40" width="${size}" height="${size}" aria-hidden="true">`
-    +`<rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11" fill="${tint}" stroke="#28211a" stroke-width="2.6"/>`
+    +`<rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11" fill="${tint||'#a7977c'}" stroke="#28211a" stroke-width="2.6"/>`
     +`<g fill="#28211a">${glyph}</g></svg>`;
 }
+// 舞台上用的版本：SVG 里不能再套 <svg>，所以只给内容、由调用方摆位置。
+function iconStageMarkup(emblem,tint,size){
+  const glyph=ICON_GLYPHS[emblem]||ICON_GLYPHS.stamp,scale=size/40;
+  return `<g transform="translate(${-size/2} ${-size-10}) scale(${scale})">`
+    +`<rect x="1.6" y="1.6" width="36.8" height="36.8" rx="11" fill="${tint||'#a7977c'}" stroke="#28211a" stroke-width="2.6"/>`
+    +`<g fill="#28211a">${glyph}</g></g>`;
+}
+function honorBadgeSvg(honor,size){return iconSvg(honor&&honor.emblem,honor&&honor.tint,size);}
 function renderFreshHonors(fresh){
   if(!fresh.length){el.freshHonors.classList.add('is-hidden');el.freshHonors.innerHTML='';return;}
   el.freshHonors.classList.remove('is-hidden');
@@ -2332,7 +2463,7 @@ function shiftDeadlines(delta){
   for(const list of [state.platforms,state.items])for(const node of list||[])for(const k of PAUSE_ENTITY_TIME_FIELDS)if(node[k])node[k]+=delta;
 }
 function pauseGame(now=performance.now()){
-  if(!state.running||state.paused||state.over||state.choiceOpen)return false;
+  if(!state.running||state.paused||state.over)return false;
   state.paused=true;state.pausedAt=now;input.left=input.right=false;
   if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;
   stopMusic();if(audioCtx&&audioCtx.state==='running')audioCtx.suspend().catch(()=>{});
@@ -2381,11 +2512,11 @@ function unregisteredTimerFields(){
 }
 // 真跑一次暂停/恢复，验「剩余时长原样保留」。做完把动过的字段还原，不许留副作用。
 function pauseShiftSelfTest(){
-  const keep={running:state.running,over:state.over,choiceOpen:state.choiceOpen,
+  const keep={running:state.running,over:state.over,
     magnet:state.magnetUntil,wide:state.wideUntil,rocket:state.player?state.player.rocketUntil:0};
   const plat=state.platforms&&state.platforms[0],platKeep=plat?plat.expireAt:0;
   const t0=performance.now(),GAP=30000;
-  state.running=true;state.over=false;state.choiceOpen=false;state.paused=false;state.pausedAt=0;
+  state.running=true;state.over=false;state.paused=false;state.pausedAt=0;
   state.magnetUntil=t0+5000;state.wideUntil=t0+9000;if(state.player)state.player.rocketUntil=t0+2000;
   if(plat)plat.expireAt=t0+7000;
   const paused=pauseGame(t0)&&state.paused===true;
@@ -2396,7 +2527,7 @@ function pauseShiftSelfTest(){
   if(state.animationFrame)cancelAnimationFrame(state.animationFrame),state.animationFrame=0;
   state.magnetUntil=keep.magnet;state.wideUntil=keep.wide;if(state.player)state.player.rocketUntil=keep.rocket;
   if(plat)plat.expireAt=platKeep;
-  state.running=keep.running;state.over=keep.over;state.choiceOpen=keep.choiceOpen;
+  state.running=keep.running;state.over=keep.over;
   state.paused=false;state.pausedAt=0;el.pause.classList.add('hidden');stopMusic(0);
   return paused&&resumed&&shifted;
 }
@@ -2713,8 +2844,9 @@ el.sound.addEventListener('click',cycleAudioMode);
 el.pauseBtn.addEventListener('click',()=>pauseGame());el.pauseResume.addEventListener('click',()=>resumeGame());
 el.pauseSound.addEventListener('click',()=>{cycleAudioMode();el.pauseSound.textContent='声音：'+el.sound.textContent;});
 el.pauseExit.addEventListener('click',pauseExit);
-el.wornTitle.addEventListener('click',openTitles);el.resultTitles.addEventListener('click',openTitles);el.titlesClose.addEventListener('click',closeTitles);
-el.teaOpen.addEventListener('click',openTeas);el.resultTeaOpen.addEventListener('click',openTeas);el.teaClose.addEventListener('click',closeTeas);
+// 首页的称号墙/奶茶图鉴入口搬到收藏条上了（renderCollectStrip 里绑），这里只剩结算页那两个。
+el.resultTitles.addEventListener('click',openTitles);el.titlesClose.addEventListener('click',closeTitles);
+el.resultTeaOpen.addEventListener('click',openTeas);el.teaClose.addEventListener('click',closeTeas);
 el.installOpen.addEventListener('click',openInstallScreen);el.installConfirm.addEventListener('click',confirmInstall);el.installClose.addEventListener('click',showTitleScreen);
 function hideSplash(){el.splash.classList.add('hidden');}
 el.splash.addEventListener('click',hideSplash);setTimeout(hideSplash,1650);
@@ -2895,6 +3027,60 @@ function runQA(){
       const ionian=MODES.find(m=>m.id==='ionian');
       if(!ionian)return false;
       return JSON.stringify(MELODY_DEGREES.map(d=>d.map(g=>degreeToSemitone(ionian.steps,g))))===JSON.stringify(before);})()],
+    ['任命排：三份同排、拉得开、最近的一份总够得着',(()=>{
+      const groups=new Map();
+      for(const item of state.items){if(item.kind!=='perk')continue;
+        if(!groups.has(item.perkGroup))groups.set(item.perkGroup,[]);groups.get(item.perkGroup).push(item);}
+      if(!groups.size)return false;
+      for(const [,items]of groups){
+        if(items.length!==3)return false;
+        if(new Set(items.map(i=>i.perk)).size!==3)return false;
+        const ps=items.map(i=>state.platforms.find(p=>p.id===i.platformId));
+        if(ps.some(p=>!p||!p.solid||!p.appointment))return false;
+        if(new Set(ps.map(p=>Math.round(p.y))).size!==1)return false;
+        // 拉不开就等于没得选：任意两块之间要留出比猴子还宽的空当。
+        const xs=ps.map(p=>p.x).sort((a,b)=>a-b),ws=ps.map(p=>p.w);
+        if(xs.slice(1).some((x,i)=>x-xs[i]-ws[i]<44))return false;
+        // 「够得着」量的是**最近的那一份**：三块摊在环形屏幕上，
+        // 从任何一个横坐标出发，到最近一块的距离都不该超过普通排的横向漂移上限（约 102）。
+        // 判据要跟玩家实际要做的事走——玩家要的是「至少能落在一份上」，不是「哪一份都能落」。
+        const centers=ps.map(p=>p.x+p.w*.5);
+        let worst=0;
+        for(let x=0;x<W;x+=6){
+          const near=Math.min(...centers.map(c=>{const d=Math.abs(x-c);return Math.min(d,W-d);}));
+          worst=Math.max(worst,near);
+        }
+        if(worst>102)return false;
+      }
+      return true;})()],
+    ['拿一份任命，同批的另外两份当场作废',(()=>{
+      // 真跑一次，别只看源码里有没有那句话。做完还原，不许留副作用。
+      const items=state.items.filter(i=>i.kind==='perk'&&!i.collected);
+      if(items.length<3)return false;
+      const group=items[0].perkGroup,batch=items.filter(i=>i.perkGroup===group);
+      if(batch.length!==3)return false;
+      const keepPerks={...state.perks},keepTaken=state.perksTaken,keepWaiver=state.player?state.player.waiver:0;
+      const keepSeen=new Set(state.seen),keepCareer=[...career.perks];
+      batch[0].collected=true;takePerk(batch[0],performance.now());
+      const voided=batch.slice(1).every(i=>i.collected&&i.declined&&typeof i.declinedAt==='number');
+      const counted=state.perksTaken===keepTaken+1;
+      for(const i of batch){i.collected=false;i.declined=false;i.declinedAt=0;}
+      state.perks=keepPerks;state.perksTaken=keepTaken;if(state.player)state.player.waiver=keepWaiver;
+      state.seen=keepSeen;career.perks=keepCareer;
+      return voided&&counted;})()],
+    ['首页收藏条：每条收集线一格，数目跟着档案走',(()=>{
+      if(el.collectStrip.children.length!==COLLECTIONS.length)return false;
+      // 格子里的数字必须是**现算的**，不是写死的。改一条档案再渲染一次，格子要跟着变。
+      const before=el.collectStrip.querySelector('[data-collect="modes"] em').textContent;
+      const keep=[...career.modes];
+      career.modes=MODES.map(m=>m.id);renderCollectStrip();
+      const full=el.collectStrip.querySelector('[data-collect="modes"]');
+      const changed=full.textContent.includes(`${MODES.length}/${MODES.length}`)&&full.dataset.full==='1';
+      career.modes=keep;renderCollectStrip();
+      const back=el.collectStrip.querySelector('[data-collect="modes"] em').textContent===before;
+      // 每一格都得点得动：没有图鉴页的那几格也要有反应，否则玩家点两下就当它是装饰。
+      const allClickable=[...el.collectStrip.children].every(node=>node.tagName==='BUTTON'&&!node.disabled);
+      return changed&&back&&allClickable;})()],
     ['每个部门都有一种调式与一种立面',
       DEPARTMENTS.every(d=>MODE_BY_DEPT[d.id]&&FACADE_BY_DEPT[d.id])&&MODES.length===DEPARTMENTS.length&&FACADES.length===DEPARTMENTS.length],
     ['竖屏锁定：CSS 与 JS 用的是同一条媒体查询',(()=>{
@@ -2976,7 +3162,7 @@ function runPosterQA(){
   const longestHonor=[...HONORS].sort((a,b)=>[...b.name].length-[...a.name].length)[0];career.titles=[...new Set([...career.titles,longestHonor.id])];career.worn=longestHonor.id;
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }
-Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,motif:state.motifId,motifDiscoveries:career.motifs.length,motifTotal:CULTURE_MOTIFS.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,choiceOpen:state.choiceOpen,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterMotif:posterMotif?.id||'',posterCombo:posterVariant&&posterMotif?posterVariant.id+'|'+posterMotif.id:'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
+Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,motif:state.motifId,motifDiscoveries:career.motifs.length,motifTotal:CULTURE_MOTIFS.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,perkGroup:state.perkGroup,perksTaken:state.perksTaken,perksOnStage:state.items.filter(i=>i.kind==='perk'&&!i.collected).length,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterMotif:posterMotif?.id||'',posterCombo:posterVariant&&posterMotif?posterVariant.id+'|'+posterMotif.id:'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
 Object.defineProperty(window,'MONKEY_UPSTAIRS_REPORT',{enumerable:true,get:()=>window.__MONKEY_UPSTAIRS_REPORT});
 setAudioMode(audioMode,false);el.rankName.value=worldAlias();renderCareer();updateBestLabels();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
 if(worldEnabled())setTimeout(()=>flushWorldQueue(),900);

@@ -59,11 +59,16 @@ if (teas.some(tea => !/^[a-z0-9-]+$/.test(tea.id) || !tea.name || !tea.tier || !
 // 加一个称号只需要在 index.html 里多写一行数据，素材库会在下一次构建里自己多出一枚。
 // 这就是「小成本、可复利」的落点：不另存一份、不维护第二套配方。
 const honorArraySource = sourceMatch(/const HONORS=(\[[\s\S]*?\n\]);/, 'HONORS');
-const honorGlyphSource = sourceMatch(/(const HONOR_GLYPHS=\{[\s\S]*?\n\};)/, 'HONOR_GLYPHS');
-const honorBadgeFunctionSource = sourceMatch(/(function honorBadgeSvg\(honor,size\)\{[\s\S]*?\n\})/, 'honorBadgeSvg');
+const honorGlyphSource = sourceMatch(/(const ICON_GLYPHS=\{[\s\S]*?\n\};)/, 'ICON_GLYPHS');
+// honorBadgeSvg 0814 缩成了 iconSvg 的一层薄包装，所以这里要连 iconSvg 一起取。
+// 而且它现在是**单行函数**：还按 /[\s\S]*?\n\}/ 去匹会一路吞到下一个换行加右括号，
+// 把中间几百行全卷进来。这跟 hueGap 那次一模一样——
+// **先看清楚目标是几行，再决定用哪种匹配。**
+const iconFunctionSource = sourceMatch(/(function iconSvg\(emblem,tint,size\)\{[\s\S]*?\n\})/, 'iconSvg');
+const honorBadgeFunctionSource = sourceMatch(/(function honorBadgeSvg\(honor,size\)\{[^\n]*\})/, 'honorBadgeSvg');
 const honorRuntime = { result: null };
 vm.runInNewContext(
-  `const SURPRISES=[];\nconst HONORS=${honorArraySource};\n${honorGlyphSource}\n${honorBadgeFunctionSource}\nresult={`
+  `const SURPRISES=[];\nconst HONORS=${honorArraySource};\n${honorGlyphSource}\n${iconFunctionSource}\n${honorBadgeFunctionSource}\nresult={`
     + `honors:HONORS.map(({test,...honor})=>honor),badges:HONORS.map(honor=>honorBadgeSvg(honor,240))};`,
   honorRuntime,
   { timeout: 1000, filename: 'monkey-honor-assets.vm.js' },

@@ -355,18 +355,24 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   // 所以这一份写死在门里，和「鱼小姐必须青绿」是同一类立法。要改先想清楚迁移。
   const HONOR_IDS = ['certified','zerofloor','grudge47','genuine','moremonkey','overdue','skimread',
     'lightsugar','fullsugar','noice','roomtemp','nopb','talker','archivist','toolfree','fake'];
-  const found = [...html.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
+  // **先把 HONORS 那一段圈出来再匹配。** 原来直接在整个 html 上匹
+  // /\{id:'…',emblem:'…',tint:'…'/，0814 给 PERK_POOL 也配了 emblem+tint 之后当场误报
+  // 「扫到 21 条，期望 16」。这是同一类错的第五次（.card 正则、ICON_GLYPHS 找 href=、
+  // FACADES 匹到 MODES、hueGap 当多行函数取）：**扫描之前先把范围圈死。**
+  const honorBlock = (CODE.match(/const HONORS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(honorBlock, '取不到 HONORS 那一段（写法变了？先修本门禁的取法）');
+  const found = [...honorBlock.matchAll(/\{id:'([a-z0-9]+)',emblem:'([a-z]+)',tint:'(#[0-9a-f]{6})'/g)];
   assert(found.length === HONOR_IDS.length,
     '称号条数或写法变了：扫到 ' + found.length + ' 条，期望 ' + HONOR_IDS.length);
   for (const id of HONOR_IDS) {
     assert(found.some(hit => hit[1] === id), '称号 id 「' + id + '」不见了。存档里存的就是它，改名等于让老玩家的称号蒸发');
   }
   // 每个徽章图形都必须真的在图形表里，否则会静默退化成默认的印章，16 枚看着像一枚。
-  const glyphBlock = (CODE.match(/const HONOR_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
+  const glyphBlock = (CODE.match(/const ICON_GLYPHS=\{([\s\S]*?)\n\};/) || [])[1] || '';
   for (const [, , emblem] of found.map(hit => [0, 0, hit[2]])) {
-    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 HONOR_GLYPHS 里，会静默退化成默认印章');
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphBlock), '徽章图形 ' + emblem + ' 不在 ICON_GLYPHS 里，会静默退化成默认印章');
   }
-  // 只在**取出来的那一段**里查。第一版写成从 HONOR_GLYPHS 一路 [\s\S]*? 找 href=，
+  // 只在**取出来的那一段**里查。第一版写成从 ICON_GLYPHS 一路 [\s\S]*? 找 href=，
   // 结果匹到了文件后面 SVG <use href= 那一堆，构建当场误报——
   // 这跟前面那个「不锚行首的 .card 正则」是同一类错：范围没圈住。
   assert(!/<image|href=/.test(glyphBlock), '徽章里出现了 <image> 或外部 href，就没法当可复用素材导出了');
@@ -382,7 +388,7 @@ const DEPT_IDS = [...html.matchAll(/\{id:'([a-z]+)',name:'[^']*',short:/g)].map(
   const deptIds = DEPT_IDS;
   // **先把 FACADES 那一段圈出来再匹配**。第一版直接在整个 html 上匹
   // /\{id:'…',dept:'…',name:/，结果把结构完全相同的 MODES 也数了进去，报「立面数 24」。
-  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 HONOR_GLYPHS 一路找 href=）：
+  // 这已经是同一类错的第三次（不锚行首的 .card 正则、从 ICON_GLYPHS 一路找 href=）：
   // **扫描之前先把范围圈死**，否则迟早匹到隔壁那张结构一样的表。
   const facadeBlock = (CODE.match(/const FACADES=\[[\s\S]*?\n\];/) || [''])[0];
   assert(facadeBlock, '取不到 FACADES 那一段（写法变了？先修本门禁的取法）');
@@ -429,6 +435,68 @@ assert(/function bindTapToAdvance\(/.test(CODE) && (CODE.match(/\bbindTapToAdvan
   '「点列表空白处翻下一页」的接线没了。王老师 0813 明说上一页/下一页还是多，这是替代它的那条路。');
 assert(/pager-dots solo/.test(html),
   '页数少时应该只留页码点、不给上一页/下一页——那两颗按钮会白占一整行。');
+
+// ---- 局内任命：不许退回模态三选一（2026-08-14 王老师定：弹窗打断连贯性）----
+{
+  // 弹窗那一套整套拔掉了。留一道门盯着它别被谁「顺手加回来」——
+  // 三选一在这个游戏里必须是**一次落点选择**，不是一次读字。
+  // 查的是剥过注释的 CODE：反向验证时发现，光是在注释里提一句 openPerkChoice
+  // 就能把这道门弄红。一条会被注释误伤的门，用不了几次就会被人当噪音忽略。
+  assert(!/choiceScreen|choice-card|openPerkChoice|choosePerk/.test(CODE),
+    '模态三选一回来了。它在这个心流型爬楼里有四重代价，最要命的是选择本身没有游戏性：'
+    + '这个游戏的动词是「位置」，卡片的动词是「文字」。要改先跟王老师说。');
+  assert(!/\bstate\.choiceOpen\b/.test(CODE),
+    'state.choiceOpen 回来了。弹窗拆了之后它恒为 false，恒为 false 的开关比没有开关更害人');
+
+  // 任命排的三块台是自己造的，不是挑现成的——第一版挑现成的那排，量下来关卡生成器
+  // 极少一排造三块台，三选一常年退化成二选一甚至发不出去。
+  const rowFn = (CODE.match(/function addAppointmentRow\([\s\S]*?\n\}/) || [''])[0];
+  assert(rowFn, '取不到 addAppointmentRow（写法变了？先修本门禁的取法）');
+  assert(/slice\(0,\s*3\)/.test(rowFn), '任命排不再是一次发三份了');
+  assert(/addPlatform\(/.test(rowFn) && /addItem\('perk'/.test(rowFn),
+    '任命排必须自己造台子再挂任命：挑现成的排会让三选一退化成一选一');
+  assert(/state\.perkGroup\s*\+=\s*1/.test(rowFn),
+    '同一批任命要有共同的 perkGroup，否则「拿一份、废另两份」认不出同批');
+
+  const takeFn = (CODE.match(/function takePerk\([\s\S]*?\n\}/) || [''])[0];
+  assert(takeFn, '取不到 takePerk（写法变了？先修本门禁的取法）');
+  assert(/other\.perkGroup!==item\.perkGroup/.test(takeFn) && /other\.declined=true/.test(takeFn),
+    '拿一份之后同批的另外两份必须当场作废并淡出，否则摔回去还能把三份都捡了，三选一就名存实亡');
+
+  // 任命图标必须真在图形表里，否则会静默退化成默认印章，五份看着一模一样。
+  const glyphs = (CODE.match(/const ICON_GLYPHS=\{([\s\S]*?)\n\};/) || ['', ''])[1];
+  const perkBlock = (CODE.match(/const PERK_POOL=\[[\s\S]*?\n\];/) || [''])[0];
+  const perkEmblems = [...perkBlock.matchAll(/emblem:'([a-z]+)'/g)].map(hit => hit[1]);
+  assert(perkEmblems.length >= 5, '任命少于五份，或不再各带一枚图标');
+  for (const emblem of perkEmblems) {
+    assert(new RegExp('(^|\\n)\\s*' + emblem + ':').test(glyphs), '任命图形 ' + emblem + ' 不在 ICON_GLYPHS 里');
+  }
+  // 局内实体一律不靠文字牌解释（台阶只有绕口令与标点例外，那两处另有门禁盯着）。
+  // 道具卡原来拿 <text> 画「U / @ / 免 / 梯 / 宽」五个字符，出海要重画，0814 换成图形。
+  const itemFn = (CODE.match(/function ensureItemNode\([\s\S]*?\n\}/) || [''])[0];
+  assert(itemFn, '取不到 ensureItemNode（写法变了？先修本门禁的取法）');
+  assert(!/<text\b/.test(itemFn), '局内道具/任命又开始用 <text> 写字了：那既不是图标风格，也没法当免翻译素材导出');
+}
+
+// ---- 首页收藏条（2026-08-14 王老师：首页缺少这些位置）----
+{
+  const stripBlock = (CODE.match(/const COLLECTIONS=\[[\s\S]*?\n\];/) || [''])[0];
+  assert(stripBlock, '取不到 COLLECTIONS（写法变了？先修本门禁的取法）');
+  const ids = [...stripBlock.matchAll(/\{id:'([a-z]+)',label:/g)].map(hit => hit[1]);
+  // 长期档案里每一条收集线都该在首页有个格子。少一格＝那条线收集了也没人看得见。
+  for (const line of ['titles', 'teas', 'perks', 'surprises', 'motifs', 'facades', 'modes']) {
+    assert(ids.includes(line), '收藏条少了「' + line + '」这一格：收集了没地方看，等于没做');
+  }
+  assert(new RegExp('grid-template-columns:repeat\\(' + ids.length + ',1fr\\)').test(CODE),
+    '收藏条的列数（CSS）与收集线条数（' + ids.length + '）对不上，会换行，把首页顶出一屏');
+  // 首页原来那两个按钮（称号墙/奶茶图鉴）被收藏条吃掉了，入口必须还在。
+  assert(/openTitles\(\)/.test(stripBlock) && /openTeas\(\)/.test(stripBlock),
+    '称号墙与奶茶图鉴的首页入口没了：那一整行按钮是被收藏条换掉的，入口得跟着搬过来');
+  assert(!/id="wornTitleButton"|id="teaButton"/.test(CODE),
+    '首页又多出一行按钮了。收藏条当初是拿那一行的高度换来的，两个都留就白换了');
+  assert(/career\.perks/.test(CODE),
+    '任命没进长期档案：一局作废的增益如果不留收集线，收集控就没有跨局的理由去凑齐它们');
+}
 
 // 可复用美术资源必须跟正本同步。以前这只是交接文档里的一条手工步骤，
 // 漏跑就悄悄过期；现在是发布门禁，改了 index.html 的美术却没重跑导出器直接构建失败。
