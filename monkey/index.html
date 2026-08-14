@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.10-final">
+<meta name="myskme-release" content="20260814.11-localboard">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -32,7 +32,7 @@
   气氛系统：十二部门各配一种建筑立面与一种调式（一个部门一门学问）、八种世界窗景、六种海报纸型各带一条排版学。
   惊喜事件：大事件、可发现小意外、随机海报稀有版与隐藏彩蛋。
   声音系统：自适应手绘玩具爵士、分层编曲、事件音标与全声/仅音效/静音三档。
-  世界楼榜：品牌网关读写，正式局先写本机队列再自动退避补交，断网不影响游玩。
+  本机楼榜：三口径（本周/生涯/不白摔）全在本机算，成绩不上传。游戏零联网出口。
   技术约束：核心游戏单文件可运行、本地 MIT 二维码模块、PWA 渐进增强、触屏与键盘双支持、安卓宽虚拟视口兜底、智能省电调度。
 -->
 <style>
@@ -861,7 +861,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div id="kitGrid" class="kit-grid"></div>
         <div class="brief"><b>内部通知：</b>请猴先生上楼谈话。他已出发；通知还剩 418 字。</div>
         <button id="startButton" class="btn">打卡上班，立即上楼</button>
-        <div class="btn-row"><button id="leaderboardButton" class="btn secondary">世界楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
+        <div class="btn-row"><button id="leaderboardButton" class="btn secondary">本机楼榜</button><button id="installButton" class="btn install compact">添加到桌面</button></div>
         <div class="best-row"><span>最高高度 <b id="bestHeight">0</b> 米</span><span>最高分 <b id="bestScore">0</b></span></div>
       </div>
     </section>
@@ -902,8 +902,8 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
         <div class="result-page hidden" data-result-page="2">
           <h2 class="screen-title">登记与收藏</h2>
           <p class="screen-note">本局没有白摔。留下名字，或者去看看长期档案。</p>
-          <div class="rank-entry"><label for="rankName">登记世界楼榜。化名可真可假，本局会先留在本机，断网后自动补交。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="12" value="猴先生" aria-label="榜单化名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
-          <button id="resultLeaderboardButton" class="btn secondary">查看世界楼榜</button>
+          <div class="rank-entry"><label for="rankName">给本机楼榜记个名。化名可真可假，成绩只存在这台设备上。</label><div class="rank-form"><input id="rankName" class="rank-input" maxlength="12" value="猴先生" aria-label="榜单化名"><button id="rankSaveButton" class="rank-save">登记</button></div></div>
+          <button id="resultLeaderboardButton" class="btn secondary">查看本机楼榜</button>
           <div class="btn-row"><button id="resultTitlesButton" class="btn secondary">查看称号墙</button><button id="resultTeaButton" class="btn secondary">查看奶茶图鉴</button></div>
         </div>
         <div id="resultTabs" class="seg-tabs" role="tablist" aria-label="结算分页"><button class="seg-tab active" type="button" role="tab" aria-selected="true" data-result-tab="0">成绩</button><button class="seg-tab" type="button" role="tab" aria-selected="false" data-result-tab="1">本局档案</button><button class="seg-tab" type="button" role="tab" aria-selected="false" data-result-tab="2">登记收藏</button></div>
@@ -960,12 +960,12 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       </div>
     </section>
 
-    <section id="leaderboardScreen" class="screen hidden" aria-label="世界排行榜">
+    <section id="leaderboardScreen" class="screen hidden" aria-label="本机楼榜">
       <div class="card">
         <span class="notice-no">每周一重新起跑</span>
-        <h2 class="screen-title">MYSKME 世界楼榜</h2>
+        <h2 class="screen-title">MYSKME 本机楼榜</h2>
         <div id="worldTabs" class="world-tabs"><button class="world-tab active" data-world-scope="weekly">本周高度</button><button class="world-tab" data-world-scope="alltime">生涯高度</button><button class="world-tab" data-world-scope="effort">不白摔</button></div>
-        <div id="worldStatus" class="world-status">正在接世界楼榜。本机成绩不会等网络。</div>
+        <div id="worldStatus" class="world-status">成绩只记在这台设备上，不上传。</div>
         <ol id="rankList" class="rank-list"></ol>
         <div id="rankPager" class="pager"></div>
         <button id="leaderboardCloseButton" class="btn secondary">看完了，继续上楼</button>
@@ -1026,7 +1026,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.10-final',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.11-localboard',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1660,17 +1660,13 @@ const state={running:false,over:false,seed:1,rng:Math.random,player:null,platfor
 // 是**先让页数变少**；少到 2 页时连翻页按钮都不用要，点点/点空白/滑一下就够。
 const TITLE_PAGE_SIZE=8,TEA_PAGE_SIZE=12,SHOP_PAGE_SIZE=9,RANK_PAGE_SIZE=5;
 let titlePage=0,teaPage=0,shopPage=0,rankPage=0,resultPage=0;
-const WORLD_DEVICE_KEY='myskme_monkey_device_v1',WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1',WORLD_PENDING_KEY='myskme_monkey_pending_v1',WORLD_TOKEN_KEY='myskme_monkey_player_token_v1';
+// 世界楼榜 0814 整体拆除（王老师拍板：联网榜不稳定，本机榜与稳定性第一，日后再说）。
+// 只留两个键：化名、是否登记过。设备号/补交队列/玩家令牌三个键连同旧值一起清掉——
+// 令牌是永久玩家标识，没有联网功能之后它留在 localStorage 里纯属隐私负债。
+const WORLD_ALIAS_KEY='myskme_monkey_alias_v1',WORLD_ENABLED_KEY='myskme_monkey_world_v1';
+try{for(const k of ['myskme_monkey_device_v1','myskme_monkey_pending_v1','myskme_monkey_player_token_v1'])localStorage.removeItem(k);}catch(_){}
 const CULTURE_BAG_KEY='myskme_monkey_culture_bag_v1',CULTURE_LAST_KEY='myskme_monkey_culture_last_v1';
-let worldScope='weekly',worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false},worldBoardSeq=0,worldSyncPromise=null,worldSyncMessage='';
-// 服务端 400 是**永久退回**（比如化名撞上保留词），换成什么网络都不会好。
-// 0813 巡查抓到的现场：用「李老师」登记，客户端放行、服务端每次 400，
-// 队列一局一局堆上去，而界面只写「待联网」——玩家以为是网不好，其实永远传不上去。
-// 原因是 worldSyncMessage 会被 loadWorldBoard 清空（打开榜单就冲掉了），
-// 所以这里单独存一个**不会被清掉**的理由。
-// 注意：故意**不**在客户端抄一份服务端的保留词表——那就是一份必然过期的镜像。
-// 客户端要做的不是猜服务端的规则，是**如实转述服务端的回答**。
-let worldBlockedReason='';
+let worldScope='weekly';
 
 function loadRecord(){
   try{return {height:Number(localStorage.getItem('myskme_monkey_upstairs_height'))||0,score:Number(localStorage.getItem('myskme_monkey_upstairs_score'))||0};}
@@ -1747,124 +1743,19 @@ function claimCultureMotif(){
   state.motifFirstTime=!career.motifs.includes(id);
   state.motifId=id;applyCultureMotif();return cultureMotif();
 }
-function worldDeviceId(){
-  let id=worldStorageGet(WORLD_DEVICE_KEY);if(id.length>=12)return id;
-  if(globalThis.crypto?.randomUUID)id=crypto.randomUUID();else{const a=new Uint32Array(4);if(globalThis.crypto?.getRandomValues)crypto.getRandomValues(a);else for(let i=0;i<a.length;i++)a[i]=Math.floor(Math.random()*4294967296);id=[...a].map(n=>n.toString(16).padStart(8,'0')).join('-');}
-  worldStorageSet(WORLD_DEVICE_KEY,id);return id;
-}
 function worldAlias(){return cleanWorldAlias(worldStorageGet(WORLD_ALIAS_KEY,'猴先生'));}
 function worldEnabled(){return worldStorageGet(WORLD_ENABLED_KEY)==='1';}
-function worldPlayerToken(){const token=worldStorageGet(WORLD_TOKEN_KEY);return /^[0-9a-f]{64}$/.test(token)?token:'';}
-function loadWorldPending(){
-  try{const rows=JSON.parse(worldStorageGet(WORLD_PENDING_KEY,'[]'));return Array.isArray(rows)?rows.filter(r=>r&&/^[A-Za-z0-9_-]{8,80}$/.test(String(r.runId||''))).slice(-200):[];}catch(_){return [];}
-}
-function saveWorldPending(rows){worldStorageSet(WORLD_PENDING_KEY,JSON.stringify(rows.slice(-200)));}
-function pendingWorldCount(){return loadWorldPending().length;}
-function cleanWorldRun(run){const row={runId:String(run.runId||''),height:Math.max(0,Math.floor(Number(run.height)||0)),score:Math.max(0,Math.floor(Number(run.score)||0)),bananas:Math.max(0,Math.floor(Number(run.bananas)||0))};return /^[A-Za-z0-9_-]{8,80}$/.test(row.runId)&&row.score>=row.height&&row.bananas<=row.score?row:null;}
-function queueWorldRun(run){const row=cleanWorldRun(run);if(!row)return false;const rows=loadWorldPending(),index=rows.findIndex(item=>item.runId===row.runId);if(index>=0)rows[index]=row;else rows.push(row);saveWorldPending(rows);return true;}
-// 6.5 秒对移动网络偏紧（地铁、电梯里一次握手就不止这么久），放到 9 秒。
-// 这个数字是**超时上限，不是性能目标**——放宽不会让正常情况变慢，只会少冤枉几次慢网。
-const WORLD_TIMEOUT_MS=9000;
-async function worldFetch(path,options={}){
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),WORLD_TIMEOUT_MS);
-  try{const response=await fetch(MONKEY_API+path,{...options,signal:controller.signal,headers:{Accept:'application/json',...(options.headers||{})}});let data={};try{data=await response.json();}catch(_){}if(!response.ok||!data.ok){const error=new Error(data.err||`榜单响应 ${response.status}`);error.status=response.status;throw error;}return data;}finally{clearTimeout(timer);}
-}
+// 楼榜是纯本机的。曾经有过一版联网世界楼榜（品牌网关 + 补交队列 + 退避重试），
+// 0814 王老师拍板整体拆除：联网榜不稳定，玩家自己不断挑战与稳定性第一，日后再说。
+// 拆掉的是整条网络层——worldFetch、设备号、玩家令牌、补交队列、退避重试器；
+// 榜单渲染走的本来就是「断网时的本地退路」，现在那条退路就是唯一的路。
+// 发布门禁盯着「零联网出口」，要恢复请先跟王老师确认。
 function updateWorldStatus(){
-  if(!el.worldStatus)return;const pending=pendingWorldCount(),suffix=pending?` · 待补交 ${pending} 局`:'';
-  // 永久退回优先显示，而且它不会被 loadWorldBoard 清掉——「待联网」会骗人，这条不会。
-  if(worldBlockedReason){el.worldStatus.textContent=`登记被退回：${worldBlockedReason}。换个化名再试。`+suffix;return;}
-  if(worldSyncMessage){el.worldStatus.textContent=worldSyncMessage+suffix;return;}
-  // **一个不动的状态和一个假的状态一样糟。** 原来失败之后就一直挂着「待联网」，
-  // 玩家没法判断它还在不在努力。现在把「第几次重试、还有多久」直接写出来。
-  if(pending&&worldRetryTimer){
-    // **不写秒数。** 第一版写了「将在 X 秒后」，可它只在有人调本函数时才刷新，
-    // 于是屏幕上挂着一个不动的倒计时——正是我要治的那种「不动的状态」，比不写还糟。
-    // 这句话什么时候看都是真的。
-    el.worldStatus.textContent=`网络没接上，正在自动重试（第 ${worldRetryRound} 次）。成绩已存在本机，不会丢。`+suffix;return;
-  }
-  const me=worldBoard.me;if(worldBoard.connected&&me){const metric=worldScope==='weekly'?`${me.weekHeight} 米`:worldScope==='alltime'?`${me.height} 米`:`${me.runs} 局`;el.worldStatus.textContent=`你目前第 ${me.rank} 名 · ${metric}${suffix}`;return;}
-  el.worldStatus.textContent=(worldBoard.connected?'榜单已接通。登记一局后，这里会出现你的附近名次。':'网络暂时没接上，先显示本机候补。')+suffix;
-}
-// 自动退避重试。**这是「上传成绩不咋地」的正主**：改之前 flushWorldQueue
-// 一遇网络级失败就收工，而它只被「打完一局 / 点登记 / 打开楼榜 / online 事件 / 开局 900ms」
-// 叫醒——手机上一次很常见的抖动，就让这一局躺在队列里等到玩家哪天碰巧再打开楼榜。
-// 玩家看到的是「待联网」三个字挂在那儿不动。
-// 退避间隔按秒：4 / 10 / 25 / 60 / 120，之后维持 120。成功即停。
-// 400（化名被退回）不进这条路——重试一万次也没用，那要玩家改名。
-const WORLD_RETRY_STEPS=[4000,10000,25000,60000,120000];
-let worldRetryTimer=0,worldRetryRound=0,worldRetryAt=0;
-function cancelWorldRetry(){if(worldRetryTimer)clearTimeout(worldRetryTimer),worldRetryTimer=0;worldRetryRound=0;worldRetryAt=0;}
-function scheduleWorldRetry(){
-  if(worldRetryTimer||!pendingWorldCount())return;
-  const wait=WORLD_RETRY_STEPS[Math.min(worldRetryRound,WORLD_RETRY_STEPS.length-1)];
-  worldRetryRound+=1;worldRetryAt=Date.now()+wait;
-  worldRetryTimer=setTimeout(()=>{worldRetryTimer=0;flushWorldQueue();},wait);
-  // 让位：「网络未完成，成绩仍在本机排队」排在重试提示前面，不清掉就永远轮不到它显示。
-  worldSyncMessage='';updateWorldStatus();
-}
-// 回到前台、或者刚恢复联网，就别再等那个定时器了——玩家正看着呢。
-// **但必须节流。** 实测：2.1 秒内猛切 30 次前后台会发出 60 个请求
-// （每次一趟，每趟还含当场重试那一次），而且把退避轮次顶到 30，
-// 下一次自动重试要等满两分钟——手动重试反而让自动重试变慢，跟设计意图正好相反。
-// worldSyncPromise 挡不住它：断网时 fetch 立即失败，上一趟早结束了，下一趟照发。
-// 三秒的门槛：真人隔十秒切回来照样立刻重试，而口袋里反复亮屏只算一次。
-const WORLD_MANUAL_GAP_MS=3000;
-let worldManualAt=0;
-function retryWorldNow(){
-  if(!pendingWorldCount())return;
-  const now=Date.now();
-  if(now-worldManualAt<WORLD_MANUAL_GAP_MS)return;
-  worldManualAt=now;
-  if(worldRetryTimer)clearTimeout(worldRetryTimer),worldRetryTimer=0;
-  worldRetryAt=0;flushWorldQueue();
-}
-async function flushWorldQueue(){
-  if(worldSyncPromise)return worldSyncPromise;
-  worldSyncPromise=(async()=>{
-    if(!worldEnabled()||!navigator.onLine)return false;
-    worldSyncMessage='正在补交本机成绩';updateWorldStatus();
-    // 一条卡住的记录不许把整个队列堵死。0813 巡查实测：第一局被退回之后，
-    // 后面两局**一个请求都没发过**，却都躺在待补交里——玩家看到「待补交 3 局」，
-    // 实际上只有第一局在反复撞墙。
-    // 但也不能见 400 就丢：化名撞保留词时**每一条都会 400**，丢光等于把成绩全扔了。
-    // 判据：先把每条都试一遍；**只有在至少有一条成功过**（证明化名本身没问题）时，
-    // 才把那些被永久退回的单独丢掉。全军覆没就一条都不丢，留着等玩家改名。
-    let anyAccepted=false;const rejected=[];
-    for(const queued of loadWorldPending()){
-      try{
-        // 同一条先当场再试一次。移动网络的抖动多半一次就过去了，
-        // 而退避重试最快也要等四秒——那四秒里玩家正盯着「待联网」。
-        // 400 不重试：那是判定，不是抖动。
-        const send=()=>worldFetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceUUID:worldDeviceId(),alias:worldAlias(),run:queued})});
-        const data=await send().catch(err=>{if(err.status===400)throw err;return send();});
-        if(data.acceptedRunId!==queued.runId)throw new Error('榜单回执与本局不一致');
-        if(data.playerToken)worldStorageSet(WORLD_TOKEN_KEY,data.playerToken);
-        anyAccepted=true;worldBlockedReason='';
-        saveWorldPending(loadWorldPending().filter(row=>row.runId!==queued.runId));
-      }catch(error){
-        if(error.status===400){
-          rejected.push(queued.runId);
-          // 永久退回：记进不会被冲掉的字段，并且当场 toast 一次——
-          // 只写进 #worldStatus 的话，玩家一点开榜单就被 loadWorldBoard 冲掉了。
-          worldBlockedReason=error.message||'登记被退回';
-          toast(`世界楼榜退回了这个化名：${worldBlockedReason}。换一个再登记。`,'red');
-        }
-        worldSyncMessage=error.status===400?`登记被退回：${error.message}`:'网络未完成，成绩仍在本机排队';
-        updateWorldStatus();
-        // 永久退回就换下一条继续试；网络级失败才停这一趟（同一趟里继续试也是白试），
-        // 但**这一趟停了不等于放弃**：挂一个退避重试，别再让成绩躺着等玩家想起来。
-        if(error.status===400)continue;
-        scheduleWorldRetry();
-        return false;}
-    }
-    if(anyAccepted&&rejected.length){
-      // 化名没问题却还是被退回的那几条，是记录本身有毛病，留着只会永远堵在队首。
-      saveWorldPending(loadWorldPending().filter(row=>!rejected.includes(row.runId)));
-    }
-    cancelWorldRetry();
-    worldSyncMessage=pendingWorldCount()?'':'补交完成';updateWorldStatus();return true;
-  })().finally(()=>{worldSyncPromise=null;setTimeout(()=>{if(worldSyncMessage==='补交完成'){worldSyncMessage='';updateWorldStatus();}},1600);});
-  return worldSyncPromise;
+  if(!el.worldStatus)return;
+  const rows=localBoard.length;
+  el.worldStatus.textContent=rows
+    ?`本机已存 ${rows} 局纪录 · 只属于这台设备，不上传。`
+    :'成绩只记在这台设备上，不上传。打一局就有纪录。';
 }
 function loadAudioMode(){try{const mode=localStorage.getItem('myskme_monkey_audio_v1');return ['full','sfx','off'].includes(mode)?mode:'full';}catch(_){return 'full';}}
 function saveAudioMode(){try{localStorage.setItem('myskme_monkey_audio_v1',audioMode);}catch(_){}}
@@ -2679,7 +2570,7 @@ function showResultPage(next=0){
 function markResultNews(){
   // 「本局档案」：这一局真的解锁了东西才亮。
   const archive=!el.freshHonors.classList.contains('is-hidden')||state.freshTeaCount>0;
-  // 「登记收藏」：只在**还没登记过化名**时亮。登记过之后正式局是自动补交的，
+  // 「登记收藏」：只在**还没登记过化名**时亮。登记过之后正式局是自动入榜的，
   //  再亮就是每局都催一次，纯属噪音。
   const register=!worldEnabled();
   const mark=(index,on)=>{const tab=el.resultTabs.querySelector(`[data-result-tab="${index}"]`);
@@ -2802,7 +2693,7 @@ function finishRun(reason='fall'){
     saveCareer();fresh=evaluateHonors(honorContext());freshTeas=evaluateTeas(teaContext());
     const localRow={id:state.runId,name:worldAlias(),height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false};
     rememberLocalRun(localRow);
-    if(worldEnabled()){queueWorldRun(currentWorldRun());flushWorldQueue();}
+
   }
   renderFreshHonors(fresh);renderFreshTeas(freshTeas);
   renderResultWallet();
@@ -3215,48 +3106,52 @@ function rememberLocalRun(row){
   const index=localBoard.findIndex(item=>item.id===row.id);if(index>=0)localBoard[index]={...localBoard[index],...row};else localBoard.push(row);
   localBoard.sort((a,b)=>b.height-a.height||b.score-a.score||b.at-a.at);localBoard.splice(30);saveBoard();
 }
-function currentWorldRun(){return {runId:state.runId,height:state.maxMeters,score:state.score,bananas:state.bananas};}
-function fallbackWorldRows(){
-  if(worldScope==='effort')return [{rank:1,alias:worldAlias(),height:saved.height,score:saved.score,weekHeight:saved.height,weekScore:saved.score,runs:career.runs,totalMeters:career.totalMeters,local:true}];
-  return rankedRows().map((row,index)=>({rank:index+1,alias:row.name,height:row.height,score:row.score,weekHeight:row.height,weekScore:row.score,runs:row.npc?0:1,totalMeters:row.height,bananas:row.bananas,local:!row.npc}));
+// 北京时间周一零点。写成「当地时区」的话，同一台手机出国旅行一趟，
+// 「本周」的边界就会自己漂移——用固定 UTC+8 算，换周时刻对所有设备一致。
+function weekStartAt(now=Date.now()){
+  const cn=now+8*3600*1000,day=Math.floor(cn/86400000),dow=(day+4)%7; // 1970-01-01 是周四
+  return (day-dow)*86400000-8*3600*1000;
 }
 function worldRows(){
-  if(!worldBoard.connected)return fallbackWorldRows();
-  const byRank=new Map();for(const row of [...worldBoard.rows,...worldBoard.nearby])if(row&&row.rank)byRank.set(row.rank,row);
-  return [...byRank.values()].sort((a,b)=>a.rank-b.rank);
+  if(worldScope==='effort')return [{rank:1,alias:worldAlias(),height:saved.height,score:saved.score,weekHeight:saved.height,weekScore:saved.score,runs:career.runs,totalMeters:career.totalMeters,local:true}];
+  if(worldScope==='weekly'){
+    // 本周口径只认真实局：常驻员工没有时间戳，塞进来等于每周一自动「复活」，
+    // 那个口径就永远不是「你这周爬了多高」。空着比掺假强——空态文案会说清楚。
+    const start=weekStartAt();
+    return localBoard.filter(row=>row.at>=start).sort((a,b)=>b.height-a.height||b.score-a.score)
+      .slice(0,10).map((row,index)=>({rank:index+1,alias:row.name,height:row.height,score:row.score,weekHeight:row.height,weekScore:row.score,runs:1,totalMeters:row.height,bananas:row.bananas,local:true}));
+  }
+  return rankedRows().map((row,index)=>({rank:index+1,alias:row.name,height:row.height,score:row.score,weekHeight:row.height,weekScore:row.score,runs:row.npc?0:1,totalMeters:row.height,bananas:row.bananas,local:!row.npc}));
 }
 function renderLeaderboard(){
   const rows=worldRows(),total=Math.max(1,Math.ceil(rows.length/RANK_PAGE_SIZE));rankPage=clamp(rankPage,0,total-1);el.rankList.innerHTML='';
   rows.slice(rankPage*RANK_PAGE_SIZE,(rankPage+1)*RANK_PAGE_SIZE).forEach(row=>{
-    const li=document.createElement('li'),isMe=!!(worldBoard.me&&row.rank===worldBoard.me.rank);li.dataset.rank=String(row.rank);if(row.local)li.classList.add('local');if(isMe)li.classList.add('me');
-    const source=worldBoard.connected?(isMe?'这是你':`编号 ${escapeHTML(row.tag||'--')}`):(row.local?'本机候补':'常驻员工');
+    const li=document.createElement('li');li.dataset.rank=String(row.rank);if(row.local)li.classList.add('local');
+    const source=row.local?'本机纪录':'常驻员工';
     const primary=worldScope==='weekly'?`${row.weekHeight} 米`:worldScope==='alltime'?`${row.height} 米`:`${row.runs} 局`;
     const secondary=worldScope==='weekly'?`${row.weekScore} 分`:worldScope==='alltime'?`${row.score} 分`:`累计 ${row.totalMeters} 米`;
     li.innerHTML=`<div><b>${escapeHTML(row.alias)}</b><small>${source}</small></div><div class="rank-score"><b>${primary}</b><small>${secondary}</small></div>`;el.rankList.appendChild(li);
   });
-  if(!rows.length){const li=document.createElement('li');li.dataset.rank='-';li.innerHTML='<div><b>世界榜正在上楼</b><small>本机成绩已经保管好，稍后再来。</small></div><div class="rank-score"><b>待接通</b><small>不会丢分</small></div>';el.rankList.appendChild(li);}
+  if(!rows.length){const li=document.createElement('li');li.dataset.rank='-';li.innerHTML='<div><b>本周还没有纪录</b><small>打一局就有。常驻员工在生涯榜等你。</small></div><div class="rank-score"><b>虚位</b><small>以待</small></div>';el.rankList.appendChild(li);}
   for(const tab of el.worldTabs.querySelectorAll('[data-world-scope]'))tab.classList.toggle('active',tab.dataset.worldScope===worldScope);
   updateWorldStatus();
   renderPager(el.rankPager,rankPage,total,page=>{rankPage=page;renderLeaderboard();});
 }
-async function loadWorldBoard(scope=worldScope){
-  if(!['weekly','alltime','effort'].includes(scope))scope='weekly';worldScope=scope;rankPage=0;const seq=++worldBoardSeq;
-  worldSyncMessage='正在读取世界楼榜';renderLeaderboard();
-  const token=worldPlayerToken(),query=`/board?scope=${scope}&limit=30${token?`&playerToken=${token}`:''}`;
-  try{const data=await worldFetch(query);if(seq!==worldBoardSeq)return;worldBoard={rows:Array.isArray(data.rows)?data.rows:[],me:data.me||null,nearby:Array.isArray(data.nearby)?data.nearby:[],weekLabel:data.weekLabel||'本周',connected:true};worldSyncMessage='';renderLeaderboard();}
-  catch(_){if(seq!==worldBoardSeq)return;worldBoard={rows:[],me:null,nearby:[],weekLabel:'本周',connected:false};worldSyncMessage='';renderLeaderboard();}
+function setBoardScope(scope){
+  if(!['weekly','alltime','effort'].includes(scope))scope='weekly';worldScope=scope;rankPage=0;renderLeaderboard();
 }
-function openLeaderboard(){rankPage=0;el.rankClose.textContent=menuBackLabel('看完了，继续上楼');el.title.classList.add('hidden');el.result.classList.add('hidden');el.leaderboard.classList.remove('hidden');renderLeaderboard();flushWorldQueue().finally(()=>loadWorldBoard(worldScope));}
+function openLeaderboard(){rankPage=0;el.rankClose.textContent=menuBackLabel('看完了，继续上楼');el.title.classList.add('hidden');el.result.classList.add('hidden');el.leaderboard.classList.remove('hidden');renderLeaderboard();}
 function closeLeaderboard(){el.leaderboard.classList.add('hidden');if(state.over)el.result.classList.remove('hidden');else el.title.classList.remove('hidden');}
 function submitRank(){
-  if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const alias=cleanWorldAlias(el.rankName.value);if(alias.length<2){toast('化名至少两个字。世界楼榜不收单字批文。','red');return;}
+  if(!state.over||state.rankSubmitted||IS_TEST_RUN)return;const alias=cleanWorldAlias(el.rankName.value);if(alias.length<2){toast('化名至少两个字。楼榜不收单字批文。','red');return;}
   worldStorageSet(WORLD_ALIAS_KEY,alias);worldStorageSet(WORLD_ENABLED_KEY,'1');el.rankName.value=alias;
-  rememberLocalRun({id:state.runId,name:alias,height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false});queueWorldRun(currentWorldRun());
-  state.rankSubmitted=true;el.rankSave.disabled=true;el.rankSave.textContent='补交中';worldSyncMessage='本局已写入本机，正在补交';updateWorldStatus();
-  flushWorldQueue().then(ok=>{state.rankSubmitted=false;el.rankSave.disabled=false;
-    // 「待联网」听着像放弃了。实际上退避重试正在跑，说清楚它会自己再试。
-    el.rankSave.textContent=ok?'已登记，可改名':'排队中，会自动重试';if(!el.leaderboard.classList.contains('hidden'))loadWorldBoard(worldScope);});
-  toast('本局先写入本机。断网也会自动补交。','teal');
+  // 改名要把已有的本机纪录一起改：这台设备上的真实局全是同一个人打的，
+  // 留着旧名字，榜上看着像有两个人，其实是同一只猴。
+  for(const row of localBoard)if(!row.npc)row.name=alias;
+  rememberLocalRun({id:state.runId,name:alias,height:state.maxMeters,score:state.score,bananas:state.bananas,at:Date.now(),npc:false});
+  el.rankSave.textContent='已记名，可改名';updateWorldStatus();
+  if(!el.leaderboard.classList.contains('hidden'))renderLeaderboard();
+  toast('已记在本机楼榜。这台设备就是你的赛场。','teal');
 }
 let posterData='',posterVariant=null,posterMotif=null,posterLastCombo='',posterMark='',posterGenerating=false,posterQrModules=0,posterHonorLabel='';
 function randomUnit(){if(globalThis.crypto?.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296;}return Math.random();}
@@ -3377,7 +3272,16 @@ async function sharePosterImage(){
 function closeSharePoster(){el.share.classList.add('hidden');el.result.classList.remove('hidden');setTimeout(()=>{if(el.share.classList.contains('hidden')){posterData='';el.shareImage.removeAttribute('src');}},500);}
 
 let deferredInstallPrompt=null;
-function isStandalone(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
+// iOS 上只认 navigator.standalone：只有 Safari「添加到主屏幕」的独立窗口它才是 true。
+// 别信 display-mode 那个媒体查询——第三方浏览器加出来的书签壳（带地址栏那种）
+// 也可能报 standalone，于是首页按钮写着「已添加到桌面」，屏幕上却明明有一圈浏览器 UI。
+// 王老师 0814 的截图抓到的就是这个假状态。那圈壳网页无权移除，
+// 我们能做的是**别谎报已安装**，让按钮继续通向「用 Safari 添加」的说明。
+function isStandalone(){
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(ios)return navigator.standalone===true;
+  return matchMedia('(display-mode: standalone)').matches;
+}
 function openInstallScreen(){
   unlockAudio();hideMenuScreens();const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=isStandalone();
   // iPhone 上只有 Safari 加出来的才是真的独立应用（全屏、无地址栏）。
@@ -3428,9 +3332,9 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))input.left=false;if(['ArrowRight','d','D'].includes(e.key))input.right=false;});
 window.addEventListener('blur',()=>{input.left=input.right=false;});
-window.addEventListener('online',()=>{retryWorldNow();if(!el.leaderboard.classList.contains('hidden'))setTimeout(()=>loadWorldBoard(worldScope),300);});
+
 // 切回前台立刻再试一次：定时器在后台常被系统压住，而玩家这会儿正看着屏幕。
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryWorldNow();});
+
 window.addEventListener('contextmenu',e=>e.preventDefault());
 // 切后台自动暂停。原来只停 rAF、不停计时，后台待十秒回来，限时道具白白少十秒；
 // 现在走同一条 pauseGame 通道，回到前台停在暂停面板上，由玩家自己点继续。
@@ -3463,7 +3367,7 @@ for(const node of [el.result,el.titles,el.teas,el.shop,el.leaderboard])bindSwipe
 for(const node of [el.titlesList,el.teaList,el.shopList,el.rankList])bindTapToAdvance(node);
 el.rankOpen.addEventListener('click',openLeaderboard);el.resultRankOpen.addEventListener('click',openLeaderboard);
 el.rankClose.addEventListener('click',closeLeaderboard);el.rankBack.addEventListener('click',closeLeaderboard);el.rankSave.addEventListener('click',submitRank);
-el.worldTabs.addEventListener('click',event=>{const button=event.target.closest('[data-world-scope]');if(button)loadWorldBoard(button.dataset.worldScope);});
+el.worldTabs.addEventListener('click',event=>{const button=event.target.closest('[data-world-scope]');if(button)setBoardScope(button.dataset.worldScope);});
 el.sound.addEventListener('click',cycleAudioMode);
 el.pauseBtn.addEventListener('click',()=>pauseGame());el.pauseResume.addEventListener('click',()=>resumeGame());
 el.pauseSound.addEventListener('click',()=>{cycleAudioMode();el.pauseSound.textContent='声音：'+el.sound.textContent;});
@@ -3531,16 +3435,16 @@ function measureMenuOverflow(){
   el.freshHonors.innerHTML=honorBackup.html;el.freshHonors.classList.toggle('is-hidden',honorBackup.hidden);
   for(let p=0;p<Math.ceil(HONORS.length/TITLE_PAGE_SIZE);p+=1)probe(el.titles,`称号墙第${p+1}页`,()=>{titlePage=p;renderTitlesScreen();});
   for(let p=0;p<Math.ceil(TEAS.length/teaPageSize());p+=1)probe(el.teas,`奶茶第${p+1}页`,()=>{teaPage=p;renderTeaScreen();});
-  // 世界楼榜这一屏原来漏在门禁外面，于是 320x568 上「别人的化名太长把退出键裁掉」
-  // 这条一直没人发现。量的时候要喂**最长的化名**，因为行高是被别人的名字决定的。
-  const keepBoard=worldBoard,keepScope=worldScope,keepRank=rankPage;
-  const longAlias='猴'.repeat(12);
-  worldBoard={connected:true,me:{rank:3},nearby:[],weekLabel:'本周',rows:Array.from({length:RANK_PAGE_SIZE+2},(_,i)=>({
-    rank:i+1,alias:longAlias,tag:'ZZZZ',height:99999,score:99999,weekHeight:99999,weekScore:99999,
-    runs:999,totalMeters:999999}))};
+  // 楼榜这一屏原来漏在门禁外面，于是 320x568 上「别人的化名太长把退出键裁掉」
+  // 这条一直没人发现。量的时候要喂**最长的化名**与满页行数——行高是被名字决定的。
+  // 世界榜拆除后数据源变成 localBoard，就往 localBoard 里灌一版最坏的再量，量完还原。
+  const keepRows=localBoard.slice(),keepScope=worldScope,keepRank=rankPage;
+  const longAlias='猴'.repeat(12),weekNow=Date.now();
+  localBoard.length=0;
+  for(let i=0;i<RANK_PAGE_SIZE+2;i+=1)localBoard.push({id:'qa-ov'+i,name:longAlias,height:99999-i,score:99999,bananas:9,at:weekNow,npc:false});
   for(const scope of ['weekly','alltime','effort'])
-    probe(el.leaderboard,`世界楼榜(${scope})`,()=>{worldScope=scope;rankPage=0;renderLeaderboard();});
-  worldBoard=keepBoard;worldScope=keepScope;rankPage=keepRank;renderLeaderboard();
+    probe(el.leaderboard,`本机楼榜(${scope})`,()=>{worldScope=scope;rankPage=0;renderLeaderboard();});
+  localBoard.length=0;localBoard.push(...keepRows);worldScope=keepScope;rankPage=keepRank;renderLeaderboard();
   for(const key of KEYS)career[key]=backup[key];
   titlePage=pageBefore.title;teaPage=pageBefore.tea;
   renderCareer();renderTitlesScreen();renderTeaScreen();showResultPage(pageBefore.result);
@@ -3566,7 +3470,7 @@ function runQAInner(){
     ['12 个部门完整登记',DEPARTMENTS.length===12],['十个指定部门均存在',['lobby','quality','fax','rent','monkey','redundancy','fertilizer','puzzle','tongue','observation'].every(id=>DEPT[id])],
     ['平台最大垂直间距不超过 132',Math.max(...gaps)<=132],['每条主路按上一台真实弹跳力保证可达',unreachable.length===0],['每一高度簇至少有一块实体平台',unsafeOnly.length===0],['机制表完整',MECHANICS.length>=14],
     ['死亡台词不少于 12 条',DEATH_LINES.length>=12],['称号五档',TITLES.length===5],['七种大事件，单局最多六种',MAJOR_EVENTS.length===7],
-    ['世界楼榜三口径、补交队列和三选一完整',typeof loadWorldBoard==='function'&&typeof flushWorldQueue==='function'&&typeof queueWorldRun==='function'&&el.worldTabs.children.length===3&&PERK_POOL.length>=5],['帮助道具与轮值任务完整',TOOL_POOL.length>=5&&MISSIONS.length>=8&&KITS.length>=4],
+    ['本机楼榜三口径与三选一完整',typeof setBoardScope==='function'&&typeof rememberLocalRun==='function'&&el.worldTabs.children.length===3&&PERK_POOL.length>=5],['帮助道具与轮值任务完整',TOOL_POOL.length>=5&&MISSIONS.length>=8&&KITS.length>=4],
     ['自适应音乐与三档声音完整',typeof startMusic==='function'&&typeof cycleAudioMode==='function'&&['full','sfx','off'].includes(audioMode)],['角色可见性看门狗已启用',typeof repairPlayerState==='function'],
     ['台阶仅绕口令与标点保留可见文字',MECHANICS.filter(type=>/<text\b/.test(platformMarkup({type,w:100,label:'词牌',direction:1}))).every(type=>['tongue','punctuation'].includes(type))],
     ['桌面安装入口完整',!!document.querySelector('link[rel="manifest"]')&&!!$('installButton')&&'serviceWorker' in navigator],
@@ -3836,25 +3740,28 @@ function runQAInner(){
       const blocked=!layers[0].innerHTML&&!backs[0].innerHTML;
       career.owned=keep.owned;career.wearing=keep.wearing;renderWorn();
       return enough&&same&&drew&&blocked;}))()],
-    ['退避重试器：排得上、取消得掉、空队列不空排',(()=>{
-      // 只验退避器本身，**不碰 fetch**：换全局 fetch 会和别的自检抢东西，
-      // 而且异步结论在同步的 runQA 里没人断言，等于没验。
-      // 「网络抖动时到底会不会自己补交」在 tools/qa-network.mjs 里用假网络真跑。
-      const keepPending=worldStorageGet(WORLD_PENDING_KEY,'[]');
-      cancelWorldRetry();
-      // 空队列不许排——没东西要补交还挂个定时器，等于白耗电。
-      worldStorageSet(WORLD_PENDING_KEY,'[]');scheduleWorldRetry();
-      const idleQuiet=!worldRetryTimer;
-      // 有东西要补交就必须排上，而且轮次要往前走（否则退避永远停在第一档）。
-      worldStorageSet(WORLD_PENDING_KEY,JSON.stringify([{runId:'qaprobe0001',height:1,score:2,bananas:0}]));
-      scheduleWorldRetry();const armed=!!worldRetryTimer&&worldRetryRound===1;
-      scheduleWorldRetry();const noDouble=worldRetryRound===1;
-      cancelWorldRetry();const cleared=!worldRetryTimer&&worldRetryRound===0;
-      worldStorageSet(WORLD_PENDING_KEY,keepPending);
-      // 退避必须是递增的，且上限不小于一分钟——一直四秒一次是在骚扰服务器。
-      const stepsOk=WORLD_RETRY_STEPS.length>=4&&WORLD_RETRY_STEPS.every((v,i)=>i===0||v>WORLD_RETRY_STEPS[i-1])
-        &&WORLD_RETRY_STEPS[WORLD_RETRY_STEPS.length-1]>=60000&&WORLD_TIMEOUT_MS>=8000;
-      return idleQuiet&&armed&&noDouble&&cleared&&stepsOk&&typeof retryWorldNow==='function';})()],
+    ['本机楼榜：排序稳定、上限三十、本周只认本周',(()=>{
+      // 世界楼榜 0814 拆除后，榜单的正确性全押在这三条本机不变量上：
+      // 一、rememberLocalRun 按高度排、同 id 覆盖不重复；二、最多存 30 条不涨破 localStorage；
+      // 三、本周口径只认北京时间本周一零点以后的局——上周的成绩混进来，
+      //     「每周一重新起跑」就是一句空话。
+      const keep=localBoard.slice();
+      localBoard.length=0;
+      const t=weekStartAt();
+      rememberLocalRun({id:'qa-a',name:'甲',height:100,score:120,bananas:2,at:t+1000,npc:false});
+      rememberLocalRun({id:'qa-b',name:'乙',height:300,score:320,bananas:3,at:t+2000,npc:false});
+      rememberLocalRun({id:'qa-a',name:'甲',height:500,score:520,bananas:4,at:t+3000,npc:false});
+      const sorted=localBoard[0].id==='qa-a'&&localBoard[0].height===500&&localBoard.length===2;
+      for(let i=0;i<40;i++)rememberLocalRun({id:'qa-x'+i,name:'丙',height:i,score:i,bananas:0,at:t+9,npc:false});
+      const capped=localBoard.length<=30;
+      rememberLocalRun({id:'qa-old',name:'旧',height:9999,score:9999,bananas:0,at:t-1000,npc:false});
+      const prevScope=worldScope;worldScope='weekly';
+      const weeklyClean=!worldRows().some(row=>row.alias==='旧');
+      worldScope='alltime';
+      const alltimeSees=worldRows().some(row=>row.alias==='旧');
+      worldScope=prevScope;
+      localBoard.length=0;localBoard.push(...keep);saveBoard();
+      return sorted&&capped&&weeklyClean&&alltimeSees;})()],
     ['海报字号全在模块化比例上（1.25 等比数列）',(()=>{
       // 排版学这门知识的可校验之处：**每一级都必须是数列上的一格**。
       // 谁往里塞一个 33px，这条当场红——说法不再是贴上去的标签，是一条被盯着的断言。
@@ -3965,10 +3872,10 @@ function runPosterQA(){
   const longestHonor=[...HONORS].sort((a,b)=>[...b.name].length-[...a.name].length)[0];career.titles=[...new Set([...career.titles,longestHonor.id])];career.worn=longestHonor.id;
   resetWorld(0x55aa);state.running=true;state.maxMeters=555;state.bananas=7;state.bonus=137;state.score=699;state.maxFlow=9;state.nearMisses=4;state.surpriseCount=3;state.lastSurprise='secret';state.visited=new Set(['lobby','quality','fax','rent','monkey','redundancy','fertilizer']);finishRun();openSharePoster();
 }
-Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,motif:state.motifId,motifDiscoveries:career.motifs.length,motifTotal:CULTURE_MOTIFS.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,worldConnected:worldBoard.connected,worldPending:pendingWorldCount(),recordPassed:state.recordPassed,careerMeters:career.totalMeters,perkGroup:state.perkGroup,perksTaken:state.perksTaken,perksOnStage:state.items.filter(i=>i.kind==='perk'&&!i.collected).length,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterMotif:posterMotif?.id||'',posterCombo:posterVariant&&posterMotif?posterVariant.id+'|'+posterMotif.id:'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
+Object.defineProperty(window,'__MONKEY_UPSTAIRS_REPORT',{get:()=>Object.freeze({release:RELEASE,running:state.running,over:state.over,floor:floorsFromMeters(state.maxMeters),height:state.maxMeters,bananas:state.bananas,score:state.score,department:state.deptId,platforms:state.platforms.length,majorEvents:state.majorCount,surprises:state.surpriseCount,lastSurprise:state.lastSurprise,surpriseDiscoveries:career.surprises.length,motif:state.motifId,motifDiscoveries:career.motifs.length,motifTotal:CULTURE_MOTIFS.length,paused:state.paused,carpHat:state.carpHat,honors:career.titles.length,honorsTotal:HONORS.length,wornHonor:career.worn,teas:career.teas.length,teasTotal:TEAS.length,cup:career.cup,rescueLift:state.rescueLift,flow:state.flow,maxFlow:state.maxFlow,nearMisses:state.nearMisses,playerRepairs:state.playerRepairs,playerX:state.player?.x??null,playerScreenY:state.player?H-(state.player.y-state.cameraY)-108:null,rankRows:worldRows().length,worldScope,localRuns:localBoard.length,recordPassed:state.recordPassed,careerMeters:career.totalMeters,perkGroup:state.perkGroup,perksTaken:state.perksTaken,perksOnStage:state.items.filter(i=>i.kind==='perk'&&!i.collected).length,shaftFace:state.shaftFace,deathFreezeUntil:state.deathFreezeUntil,resultStamp:state.resultStamp,audioMode,audioState:audioCtx?.state||'unopened',audioReduction:audioGraph?.compressor?.reduction??0,musicActive,musicScheduled:audioGraph?.scheduled||0,musicTickMs:MUSIC_TICK_MS,frameInterval:FRAME_INTERVAL,animationFrame:state.animationFrame,mission:state.mission?.id||'',missionValue:missionValue(),missionDone:missionDone(),careerStamps:career.stamps,kit:state.kitId,toolsUsed:state.toolsUsed,itemKinds:[...new Set(state.items.map(i=>i.kind))],posterReady:posterData.startsWith('data:image/jpeg'),posterVariant:posterVariant?.id||'',posterMotif:posterMotif?.id||'',posterCombo:posterVariant&&posterMotif?posterVariant.id+'|'+posterMotif.id:'',posterHonor:posterHonorLabel,posterQrModules,wideMobile:document.documentElement.dataset.wideMobile==='true',shellScale:Number(document.documentElement.dataset.shellScale)||1,standalone:isStandalone()})});
 Object.defineProperty(window,'MONKEY_UPSTAIRS_REPORT',{enumerable:true,get:()=>window.__MONKEY_UPSTAIRS_REPORT});
 setAudioMode(audioMode,false);el.rankName.value=worldAlias();renderCareer();updateBestLabels();updateInstallButton();resetWorld(1020);state.running=false;renderAll(performance.now());syncViewportMode();
-if(worldEnabled())setTimeout(()=>flushWorldQueue(),900);
+
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 if(TEST_PARAMS.get('qa')==='1'){hideSplash();setTimeout(runQA,50);}
 if(STRESS_TEST){hideSplash();setTimeout(()=>runStressQA(),60);}

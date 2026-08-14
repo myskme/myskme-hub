@@ -150,27 +150,34 @@ function stripComments(source) {
 // CSS 的 /* */ 也会被一起剥掉，正好——那些注释同样不该算作「接线」。
 const CODE = stripComments(html);
 
-// 世界楼榜只准从一个封装出口联网。数调用点而不是搜函数名，避免定义自己满足门禁。
-// 品牌网关是固定正门，客户端不直连 Worker，也不许另开 WebSocket 或 XHR 旁路。
+// 游戏零联网出口。世界楼榜 0814 整体拆除（王老师拍板：联网榜不稳定，
+// 本机榜与稳定性第一，日后再说）——从那天起，这个单文件在运行时**一次网都不联**。
+// 曾经的门是「fetch 只许有一个且必须在 worldFetch 里」，现在是「一个都不许有」。
+// 要恢复联网功能请先跟王老师确认，然后把这一段门改回「唯一出口」的形状。
 const FETCH_CALLS = (CODE.match(/\bfetch\s*\(/g) || []).length;
-assert(FETCH_CALLS === 1 && html.includes('async function worldFetch('), '世界楼榜联网出口必须且只能有一个');
-assert(html.includes("MONKEY_API='https://myskme.com/api/monkey'"), '世界楼榜没有走 MYSKME 品牌网关');
-// 黑名单原来只有 XHR 与 WebSocket，0813 巡查实测 sendBeacon / EventSource /
-// new Image().src / 动态 import 四种旁路全部畅通无阻——数 fetch( 根本挡不住它们。
+assert(FETCH_CALLS === 0, '游戏代码里出现了 fetch 调用（' + FETCH_CALLS + ' 处）：'
+  + '本作 0814 起零联网，世界楼榜已拆除，要联网先跟王老师确认');
+// 旁路黑名单照旧全量盯着：sendBeacon / EventSource / XHR / WebSocket / 动态 import。
 assert(!/\b(?:XMLHttpRequest|WebSocket|EventSource)\s*\(/.test(CODE), '游戏出现未批准的网络旁路');
-assert(!/navigator\s*\.\s*sendBeacon/.test(CODE), '出现 sendBeacon 旁路：它不经过 worldFetch，也不受品牌网关约束');
+assert(!/navigator\s*\.\s*sendBeacon/.test(CODE), '出现 sendBeacon 旁路');
 assert(!/\bimport\s*\(/.test(CODE), '出现动态 import：本作是单文件离线包，不许运行时再拉代码');
-// 唯一那处 fetch 必须长在 worldFetch 里，不能是别处随手写的一个。
-const WORLD_FETCH_BODY = CODE.slice(CODE.indexOf('async function worldFetch('));
-assert(/\bfetch\s*\(/.test(WORLD_FETCH_BODY.slice(0, 900)), '唯一的 fetch 不在 worldFetch 里');
+// 世界楼榜的回潮门：这些标识符一个都不许再出现（历史注释不算——查的是剥注释后的 CODE）。
+// 注意别把「世界窗景」(worldWindow) 误伤进来，那是留下的气氛系统。
+for (const token of ['MONKEY_API', 'worldFetch', 'WORLD_RETRY_STEPS', 'flushWorldQueue',
+  'queueWorldRun', 'playerToken', 'worldDeviceId', 'WORLD_PENDING_KEY']) {
+  assert(!CODE.includes(token),
+    '世界楼榜的残余又出现了（' + token + '）：0814 已整体拆除，要恢复先跟王老师确认');
+}
 // 代码里除了品牌网关，不许再出现别的外链地址（图片 src 那类旁路顺带一起挡）。
 const URLS = [...new Set((CODE.match(/https?:\/\/[A-Za-z0-9.-]+/g) || []))]
   .filter(u => !u.startsWith('https://myskme.com') && !u.startsWith('https://monkey.myskme.com')
     && !u.startsWith('http://www.w3.org') && !u.startsWith('https://www.w3.org'));
 assert(URLS.length === 0, '代码里出现了品牌网关以外的外链：' + URLS.join('、'));
-assert(html.includes('function queueWorldRun(') && html.includes('function flushWorldQueue(')
-  && html.includes('acceptedRunId!==queued.runId') && html.includes("window.addEventListener('online'"),
-  '世界榜本机先存、精确回执或联网补交链路不完整');
+// 本机楼榜的三件事：真的存（rememberLocalRun）、真的登记（submitRank 改名同步旧行）、
+// 真的分周（weekStartAt 按北京时间算周一零点，不跟设备时区漂）。
+assert(html.includes('function rememberLocalRun(') && html.includes('function weekStartAt(')
+  && CODE.includes('for(const row of localBoard)if(!row.npc)row.name=alias;'),
+  '本机楼榜链路不完整：存榜、改名同步、按周分口径三样缺一不可');
 assert(html.includes('id="recordLine"') && html.includes('personalBestAtStart=IS_TEST_RUN?0:saved.height')
   && html.includes('state.maxMeters>state.personalBestAtStart'), '上次纪录目标线或越线庆祝不完整');
 assert(!html.includes('l1fr2z'), '仍含随机旧路径');
@@ -821,53 +828,10 @@ assert(/pager-dots solo/.test(html),
   assert(!/state\.bananas\s*-=/.test(CODE), '花的是局内香蕉而不是长期账户：那会把已经算过的分数改掉，历史成绩必须不可变');
 }
 
-// ---- 世界楼榜补交必须会自己重试（2026-08-14 王老师：上传成绩不咋地）----
-{
-  // 改之前 flushWorldQueue 一遇网络级失败就 return false 收工，而它只被
-  // 「打完一局 / 点登记 / 打开楼榜 / online 事件 / 开局 900ms」叫醒——
-  // 手机上一次很常见的抖动就让这一局躺到玩家哪天碰巧再打开楼榜。这道门盯着别再退回去。
-  assert(/const WORLD_RETRY_STEPS=\[[^\]]+\];/.test(CODE), '退避重试表没了：补交失败之后就再也没人管了');
-  const steps = ((CODE.match(/const WORLD_RETRY_STEPS=\[([^\]]+)\]/) || ['', ''])[1] || '')
-    .split(',').map(Number).filter(Number.isFinite);
-  assert(steps.length >= 4, '退避档位少于四档');
-  for (let i = 1; i < steps.length; i += 1) {
-    assert(steps[i] > steps[i - 1], '退避不是递增的：一直用同一个间隔重试是在骚扰服务器');
-  }
-  assert(steps[steps.length - 1] >= 60000, '退避上限不到一分钟，长时间断网时会一直空撞');
-
-  const flushFn = (CODE.match(/async function flushWorldQueue\(\)\{[\s\S]*?\n\}/) || [''])[0];
-  assert(flushFn, '取不到 flushWorldQueue（写法变了？先修本门禁的取法）');
-  assert(/scheduleWorldRetry\(\)/.test(flushFn), '网络级失败之后没有挂上重试，成绩会一直躺在队列里');
-  // 400（化名被退回）必须换下一条继续，而不是把整趟停掉——重试一万次也没用，那要玩家改名。
-  assert(flushFn.includes('if(error.status===400)continue;'),
-    '化名被退回时不再换下一条继续了：一条卡住会把整个队列堵死（0813 修过，别回归）');
-  // **一趟跑完必须调 cancelWorldRetry。** 它在成功路径上观察得到的作用只有一个：
-  // 把退避轮次清零。不清的话，下一次断网会直接从最长的那一档开始等
-  // （打完一局想看名次，却要干等两分钟）。
-  //
-  // 这句话是改过两遍的。前两版我先想好一个听着吓人的后果再写门——
-  // 「400 也会去无谓重试」「永不停歇地空转」——反向验证两次都不红，因为那两个后果根本到不了。
-  // **给门写理由时，理由本身也要能被反向验证；顺序是先弄清楚拆掉它会怎样，再动笔。**
-  assert(/cancelWorldRetry\(\);[\s\S]{0,120}return true;/.test(flushFn),
-    '补交跑完没有取消重试：退避轮次不清零，下一次断网会直接从最长那一档开始等');
-  assert(/status===400\)throw err;return send\(\)/.test(flushFn),
-    '单条的当场重试没了：移动网络的抖动多半一次就过去，而退避最快也要等四秒');
-
-  assert(/WORLD_TIMEOUT_MS=(\d+)/.test(CODE) && Number(CODE.match(/WORLD_TIMEOUT_MS=(\d+)/)[1]) >= 8000,
-    '联网超时短于 8 秒：地铁电梯里一次握手就不止这么久，会把慢网冤枉成断网');
-  assert(/visibilitychange[\s\S]{0,120}retryWorldNow/.test(CODE),
-    '回到前台不再立刻重试：后台定时器常被系统压住，而玩家这会儿正看着屏幕');
-  // 手动重试必须节流。实测没节流时，2.1 秒内猛切 30 次前后台会发出 60 个请求，
-  // 并把退避轮次顶到 30（下一次自动重试要等满两分钟）——手动重试反而让自动重试变慢。
-  const manualFn = (CODE.match(/function retryWorldNow\(\)\{[\s\S]*?\n\}/) || [''])[0];
-  assert(manualFn, '取不到 retryWorldNow（写法变了？先修本门禁的取法）');
-  assert(/WORLD_MANUAL_GAP_MS/.test(manualFn),
-    '手动重试没有节流：口袋里反复亮屏就会持续打请求（实测 2 秒能发 60 个）');
-  const gap = Number((CODE.match(/WORLD_MANUAL_GAP_MS=(\d+)/) || [])[1] || 0);
-  assert(gap >= 1500 && gap <= 10000,
-    '手动重试的节流窗口 ' + gap + 'ms 不合理：太短挡不住风暴，太长会让「切回来立刻重试」失效');
-  assert(/addEventListener\('online'[\s\S]{0,80}retryWorldNow/.test(CODE), '恢复联网时没有立刻重试');
-}
+// ---- 世界楼榜的补交重试门 0814 随功能一起拆除 ----
+// 原来这里有十几条断言守着退避重试器（递增、上限、节流、回前台立即重试……）。
+// 功能整体拆除后它们守的机器不存在了，留着只会红得毫无意义。
+// 那套「按失败种类退避」的思路搬去了 deploy/monkey/verify-online-monkey.mjs（发布验收）。
 
 // ---- 香蕉商店的入口必须找得到（2026-08-14 王老师：那个商店没找到）----
 {
