@@ -243,7 +243,11 @@ assert(html.includes('#gameShell.carp-hat-on .carp-hat'), '戴帽子的状态类
   // **每一块都要查**，不能只查第一块。0813 巡查实测：在后面再写一块
   // @media(max-width:699px){#gameShell{height:844px}}，构建绿、?qa=1 绿，
   // 而 430x932 上下各露 44px 底色——正是 0813 白天刚修过的那个毛病原样回来。
-  const blocks = [...html.matchAll(/@media\(max-width:699px\)\{[\s\S]{0,600}?\n\}/g)].map(hit => hit[0]);
+  // **写法归一之后再匹配。** 原来只认不带空格的 `@media(max-width:699px)`，
+  // 按 CSS 常规写法补一块 `@media (max-width: 699px) { … 844px … }` 就能绕过去，
+  // 而它同优先级又写在后面，层叠上赢——0813 白天刚修过的毛病原样回来。
+  const FLAT = html.replace(/\s+/g, '');
+  const blocks = [...FLAT.matchAll(/@media\(max-width:699px\)\{[\s\S]{0,600}?\}\}/g)].map(hit => hit[0]);
   assert(blocks.length >= 1, '手机铺满规则整块没了（0813 修过一次，别再退回 844 死高度）');
   assert(blocks.some(block => /#gameShell\{[^}]*height:min\(100svh/.test(block)), '手机铺满规则里外壳高度没用 100svh');
   for (const block of blocks) {
@@ -321,7 +325,14 @@ const PRODUCT_CODE = CODE.slice(0, QA_AT);
 // claimCultureMotif / choosePosterPair 原来只被断言「函数在不在」，不查调用点——
 // 0813 实测把 claimCultureMotif 的调用删掉，构建绿、?qa=1 绿，
 // 而八种世界窗景当场退化成四种死循环（前 8 局只出 4 种）。
-for (const fn of ['activePager', 'stepPage', 'bindSwipePaging', 'claimCultureMotif']) {
+// syncRotateGate 与 choosePosterPair 0814 补进来：
+// 前者原来写的是 `CODE.replace(/function\\s+syncRotateGate/,'')` 再 test 名字，
+// **被 runQA 自己那句 `typeof syncRotateGate==='function'` 满足了**——
+// 把三行接线全删光，构建照样绿，而横屏时局在后台继续跑、方向键卡在按下状态。
+// 后者原来只断言「函数在不在」，把唯一调用点换成写死的第一档，
+// 六种纸型退化成一种、纸型收藏线整条死掉，构建与 ?qa=1 双绿。
+for (const fn of ['activePager', 'stepPage', 'bindSwipePaging', 'claimCultureMotif',
+  'syncRotateGate', 'choosePosterPair', 'loadDressedMonkeyImage', 'renderResultWallet']) {
   assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(PRODUCT_CODE), '导航函数 ' + fn + ' 不见了');
   const uses = (PRODUCT_CODE.match(new RegExp('\\b' + fn + '\\b', 'g')) || []).length;
   assert(uses >= 2, '导航函数 ' + fn + ' 在产品代码里只有定义、没有接线（自检里的引用不算数）');
@@ -344,8 +355,8 @@ assert(html.includes('id="rotateGate"'), '竖屏提示层没了。横过来时�
   const cssQuery = new RegExp('@media' + jsQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*'));
   assert(cssQuery.test(html.replace(/\s+/g, ' ')) || html.includes('@media(' + jsQuery.slice(1)),
     '竖屏锁定的 CSS 与 JS 用的不是同一条媒体查询');
-  assert(/\bsyncRotateGate\b/.test(CODE.replace(/function\s+syncRotateGate/, '')),
-    'syncRotateGate 只有定义没有接线，横过来不会自动暂停');
+  // syncRotateGate 的接线由上面那一圈「必须有调用点」统一守（它原来在这里，
+  // 写法是 replace 掉定义再 test 名字，被 runQA 自己的 typeof 检查满足了）。
 }
 
 // ---- 称号徽章与存档契约 ----
@@ -547,8 +558,13 @@ assert(/pager-dots solo/.test(html),
   // 分成三份迟早出现「货架上是这样、穿上是那样」。
   assert(/function wornMarkup\(/.test(CODE) && /WEAR_ART\[id\]/.test(CODE), '穿戴图不再是从同一张表取的');
   assert(/function shopPreviewSvg\([\s\S]{0,400}?WEAR_ART\[id\]/.test(CODE), '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
-  assert(/loadDressedMonkeyImage/.test(CODE) && /dressedMonkeySvg/.test(CODE),
+  // **要求调用点在 buildPoster 里面**，不是「名字在文件里出现过」——
+  // 后者被函数定义自己满足：把 buildPoster 里那句换成 `const dressed=null`，
+  // 十八件行头从名片上消失，构建照样绿。
+  const posterFn2 = (CODE.match(/async function buildPoster\(\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert(/await loadDressedMonkeyImage\(\)/.test(posterFn2),
     '海报不印穿戴了。名片是「攀比」真正发生的地方，行头必须上那张图');
+  assert(/dressedMonkeySvg\(/.test(CODE), '穿好行头的猴子画不出来了');
   assert(/querySelectorAll\('\.wear-layer'\)/.test(CODE),
     '穿戴层不再是一次刷全部了：局内三个环屏副本加首页那只，分开写迟早穿得不一致');
   // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
@@ -682,8 +698,11 @@ assert(/pager-dots solo/.test(html),
   const typeBlock = (CODE.match(/const TYPE=\{[\s\S]*?\n\};/) || [''])[0];
   assert(typeBlock, '取不到 TYPE（写法变了？先修本门禁的取法）');
   // TYPE 里的每一级都得是 typeStep() 算出来的，不许直接写数字。
+  // **不许靠缩进宽度取键名。** 原来 entries 匹的是「行首恰好两个空格」，
+  // 于是新加一行写死字号时多敲一个空格就绕过去了（实测三个空格构建绿、两个空格才红）。
+  // 一道拦不拦得住取决于敲了几个空格的门，等于没门。
   const steps = [...typeBlock.matchAll(/:\s*typeStep\(-?\d+\)/g)];
-  const entries = [...typeBlock.matchAll(/^\s{2}([a-z]+):/gm)];
+  const entries = [...typeBlock.matchAll(/[{,]\s*([a-z][a-zA-Z0-9]*)\s*:/g)];
   assert(steps.length === entries.length,
     'TYPE 里有直接写死的字号（' + entries.length + ' 级里只有 ' + steps.length + ' 级走了 typeStep）');
   assert(/const TYPE_BASE=\d+,TYPE_RATIO=[\d.]+;/.test(CODE), '模块化比例的基准与比率没了');

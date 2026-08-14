@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.5-final">
+<meta name="myskme-release" content="20260814.6-truegates">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -965,7 +965,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.5-final',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.6-truegates',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -2818,8 +2818,11 @@ function unregisteredTimerFields(){
     if(!/(?:Until|At)$/.test(k)||skip.has(k)||list.includes(k))continue;bad.push(where+'.'+k);}};
   scan(state,PAUSE_TIME_FIELDS,'state');
   scan(state.player,PAUSE_PLAYER_TIME_FIELDS,'player');
-  if(state.platforms&&state.platforms[0])scan(state.platforms[0],PAUSE_ENTITY_TIME_FIELDS,'platform');
-  if(state.items&&state.items[0])scan(state.items[0],PAUSE_ENTITY_TIME_FIELDS,'item');
+  // **扫全部，不能只扫下标 0。** items 与 platforms 都是异质数组：
+  // declinedAt 只长在任命上、expireAt 只长在限时台上。只看第一个样本意味着
+  // 「只出现在非首个实体上的计时字段」永远看不见，而漏登记的后果是暂停十秒白送十秒。
+  for(const p of state.platforms||[])scan(p,PAUSE_ENTITY_TIME_FIELDS,'platform');
+  for(const i of state.items||[])scan(i,PAUSE_ENTITY_TIME_FIELDS,'item');
   return bad;
 }
 // 真跑一次暂停/恢复，验「剩余时长原样保留」。做完把动过的字段还原，不许留副作用。
@@ -3667,8 +3670,14 @@ function runQAInner(){
       const ok=getComputedStyle(el.shell).display!=='none'&&getComputedStyle(el.stage).display!=='none'&&getComputedStyle(el.playerGroup).display!=='none';
       if(!had)el.shell.classList.remove('carp-hat-on');return ok;})()],
     ['红鲤鱼帽是纯装饰，不改任何数值',/state\.carpHat=true/.test(wearCarpHat.toString())&&!/state\.(?:bonus|bananas|score)/.test(wearCarpHat.toString())],['鱼式救援含上推动量与临时平台',/pl\.vy=960/.test(rescueOrEnd.toString())&&/expireAt:now\+3300/.test(rescueOrEnd.toString())],
-    ['低功耗调度已启用',FRAME_INTERVAL>=16&&MUSIC_TICK_MS>=70&&REVERB_SECONDS<=.6&&state.animationFrame===0],['音频限制器与防爆音包络完整',typeof audioCtx==='object'&&/createDynamicsCompressor/.test(buildAudioGraph.toString())&&/linearRampToValueAtTime/.test(noiseHit.toString())],
-    ['安卓宽虚拟视口兜底完整',typeof syncViewportMode==='function'&&document.documentElement.dataset.shellScale],['1020 米彩蛋加分值为 52',true]
+    ['低功耗调度已启用',FRAME_INTERVAL>=16&&MUSIC_TICK_MS>=70&&REVERB_SECONDS<=.6&&state.animationFrame===0],['音频限制器与防爆音包络完整',/createDynamicsCompressor/.test(buildAudioGraph.toString())&&/connect\(/.test(buildAudioGraph.toString())&&/linearRampToValueAtTime/.test(noiseHit.toString())],
+    ['安卓宽虚拟视口兜底完整',typeof syncViewportMode==='function'&&document.documentElement.dataset.shellScale],['1020 米彩蛋加分值为 52',(()=>{
+      // 原来这条的判据**就是字面量 true**——把 +=52 改成 +=0，祝贺文案照旧写「加 52 分」，
+      // 两道自检都不吭声。真跑一次：走一遍暗号发放，量 bonus 到底涨了多少。
+      const keep=state.bonus;state.bonus=0;
+      triggerSurprise({kind:'secret',rarity:'极怪意外',text:'自检'},performance.now());
+      const gained=state.bonus;state.bonus=keep;
+      return gained===52;})()]
   ];
   const failed=checks.filter(c=>!c[1]);$('qaReport').style.display='block';$('qaReport').textContent=`${failed.length?'FAIL':'PASS'} · 是猴就上100层静态质检\n\n`+checks.map(([n,ok])=>`${ok?'PASS':'FAIL'}  ${n}`).join('\n')+`\n\n未登记计时字段：${unregisteredTimerFields().join(' / ')||'无'}\n称号：${career.titles.length}/${HONORS.length}　奶茶：${career.teas.length}/${TEAS.length}\n平台样本：${state.platforms.length}\n最大间距：${Math.max(...gaps).toFixed(1)}\n不可达主路：${unreachable.length}\n死亡台词：${DEATH_LINES.length}\n部门：${DEPARTMENTS.map(d=>d.name).join(' / ')}`;
 }
