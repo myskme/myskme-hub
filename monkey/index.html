@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#faf3e2">
 <meta name="color-scheme" content="light">
 <meta name="description" content="MYSKME 荒诞休闲挑战：是猴就上100层。左右两键往上爬，随机楼层每局不同。">
-<meta name="myskme-release" content="20260814.6-truegates">
+<meta name="myskme-release" content="20260814.7-liftbehind">
 <meta property="og:title" content="是猴就上100层 · MYSKME">
 <meta property="og:description" content="点左点右，上到100层。上去了也别问为什么。">
 <meta property="og:type" content="website">
@@ -759,10 +759,10 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       <g id="itemLayer"></g>
       <g id="playerGroup" transform="translate(145 660)">
         <circle id="goldAura" cx="50" cy="55" r="52"/>
-        <g id="monkeyMotion" class="monkey-motion"><use id="monkeyUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g>
+        <g id="monkeyMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g>
       </g>
-      <g id="playerWrapLeft"><g id="monkeyWrapLeftMotion" class="monkey-motion"><use id="monkeyWrapLeftUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
-      <g id="playerWrapRight"><g id="monkeyWrapRightMotion" class="monkey-motion"><use id="monkeyWrapRightUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
+      <g id="playerWrapLeft"><g id="monkeyWrapLeftMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyWrapLeftUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
+      <g id="playerWrapRight"><g id="monkeyWrapRightMotion" class="monkey-motion"><g class="wear-behind"></g><use id="monkeyWrapRightUse" href="#art-monkey-rise" width="100" height="116"/><use class="carp-hat" href="#art-carp-hat" width="100" height="116"/><g class="wear-layer"></g></g></g>
     </svg>
 
     <header id="hud" aria-live="polite">
@@ -793,7 +793,7 @@ html.wide-mobile-viewport #gameShell{width:min(100vw,460px);height:min(100svh,84
       <div class="card">
         <span class="notice-no">约谈通知第 0001 号</span>
         <div class="eyebrow">MYSKME 驯猴办直属项目</div>
-        <svg class="title-art" viewBox="-4 0 108 120"><use href="#art-monkey-rise"/><g class="wear-layer"></g></svg>
+        <svg class="title-art" viewBox="-4 0 108 120"><g class="wear-behind"></g><use href="#art-monkey-rise"/><g class="wear-layer"></g></svg>
         <h1>是猴就上<strong>100层</strong></h1>
         <p id="subtitle" class="subtitle">电梯在等他。他没看见。</p>
         <div class="career"><b>长期档案</b><span id="careerCopy">档案章可解锁开工装备</span><strong id="careerStamps">0</strong>
@@ -965,7 +965,7 @@ window.MONKEY_UPSTAIRS_ERRORS=[];
 window.addEventListener('error',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.message||e.error||'error').slice(0,240)));
 window.addEventListener('unhandledrejection',e=>window.MONKEY_UPSTAIRS_ERRORS.push(String(e.reason||'unhandled rejection').slice(0,240)));
 
-const RELEASE='20260814.6-truegates',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
+const RELEASE='20260814.7-liftbehind',W=390,H=844,METER_SCALE=5,SVG_NS='http://www.w3.org/2000/svg',MONKEY_API='https://myskme.com/api/monkey';
 const $=id=>document.getElementById(id);
 const TEST_PARAMS=new URLSearchParams(location.search),AUTO_PLAY=TEST_PARAMS.get('autoplay')==='1',STRESS_TEST=TEST_PARAMS.get('stress')==='1',WIDE_QA=TEST_PARAMS.get('wideqa')==='1',POSTER_QA=TEST_PARAMS.get('posterqa')==='1',FORCE_FALL=TEST_PARAMS.get('fall')==='1',FORCE_RESCUE=TEST_PARAMS.get('rescue')==='1',DEBUG_EVENT=TEST_PARAMS.get('event')||'',DEBUG_MISSION=TEST_PARAMS.get('mission')||'',DEBUG_START=Math.max(0,Number(TEST_PARAMS.get('start'))||0),DEBUG_SEED=Number(TEST_PARAMS.get('seed'))||0,DEBUG_X=TEST_PARAMS.has('x')&&Number.isFinite(Number(TEST_PARAMS.get('x')))?wrap(Number(TEST_PARAMS.get('x'))):195,IS_TEST_RUN=TEST_PARAMS.has('qa')||WIDE_QA||POSTER_QA||AUTO_PLAY||STRESS_TEST||FORCE_FALL||FORCE_RESCUE||!!DEBUG_EVENT||!!DEBUG_MISSION||DEBUG_START>0||DEBUG_SEED!==0;
 function syncViewportMode(){
@@ -1429,15 +1429,47 @@ const WEAR_ART={
   maybach:'<path d="M6 112V99q0-4 5-5l10-9q3-3 8-3h40q5 0 8 3l10 9q5 1 5 5v13z" fill="#28211a" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 88h48l7 7H17z" fill="#9fb8c8"/><circle cx="24" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><circle cx="76" cy="112" r="7" fill="#3a332a" stroke="#28211a" stroke-width="2"/><path d="M10 100h12M78 100h12" stroke="#f1bd3c" stroke-width="3" stroke-linecap="round"/>',
   lambo:'<path d="M2 112v-6l22-6 14-10h26l22 16v6z" fill="#e0a21c" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M40 92h22l14 10H32z" fill="#3a332a"/><path d="M62 90l16-14" stroke="#e0a21c" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="110" r="7" fill="#28211a"/><circle cx="76" cy="110" r="7" fill="#28211a"/>',
   rocket:'<path d="M50 78q13 12 13 28H37q0-16 13-28z" fill="#f5f0e2" stroke="#28211a" stroke-width="2.6" stroke-linejoin="round"/><path d="M37 100l-12 8h12zM63 100l12 8H63z" fill="#e0452c" stroke="#28211a" stroke-width="2.4" stroke-linejoin="round"/><circle cx="50" cy="92" r="5" fill="#6f86c9" stroke="#28211a" stroke-width="2"/><path d="M42 108q8 12 16 0z" fill="#f1bd3c" stroke="#e0452c" stroke-width="2"/>',
-  lift:'<rect x="14" y="74" width="72" height="42" rx="3" fill="none" stroke="#a7977c" stroke-width="3"/><path d="M20 80h26v34H20zM54 80h26v34H54z" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M50 74v42" stroke="#28211a" stroke-width="2.6"/><rect x="36" y="62" width="28" height="10" rx="2" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M44 67h3M53 67h3" stroke="#e0452c" stroke-width="2.6" stroke-linecap="round"/>'
+  // 电梯是唯一一件跨在猴子前后两层的行头，断点写在字符串里（见 WEAR_SPLIT）：
+  // 车厢与两扇门在**身后**——它们是实心的，画在前面会把猴子下半身整个盖住；
+  // 楼层显示牌与那两位红字在**身前**——它才是「这是电梯」的那个记号，
+  // 全塞到身后就只剩一个空框，750 根香蕉买回来看着像个纸箱。
+  lift:'<rect x="14" y="74" width="72" height="42" rx="3" fill="none" stroke="#a7977c" stroke-width="3"/><path d="M20 80h26v34H20zM54 80h26v34H54z" fill="#c9a05e" stroke="#28211a" stroke-width="2.6"/><path d="M50 74v42" stroke="#28211a" stroke-width="2.6"/><!--前--><rect x="36" y="62" width="28" height="10" rx="2" fill="#fff0af" stroke="#28211a" stroke-width="2.4"/><path d="M44 67h3M53 67h3" stroke="#e0452c" stroke-width="2.6" stroke-linecap="round"/>'
 };
 const SHOP_BY_ID=Object.fromEntries(SHOP_ITEMS.map(i=>[i.id,i]));
 function shopPrice(item){return TIER_PRICE[item.tier];}
 // 穿戴顺序按槽位固定，不按购买顺序——否则先买车后买帽子会把帽子画到车底下。
-function wornMarkup(){
+// 穿戴画两层：猴子身后一层，猴子身前一层。0814 Codex 真机复核报出来的毛病是
+// 私人电梯两扇门叠在猴子前方，把下半身整个盖住——它是全套里唯一体积比猴子还大的一件。
+//
+// **修法是给穿戴分前后，不是给电梯挪坐标。** 挪坐标只是把这一件改到「刚好不挡」，
+// 下一件大件又会重犯；分层把「谁该在身后」变成画法里的一个断点，
+// 以后加轿子、加热气球都不用再想这件事。
+//
+// 断点写在画法字符串里，而不是另开一张「谁在身后」的表：**另开一张表就是又一份会漂的镜像**，
+// 美术改了那张表不会跟着改。没有断点的行头整件画在前面，也就是原来的行为。
+//
+// 为什么不按槽位一刀切：座驾里的车与滑板车画在**前面**反而对——
+// 猴子看着像坐在车里（下半身被车身挡住，正是「坐进去」的视觉）。
+// 而电梯是**跨着两层**的：实心的车厢与门在身后，楼层显示牌在身前。
+// 一刀切成「整件在前」或「整件在后」都得不到对的画面——
+// 整件在后那版拍出来是个空框子，看着像纸箱，这是靠截图才看出来的，数值断言全绿。
+// 图层类名必须叫 wear-behind，**不能叫 wear-back**：槽位的类名是 `wear-<槽位id>`，
+// 而「背上」这个槽位的 id 就是 back——撞名之后 querySelectorAll('.wear-back')
+// 会把背上槽位那个 <g> 也当成图层刷，电梯的图形被写进前面的图层，又画到猴子前面去了。
+// 这是 AGENTS.md 那条 canon 锁警告的同一族错（carp-hat-on 与 carp-hat 撞名，0813 整个画面消失），
+// 同样是数值判据全绿、靠截图才看见。下面那道自检把「别撞名」变成断言。
+const WEAR_SPLIT='<!--前-->';
+function wearPart(id,where){
+  const art=WEAR_ART[id]||'',at=art.indexOf(WEAR_SPLIT);
+  if(at<0)return where==='front'?art:'';
+  return where==='back'?art.slice(0,at):art.slice(at+WEAR_SPLIT.length);
+}
+function wornMarkup(where='front'){
   return SHOP_SLOTS.map(slot=>{
     const id=career.wearing[slot.id];
-    return id&&WEAR_ART[id]?`<g class="wear-${slot.id}">${WEAR_ART[id]}</g>`:'';
+    if(!id||!WEAR_ART[id])return '';
+    const part=wearPart(id,where);
+    return part?`<g class="wear-${slot.id}">${part}</g>`:'';
   }).join('');
 }
 const MAJOR_EVENTS=['stamp','donkey','gravity','wind','shaft','faxRain','elevator'];
@@ -2884,6 +2916,8 @@ function teaCupSvg(tea,h=52){
 function renderWorn(){
   const markup=wornMarkup();
   for(const node of document.querySelectorAll('.wear-layer'))node.innerHTML=markup;
+  const behind=wornMarkup('back');
+  for(const node of document.querySelectorAll('.wear-behind'))node.innerHTML=behind;
 }
 // 穿好行头的猴子，画成一张独立 SVG（不依赖页面里的 defs），给海报用。
 // symbol 整段抄进去，所以里面的 <use href="#art-monkey-head-base"> 在这张图内部就能解析。
@@ -2891,7 +2925,8 @@ function dressedMonkeySvg(size){
   const defs=['art-monkey-head-base','art-monkey-land'].map(id=>{const node=$(id);return node?node.outerHTML:'';}).join('');
   // 视框比猴子大一圈：海报那格是圆角方块，贴边画的话座驾的轮子会被切掉。
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -6 118 132" width="${size}" height="${size}">`
-    +`<defs>${defs}</defs><use href="#art-monkey-land" width="100" height="116"/>${wornMarkup()}</svg>`;
+    +`<defs>${defs}</defs>${wornMarkup('back')}`
+    +`<use href="#art-monkey-land" width="100" height="116"/>${wornMarkup('front')}</svg>`;
 }
 function loadDressedMonkeyImage(){
   return new Promise(resolve=>{
@@ -2911,8 +2946,12 @@ const SLOT_VIEW={
 function shopPreviewSvg(id,size){
   const item=SHOP_BY_ID[id],view=SLOT_VIEW[item&&item.slot]||'-4 0 108 120';
   const box=view.split(' ').map(Number),ratio=box[3]/box[2];
+  // 试衣镜走的是同一个 wearPart，不是另抄一遍判断——
+  // 抄一遍就意味着「买之前看到的」与「穿上之后的」迟早对不上。
   return `<svg viewBox="${view}" width="${size}" height="${Math.round(size*ratio)}" aria-hidden="true">`
-    +`<use href="#art-monkey-land" width="100" height="116"/>${WEAR_ART[id]||''}</svg>`;
+    +wearPart(id,'back')
+    +`<use href="#art-monkey-land" width="100" height="116"/>`
+    +wearPart(id,'front')+`</svg>`;
 }
 function ownedCount(){return career.owned.length;}
 function renderShopScreen(){
@@ -3559,17 +3598,65 @@ function runQAInner(){
       const swapOk=career.wearing.head===second.id&&career.owned.length===2&&career.bananas===0;
       career.bananas=keep.bananas;career.owned=keep.owned;career.wearing=keep.wearing;saveCareer();renderWorn();
       return poorOk&&buyOk&&offOk&&onOk&&swapOk;}))()],
+    ['穿戴分前后：断点两边都画得出来，图层类名不与槽位类名撞车',(()=>withCareerSandbox(()=>{
+      // 这一条守的是**机制**，不是画面：画面归 monkey/tools/qa-wear-layers.mjs
+      // （它在真浏览器里对猴子身上打网格做命中测试，问「谁画在上面」）。
+      // 分工的理由很实在——数值断言看不见画面，0813 加红鲤鱼帽时整个画面消失，
+      // 三十条断言照样全过；反过来，画面工具跑不了 CI。两边各守各的。
+      //
+      // 图层类名撞车是 0814 现场栽出来的：图层原来叫 `wear-back`，而「背上」槽位的类名
+      // 也是 `wear-back`（槽位类名是 wear-<槽位id>）。querySelectorAll 把槽位那个 <g>
+      // 也当成图层刷，电梯的图形被写进前面的图层，又画到猴子前面去了。
+      // **和 canon 锁里 carp-hat-on 撞 carp-hat 是同一族错。**
+      const slotClasses=new Set(SHOP_SLOTS.map(s=>'wear-'+s.id));
+      if(slotClasses.has('wear-behind')||slotClasses.has('wear-layer'))return false;
+      // 每一只猴子都要有「身后」层，而且它必须排在猴子本体前面（SVG 里先画的在下面）。
+      const holders=[...document.querySelectorAll('.wear-behind')];
+      if(holders.length<4)return false;
+      for(const back of holders){
+        const parent=back.parentNode,kids=[...parent.children];
+        const body=kids.find(n=>n.tagName==='use'&&(n.getAttribute('href')||'').includes('art-monkey'));
+        if(!body||kids.indexOf(back)>kids.indexOf(body))return false;
+      }
+      // 带断点的行头**两层都要画得出东西**，而且拼回去必须等于原画法：
+      // 少一半、或者顺序错了，都会在这里被抓到，而不必抄任何一段坐标。
+      const split=SHOP_ITEMS.map(i=>i.id).filter(id=>(WEAR_ART[id]||'').includes(WEAR_SPLIT));
+      if(!split.length)return false;
+      const partsOk=split.every(id=>{
+        const back=wearPart(id,'back'),front=wearPart(id,'front');
+        return back&&front&&back+front===WEAR_ART[id].replace(WEAR_SPLIT,'');
+      });
+      // 没有断点的行头整件在前面，身后层一个字都不能有——这是原来的行为，不许被改掉。
+      const plain=SHOP_ITEMS.map(i=>i.id).filter(id=>WEAR_ART[id]&&!WEAR_ART[id].includes(WEAR_SPLIT));
+      const plainOk=plain.every(id=>wearPart(id,'front')===WEAR_ART[id]&&wearPart(id,'back')==='');
+      // 真穿一次电梯：两层都得有它。
+      career.owned=SHOP_ITEMS.map(i=>i.id);career.wearing={ride:'lift',back:'donkeybag'};renderWorn();
+      const liftBoth=holders.every(n=>n.innerHTML.includes('wear-ride'))
+        &&[...document.querySelectorAll('.wear-layer')].every(n=>n.innerHTML.includes('wear-ride'));
+      // 反过来：车必须**整件**留在前面（那是「坐进车里」的视觉，一刀切会毁掉它）。
+      career.wearing={ride:'maybach'};renderWorn();
+      const carUpFront=[...document.querySelectorAll('.wear-layer')].every(n=>n.innerHTML.includes('wear-ride'))
+        &&holders.every(n=>!n.innerHTML.includes('wear-ride'));
+      // 自己收拾干净：不还原的话下一条自检拿到的就不是它自己设的那套。
+      // 「一条会把邻居弄红的门，和一条永远绿的门一样害人」——上一轮刚写进注释，这轮又犯了一次。
+      career.wearing={};renderWorn();
+      return partsOk&&plainOk&&liftBoth&&carUpFront;}))()],
     ['行头四处同步：局内三只加首页那只，穿的是同一套',(()=>withCareerSandbox(()=>{
       const keep={owned:[...career.owned],wearing:{...career.wearing}};
       career.owned=SHOP_ITEMS.map(i=>i.id);career.wearing={head:'crown',ride:'lift'};
       renderWorn();
+      // **不变量是「四只猴子穿的是同一套」，跟分在哪一层无关**，所以看两层的合并结果。
+      // 原来只看 .wear-layer，电梯挪到身后层之后这条就过期了。
       const layers=[...document.querySelectorAll('.wear-layer')];
-      const enough=layers.length>=4,same=new Set(layers.map(n=>n.innerHTML)).size===1;
-      const drew=layers.length&&layers[0].innerHTML.includes('wear-head')&&layers[0].innerHTML.includes('wear-ride');
+      const backs=[...document.querySelectorAll('.wear-behind')];
+      const enough=layers.length>=4&&backs.length===layers.length;
+      const same=new Set(layers.map(n=>n.innerHTML)).size===1&&new Set(backs.map(n=>n.innerHTML)).size===1;
+      const whole=layers.length?layers[0].innerHTML+backs[0].innerHTML:'';
+      const drew=whole.includes('wear-head')&&whole.includes('wear-ride');
       // 没买过的东西穿不上：存档被手改过也不该画出一个不存在的洞。
       career.owned=[];career.wearing=safeWearing({head:'crown'},[]);
       renderWorn();
-      const blocked=!layers[0].innerHTML;
+      const blocked=!layers[0].innerHTML&&!backs[0].innerHTML;
       career.owned=keep.owned;career.wearing=keep.wearing;renderWorn();
       return enough&&same&&drew&&blocked;}))()],
     ['退避重试器：排得上、取消得掉、空队列不空排',(()=>{

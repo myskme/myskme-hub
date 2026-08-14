@@ -557,7 +557,13 @@ assert(/pager-dots solo/.test(html),
   // 三处落点必须共用同一段 WEAR_ART：局内的猴子、货架上的试衣镜、海报上的名片照。
   // 分成三份迟早出现「货架上是这样、穿上是那样」。
   assert(/function wornMarkup\(/.test(CODE) && /WEAR_ART\[id\]/.test(CODE), '穿戴图不再是从同一张表取的');
-  assert(/function shopPreviewSvg\([\s\S]{0,400}?WEAR_ART\[id\]/.test(CODE), '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
+  // 货架的试衣镜现在经由 wearPart 取图（分前后两层用的同一条路），
+  // 所以这里认的是**那条链没断**：试衣镜 -> wearPart -> WEAR_ART。
+  // 只认最终那个字面量会把这条门变成一份会过期的镜像——它刚刚就是这么红的。
+  assert(/function wearPart\(id,where\)\{[\s\S]{0,200}?WEAR_ART\[id\]/.test(CODE),
+    'wearPart 不再从 WEAR_ART 取图了');
+  assert(/function shopPreviewSvg\([\s\S]{0,500}?(WEAR_ART\[id\]|wearPart\(id,)/.test(CODE),
+    '货架预览没用同一段穿戴图，会出现「买之前一个样、买之后另一个样」');
   // **要求调用点在 buildPoster 里面**，不是「名字在文件里出现过」——
   // 后者被函数定义自己满足：把 buildPoster 里那句换成 `const dressed=null`，
   // 十八件行头从名片上消失，构建照样绿。
@@ -567,6 +573,46 @@ assert(/pager-dots solo/.test(html),
   assert(/dressedMonkeySvg\(/.test(CODE), '穿好行头的猴子画不出来了');
   assert(/querySelectorAll\('\.wear-layer'\)/.test(CODE),
     '穿戴层不再是一次刷全部了：局内三个环屏副本加首页那只，分开写迟早穿得不一致');
+  // 穿戴要分前后两层：私人电梯体积比猴子还大，两扇门画在前面会把下半身整个盖住
+  // （0814 Codex 真机复核报的）。断点写在画法字符串里，不另开一张会漂的表。
+  assert(/const WEAR_SPLIT='<!--前-->'/.test(CODE), '穿戴的前后断点标记没了');
+  assert(/function wornMarkup\(where='front'\)/.test(CODE), '穿戴不再分前后两层');
+  assert(/\+wearPart\(id,'back'\)/.test(CODE) && /\+wearPart\(id,'front'\)/.test(CODE),
+    '试衣镜不再走 wearPart 了：另抄一遍判断，「买之前看到的」与「穿上之后的」迟早对不上');
+  // 电梯必须仍然是**跨两层**的那一件：断点在它的画法里。
+  // 只认「断点在不在」，不抄任何一段坐标——抄坐标就是又一份会过期的镜像。
+  const liftArt = (CODE.match(/\n  lift:'([^']*)'/) || [])[1] || '';
+  assert(liftArt.includes('<!--前-->'),
+    '私人电梯的画法没有前后断点了：整件画在前面会盖住猴子下半身，'
+    + '整件画到身后又只剩一个空框、看着像纸箱（两种都拍过照）');
+  // 断点不能画蛇添足地退化成「其实一边是空的」——那等于没分层。
+  const [liftBack, liftFront] = liftArt.split('<!--前-->');
+  assert(liftBack.trim() && liftFront.trim(),
+    '私人电梯的前后断点有一边是空的，等于没分层');
+  // 下面两道门的名字**全部从源码现取**，一个字面量都不抄。
+  // 第一版两道都写死了 wear-behind，于是「把图层改名回 wear-back」——也就是 0814 真栽的那个改法——
+  // 只会撞上写死名字的计数门，撞名门永远走不到；反向验证当场把这个揪了出来。
+  // **门里抄的名字，和文档里抄的数字是同一类东西：会过期的镜像。**
+  const slotIds = [...(CODE.match(/const SHOP_SLOTS=\[[\s\S]*?\n\];/) || [''])[0]
+    .matchAll(/\{id:'([a-z]+)',name:/g)].map(hit => hit[1]);
+  const layerNames = [...CODE.matchAll(/querySelectorAll\('\.(wear-[a-z]+)'\)/g)].map(hit => hit[1]);
+  // 「身后」那层认的不是名字，是**它收的是 wornMarkup('back') 的产物**。
+  const behindLayer = (CODE.match(
+    /const (\w+)=wornMarkup\('back'\);[\s\S]{0,160}?querySelectorAll\('\.(wear-[a-z]+)'\)\)node\.innerHTML=\1;/) || [])[2];
+  assert(slotIds.length >= 6 && layerNames.length >= 2 && behindLayer,
+    '槽位表或图层名没取到，这道门等于没跑');
+  assert((CODE.match(new RegExp('class="' + behindLayer + '"', 'g')) || []).length >= 4,
+    '身后层（' + behindLayer + '）不足四处：局内三只环屏副本加首页那只');
+  // **图层类名不许与任何槽位类名撞车。** 槽位类名是 wear-<槽位id>，
+  // 图层第一版叫 wear-back，而「背上」槽位的 id 就是 back——
+  // querySelectorAll 把槽位那个 <g> 也当成图层刷，电梯又画到猴子前面去了。
+  // 这是 canon 锁里 carp-hat-on 撞 carp-hat 的同一族错，同样数值全绿、靠截图才看见。
+  for (const layer of layerNames) {
+    assert(!slotIds.includes(layer.slice(5)),
+      '图层类名 ' + layer + ' 与槽位 ' + layer.slice(5) + ' 撞车了：'
+      + "querySelectorAll('." + layer + "') 会把槽位那个 <g> 也当成图层刷");
+  }
+
   // 局内捡到的红鲤鱼帽压过买来的帽子（同一个头顶，两顶帽子会糊在一起）。
   assert(/#gameShell\.carp-hat-on \.wear-head\{display:none\}/.test(CODE),
     '买来的帽子会和局内的红鲤鱼帽叠在一起。注意状态类名与资源类名必须分开——0813 撞过一次，整个画面消失');
