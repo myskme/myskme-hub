@@ -96,10 +96,11 @@ async function verify() {
   assert(response.status === 200, '首页状态码 ' + response.status);
   try { checkHtml(html); } catch (error) { throw new Error('线上' + error.message + '（CDN 还没刷新，或发布包不对）'); }
   const manifestResponse = await fetch('https://monkey.myskme.com/manifest.webmanifest?release-check=' + stamp, { signal: AbortSignal.timeout(15000) });
-  const manifest = await manifestResponse.json(); assert(manifestResponse.status === 200 && manifest.name === '是猴就上100层', '线上 PWA 清单不匹配');
-  const iconResponse = await fetch('https://monkey.myskme.com/icons/monkey-100-192.png?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); const icon = await iconResponse.arrayBuffer(); assert(iconResponse.status === 200 && icon.byteLength > 1000, '线上桌面图标缺失');
-  const qrResponse = await fetch('https://monkey.myskme.com/vendor/qrcode-generator.js?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); const qr = await qrResponse.text(); assert(qrResponse.status === 200 && qr.includes('QR Code Generator for JavaScript') && qr.length > 50000, '线上本地二维码模块缺失');
-  const swResponse = await fetch('https://monkey.myskme.com/sw.js?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); const sw = await swResponse.text(); assert(swResponse.status === 200 && sw.includes(EXPECT_SW_CACHE), '线上离线缓存脚本不是 ' + EXPECT_SW_CACHE + '（CDN 还没刷新，或 sw.js 没进发布包）');
+  assert(manifestResponse.status === 200, 'PWA 清单状态码 ' + manifestResponse.status);
+  const manifest = await manifestResponse.json(); assert(manifest.name === '是猴就上100层', '线上 PWA 清单不匹配');
+  const iconResponse = await fetch('https://monkey.myskme.com/icons/monkey-100-192.png?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); assert(iconResponse.status === 200, '桌面图标状态码 ' + iconResponse.status); const icon = await iconResponse.arrayBuffer(); assert(icon.byteLength > 1000, '线上桌面图标缺失');
+  const qrResponse = await fetch('https://monkey.myskme.com/vendor/qrcode-generator.js?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); assert(qrResponse.status === 200, '二维码模块状态码 ' + qrResponse.status); const qr = await qrResponse.text(); assert(qr.includes('QR Code Generator for JavaScript') && qr.length > 50000, '线上本地二维码模块缺失');
+  const swResponse = await fetch('https://monkey.myskme.com/sw.js?release-check=' + stamp, { signal: AbortSignal.timeout(15000) }); assert(swResponse.status === 200, 'sw 脚本状态码 ' + swResponse.status); const sw = await swResponse.text(); assert(sw.includes(EXPECT_SW_CACHE), '线上离线缓存脚本不是 ' + EXPECT_SW_CACHE + '（CDN 还没刷新，或 sw.js 没进发布包）');
 }
 
 let lastError;
