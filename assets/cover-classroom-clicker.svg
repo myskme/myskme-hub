@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="驯猴办课堂答题器封面">
+  <rect width="1280" height="720" rx="48" fill="#faf3e2"/>
+  <path d="M0 550Q250 485 475 555T905 525T1280 555V720H0Z" fill="#dcefe9"/>
+  <g fill="none" stroke="#2f5148" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M394 610V186l246-102 246 102v424" fill="#fffaf0" stroke-width="12"/>
+    <path d="M435 250h410M435 334h410M435 418h410M435 502h410" stroke="#d6c8aa" stroke-width="8"/>
+    <path d="M585 610V502h110v108" fill="#e0452c" stroke-width="10"/>
+    <path d="M475 205h94v55h-94zM711 205h94v55h-94zM475 373h94v55h-94zM711 373h94v55h-94z" fill="#d9f3ef" stroke-width="8"/>
+  </g>
+  <g stroke="#2f5148" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(130 120)">
+      <circle cx="100" cy="104" r="70" fill="#9a6a47"/><circle cx="34" cy="99" r="26" fill="#9a6a47"/><circle cx="166" cy="99" r="26" fill="#9a6a47"/>
+      <ellipse cx="100" cy="118" rx="48" ry="42" fill="#f0d3a4"/><circle cx="82" cy="105" r="7" fill="#2f5148"/><circle cx="118" cy="105" r="7" fill="#2f5148"/><path d="M82 136q18 15 36 0" fill="none"/>
+    </g>
+    <g transform="translate(905 120)">
+      <path d="M30 96q55-72 145-18 26 19 22 58-7 61-91 64-76 5-100-50-13-31 24-54z" fill="#3fab84"/>
+      <path d="M191 105q44-35 76-8-26 34-2 69-38 15-73-11z" fill="#6cd0af"/>
+      <circle cx="65" cy="116" r="14" fill="#fffdf6"/><circle cx="65" cy="116" r="6" fill="#2f5148"/><path d="M45 153q25 16 49 0" fill="none"/>
+    </g>
+  </g>
+  <g transform="translate(82 438)" stroke="#2f5148" stroke-width="8" stroke-linejoin="round">
+    <path d="M0 22h246v136H0z" fill="#fffaf0"/><path d="M22 50h130M22 78h178M22 106h112"/>
+    <circle cx="206" cy="112" r="48" fill="none" stroke="#e0452c"/><path d="M178 112h56M206 84v56" stroke="#e0452c"/>
+  </g>
+  <g transform="translate(922 445)" stroke="#2f5148" stroke-width="8" stroke-linejoin="round">
+    <path d="M0 56l126-50 126 50-126 52z" fill="#f5b731"/><path d="M0 56v88l126 58 126-58V56M126 108v94" fill="#e8aa27"/>
+    <path d="M94 87q32-30 64 0" fill="none" stroke="#e0452c"/>
+  </g>
+  <g fill="#e0452c"><circle cx="352" cy="135" r="8"/><circle cx="921" cy="336" r="7"/><circle cx="338" cy="363" r="6"/></g>
+</svg>

@@ -26,6 +26,7 @@
 
 | 工具 | 地址 |
 |---|---|
+| 驯猴办 · 课堂答题器 | https://myskme.com/classroom/ |
 | 题库书架 | https://myskme.com/banks/ |
 | 优秀作文墙 | https://myskme.com/wall/ |
 | 作文训练场 | https://myskme.com/write/ |
