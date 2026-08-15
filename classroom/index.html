@@ -30,6 +30,7 @@
     .btn-red:hover{background:#c73928}
     .btn-warm{background:var(--banana)}
     .btn-warm:hover{background:#dda31f}
+    .btn-final-confirm{background:var(--red)!important;color:#fffdf6!important;border-color:#78261d!important}
     .btn-quiet{background:transparent;border-color:var(--line)}
     .btn-small{min-height:34px;padding:5px 10px;font-size:13px}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -634,7 +635,8 @@
   }
   function gearTotals(row){return (row.gear||[]).reduce((totals,item)=>({atk:totals.atk+(item.atk||0),guard:totals.guard+(item.guard||0),luck:totals.luck+(item.luck||0),chaos:totals.chaos+(item.chaos||0)}),{atk:0,guard:0,luck:0,chaos:0});}
   function rankingRows(session){return session.participantIds.map(id=>session.studentResults[id]).filter(Boolean).sort((a,b)=>b.floors-a.floors||b.earnedBananas-a.earnedBananas||b.bananas-a.bananas||a.name.localeCompare(b.name,'zh-CN'));}
-  function shopOrder(session){return rankingRows(session).slice().reverse().map(row=>row.id);}
+  function presentParticipantIds(session,cls=currentClass()){const allowed=new Set(session.participantIds);return new Set(cls.students.filter(student=>allowed.has(student.id)&&!student.absent).map(student=>student.id));}
+  function shopOrder(session,cls=currentClass()){const present=presentParticipantIds(session,cls);return rankingRows(session).filter(row=>present.has(row.id)).slice().reverse().map(row=>row.id);}
   function generateOffers(session,studentId,rng=Math.random){const rank=rankingRows(session).findIndex(row=>row.id===studentId);return Array.from({length:3},()=>rollGear(rank,session.participantIds.length,rng));}
   function buyGear(row,gear){if(!row||!gear||row.bananas<gear.cost)return false;row.bananas-=gear.cost;row.spentBananas=(row.spentBananas||0)+gear.cost;row.gear=Array.isArray(row.gear)?row.gear:[];row.gear.push(deepClone(gear));return true;}
   function roleBattleBonus(row){const totals={monkey:2,fish:1,egg:2,snake:2,fertilizer:1,donkey:2};return totals[row.character]||0;}
@@ -710,6 +712,8 @@
   let viewedSession=null;
   let toastTimer=0;
   let popTimer=0;
+  let finalConfirmUntil=0;
+  let finalConfirmTimer=0;
   let audioContext=null;
   let lessonSetupDraft=[];
 
@@ -789,7 +793,7 @@
   }
   function startLesson(configs){
     if(!Array.isArray(configs)){openLessonSetup();return;}
-    const cls=currentClass();if(!validLessonSetup(configs,cls)){showToast('参战同学和角色都不能重复，请重新选择。');return;}
+    const cls=currentClass();if(!validLessonSetup(configs,cls)){showToast('参战同学和角色都不能重复，请重新选择。');return;}finalConfirmUntil=0;clearTimeout(finalConfirmTimer);
     const previous=cls.sessions[cls.sessions.length-1]||null;
     const studentResults={};configs.forEach(item=>{const student=cls.students.find(row=>row.id===item.studentId);student.character=item.character;studentResults[student.id]=emptyLessonStudent(student,item.character);});
     state.activeSession={id:makeId('lesson'),classId:cls.id,participantIds:configs.map(item=>item.studentId),phase:'answer',section:1,roundStartedEventIndex:0,intermission:null,battleLog:[],bag:{round:0,remaining:[],served:[],last:null},startedAt:Date.now(),noticeNo:0,globalWrongChain:0,rushNext:false,currentCall:null,pendingCall:null,lastResult:null,events:[],airdropEffect:null,airdropLog:[],surpriseLog:[],surpriseReveal:null,undoStack:[],previousFloors:Object.fromEntries((previous?.studentResults||[]).map(item=>[item.id,item.floors||0])),studentResults};
@@ -933,15 +937,15 @@
     session.studentResults[undo.targetId]=undo.beforeResult;session.globalWrongChain=undo.beforeGlobalWrongChain;session.rushNext=undo.beforeRushNext;session.events.length=undo.beforeEventsLength;session.currentCall=undo.call;session.lastResult=undo.beforeLastResult;
     saveState();render();showToast('上一笔已撤销，可以重新判定。');
   }
-  function enterShopPhase(session,rng=Math.random){
-    const order=shopOrder(session);session.phase='shop';session.intermission={section:session.section,shopOrder:order,shopIndex:0,offersById:{},rerolled:{},purchased:{},pairs:[],battleStarted:false};order.forEach(id=>{session.intermission.offersById[id]=generateOffers(session,id,rng);});return session;
+  function enterShopPhase(session,rng=Math.random,cls=currentClass()){
+    const order=shopOrder(session,cls);session.phase='shop';session.intermission={section:session.section,shopOrder:order,shopIndex:0,offersById:{},rerolled:{},purchased:{},pairs:[],battleStarted:false};order.forEach(id=>{session.intermission.offersById[id]=generateOffers(session,id,rng);});return session;
   }
   function beginIntermission(){
     const session=activeSession();if(!session)return;
     if(session.phase!=='answer'){openIntermission();return;}
-    if(session.currentCall&&!confirm('当前约谈尚未判定。确定撤回这张通知并结束本节吗？'))return;
+    if(session.currentCall||session.pendingCall||drawing){showToast('当前约谈还没登记，请先判定、免答或等待盖章完成。');return;}
     session.currentCall=null;session.pendingCall=null;drawing=false;clearInterval(drawingInterval);
-    enterShopPhase(session);
+    enterShopPhase(session,Math.random,currentClass());
     saveState();render();openIntermission();playTone('finish');
   }
   function openIntermission(){const session=activeSession();if(!session||session.phase==='answer')return;$('intermission').classList.remove('hidden');renderIntermission();}
@@ -950,7 +954,7 @@
   function renderIntermission(){
     const session=activeSession();if(!session||session.phase==='answer'){$('intermission').classList.add('hidden');return;}
     ['phaseAnswer','phaseShop','phaseBattle'].forEach(id=>$(id).classList.remove('is-current'));$(session.phase==='shop'?'phaseShop':'phaseBattle').classList.add('is-current');
-    if(session.phase==='shop')renderShop(session);else renderBattle(session);
+    if(session.phase==='shop')renderShop(session);else renderBattle(session);renderFinalButtons();
   }
   function renderShop(session){
     const inter=session.intermission;if(!inter)return;const id=inter.shopOrder[inter.shopIndex];if(!id){prepareBattles(session);return;}const row=session.studentResults[id];const rank=rankingRows(session).findIndex(item=>item.id===id)+1;const offers=inter.offersById[id]||generateOffers(session,id);inter.offersById[id]=offers;
@@ -963,10 +967,11 @@
     const session=activeSession();if(!session||session.phase!=='shop')return;const inter=session.intermission;const id=inter.shopOrder[inter.shopIndex];const row=session.studentResults[id];const gear=inter.offersById[id]?.[index];if(!buyGear(row,gear)){showToast('香蕉不够，这件装备拒绝赊账。');return;}const student=studentById(id);if(student)student.stats.gearFound+=1;session.events.push({at:Date.now(),studentId:id,name:row.name,outcome:'purchase',delta:-gear.cost,gear:deepClone(gear),section:session.section});showToast(row.name+' 买到 '+gear.rarityName+' · '+gear.name+'。');completeShopTurn(session,true);saveState();
   }
   function rerollShop(){const session=activeSession();if(!session||session.phase!=='shop')return;const inter=session.intermission;const id=inter.shopOrder[inter.shopIndex];if(inter.rerolled[id])return;inter.rerolled[id]=true;inter.offersById[id]=generateOffers(session,id);saveState();renderIntermission();showToast('三件货已重新从装备科滚下传送带。');}
+  function makeBattlePairs(session,cls=currentClass()){const present=presentParticipantIds(session,cls);const rows=rankingRows(session).filter(row=>present.has(row.id));const pairs=[];for(let index=0;index<rows.length;index+=2)pairs.push({leftId:rows[index].id,rightId:rows[index+1]?.id||null,resolved:false,winnerId:null});return pairs;}
   function prepareBattles(session){
-    const inter=session.intermission;const rows=rankingRows(session);inter.pairs=[];for(let index=0;index<rows.length;index+=2)inter.pairs.push({leftId:rows[index].id,rightId:rows[index+1]?.id||null,resolved:false,winnerId:null});inter.battleStarted=false;session.phase='battle';saveState();render();openIntermission();
+    const inter=session.intermission;inter.pairs=makeBattlePairs(session,currentClass());inter.battleStarted=false;session.phase='battle';saveState();render();openIntermission();
   }
-  function battleSide(row){const totals=gearTotals(row);return '<div class="battle-side">'+characterSvg(row.character,null,'')+'<div><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><span>楼层 '+row.floors+' · 装备 '+row.gear.length+' · 冲 '+totals.atk+' 稳 '+totals.guard+' 运 '+totals.luck+' 乱 '+totals.chaos+'</span></div></div>';}
+  function battleSide(row){const totals=gearTotals(row);const names=row.gear?.length?row.gear.slice(-2).map(item=>item.name).join('、'):'空手但有尊严';return '<div class="battle-side">'+characterSvg(row.character,null,'')+'<div><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><span>楼层 '+row.floors+' · 冲 '+totals.atk+' 稳 '+totals.guard+' 运 '+totals.luck+' 乱 '+totals.chaos+'<br>携带：'+esc(names)+'</span></div></div>';}
   function renderBattle(session){
     const inter=session.intermission;const done=session.phase==='round-summary';$('intermissionKicker').textContent='第 '+session.section+' 节结束 · '+(done?'乱斗归档':'办公室乱斗');$('intermissionTitle').textContent=done?'本轮公文互殴已经停笔':'驯猴办不负责的办公室乱斗';$('intermissionMeta').innerHTML='实力决定下限，装备决定手段。<br>运气负责把结论写得很突然。';
     const pairs=(inter?.pairs||[]).map((pair,index)=>{const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;return '<article class="battle-card '+(pair.resolved?'is-resolved':'')+'"><div class="battle-title">第 '+pad(index+1,2)+' 桌 · '+(right?'公文互殴':'影印件特别席')+'</div>'+battleSide(left)+(right?battleSide(right):'<div class="battle-side"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/><path d="M28 31h44M28 45h31M28 59h38" stroke="#a7977c" stroke-width="4"/></svg><div><strong>驯猴办影印件</strong><span>没有角色，也没有本机存档</span></div></div>')+(pair.resolved?'<div class="battle-result">'+esc(pair.line)+'</div>':'')+'</article>';}).join('');
@@ -994,10 +999,17 @@
     ];
   }
   function archiveCompetitionSnapshot(session,endedAt=Date.now()){return {id:session.id,classId:session.classId,participantIds:deepClone(session.participantIds),startedAt:session.startedAt,endedAt,section:session.section,noticeNo:session.noticeNo,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog||[]),surpriseLog:deepClone(session.surpriseLog||[]),battleLog:deepClone(session.battleLog||[]),previousFloors:deepClone(session.previousFloors||{}),studentResults:session.participantIds.map(id=>deepClone(session.studentResults[id])).filter(Boolean),awards:buildAwards(session)};}
+  function finalConfirmationReady(now,until){return Number(until)>Number(now);}
+  function renderFinalButtons(){const armed=finalConfirmationReady(Date.now(),finalConfirmUntil);const label=armed?'再次点击确认结算':'最终结算';const top=$('liveSettlement');if(top){top.textContent=label;top.classList.toggle('btn-final-confirm',armed);}document.querySelectorAll('[data-final-settlement]').forEach(button=>{button.textContent=label;button.classList.toggle('btn-final-confirm',armed);});}
+  function requestFinalSettlement(){
+    const session=activeSession();if(!session)return;
+    if(session.currentCall||session.pendingCall||drawing){showToast('当前约谈还没登记，请先判定、免答或等待盖章完成。');return;}
+    const now=Date.now();if(!finalConfirmationReady(now,finalConfirmUntil)){finalConfirmUntil=now+3600;renderFinalButtons();showToast('最终结算会封存整场比赛。请在 3 秒内再次点击确认。');clearTimeout(finalConfirmTimer);finalConfirmTimer=setTimeout(()=>{if(Date.now()>=finalConfirmUntil){finalConfirmUntil=0;renderFinalButtons();}},3700);return;}
+    finalConfirmUntil=0;clearTimeout(finalConfirmTimer);finishCompetition();
+  }
   function finishCompetition(){
     const session=activeSession();if(!session)return;
-    if(!confirm('“最终结算”会封存整场比赛，之后不能继续下一节。确定现在结算吗？'))return;
-    if(session.currentCall)session.currentCall=null;
+    finalConfirmUntil=0;clearTimeout(finalConfirmTimer);
     const cls=currentClass();const endedAt=Date.now();
     session.participantIds.forEach(id=>{const student=cls.students.find(item=>item.id===id);const row=session.studentResults[id];if(student&&row&&!row.absentAtStart)student.stats.lessons+=1;});
     const archived=archiveCompetitionSnapshot(session,endedAt);
@@ -1034,7 +1046,7 @@
     $('buildingName').textContent=cls.name+' · 联合办公楼';
     const present=cls.students.filter(student=>!student.absent);const participants=sessionStudents(cls,session);const activePresent=participants.filter(student=>!student.absent);$('presentLabel').textContent=session?'本场在岗':'名册在岗';$('presentMetric').textContent=session?activePresent.length+'/'+participants.length:present.length+'/'+cls.students.length;
     $('sessionToggle').textContent=!session?'开始比赛':session.phase==='answer'?'结束本节 · 进入乱斗':'继续课间流程';$('sessionToggle').className=session?'btn-red':'btn-primary';
-    $('liveSettlement').classList.toggle('hidden',!session);
+    $('liveSettlement').classList.toggle('hidden',!session);renderFinalButtons();
     $('idleControl').classList.toggle('hidden',Boolean(session));$('activeControl').classList.toggle('hidden',!session);
     $('idleHeading').textContent=cls.students.length?cls.name+' 已就位':'当前班级还没有名册';$('idleCopy').textContent=cls.students.length?'题目与回答发生在设备外；老师在这台平板上逐次登记。当前 '+present.length+'/'+cls.students.length+' 位在岗。':'点击“名册管理”，粘贴一列名字即可建班。';
     renderBuilding(cls,session);
@@ -1168,7 +1180,9 @@
     const buyer=emptyLessonStudent(createStudent('买家'));buyer.bananas=6;buyer.earnedBananas=6;const cheap=Object.assign({},rollGear(2,6,seededRandom(4)),{cost:2});const bought=buyGear(buyer,cheap);const poor=emptyLessonStudent(createStudent('赊账'));poor.bananas=1;poor.earnedBananas=6;const refused=buyGear(poor,cheap);const brokenPoor=deepClone(poor);brokenPoor.bananas-=cheap.cost;record('购买扣余粮但不抹掉已赚分数',bought&&buyer.bananas===4&&buyer.earnedBananas===6&&buyer.gear.length===1&&!refused&&poor.bananas===1,brokenPoor.bananas<0);
     const fighterA=emptyLessonStudent(createStudent('甲方'),'monkey');const fighterB=emptyLessonStudent(createStudent('乙方'),'fish');fighterA.floors=4;fighterB.floors=2;fighterA.earnedBananas=fighterA.bananas=4;fighterB.earnedBananas=fighterB.bananas=4;fighterA.gear=[Object.assign({},cheap,{atk:8,guard:3,luck:0,chaos:0,effect:'steady'})];const fightSession={studentResults:{[fighterA.id]:fighterA,[fighterB.id]:fighterB}};const fightPair={leftId:fighterA.id,rightId:fighterB.id,resolved:false};resolveBattlePair(fightSession,fightPair,()=>.1);const untouched={leftId:fighterA.id,rightId:fighterB.id,resolved:false};record('乱斗同时计算实力装备与可控运气',fightPair.resolved&&fightPair.winnerId===fighterA.id&&fighterA.battleWins===1&&fighterA.bananas===6,!untouched.resolved&&untouched.winnerId==null);
     const phaseCandidate=deepClone(persistCandidate);phaseCandidate.activeSession.phase='shop';phaseCandidate.activeSession.section=3;phaseCandidate.activeSession.intermission={shopOrder:persistIds,shopIndex:1,offersById:{}};const repairedPhase=repairState(phaseCandidate);const brokenPhase=deepClone(phaseCandidate);brokenPhase.activeSession.phase='teleport';const repairedInvalidPhase=repairState(brokenPhase);record('采购与乱斗阶段跨刷新持久化',repairedPhase.activeSession.phase==='shop'&&repairedPhase.activeSession.section===3&&repairedPhase.activeSession.intermission.shopIndex===1,repairedInvalidPhase.activeSession.phase==='answer');
-    const sectionModel=repairState(deepClone(persistCandidate)).activeSession;Object.assign(sectionModel,{phase:'answer',section:1,startedAt:1,noticeNo:0,events:[],airdropLog:[],surpriseLog:[],battleLog:[],previousFloors:{}});enterShopPhase(sectionModel,seededRandom(8));const brokenSection=deepClone(sectionModel);brokenSection.endedAt=2;record('结束本节只进入采购而不封存比赛',sectionModel.phase==='shop'&&!('endedAt' in sectionModel)&&sectionModel.intermission.shopOrder.length===2,'endedAt' in brokenSection);
+    const sectionModel=repairState(deepClone(persistCandidate)).activeSession;Object.assign(sectionModel,{phase:'answer',section:1,startedAt:1,noticeNo:0,events:[],airdropLog:[],surpriseLog:[],battleLog:[],previousFloors:{}});enterShopPhase(sectionModel,seededRandom(8),persistClass);const brokenSection=deepClone(sectionModel);brokenSection.endedAt=2;record('结束本节只进入采购而不封存比赛',sectionModel.phase==='shop'&&!('endedAt' in sectionModel)&&sectionModel.intermission.shopOrder.length===2,'endedAt' in brokenSection);
+    persistClass.students[1].absent=true;const absentSession=repairState(deepClone(persistCandidate)).activeSession;const filteredShop=shopOrder(absentSession,persistClass);const filteredPairs=makeBattlePairs(absentSession,persistClass);const brokenAbsentShop=absentSession.participantIds.slice();record('缺席同学不进入采购与乱斗',filteredShop.length===1&&filteredShop[0]===persistClass.students[0].id&&filteredPairs.length===1&&filteredPairs[0].rightId===null,brokenAbsentShop.includes(persistClass.students[1].id));
+    const confirmPositive=finalConfirmationReady(100,200)&&!finalConfirmationReady(200,200);const brokenConfirm=finalConfirmationReady(100,0);record('最终结算须在时限内二次确认',confirmPositive,!brokenConfirm);
     const archivedModel=archiveCompetitionSnapshot(sectionModel,99);const brokenArchive=deepClone(archivedModel);delete brokenArchive.endedAt;record('最终结算才生成完整历史快照',archivedModel.endedAt===99&&Array.isArray(archivedModel.studentResults)&&archivedModel.studentResults.length===2,!('endedAt' in brokenArchive));
     const source=document.documentElement.outerHTML;const badCall=['fet','ch'].join('')+'("/qa-break")';record('单文件零联网出口',networkGate(source),!networkGate(source+'\n'+badCall));
     const pictographic=/\p{Extended_Pictographic}/u;const flavored=/[\u2190-\u21ff\u2460-\u24ff]/u;const emojiFree=!pictographic.test(source)&&!flavored.test(source);const brokenEmoji=pictographic.test(source+' '+String.fromCodePoint(0x1f600));record('emoji 与装饰符号全局禁令',emojiFree,brokenEmoji);
@@ -1194,7 +1208,7 @@
   }
 
   document.addEventListener('click',event=>{
-    if(event.target.closest('[data-final-settlement]')){finishCompetition();return;}
+    if(event.target.closest('[data-final-settlement]')){requestFinalSettlement();return;}
     const buy=event.target.closest('[data-buy-gear]');if(buy){purchaseOffer(Number(buy.dataset.buyGear));return;}
     if(event.target.closest('[data-reroll-shop]')){rerollShop();return;}
     if(event.target.closest('[data-skip-shop]')){const session=activeSession();if(session?.phase==='shop')completeShopTurn(session,false);return;}
@@ -1211,7 +1225,7 @@
   $('participantCount').addEventListener('change',renderLessonSeats);
   $('lessonSeats').addEventListener('change',event=>{const row=event.target.closest('.seat-row');if(!row)return;const seat=lessonSetupDraft[Number(row.dataset.seat)];if(event.target.matches('.seat-student'))seat.studentId=event.target.value;if(event.target.matches('.seat-character'))seat.character=event.target.value;renderLessonSeats();});
   $('confirmStartLesson').addEventListener('click',()=>startLesson(deepClone(lessonSetupDraft)));
-  $('liveSettlement').addEventListener('click',finishCompetition);$('openAirdrop').addEventListener('click',openAirdrop);
+  $('liveSettlement').addEventListener('click',requestFinalSettlement);$('openAirdrop').addEventListener('click',openAirdrop);
   $('revealAirdrop').addEventListener('click',revealAirdrop);
   $('exemptCall').addEventListener('click',exemptCurrent);$('undoScore').addEventListener('click',undoLast);$('closeSettlement').addEventListener('click',closeSettlement);$('settlementCsv').addEventListener('click',copyCsv);
   $('renameClass').addEventListener('click',()=>{const name=$('classNameInput').value.trim().slice(0,24);if(!name){showToast('班级名称不能为空。');return;}currentClass().name=name;saveState();render();showToast('班级名称已保存。');});
