@@ -47,9 +47,10 @@ async function verify() {
     const response = await get(`https://myskme.com/classroom/?${cacheBust}`);
     const html = await response.text();
     assert(response.status === 200, `课堂答题器状态码 ${response.status}`);
-    assert(html.includes('<title>驯猴办 · 课堂点名器</title>'), '课堂答题器标题不匹配');
+    assert(html.includes('<title>猴与鱼 · 灵光塔</title>'), '课堂答题器标题不匹配');
     assert(html.includes("default-src 'none'"), '课堂答题器缺少零联网 CSP');
     assert(html.includes('QA 总结'), '课堂答题器缺少自检入口');
+    assert(html.includes('灵光杯 · 单人巡塔赛'), '课堂答题器缺少独立单人赛入口');
   });
 
   await check('www 以 301 统一到主域', async () => {
