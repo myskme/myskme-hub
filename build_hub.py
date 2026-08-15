@@ -63,8 +63,8 @@ DEFAULT_DATA = {
         {"label": "学习", "anchor": "vol-2", "vol": "贰", "era": "第二纪 · 中考修行与课堂器物",
          "epigraph": "把中考听说读写，做成可玩、可练、可打卡的器物。", "icon": "book", "items": [
             {"key": "classroom-clicker", "glyph": "课", "cat": "tool", "rarity": "UR", "cover": "assets/cover-classroom-clicker.svg",
-             "tag": "课堂答题器 · 2～6 人", "title": "驯猴办 · 课堂答题器", "en": "CLASSROOM CLICKER",
-             "desc": "iPad 与平板直接开赛的离线课堂工具 · 公平点名、逐题记分与长期成绩 · 每节随机装备采购、办公室乱斗、空投彩蛋和最终排行，全程只存本机。",
+             "tag": "课堂竞技工具 · 独立单人赛", "title": "猴与鱼 · 灵光塔", "en": "SPARK TOWER",
+             "desc": "iPad 与平板直接开赛的离线课堂竞技工具 · 2～6 人点名记分、装备采购与课间乱斗 · 另带无题库的灵光杯单人经济赛、本机 NPC 与本地榜单，全程只存本机。",
              "url": "https://myskme.com/classroom/", "featured": True},
             {"key": "quiz", "glyph": "题", "cat": "tool", "rarity": "UR", "cover": "assets/cover-quiz.webp",
              "tag": "题库训练 · 两种玩法", "title": "题库训练场", "en": "QUIZ TRAINER",

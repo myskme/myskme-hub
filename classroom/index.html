@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#1f6f66">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>驯猴办 · 课堂点名器</title>
+  <link id="browserIcon" rel="icon" type="image/svg+xml">
+  <link id="touchIcon" rel="apple-touch-icon">
+  <title>猴与鱼 · 灵光塔</title>
   <style>
     :root{
       --paper:#faf3e2;--paper-2:#fffaf0;--ink:#28211a;--outline:#2f5148;
@@ -40,13 +42,14 @@
     #app{height:100dvh;display:grid;grid-template-rows:var(--header-h) minmax(0,1fr)}
     .topbar{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--paper);border-bottom:3px solid var(--outline);z-index:30}
     .brand{display:flex;align-items:center;gap:9px;min-width:max-content}
-    .brand-mark{display:grid;place-items:center;width:42px;height:42px;border:3px solid var(--outline);border-radius:50%;background:var(--red);color:#fffdf6;font-family:Georgia,serif;font-size:24px;font-weight:900}
+    .brand-mark{display:grid;place-items:center;width:42px;height:42px;border:2px solid var(--outline);border-radius:12px;background:var(--paper-2);overflow:hidden}.brand-mark svg{width:100%;height:100%}
     .brand-copy{line-height:1.02}
     .brand-copy strong{display:block;font-family:Georgia,"Songti SC",serif;font-size:19px;letter-spacing:.05em}
     .brand-copy span{display:block;margin-top:4px;color:var(--muted);font-size:11px;letter-spacing:.12em}
     .top-select{height:42px;min-width:160px;border-radius:9px;padding:0 34px 0 11px;font-weight:850}
     .top-spacer{flex:1}
     .top-actions{display:flex;align-items:center;gap:7px}
+    .top-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:6px}.top-icon-button svg{width:18px;height:18px;flex:none}
     .storage-note{display:flex;align-items:center;gap:6px;color:var(--teal-dark);font-size:12px;white-space:nowrap}
     .storage-dot{width:9px;height:9px;border:2px solid var(--teal-dark);border-radius:50%;background:var(--fish-fin)}
 
@@ -153,7 +156,7 @@
     .toast{position:fixed;z-index:100;left:50%;bottom:18px;max-width:min(580px,calc(100vw - 28px));padding:10px 16px;border:2px solid var(--outline);border-radius:9px;background:var(--ink);color:#fffdf6;font-size:13px;transform:translate(-50%,130%);transition:transform .22s ease}
     .toast.is-showing{transform:translate(-50%,0)}
 
-    .modal{position:fixed;z-index:70;inset:0;display:grid;place-items:center;padding:16px;background:rgba(40,33,26,.66)}
+    .modal{position:fixed;z-index:115;inset:0;display:grid;place-items:center;padding:16px;background:rgba(40,33,26,.66)}
     .modal-panel{width:min(980px,100%);max-height:calc(100dvh - 32px);display:grid;grid-template-rows:auto minmax(0,1fr);border:3px solid var(--outline);border-radius:15px;background:var(--paper);overflow:hidden}
     .modal-head{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:2px solid var(--outline);background:var(--paper-2)}
     .modal-head h2{margin:0;font-family:Georgia,"Songti SC",serif;font-size:21px}.modal-head p{margin:0;color:var(--muted);font-size:11px}.modal-head button{margin-left:auto}
@@ -214,6 +217,10 @@
     .gear-card{position:relative;min-height:310px;display:grid;grid-template-rows:104px auto auto auto minmax(48px,1fr) auto;gap:5px;padding:10px;border:3px solid var(--outline);background:var(--paper-2);overflow:hidden}.gear-card:before{content:"";position:absolute;inset:5px;border:1px solid rgba(47,81,72,.22);pointer-events:none}.gear-card[data-rarity="rare"]{background:#e3f0e9}.gear-card[data-rarity="epic"]{background:#ebe2f3}.gear-card[data-rarity="legend"]{background:#fff0af}.gear-card[data-rarity="mythic"]{border-color:#5c3f72;background:linear-gradient(145deg,#fffdf6 0 45%,#eee5f2 45% 58%,#fff0af 58% 100%)}.gear-card[data-rarity="mythic"] .gear-rarity{color:#5c3f72;font-weight:900}.mystery-shop-note{margin-bottom:8px;padding:7px 9px;border:2px double #5c3f72;background:#eee5f2;color:#4a315c;font-size:10px;line-height:1.4}
     .gear-art{display:grid;place-items:center;position:relative}.gear-art svg{width:100px;height:105px;overflow:visible}.gear-rarity{position:relative;color:var(--red);font-size:10px;letter-spacing:.1em}.gear-card h4{position:relative;margin:0;font-family:Georgia,"Songti SC",serif;font-size:18px;line-height:1.1}.gear-stats{position:relative;display:grid;grid-template-columns:repeat(2,1fr);gap:4px;font-size:10px}.gear-stat{padding:4px;border:1px solid var(--line);background:rgba(255,255,255,.55)}.gear-line{position:relative;margin:0;color:var(--muted);font-size:10px;line-height:1.4}.gear-card button{position:relative;width:100%;min-height:40px}.offer-footer{display:flex;justify-content:space-between;gap:8px;margin-top:9px}.offer-footer .section-note{margin:0}
     .gear-rule{position:relative;padding:5px 6px;border-left:4px solid var(--teal-dark);background:rgba(220,235,228,.78);font-size:9px;line-height:1.35}.gear-rule b{display:block;color:var(--teal-dark)}
+    .stat-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.stat-guide-item{padding:7px 8px;border:1.5px solid var(--line);background:var(--paper-2);font-size:9px;line-height:1.35}.stat-guide-item b{display:block;color:var(--teal-dark);font-size:13px}.stat-guide-item span{color:var(--muted)}
+    .shop-stat-guide{margin:0 0 8px}.handbook-stat-guide{margin:0 9px 8px}.handbook-catalog{grid-template-rows:auto auto minmax(0,1fr)}
+    .stat-explain-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.stat-explain-card{padding:12px;border:2px solid var(--outline);background:var(--paper-2)}.stat-explain-card b{display:block;color:var(--red);font-family:Georgia,"Songti SC",serif;font-size:25px}.stat-explain-card strong{display:block;margin:3px 0;font-size:14px}.stat-explain-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}.formula-note{margin-top:10px;padding:10px;border-left:5px solid var(--teal-dark);background:#dcebe4;font-size:11px;line-height:1.55}
+    .desktop-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:center}.desktop-icon-preview{display:grid;place-items:center;aspect-ratio:1;border:3px solid var(--outline);border-radius:42px;background:var(--paper-2);overflow:hidden}.desktop-icon-preview svg{width:100%;height:100%}.desktop-copy h3{margin:0 0 7px;font-family:Georgia,"Songti SC",serif;font-size:25px}.desktop-copy p{margin:5px 0;color:var(--muted);font-size:12px;line-height:1.55}.desktop-steps{display:grid;gap:6px;margin:10px 0}.desktop-step{padding:7px 9px;border:1.5px solid var(--line);background:var(--paper-2);font-size:11px;line-height:1.45}.desktop-step b{color:var(--teal-dark)}
     .battle-pairs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.battle-card{padding:10px;border:2px solid var(--outline);background:var(--paper-2)}.battle-card.is-resolved{background:#e2eee7}.battle-title{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--red);font-family:Georgia,"Songti SC",serif;font-size:15px}.battle-side{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center;gap:6px;margin:7px 0;padding:6px;border:1px solid var(--line);background:#fffdf6}.battle-side svg{width:48px;height:54px}.battle-side strong{display:block}.battle-side span{font-size:9px;color:var(--muted)}.battle-result{margin:7px 0 0;padding:7px;border-left:4px solid var(--teal-dark);background:#dcebe4;font-size:10px;line-height:1.45}
     .battle-summary{display:grid;place-items:center;min-height:170px;padding:16px;border:3px double var(--red);background:var(--paper-2);text-align:center}.battle-summary h3{margin:5px 0;font-family:Georgia,"Songti SC",serif;font-size:26px}.battle-summary p{max-width:680px;margin:5px auto;color:var(--muted);font-size:12px;line-height:1.5}
 
@@ -237,12 +244,18 @@
     .handbook{position:fixed;z-index:110;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:#d8e5df}
     .handbook-head{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:4px solid var(--outline);background:var(--paper)}
     .handbook-title small{display:block;color:var(--red);font-size:10px;letter-spacing:.16em}.handbook-title h1{margin:2px 0 0;font-family:Georgia,"Songti SC",serif;font-size:24px}.handbook-title p{margin:3px 0 0;color:var(--muted);font-size:10px}
-    .handbook-head button{margin-left:auto}.handbook-main{min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;padding:10px;overflow:hidden}
+    .handbook-head button{margin-left:auto}.handbook-head-actions{display:flex;gap:6px;margin-left:auto}.handbook-head-actions button{margin-left:0}.handbook-main{min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr);gap:10px;padding:10px;overflow:hidden}
     .handbook-aside,.handbook-catalog{min-height:0;border:3px solid var(--outline);background:var(--paper);overflow:hidden}.handbook-aside{padding:12px;overflow:auto}.handbook-aside h2{margin:0 0 7px;font-family:Georgia,"Songti SC",serif;font-size:18px}.handbook-aside p{margin:5px 0;color:var(--muted);font-size:11px;line-height:1.5}
     .handbook-rule{margin-top:8px;padding:8px;border-left:5px solid var(--teal-dark);background:#dcebe4;font-size:10px;line-height:1.45}.handbook-rule b{display:block;color:var(--teal-dark)}
     .handbook-sets{display:grid;gap:5px;margin-top:10px}.handbook-set{padding:6px 7px;border:1px solid var(--line);background:var(--paper-2);font-size:10px}.handbook-set b{display:block;color:var(--red)}
     .handbook-catalog{display:grid;grid-template-rows:auto minmax(0,1fr)}.handbook-tools{display:grid;grid-template-columns:minmax(160px,1fr) 150px 150px auto;gap:7px;padding:9px;border-bottom:2px solid var(--outline);background:var(--paper-2)}.handbook-tools input,.handbook-tools select{min-width:0;height:38px;border-radius:8px;padding:0 9px}.handbook-count{align-self:center;color:var(--muted);font-size:11px;text-align:right;white-space:nowrap}
     .handbook-grid{min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:9px;overflow:auto;align-content:start}.handbook-card{position:relative;display:grid;grid-template-rows:82px auto auto auto auto auto;gap:5px;min-height:268px;padding:9px;border:2px solid var(--outline);background:var(--paper-2);overflow:hidden}.handbook-card:before{content:"";position:absolute;inset:4px;border:1px solid rgba(47,81,72,.18);pointer-events:none}.handbook-card.is-mystery{border-color:#5c3f72;background:linear-gradient(145deg,#fffdf6 0 48%,#eee5f2 48% 63%,#fff0af 63% 100%)}.handbook-art{position:relative;display:grid;place-items:center}.handbook-art svg{width:76px;height:80px;overflow:visible}.handbook-kind{position:relative;color:var(--red);font-size:9px;letter-spacing:.08em}.handbook-card h3{position:relative;margin:0;font-family:Georgia,"Songti SC",serif;font-size:15px;line-height:1.15}.handbook-card .gear-stats{grid-template-columns:repeat(4,1fr);font-size:8px}.handbook-card .gear-rule{font-size:8px}.handbook-card .gear-line{font-size:9px}.handbook-empty{grid-column:1/-1;place-self:center;padding:30px;border:2px dashed var(--line);color:var(--muted);font-size:12px}
+
+    .solo-game{position:fixed;z-index:108;inset:0;display:grid;grid-template-rows:68px minmax(0,1fr);background:#d8e5df;overflow:hidden}.solo-head{display:flex;align-items:center;gap:11px;padding:9px 14px;border-bottom:4px solid var(--outline);background:var(--paper)}.solo-head-mark{width:46px;height:46px;display:grid;place-items:center;border:2px solid var(--outline);border-radius:13px;background:var(--paper-2);overflow:hidden}.solo-head-mark svg{width:100%;height:100%}.solo-head-copy small{display:block;color:var(--red);font-size:9px;letter-spacing:.17em}.solo-head-copy h1{margin:1px 0;font-family:Georgia,"Songti SC",serif;font-size:23px}.solo-head-copy p{margin:0;color:var(--muted);font-size:10px}.solo-head-actions{display:flex;gap:7px;margin-left:auto}.solo-main{min-height:0;padding:10px;overflow:hidden}
+    .solo-setup{height:100%;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:10px}.solo-setup-main,.solo-board,.solo-race-panel,.solo-command{min-height:0;border:3px solid var(--outline);background:var(--paper);overflow:hidden}.solo-setup-main{display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;padding:13px;gap:10px}.solo-kicker{color:var(--red);font-size:10px;letter-spacing:.16em}.solo-setup h2{margin:2px 0;font-family:Georgia,"Songti SC",serif;font-size:28px}.solo-setup-copy{margin:0;color:var(--muted);font-size:11px;line-height:1.55}.solo-label{display:block;margin-bottom:5px;font-size:10px;color:var(--muted);letter-spacing:.08em}.solo-character-list{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.solo-character{min-width:0;padding:6px 4px;border:2px solid var(--line);background:var(--paper-2);text-align:center}.solo-character.is-selected{border-color:var(--red);box-shadow:inset 0 -5px var(--banana)}.solo-character svg{width:50px;height:54px}.solo-character b{display:block;font-size:10px}.solo-difficulty-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.solo-difficulty{padding:8px;border:2px solid var(--line);background:var(--paper-2);text-align:left}.solo-difficulty.is-selected{border-color:var(--teal-dark);background:#dcebe4}.solo-difficulty b{display:block}.solo-difficulty span{display:block;margin-top:2px;color:var(--muted);font-size:9px;line-height:1.35}.solo-loop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;align-self:stretch}.solo-loop article{padding:9px;border-left:5px solid var(--teal-dark);background:var(--paper-2)}.solo-loop b{font-family:Georgia,"Songti SC",serif}.solo-loop p{margin:3px 0 0;color:var(--muted);font-size:9px;line-height:1.4}.solo-start-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.solo-start-row span{max-width:520px;color:var(--muted);font-size:10px;line-height:1.4}.solo-start-row button{min-width:180px}
+    .solo-board{display:grid;grid-template-rows:auto minmax(0,1fr) auto}.solo-board-head{padding:11px 12px;border-bottom:2px solid var(--outline);background:var(--paper-2)}.solo-board-head h3{margin:0;font-family:Georgia,"Songti SC",serif}.solo-board-head p{margin:3px 0 0;color:var(--muted);font-size:9px}.solo-record-list{min-height:0;overflow:auto;padding:7px}.solo-record{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:6px;padding:7px;border-bottom:1px solid var(--line);font-size:10px}.solo-record>span:first-child{font-family:Georgia,serif;font-weight:900;color:var(--red)}.solo-record b{display:block}.solo-record small{display:block;color:var(--muted)}.solo-record-score{text-align:right}.solo-record-score strong{display:block;font-size:15px}.solo-board-note{padding:8px 10px;border-top:2px solid var(--outline);background:#dcebe4;font-size:9px;line-height:1.45}
+    .solo-race{height:100%;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:10px}.solo-race-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto}.solo-race-top{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:2px solid var(--outline);background:var(--paper-2)}.solo-race-top h2{margin:0;font-family:Georgia,"Songti SC",serif;font-size:20px}.solo-race-top p{margin:2px 0 0;color:var(--muted);font-size:9px}.solo-checkpoints{display:flex;gap:5px;margin-left:auto}.solo-checkpoint{padding:4px 7px;border:1px solid var(--line);font-size:8px;background:var(--paper)}.solo-checkpoint.is-passed{background:var(--teal);color:#fff}.solo-track{min-height:0;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));gap:4px;padding:8px;background:repeating-linear-gradient(90deg,transparent 0 19%,rgba(47,81,72,.11) 19% 20%)}.solo-racer{display:grid;grid-template-columns:52px 82px minmax(0,1fr) 48px;align-items:center;gap:7px;padding:3px 7px;border:1px solid var(--line);background:rgba(255,250,240,.9);transition:opacity .2s}.solo-racer.is-player{border:2px solid var(--red);background:#fff7d6}.solo-racer.is-out{opacity:.38;filter:grayscale(.7)}.solo-racer-art svg{width:48px;height:50px}.solo-racer-name b{display:block;font-size:11px}.solo-racer-name small{font-size:8px;color:var(--muted)}.solo-progress{position:relative;height:17px;border:2px solid var(--outline);border-radius:9px;background:#e7dfd0;overflow:hidden}.solo-progress-fill{height:100%;border-right:2px solid var(--outline);background:linear-gradient(90deg,var(--teal),#75c7b2);transition:width .32s ease}.solo-racer.is-player .solo-progress-fill{background:linear-gradient(90deg,var(--red),var(--banana))}.solo-ghost{position:absolute;top:-2px;bottom:-2px;width:3px;background:#5c3f72;opacity:.85}.solo-racer-score{text-align:right;font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px;font-weight:900}.solo-commentary{display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center;gap:7px;padding:7px 10px;border-top:2px solid var(--outline);background:#273f39;color:#fffdf6}.solo-commentary svg{width:50px;height:52px}.solo-commentary small{display:block;color:#bcd8ce;font-size:8px}.solo-commentary p{margin:2px 0;font-family:Georgia,"Songti SC",serif;font-size:12px;line-height:1.35}
+    .solo-command{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;padding:11px;gap:9px}.solo-status{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.solo-stat{padding:6px;border:1px solid var(--line);background:var(--paper-2);font-size:8px}.solo-stat b{display:block;font-size:15px}.solo-command h3{margin:0;font-family:Georgia,"Songti SC",serif;font-size:18px}.solo-command>p{margin:0;color:var(--muted);font-size:10px;line-height:1.45}.solo-inventory{min-height:0;display:grid;align-content:start;gap:5px}.solo-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:2px solid var(--outline);background:#e5eef0}.solo-item-art{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--line);background:var(--paper-2);font-family:Georgia,"Songti SC",serif;font-size:18px;font-weight:900;color:var(--red)}.solo-item b{display:block;font-size:10px}.solo-item small{display:block;color:var(--muted);font-size:8px;line-height:1.3}.solo-item button{min-height:31px;padding:4px 7px;font-size:9px}.solo-routes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.solo-routes button{min-height:52px;padding:6px 4px}.solo-routes small{display:block;margin-top:3px;font-size:8px;font-weight:500;line-height:1.25}.solo-summary{height:100%;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:10px}.solo-summary-card{display:grid;place-items:center;padding:18px;border:3px double var(--outline);background:var(--paper);text-align:center}.solo-summary-art svg{width:120px;height:130px}.solo-summary-card small{color:var(--red);letter-spacing:.15em}.solo-summary-card h2{margin:5px 0;font-family:Georgia,"Songti SC",serif;font-size:34px}.solo-summary-card strong{font-family:ui-monospace,SFMono-Regular,monospace;font-size:42px}.solo-summary-card p{max-width:620px;color:var(--muted);font-size:11px;line-height:1.55}.solo-summary-actions{display:flex;gap:7px;justify-content:center}.solo-summary .solo-board{height:100%}
 
     @media(max-width:1100px){
       :root{--header-h:94px}
@@ -253,6 +266,8 @@
       .building-body{grid-template-columns:minmax(0,1fr) 174px}.metric{min-width:72px}.metric b{font-size:16px}
       .award-grid{grid-template-columns:repeat(2,1fr)}
       .handbook-main{grid-template-columns:210px minmax(0,1fr)}.handbook-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .stat-guide-item{padding:5px 6px}
+      .solo-race{grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr)}.solo-racer{grid-template-columns:44px 68px minmax(0,1fr) 40px}.solo-racer-art svg{width:40px;height:43px}
     }
     @media(max-width:820px) and (min-width:701px){
       .intermission-shell{height:calc(100dvh - 14px)}
@@ -265,6 +280,8 @@
     @media(max-width:700px){
       :root{--header-h:96px}
       .brand{min-width:0}.brand-mark{width:34px;height:34px}.brand-copy strong{font-size:14px}.top-select{min-width:115px;font-size:12px}.storage-note{font-size:10px}
+      .top-actions{justify-content:flex-start;overflow-x:auto;scrollbar-width:none}.top-actions::-webkit-scrollbar{display:none}.top-actions button{flex:none}
+      .top-icon-button{width:34px;padding:4px}.top-icon-button .desktop-label{display:none}.top-icon-button svg{width:17px;height:17px}
       .workspace{height:calc(100dvh - var(--header-h));grid-template-columns:1fr;grid-template-rows:minmax(0,52%) minmax(0,48%);gap:5px;padding:5px}
       .panel{border-width:2px;border-radius:10px}.building-head{padding:5px 8px;gap:5px}.building-title{min-width:112px}.building-title small{font-size:8px}.building-title strong{font-size:13px}
       .metric-row{gap:0}.metric{min-width:54px;padding:3px 5px}.metric span{font-size:8px}.metric b{font-size:13px}
@@ -280,6 +297,8 @@
       .intermission{padding:0;align-items:stretch}.intermission-shell{height:100dvh;border-width:0}.intermission-head{padding:7px 8px}.intermission-head h2{font-size:18px}.intermission-head p{display:none}.intermission-head>button{min-width:82px;min-height:36px;padding:4px 7px;font-size:10px}.intermission-body{padding:7px}.phase-strip{margin-bottom:6px}.phase-pill{padding:5px 3px;font-size:9px}.shop-layout{grid-template-columns:minmax(0,1fr)}.shop-player{display:grid;grid-template-columns:58px minmax(0,1fr);gap:6px;padding:6px}.shop-player-art{height:62px}.shop-player-art svg{width:54px;height:60px}.shop-player h3{font-size:17px}.shop-player .wallet{margin:2px 0}.shop-player .gear-rack{grid-column:1/-1;margin:0}.offer-grid{width:100%;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 8vw 3px}.offer-grid::-webkit-scrollbar,.battle-pairs::-webkit-scrollbar{display:none}.gear-card{flex:0 0 76vw;min-height:250px;grid-template-rows:62px auto auto auto minmax(34px,1fr) auto;padding:5px;border-width:2px;scroll-snap-align:center}.gear-art svg{width:60px;height:64px}.gear-card h4{font-size:13px}.gear-stats{grid-template-columns:repeat(4,1fr);font-size:8px}.gear-line{font-size:8px}.gear-rule{font-size:8px;padding:3px 4px}.gear-card button{min-height:34px;padding:3px;font-size:9px}.offer-head h3{font-size:13px}.offer-head p{display:none}.offer-footer{margin-top:5px}.battle-pairs{width:100%;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 8vw 3px}.battle-card{flex:0 0 78vw;padding:6px;scroll-snap-align:center}.battle-side{margin:4px 0;padding:4px}.battle-summary{min-height:120px;padding:8px}.battle-summary h3{font-size:20px}
       .settlement{padding:4px}.settlement-sheet{height:calc(100dvh - 8px);border-width:2px}.settlement-head{padding:8px 9px}.settlement-head h2{font-size:20px}.settlement-head .settlement-meta{font-size:9px}.award-grid{grid-template-columns:1fr;gap:4px;padding:6px}.award-card{min-height:61px;padding:6px 8px}.award-card strong{font-size:14px;margin:2px 0}.award-card p{font-size:9px}.settlement-table-wrap{margin:0 6px}.settlement-table{font-size:10px}.settlement-table th,.settlement-table td{padding:5px 4px}.settlement-actions{padding:6px}.settlement-actions button{min-height:34px;padding:5px 8px;font-size:11px}
       .handbook-head{padding:7px 8px}.handbook-title h1{font-size:18px}.handbook-title p{display:none}.handbook-head button{min-height:34px;padding:4px 8px;font-size:10px}.handbook-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:5px;padding:5px}.handbook-aside{display:flex;gap:5px;padding:5px;overflow-x:auto;overflow-y:hidden}.handbook-aside h2,.handbook-aside>p,.handbook-sets{display:none}.handbook-rule{flex:0 0 205px;margin:0;padding:5px;font-size:8px}.handbook-catalog{border-width:2px}.handbook-tools{grid-template-columns:minmax(0,1fr) 92px 92px;padding:5px;gap:4px}.handbook-tools input,.handbook-tools select{height:34px;padding:0 5px;font-size:9px}.handbook-count{grid-column:1/-1;text-align:left;font-size:9px}.handbook-grid{display:flex;align-items:flex-start;gap:7px;padding:6px 9vw;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.handbook-grid::-webkit-scrollbar{display:none}.handbook-card{flex:0 0 78vw;min-height:330px;grid-template-rows:74px auto auto auto auto auto;padding:7px;scroll-snap-align:center}.handbook-art svg{width:68px;height:72px}.handbook-card h3{font-size:14px}.handbook-card .gear-line{font-size:8px}
+      .stat-explain-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.stat-explain-card{padding:8px}.stat-explain-card b{font-size:20px}.desktop-layout{grid-template-columns:1fr;text-align:center}.desktop-icon-preview{width:128px;margin:auto;border-radius:26px}.desktop-copy h3{font-size:20px}.desktop-steps{text-align:left}.shop-stat-guide{gap:3px;margin-bottom:5px}.handbook-stat-guide{gap:3px;margin:0 5px 5px}.shop-stat-guide .stat-guide-item,.handbook-stat-guide .stat-guide-item{padding:3px;text-align:center;font-size:7px}.shop-stat-guide .stat-guide-item b,.handbook-stat-guide .stat-guide-item b{font-size:10px}.shop-stat-guide .stat-guide-item span,.handbook-stat-guide .stat-guide-item span{display:none}
+      .solo-game{grid-template-rows:62px minmax(0,1fr)}.solo-head{padding:6px 8px}.solo-head-mark{width:38px;height:38px}.solo-head-copy h1{font-size:17px}.solo-head-copy p{display:none}.solo-head-actions button{min-height:34px;padding:4px 7px;font-size:9px}.solo-main{padding:5px}.solo-setup{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 126px;gap:5px}.solo-setup-main{padding:7px;gap:6px;grid-template-rows:auto auto auto minmax(0,1fr) auto}.solo-setup h2{font-size:20px}.solo-setup-copy{font-size:9px}.solo-character-list{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;scroll-snap-type:x mandatory}.solo-character{flex:0 0 76px;scroll-snap-align:center}.solo-character svg{width:42px;height:44px}.solo-difficulty{padding:5px}.solo-difficulty span{font-size:7px}.solo-loop{gap:4px}.solo-loop article{padding:5px;border-left-width:3px}.solo-loop p{font-size:7px}.solo-start-row span{display:none}.solo-start-row button{min-width:0;width:100%;min-height:40px}.solo-board{grid-template-rows:auto minmax(0,1fr)}.solo-board-head{padding:5px 7px}.solo-board-head h3{font-size:13px}.solo-board-head p,.solo-board-note{display:none}.solo-record-list{display:flex;gap:5px;overflow-x:auto;padding:4px}.solo-record{flex:0 0 155px;grid-template-columns:22px minmax(0,1fr) auto;padding:4px;border:1px solid var(--line)}.solo-race{grid-template-columns:1fr;grid-template-rows:minmax(0,52%) minmax(0,48%);gap:5px}.solo-race-top{padding:5px 7px}.solo-race-top h2{font-size:15px}.solo-checkpoint{padding:3px 4px;font-size:7px}.solo-track{padding:4px;gap:2px}.solo-racer{grid-template-columns:35px 61px minmax(0,1fr) 34px;gap:4px;padding:1px 4px}.solo-racer-art svg{width:33px;height:34px}.solo-racer-name b{font-size:9px}.solo-racer-name small{font-size:7px}.solo-progress{height:13px}.solo-racer-score{font-size:9px}.solo-commentary{grid-template-columns:36px minmax(0,1fr);padding:3px 6px}.solo-commentary svg{width:34px;height:36px}.solo-commentary p{font-size:9px}.solo-command{padding:6px;gap:4px;grid-template-rows:auto auto minmax(0,1fr) auto}.solo-status{gap:3px}.solo-stat{padding:3px}.solo-stat b{font-size:12px}.solo-command h3{font-size:14px}.solo-command>p{font-size:8px}.solo-item{grid-template-columns:28px minmax(0,1fr) auto;padding:3px}.solo-item-art{width:26px;height:26px;font-size:14px}.solo-item small{font-size:7px}.solo-routes{gap:4px}.solo-routes button{min-height:42px;padding:4px 2px;font-size:9px}.solo-routes small{font-size:7px}.solo-summary{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 150px;gap:5px}.solo-summary-card{padding:8px}.solo-summary-art svg{width:72px;height:78px}.solo-summary-card h2{font-size:22px}.solo-summary-card strong{font-size:28px}.solo-summary-card p{font-size:8px}.solo-summary-actions button{min-height:35px;padding:5px 8px;font-size:9px}
     }
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
@@ -287,6 +306,7 @@
 <body>
   <svg class="svg-sprite" aria-hidden="true" focusable="false">
     <defs>
+      <symbol id="asset-spark-mark" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#fffaf0"/><path d="M31 13v38M23 20h16M23 32h16M23 44h16" fill="none" stroke="#2f5148" stroke-width="3" stroke-linecap="round"/><g stroke="#2f5148" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="28" r="10" fill="#9a6a47"/><circle cx="9" cy="27" r="4" fill="#9a6a47"/><circle cx="27" cy="27" r="4" fill="#9a6a47"/><ellipse cx="18" cy="31" rx="7" ry="6" fill="#f0d3a4"/><circle cx="15" cy="28" r="1.3" fill="#28211a" stroke="none"/><circle cx="21" cy="28" r="1.3" fill="#28211a" stroke="none"/><path d="M15 34q3 2 6 0" fill="none"/><path d="M39 28q7-8 15-2 6 5 0 11-8 7-15-2z" fill="#3fab84"/><path d="M53 28l8-5-1 9 1 9-8-5" fill="#6cd0af"/><circle cx="43" cy="30" r="1.7" fill="#28211a" stroke="none"/><path d="M42 22q5-5 10 0" fill="none" stroke="#e0452c" stroke-width="3"/></g></symbol>
       <symbol id="asset-monkey-head" viewBox="0 0 100 74">
         <g stroke="#2f5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M43 12Q47 4 51 12Q57 3 60 13" fill="#765039"/>
@@ -364,12 +384,14 @@
 
   <div id="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark">M</div><div class="brand-copy"><strong>驯猴办 · 课堂点名器</strong><span>本机离线课堂工具</span></div></div>
+      <div class="brand"><div class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#asset-spark-mark"></use></svg></div><div class="brand-copy"><strong>猴与鱼 · 灵光塔</strong><span>课堂竞技答题器 · 本机离线</span></div></div>
       <label class="sr-only" for="classSelect">当前班级</label><select id="classSelect" class="top-select"></select>
       <div class="top-spacer"></div>
       <div class="storage-note"><span class="storage-dot"></span><span id="storageText">仅存本机</span></div>
       <nav class="top-actions" aria-label="课堂工具">
-        <button id="openHandbook" class="btn-quiet">装备图鉴</button>
+        <button id="openSolo" class="btn-warm">单人游戏</button>
+        <button id="openHandbook" class="btn-quiet">玩法图鉴</button>
+        <button class="btn-quiet top-icon-button" data-open-modal="desktopModal" aria-label="放到桌面"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M7 12h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="desktop-label">放到桌面</span></button>
         <button class="btn-quiet" data-open-modal="rosterModal">名册管理</button>
         <button class="btn-quiet" data-open-modal="settingsModal">计分设置</button>
         <button class="btn-quiet" data-open-modal="historyModal">历史与成绩</button>
@@ -381,7 +403,7 @@
     <main class="workspace">
       <section class="panel building-panel" aria-label="全班楼层看板">
         <header class="building-head">
-          <div class="building-title"><small>同一栋楼 · 各爬各的</small><strong id="buildingName">驯猴办联合办公楼</strong></div>
+          <div class="building-title"><small>同一栋楼 · 各爬各的</small><strong id="buildingName">灵光局联合办公楼</strong></div>
           <div class="metric-row">
             <div class="metric"><span id="presentLabel">名册在岗</span><b id="presentMetric">0</b></div>
             <div class="metric"><span>本节最高</span><b id="topFloorMetric">0F</b></div>
@@ -393,7 +415,7 @@
             <div id="floorGrid" class="floor-grid" aria-hidden="true"></div>
             <div id="monkeyLayer" class="monkey-layer"></div>
             <div id="suspense" class="suspense hidden" aria-live="assertive">
-              <div class="elevator-box"><small>驯猴办内部电梯检索中</small><div id="elevatorDigits" class="elevator-digits">000</div><div class="elevator-lights"><i></i><i></i><i></i><i></i><i></i></div><div id="suspenseLine" class="suspense-line">约谈对象正在办理上楼手续</div></div>
+              <div class="elevator-box"><small>灵光局内部电梯检索中</small><div id="elevatorDigits" class="elevator-digits">000</div><div class="elevator-lights"><i></i><i></i><i></i><i></i><i></i></div><div id="suspenseLine" class="suspense-line">约谈对象正在办理上楼手续</div></div>
             </div>
           </div>
           <aside class="rank-rail">
@@ -405,7 +427,7 @@
       </section>
 
       <aside class="panel control-panel" aria-label="点名与记分控制台">
-        <div class="control-kicker">驯猴办当值窗口</div><h1 class="control-title">课堂约谈签发台</h1>
+        <div class="control-kicker">灵光局当值窗口</div><h1 class="control-title">课堂约谈签发台</h1>
         <div id="idleControl" class="status-card">
           <strong id="idleHeading">本节课尚未开始</strong>
           <p id="idleCopy">题目与回答发生在设备外；老师在这台平板上点名、逐次判定并记分。</p>
@@ -428,9 +450,9 @@
               <div id="noticeNo" class="notice-no">约谈通知第 001 号</div>
               <div class="notice-body">
                 <div id="noticePortrait" class="notice-portrait"></div>
-                <div class="notice-copy"><small id="noticeDept">驯猴办签发</small><strong id="calledName">海</strong><p id="noticeSentence">请该同学即刻上楼答题。</p></div>
+                <div class="notice-copy"><small id="noticeDept">灵光局签发</small><strong id="calledName">海</strong><p id="noticeSentence">请该同学即刻上楼答题。</p></div>
               </div>
-              <div class="notice-stamp">驯猴办<br>已约谈</div>
+              <div class="notice-stamp">灵光局<br>已约谈</div>
             </article>
             <div id="eventRibbon" class="event-ribbon hidden"></div>
             <div id="airdropBanner" class="airdrop-banner hidden"></div>
@@ -520,30 +542,42 @@
     </section>
   </div>
 
+  <div id="statsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <section class="modal-panel" style="width:min(820px,100%)"><header class="modal-head"><div><h2 id="statsTitle">乱斗四维说明</h2><p>四个字只影响每节结束后的办公室乱斗，不会改写答题成绩</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="stat-explain-grid"><article class="stat-explain-card"><b>冲</b><strong>主动实力</strong><p>每 1 点直接增加 1.18 点账面乱斗实力，是最直观的进攻底盘。</p></article><article class="stat-explain-card"><b>稳</b><strong>稳定底盘</strong><p>每 1 点直接增加 0.92 点账面实力；防线与压波动装备通常也会带稳。</p></article><article class="stat-explain-card"><b>运</b><strong>好运上限</strong><p>每 1 点扩大 0.55 点随机签空间。运越高，抽到额外好结果的上限越高。</p></article><article class="stat-explain-card"><b>乱</b><strong>怪招幅度</strong><p>每 1 点扩大 0.65 点随机签空间，也会被回形针、怪招和无厘头套装继续利用。</p></article></div><div class="formula-note"><b>怎么看一场乱斗：</b>楼层、答题次数、冲、稳和角色底盘先组成账面实力；装备技能、套装、运与乱再制造变化。香蕉可以买装备，但四维与乱斗绝不修改答对率、答题楼层或长期成绩。</div></div>
+    </section>
+  </div>
+
+  <div id="desktopModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="desktopTitle">
+    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="desktopTitle">把灵光塔放到桌面</h2><p>猴先生与鱼小姐专属标志，适合 iPad、平板和电脑快捷入口</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="desktop-layout"><div id="desktopIconPreview" class="desktop-icon-preview"></div><section class="desktop-copy"><h3>猴与鱼 · 灵光塔</h3><p id="desktopStatus">这份工具仍然只在本机保存名册与课堂记录。添加到桌面不会上传任何数据。</p><div class="desktop-steps"><div class="desktop-step"><b>iPad 或 iPhone：</b>用 Safari 打开 -> 点“分享” -> 选“添加到主屏幕” -> 点“添加”。</div><div class="desktop-step"><b>Android 平板：</b>用 Chrome 打开 -> 浏览器菜单 -> 选“添加到主屏幕”或“安装应用”。</div><div class="desktop-step"><b>Mac 或 Windows：</b>用 Chrome 或 Edge 打开 -> 浏览器菜单 -> 选“安装”或“创建快捷方式”。</div></div><div class="toolbar"><button id="installNow" class="btn-primary">查看当前设备安装方式</button><button id="exportDesktopIcon" class="btn-warm">导出 512 桌面图标</button></div></section></div></div>
+    </section>
+  </div>
+
   <div id="airdropModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="airdropTitle">
     <section class="modal-panel" style="width:min(700px,100%)"><header class="modal-head"><div><h2 id="airdropTitle">课堂随机惊喜机</h2><p>揭晓仪式与结果双重随机，规则会写入本机课次</p></div><button class="btn-small" data-close-modal>关闭</button></header>
-      <div class="modal-body"><article id="airdropCard" class="airdrop-card"><div id="ritualArt" class="ritual-art"></div><div class="airdrop-copy"><small id="airdropKind">驯猴办随机仪式</small><h3 id="airdropName">下一秒仍未备案</h3><p id="airdropLine">盲盒、公文签筒、怪骰子都可能出勤。</p><button id="revealAirdrop" class="btn-primary">开始揭晓</button><button id="acceptAirdrop" class="btn-primary hidden" data-close-modal>确认收件</button></div></article></div>
+      <div class="modal-body"><article id="airdropCard" class="airdrop-card"><div id="ritualArt" class="ritual-art"></div><div class="airdrop-copy"><small id="airdropKind">灵光局随机仪式</small><h3 id="airdropName">下一秒仍未备案</h3><p id="airdropLine">盲盒、公文签筒、怪骰子都可能出勤。</p><button id="revealAirdrop" class="btn-primary">开始揭晓</button><button id="acceptAirdrop" class="btn-primary hidden" data-close-modal>确认收件</button></div></article></div>
     </section>
   </div>
 
   <section id="intermission" class="intermission hidden" aria-label="课间采购与办公室乱斗">
     <div class="intermission-shell">
-      <header class="intermission-head"><div><small id="intermissionKicker">结束本节 · 随机采购</small><h2 id="intermissionTitle">驯猴办课间装备流转处</h2></div><p id="intermissionMeta">落后位先选，领先位也不能空手。<br>同名装备仍会刷出不同稀有度与属性。</p><button class="btn-red" data-final-settlement>最终结算</button></header>
+      <header class="intermission-head"><div><small id="intermissionKicker">结束本节 · 随机采购</small><h2 id="intermissionTitle">灵光局课间装备流转处</h2></div><p id="intermissionMeta">落后位先选，领先位也不能空手。<br>同名装备仍会刷出不同稀有度与属性。</p><button class="btn-red" data-final-settlement>最终结算</button></header>
       <div class="intermission-body"><div class="phase-strip"><div id="phaseAnswer" class="phase-pill">01 答题赚香蕉</div><div id="phaseShop" class="phase-pill is-current">02 随机采购</div><div id="phaseBattle" class="phase-pill">03 办公室乱斗</div></div><div id="intermissionMain"></div></div>
     </div>
   </section>
 
   <section id="settlement" class="settlement hidden" aria-label="课堂结算页">
     <div class="settlement-sheet">
-      <header class="settlement-head"><div><small>驯猴办课堂结算公示</small><h2 id="settlementTitle">本节课楼层清点完毕</h2></div><div id="settlementMeta" class="settlement-meta"></div></header>
+      <header class="settlement-head"><div><small>灵光局课堂结算公示</small><h2 id="settlementTitle">本节课楼层清点完毕</h2></div><div id="settlementMeta" class="settlement-meta"></div></header>
       <div id="awardGrid" class="award-grid"></div>
       <div class="settlement-table-wrap"><table class="settlement-table"><thead><tr><th>名次</th><th>同学</th><th>角色</th><th>部门</th><th class="num">楼层</th><th class="num">余粮</th><th class="num">总赚</th><th class="num">乱斗</th><th class="num">装备</th><th class="num">答对率</th></tr></thead><tbody id="settlementBody"></tbody></table></div>
       <div class="settlement-actions"><button id="settlementCsv" class="btn-quiet">复制长期 CSV</button><button id="closeSettlement" class="btn-primary">返回课堂看板</button></div>
     </div>
   </section>
 
-  <section id="handbook" class="handbook hidden" aria-label="驯猴办装备图鉴宝典">
-    <header class="handbook-head"><div class="handbook-title"><small>所有玩家公开查阅 · 不展示课堂成绩</small><h1>驯猴办 · 装备图鉴宝典</h1><p>全库、技能、套装、融合和神秘商店，全部以当前比赛正本实时生成。</p></div><button id="closeHandbook" class="btn-primary">返回答题器</button></header>
+  <section id="handbook" class="handbook hidden" aria-label="猴与鱼灵光塔玩法图鉴">
+    <header class="handbook-head"><div class="handbook-title"><small>所有玩家公开查阅 · 不展示课堂成绩</small><h1>猴与鱼 · 灵光塔玩法图鉴</h1><p>全库、四维、技能、套装、融合和神秘商店，全部以当前比赛正本实时生成。</p></div><div class="handbook-head-actions"><button class="btn-quiet" data-open-modal="statsModal">四维说明</button><button id="closeHandbook" class="btn-primary">返回答题器</button></div></header>
     <div class="handbook-main">
       <aside class="handbook-aside">
         <h2>五条采购纪律</h2><p>答题决定香蕉与楼层，装备只参与每节结束后的办公室乱斗，不会改写任何人的答题成绩。</p>
@@ -556,9 +590,15 @@
       </aside>
       <section class="handbook-catalog">
         <div class="handbook-tools"><label class="sr-only" for="handbookSearch">搜索装备</label><input id="handbookSearch" type="search" placeholder="搜索名称、技能或怪话"><label class="sr-only" for="handbookKind">装备类别</label><select id="handbookKind"><option value="all">全部类别</option><option value="outfit">原行头道具</option><option value="tea">奶茶补给</option><option value="prop">办公室怪招</option><option value="luxury">夸张奢侈品</option><option value="mystery">神秘神器</option></select><label class="sr-only" for="handbookSet">套装类别</label><select id="handbookSet"><option value="all">全部套装</option></select><span id="handbookCount" class="handbook-count"></span></div>
+        <div class="stat-guide handbook-stat-guide"><div class="stat-guide-item"><b>冲</b><span>主动进攻底分</span></div><div class="stat-guide-item"><b>稳</b><span>稳定与防线底盘</span></div><div class="stat-guide-item"><b>运</b><span>好运随机上限</span></div><div class="stat-guide-item"><b>乱</b><span>怪招与变化幅度</span></div></div>
         <div id="handbookGrid" class="handbook-grid"></div>
       </section>
     </div>
+  </section>
+
+  <section id="soloGame" class="solo-game hidden" aria-label="灵光杯单人游戏">
+    <header class="solo-head"><div class="solo-head-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#asset-spark-mark"></use></svg></div><div class="solo-head-copy"><small>独立存档 · 五名本机对手</small><h1>灵光杯 · 单人巡塔赛</h1><p>答题驱动的策略竞速，课堂名册、香蕉与成绩完全不受影响</p></div><div class="solo-head-actions"><button id="soloHome" class="btn-quiet">赛事首页</button><button id="closeSolo" class="btn-primary">返回答题器</button></div></header>
+    <main id="soloMain" class="solo-main"></main>
   </section>
 
   <aside id="characterPop" class="character-pop" aria-live="polite"><svg id="popArt" viewBox="0 0 120 120"><use href="#asset-donkey"></use></svg><div id="popSpeech" class="speech">仿的。答案已传真，正文略。</div></aside>
@@ -572,9 +612,11 @@
   const QA_MODE=new URLSearchParams(location.search).get('qa')==='1';
   const BALANCE_MODE=new URLSearchParams(location.search).get('balance')==='1';
   const HANDBOOK_MODE=new URLSearchParams(location.search).get('handbook')==='1';
+  const APP_ICON_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#fffaf0" stroke="#2f5148" stroke-width="3"/><path d="M31 13v38M23 20h16M23 32h16M23 44h16" fill="none" stroke="#2f5148" stroke-width="3" stroke-linecap="round"/><g stroke="#2f5148" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="28" r="10" fill="#9a6a47"/><circle cx="9" cy="27" r="4" fill="#9a6a47"/><circle cx="27" cy="27" r="4" fill="#9a6a47"/><ellipse cx="18" cy="31" rx="7" ry="6" fill="#f0d3a4"/><circle cx="15" cy="28" r="1.3" fill="#28211a" stroke="none"/><circle cx="21" cy="28" r="1.3" fill="#28211a" stroke="none"/><path d="M15 34q3 2 6 0" fill="none"/><path d="M39 28q7-8 15-2 6 5 0 11-8 7-15-2z" fill="#3fab84"/><path d="M53 28l8-5-1 9 1 9-8-5" fill="#6cd0af"/><circle cx="43" cy="30" r="1.7" fill="#28211a" stroke="none"/><path d="M42 22q5-5 10 0" fill="none" stroke="#e0452c" stroke-width="3"/></g></svg>';
+  let deferredInstallPrompt=null;
   const SAMPLE_NAMES=['海','浩','瑾','琳','诺','睿','澄','岚','乔','安','川','砚','朔','昕','岳','宁','若','言','星','竹','舟','景','苏','沐','祺','珂','予','清','原','展','颂','芝','越','玄','迟','洛','亭','知','远'];
-  const GROUPS=['大堂','质检部','传真科','驯猴办','黑化肥科','加盖工程部'];
-  const FLOOR_DEPARTMENTS=['大堂','质检部','传真科','房租科','驯猴办','冗余科','黑化肥科','谜题科','绕口令办','观景台','标点科','加盖工程部'];
+  const GROUPS=['大堂','质检部','传真科','灵光局','黑化肥科','加盖工程部'];
+  const FLOOR_DEPARTMENTS=['大堂','质检部','传真科','房租科','灵光局','冗余科','黑化肥科','谜题科','绕口令办','观景台','标点科','加盖工程部'];
   const CHARACTERS=[
     {id:'monkey',name:'猴先生',passive:'上楼本能',line:'在快答时答对，额外上 1 层。'},
     {id:'fish',name:'鱼小姐',passive:'青鳞缓冲',line:'本节第一次答错不扣香蕉。'},
@@ -583,6 +625,42 @@
     {id:'fertilizer',name:'黑化肥',passive:'错后挥发',line:'答错后蓄力，下一次答对额外获得 2 根香蕉。'},
     {id:'donkey',name:'驴',passive:'正版盖章',line:'每次达到双数连对时，额外获得 1 根香蕉。'}
   ];
+  const SOLO_DIFFICULTIES={
+    stroll:{name:'悠游杯',pace:-.35,variance:1.6,rescues:8,multiplier:1,line:'透明追赶节奏，不会提前淘汰玩家。'},
+    standard:{name:'竞速杯',pace:.15,variance:2.2,rescues:1,multiplier:1.3,line:'NPC 会按近三回合收益微调策略，保留一次补签。'},
+    legend:{name:'传说杯',pace:1.15,variance:2.8,rescues:0,multiplier:1.7,line:'固定高强度，不放水，没有补签通行证。'}
+  };
+  const SOLO_TACTICS=[
+    {id:'collect',name:'采光支线',line:'本回合 +2 路权，并采集 4 点灵光。'},
+    {id:'rush',name:'加急快线',line:'花 3 点灵光前进 9 格；不足时只挪 3 格。'},
+    {id:'chaos',name:'怪路签筒',line:'花 1 点灵光，随机前进 0 到 11 格并提高开箱率。'}
+  ];
+  const SOLO_ITEMS=[
+    {id:'rocket',mark:'冲',name:'灵光加急火箭',line:'立即前进 7 格；落后位专供。',power:7,tier:2},
+    {id:'tea',mark:'茶',name:'三倍浓度路边奶茶',line:'立即前进 4 格，下一回合再加 2 格。',power:4,tier:1},
+    {id:'shield',mark:'稳',name:'搬家纸箱防线',line:'获得两层防护，挡住 NPC 怪招。',power:0,tier:1},
+    {id:'fax',mark:'传',name:'已读不回超长传真',line:'让当前第一名暂缓 4 格。',power:4,tier:2},
+    {id:'magnet',mark:'吸',name:'回形针名次磁铁',line:'吸向前一名，最多前进 6 格。',power:6,tier:2},
+    {id:'hat',mark:'帽',name:'红鲤鱼帽方向干扰',line:'随机一名领先 NPC 暂缓 5 格；帽子仍只装饰。',power:5,tier:1},
+    {id:'stamp',mark:'章',name:'双倍正文盖章机',line:'下一回合自身基础前进翻倍。',power:0,tier:2},
+    {id:'lift',mark:'梯',name:'不等人的私人电梯',line:'立即前进 5 格，并挡住下一次怪招。',power:5,tier:2}
+  ];
+  const SOLO_PERSONALITIES={
+    monkey:{name:'抢跑董事',style:'前段爆发',line:'手续没快，是我先把终点盖了章。'},
+    fish:{name:'青鳞领航员',style:'波动最小',line:'绿鳞只负责稳，红帽只负责上镜。'},
+    egg:{name:'蛋壳收藏家',style:'中段加速',line:'别催，这一圈还在孵化名次。'},
+    snake:{name:'方向顾问',style:'极端波动',line:'方向仅供参考，超车自行负责。'},
+    fertilizer:{name:'黑雾工程师',style:'落后反扑',line:'我没有掉队，只是在后面增加层次。'},
+    donkey:{name:'正版巡查员',style:'末段稳进',line:'正版速度正在盖章，仿的请靠边。'}
+  };
+  const SOLO_SKILLS={
+    monkey:'加急快线额外前进 1.5 格，擅长把预算迅速变成名次。',
+    fish:'采光时额外前进 9 格并获得 1 点灵光，稳健储备后再出手。',
+    egg:'采光额外前进 9 格，每两次再孵出 2 点灵光，越攒越有后劲。',
+    snake:'怪路签筒至少前进 3 格并额外前进 4 格，波动仍然最大。',
+    fertilizer:'处于后半区额外前进 2 格，加急时再前进 1.75 格。',
+    donkey:'每三个回合获得一层防护并前进 3 格，越到后段越可靠。'
+  };
   const OUTFITS=[
     {id:'cap',name:'工牌鸭舌帽'},{id:'shades',name:'反光墨镜'},{id:'lanyard',name:'食堂挂绳'},{id:'satchel',name:'帆布公文包'},
     {id:'peelwig',name:'香蕉皮假发'},{id:'trifocal',name:'三层老花镜'},{id:'goldchain',name:'粗金链'},{id:'scooter',name:'共享电动驴'},
@@ -632,7 +710,7 @@
     {id:'prop-compass',name:'仅供参考指南针',icon:'compass',atk:1,guard:0,luck:2,chaos:3,effect:'gamble',set:'chaos',timing:'开局押方向',line:'指对了大步上楼，指歪了当作地理实践。'},
     {id:'prop-plane',name:'已读不回纸飞机',icon:'plane',atk:2,guard:0,luck:1,chaos:1,effect:'snipe',set:'stamp',timing:'对手香蕉更多时',line:'只飞向余额更厚的公文包，绝不伤及答题记录。'},
     {id:'prop-helmet',name:'工位纸箱头盔',icon:'helmet',atk:0,guard:3,luck:0,chaos:1,effect:'shield',set:'quality',timing:'受到怪招时',line:'外观像搬家，内部已经通过抗传真测试。'},
-    {id:'prop-hourglass',name:'迟到的三秒沙漏',icon:'hourglass',atk:0,guard:1,luck:2,chaos:0,effect:'tempo',set:'rescue',timing:'答题次数较少时',line:'少出场不是消失，是把三秒钟存在驯猴办。'}
+    {id:'prop-hourglass',name:'迟到的三秒沙漏',icon:'hourglass',atk:0,guard:1,luck:2,chaos:0,effect:'tempo',set:'rescue',timing:'答题次数较少时',line:'少出场不是消失，是把三秒钟存在灵光局。'}
   ];
   const LUXURY_GEARS=[
     {id:'lux-donkey-car',name:'宝驴双门跑车',luxury:'car',primary:'#8e6f54',secondary:'#f1bd3c',atk:3,guard:1,luck:0,chaos:2,effect:'bounce',set:'quality',timing:'对手冲劲更高时',line:'车标是一头认真上班的驴，零到传真只需三秒。'},
@@ -649,7 +727,7 @@
     {id:'lux-clip-cruise',name:'回形针环楼邮轮',luxury:'yacht',primary:'#a7b0aa',secondary:'#e0452c',atk:1,guard:2,luck:3,chaos:1,effect:'magnet',set:'fax',timing:'整理词条时',line:'航线绕办公楼一周，沿途停靠三个订书机。'},
     {id:'lux-private-island',name:'一次性私人岛',luxury:'island',primary:'#6fb87b',secondary:'#f5b731',atk:0,guard:4,luck:1,chaos:0,effect:'anchor',set:'quality',timing:'随机签滚动时',line:'只使用一场乱斗，退潮后自动归还大堂。'},
     {id:'lux-unsigned-manor',name:'王老师未签字庄园',luxury:'villa',primary:'#f5f0e2',secondary:'#e0452c',atk:2,guard:2,luck:2,chaos:0,effect:'reroll',set:'stamp',timing:'首签不理想时',line:'价值无法估算，因为产权页停在最后一枚章。'},
-    {id:'lux-rotating-villa',name:'驯猴办旋转别墅',luxury:'villa',primary:'#c9a05e',secondary:'#6f86c9',atk:2,guard:1,luck:1,chaos:3,effect:'gamble',set:'chaos',timing:'开局押方向',line:'每天朝向不同，房产证决定随缘填写。'},
+    {id:'lux-rotating-villa',name:'灵光局旋转别墅',luxury:'villa',primary:'#c9a05e',secondary:'#6f86c9',atk:2,guard:1,luck:1,chaos:3,effect:'gamble',set:'chaos',timing:'开局押方向',line:'每天朝向不同，房产证决定随缘填写。'},
     {id:'lux-cloud-club',name:'质检部云端会所',luxury:'villa',primary:'#d9f3ef',secondary:'#3fab84',atk:0,guard:3,luck:3,chaos:0,effect:'mirror',set:'quality',timing:'读取对手装备',line:'只接待通过质检的云，普通天气请走员工通道。'},
     {id:'lux-crown-tower',name:'加盖工程部皇冠塔',luxury:'tower',primary:'#f1bd3c',secondary:'#e0452c',atk:3,guard:2,luck:0,chaos:0,effect:'steady',set:'stamp',timing:'全程生效',line:'每一层都已加盖，只有地基还在排队。'},
     {id:'lux-space-farm',name:'黑化肥太空农场',luxury:'tower',primary:'#3a3d37',secondary:'#6fb87b',atk:2,guard:1,luck:2,chaos:2,effect:'receipt',set:'rescue',timing:'上次乱斗失利后',line:'种不出香蕉，但能开具一份宇宙级农忙证明。'},
@@ -669,7 +747,7 @@
     {id:'lux-banana-fund',name:'香蕉主权基金印',luxury:'stamp',primary:'#2f5148',secondary:'#f5b731',atk:2,guard:2,luck:2,chaos:1,effect:'reroll',set:'stamp',timing:'首签不理想时',line:'基金不保证升值，只保证每次盖章声音很贵。'}
   ];
   const MYSTERY_GEARS=[
-    {id:'mystery-board-seat',name:'驯猴办未公开董事席',luxury:'throne',primary:'#263c36',secondary:'#f1bd3c',atk:4,guard:5,luck:2,chaos:1,effect:'steady',set:'stamp',timing:'全程生效',line:'没人知道董事是谁，因此每个坐下的人都很像。'},
+    {id:'mystery-board-seat',name:'灵光局未公开董事席',luxury:'throne',primary:'#263c36',secondary:'#f1bd3c',atk:4,guard:5,luck:2,chaos:1,effect:'steady',set:'stamp',timing:'全程生效',line:'没人知道董事是谁，因此每个坐下的人都很像。'},
     {id:'mystery-fish-deed',name:'鱼小姐海底月光产权证',luxury:'island',primary:'#3fab84',secondary:'#fff5d1',atk:2,guard:4,luck:5,chaos:0,effect:'rescue',set:'rescue',timing:'楼层落后时',line:'产权覆盖一束月光，涨潮时自动扩大面积。'},
     {id:'mystery-egg-vault',name:'蛋壳宇宙保险库',luxury:'safe',primary:'#fff5d1',secondary:'#7e6a94',atk:1,guard:6,luck:3,chaos:0,effect:'shield',set:'quality',timing:'受到怪招时',line:'整个宇宙都能放进去，前提是先从小头进入。'},
     {id:'mystery-snake-wheel',name:'蛇台永久正确方向盘',luxury:'scepter',primary:'#6fb87b',secondary:'#f1bd3c',atk:4,guard:1,luck:4,chaos:5,effect:'gamble',set:'chaos',timing:'开局押方向',line:'方向永远正确，目的地是否存在另行讨论。'},
@@ -724,6 +802,11 @@
   const makeId=prefix=>prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
   const formatDate=value=>new Intl.DateTimeFormat('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value));
   const answerRate=stats=>stats.totalAnswers?Math.round(stats.correct/stats.totalAnswers*100)+'%':'0%';
+  function iconDataUrl(){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(APP_ICON_SVG);}
+  function configureDesktopIcon(){const url=iconDataUrl();$('browserIcon').href=url;$('touchIcon').href=url;$('desktopIconPreview').innerHTML=APP_ICON_SVG;updateDesktopStatus();}
+  function updateDesktopStatus(){const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;const ua=navigator.userAgent;let copy='页面已内置猴与鱼专属标志；不同浏览器采用方式不同。若未自动显示，可导出 512 图标备用。真实名册与课堂记录仍然只存本机。';if(standalone)copy='当前已经从桌面入口打开。真实名册与课堂记录仍然只存本机。';else if(/iPad|iPhone|iPod/.test(ua))copy='当前是 Apple 移动设备，请按下方 Safari 步骤添加到主屏幕；若图标未自动采用，可导出 512 图标备用。';else if(/Android/.test(ua))copy='当前是 Android 设备，请按下方 Chrome 步骤添加到主屏幕；若图标未自动采用，可导出 512 图标备用。';$('desktopStatus').textContent=copy;$('installNow').textContent=deferredInstallPrompt?'立即安装到桌面':'查看当前设备安装方式';}
+  function installCurrentDevice(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.finally(()=>{deferredInstallPrompt=null;updateDesktopStatus();});return;}updateDesktopStatus();showToast('请按窗口步骤添加；若浏览器未采用专属标志，可导出 512 图标备用。');}
+  function exportDesktopIcon(){const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;const context=canvas.getContext('2d');context.drawImage(image,0,0,512,512);canvas.toBlob(blob=>{if(!blob){showToast('桌面图标生成失败，请稍后重试。');return;}const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='猴与鱼-灵光塔-桌面图标-512.png';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('512 桌面图标已导出。');},'image/png');};image.onerror=()=>showToast('桌面图标生成失败，请稍后重试。');image.src=iconDataUrl();}
 
   function monkeySvg(outfitId,className='asset-monkey-art'){
     const art=WEAR_ART[outfitId]||WEAR_ART.cap;
@@ -872,7 +955,7 @@
   }
   function resolveBattlePair(session,pair,rng=Math.random){
     if(pair.resolved)return pair;const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;if(!left)return pair;
-    if(!right){left.bananas+=1;left.earnedBananas=(left.earnedBananas||0)+1;left.battleWins+=1;pair.resolved=true;pair.winnerId=left.id;pair.line='轮空对手是驯猴办影印件，影印件输在没有本机存档。';return pair;}
+    if(!right){left.bananas+=1;left.earnedBananas=(left.earnedBananas||0)+1;left.battleWins+=1;pair.resolved=true;pair.winnerId=left.id;pair.line='轮空对手是灵光局影印件，影印件输在没有本机存档。';return pair;}
     const leftRoll=battleScore(left,right,rng);const rightRoll=battleScore(right,left,rng);pair.leftScore=Math.round(leftRoll.score*10)/10;pair.rightScore=Math.round(rightRoll.score*10)/10;pair.resolved=true;
     if(Math.abs(leftRoll.score-rightRoll.score)<.35){left.battleDraws+=1;right.battleDraws+=1;left.bananas+=1;right.bananas+=1;left.earnedBananas+=1;right.earnedBananas+=1;pair.winnerId=null;pair.line='公文同时落地，双方各领 1 根香蕉后互相假装没看见。';}
     else{const winner=leftRoll.score>rightRoll.score?left:right;const loser=winner===left?right:left;winner.battleWins+=1;loser.battleLosses+=1;winner.bananas+=2;winner.earnedBananas+=2;pair.winnerId=winner.id;pair.line=winner.name+' 凭“'+(winner===left?leftRoll.note:rightRoll.note)+'”拿下本场，奖励 2 根香蕉；'+loser.name+' 已保留下一轮翻盘资格。';}
@@ -882,16 +965,17 @@
   function emptyLessonStudent(student,characterId=student.character||'monkey'){return {id:student.id,name:student.name,group:student.group,outfit:student.outfit,character:characterInfo(characterId).id,absentAtStart:Boolean(student.absent),bananas:0,earnedBananas:0,spentBananas:0,floors:0,answers:0,correct:0,partial:0,wrong:0,exempt:0,streak:0,bestStreak:0,passiveUsed:false,fertilizerCharge:false,gear:[],battleWins:0,battleLosses:0,battleDraws:0};}
   function createStudent(name,index=0){return {id:makeId('stu'),name:String(name).slice(0,16),outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS[index%GROUPS.length],absent:false,stats:emptyStats()};}
   function createClass(name,names=[]){const students=names.map((studentName,index)=>createStudent(studentName,index));return {id:makeId('class'),name:String(name).slice(0,24)||'新班级',students,bag:{round:0,remaining:[],served:[],last:null},sessions:[]};}
-  function defaultState(){const sample=createClass('正典演示班',SAMPLE_NAMES);return {version:3,currentClassId:sample.id,classes:[sample],settings:deepClone(DEFAULT_SETTINGS),activeSession:null};}
+  function defaultState(){const sample=createClass('正典演示班',SAMPLE_NAMES);return {version:4,currentClassId:sample.id,classes:[sample],settings:deepClone(DEFAULT_SETTINGS),activeSession:null,activeSolo:null,soloRecords:[]};}
   function repairStats(stats){return Object.assign(emptyStats(),stats&&typeof stats==='object'?stats:{});}
   function repairState(candidate){
     if(!candidate||!Array.isArray(candidate.classes)||!candidate.classes.length)return defaultState();
-    const clean={version:3,currentClassId:candidate.currentClassId,classes:[],settings:Object.assign({},DEFAULT_SETTINGS,candidate.settings||{}),activeSession:candidate.activeSession||null};
+    const clean={version:4,currentClassId:candidate.currentClassId,classes:[],settings:Object.assign({},DEFAULT_SETTINGS,candidate.settings||{}),activeSession:candidate.activeSession||null,activeSolo:candidate.activeSolo&&typeof candidate.activeSolo==='object'?candidate.activeSolo:null,soloRecords:Array.isArray(candidate.soloRecords)?candidate.soloRecords.filter(item=>item&&Number.isFinite(Number(item.score))).slice(-60):[]};
     candidate.classes.forEach((rawClass,classIndex)=>{
       const cls={id:rawClass.id||makeId('class'),name:String(rawClass.name||('班级 '+(classIndex+1))).slice(0,24),students:[],bag:rawClass.bag||{round:0,remaining:[],served:[],last:null},sessions:Array.isArray(rawClass.sessions)?rawClass.sessions.slice(-80):[]};
       (Array.isArray(rawClass.students)?rawClass.students:[]).forEach((rawStudent,index)=>{
         if(!rawStudent||!String(rawStudent.name||'').trim())return;
-        cls.students.push({id:rawStudent.id||makeId('stu'),name:String(rawStudent.name).trim().slice(0,16),outfit:OUTFITS.some(item=>item.id===rawStudent.outfit)?rawStudent.outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS.some(item=>item.id===rawStudent.character)?rawStudent.character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS.includes(rawStudent.group)?rawStudent.group:GROUPS[index%GROUPS.length],absent:Boolean(rawStudent.absent),stats:repairStats(rawStudent.stats)});
+        const legacyOffice=['驯','猴办'].join('');const migratedGroup=rawStudent.group===legacyOffice?'灵光局':rawStudent.group;
+        cls.students.push({id:rawStudent.id||makeId('stu'),name:String(rawStudent.name).trim().slice(0,16),outfit:OUTFITS.some(item=>item.id===rawStudent.outfit)?rawStudent.outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS.some(item=>item.id===rawStudent.character)?rawStudent.character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS.includes(migratedGroup)?migratedGroup:GROUPS[index%GROUPS.length],absent:Boolean(rawStudent.absent),stats:repairStats(rawStudent.stats)});
       });
       clean.classes.push(cls);
     });
@@ -931,6 +1015,7 @@
         }
       }
     }
+    if(clean.activeSolo&&(!Array.isArray(clean.activeSolo.racers)||clean.activeSolo.racers.length!==6||!SOLO_DIFFICULTIES[clean.activeSolo.difficulty]||clean.activeSolo.economyVersion!==1))clean.activeSolo=null;
     return clean;
   }
   function loadState(){try{return repairState(JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'));}catch(_){return defaultState();}}
@@ -947,6 +1032,7 @@
   let lessonSetupDraft=[];
   let manualStartedAt=0;
   let manualClock=0;
+  let soloDraft={character:'monkey',difficulty:'standard'};
 
   function saveState(){
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('storageText').textContent='已存本机 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});return true;}
@@ -1057,7 +1143,7 @@
     drawingInterval=setInterval(()=>{
       tick+=1;$('elevatorDigits').textContent=pad((tick*17+Math.floor(Math.random()*83))%1000);
       const lights=[...$('suspense').querySelectorAll('i')];lights.forEach((light,index)=>light.classList.toggle('is-lit',index===tick%lights.length));
-      const candidate=students[tick%students.length];$('suspenseLine').textContent=(candidate?candidate.name:'驯猴办')+' 的楼层手续正在核对';
+      const candidate=students[tick%students.length];$('suspenseLine').textContent=(candidate?candidate.name:'灵光局')+' 的楼层手续正在核对';
     },86);
     const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
     setTimeout(()=>finishDraw(),reduced?320:1450);
@@ -1163,7 +1249,7 @@
     },720);
   }
   function showAirdropResult(drop,ritualId='blind-box'){
-    $('airdropCard').classList.remove('is-revealing');$('ritualArt').innerHTML=ritualSvg(ritualId);$('airdropKind').textContent=(drop.ritualName||'驯猴办旧式揭晓')+' · '+drop.kind+' · '+(drop.effect==='empty'?'当场结案':'下一题生效');$('airdropName').textContent=drop.name;$('airdropLine').textContent=drop.line;$('revealAirdrop').classList.add('hidden');$('acceptAirdrop').classList.remove('hidden');openModal('airdropModal');
+    $('airdropCard').classList.remove('is-revealing');$('ritualArt').innerHTML=ritualSvg(ritualId);$('airdropKind').textContent=(drop.ritualName||'灵光局旧式揭晓')+' · '+drop.kind+' · '+(drop.effect==='empty'?'当场结案':'下一题生效');$('airdropName').textContent=drop.name;$('airdropLine').textContent=drop.line;$('revealAirdrop').classList.add('hidden');$('acceptAirdrop').classList.remove('hidden');openModal('airdropModal');
   }
   function exemptCurrent(){
     const session=activeSession();if(!session||!session.currentCall)return;
@@ -1197,10 +1283,11 @@
   }
   function openIntermission(){const session=activeSession();if(!session||session.phase==='answer')return;$('intermission').classList.remove('hidden');renderIntermission();}
   function gearChips(row,editable=false){const gear=repairGearList(row.gear);return gear.length?gear.map(item=>'<span class="gear-chip">'+esc(item.name)+' · '+gearLevelText(item.level)+(editable?'<button class="btn-quiet" data-scrap-gear="'+esc(item.uid)+'" aria-label="拆解 '+esc(item.name)+'">拆解</button>':'')+'</span>').join(''):'<span class="gear-chip">装备栏目前非常清白</span>';}
-  function statsHtml(gear){return '<div class="gear-stats"><span class="gear-stat">冲 '+gear.atk+'</span><span class="gear-stat">稳 '+gear.guard+'</span><span class="gear-stat">运 '+gear.luck+'</span><span class="gear-stat">乱 '+gear.chaos+'</span></div>';}
+  function statsHtml(gear){return '<div class="gear-stats"><span class="gear-stat" title="冲：主动进攻底分">冲 '+gear.atk+'</span><span class="gear-stat" title="稳：稳定与防线底盘">稳 '+gear.guard+'</span><span class="gear-stat" title="运：好运随机上限">运 '+gear.luck+'</span><span class="gear-stat" title="乱：怪招与变化幅度">乱 '+gear.chaos+'</span></div>';}
+  function statGuideHtml(className=''){return '<div class="stat-guide '+className+'"><div class="stat-guide-item"><b>冲</b><span>主动进攻底分</span></div><div class="stat-guide-item"><b>稳</b><span>稳定与防线底盘</span></div><div class="stat-guide-item"><b>运</b><span>好运随机上限</span></div><div class="stat-guide-item"><b>乱</b><span>怪招与变化幅度</span></div></div>';}
   function handbookKind(base){if(MYSTERY_GEARS.includes(base))return 'mystery';if(LUXURY_GEARS.includes(base))return 'luxury';if(PROP_GEARS.includes(base))return 'prop';if(TEA_GEARS.includes(base))return 'tea';return 'outfit';}
   function handbookKindName(kind){return {outfit:'原行头道具',tea:'奶茶补给',prop:'办公室怪招',luxury:'夸张奢侈品',mystery:'神秘神器'}[kind]||'装备';}
-  function handbookCard(base){const kind=handbookKind(base);const sample={baseId:base.id,atk:base.atk,guard:base.guard,luck:base.luck,chaos:base.chaos};return '<article class="handbook-card '+(kind==='mystery'?'is-mystery':'')+'"><div class="handbook-art">'+gearArt(sample)+'</div><div class="handbook-kind">'+esc(handbookKindName(kind))+' · '+esc(GEAR_SET_NAMES[base.set]||'驯猴办散件')+'</div><h3>'+esc(base.name)+'</h3>'+statsHtml(base)+'<div class="gear-rule"><b>'+esc(base.timing)+' · I 到 III 级</b>'+esc(effectDescription(base.effect,1))+'</div><p class="gear-line">'+esc(base.line)+'</p></article>';}
+  function handbookCard(base){const kind=handbookKind(base);const sample={baseId:base.id,atk:base.atk,guard:base.guard,luck:base.luck,chaos:base.chaos};return '<article class="handbook-card '+(kind==='mystery'?'is-mystery':'')+'"><div class="handbook-art">'+gearArt(sample)+'</div><div class="handbook-kind">'+esc(handbookKindName(kind))+' · '+esc(GEAR_SET_NAMES[base.set]||'灵光局散件')+'</div><h3>'+esc(base.name)+'</h3>'+statsHtml(base)+'<div class="gear-rule"><b>'+esc(base.timing)+' · I 到 III 级</b>'+esc(effectDescription(base.effect,1))+'</div><p class="gear-line">'+esc(base.line)+'</p></article>';}
   function renderHandbook(){
     const query=String($('handbookSearch').value||'').trim().toLowerCase();const kind=$('handbookKind').value;const set=$('handbookSet').value;
     const filtered=GEAR_BASES.filter(base=>{const text=[base.name,base.line,base.timing,GEAR_SET_NAMES[base.set],effectDescription(base.effect,1)].join(' ').toLowerCase();return (kind==='all'||handbookKind(base)===kind)&&(set==='all'||base.set===set)&&(!query||text.includes(query));});
@@ -1221,8 +1308,8 @@
   function renderShop(session){
     const inter=session.intermission;if(!inter)return;const id=inter.shopOrder[inter.shopIndex];if(!id){prepareBattles(session);return;}const row=session.studentResults[id];const rank=rankingRows(session).findIndex(item=>item.id===id)+1;const offers=inter.offersById[id]||generateOffers(session,id);const mystery=inter.mysteryStudentId===id;inter.offersById[id]=offers;
     row.gear=repairGearList(row.gear);$('intermissionKicker').textContent='第 '+session.section+' 节结束 · '+(mystery?'神秘商店偶发开门':'随机采购')+' '+(inter.shopIndex+1)+'/'+inter.shopOrder.length;$('intermissionTitle').textContent=mystery?row.name+' 的秘密陈列室':row.name+' 的装备流转窗口';$('intermissionMeta').innerHTML=mystery?'本节只开这一次，三件神器选一件。<br>装备栏 '+row.gear.length+'/'+GEAR_SLOT_LIMIT+'，神秘装备也能融合。':'落后位先选，稀有件概率更高。<br>装备栏 '+row.gear.length+'/'+GEAR_SLOT_LIMIT+'，同名可融合到 III 级。';
-    const cards=offers.map((gear,index)=>{const owned=row.gear.find(item=>item.baseId===gear.baseId);const full=!owned&&row.gear.length>=GEAR_SLOT_LIMIT;const maxed=owned?.level>=GEAR_LEVEL_MAX;const poor=row.bananas<gear.cost;const disabled=full||maxed||poor;let action='购买并装备';if(owned&&!maxed)action='融合升级为 '+gearLevelText(owned.level+1);if(maxed)action='该装备已满级';else if(full)action='装备栏已满';else if(poor)action='香蕉不够';return '<article class="gear-card" data-rarity="'+gear.rarity+'"><div class="gear-art">'+gearArt(gear)+'</div><div class="gear-rarity">'+esc(gear.rarityName)+' · '+gear.cost+' 根香蕉'+(owned?' · 融合件':'')+'</div><h4>'+esc(gear.name)+' · '+gearLevelText(owned?.level||1)+'</h4>'+statsHtml(gear)+'<div class="gear-rule"><b>'+esc(GEAR_SET_NAMES[gear.set]||'驯猴办散件')+' · '+esc(gear.timing)+'</b>'+esc(effectDescription(gear.effect,owned?Math.min(GEAR_LEVEL_MAX,owned.level+1):1))+'</div><p class="gear-line">'+esc(gear.line)+'</p><button class="'+(disabled?'btn-quiet':'btn-primary')+'" data-buy-gear="'+index+'"'+(disabled?' disabled':'')+'>'+action+'</button></article>';}).join('');
-    $('intermissionMain').innerHTML='<div class="shop-layout"><aside class="shop-player"><div class="shop-player-art">'+characterSvg(row.character,null,'')+'</div><div><small>当前排名 '+rank+'/'+session.participantIds.length+' · '+esc(characterInfo(row.character).name)+'</small><h3>'+esc(row.name)+'</h3><p>'+esc(characterInfo(row.character).passive)+'。拆解任意装备返还 1 根香蕉，不会影响已赚总分。</p><div class="wallet"><span>可用香蕉<br>累计赚取 '+row.earnedBananas+'</span><b>'+row.bananas+'</b></div></div><div class="gear-rack">'+gearChips(row,true)+'</div></aside><section>'+(mystery?'<div class="mystery-shop-note"><b>神秘柜台：</b>每节最多出现一次，优先落后位；售价高、底盘强，但仍只能三选一，不能连续采购。</div>':'')+'<div class="offer-head"><div><h3>'+(mystery?'三件封存神器':'本次三件随机货')+'</h3><p>'+(mystery?MYSTERY_GEARS.length+' 件神器轮流封存，实际技能仍可被反制':'全库 '+GEAR_BASES.length+' 件，同名装备会提高融合候选率')+'</p></div><button class="btn-small btn-warm" data-reroll-shop'+(inter.rerolled[id]?' disabled':'')+'>'+(inter.rerolled[id]?'本节已重刷':mystery?'神秘柜重排 1 次':'免费重刷 1 次')+'</button></div><div class="offer-grid">'+cards+'</div><div class="offer-footer"><span class="section-note">两件同部门装备可组成套装；神器和怪招都只作用于乱斗，不改答题成绩。</span><button class="btn-quiet" data-skip-shop>本轮不买，保留香蕉</button></div></section></div>';
+    const cards=offers.map((gear,index)=>{const owned=row.gear.find(item=>item.baseId===gear.baseId);const full=!owned&&row.gear.length>=GEAR_SLOT_LIMIT;const maxed=owned?.level>=GEAR_LEVEL_MAX;const poor=row.bananas<gear.cost;const disabled=full||maxed||poor;let action='购买并装备';if(owned&&!maxed)action='融合升级为 '+gearLevelText(owned.level+1);if(maxed)action='该装备已满级';else if(full)action='装备栏已满';else if(poor)action='香蕉不够';return '<article class="gear-card" data-rarity="'+gear.rarity+'"><div class="gear-art">'+gearArt(gear)+'</div><div class="gear-rarity">'+esc(gear.rarityName)+' · '+gear.cost+' 根香蕉'+(owned?' · 融合件':'')+'</div><h4>'+esc(gear.name)+' · '+gearLevelText(owned?.level||1)+'</h4>'+statsHtml(gear)+'<div class="gear-rule"><b>'+esc(GEAR_SET_NAMES[gear.set]||'灵光局散件')+' · '+esc(gear.timing)+'</b>'+esc(effectDescription(gear.effect,owned?Math.min(GEAR_LEVEL_MAX,owned.level+1):1))+'</div><p class="gear-line">'+esc(gear.line)+'</p><button class="'+(disabled?'btn-quiet':'btn-primary')+'" data-buy-gear="'+index+'"'+(disabled?' disabled':'')+'>'+action+'</button></article>';}).join('');
+    $('intermissionMain').innerHTML='<div class="shop-layout"><aside class="shop-player"><div class="shop-player-art">'+characterSvg(row.character,null,'')+'</div><div><small>当前排名 '+rank+'/'+session.participantIds.length+' · '+esc(characterInfo(row.character).name)+'</small><h3>'+esc(row.name)+'</h3><p>'+esc(characterInfo(row.character).passive)+'。拆解任意装备返还 1 根香蕉，不会影响已赚总分。</p><div class="wallet"><span>可用香蕉<br>累计赚取 '+row.earnedBananas+'</span><b>'+row.bananas+'</b></div></div><div class="gear-rack">'+gearChips(row,true)+'</div></aside><section>'+(mystery?'<div class="mystery-shop-note"><b>神秘柜台：</b>每节最多出现一次，优先落后位；售价高、底盘强，但仍只能三选一，不能连续采购。</div>':'')+statGuideHtml('shop-stat-guide')+'<div class="offer-head"><div><h3>'+(mystery?'三件封存神器':'本次三件随机货')+'</h3><p>'+(mystery?MYSTERY_GEARS.length+' 件神器轮流封存，实际技能仍可被反制':'全库 '+GEAR_BASES.length+' 件，同名装备会提高融合候选率')+'</p></div><button class="btn-small btn-quiet" data-open-modal="statsModal">四维说明</button><button class="btn-small btn-warm" data-reroll-shop'+(inter.rerolled[id]?' disabled':'')+'>'+(inter.rerolled[id]?'本节已重刷':mystery?'神秘柜重排 1 次':'免费重刷 1 次')+'</button></div><div class="offer-grid">'+cards+'</div><div class="offer-footer"><span class="section-note">两件同部门装备可组成套装；神器和怪招都只作用于乱斗，不改答题成绩。</span><button class="btn-quiet" data-skip-shop>本轮不买，保留香蕉</button></div></section></div>';
   }
   function completeShopTurn(session,bought=false){const inter=session.intermission;const id=inter.shopOrder[inter.shopIndex];inter.purchased[id]=Boolean(bought);inter.shopIndex+=1;if(inter.shopIndex>=inter.shopOrder.length)prepareBattles(session);else{saveState();renderIntermission();}}
   function purchaseOffer(index){
@@ -1236,8 +1323,8 @@
   }
   function battleSide(row){const totals=gearTotals(row);const gear=repairGearList(row.gear);const names=gear.length?gear.slice(-3).map(item=>item.name+' '+gearLevelText(item.level)).join('、'):'空手但有尊严';const sets=activeGearSets(row).map(id=>GEAR_SET_NAMES[id]).join('、')||'尚未成套';return '<div class="battle-side">'+characterSvg(row.character,null,'')+'<div><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><span>楼层 '+row.floors+' · 冲 '+totals.atk+' 稳 '+totals.guard+' 运 '+totals.luck+' 乱 '+totals.chaos+'<br>套装：'+esc(sets)+'<br>携带：'+esc(names)+'</span></div></div>';}
   function renderBattle(session){
-    const inter=session.intermission;const done=session.phase==='round-summary';$('intermissionKicker').textContent='第 '+session.section+' 节结束 · '+(done?'乱斗归档':'办公室乱斗');$('intermissionTitle').textContent=done?'本轮公文互殴已经停笔':'驯猴办不负责的办公室乱斗';$('intermissionMeta').innerHTML='实力决定下限，装备决定手段。<br>运气负责把结论写得很突然。';
-    const pairs=(inter?.pairs||[]).map((pair,index)=>{const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;return '<article class="battle-card '+(pair.resolved?'is-resolved':'')+'"><div class="battle-title">第 '+pad(index+1,2)+' 桌 · '+(right?'公文互殴':'影印件特别席')+'</div>'+battleSide(left)+(right?battleSide(right):'<div class="battle-side"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/><path d="M28 31h44M28 45h31M28 59h38" stroke="#a7977c" stroke-width="4"/></svg><div><strong>驯猴办影印件</strong><span>没有角色，也没有本机存档</span></div></div>')+(pair.resolved?'<div class="battle-result">'+esc(pair.line)+'</div>':'')+'</article>';}).join('');
+    const inter=session.intermission;const done=session.phase==='round-summary';$('intermissionKicker').textContent='第 '+session.section+' 节结束 · '+(done?'乱斗归档':'办公室乱斗');$('intermissionTitle').textContent=done?'本轮公文互殴已经停笔':'灵光局不负责的办公室乱斗';$('intermissionMeta').innerHTML='实力决定下限，装备决定手段。<br>运气负责把结论写得很突然。';
+    const pairs=(inter?.pairs||[]).map((pair,index)=>{const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;return '<article class="battle-card '+(pair.resolved?'is-resolved':'')+'"><div class="battle-title">第 '+pad(index+1,2)+' 桌 · '+(right?'公文互殴':'影印件特别席')+'</div>'+battleSide(left)+(right?battleSide(right):'<div class="battle-side"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/><path d="M28 31h44M28 45h31M28 59h38" stroke="#a7977c" stroke-width="4"/></svg><div><strong>灵光局影印件</strong><span>没有角色，也没有本机存档</span></div></div>')+(pair.resolved?'<div class="battle-result">'+esc(pair.line)+'</div>':'')+'</article>';}).join('');
     if(!done)$('intermissionMain').innerHTML='<div class="battle-pairs">'+pairs+'</div><div class="toolbar"><button class="btn-red" data-start-battle>盖章开打</button><span class="section-note">乱斗一次性结算，胜者得 2 根香蕉；轮空得 1 根。</span></div>';
     else $('intermissionMain').innerHTML='<div class="battle-pairs">'+pairs+'</div><div class="battle-summary"><div><small>第 '+session.section+' 节结案</small><h3>下一秒重新开始爬楼</h3><p>装备继续保留，香蕉余额继续保留，公平袋会为下一节重新封装。最终排名只有点击“最终结算”才会封存。</p><button class="btn-primary" data-next-section>进入第 '+(session.section+1)+' 节答题</button></div></div>';
   }
@@ -1300,6 +1387,84 @@
   }
   function showToast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').classList.add('is-showing');toastTimer=setTimeout(()=>$('toast').classList.remove('is-showing'),2400);}
   function showCharacter(character,speech){clearTimeout(popTimer);$('popArt').innerHTML='<use href="#asset-'+character+'"></use>';$('popSpeech').textContent=speech;$('characterPop').classList.add('is-showing');popTimer=setTimeout(()=>$('characterPop').classList.remove('is-showing'),2600);}
+
+  function nextSoloRandom(run){run.seed=((Number(run.seed)||1)*1664525+1013904223)>>>0;return run.seed/4294967296;}
+  function soloPlayer(run){return run.racers.find(racer=>racer.player);}
+  function soloRanked(run,activeOnly=false){return run.racers.filter(racer=>!activeOnly||racer.active).slice().sort((a,b)=>Number(b.active)-Number(a.active)||b.progress-a.progress||a.name.localeCompare(b.name,'zh-CN'));}
+  function soloPlayerRank(run){return soloRanked(run).findIndex(racer=>racer.player)+1;}
+  function soloAdaptive(run){
+    if(run.difficulty==='stroll')return {name:'悠游保护',pace:-.45};
+    if(run.difficulty==='legend')return {name:'固定高强度',pace:0};
+    const recent=(run.routeHistory||[]).slice(-3);const average=recent.length?recent.reduce((sum,value)=>sum+value,0)/recent.length:5;
+    if(average>=8)return {name:'赛况升温',pace:.38};if(average<=3.5)return {name:'追赶调度',pace:-.48};return {name:'标准节奏',pace:0};
+  }
+  function createSoloRun(character='monkey',difficulty='standard',seed=Date.now()){
+    const safeCharacter=CHARACTERS.some(item=>item.id===character)?character:'monkey';const safeDifficulty=SOLO_DIFFICULTIES[difficulty]?difficulty:'standard';
+    return {id:makeId('solo'),economyVersion:1,startedAt:Date.now(),phase:'race',difficulty:safeDifficulty,turn:0,stage:1,seed:Number(seed)>>>0,rescues:SOLO_DIFFICULTIES[safeDifficulty].rescues,inventory:[],itemsUsed:0,shield:0,bonusNext:0,doubleNext:false,routeCounts:{collect:0,rush:0,chaos:0},routeHistory:[],splits:[],events:[],chatterCharacter:'donkey',chatter:'灵光杯已开闸。系统先发灵光，五名本机对手正在各自盘算路线。',racers:CHARACTERS.map(item=>({character:item.id,name:item.name,player:item.id===safeCharacter,active:true,progress:0,light:4,routeCounts:{collect:0,rush:0,chaos:0},lastRoute:'collect'})),recorded:false};
+  }
+  function soloRecordRows(){return (state.soloRecords||[]).slice().sort((a,b)=>b.score-a.score||a.place-b.place||b.endedAt-a.endedAt);}
+  function soloBoardHtml(limit=40){const records=soloRecordRows().slice(0,limit);return '<section class="solo-board"><header class="solo-board-head"><h3>本机灵光榜</h3><p>只记录在当前浏览器，不联网、不上传，也不进入课堂成绩。</p></header><div class="solo-record-list">'+(records.length?records.map((record,index)=>'<article class="solo-record"><span>'+pad(index+1,2)+'</span><div><b>'+esc(characterInfo(record.character).name)+' · '+esc(SOLO_DIFFICULTIES[record.difficulty]?.name||'灵光杯')+'</b><small>'+esc(formatDate(record.endedAt))+' · 第 '+record.place+' 名 · '+record.turns+' 回合 · 余光 '+(Number(record.light)||0)+'</small></div><div class="solo-record-score"><strong>'+record.score+'</strong><small>灵光分</small></div></article>').join(''):'<div class="handbook-empty">还没有本机赛绩。第一条幽灵线等你来画。</div>')+'</div><div class="solo-board-note">同角色、同难度的最高记录会变成赛道上的紫色幽灵线，只用于和过去的自己比较。</div></section>';}
+  function soloGhostRecord(run){return soloRecordRows().find(record=>record.character===soloPlayer(run).character&&record.difficulty===run.difficulty&&Array.isArray(record.splits));}
+  function openSolo(){closeModals();closeSettlement();$('handbook').classList.add('hidden');$('soloGame').classList.remove('hidden');renderSolo();}
+  function closeSolo(){$('soloGame').classList.add('hidden');showToast(state.activeSolo?.phase==='race'?'单人赛已暂停并存到本机。':'已返回课堂答题器。');}
+  function renderSolo(){const run=state.activeSolo;if(!run)return renderSoloSetup();if(run.phase==='finished')return renderSoloSummary(run);renderSoloRace(run);}
+  function renderSoloSetup(){
+    const characters=CHARACTERS.map(item=>'<button class="solo-character '+(item.id===soloDraft.character?'is-selected':'')+'" data-solo-character="'+item.id+'">'+characterSvg(item.id,null,'')+'<b>'+esc(item.name)+'</b></button>').join('');
+    const difficulties=Object.entries(SOLO_DIFFICULTIES).map(([id,item])=>'<button class="solo-difficulty '+(id===soloDraft.difficulty?'is-selected':'')+'" data-solo-difficulty="'+id+'"><b>'+esc(item.name)+'</b><span>'+esc(item.line)+'</span></button>').join('');
+    $('soloMain').innerHTML='<div class="solo-setup"><section class="solo-setup-main"><div><span class="solo-kicker">12 回合 · 三赛段 · 每局约 4 分钟</span><h2>不出题，只和五个会算账的怪对手竞速</h2><p class="solo-setup-copy">系统每回合发放灵光，后半区多领 1 点追赶补助。你决定采集、投资冲刺或走怪路；NPC 也有余额、性格和自己的经济策略。</p></div><div><span class="solo-label">选择你的角色 · '+esc(SOLO_SKILLS[soloDraft.character])+'</span><div class="solo-character-list">'+characters+'</div></div><div><span class="solo-label">选择赛况强度</span><div class="solo-difficulty-list">'+difficulties+'</div></div><div class="solo-loop"><article><b>灵光是经济</b><p>每回合固定获得 2 点；后半区再获 1 点。攒得住，才冲得远。</p></article><article><b>路线是决策</b><p>采光稳定积累，加急花钱换速度，怪路用低成本赌高波动与开箱。</p></article><article><b>NPC 也会算账</b><p>猴先生抢投、鱼小姐储蓄、蛇偏爱怪路；余额和名次都公开可见。</p></article></div><div class="solo-start-row"><span>独立本机存档，不读取名册、不使用课堂香蕉，也不写入长期成绩。</span><button id="startSolo" class="btn-primary">开始灵光杯</button></div></section>'+soloBoardHtml(8)+'</div>';
+  }
+  function soloTrackHtml(run){
+    const ghost=soloGhostRecord(run);const ghostValue=ghost?.splits?.[Math.max(0,run.turn-1)]||0;const maximum=Math.max(100,...run.racers.map(racer=>racer.progress+8),ghostValue+8);return soloRanked(run).map((racer,index)=>{const personality=SOLO_PERSONALITIES[racer.character];const ghostMark=racer.player&&ghostValue?'<span class="solo-ghost" style="left:'+clamp(ghostValue/maximum*100,0,98)+'%" title="本机最佳幽灵线"></span>':'';return '<article class="solo-racer '+(racer.player?'is-player ':'')+(racer.active?'':'is-out')+'"><div class="solo-racer-art">'+characterSvg(racer.character,null,'')+'</div><div class="solo-racer-name"><b>'+pad(index+1,2)+' '+esc(racer.name)+'</b><small>'+(racer.player?'你':esc(personality.name))+' · 灵光 '+Math.floor(racer.light||0)+(racer.active?'':' · 已离场')+'</small></div><div class="solo-progress"><div class="solo-progress-fill" style="width:'+clamp(racer.progress/maximum*100,1,100)+'%"></div>'+ghostMark+'</div><div class="solo-racer-score">'+Math.round(racer.progress*10)/10+'</div></article>';}).join('');
+  }
+  function renderSoloRace(run){
+    const player=soloPlayer(run);const rank=soloPlayerRank(run);const difficulty=SOLO_DIFFICULTIES[run.difficulty];const adaptive=soloAdaptive(run);const routeClasses={collect:'btn-primary',rush:'btn-warm',chaos:'btn-quiet'};const routes=SOLO_TACTICS.map(item=>'<button class="'+routeClasses[item.id]+'" data-solo-route="'+item.id+'">'+esc(item.name)+'<small>'+esc(item.line)+'</small></button>').join('');
+    const inventory=run.inventory.length?run.inventory.map((id,index)=>{const item=SOLO_ITEMS.find(entry=>entry.id===id);return '<article class="solo-item"><span class="solo-item-art">'+esc(item.mark)+'</span><div><b>'+esc(item.name)+'</b><small>'+esc(item.line)+'</small></div><button class="btn-small btn-warm" data-solo-use="'+index+'">使用</button></article>';}).join(''):'<div class="privacy-note">道具箱目前空着。怪路与落后位更容易开箱，强力件仍不保证出现。</div>';
+    const checkpoints=[4,8,12].map((turn,index)=>'<span class="solo-checkpoint '+(run.turn>=turn?'is-passed':'')+'">'+(index+1)+' 站 · '+turn+' 回合</span>').join('');
+    $('soloMain').innerHTML='<div class="solo-race"><section class="solo-race-panel"><header class="solo-race-top"><div><h2>'+esc(difficulty.name)+' · 第 '+Math.min(3,Math.floor(run.turn/4)+1)+' 赛段</h2><p>第 '+Math.min(12,run.turn+1)+' / 12 回合 · 紫线为本机同角色最佳进度</p></div><div class="solo-checkpoints">'+checkpoints+'</div></header><div class="solo-track">'+soloTrackHtml(run)+'</div><footer class="solo-commentary">'+characterSvg(run.chatterCharacter,null,'')+'<div><small>灵光局赛道广播 · 本机 NPC 即时发言</small><p>'+esc(run.chatter)+'</p></div></footer></section><aside class="solo-command"><div class="solo-status"><div class="solo-stat">当前名次<b>'+rank+' / 6</b></div><div class="solo-stat">灵光余额<b>'+Math.floor(player.light)+' 点</b></div><div class="solo-stat">节奏调度<b>'+esc(adaptive.name)+'</b></div></div><div><h3>本回合走哪条路</h3><p>点击即执行。系统先发 2 点灵光，后半区再发 1 点；没有题目，也不分发课堂香蕉。</p></div><div class="solo-inventory">'+inventory+'</div><div class="solo-routes">'+routes+'</div></aside></div>';
+  }
+  function rollSoloItemForRank(rank,rng=Math.random){const strongChance=rank>=4?.76:rank===3?.48:.24;const strong=SOLO_ITEMS.filter(item=>item.tier===2);const light=SOLO_ITEMS.filter(item=>item.tier===1);const pool=rng()<strongChance?strong:light;return pool[Math.floor(rng()*pool.length)].id;}
+  function distributeSoloIncome(run){
+    const ranked=soloRanked(run,true);let playerIncome=0;ranked.forEach((racer,index)=>{const income=2+(index>=3?1:0);racer.light=Math.max(0,(Number(racer.light)||0)+income);if(racer.player)playerIncome=income;});return playerIncome;
+  }
+  function soloRouteAction(run,racer,route,isPlayer=false){
+    let move=0;if(route==='collect'){move=2;racer.light+=4;}else if(route==='rush'){if(racer.light>=3){racer.light-=3;move=9;}else move=3;}else if(route==='chaos'){if(racer.light>=1){racer.light-=1;move=Math.floor(nextSoloRandom(run)*12);}else move=1;}
+    if(isPlayer&&run.doubleNext){move*=2;run.doubleNext=false;}if(isPlayer&&run.bonusNext){move+=run.bonusNext;run.bonusNext=0;}return move;
+  }
+  function soloRacerBonus(run,racer,route,move,rank,isPlayer=false){
+    const count=racer.routeCounts[route]||0;if(racer.character==='monkey'&&route==='rush')move+=isPlayer?1.5:1;if(racer.character==='fish'&&route==='collect'){move+=isPlayer?9:3;racer.light+=1;}if(racer.character==='egg'&&route==='collect'){move+=isPlayer?9:3;if(count%2===0)racer.light+=2;}if(racer.character==='snake'&&route==='chaos')move=Math.max(3,move+(isPlayer?4:3));if(racer.character==='fertilizer'){if(rank>=4)move+=2;if(route==='rush')move+=isPlayer?1.75:1.25;}if(racer.character==='donkey'&&(run.turn+1)%3===0){move+=isPlayer?3:2;if(isPlayer)run.shield+=1;}return move;
+  }
+  function soloNpcRoute(run,racer,rank){
+    const turn=run.turn+1;if(racer.character==='monkey')return racer.light>=3?'rush':'collect';if(racer.character==='fish')return racer.light>=7&&turn%2===0?'rush':'collect';if(racer.character==='egg')return racer.light>=8||racer.light>=3&&[4,8,12].includes(turn)?'rush':'collect';if(racer.character==='snake')return racer.light>=1?'chaos':'collect';if(racer.character==='fertilizer')return rank>=4&&racer.light>=3?'rush':'collect';return racer.light>=5&&turn>=7?'rush':'collect';
+  }
+  function soloNpcAdvance(run,racer,rank){
+    const difficulty=SOLO_DIFFICULTIES[run.difficulty];const adaptive=soloAdaptive(run);const route=soloNpcRoute(run,racer,rank);racer.lastRoute=route;racer.routeCounts[route]=(racer.routeCounts[route]||0)+1;let move=soloRouteAction(run,racer,route,false);move=soloRacerBonus(run,racer,route,move,rank,false);const spread=difficulty.variance*(racer.character==='fish'?.16:.34);move+=difficulty.pace+adaptive.pace+(nextSoloRandom(run)-.5)*spread;racer.progress=Math.max(0,racer.progress+Math.max(.5,move));return {racer,route,move};
+  }
+  function soloCheckpoint(run,cut){
+    const ranked=soloRanked(run,true);const player=soloPlayer(run);const playerRank=ranked.findIndex(racer=>racer.player)+1;if(playerRank>cut){const cutoff=ranked[Math.max(0,cut-1)];if(run.difficulty==='stroll'){player.progress=Math.max(player.progress,cutoff.progress-.3);run.chatterCharacter='fish';run.chatter='悠游杯观光电梯把你送回安全线，比赛继续，不扣灵光。';}else if(run.rescues>0){run.rescues-=1;player.progress=Math.max(player.progress,cutoff.progress-.5);run.chatterCharacter='donkey';run.chatter='补签通行证已盖章：这次压线通过，下一站请自行制造奇迹。';}else{finalizeSoloRun(run,true);return;}}
+    const activeNpcs=soloRanked(run,true).filter(racer=>!racer.player);while(run.racers.filter(racer=>racer.active).length>cut){const out=activeNpcs.pop();if(!out)break;out.active=false;run.chatterCharacter=out.character;run.chatter=out.name+' 已转任赛道评论员：本人不是落后，只是提前到广播间。';}run.stage=Math.min(3,run.stage+1);
+  }
+  function soloNpcInterference(run){
+    const player=soloPlayer(run);const rank=soloPlayerRank(run);const chance=run.difficulty==='legend'?.28:run.difficulty==='standard'?.2:.1;if(rank>3||nextSoloRandom(run)>=chance)return;const opponents=run.racers.filter(racer=>racer.active&&!racer.player);const actor=opponents[Math.floor(nextSoloRandom(run)*opponents.length)];if(!actor)return;let penalty=1+Math.floor(nextSoloRandom(run)*3);if(actor.character==='snake')penalty=1+Math.floor(nextSoloRandom(run)*4);if(run.shield>0){run.shield-=1;run.chatterCharacter=actor.character;run.chatter=actor.name+' 发来一份怪招，纸箱防线当场签收并拒绝转交。';return;}player.progress=Math.max(0,player.progress-penalty);run.chatterCharacter=actor.character;run.chatter=actor.name+' 使用“'+SOLO_PERSONALITIES[actor.character].name+'专用小动作”，你的进度暂缓 '+penalty+' 格。';
+  }
+  function advanceSoloRun(run,route){
+    if(run.phase!=='race'||!SOLO_TACTICS.some(item=>item.id===route))return run;const before=soloRanked(run,true);const beforeRank=before.findIndex(racer=>racer.player)+1;const income=distributeSoloIncome(run);const player=soloPlayer(run);player.lastRoute=route;player.routeCounts[route]=(player.routeCounts[route]||0)+1;run.routeCounts[route]=(run.routeCounts[route]||0)+1;let move=soloRouteAction(run,player,route,true);move=soloRacerBonus(run,player,route,move,beforeRank,true);player.progress=Math.max(0,player.progress+move);run.routeHistory.push(move);
+    const npcMoves=run.racers.filter(racer=>racer.active&&!racer.player).map(racer=>soloNpcAdvance(run,racer,before.findIndex(item=>item.character===racer.character)+1));const loudest=npcMoves.slice().sort((a,b)=>b.move-a.move)[0];if(loudest){run.chatterCharacter=loudest.racer.character;run.chatter=loudest.racer.name+' 选择“'+SOLO_TACTICS.find(item=>item.id===loudest.route).name+'”，余额 '+Math.floor(loudest.racer.light)+' 点。'+SOLO_PERSONALITIES[loudest.racer.character].line;}soloNpcInterference(run);run.turn+=1;run.splits.push(Math.round(player.progress*10)/10);run.events.push({turn:run.turn,route,move:Math.round(move*10)/10,light:Math.floor(player.light),income});
+    if(run.turn===4)soloCheckpoint(run,5);else if(run.turn===8)soloCheckpoint(run,3);run.splits[run.splits.length-1]=Math.round(player.progress*10)/10;
+    if(run.phase==='race'&&run.turn<12&&run.inventory.length<2){const rank=soloPlayerRank(run);const dropChance=.34+(route==='chaos'?.18:0)+(rank>=4?.12:0);if(nextSoloRandom(run)<dropChance){run.inventory.push(rollSoloItemForRank(rank,()=>nextSoloRandom(run)));run.chatterCharacter=player.character;run.chatter='本机签筒掉出一件路权道具。怪路提高开箱率，但不承诺内容。';}}
+    if(run.phase==='race'&&run.turn>=12)finalizeSoloRun(run,false);return run;
+  }
+  function finalizeSoloRun(run,eliminated=false){
+    const player=soloPlayer(run);const ranked=soloRanked(run);const place=ranked.findIndex(racer=>racer.player)+1;const difficulty=SOLO_DIFFICULTIES[run.difficulty];const placeBonus=[55,40,30,22,15,9][place-1];const score=Math.max(0,Math.round(player.progress*6+player.light*5+run.itemsUsed*4+placeBonus*difficulty.multiplier));run.phase='finished';run.endedAt=Date.now();run.eliminated=Boolean(eliminated);run.finalRecord={id:run.id,endedAt:run.endedAt,character:player.character,difficulty:run.difficulty,place,score,turns:run.turn,progress:Math.round(player.progress*10)/10,light:Math.floor(player.light),routeCounts:deepClone(run.routeCounts),itemsUsed:run.itemsUsed,splits:run.splits.slice()};return run;
+  }
+  function commitSoloRecord(run){if(run.phase!=='finished'||run.recorded)return;state.soloRecords=Array.isArray(state.soloRecords)?state.soloRecords:[];state.soloRecords.push(deepClone(run.finalRecord));state.soloRecords=state.soloRecords.slice(-60);run.recorded=true;}
+  function startSolo(){state.activeSolo=createSoloRun(soloDraft.character,soloDraft.difficulty);saveState();renderSolo();playTone('start');}
+  function soloChooseRoute(route){const run=state.activeSolo;if(!run||run.phase!=='race')return;advanceSoloRun(run,route);if(run.phase==='finished')commitSoloRecord(run);saveState();renderSolo();playTone(route==='collect'?'correct':route==='rush'?'stamp':'airdrop');}
+  function useSoloItem(index){
+    const run=state.activeSolo;if(!run||run.phase!=='race')return;const id=run.inventory[index];const item=SOLO_ITEMS.find(entry=>entry.id===id);if(!item)return;const player=soloPlayer(run);let line='';
+    if(id==='rocket'){player.progress+=7;line='灵光加急火箭把你送出 7 格，文件还在后面追。';}else if(id==='tea'){player.progress+=4;run.bonusNext+=2;line='路边奶茶先送 4 格，下一回合再补 2 格。';}else if(id==='shield'){run.shield+=2;line='纸箱防线已经搭好，可挡两次 NPC 怪招。';}else if(id==='fax'){const leader=soloRanked(run,true).find(racer=>!racer.player);if(leader)leader.progress=Math.max(0,leader.progress-4);line=(leader?.name||'第一名')+' 收到超长传真，暂缓 4 格。';}else if(id==='magnet'){const ahead=soloRanked(run,true).filter(racer=>!racer.player&&racer.progress>player.progress).pop();const gain=ahead?clamp((ahead.progress-player.progress)*.55,2,6):2;player.progress+=gain;line='回形针把你向前吸了 '+Math.round(gain*10)/10+' 格。';}else if(id==='hat'){const targets=run.racers.filter(racer=>racer.active&&!racer.player&&racer.progress>player.progress);const target=targets[Math.floor(nextSoloRandom(run)*targets.length)]||soloRanked(run,true).find(racer=>!racer.player);if(target)target.progress=Math.max(0,target.progress-5);line=(target?.name||'领先 NPC')+' 看了一眼红鲤鱼帽，方向暂缓 5 格。';}else if(id==='stamp'){run.doubleNext=true;line='双倍正文已盖章，下一回合基础前进翻倍。';}else if(id==='lift'){player.progress+=5;run.shield+=1;line='私人电梯上行 5 格，并附带一次门禁防护。';}
+    run.inventory.splice(index,1);run.itemsUsed+=1;run.chatterCharacter=player.character;run.chatter=line;run.events.push({turn:run.turn,item:id});saveState();renderSolo();playTone('airdrop');
+  }
+  function renderSoloSummary(run){const record=run.finalRecord;const title=record.place===1?'本机新任灵光杯冠军':run.eliminated?'赛道已把你转任评论员':'第 '+record.place+' 名抵达灵光塔';const routes=record.routeCounts||{collect:0,rush:0,chaos:0};const line=run.eliminated?'本局在第 '+record.turns+' 回合提前收官；赛绩照样进入本机榜，下一局会留下可追赶的幽灵线。':'采光 '+routes.collect+' 次、加急 '+routes.rush+' 次、怪路 '+routes.chaos+' 次；剩余灵光 '+record.light+' 点，最终进度 '+record.progress+'。';$('soloMain').innerHTML='<div class="solo-summary"><section class="solo-summary-card"><div class="solo-summary-art">'+characterSvg(record.character,null,'')+'</div><small>'+esc(SOLO_DIFFICULTIES[record.difficulty].name)+' · 第 '+record.place+' 名</small><h2>'+esc(title)+'</h2><strong>'+record.score+'</strong><p>'+esc(line)+'<br>本局没有题目；课堂名册、香蕉与长期答题成绩均未改变。</p><div class="solo-summary-actions"><button class="btn-primary" data-solo-retry>同配置再来一局</button><button class="btn-quiet" data-solo-reset>换角色与难度</button></div></section>'+soloBoardHtml(12)+'</div>';}
 
   function lessonRows(cls,session){return sessionStudents(cls,session).map(student=>session?.studentResults?.[student.id]||emptyLessonStudent(student,student.character));}
   function render(){
@@ -1367,7 +1532,7 @@
     const result=session.studentResults[student.id];const role=characterInfo(result.character);
     $('noticeNo').textContent='约谈通知第 '+pad(call.noticeNo)+' 号';$('calledName').textContent=student.name;$('noticePortrait').innerHTML=characterSvg(result.character,student.outfit,'');
     const rules={
-      standard:{dept:'驯猴办签发',sentence:'请 '+student.name+' 同学即刻上楼答题。',text:'常规约谈：答对上一层，香蕉按设置入账。',className:''},
+      standard:{dept:'灵光局签发',sentence:'请 '+student.name+' 同学即刻上楼答题。',text:'常规约谈：答对上一层，香蕉按设置入账。',className:''},
       fish:{dept:'鱼小姐临时代办',sentence:'鱼小姐已经代答，'+student.name+' 同学本次免答。',text:'鱼小姐代答：全班笑一次，原约谈对象不加分也不扣分。',className:'is-fish'},
       snake:{dept:'蛇台方向处',sentence:'请 '+student.name+' 同学参考方向后自行判断。',text:'方向仅供参考：答对香蕉翻倍，答错不扣。',className:'is-snake'},
       fertilizer:{dept:'黑化肥专场',sentence:'全班抢答，'+student.name+' 同学保留优先权。',text:'连续三次答错已触发全班抢答。谁抢到，就把记分归属改成谁。',className:'is-fertilizer'}
@@ -1388,7 +1553,7 @@
     const totals=Object.fromEntries(GROUPS.map(group=>[group,0]));Object.values(session.studentResults).forEach(row=>{totals[row.group]=(totals[row.group]||0)+row.bananas;});
     $('groupList').innerHTML=GROUPS.map(group=>'<div class="group-chip"><span>'+esc(group)+'</span><b>'+totals[group]+'</b></div>').join('');
   }
-  function openModal(id){document.querySelectorAll('.modal').forEach(modal=>modal.classList.add('hidden'));$(id).classList.remove('hidden');if(id==='rosterModal')renderRosterModal();if(id==='lessonSetupModal')renderLessonSeats();if(id==='settingsModal')fillSettings();if(id==='historyModal')renderHistory();}
+  function openModal(id){document.querySelectorAll('.modal').forEach(modal=>modal.classList.add('hidden'));$(id).classList.remove('hidden');if(id==='rosterModal')renderRosterModal();if(id==='lessonSetupModal')renderLessonSeats();if(id==='settingsModal')fillSettings();if(id==='historyModal')renderHistory();if(id==='desktopModal'){configureDesktopIcon();requestAnimationFrame(()=>$('installNow').focus());}}
   function closeModals(){document.querySelectorAll('.modal').forEach(modal=>modal.classList.add('hidden'));clearInterval(manualClock);manualClock=0;manualStartedAt=0;}
   function groupOptions(selected){return GROUPS.map(group=>'<option value="'+esc(group)+'"'+(group===selected?' selected':'')+'>'+esc(group)+'</option>').join('');}
   function renderRosterModal(){
@@ -1438,7 +1603,10 @@
     const averageBananas=roleRows.reduce((sum,row)=>sum+row.banana,0)/roleRows.length;record('一轮五题收入可做一次明确采购选择',averageBananas>=normalCost*1.6&&averageBananas<=normalCost*4.8,'角色平均 '+fixed(averageBananas)+' 蕉；普通装备均价 '+fixed(normalCost)+' 蕉');
     const eventRng=seededRandom(31415);let mysteryHits=0,duplicateHits=0;for(let index=0;index<20000;index++){if(eventRng()<.22)mysteryHits++;if(eventRng()<.48)duplicateHits++;}const mysteryRate=mysteryHits/20000;const duplicateRate=duplicateHits/20000;record('神秘商店保持偶发而非每轮必见',mysteryRate>=.205&&mysteryRate<=.235,'两万节命中 '+fixed(mysteryRate*100)+'%');record('同名融合候选稳定但不挤占全部货架',duplicateRate>=.46&&duplicateRate<=.50,'有可升级装备时命中 '+fixed(duplicateRate*100)+'%');
     const rescueRng=seededRandom(9527);let rescueWins=0;for(let index=0;index<5000;index++){const trail=emptyLessonStudent(createStudent('落后'),'fish');const lead=emptyLessonStudent(createStudent('领先'),'monkey');trail.floors=3;lead.floors=4;trail.answers=lead.answers=5;trail.bananas=lead.bananas=8;trail.gear=[rollGear(5,6,rescueRng,'prop-badge')];lead.gear=[rollGear(0,6,rescueRng,'prop-stapler')];const a=battleScore(trail,lead,rescueRng).score;const b=battleScore(lead,trail,rescueRng).score;if(a>b)rescueWins++;}const rescueRate=rescueWins/5000;record('落后一层的反超构筑有机会但非必中',rescueRate>=.36&&rescueRate<=.72,'五千场胜率 '+fixed(rescueRate*100)+'%');
-    const passed=tests.every(test=>test.pass);lines.unshift((passed?'[过]':'[败]')+' 平衡审计：'+tests.filter(test=>test.pass).length+'/'+tests.length+' 项通过；固定种子 20260815');$('qaPanel').querySelector('strong').textContent='课堂答题器平衡审计';$('qaOutput').textContent=lines.join('\n');$('qaOutput').classList.toggle('has-failure',!passed);$('qaPanel').classList.remove('hidden');window.__CLASSROOM_BALANCE__={done:true,passed,tests,output:lines.join('\n')};
+    const soloPaces=Object.values(SOLO_DIFFICULTIES).map(item=>item.pace);record('单人三档难度具有清晰且不过度跳变的速度梯度',soloPaces[0]<soloPaces[1]&&soloPaces[1]<soloPaces[2]&&Math.max(soloPaces[1]-soloPaces[0],soloPaces[2]-soloPaces[1])<1.4,soloPaces.map(fixed).join(' -> '));
+    const soloLeadRng=seededRandom(816);const soloTrailRng=seededRandom(816);const soloItemTier=id=>SOLO_ITEMS.find(item=>item.id===id)?.tier||0;let soloLeadStrong=0,soloTrailStrong=0;for(let index=0;index<10000;index++){if(soloItemTier(rollSoloItemForRank(1,soloLeadRng))===2)soloLeadStrong++;if(soloItemTier(rollSoloItemForRank(6,soloTrailRng))===2)soloTrailStrong++;}const leadStrongRate=soloLeadStrong/10000;const trailStrongRate=soloTrailStrong/10000;record('单人追赶道具扶持明显但不保证强力件',leadStrongRate>=.2&&leadStrongRate<=.28&&trailStrongRate>=.72&&trailStrongRate<=.8,'领先强力 '+fixed(leadStrongRate*100)+'%；落后强力 '+fixed(trailStrongRate*100)+'%');
+    const soloPolicy=(run,player)=>player.character==='snake'?'chaos':['fish','egg'].includes(player.character)&&run.turn%3===2?'collect':player.light>=1?'rush':'collect';const soloRoleRates=CHARACTERS.map((role,roleIndex)=>{let wins=0;for(let index=0;index<180;index++){const run=createSoloRun(role.id,'standard',20260816+roleIndex*5000+index*97);while(run.phase==='race')advanceSoloRun(run,soloPolicy(run,soloPlayer(run)));if(run.finalRecord.place===1)wins++;}return {name:role.name,rate:wins/180};});const soloRoleSpread=Math.max(...soloRoleRates.map(row=>row.rate))-Math.min(...soloRoleRates.map(row=>row.rate));record('单人六角色均可夺冠且处于同一胜率带',soloRoleRates.every(row=>row.rate>=.25&&row.rate<=.68)&&soloRoleSpread<=.32,soloRoleRates.map(row=>row.name+' '+fixed(row.rate*100)+'%').join('；')+'；差 '+fixed(soloRoleSpread*100)+'%');
+    const passed=tests.every(test=>test.pass);lines.unshift((passed?'[过]':'[败]')+' 平衡审计：'+tests.filter(test=>test.pass).length+'/'+tests.length+' 项通过；固定种子 20260816');$('qaPanel').querySelector('strong').textContent='课堂答题器平衡审计';$('qaOutput').textContent=lines.join('\n');$('qaOutput').classList.toggle('has-failure',!passed);$('qaPanel').classList.remove('hidden');window.__CLASSROOM_BALANCE__={done:true,passed,tests,output:lines.join('\n')};
   }
   function runQa(){
     $('qaPanel').querySelector('strong').textContent='课堂答题器 QA 自检';const lines=[];const tests=[];
@@ -1470,7 +1638,16 @@
     persistClass.students[1].absent=true;const absentSession=repairState(deepClone(persistCandidate)).activeSession;const filteredShop=shopOrder(absentSession,persistClass);const filteredPairs=makeBattlePairs(absentSession,persistClass);const brokenAbsentShop=absentSession.participantIds.slice();record('缺席同学不进入采购与乱斗',filteredShop.length===1&&filteredShop[0]===persistClass.students[0].id&&filteredPairs.length===1&&filteredPairs[0].rightId===null,brokenAbsentShop.includes(persistClass.students[1].id));
     const confirmPositive=finalConfirmationReady(100,200)&&!finalConfirmationReady(200,200);const brokenConfirm=finalConfirmationReady(100,0);record('最终结算须在时限内二次确认',confirmPositive,!brokenConfirm);
     const archivedModel=archiveCompetitionSnapshot(sectionModel,99);const brokenArchive=deepClone(archivedModel);delete brokenArchive.endedAt;record('最终结算才生成完整历史快照',archivedModel.endedAt===99&&Array.isArray(archivedModel.studentResults)&&archivedModel.studentResults.length===2,!('endedAt' in brokenArchive));
+    const soloRun=createSoloRun('fish','standard',20260816);const classBefore=JSON.stringify(persistCandidate.classes);advanceSoloRun(soloRun,'collect');advanceSoloRun(soloRun,'rush');const brokenSoloClass=deepClone(persistCandidate.classes);brokenSoloClass[0].students[0].stats.totalBananas+=1;record('单人游戏与课堂名册成绩完全隔离',JSON.stringify(persistCandidate.classes)===classBefore&&soloRun.turn===2&&soloRun.routeCounts.collect===1&&soloRun.routeCounts.rush===1,JSON.stringify(brokenSoloClass)!==classBefore);
+    const npcRoles=soloRun.racers.filter(racer=>!racer.player).map(racer=>racer.character);const brokenNpcRoles=npcRoles.concat(npcRoles[0]);record('五名 NPC 角色唯一且各有竞速性格',npcRoles.length===5&&new Set(npcRoles).size===5&&npcRoles.every(id=>SOLO_PERSONALITIES[id]?.line),new Set(brokenNpcRoles).size!==brokenNpcRoles.length);
+    const leadItemRng=seededRandom(1201);const trailItemRng=seededRandom(1201);const itemPower=id=>SOLO_ITEMS.find(item=>item.id===id)?.tier||0;const leadStrong=Array.from({length:1200},()=>itemPower(rollSoloItemForRank(1,leadItemRng))).filter(tier=>tier===2).length/1200;const trailStrong=Array.from({length:1200},()=>itemPower(rollSoloItemForRank(6,trailItemRng))).filter(tier=>tier===2).length/1200;const brokenItemBias=leadStrong>trailStrong;record('单人竞速落后位更易获得强力追赶道具',trailStrong-leadStrong>.4,!brokenItemBias);
+    const soloCandidate=deepClone(persistCandidate);soloCandidate.activeSolo=soloRun;soloCandidate.soloRecords=[{id:'local_rank',endedAt:1,character:'fish',difficulty:'standard',place:2,turns:12,score:321,splits:[4,8]}];const repairedSolo=repairState(soloCandidate);const brokenSoloCandidate=deepClone(soloCandidate);brokenSoloCandidate.activeSolo.racers=[];record('单人赛与本地排行榜跨刷新持久化',repairedSolo.activeSolo.turn===2&&repairedSolo.soloRecords[0].score===321,repairState(brokenSoloCandidate).activeSolo===null);
+    const economyRun=createSoloRun('egg','stroll',91);const openingLight=soloPlayer(economyRun).light;advanceSoloRun(economyRun,'collect');const afterCollect=soloPlayer(economyRun).light;advanceSoloRun(economyRun,'rush');const afterRush=soloPlayer(economyRun).light;const brokenEconomy=deepClone(economyRun);soloPlayer(brokenEconomy).light=-1;record('单人灵光按回合发放且采集与投资形成取舍',openingLight===4&&afterCollect>=10&&afterRush>=afterCollect-1&&afterRush<=afterCollect&&soloPlayer(economyRun).light>=0,soloPlayer(brokenEconomy).light<0);
+    const finishRun=createSoloRun('monkey','stroll',33);for(let turn=0;turn<12&&finishRun.phase==='race';turn++)advanceSoloRun(finishRun,turn%3===0?'collect':turn%3===1?'rush':'chaos');const brokenFinish=deepClone(finishRun);brokenFinish.finalRecord.splits=[];record('十二回合完赛生成名次分数与本机幽灵线',finishRun.phase==='finished'&&finishRun.finalRecord.score>0&&finishRun.finalRecord.splits.length===12&&finishRun.finalRecord.routeCounts.collect===4,brokenFinish.finalRecord.splits.length!==12);
     const catalogKinds=new Set(GEAR_BASES.map(handbookKind));const brokenCatalog=GEAR_BASES.slice(1);record('玩家图鉴与比赛共用八十四件装备正本',GEAR_BASES.length===84&&catalogKinds.size===5&&GEAR_BASES.every(base=>handbookCard(base).includes(esc(base.name))),brokenCatalog.length!==84);
+    const legacyBrand=['驯','猴办'].join('');const brandGate=text=>text.includes('猴与鱼 · 灵光塔')&&!text.includes(legacyBrand);const brandSource=document.title+'\n'+document.body.innerText+'\n'+GROUPS.join('|');record('品牌统一为猴与鱼灵光塔并迁移旧部门名',brandGate(brandSource)&&GROUPS.includes('灵光局'),!brandGate(brandSource+'\n'+legacyBrand));
+    const statDefinitions=[['冲','1.18'],['稳','0.92'],['运','0.55'],['乱','0.65']];const statCopy=$('statsModal').innerText;const statGate=copy=>statDefinitions.every(([name,value])=>copy.includes(name)&&copy.includes(value))&&copy.includes('不会改写答题成绩');record('冲稳运乱四维逐项解释且限定只作用于乱斗',statGate(statCopy),!statGate(statCopy.replace('0.65','')));
+    const desktopGate=svg=>svg.includes('<svg')&&svg.includes('#3fab84')&&iconDataUrl().startsWith('data:image/svg+xml')&&!/<(?:image|script)[^>]+(?:https?:)?\/\//i.test(svg);record('桌面入口使用内嵌猴与鱼图标且保持零联网',desktopGate(APP_ICON_SVG),!desktopGate(APP_ICON_SVG+'<image href="https://example.com/icon.png">'));
     const source=document.documentElement.outerHTML;const badCall=['fet','ch'].join('')+'("/qa-break")';record('单文件零联网出口',networkGate(source),!networkGate(source+'\n'+badCall));
     const pictographic=/\p{Extended_Pictographic}/u;const flavored=/[\u2190-\u21ff\u2460-\u24ff]/u;const emojiFree=!pictographic.test(source)&&!flavored.test(source);const brokenEmoji=pictographic.test(source+' '+String.fromCodePoint(0x1f600));record('emoji 与装饰符号全局禁令',emojiFree,brokenEmoji);
     const passed=tests.every(test=>test.pass);lines.unshift((passed?'[过]':'[败]')+' QA 总结：'+tests.filter(test=>test.pass).length+'/'+tests.length+' 项完整通过');$('qaOutput').textContent=lines.join('\n');$('qaOutput').classList.toggle('has-failure',!passed);$('qaPanel').classList.remove('hidden');
@@ -1497,6 +1674,12 @@
   }
 
   document.addEventListener('click',event=>{
+    const soloCharacter=event.target.closest('[data-solo-character]');if(soloCharacter){soloDraft.character=soloCharacter.dataset.soloCharacter;renderSoloSetup();return;}
+    const soloDifficulty=event.target.closest('[data-solo-difficulty]');if(soloDifficulty){soloDraft.difficulty=soloDifficulty.dataset.soloDifficulty;renderSoloSetup();return;}
+    const soloUse=event.target.closest('[data-solo-use]');if(soloUse){useSoloItem(Number(soloUse.dataset.soloUse));return;}
+    const soloRoute=event.target.closest('[data-solo-route]');if(soloRoute){soloChooseRoute(soloRoute.dataset.soloRoute);return;}
+    if(event.target.closest('[data-solo-retry]')){const last=state.activeSolo?.finalRecord;if(last){soloDraft={character:last.character,difficulty:last.difficulty};state.activeSolo=createSoloRun(last.character,last.difficulty);saveState();renderSolo();}return;}
+    if(event.target.closest('[data-solo-reset]')){state.activeSolo=null;saveState();renderSoloSetup();return;}
     if(event.target.closest('[data-final-settlement]')){requestFinalSettlement();return;}
     const scrap=event.target.closest('[data-scrap-gear]');if(scrap){scrapGear(scrap.dataset.scrapGear);return;}
     const buy=event.target.closest('[data-buy-gear]');if(buy){purchaseOffer(Number(buy.dataset.buyGear));return;}
@@ -1514,6 +1697,9 @@
     const studentToken=event.target.closest('[data-student-id]');if(studentToken){openManualScore(studentToken.dataset.studentId);return;}
   });
   $('classSelect').addEventListener('change',event=>{if(activeSession())return;state.currentClassId=event.target.value;saveState();render();});
+  $('openSolo').addEventListener('click',openSolo);$('closeSolo').addEventListener('click',closeSolo);
+  $('soloMain').addEventListener('click',event=>{if(event.target.closest('#startSolo'))startSolo();});
+  $('soloHome').addEventListener('click',()=>{if(state.activeSolo?.phase==='race'){showToast('当前灵光杯仍在进行，进度已经存到本机。');renderSolo();return;}state.activeSolo=null;saveState();renderSoloSetup();});
   $('sessionToggle').addEventListener('click',()=>{const session=activeSession();if(!session)startLesson();else if(session.phase==='answer')beginIntermission();else openIntermission();});$('startLesson').addEventListener('click',startLesson);$('drawStudent').addEventListener('click',drawStudent);
   $('participantCount').addEventListener('change',renderLessonSeats);
   $('lessonSeats').addEventListener('change',event=>{const row=event.target.closest('.seat-row');if(!row)return;const seat=lessonSetupDraft[Number(row.dataset.seat)];if(event.target.matches('.seat-student'))seat.studentId=event.target.value;if(event.target.matches('.seat-character'))seat.character=event.target.value;renderLessonSeats();});
@@ -1538,13 +1724,15 @@
     saveState();render();
   });
   $('saveSettings').addEventListener('click',saveSettings);$('resetSettings').addEventListener('click',()=>{state.settings=deepClone(DEFAULT_SETTINGS);fillSettings();showToast('建议值已恢复，点击保存后生效。');});
+  $('installNow').addEventListener('click',installCurrentDevice);$('exportDesktopIcon').addEventListener('click',exportDesktopIcon);
   $('copyCsv').addEventListener('click',copyCsv);$('refreshCsv').addEventListener('click',()=>{$('csvBox').value=csvText();showToast('CSV 文本已重新生成。');});
   $('openHandbook').addEventListener('click',()=>openHandbook());$('closeHandbook').addEventListener('click',closeHandbook);$('handbookSearch').addEventListener('input',renderHandbook);$('handbookKind').addEventListener('change',renderHandbook);$('handbookSet').addEventListener('change',renderHandbook);addEventListener('popstate',()=>{if(new URLSearchParams(location.search).get('handbook')==='1')openHandbook(false);else $('handbook').classList.add('hidden');});
   $('closeQa').addEventListener('click',()=>$('qaPanel').classList.add('hidden'));
+  addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;updateDesktopStatus();});addEventListener('appinstalled',()=>{deferredInstallPrompt=null;updateDesktopStatus();showToast('灵光塔已添加到桌面。');});
   addEventListener('resize',()=>requestAnimationFrame(()=>layoutBuilding(Math.max(0,...lessonRows(currentClass(),activeSession()).map(row=>row.floors||0)))));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInterval(answerClock);else if(activeSession()?.currentCall){updateAnswerClock();clearInterval(answerClock);answerClock=setInterval(updateAnswerClock,1000);}});
 
-  render();
+  configureDesktopIcon();render();
   if(QA_MODE)setTimeout(()=>{runQa();const fixture=new URLSearchParams(location.search).get('fixture');if(fixture)setTimeout(()=>showFixture(fixture),40);},80);
   else if(BALANCE_MODE)setTimeout(runBalanceAudit,80);
   if(HANDBOOK_MODE)setTimeout(()=>openHandbook(false),40);
