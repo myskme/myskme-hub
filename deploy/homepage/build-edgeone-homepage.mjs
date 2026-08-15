@@ -18,7 +18,7 @@ const runtimeEntries = [
   'sitemap.xml',
   'icons',
   'assets',
-  'classroom',
+  'classroom/index.html',
   'banks',
   'daily',
   'listen',
