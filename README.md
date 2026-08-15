@@ -26,7 +26,7 @@
 
 | 工具 | 地址 |
 |---|---|
-| 驯猴办 · 课堂答题器 | https://myskme.com/classroom/ |
+| 猴与鱼 · 灵光塔（课堂工具 + 独立单人游戏） | https://myskme.com/classroom/ |
 | 题库书架 | https://myskme.com/banks/ |
 | 优秀作文墙 | https://myskme.com/wall/ |
 | 作文训练场 | https://myskme.com/write/ |
