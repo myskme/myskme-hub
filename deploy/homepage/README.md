@@ -13,7 +13,7 @@ node deploy/homepage/verify-layout-contract.mjs
 node deploy/homepage/build-edgeone-homepage.mjs /private/tmp/myskme-homepage.zip
 ```
 
-发布包只包含总主页、分享封面、公共封面资源以及题库书架、听力、写作、每日一题、
+发布包只包含总主页、分享封面、公共封面资源以及课堂答题器、题库书架、听力、写作、每日一题、
 作文墙和打印中心，**外加品牌 API 网关的边缘函数**，不包含管理员控制台、源码工具或
 《灵石远征》运行目录。
 

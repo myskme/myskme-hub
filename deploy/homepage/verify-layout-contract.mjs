@@ -22,6 +22,9 @@ const checks = [
   ['手机详情保留电影感', ':root[data-theme="light"] .project-stage{background:#101114'],
   ['详情图首屏高优先级', "loading=\"'+(eager?'eager':'lazy')+'\" fetchpriority=\"'+(eager?'high':'low')+'\""],
   ['首张详情图预加载', '<link rel="preload" as="image" href="assets/cover-gemfall.webp" fetchpriority="high">'],
+  ['课堂答题器主页卡片', '"key": "classroom-clicker"'],
+  ['课堂答题器正式入口', 'https://myskme.com/classroom/'],
+  ['课堂答题器旧存档回填', 'learning.items.unshift(clone(classroomClicker));'],
 ];
 
 const failures = checks.filter(([, token]) => !html.includes(token)).map(([label]) => label);
