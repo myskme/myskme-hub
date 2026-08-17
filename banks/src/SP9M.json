@@ -1,0 +1,159 @@
+{
+ "date": "2026-08-17",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "进阶",
+ "tier": "free",
+ "name": "大雨那天 · 人物传 VOL.8（学徒版）",
+ "code": "SP9M",
+ "desc": "2026 暑假特辑 SP9M《大雨那天》学徒版语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的九宫格主图、看图与回读（13–17）、传记阅读（18–20）、对号入座、名册核对与密码显影依赖纸面图与原文，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "Jun carried the bags all the way, ___ ?",
+    "ops": [
+     "did he",
+     "doesn't he",
+     "didn't he",
+     "wasn't he"
+    ],
+    "ans": 2,
+    "why": "陈述部分是肯定的一般过去时，反意部分用否定 + 助动词 did。",
+    "lv": 1
+   },
+   {
+    "q": "It was ___ heavy rain that they had to stop under a tree.",
+    "ops": [
+     "so",
+     "very",
+     "too",
+     "such"
+    ],
+    "ans": 3,
+    "why": "such + 形容词 + 名词 + that 从句——rain 是名词。",
+    "lv": 1
+   },
+   {
+    "q": "It ___ since early morning, and the road is still under water.",
+    "ops": [
+     "rained",
+     "has been raining",
+     "is raining",
+     "had rained"
+    ],
+    "ans": 1,
+    "why": "since + 时间点 + 现在仍未停 → 现在完成进行时。",
+    "lv": 2
+   },
+   {
+    "q": "Jie is the boy ___ never complains, however wet he gets.",
+    "ops": [
+     "whose",
+     "which",
+     "whom",
+     "who"
+    ],
+    "ans": 3,
+    "why": "先行词是人，且在从句中作主语，用 who。",
+    "lv": 2
+   },
+   {
+    "q": "That is the guard to ___ Wen spoke at the gate.",
+    "ops": [
+     "whom",
+     "who",
+     "which",
+     "that"
+    ],
+    "ans": 0,
+    "why": "介词 + 关系代词，指人用 whom——to whom。",
+    "lv": 2
+   },
+   {
+    "q": "The cat ___ under the eaves did not move at all.",
+    "ops": [
+     "sat",
+     "sit",
+     "sitting",
+     "to sit"
+    ],
+    "ans": 2,
+    "why": "现在分词作后置定语，表主动——猫是自己坐着的。",
+    "lv": 2
+   },
+   {
+    "q": "The longer they walked, ___ they became.",
+    "ops": [
+     "wetter",
+     "the wetter",
+     "more wet",
+     "the more wet"
+    ],
+    "ans": 1,
+    "why": "the + 比较级, the + 比较级——两个分句都要带 the。",
+    "lv": 2
+   },
+   {
+    "q": "Ming ___ some milk by mistake — he went white in the face at once.",
+    "ops": [
+     "may drink",
+     "may be drinking",
+     "may have drunk",
+     "may drank"
+    ],
+    "ans": 2,
+    "why": "对过去的推测用 may have done——他可能刚才喝了。",
+    "lv": 2
+   },
+   {
+    "q": "Chen said he ___ the umbrella as soon as the rain stopped.",
+    "ops": [
+     "will fix",
+     "fixes",
+     "has fixed",
+     "would fix"
+    ],
+    "ans": 3,
+    "why": "主句是过去时 said，从句里的「将来」要退成过去将来 would fix。",
+    "lv": 2
+   },
+   {
+    "q": "If the road ___ so muddy now, they would walk much faster.",
+    "ops": [
+     "were not",
+     "is not",
+     "had not been",
+     "will not be"
+    ],
+    "ans": 0,
+    "why": "与现在事实相反的虚拟——从句用过去式，be 一律 were；主句 would do。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "Jun is the boy who bag was left in the rain.",
+     "It was such heavy rain that the road turned to water.",
+     "That is the man to whom she gave the key.",
+     "The cat sitting under the eaves was quite dry."
+    ],
+    "ans": 0,
+    "why": "后面跟着名词 bag，缺的是「谁的」→ whose bag。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "They have been standing there for twenty minutes.",
+     "If I was you, I would wait for the rain to stop.",
+     "She said she would bring an umbrella.",
+     "The letter written in pencil was hard to read."
+    ],
+    "ans": 1,
+    "why": "与现在相反的虚拟，be 动词一律用 were → If I were you。",
+    "lv": 2
+   }
+  ]
+ }
+}
+
