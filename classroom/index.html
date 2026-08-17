@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; media-src blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link id="browserIcon" rel="icon" type="image/svg+xml">
   <link id="touchIcon" rel="apple-touch-icon">
-  <title>猴与鱼 · 灵光塔</title>
+  <title>猴与鱼 · 灵光大巡游</title>
   <style>
     :root{
       --paper:#faf3e2;--paper-2:#fffaf0;--ink:#28211a;--outline:#2f5148;
@@ -94,6 +94,25 @@
     .rank-score span{font-size:9px;color:var(--muted)}
     .round-note{padding:8px 10px;border-top:1.5px solid var(--line);color:var(--muted);font-size:11px}
 
+    .floor-stage{background:linear-gradient(135deg,#eef4eb 0 25%,#fffaf0 25% 50%,#e8f0eb 50% 75%,#fffaf0 75%);background-size:32px 32px}
+    .floor-stage:before,.floor-stage:after{display:none}
+    .floor-grid{z-index:2}.monkey-layer{z-index:6}
+    .tour-cell{position:absolute;display:grid;place-items:center;width:38px;height:38px;border:2px solid var(--outline);border-radius:11px;background:var(--paper-2);transform:translate(-50%,-50%);box-shadow:0 2px 0 rgba(47,81,72,.18);font-size:10px;font-weight:900;transition:left .2s,top .2s}
+    .tour-cell span{position:absolute;inset:auto -12px -14px;text-align:center;font-size:8px;line-height:1;white-space:nowrap;color:var(--muted)}
+    .tour-cell.is-landmark{width:52px;height:52px;border-width:3px;border-radius:16px;background:#fff0af;color:#7b3528;font-size:15px}
+    .tour-cell.is-banana{background:#fff3c4}.tour-cell.is-chest{background:#e7ddc5}.tour-cell.is-shortcut{background:#d8ede3}.tour-cell.is-trap{background:#e8ddd7}.tour-cell.is-shop{background:#dce4f0}
+    .tour-cell.is-landmark span{bottom:-16px;color:var(--ink);font-size:8px}
+    .tour-center{position:absolute;z-index:1;left:18%;right:18%;top:23%;bottom:23%;display:grid;place-items:center;padding:12px;border:2px dashed var(--outline);border-radius:24px;background:rgba(255,250,240,.86);text-align:center;pointer-events:none}
+    .tour-center small{display:block;color:var(--red);font-size:10px;letter-spacing:.13em}.tour-center strong{display:block;margin:4px 0;font-family:Georgia,"Songti SC",serif;font-size:clamp(18px,2.5vw,30px)}.tour-center p{margin:0;color:var(--muted);font-size:10px;line-height:1.45}
+    .monkey-token{width:54px;height:64px}.monkey-token .asset-monkey-art,.monkey-token .asset-character-art{left:10px;width:36px;height:44px}.monkey-token .token-name{max-width:76px;background:#fffdf6}
+    .tour-last-move{position:absolute;left:50%;top:-10px;min-width:24px;padding:1px 4px;border:1.5px solid var(--outline);border-radius:8px;background:var(--banana);font-size:9px;line-height:15px;transform:translateX(-50%);opacity:0}.monkey-token.has-moved .tour-last-move{opacity:1}
+    .dice-panel{width:min(760px,100%)}.dice-body{display:grid;grid-template-columns:190px minmax(0,1fr);gap:14px;padding:16px}
+    .dice-hero{display:grid;place-items:center;align-content:center;min-height:240px;padding:12px;border:2px solid var(--outline);border-radius:14px;background:#fffaf0;text-align:center}.dice-hero svg{width:124px;height:132px}.dice-hero strong{font-family:Georgia,"Songti SC",serif;font-size:23px}.dice-hero span{color:var(--muted);font-size:11px}
+    .dice-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dice-option{min-height:160px;padding:13px;border:3px solid var(--outline);background:var(--paper-2);text-align:left}.dice-option:hover{background:#fff3c4}.dice-option b{display:block;font-family:Georgia,"Songti SC",serif;font-size:20px}.dice-option strong{display:block;margin:8px 0;color:var(--teal-dark);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:17px;letter-spacing:.08em}.dice-option span{display:block;color:var(--muted);font-size:11px;line-height:1.45}
+    .dice-public{grid-column:1/-1;padding:9px 11px;border-left:5px solid var(--teal-dark);background:#dcebe4;font-size:11px;line-height:1.5}.dice-result{grid-column:1/-1;display:grid;place-items:center;min-height:190px;padding:18px;border:3px double var(--outline);background:#fffaf0;text-align:center}.dice-face{display:grid;place-items:center;width:92px;height:92px;border:5px solid var(--outline);border-radius:22px;background:var(--banana);font-size:48px;font-weight:950;transform:rotate(-4deg)}.dice-result.is-rolling .dice-face{animation:diceRoll .12s linear infinite}@keyframes diceRoll{50%{transform:rotate(8deg) scale(.94)}}.dice-result h3{margin:10px 0 4px;font-family:Georgia,"Songti SC",serif;font-size:23px}.dice-result p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+    .draft-body{padding:16px}.draft-lead{margin:0 0 12px;padding:9px 11px;border-left:5px solid var(--red);background:#f5e2d9;font-size:12px;line-height:1.5}.draft-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.draft-card{position:relative;min-height:250px;padding:14px;border:3px solid var(--outline);border-radius:18px;background:linear-gradient(150deg,#fffdf6 0 64%,#dcebe4 64%);text-align:left;overflow:hidden}.draft-card:before{content:"";position:absolute;inset:6px;border:1px solid rgba(47,81,72,.24);border-radius:12px;pointer-events:none}.draft-mark{position:relative;display:grid;place-items:center;width:76px;height:76px;margin:4px auto 12px;border:4px double var(--outline);border-radius:20px;background:var(--banana);font-family:Georgia,"Songti SC",serif;font-size:34px}.draft-card small,.draft-card b,.draft-card p{position:relative;display:block}.draft-card small{color:var(--red);font-size:9px;letter-spacing:.1em}.draft-card b{margin:5px 0;font-family:Georgia,"Songti SC",serif;font-size:19px;line-height:1.2}.draft-card p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}.draft-card .draft-action{position:relative;width:100%;margin-top:13px;background:var(--teal-dark);color:#fffdf6}.tour-card-summary{font-size:8px;color:var(--muted)}
+
+    .tour-card-summary{display:block}
     .control-panel{display:flex;flex-direction:column;padding:12px;overflow:auto;background:var(--paper)}
     .control-kicker{color:var(--red);font-size:11px;letter-spacing:.17em}
     .control-title{margin:4px 0 10px;font-family:Georgia,"Songti SC",serif;font-size:24px;line-height:1.1}
@@ -293,6 +312,7 @@
       .metric-row{gap:0}.metric{min-width:54px;padding:3px 5px}.metric span{font-size:8px}.metric b{font-size:13px}
       .building-body{grid-template-columns:1fr}.rank-rail{display:none}.floor-stage:before,.floor-stage:after{width:9px}.floor-stage:before{left:0}.floor-stage:after{right:0}.floor-line{left:9px;right:9px}.floor-label{left:12px}
       .monkey-token{width:40px;height:48px}.asset-monkey-art,.asset-character-art{left:7px;width:28px;height:35px}.token-name{max-width:48px;font-size:8px;line-height:11px}.token-aura{inset:0 3px 7px}
+      .tour-cell{width:26px;height:26px;border-width:1.5px;border-radius:8px;font-size:8px}.tour-cell.is-landmark{width:34px;height:34px;border-width:2px;border-radius:11px;font-size:11px}.tour-cell span{display:none}.tour-center{left:16%;right:16%;top:25%;bottom:25%;padding:5px;border-radius:14px}.tour-center small{font-size:7px}.tour-center strong{font-size:13px}.tour-center p{display:none}.tour-last-move{top:-8px;font-size:7px;line-height:12px;min-width:18px}
       .control-panel{padding:7px}.control-kicker{font-size:9px}.control-title{display:none}.status-card{padding:8px}.status-card p{font-size:11px}.big-action{min-height:50px;margin-top:6px;font-size:15px}.lesson-strip{margin-bottom:5px}.lesson-stat{padding:4px}.lesson-stat b{font-size:14px}.ready-actions{grid-template-columns:repeat(4,minmax(0,1fr))}.ready-actions .big-action{font-size:11px}
       .notice{min-height:0;padding:10px 10px 8px}.notice:before{inset:4px}.notice-body{grid-template-columns:68px minmax(0,1fr);margin-top:3px}.notice-portrait{width:64px;height:75px}.notice-copy strong{font-size:22px}.notice-copy p{font-size:11px}.notice-stamp{width:56px;height:56px;right:7px;bottom:7px;border-width:4px;font-size:11px}.event-ribbon{margin-top:5px;padding:5px 7px;font-size:10px}.timer-line{margin:4px 0 2px}.timer-value{font-size:14px}.target-row{margin:3px 0;grid-template-columns:68px}.target-row select{height:32px;font-size:11px}.score-grid{gap:4px;margin-top:4px}.score-btn{min-height:42px}.score-btn b{font-size:12px}.follow-actions{margin-top:4px}.follow-actions button{min-height:34px;font-size:11px}.ready-actions{gap:4px;margin-top:6px}.ready-actions button{min-height:46px;padding:5px;font-size:12px}.last-result{display:none}.group-board{display:none}
       .elevator-box{padding:14px}.elevator-digits{font-size:54px}.suspense-line{font-size:14px}.character-pop{right:5px;bottom:5px;grid-template-columns:82px minmax(0,230px)}.character-pop svg{width:82px;height:82px}.speech{font-size:12px}
@@ -300,6 +320,8 @@
       .airdrop-card{grid-template-columns:92px minmax(0,1fr);gap:8px;padding:10px}.ritual-art{width:88px;height:88px}.ritual-art svg{width:78px;height:78px}.airdrop-copy h3{font-size:18px}.airdrop-copy p{font-size:11px}
       .seat-row{grid-template-columns:38px minmax(0,1fr) minmax(0,1fr);gap:5px;padding:6px}.seat-art{width:36px;height:44px}.seat-row select{height:36px;font-size:11px}.seat-passive{grid-column:2/-1;font-size:10px}
       .manual-score-layout{grid-template-columns:1fr}.manual-target-card{display:grid;grid-template-columns:78px minmax(0,1fr);gap:8px;padding:8px}.manual-target-art{grid-row:1/4;width:76px;height:90px;margin:0}.manual-target-art svg{width:70px;height:86px}.manual-target-card h3{font-size:15px}.manual-timer{margin-top:3px;padding:4px 6px}.manual-action-card{padding:8px}.manual-answer-grid{gap:4px;margin:5px 0 8px}.manual-answer-grid button{min-height:40px;font-size:11px}.banana-adjust-grid{gap:4px}.banana-adjust-grid button{min-height:36px;font-size:11px}
+      .dice-panel{height:auto;max-height:96dvh}.dice-body{grid-template-columns:92px minmax(0,1fr);gap:7px;padding:8px}.dice-hero{min-height:180px;padding:5px}.dice-hero svg{width:76px;height:84px}.dice-hero strong{font-size:16px}.dice-hero span{font-size:8px}.dice-options{gap:5px}.dice-public{padding:5px 7px;font-size:8px}.dice-option{min-height:112px;padding:7px;border-width:2px}.dice-option b{font-size:14px}.dice-option strong{margin:5px 0;font-size:11px}.dice-option span{font-size:8px}.dice-result{min-height:210px}.dice-face{width:72px;height:72px;font-size:38px}
+      .draft-body{padding:8px}.draft-lead{margin-bottom:6px;padding:6px 8px;font-size:9px}.draft-grid{display:flex;gap:7px;overflow-x:auto;padding:2px 8vw 5px;scroll-snap-type:x mandatory}.draft-card{flex:0 0 76vw;min-height:280px;padding:11px;scroll-snap-align:center}.draft-mark{width:70px;height:70px}.draft-card b{font-size:17px}
       .intermission{padding:0;align-items:stretch}.intermission-shell{height:100dvh;border-width:0}.intermission-head{padding:7px 8px}.intermission-head h2{font-size:18px}.intermission-head p{display:none}.intermission-head>button{min-width:82px;min-height:36px;padding:4px 7px;font-size:10px}.intermission-body{padding:7px}.phase-strip{margin-bottom:6px}.phase-pill{padding:5px 3px;font-size:9px}.shop-layout{grid-template-columns:minmax(0,1fr)}.shop-player{display:grid;grid-template-columns:58px minmax(0,1fr);gap:6px;padding:6px}.shop-player-art{height:62px}.shop-player-art svg{width:54px;height:60px}.shop-player h3{font-size:17px}.shop-player .wallet{margin:2px 0}.shop-player .gear-rack{grid-column:1/-1;margin:0}.offer-grid{width:100%;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 8vw 3px}.offer-grid::-webkit-scrollbar,.battle-pairs::-webkit-scrollbar{display:none}.gear-card{flex:0 0 76vw;min-height:250px;grid-template-rows:62px auto auto auto minmax(34px,1fr) auto;padding:5px;border-width:2px;scroll-snap-align:center}.gear-art svg{width:60px;height:64px}.gear-card h4{font-size:13px}.gear-stats{grid-template-columns:repeat(4,1fr);font-size:8px}.gear-line{font-size:8px}.gear-rule{font-size:8px;padding:3px 4px}.gear-card button{min-height:34px;padding:3px;font-size:9px}.offer-head h3{font-size:13px}.offer-head p{display:none}.offer-footer{margin-top:5px}.battle-pairs{width:100%;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 8vw 3px}.battle-card{flex:0 0 78vw;padding:6px;scroll-snap-align:center}.battle-side{margin:4px 0;padding:4px}.battle-summary{min-height:120px;padding:8px}.battle-summary h3{font-size:20px}
       .settlement{padding:4px}.settlement-sheet{height:calc(100dvh - 8px);border-width:2px}.settlement-head{padding:8px 9px}.settlement-head h2{font-size:20px}.settlement-head .settlement-meta{font-size:9px}.award-grid{grid-template-columns:1fr;gap:4px;padding:6px}.award-card{min-height:61px;padding:6px 8px}.award-card strong{font-size:14px;margin:2px 0}.award-card p{font-size:9px}.settlement-table-wrap{margin:0 6px}.settlement-table{font-size:10px}.settlement-table th,.settlement-table td{padding:5px 4px}.settlement-actions{padding:6px}.settlement-actions button{min-height:34px;padding:5px 8px;font-size:11px}
       .handbook-head{padding:7px 8px}.handbook-title h1{font-size:18px}.handbook-title p{display:none}.handbook-head button{min-height:34px;padding:4px 8px;font-size:10px}.handbook-main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:5px;padding:5px}.handbook-aside{display:flex;gap:5px;padding:5px;overflow-x:auto;overflow-y:hidden}.handbook-aside h2,.handbook-aside>p,.handbook-sets{display:none}.handbook-rule{flex:0 0 205px;margin:0;padding:5px;font-size:8px}.handbook-catalog{border-width:2px}.handbook-tools{grid-template-columns:minmax(0,1fr) 92px 92px;padding:5px;gap:4px}.handbook-tools input,.handbook-tools select{height:34px;padding:0 5px;font-size:9px}.handbook-count{grid-column:1/-1;text-align:left;font-size:9px}.handbook-grid{display:flex;align-items:flex-start;gap:7px;padding:6px 9vw;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.handbook-grid::-webkit-scrollbar{display:none}.handbook-card{flex:0 0 78vw;min-height:330px;grid-template-rows:74px auto auto auto auto auto;padding:7px;scroll-snap-align:center}.handbook-art svg{width:68px;height:72px}.handbook-card h3{font-size:14px}.handbook-card .gear-line{font-size:8px}
@@ -391,7 +413,7 @@
 
   <div id="app">
     <header class="topbar">
-      <div class="brand"><div class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#asset-spark-mark"></use></svg></div><div class="brand-copy"><strong>猴与鱼 · 灵光塔</strong><span>课堂竞技答题器 · 本机离线</span></div></div>
+      <div class="brand"><div class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#asset-spark-mark"></use></svg></div><div class="brand-copy"><strong>猴与鱼 · 灵光大巡游</strong><span>课堂派对答题器 · 本机离线</span></div></div>
       <label class="sr-only" for="classSelect">当前班级</label><select id="classSelect" class="top-select"></select>
       <div class="top-spacer"></div>
       <div class="storage-note"><span class="storage-dot"></span><span id="storageText">仅存本机</span></div>
@@ -408,12 +430,12 @@
     </header>
 
     <main class="workspace">
-      <section class="panel building-panel" aria-label="全班楼层看板">
+      <section class="panel building-panel" aria-label="全班巡游赛道">
         <header class="building-head">
-          <div class="building-title"><small>同一栋楼 · 各爬各的</small><strong id="buildingName">灵光局联合办公楼</strong></div>
+          <div class="building-title"><small>同一张地图 · 全员每题都走</small><strong id="buildingName">灵光大巡游环线</strong></div>
           <div class="metric-row">
             <div class="metric"><span id="presentLabel">名册在岗</span><b id="presentMetric">0</b></div>
-            <div class="metric"><span>本节最高</span><b id="topFloorMetric">0F</b></div>
+            <div class="metric"><span>领先里程</span><b id="topFloorMetric">0 格</b></div>
             <div class="metric"><span>香蕉流通</span><b id="bananaMetric">0</b></div>
           </div>
         </header>
@@ -422,11 +444,11 @@
             <div id="floorGrid" class="floor-grid" aria-hidden="true"></div>
             <div id="monkeyLayer" class="monkey-layer"></div>
             <div id="suspense" class="suspense hidden" aria-live="assertive">
-              <div class="elevator-box"><small>灵光局内部电梯检索中</small><div id="elevatorDigits" class="elevator-digits">000</div><div class="elevator-lights"><i></i><i></i><i></i><i></i><i></i></div><div id="suspenseLine" class="suspense-line">约谈对象正在办理上楼手续</div></div>
+              <div class="elevator-box"><small>灵光巡游选手检索中</small><div id="elevatorDigits" class="elevator-digits">000</div><div class="elevator-lights"><i></i><i></i><i></i><i></i><i></i></div><div id="suspenseLine" class="suspense-line">约谈对象正在办理参赛手续</div></div>
             </div>
           </div>
           <aside class="rank-rail">
-            <div class="rank-head">楼层实时清点</div>
+            <div class="rank-head">巡游实时名次</div>
             <div id="rankList" class="rank-list"></div>
             <div id="roundNote" class="round-note">洗牌袋尚未开封</div>
           </aside>
@@ -434,7 +456,7 @@
       </section>
 
       <aside class="panel control-panel" aria-label="点名与记分控制台">
-        <div class="control-kicker">灵光局当值窗口</div><h1 class="control-title">课堂约谈签发台</h1>
+        <div class="control-kicker">灵光巡游赛事台</div><h1 class="control-title">课堂通知与判定</h1>
         <div id="idleControl" class="status-card">
           <strong id="idleHeading">本节课尚未开始</strong>
           <p id="idleCopy">题目与回答发生在设备外；老师在这台平板上点名、逐次判定并记分。</p>
@@ -457,7 +479,7 @@
               <div id="noticeNo" class="notice-no">约谈通知第 001 号</div>
               <div class="notice-body">
                 <div id="noticePortrait" class="notice-portrait"></div>
-                <div class="notice-copy"><small id="noticeDept">灵光局签发</small><strong id="calledName">海</strong><p id="noticeSentence">请该同学即刻上楼答题。</p></div>
+                <div class="notice-copy"><small id="noticeDept">灵光巡游签发</small><strong id="calledName">海</strong><p id="noticeSentence">请该同学即刻答题并掷巡游骰。</p></div>
               </div>
               <div class="notice-stamp">灵光局<br>已约谈</div>
             </article>
@@ -492,7 +514,7 @@
   </div>
 
   <div id="manualScoreModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="manualScoreTitle">
-    <section class="modal-panel" style="width:min(790px,100%)"><header class="modal-head"><div><h2 id="manualScoreTitle">自由记分窗口</h2><p>不抽签、不滚楼层，老师按现场情况直接指定</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+    <section class="modal-panel" style="width:min(790px,100%)"><header class="modal-head"><div><h2 id="manualScoreTitle">自由记分窗口</h2><p>不抽签，老师按现场情况直接指定，判题后照常巡游</p></div><button class="btn-small" data-close-modal>关闭</button></header>
       <div class="modal-body">
         <div class="manual-score-layout">
           <section class="manual-target-card">
@@ -502,9 +524,9 @@
             <div class="manual-timer"><span>打开窗口后计时</span><b id="manualTimer">00:00</b></div>
           </section>
           <section class="manual-action-card">
-            <h3>完整答题登记</h3><p>和约谈后的判定完全一致：计答题次数、上楼、角色被动、快答与连对，但不会消耗公平洗牌袋或惊喜机效果。</p>
-            <div class="manual-answer-grid"><button class="score-correct" data-manual-outcome="correct">答对并上楼</button><button class="score-partial" data-manual-outcome="partial">部分对</button><button class="score-wrong" data-manual-outcome="wrong">答错登记</button></div>
-            <h3>临时香蕉</h3><p>适合附加题、抢答、协作奖励或现场修正；只改香蕉，不计答题次数，也不上楼。</p>
+            <h3>完整答题登记</h3><p>和约谈后的判定完全一致：计答题次数、角色被动、快答与连对，随后选择巡游骰型；不会消耗公平洗牌袋或惊喜机效果。</p>
+            <div class="manual-answer-grid"><button class="score-correct" data-manual-outcome="correct">答对并巡游</button><button class="score-partial" data-manual-outcome="partial">部分对并巡游</button><button class="score-wrong" data-manual-outcome="wrong">答错也前进</button></div>
+            <h3>临时香蕉</h3><p>适合附加题、抢答、协作奖励或现场修正；只改香蕉，不计答题次数，也不触发巡游。</p>
             <div class="banana-adjust-grid"><button class="btn-quiet" data-banana-delta="-1">-1</button><button class="btn-warm" data-banana-delta="1">+1</button><button class="btn-warm" data-banana-delta="2">+2</button><button class="btn-warm" data-banana-delta="3">+3</button></div>
             <div class="manual-custom"><input id="manualCustomValue" type="number" min="-20" max="50" value="1" aria-label="自定义香蕉变化"><button id="manualCustomApply" class="btn-primary">按此数值记账</button></div>
             <p>所有自由记分都会写入本机历史，并可用控制台的“撤销上一笔”恢复。</p>
@@ -550,26 +572,38 @@
   </div>
 
   <div id="statsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
-    <section class="modal-panel" style="width:min(820px,100%)"><header class="modal-head"><div><h2 id="statsTitle">乱斗四维说明</h2><p>四个字只影响随时乱斗与每节终局，不会改写答题成绩</p></div><button class="btn-small" data-close-modal>关闭</button></header>
-      <div class="modal-body"><div class="stat-explain-grid"><article class="stat-explain-card"><b>冲</b><strong>主动实力</strong><p>每 1 点直接增加 1.18 点账面乱斗实力，是最直观的进攻底盘。</p></article><article class="stat-explain-card"><b>稳</b><strong>稳定底盘</strong><p>每 1 点直接增加 0.92 点账面实力；防线与压波动装备通常也会带稳。</p></article><article class="stat-explain-card"><b>运</b><strong>好运上限</strong><p>每 1 点扩大 0.55 点随机签空间。运越高，抽到额外好结果的上限越高。</p></article><article class="stat-explain-card"><b>乱</b><strong>怪招幅度</strong><p>每 1 点扩大 0.65 点随机签空间，也会被回形针、怪招和无厘头套装继续利用。</p></article></div><div class="formula-note"><b>怎么看一场乱斗：</b>楼层、答题次数、冲、稳和角色底盘先组成账面实力；装备技能、套装、运与乱再制造变化。乱斗会产生额外楼层和香蕉，但不会改写答题次数、答对率或原始答题记录。</div></div>
+    <section class="modal-panel" style="width:min(820px,100%)"><header class="modal-head"><div><h2 id="statsTitle">巡游四维说明</h2><p>四个字同时作用于赛道与乱斗，不会改写答题成绩</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="stat-explain-grid"><article class="stat-explain-card"><b>冲</b><strong>推进动力</strong><p>每累计 8 点，答题者主骰额外前进 1 格，最多加 2 格；乱斗中仍提供主动实力。</p></article><article class="stat-explain-card"><b>稳</b><strong>防护底盘</strong><p>每累计 8 点获得更可靠的最低步数；累计 12 点时，每节第一次陷阱自动被挡住。</p></article><article class="stat-explain-card"><b>运</b><strong>奖励放大</strong><p>累计 8 点后，地标与香蕉格有机会多发 1 根；数值越高，机会越明显。</p></article><article class="stat-explain-card"><b>乱</b><strong>怪路幅度</strong><p>累计 9 点后，落地有机会临时抄近路 2 格；也会扩大乱斗中的意外变化。</p></article></div><div class="formula-note"><b>怎么看一轮巡游：</b>全员先走公开基础步，答题者再掷所选骰型；角色、装备、地标、碰撞依次结算。所有效果只改变派对赛道、装备和香蕉，不改写答题次数、答对率或原始记录。</div></div>
     </section>
   </div>
 
   <div id="instantBattleModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="instantBattleTitle">
-    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="instantBattleTitle">随时开打 · 楼层震荡局</h2><p>只在两道题之间启动，完整演出后回到当前答题节</p></div><button class="btn-small" data-close-modal>关闭</button></header>
-      <div class="modal-body"><div class="instant-mode-grid"><article><b>随机单挑</b><p>随机洗牌配对；胜者冲 3 层并得 6 根，另一方也被冲击波送上 1 层并得 3 根。</p><button class="btn-red" data-instant-mode="duel">随机配对开打</button></article><article><b>随机组队</b><p>每次重新洗队。人数为奇数时，少人队随机产生一位临时大魔王，获得醒目的绝对加成。</p><button class="btn-primary" data-instant-mode="team">随机组队开打</button></article></div><p class="privacy-note">这不是惩罚环节。所有参战者都会获得楼层与香蕉，胜者只是获得更大的冲刺；答题成绩完全不变。</p></div>
+    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="instantBattleTitle">随时开打 · 赛道震荡局</h2><p>只在两道题之间启动，完整演出后回到当前答题节</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="instant-mode-grid"><article><b>随机单挑</b><p>随机洗牌配对；胜者冲 3 格并得 6 根，另一方也被冲击波送出 1 格并得 3 根。</p><button class="btn-red" data-instant-mode="duel">随机配对开打</button></article><article><b>随机组队</b><p>每次重新洗队。人数为奇数时，少人队随机产生一位临时大魔王，获得醒目的绝对加成。</p><button class="btn-primary" data-instant-mode="team">随机组队开打</button></article></div><p class="privacy-note">这不是惩罚环节。所有参战者都会获得里程与香蕉，胜者只是获得更大的冲刺；答题成绩完全不变。</p></div>
     </section>
   </div>
 
   <div id="desktopModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="desktopTitle">
-    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="desktopTitle">把灵光塔放到桌面</h2><p>猴先生与鱼小姐专属标志，适合 iPad、平板和电脑快捷入口</p></div><button class="btn-small" data-close-modal>关闭</button></header>
-      <div class="modal-body"><div class="desktop-layout"><div id="desktopIconPreview" class="desktop-icon-preview"></div><section class="desktop-copy"><h3>猴与鱼 · 灵光塔</h3><p id="desktopStatus">这份工具仍然只在本机保存名册与课堂记录。添加到桌面不会上传任何数据。</p><div class="desktop-steps"><div class="desktop-step"><b>iPad 或 iPhone：</b>用 Safari 打开 -> 点“分享” -> 选“添加到主屏幕” -> 点“添加”。</div><div class="desktop-step"><b>Android 平板：</b>用 Chrome 打开 -> 浏览器菜单 -> 选“添加到主屏幕”或“安装应用”。</div><div class="desktop-step"><b>Mac 或 Windows：</b>用 Chrome 或 Edge 打开 -> 浏览器菜单 -> 选“安装”或“创建快捷方式”。</div></div><div class="toolbar"><button id="installNow" class="btn-primary">查看当前设备安装方式</button><button id="exportDesktopIcon" class="btn-warm">导出 512 桌面图标</button></div></section></div></div>
+    <section class="modal-panel" style="width:min(760px,100%)"><header class="modal-head"><div><h2 id="desktopTitle">把灵光大巡游放到桌面</h2><p>猴先生与鱼小姐专属标志，适合 iPad、平板和电脑快捷入口</p></div><button class="btn-small" data-close-modal>关闭</button></header>
+      <div class="modal-body"><div class="desktop-layout"><div id="desktopIconPreview" class="desktop-icon-preview"></div><section class="desktop-copy"><h3>猴与鱼 · 灵光大巡游</h3><p id="desktopStatus">这份工具仍然只在本机保存名册与课堂记录。添加到桌面不会上传任何数据。</p><div class="desktop-steps"><div class="desktop-step"><b>iPad 或 iPhone：</b>用 Safari 打开 -> 点“分享” -> 选“添加到主屏幕” -> 点“添加”。</div><div class="desktop-step"><b>Android 平板：</b>用 Chrome 打开 -> 浏览器菜单 -> 选“添加到主屏幕”或“安装应用”。</div><div class="desktop-step"><b>Mac 或 Windows：</b>用 Chrome 或 Edge 打开 -> 浏览器菜单 -> 选“安装”或“创建快捷方式”。</div></div><div class="toolbar"><button id="installNow" class="btn-primary">查看当前设备安装方式</button><button id="exportDesktopIcon" class="btn-warm">导出 512 桌面图标</button></div></section></div></div>
     </section>
   </div>
 
   <div id="airdropModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="airdropTitle">
     <section class="modal-panel" style="width:min(700px,100%)"><header class="modal-head"><div><h2 id="airdropTitle">课堂随机惊喜机</h2><p>揭晓仪式与结果双重随机，规则会写入本机课次</p></div><button class="btn-small" data-close-modal>关闭</button></header>
       <div class="modal-body"><article id="airdropCard" class="airdrop-card"><div id="ritualArt" class="ritual-art"></div><div class="airdrop-copy"><small id="airdropKind">灵光局随机仪式</small><h3 id="airdropName">下一秒仍未备案</h3><p id="airdropLine">盲盒、公文签筒、怪骰子都可能出勤。</p><button id="revealAirdrop" class="btn-primary">开始揭晓</button><button id="acceptAirdrop" class="btn-primary hidden" data-close-modal>确认收件</button></div></article></div>
+    </section>
+  </div>
+
+  <div id="tourDiceModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tourDiceTitle">
+    <section class="modal-panel dice-panel"><header class="modal-head"><div><h2 id="tourDiceTitle">巡游骰型选择</h2><p>答题结果已留档；现在决定这一题怎样走</p></div></header>
+      <div id="tourDiceBody" class="dice-body"></div>
+    </section>
+  </div>
+
+  <div id="tourDraftModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tourDraftTitle">
+    <section class="modal-panel dice-panel"><header class="modal-head"><div><h2 id="tourDraftTitle">旅途奇遇三选一</h2><p>本场肉鸽构筑；同名会升级，最高 III 级</p></div></header>
+      <div id="tourDraftBody" class="draft-body"></div>
     </section>
   </div>
 
@@ -582,18 +616,18 @@
 
   <section id="settlement" class="settlement hidden" aria-label="课堂结算页">
     <div class="settlement-sheet">
-      <header class="settlement-head"><div><small>灵光局课堂结算公示</small><h2 id="settlementTitle">本节课楼层清点完毕</h2></div><div id="settlementMeta" class="settlement-meta"></div></header>
+      <header class="settlement-head"><div><small>灵光巡游课堂结算公示</small><h2 id="settlementTitle">本场巡游清点完毕</h2></div><div id="settlementMeta" class="settlement-meta"></div></header>
       <div id="awardGrid" class="award-grid"></div>
       <div class="settlement-table-wrap"><table class="settlement-table"><thead><tr><th>名次</th><th>同学</th><th>角色</th><th>部门</th><th class="num">楼层</th><th class="num">余粮</th><th class="num">总赚</th><th class="num">乱斗</th><th class="num">装备</th><th class="num">答对率</th></tr></thead><tbody id="settlementBody"></tbody></table></div>
       <div class="settlement-actions"><button id="settlementCsv" class="btn-quiet">复制长期 CSV</button><button id="closeSettlement" class="btn-primary">返回课堂看板</button></div>
     </div>
   </section>
 
-  <section id="handbook" class="handbook hidden" aria-label="猴与鱼灵光塔玩法图鉴">
-    <header class="handbook-head"><div class="handbook-title"><small>所有玩家公开查阅 · 不展示课堂成绩</small><h1>猴与鱼 · 灵光塔玩法图鉴</h1><p>全库、四维、技能、套装、融合和神秘商店，全部以当前比赛正本实时生成。</p></div><div class="handbook-head-actions"><button class="btn-quiet" data-open-modal="statsModal">四维说明</button><button id="closeHandbook" class="btn-primary">返回答题器</button></div></header>
+  <section id="handbook" class="handbook hidden" aria-label="猴与鱼灵光大巡游玩法图鉴">
+    <header class="handbook-head"><div class="handbook-title"><small>所有玩家公开查阅 · 不展示课堂成绩</small><h1>猴与鱼 · 灵光大巡游玩法图鉴</h1><p>赛道、骰型、全库、四维、技能、套装、融合和神秘商店，全部以当前比赛正本实时生成。</p></div><div class="handbook-head-actions"><button class="btn-quiet" data-open-modal="statsModal">四维说明</button><button id="closeHandbook" class="btn-primary">返回答题器</button></div></header>
     <div class="handbook-main">
       <aside class="handbook-aside">
-        <h2>五条采购纪律</h2><p>答题先决定基础香蕉与楼层；装备参与随时乱斗和每节终局乱斗，乱斗另发楼层与香蕉，但不改写答题成绩。</p>
+        <h2>五条采购纪律</h2><p>答题先决定香蕉与巡游骰；装备同时参与赛道和每节终局乱斗，但不会改写答题成绩。</p>
         <div class="handbook-rule"><b>01 五格装备栏</b>第六件必须取舍；拆解返还 1 根香蕉。</div>
         <div class="handbook-rule"><b>02 同名自动融合</b>同一装备再次买到会升为 II 级、III 级，属性保留较高值后再成长。</div>
         <div class="handbook-rule"><b>03 两件组成套装</b>同一部门标签达到两件即可触发，不要求完全同名。</div>
@@ -602,8 +636,8 @@
         <div id="handbookSets" class="handbook-sets"></div>
       </aside>
       <section class="handbook-catalog">
-        <div class="handbook-tools"><label class="sr-only" for="handbookSearch">搜索装备</label><input id="handbookSearch" type="search" placeholder="搜索名称、技能或怪话"><label class="sr-only" for="handbookKind">装备类别</label><select id="handbookKind"><option value="all">全部类别</option><option value="outfit">原行头道具</option><option value="tea">奶茶补给</option><option value="prop">办公室怪招</option><option value="luxury">夸张奢侈品</option><option value="mystery">神秘神器</option></select><label class="sr-only" for="handbookSet">套装类别</label><select id="handbookSet"><option value="all">全部套装</option></select><span id="handbookCount" class="handbook-count"></span></div>
-        <div class="stat-guide handbook-stat-guide"><div class="stat-guide-item"><b>冲</b><span>主动进攻底分</span></div><div class="stat-guide-item"><b>稳</b><span>稳定与防线底盘</span></div><div class="stat-guide-item"><b>运</b><span>好运随机上限</span></div><div class="stat-guide-item"><b>乱</b><span>怪招与变化幅度</span></div></div>
+        <div class="handbook-tools"><label class="sr-only" for="handbookSearch">搜索装备</label><input id="handbookSearch" type="search" placeholder="搜索名称、技能或怪话"><label class="sr-only" for="handbookKind">装备类别</label><select id="handbookKind"><option value="all">全部类别</option><option value="card">旅途奇遇卡</option><option value="outfit">原行头道具</option><option value="tea">奶茶补给</option><option value="prop">办公室怪招</option><option value="luxury">夸张奢侈品</option><option value="mystery">神秘神器</option></select><label class="sr-only" for="handbookSet">套装类别</label><select id="handbookSet"><option value="all">全部套装</option></select><span id="handbookCount" class="handbook-count"></span></div>
+        <div class="stat-guide handbook-stat-guide"><div class="stat-guide-item"><b>冲</b><span>主骰推进动力</span></div><div class="stat-guide-item"><b>稳</b><span>最低步与防护</span></div><div class="stat-guide-item"><b>运</b><span>地标奖励放大</span></div><div class="stat-guide-item"><b>乱</b><span>怪路变化幅度</span></div></div>
         <div id="handbookGrid" class="handbook-grid"></div>
       </section>
     </div>
@@ -630,13 +664,47 @@
   const SAMPLE_NAMES=['海','浩','瑾','琳','诺','睿','澄','岚','乔','安','川','砚','朔','昕','岳','宁','若','言','星','竹','舟','景','苏','沐','祺','珂','予','清','原','展','颂','芝','越','玄','迟','洛','亭','知','远'];
   const GROUPS=['大堂','质检部','传真科','灵光局','黑化肥科','加盖工程部'];
   const FLOOR_DEPARTMENTS=['大堂','质检部','传真科','房租科','灵光局','冗余科','黑化肥科','谜题科','绕口令办','观景台','标点科','加盖工程部'];
+  const TOUR_LENGTH=30;
+  const TOUR_LANDMARKS={
+    0:{name:'灵光塔',mark:'塔'},5:{name:'宝驴豪车库',mark:'驴'},10:{name:'鱼小姐水务大厅',mark:'鱼'},15:{name:'黑化肥急转弯',mark:'肥'},20:{name:'蛇台方向参考处',mark:'蛇'},25:{name:'蛋氏滚动办公室',mark:'蛋'}
+  };
+  const TOUR_CELLS=Array.from({length:TOUR_LENGTH},(_,index)=>{
+    if(TOUR_LANDMARKS[index])return {index,type:'landmark',name:TOUR_LANDMARKS[index].name,mark:TOUR_LANDMARKS[index].mark};
+    const types={2:['banana','蕉','香蕉补给格'],4:['shortcut','近','临时近路'],7:['chest','箱','纸箱防线'],9:['trap','弯','方向仅供参考'],12:['shop','店','橱窗试驾'],14:['banana','蕉','香蕉补给格'],17:['shortcut','近','传真近路'],19:['trap','印','公章未干'],22:['chest','箱','神秘纸箱'],24:['shop','店','奶茶停靠'],27:['banana','蕉','香蕉补给格'],29:['shortcut','近','终点抄近路']};
+    const data=types[index]||['plain',String(index),'巡游路面'];return {index,type:data[0],mark:data[1],name:data[2]};
+  });
+  const TOUR_DICE={
+    correct:[{id:'precise',name:'董事会稳准骰',faces:[3,3,4,4,5,6],line:'下限更高，适合守住领先。'},{id:'burst',name:'宝驴涡轮骰',faces:[1,2,3,5,7,8],line:'上限夸张，偶尔原地整理领带。'}],
+    partial:[{id:'steady',name:'鱼小姐稳流骰',faces:[1,2,2,3,3,4],line:'波动小，稳稳进入下一格。'},{id:'shortcut',name:'蛇台近路骰',faces:[0,2,3,4,5,6],line:'方向仅供参考，但更容易触发怪路。'}],
+    wrong:[{id:'dignity',name:'体面离场骰',faces:[1,1,2,2,3,3],line:'答案先传真，人继续前进。'},{id:'filing',name:'整理思路骰',faces:[0,1,2,3,3,4],line:'可能停下整理，但会附送一层防护。'}]
+  };
+  const TOUR_CARDS=[
+    {id:'convoy',mark:'众',name:'全员都有份车队卡',effect:'publicPlus',line:'自己的全员基础步额外 +1。'},
+    {id:'turbo',mark:'冲',name:'宝驴涡轮保修卡',effect:'mainPlus',line:'自己作为答题者时，主推进 +1。'},
+    {id:'stamp',mark:'章',name:'六地盖章收藏册',effect:'landmarkBonus',line:'地标香蕉额外 +1。'},
+    {id:'picnic',mark:'蕉',name:'董事会野餐预算',effect:'bananaBonus',line:'香蕉格额外 +1 根。'},
+    {id:'carton',mark:'箱',name:'豪宅同款纸箱墙',effect:'chestShield',line:'纸箱格额外增加一层防护。'},
+    {id:'alley',mark:'近',name:'传真科秘密小路',effect:'shortcutPlus',line:'近路额外前进 1 格。'},
+    {id:'toast',mark:'碰',name:'同格香槟碰杯券',effect:'collisionBonus',line:'同格碰杯时自己额外得 1 根。'},
+    {id:'catchup',mark:'追',name:'落后董事特别批文',effect:'catchup',line:'处于后半区答题时主推进 +1。'},
+    {id:'window',mark:'店',name:'只看不买返现卡',effect:'shopBonus',line:'橱窗格额外折现 1 根。'},
+    {id:'minimum',mark:'稳',name:'最低消费步数合同',effect:'faceMin',line:'主骰最终至少前进 2 格。'},
+    {id:'lucky',mark:'运',name:'鱼小姐青鳞请柬',effect:'rewardChance',line:'地标与香蕉格更易多发 1 根。'},
+    {id:'lap',mark:'圈',name:'环线董事里程章',effect:'lapBonus',line:'每完成一圈额外得 1 根。'},
+    {id:'helmet',mark:'护',name:'红鲤鱼帽安全声明',effect:'trapShield',line:'每节第一次陷阱自动挡住；帽子只装饰。'},
+    {id:'odd',mark:'奇',name:'奇数大魔王临时证',effect:'chaosPlus',line:'怪路触发时再多走 1 格。'},
+    {id:'tea',mark:'茶',name:'巴黎是家路边奶茶卡',effect:'publicPlus',line:'自己的全员基础步额外 +1。'},
+    {id:'garage',mark:'车',name:'宝驴跑车代客泊车卡',effect:'mainPlus',line:'自己作为答题者时，主推进 +1。'},
+    {id:'memo',mark:'文',name:'答案正文略通行证',effect:'faceMin',line:'主骰最终至少前进 2 格。'},
+    {id:'confetti',mark:'喜',name:'无声庆功纸屑公文',effect:'landmarkBonus',line:'地标香蕉额外 +1。'}
+  ];
   const CHARACTERS=[
-    {id:'monkey',name:'猴先生',passive:'上楼本能',line:'在快答时答对，额外上 1 层。'},
+    {id:'monkey',name:'猴先生',passive:'抢跑本能',line:'快答且答对时，主骰额外前进 1 格。'},
     {id:'fish',name:'鱼小姐',passive:'青鳞缓冲',line:'本节第一次答错不扣香蕉。'},
     {id:'egg',name:'蛋',passive:'蛋壳补录',line:'部分对时额外获得 1 根香蕉。'},
     {id:'snake',name:'蛇',passive:'方向加码',line:'蛇台事件答对时，翻倍后再加 1 根香蕉。'},
     {id:'fertilizer',name:'黑化肥',passive:'错后挥发',line:'答错后蓄力，下一次答对额外获得 2 根香蕉。'},
-    {id:'donkey',name:'驴',passive:'正版盖章',line:'每次达到双数连对时，额外获得 1 根香蕉。'}
+    {id:'donkey',name:'驴',passive:'正版盖章',line:'每次达到双数连对时额外得 1 根香蕉；到地标再补一层防护。'}
   ];
   const SOLO_DIFFICULTIES={
     stroll:{name:'悠游杯',pace:-.35,variance:1.6,rescues:8,multiplier:1,line:'透明追赶节奏，不会提前淘汰玩家。'},
@@ -821,7 +889,7 @@
   function configureDesktopIcon(){const url=iconDataUrl();$('browserIcon').href=url;$('touchIcon').href=url;$('desktopIconPreview').innerHTML=APP_ICON_SVG;updateDesktopStatus();}
   function updateDesktopStatus(){const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;const ua=navigator.userAgent;let copy='页面已内置猴与鱼专属标志；不同浏览器采用方式不同。若未自动显示，可导出 512 图标备用。真实名册与课堂记录仍然只存本机。';if(standalone)copy='当前已经从桌面入口打开。真实名册与课堂记录仍然只存本机。';else if(/iPad|iPhone|iPod/.test(ua))copy='当前是 Apple 移动设备，请按下方 Safari 步骤添加到主屏幕；若图标未自动采用，可导出 512 图标备用。';else if(/Android/.test(ua))copy='当前是 Android 设备，请按下方 Chrome 步骤添加到主屏幕；若图标未自动采用，可导出 512 图标备用。';$('desktopStatus').textContent=copy;$('installNow').textContent=deferredInstallPrompt?'立即安装到桌面':'查看当前设备安装方式';}
   function installCurrentDevice(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.finally(()=>{deferredInstallPrompt=null;updateDesktopStatus();});return;}updateDesktopStatus();showToast('请按窗口步骤添加；若浏览器未采用专属标志，可导出 512 图标备用。');}
-  function exportDesktopIcon(){const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;const context=canvas.getContext('2d');context.drawImage(image,0,0,512,512);canvas.toBlob(blob=>{if(!blob){showToast('桌面图标生成失败，请稍后重试。');return;}const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='猴与鱼-灵光塔-桌面图标-512.png';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('512 桌面图标已导出。');},'image/png');};image.onerror=()=>showToast('桌面图标生成失败，请稍后重试。');image.src=iconDataUrl();}
+  function exportDesktopIcon(){const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;const context=canvas.getContext('2d');context.drawImage(image,0,0,512,512);canvas.toBlob(blob=>{if(!blob){showToast('桌面图标生成失败，请稍后重试。');return;}const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='猴与鱼-灵光大巡游-桌面图标-512.png';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('512 桌面图标已导出。');},'image/png');};image.onerror=()=>showToast('桌面图标生成失败，请稍后重试。');image.src=iconDataUrl();}
 
   function monkeySvg(outfitId,className='asset-monkey-art'){
     const art=WEAR_ART[outfitId]||WEAR_ART.cap;
@@ -924,7 +992,7 @@
   function gearSetCounts(row){return repairGearList(row.gear).reduce((counts,item)=>{counts[item.set]=(counts[item.set]||0)+1;return counts;},{});}
   function activeGearSets(row){const counts=gearSetCounts(row);return Object.keys(counts).filter(key=>counts[key]>=2);}
   function effectLevels(row){return repairGearList(row.gear).reduce((levels,item)=>{levels[item.effect]=Math.max(levels[item.effect]||0,item.level||1);return levels;},{});}
-  function rankingRows(session){return session.participantIds.map(id=>session.studentResults[id]).filter(Boolean).sort((a,b)=>b.floors-a.floors||b.earnedBananas-a.earnedBananas||b.bananas-a.bananas||a.name.localeCompare(b.name,'zh-CN'));}
+  function rankingRows(session){return session.participantIds.map(id=>session.studentResults[id]).filter(Boolean).sort((a,b)=>(b.tourStamps||0)-(a.tourStamps||0)||(b.tourDistance||b.floors||0)-(a.tourDistance||a.floors||0)||b.earnedBananas-a.earnedBananas||b.bananas-a.bananas||a.name.localeCompare(b.name,'zh-CN'));}
   function presentParticipantIds(session,cls=currentClass()){const allowed=new Set(session.participantIds);return new Set(cls.students.filter(student=>allowed.has(student.id)&&!student.absent).map(student=>student.id));}
   function shopOrder(session,cls=currentClass()){const present=presentParticipantIds(session,cls);return rankingRows(session).filter(row=>present.has(row.id)).slice().reverse().map(row=>row.id);}
   function generateOffers(session,studentId,rng=Math.random){
@@ -971,22 +1039,23 @@
   function resolveBattlePair(session,pair,rng=Math.random){
     if(pair.resolved)return pair;const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;if(!left)return pair;
     pair.beforeFloors={[left.id]:left.floors};pair.beforeBananas={[left.id]:left.bananas};
-    if(!right){left.bananas+=4;left.earnedBananas=(left.earnedBananas||0)+4;left.floors+=2;left.battleWins+=1;pair.leftFloorDelta=2;pair.leftBananaDelta=4;pair.resolved=true;pair.winnerId=left.id;pair.line='影印件没有本机存档。'+left.name+' 被影印机直接送上 2 层，并领取 4 根香蕉。';return pair;}
+    if(!right){left.bananas+=4;left.earnedBananas=(left.earnedBananas||0)+4;advanceTourRow(left,2);left.battleWins+=1;pair.leftFloorDelta=2;pair.leftBananaDelta=4;pair.resolved=true;pair.winnerId=left.id;pair.line='影印件没有本机存档。'+left.name+' 被影印车直接送出 2 格，并领取 4 根香蕉。';return pair;}
     pair.beforeFloors[right.id]=right.floors;pair.beforeBananas[right.id]=right.bananas;const leftRoll=battleScore(left,right,rng);const rightRoll=battleScore(right,left,rng);pair.leftScore=Math.round(leftRoll.score*10)/10;pair.rightScore=Math.round(rightRoll.score*10)/10;pair.leftNote=leftRoll.note;pair.rightNote=rightRoll.note;pair.resolved=true;
-    if(Math.abs(leftRoll.score-rightRoll.score)<.35){left.battleDraws+=1;right.battleDraws+=1;left.bananas+=4;right.bananas+=4;left.earnedBananas+=4;right.earnedBananas+=4;left.floors+=2;right.floors+=2;pair.leftFloorDelta=pair.rightFloorDelta=2;pair.leftBananaDelta=pair.rightBananaDelta=4;pair.winnerId=null;pair.line='公文同时落地，冲击波把双方各送上 2 层，并各发 4 根香蕉。';}
-    else{const winner=leftRoll.score>rightRoll.score?left:right;const loser=winner===left?right:left;winner.battleWins+=1;loser.battleLosses+=1;winner.bananas+=6;winner.earnedBananas+=6;winner.floors+=3;loser.bananas+=3;loser.earnedBananas+=3;loser.floors+=1;pair.leftFloorDelta=winner===left?3:1;pair.rightFloorDelta=winner===right?3:1;pair.leftBananaDelta=winner===left?6:3;pair.rightBananaDelta=winner===right?6:3;pair.winnerId=winner.id;pair.line=winner.name+' 凭“'+(winner===left?leftRoll.note:rightRoll.note)+'”冲上 3 层并得 6 根；'+loser.name+' 也乘冲击波上 1 层并得 3 根。';}
+    if(Math.abs(leftRoll.score-rightRoll.score)<.35){left.battleDraws+=1;right.battleDraws+=1;left.bananas+=4;right.bananas+=4;left.earnedBananas+=4;right.earnedBananas+=4;advanceTourRow(left,2);advanceTourRow(right,2);pair.leftFloorDelta=pair.rightFloorDelta=2;pair.leftBananaDelta=pair.rightBananaDelta=4;pair.winnerId=null;pair.line='公文同时落地，冲击波把双方各送出 2 格，并各发 4 根香蕉。';}
+    else{const winner=leftRoll.score>rightRoll.score?left:right;const loser=winner===left?right:left;winner.battleWins+=1;loser.battleLosses+=1;winner.bananas+=6;winner.earnedBananas+=6;advanceTourRow(winner,3);loser.bananas+=3;loser.earnedBananas+=3;advanceTourRow(loser,1);pair.leftFloorDelta=winner===left?3:1;pair.rightFloorDelta=winner===right?3:1;pair.leftBananaDelta=winner===left?6:3;pair.rightBananaDelta=winner===right?6:3;pair.winnerId=winner.id;pair.line=winner.name+' 凭“'+(winner===left?leftRoll.note:rightRoll.note)+'”冲出 3 格并得 6 根；'+loser.name+' 也乘冲击波前进 1 格并得 3 根。';}
     return pair;
   }
   function emptyStats(){return {totalBananas:0,totalAnswers:0,correct:0,partial:0,wrong:0,bestStreak:0,lessons:0,battleWins:0,gearFound:0};}
-  function emptyLessonStudent(student,characterId=student.character||'monkey'){return {id:student.id,name:student.name,group:student.group,outfit:student.outfit,character:characterInfo(characterId).id,absentAtStart:Boolean(student.absent),bananas:0,earnedBananas:0,spentBananas:0,floors:0,answers:0,correct:0,partial:0,wrong:0,exempt:0,streak:0,bestStreak:0,passiveUsed:false,fertilizerCharge:false,gear:[],battleWins:0,battleLosses:0,battleDraws:0};}
+  function repairTourRow(row){const distance=Math.max(0,Number.isFinite(Number(row.tourDistance))?Number(row.tourDistance):Number(row.floors)||0);row.tourDistance=distance;row.tourPosition=((Number.isFinite(Number(row.tourPosition))?Number(row.tourPosition):distance)%TOUR_LENGTH+TOUR_LENGTH)%TOUR_LENGTH;row.tourLaps=Math.max(0,Number(row.tourLaps)||Math.floor(distance/TOUR_LENGTH));row.tourStamps=Math.max(0,Number(row.tourStamps)||row.tourLaps);row.tourLandmarks=Array.isArray(row.tourLandmarks)?[...new Set(row.tourLandmarks.filter(value=>TOUR_LANDMARKS[value]))]:[];row.tourShields=Math.max(0,Number(row.tourShields)||0);row.tourSlowNext=Math.max(0,Number(row.tourSlowNext)||0);row.tourLastMove=Math.max(0,Number(row.tourLastMove)||0);row.tourOvertakes=Math.max(0,Number(row.tourOvertakes)||0);row.tourTrapCardSection=Math.max(0,Number(row.tourTrapCardSection)||0);row.tourTrapCardUses=Math.max(0,Number(row.tourTrapCardUses)||0);row.tourCards=(Array.isArray(row.tourCards)?row.tourCards:[]).filter(card=>card&&TOUR_CARDS.some(base=>base.id===card.id)).slice(0,5).map(card=>({id:card.id,level:clamp(Number(card.level)||1,1,3)}));row.floors=distance;return row;}
+  function emptyLessonStudent(student,characterId=student.character||'monkey'){return repairTourRow({id:student.id,name:student.name,group:student.group,outfit:student.outfit,character:characterInfo(characterId).id,absentAtStart:Boolean(student.absent),bananas:0,earnedBananas:0,spentBananas:0,floors:0,answers:0,correct:0,partial:0,wrong:0,exempt:0,streak:0,bestStreak:0,passiveUsed:false,fertilizerCharge:false,gear:[],battleWins:0,battleLosses:0,battleDraws:0});}
   function createStudent(name,index=0){return {id:makeId('stu'),name:String(name).slice(0,16),outfit:OUTFITS[index%OUTFITS.length].id,character:CHARACTERS[index%CHARACTERS.length].id,group:GROUPS[index%GROUPS.length],absent:false,stats:emptyStats()};}
   function createClass(name,names=[]){const students=names.map((studentName,index)=>createStudent(studentName,index));return {id:makeId('class'),name:String(name).slice(0,24)||'新班级',students,bag:{round:0,remaining:[],served:[],last:null},sessions:[]};}
   function migrateSettings(raw){const settings=Object.assign({},DEFAULT_SETTINGS,raw&&typeof raw==='object'?raw:{});if(Number(raw?.rewardVersion)!==2){const untouched=Number(raw?.correct)===3&&Number(raw?.partial)===1&&Number(raw?.wrong)===-1&&Number(raw?.fastBonus)===1&&Number(raw?.streakBonus)===1;if(untouched)Object.assign(settings,{correct:8,partial:4,wrong:0,fastBonus:3,streakBonus:3});settings.rewardVersion=2;}return settings;}
-  function defaultState(){const sample=createClass('正典演示班',SAMPLE_NAMES);return {version:5,currentClassId:sample.id,classes:[sample],settings:deepClone(DEFAULT_SETTINGS),activeSession:null,activeSolo:null,soloRecords:[]};}
+  function defaultState(){const sample=createClass('正典演示班',SAMPLE_NAMES);return {version:6,currentClassId:sample.id,classes:[sample],settings:deepClone(DEFAULT_SETTINGS),activeSession:null,activeSolo:null,soloRecords:[]};}
   function repairStats(stats){return Object.assign(emptyStats(),stats&&typeof stats==='object'?stats:{});}
   function repairState(candidate){
     if(!candidate||!Array.isArray(candidate.classes)||!candidate.classes.length)return defaultState();
-    const clean={version:5,currentClassId:candidate.currentClassId,classes:[],settings:migrateSettings(candidate.settings),activeSession:candidate.activeSession||null,activeSolo:candidate.activeSolo&&typeof candidate.activeSolo==='object'?candidate.activeSolo:null,soloRecords:Array.isArray(candidate.soloRecords)?candidate.soloRecords.filter(item=>item&&Number.isFinite(Number(item.score))).slice(-60):[]};
+    const clean={version:6,currentClassId:candidate.currentClassId,classes:[],settings:migrateSettings(candidate.settings),activeSession:candidate.activeSession||null,activeSolo:candidate.activeSolo&&typeof candidate.activeSolo==='object'?candidate.activeSolo:null,soloRecords:Array.isArray(candidate.soloRecords)?candidate.soloRecords.filter(item=>item&&Number.isFinite(Number(item.score))).slice(-60):[]};
     candidate.classes.forEach((rawClass,classIndex)=>{
       const cls={id:rawClass.id||makeId('class'),name:String(rawClass.name||('班级 '+(classIndex+1))).slice(0,24),students:[],bag:rawClass.bag||{round:0,remaining:[],served:[],last:null},sessions:Array.isArray(rawClass.sessions)?rawClass.sessions.slice(-80):[]};
       (Array.isArray(rawClass.students)?rawClass.students:[]).forEach((rawStudent,index)=>{
@@ -1015,7 +1084,7 @@
           participantIds.forEach((id,index)=>{
             const student=owner.students.find(item=>item.id===id);const row=active.studentResults[id]||emptyLessonStudent(student,CHARACTERS[index].id);
             const role=CHARACTERS.some(item=>item.id===row.character)&&!usedRoles.has(row.character)?row.character:CHARACTERS.find(item=>!usedRoles.has(item.id)).id;
-            usedRoles.add(role);Object.assign(row,{name:student.name,group:student.group,outfit:student.outfit,character:role,passiveUsed:Boolean(row.passiveUsed),fertilizerCharge:Boolean(row.fertilizerCharge),earnedBananas:Number.isFinite(Number(row.earnedBananas))?Number(row.earnedBananas):Number(row.bananas)||0,spentBananas:Number(row.spentBananas)||0,gear:repairGearList(row.gear),battleWins:Number(row.battleWins)||0,battleLosses:Number(row.battleLosses)||0,battleDraws:Number(row.battleDraws)||0});active.studentResults[id]=row;student.character=role;
+            usedRoles.add(role);Object.assign(row,{name:student.name,group:student.group,outfit:student.outfit,character:role,passiveUsed:Boolean(row.passiveUsed),fertilizerCharge:Boolean(row.fertilizerCharge),earnedBananas:Number.isFinite(Number(row.earnedBananas))?Number(row.earnedBananas):Number(row.bananas)||0,spentBananas:Number(row.spentBananas)||0,gear:repairGearList(row.gear),battleWins:Number(row.battleWins)||0,battleLosses:Number(row.battleLosses)||0,battleDraws:Number(row.battleDraws)||0});repairTourRow(row);active.studentResults[id]=row;student.character=role;
           });
         }
         if(clean.activeSession){
@@ -1029,6 +1098,7 @@
           clean.activeSession.intermission=clean.activeSession.intermission&&typeof clean.activeSession.intermission==='object'?clean.activeSession.intermission:null;
           if(clean.activeSession.intermission){const inter=clean.activeSession.intermission;inter.battleMode=inter.battleMode==='team'?'team':'duel';inter.purchaseCounts=inter.purchaseCounts&&typeof inter.purchaseCounts==='object'?inter.purchaseCounts:{};inter.battleShowIndex=Math.max(0,Number(inter.battleShowIndex)||0);inter.battleShowBeat=Math.max(0,Number(inter.battleShowBeat)||0);}
           clean.activeSession.battleLog=Array.isArray(clean.activeSession.battleLog)?clean.activeSession.battleLog:[];
+          clean.activeSession.mode='grand-tour';clean.activeSession.tourVersion=1;clean.activeSession.tour=clean.activeSession.tour&&typeof clean.activeSession.tour==='object'?clean.activeSession.tour:{pendingMove:null,pendingDraft:null,lastResolution:null};clean.activeSession.tour.pendingMove=clean.activeSession.tour.pendingMove&&typeof clean.activeSession.tour.pendingMove==='object'?clean.activeSession.tour.pendingMove:null;clean.activeSession.tour.pendingDraft=clean.activeSession.tour.pendingDraft&&typeof clean.activeSession.tour.pendingDraft==='object'?clean.activeSession.tour.pendingDraft:null;
           if(clean.activeSession.pendingCall&&!clean.activeSession.currentCall){clean.activeSession.currentCall=Object.assign({},clean.activeSession.pendingCall,{startedAt:Date.now()});clean.activeSession.pendingCall=null;}
         }
       }
@@ -1132,7 +1202,7 @@
     const cls=currentClass();if(!validLessonSetup(configs,cls)){showToast('参战同学和角色都不能重复，请重新选择。');return;}finalConfirmUntil=0;clearTimeout(finalConfirmTimer);
     const previous=cls.sessions[cls.sessions.length-1]||null;
     const studentResults={};configs.forEach(item=>{const student=cls.students.find(row=>row.id===item.studentId);student.character=item.character;studentResults[student.id]=emptyLessonStudent(student,item.character);});
-    state.activeSession={id:makeId('lesson'),classId:cls.id,participantIds:configs.map(item=>item.studentId),phase:'answer',section:1,roundStartedEventIndex:0,intermission:null,battleLog:[],bag:{round:0,remaining:[],served:[],last:null},startedAt:Date.now(),noticeNo:0,globalWrongChain:0,rushNext:false,currentCall:null,pendingCall:null,lastResult:null,events:[],airdropEffect:null,airdropLog:[],surpriseLog:[],surpriseReveal:null,undoStack:[],previousFloors:Object.fromEntries((previous?.studentResults||[]).map(item=>[item.id,item.floors||0])),studentResults};
+    state.activeSession={id:makeId('lesson'),classId:cls.id,participantIds:configs.map(item=>item.studentId),mode:'grand-tour',tourVersion:1,tour:{pendingMove:null,pendingDraft:null,lastResolution:null},phase:'answer',section:1,roundStartedEventIndex:0,intermission:null,battleLog:[],bag:{round:0,remaining:[],served:[],last:null},startedAt:Date.now(),noticeNo:0,globalWrongChain:0,rushNext:false,currentCall:null,pendingCall:null,lastResult:null,events:[],airdropEffect:null,airdropLog:[],surpriseLog:[],surpriseReveal:null,undoStack:[],previousFloors:Object.fromEntries((previous?.studentResults||[]).map(item=>[item.id,item.tourDistance??item.floors??0])),studentResults};
     closeModals();saveState();render();playTone('start');showToast('比赛已开始。第 1 节答题公平袋现已封存。');
   }
   function chooseEvent(session,rng=Math.random,hasAirdrop=false){
@@ -1146,6 +1216,7 @@
   function drawStudent(){
     const session=activeSession();const cls=currentClass();
     if(!session||drawing)return;
+    if(session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('先完成上一题的巡游与奇遇。');return;}
     if(session.phase!=='answer'){openIntermission();showToast('采购或乱斗尚未办结，先完成课间流程。');return;}
     if(session.currentCall){showToast('上一张约谈通知还没有登记结果。');return;}
     const pool=sessionPool(cls,session);const id=claimFromBag(pool);
@@ -1162,7 +1233,7 @@
     drawingInterval=setInterval(()=>{
       tick+=1;$('elevatorDigits').textContent=pad((tick*17+Math.floor(Math.random()*83))%1000);
       const lights=[...$('suspense').querySelectorAll('i')];lights.forEach((light,index)=>light.classList.toggle('is-lit',index===tick%lights.length));
-      const candidate=students[tick%students.length];$('suspenseLine').textContent=(candidate?candidate.name:'灵光局')+' 的楼层手续正在核对';
+      const candidate=students[tick%students.length];$('suspenseLine').textContent=(candidate?candidate.name:'灵光巡游')+' 的参赛手续正在核对';
     },86);
     const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
     setTimeout(()=>finishDraw(),reduced?320:1450);
@@ -1175,20 +1246,20 @@
     requestAnimationFrame(()=>{const notice=$('notice');notice.classList.remove('is-stamped');void notice.offsetWidth;notice.classList.add('is-stamped');});
   }
   function applyOutcome(result,outcome,elapsedSeconds,event,settings,airdrop=null){
-    const next=deepClone(result);let delta=0;let fast=0;let streak=0;let airdropNote='';let passiveNote='';const role=characterInfo(next.character);
+    const next=repairTourRow(deepClone(result));let delta=0;let fast=0;let streak=0;let moveBonus=0;let tourBonus=0;let airdropNote='';let passiveNote='';const role=characterInfo(next.character);
     next.passiveUsed=Boolean(next.passiveUsed);next.fertilizerCharge=Boolean(next.fertilizerCharge);
     next.answers+=1;
     if(outcome==='correct'){
-      next.correct+=1;next.floors+=1;next.streak+=1;next.bestStreak=Math.max(next.bestStreak,next.streak);
+      next.correct+=1;next.streak+=1;next.bestStreak=Math.max(next.bestStreak,next.streak);
       fast=elapsedSeconds<=settings.fastSeconds&&airdrop?.effect!=='noFast'?settings.fastBonus:0;
       streak=next.streak>=settings.streakAt?settings.streakBonus:0;
       delta=settings.correct+fast+streak;if(event==='snake')delta*=2;
-      if(role.id==='monkey'&&fast){next.floors+=1;passiveNote=role.passive+'：快答额外上 1 层';}
+      if(role.id==='monkey'&&fast){moveBonus+=1;passiveNote=role.passive+'：主骰额外前进 1 格';}
       if(role.id==='snake'&&event==='snake'){delta+=1;passiveNote=role.passive+'：翻倍后再加 1';}
       if(role.id==='fertilizer'&&next.fertilizerCharge){delta+=2;next.fertilizerCharge=false;passiveNote=role.passive+'：蓄力香蕉 +2';}
       if(role.id==='donkey'&&next.streak%2===0){delta+=1;passiveNote=role.passive+'：双数连对 +1';}
       if(airdrop?.effect==='bonusCorrect'){delta+=airdrop.value;airdropNote='空投额外 +'+airdrop.value;}
-      if(airdrop?.effect==='extraFloor'){next.floors+=airdrop.value;airdropNote='空投加盖 +'+airdrop.value+' 层';}
+      if(airdrop?.effect==='extraFloor'){tourBonus+=airdrop.value;airdropNote='私人电梯追加 '+airdrop.value+' 格';}
       if(airdrop?.effect==='taxCorrect'){delta+=airdrop.value;airdropNote='房租科抽成 '+airdrop.value;}
       if(airdrop?.effect==='noFast')airdropNote='快答加成暂缓';
     }else if(outcome==='partial'){
@@ -1201,12 +1272,51 @@
       if(airdrop?.effect==='wrongGuard')airdropNote='宽容卷尺免扣';
     }
     next.bananas+=delta;next.earnedBananas=(next.earnedBananas||0)+delta;
-    return {next,delta,fast,streak,airdropNote,passiveNote};
+    return {next,delta,fast,streak,moveBonus,tourBonus,airdropNote,passiveNote};
   }
   function applyManualBanana(result,stats,delta){const amount=clamp(Math.trunc(Number(delta)||0),-20,50);const next=deepClone(result);const nextStats=repairStats(stats);next.bananas+=amount;next.earnedBananas=(next.earnedBananas||0)+amount;nextStats.totalBananas+=amount;return {next,nextStats,delta:amount};}
+  function tourDiceOptions(outcome){return TOUR_DICE[outcome]||TOUR_DICE.wrong;}
+  function tourCardLevel(row,effect){return repairTourRow(row).tourCards.reduce((sum,item)=>{const base=TOUR_CARDS.find(card=>card.id===item.id);return sum+(base?.effect===effect?item.level:0);},0);}
+  function prepareTourDraft(session,row,reason,rng=Math.random){const owned=new Map(row.tourCards.map(card=>[card.id,card.level]));const weighted=shuffle(TOUR_CARDS,rng).sort((a,b)=>(owned.has(b.id)?1:0)-(owned.has(a.id)?1:0));session.tour.pendingDraft={targetId:row.id,reason,offers:weighted.slice(0,3).map(card=>card.id),createdAt:Date.now()};return session.tour.pendingDraft;}
+  function renderTourDraft(){const session=activeSession();const draft=session?.tour?.pendingDraft;if(!draft)return;const row=session.studentResults[draft.targetId];$('tourDraftBody').innerHTML='<p class="draft-lead"><b>'+esc(row.name)+' 触发“'+esc(draft.reason)+'”。</b>选择一张只在本场有效的旅途卡。最多携带 5 张；同名自动融合，满栏时新卡折成 2 根香蕉。</p><div class="draft-grid">'+draft.offers.map(id=>{const card=TOUR_CARDS.find(item=>item.id===id);const owned=row.tourCards.find(item=>item.id===id);const next=owned?Math.min(3,owned.level+1):1;return '<article class="draft-card"><div class="draft-mark">'+esc(card.mark)+'</div><small>'+(owned?'同名融合升级':'全新旅途卡')+' · '+gearLevelText(next)+'</small><b>'+esc(card.name)+'</b><p>'+esc(card.line)+'<br>每级都会增强一次对应效果。</p><button class="draft-action" data-tour-card="'+card.id+'">'+(owned&&owned.level>=3?'满级改领 2 根':owned?'融合到 '+gearLevelText(next):'收入本场牌组')+'</button></article>';}).join('')+'</div>';openModal('tourDraftModal');}
+  function chooseTourCard(cardId){const session=activeSession();const draft=session?.tour?.pendingDraft;const card=TOUR_CARDS.find(item=>item.id===cardId);const row=session?.studentResults?.[draft?.targetId];if(!draft||!card||!row||!draft.offers.includes(cardId))return;repairTourRow(row);const owned=row.tourCards.find(item=>item.id===cardId);let message='';if(owned&&owned.level<3){owned.level+=1;message=card.name+' 已融合到 '+gearLevelText(owned.level)+' 级';}else if(owned){awardTourBananas(row,2);message=card.name+' 已满级，折成 2 根香蕉';}else if(row.tourCards.length<5){row.tourCards.push({id:card.id,level:1});message=card.name+' 已收入本场牌组';}else{awardTourBananas(row,2);message='牌组已满，'+card.name+' 折成 2 根香蕉';}session.events.push({at:Date.now(),studentId:row.id,name:row.name,outcome:'tour-card',delta:0,event:'draft',cardId:card.id,level:owned?.level||1});session.tour.pendingDraft=null;saveState();closeModals();render();showToast(row.name+'：'+message+'。');playTone('correct');}
+  function advanceTourRow(row,steps){repairTourRow(row);const amount=Math.max(0,Math.round(Number(steps)||0));const before=row.tourDistance;row.tourDistance+=amount;row.tourPosition=row.tourDistance%TOUR_LENGTH;const crossed=Math.floor(row.tourDistance/TOUR_LENGTH)-Math.floor(before/TOUR_LENGTH);if(crossed>0){row.tourLaps+=crossed;row.tourStamps+=crossed;}row.tourLastMove=amount;row.floors=row.tourDistance;return {amount,crossed,before,after:row.tourDistance};}
+  function awardTourBananas(row,amount){const delta=Math.max(0,Math.round(Number(amount)||0));if(!delta)return 0;row.bananas+=delta;row.earnedBananas=(row.earnedBananas||0)+delta;const student=studentById(row.id);if(student)student.stats.totalBananas+=delta;return delta;}
+  function prepareTourMove(session,targetId,outcome,applied,source){
+    if(!session.tour)session.tour={pendingMove:null,lastResolution:null};const options=tourDiceOptions(outcome);session.tour.pendingMove={id:makeId('move'),targetId,outcome,source,createdAt:Date.now(),moveBonus:applied.moveBonus||0,tourBonus:applied.tourBonus||0,options:options.map(option=>option.id)};return session.tour.pendingMove;
+  }
+  function renderTourDice(){
+    const session=activeSession();const pending=session?.tour?.pendingMove;if(!pending)return;const row=session.studentResults[pending.targetId];const options=tourDiceOptions(pending.outcome).filter(option=>pending.options.includes(option.id));const resultName={correct:'答对主推进',partial:'部分对稳步走',wrong:'答错也继续'}[pending.outcome];
+    $('tourDiceBody').innerHTML='<section class="dice-hero">'+characterSvg(row.character,null,'')+'<strong>'+esc(row.name)+'</strong><span>'+resultName+' · 当前 '+row.tourDistance+' 格 · '+row.tourStamps+' 枚章</span></section><section class="dice-options"><div class="dice-public"><b>全员参与规则：</b>本题所有在岗玩家先公开前进 1 到 2 格；'+esc(row.name)+' 再掷一枚主骰。冲、稳、运、乱会分别影响推进、防护、奖励和怪路。</div>'+options.map(option=>'<button class="dice-option" data-tour-die="'+option.id+'"><b>'+esc(option.name)+'</b><strong>'+option.faces.join(' · ')+'</strong><span>'+esc(option.line)+'</span></button>').join('')+'</section>';openModal('tourDiceModal');
+  }
+  function resumeTourPending(session=activeSession()){if(session?.tour?.pendingDraft){renderTourDraft();return true;}if(session?.tour?.pendingMove){renderTourDice();return true;}return false;}
+  function resolveTourLanding(session,row,dieId,rng,notes){
+    let cell=TOUR_CELLS[row.tourPosition];const totals=gearTotals(row);let reward=0;let draftReason='';
+    if(cell.type==='landmark'){
+      const first=!row.tourLandmarks.includes(cell.index);if(first){row.tourLandmarks.push(cell.index);row.tourStamps+=1;reward=3+tourCardLevel(row,'landmarkBonus');draftReason=cell.name+'首次盖章';notes.push('首次抵达“'+cell.name+'”，盖巡游章并领 '+reward+' 根');}else{reward=1+tourCardLevel(row,'landmarkBonus');notes.push('重访“'+cell.name+'”，获 '+reward+' 根通行香蕉');}
+      if(row.character==='donkey'){row.tourShields+=1;notes.push('驴的正版盖章补一层防护');}
+    }else if(cell.type==='banana'){reward=2+tourCardLevel(row,'bananaBonus');notes.push('香蕉补给格发放 '+reward+' 根');}
+    else if(cell.type==='chest'){const shields=(totals.luck>=12?2:1)+tourCardLevel(row,'chestShield');row.tourShields+=shields;draftReason='纸箱奇遇';notes.push('纸箱防线增加 '+shields+' 层，并翻出旅途卡');}
+    else if(cell.type==='shortcut'){const shortcut=2+tourCardLevel(row,'shortcutPlus');advanceTourRow(row,shortcut);notes.push('临时近路再送 '+shortcut+' 格');cell=TOUR_CELLS[row.tourPosition];}
+    else if(cell.type==='trap'){const cardShields=tourCardLevel(row,'trapShield');if(row.tourTrapCardSection!==session.section){row.tourTrapCardSection=session.section;row.tourTrapCardUses=0;}if(cardShields&&row.tourTrapCardUses<cardShields){row.tourTrapCardUses+=1;notes.push('红鲤鱼帽安全声明挡住本节第 '+row.tourTrapCardUses+' 次陷阱');}else if(row.tourShields>0){row.tourShields-=1;notes.push('防护挡住了“'+cell.name+'”');}else{row.tourSlowNext=1;notes.push('下题全员步少 1 格，最低仍为 0');}}
+    else if(cell.type==='shop'){reward=1+tourCardLevel(row,'shopBonus');notes.push('橱窗试驾券折现 '+reward+' 根香蕉');}
+    if(reward&&(totals.luck>=8||tourCardLevel(row,'rewardChance'))&&rng()<Math.min(.78,.18+totals.luck*.025+tourCardLevel(row,'rewardChance')*.12)){reward+=1;notes.push('运值与旅途卡把奖励加厚 1 根');}
+    awardTourBananas(row,reward);
+    if(dieId==='filing'){row.tourShields+=1;notes.push('整理思路骰附送一层体面防护');}
+    const collisions=session.participantIds.map(id=>session.studentResults[id]).filter(other=>other&&other.id!==row.id&&other.tourPosition===row.tourPosition);if(collisions.length){awardTourBananas(row,1+tourCardLevel(row,'collisionBonus'));collisions.forEach(other=>awardTourBananas(other,1));row.tourOvertakes+=collisions.length;notes.push('与 '+collisions.map(other=>other.name).join('、')+' 同格，碰杯双方都得香蕉');}return draftReason;
+  }
+  function resolveTourMove(dieId,rng=Math.random,sessionOverride=null,clsOverride=null){
+    const session=sessionOverride||activeSession();const pending=session?.tour?.pendingMove;if(!pending)return null;const die=tourDiceOptions(pending.outcome).find(option=>option.id===dieId);if(!die)return null;const target=session.studentResults[pending.targetId];const present=presentParticipantIds(session,clsOverride||currentClass());const publicMoves={};const notes=[];
+    session.participantIds.forEach(id=>{const row=session.studentResults[id];if(!row||!present.has(id))return;let base=(rng()<.48?2:1)+Math.min(2,Math.ceil(tourCardLevel(row,'publicPlus')/2));if(row.tourSlowNext){base=Math.max(0,base-row.tourSlowNext);row.tourSlowNext=0;}publicMoves[id]=base;const moved=advanceTourRow(row,base);if(moved.crossed){const bonus=awardTourBananas(row,moved.crossed*(4+tourCardLevel(row,'lapBonus')));notes.push(row.name+' 完成整圈，获 '+bonus+' 根并加盖巡游章');}});
+    const publicGroups=new Map();session.participantIds.forEach(id=>{const row=session.studentResults[id];if(!row||!present.has(id))return;const key=row.tourPosition;if(!publicGroups.has(key))publicGroups.set(key,[]);publicGroups.get(key).push(row);});const publicCollisions=[];publicGroups.forEach(group=>{if(group.length<2)return;group.forEach(row=>awardTourBananas(row,1));publicCollisions.push(group.map(row=>row.name));});if(publicCollisions.length)notes.push(publicCollisions.map(group=>group.join('、')).join('；')+' 在基础步并排，相关玩家各得 1 根');
+    const face=die.faces[Math.floor(rng()*die.faces.length)];const totals=gearTotals(target);const rank=rankingRows(session).findIndex(row=>row.id===target.id);let main=face+pending.moveBonus+pending.tourBonus+Math.min(2,Math.floor(totals.atk/8))+tourCardLevel(target,'mainPlus');if(rank>=Math.ceil(session.participantIds.length/2))main+=Math.min(2,tourCardLevel(target,'catchup'));const faceMin=tourCardLevel(target,'faceMin');if(totals.guard>=8||faceMin)main=Math.max(main,faceMin?1+Math.min(3,faceMin):2);if(target.character==='fish'&&main<3){main+=1;notes.push('鱼小姐稳流把低步数托高 1 格');}if(target.character==='snake'&&dieId==='shortcut'){main+=1;notes.push('蛇台近路骰额外拐出 1 格');}if(totals.chaos>=9&&rng()<Math.min(.55,.12+totals.chaos*.02)){main+=2+tourCardLevel(target,'chaosPlus');notes.push('乱值与奇遇卡批出一条临时怪路');}
+    const mainMove=advanceTourRow(target,main);if(mainMove.crossed){const bonus=awardTourBananas(target,mainMove.crossed*(4+tourCardLevel(target,'lapBonus')));notes.push(target.name+' 主推进完成整圈，获 '+bonus+' 根并加盖巡游章');}const draftReason=resolveTourLanding(session,target,dieId,rng,notes);if(draftReason)prepareTourDraft(session,target,draftReason,rng);
+    const resolution={id:pending.id,targetId:target.id,dieId,dieName:die.name,face,mainMove:main,publicMoves,publicCollisions,notes,at:Date.now(),position:target.tourPosition,distance:target.tourDistance,stamps:target.tourStamps};session.tour.lastResolution=resolution;session.tour.pendingMove=null;session.events.push({at:resolution.at,studentId:target.id,name:target.name,outcome:'tour-move',delta:0,event:'tour',source:pending.source,dieId,face,mainMove,publicMoves:deepClone(publicMoves),publicCollisions:deepClone(publicCollisions),notes:deepClone(notes)});session.lastResult={message:target.name+' 掷出 '+face+'，主推进共 '+main+' 格'+(notes.length?'；'+notes.join('，'):''),at:Date.now()};if(!sessionOverride){saveState();closeModals();render();if(session.tour.pendingDraft)renderTourDraft();else showToast(session.lastResult.message+'。');playTone('airdrop');}return resolution;
+  }
+  function rollTourDice(dieId){const session=activeSession();const pending=session?.tour?.pendingMove;if(!pending)return;const die=tourDiceOptions(pending.outcome).find(option=>option.id===dieId);if(!die)return;const row=session.studentResults[pending.targetId];$('tourDiceBody').innerHTML='<div class="dice-result is-rolling"><div id="tourDiceFace" class="dice-face">0</div><h3>'+esc(row.name)+' 正在签收 '+esc(die.name)+'</h3><p>全员基础步、装备四维、角色被动与落地事件将一次结清。</p></div>';let tick=0;const timer=setInterval(()=>{tick+=1;const face=$('tourDiceFace');if(face)face.textContent=die.faces[tick%die.faces.length];},70);setTimeout(()=>{clearInterval(timer);resolveTourMove(dieId,Math.random);},matchMedia('(prefers-reduced-motion:reduce)').matches?180:720);}
   function pushUndo(session,targetId,call,restoreCall=true){
     const target=studentById(targetId);
-    session.undoStack.push({targetId,beforeLong:deepClone(target?.stats||emptyStats()),beforeResult:deepClone(session.studentResults[targetId]),beforeGlobalWrongChain:session.globalWrongChain,beforeRushNext:session.rushNext,beforeEventsLength:session.events.length,call:deepClone(call),restoreCall:Boolean(restoreCall),beforeLastResult:session.lastResult?deepClone(session.lastResult):null});
+    session.undoStack.push({targetId,beforeLong:deepClone(target?.stats||emptyStats()),beforeLongAll:Object.fromEntries(session.participantIds.map(id=>[id,deepClone(studentById(id)?.stats||emptyStats())])),beforeResult:deepClone(session.studentResults[targetId]),beforeStudentResults:deepClone(session.studentResults),beforeTour:deepClone(session.tour||null),beforeGlobalWrongChain:session.globalWrongChain,beforeRushNext:session.rushNext,beforeEventsLength:session.events.length,call:deepClone(call),restoreCall:Boolean(restoreCall),beforeLastResult:session.lastResult?deepClone(session.lastResult):null});
     if(session.undoStack.length>12)session.undoStack.shift();
   }
   function recordOutcome(outcome,call,targetId,source='notice',reason=''){
@@ -1223,12 +1333,12 @@
     const bonusParts=[];if(applied.fast)bonusParts.push('快答 +'+applied.fast);if(applied.streak)bonusParts.push('连对 +'+applied.streak);if(call.event==='snake'&&outcome==='correct')bonusParts.push('蛇台翻倍');if(applied.airdropNote)bonusParts.push(applied.airdropNote);if(applied.passiveNote)bonusParts.push(applied.passiveNote);
     const reasonCopy=reason?'（'+reason+'）':'';const message=target.name+reasonCopy+' '+labels[outcome]+'，香蕉 '+(applied.delta>=0?'+':'')+applied.delta+(bonusParts.length?'；'+bonusParts.join('，'):'');
     session.events.push({at:Date.now(),studentId:targetId,name:target.name,character:result.character,outcome,delta:applied.delta,event:call.event,source,reason,passiveNote:applied.passiveNote,elapsed:Math.round(elapsed)});
-    session.lastResult={message,at:Date.now()};if(source==='notice')session.currentCall=null;
+    session.lastResult={message,at:Date.now()};if(source==='notice')session.currentCall=null;prepareTourMove(session,targetId,outcome,applied,source);
     saveState();render();
-    if(source==='manual')closeModals();
+    if(source==='manual')closeModals();renderTourDice();
     if(outcome==='wrong')showCharacter('donkey','仿的。答案已传真，正文略。');
-    else if(applied.next.streak>=state.settings.streakAt)showToast(message+'。连对金光已备案。');
-    else showToast(message+'。');
+    else if(applied.next.streak>=state.settings.streakAt)showToast(message+'。连对金光已备案，请选择巡游骰。');
+    else showToast(message+'。请选择巡游骰。');
     playTone(outcome);
   }
   function judge(outcome){
@@ -1238,6 +1348,7 @@
   function updateManualTimer(){if(!manualStartedAt||$('manualScoreModal').classList.contains('hidden'))return;const elapsed=Math.max(0,Math.floor((Date.now()-manualStartedAt)/1000));$('manualTimer').textContent=pad(Math.floor(elapsed/60),2)+':'+pad(elapsed%60,2);}
   function openManualScore(preferredId=''){
     const session=activeSession();if(!session){showToast('请先开始比赛。');return;}if(session.phase!=='answer'){openIntermission();showToast('课间流程中暂不记答题，请先进入下一节。');return;}if(drawing||session.currentCall){showToast('当前约谈尚未登记，处理完再使用自由记分。');return;}
+    if(session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('先完成上一题的巡游与奇遇。');return;}
     const cls=currentClass();const candidates=session.participantIds.map(id=>cls.students.find(student=>student.id===id)).filter(student=>student&&!student.absent);if(!candidates.length){showToast('当前没有可记分的在岗同学。');return;}
     $('manualStudent').innerHTML=candidates.map(student=>'<option value="'+esc(student.id)+'"'+(student.id===preferredId?' selected':'')+'>'+esc(student.name)+' · '+esc(characterInfo(session.studentResults[student.id].character).name)+'</option>').join('');
     if(!$('manualStudent').value)$('manualStudent').value=candidates[0].id;$('manualCustomValue').value='1';manualStartedAt=Date.now();openModal('manualScoreModal');updateManualTargetArt();updateManualTimer();clearInterval(manualClock);manualClock=setInterval(updateManualTimer,500);
@@ -1249,6 +1360,7 @@
   }
   function openAirdrop(){
     const session=activeSession();if(!session)return;
+    if(session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('先完成上一题的巡游与奇遇。');return;}
     if(session.phase!=='answer'){openIntermission();showToast('惊喜机留在答题阶段，课间请先处理装备与乱斗。');return;}
     if(session.currentCall||drawing){showToast('惊喜机只能在两张约谈通知之间启动。');return;}
     if(session.surpriseReveal){showAirdropRitual(session.surpriseReveal);return;}
@@ -1285,8 +1397,8 @@
     const session=activeSession();if(!session||!session.undoStack.length){showToast('当前没有可撤销的记分。');return;}
     if(session.currentCall){showToast('请先处理当前通知，再撤销上一笔。');return;}
     const undo=session.undoStack.pop();const target=studentById(undo.targetId);
-    if(target)target.stats=undo.beforeLong;
-    const restoreCall=undo.restoreCall===true||(undo.restoreCall==null&&Boolean(undo.call));session.studentResults[undo.targetId]=undo.beforeResult;session.globalWrongChain=undo.beforeGlobalWrongChain;session.rushNext=undo.beforeRushNext;session.events.length=undo.beforeEventsLength;session.currentCall=restoreCall?undo.call:null;session.lastResult=undo.beforeLastResult;
+    if(undo.beforeLongAll)Object.entries(undo.beforeLongAll).forEach(([id,stats])=>{const student=studentById(id);if(student)student.stats=stats;});else if(target)target.stats=undo.beforeLong;
+    const restoreCall=undo.restoreCall===true||(undo.restoreCall==null&&Boolean(undo.call));session.studentResults=undo.beforeStudentResults||Object.assign(session.studentResults,{[undo.targetId]:undo.beforeResult});session.tour=undo.beforeTour||{pendingMove:null,lastResolution:null};session.globalWrongChain=undo.beforeGlobalWrongChain;session.rushNext=undo.beforeRushNext;session.events.length=undo.beforeEventsLength;session.currentCall=restoreCall?undo.call:null;session.lastResult=undo.beforeLastResult;
     saveState();render();showToast(restoreCall?'上一笔已撤销，可以重新判定。':'上一笔自由记分已撤销。');
   }
   function enterShopPhase(session,rng=Math.random,cls=currentClass()){
@@ -1296,22 +1408,22 @@
   function beginIntermission(){
     const session=activeSession();if(!session)return;
     if(session.phase!=='answer'){openIntermission();return;}
-    if(session.currentCall||session.pendingCall||drawing){showToast('当前约谈还没登记，请先判定、免答或等待盖章完成。');return;}
+    if(session.currentCall||session.pendingCall||drawing||session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('当前题目还没完整结清，请先完成判定、巡游与奇遇。');return;}
     session.currentCall=null;session.pendingCall=null;drawing=false;clearInterval(drawingInterval);
     enterShopPhase(session,Math.random,currentClass());
     saveState();render();openIntermission();playTone('finish');
   }
   function openIntermission(){const session=activeSession();if(!session||session.phase==='answer')return;$('intermission').classList.remove('hidden');renderIntermission();}
   function gearChips(row,editable=false){const gear=repairGearList(row.gear);return gear.length?gear.map(item=>'<span class="gear-chip">'+esc(item.name)+' · '+gearLevelText(item.level)+(editable?'<button class="btn-quiet" data-scrap-gear="'+esc(item.uid)+'" aria-label="拆解 '+esc(item.name)+'">拆解</button>':'')+'</span>').join(''):'<span class="gear-chip">装备栏目前非常清白</span>';}
-  function statsHtml(gear){return '<div class="gear-stats"><span class="gear-stat" title="冲：主动进攻底分">冲 '+gear.atk+'</span><span class="gear-stat" title="稳：稳定与防线底盘">稳 '+gear.guard+'</span><span class="gear-stat" title="运：好运随机上限">运 '+gear.luck+'</span><span class="gear-stat" title="乱：怪招与变化幅度">乱 '+gear.chaos+'</span></div>';}
-  function statGuideHtml(className=''){return '<div class="stat-guide '+className+'"><div class="stat-guide-item"><b>冲</b><span>主动进攻底分</span></div><div class="stat-guide-item"><b>稳</b><span>稳定与防线底盘</span></div><div class="stat-guide-item"><b>运</b><span>好运随机上限</span></div><div class="stat-guide-item"><b>乱</b><span>怪招与变化幅度</span></div></div>';}
+  function statsHtml(gear){return '<div class="gear-stats"><span class="gear-stat" title="冲：巡游推进与乱斗攻势">冲 '+gear.atk+'</span><span class="gear-stat" title="稳：最低步数与陷阱防护">稳 '+gear.guard+'</span><span class="gear-stat" title="运：赛道奖励与好运上限">运 '+gear.luck+'</span><span class="gear-stat" title="乱：怪路与意外变化">乱 '+gear.chaos+'</span></div>';}
+  function statGuideHtml(className=''){return '<div class="stat-guide '+className+'"><div class="stat-guide-item"><b>冲</b><span>主骰推进动力</span></div><div class="stat-guide-item"><b>稳</b><span>最低步与防护</span></div><div class="stat-guide-item"><b>运</b><span>地标奖励放大</span></div><div class="stat-guide-item"><b>乱</b><span>怪路变化幅度</span></div></div>';}
   function handbookKind(base){if(MYSTERY_GEARS.includes(base))return 'mystery';if(LUXURY_GEARS.includes(base))return 'luxury';if(PROP_GEARS.includes(base))return 'prop';if(TEA_GEARS.includes(base))return 'tea';return 'outfit';}
   function handbookKindName(kind){return {outfit:'原行头道具',tea:'奶茶补给',prop:'办公室怪招',luxury:'夸张奢侈品',mystery:'神秘神器'}[kind]||'装备';}
   function handbookCard(base){const kind=handbookKind(base);const sample={baseId:base.id,atk:base.atk,guard:base.guard,luck:base.luck,chaos:base.chaos};return '<article class="handbook-card '+(kind==='mystery'?'is-mystery':'')+'"><div class="handbook-art">'+gearArt(sample)+'</div><div class="handbook-kind">'+esc(handbookKindName(kind))+' · '+esc(GEAR_SET_NAMES[base.set]||'灵光局散件')+'</div><h3>'+esc(base.name)+'</h3>'+statsHtml(base)+'<div class="gear-rule"><b>'+esc(base.timing)+' · I 到 III 级</b>'+esc(effectDescription(base.effect,1))+'</div><p class="gear-line">'+esc(base.line)+'</p></article>';}
+  function handbookTourCard(card){return '<article class="handbook-card"><div class="handbook-art"><div class="draft-mark">'+esc(card.mark)+'</div></div><div class="handbook-kind">旅途奇遇卡 · 本场肉鸽构筑</div><h3>'+esc(card.name)+'</h3><div class="gear-rule"><b>地标或纸箱三选一 · I 到 III 级</b>'+esc(card.line)+'</div><p class="gear-line">最多携带 5 张；同名自动融合，满栏新卡折成香蕉。卡牌不改写答题成绩。</p></article>';}
   function renderHandbook(){
     const query=String($('handbookSearch').value||'').trim().toLowerCase();const kind=$('handbookKind').value;const set=$('handbookSet').value;
-    const filtered=GEAR_BASES.filter(base=>{const text=[base.name,base.line,base.timing,GEAR_SET_NAMES[base.set],effectDescription(base.effect,1)].join(' ').toLowerCase();return (kind==='all'||handbookKind(base)===kind)&&(set==='all'||base.set===set)&&(!query||text.includes(query));});
-    $('handbookCount').textContent='显示 '+filtered.length+' / '+GEAR_BASES.length+' 件';$('handbookGrid').innerHTML=filtered.length?filtered.map(handbookCard).join(''):'<div class="handbook-empty">没有查到这件公文财产，可能仍在传真途中。</div>';
+    const filtered=GEAR_BASES.filter(base=>{const text=[base.name,base.line,base.timing,GEAR_SET_NAMES[base.set],effectDescription(base.effect,1)].join(' ').toLowerCase();return kind!=='card'&&(kind==='all'||handbookKind(base)===kind)&&(set==='all'||base.set===set)&&(!query||text.includes(query));});const cards=TOUR_CARDS.filter(card=>{const text=[card.name,card.line,card.mark].join(' ').toLowerCase();return (kind==='all'||kind==='card')&&set==='all'&&(!query||text.includes(query));});const total=GEAR_BASES.length+TOUR_CARDS.length;const html=cards.map(handbookTourCard).concat(filtered.map(handbookCard));$('handbookCount').textContent='显示 '+html.length+' / '+total+' 件';$('handbookGrid').innerHTML=html.length?html.join(''):'<div class="handbook-empty">没有查到这件公文财产，可能仍在传真途中。</div>';
   }
   function openHandbook(push=true){
     if(!$('handbookSet').dataset.ready){$('handbookSet').insertAdjacentHTML('beforeend',Object.entries(GEAR_SET_NAMES).map(([id,name])=>'<option value="'+id+'">'+esc(name)+'</option>').join(''));$('handbookSets').innerHTML=Object.entries(GEAR_SET_NAMES).map(([id,name])=>'<div class="handbook-set"><b>'+esc(name)+'</b>'+GEAR_BASES.filter(base=>base.set===id).length+' 件；两件即成套。</div>').join('');$('handbookSet').dataset.ready='1';}
@@ -1342,25 +1454,25 @@
   function resolveTeamBattle(session,battle,rng=Math.random){
     if(!battle||battle.resolved)return battle;const scoreTeam=(ids,opponents)=>ids.reduce((sum,id,index)=>{const row=session.studentResults[id];const opponent=session.studentResults[opponents[index%opponents.length]];const roll=battleScore(row,opponent,rng);const score=id===battle.bossId?roll.score*1.85+14:roll.score;battle.memberScores[id]={score:Math.round(score*10)/10,note:id===battle.bossId?'临时大魔王绝对加成：实力乘 1.85 后再加 14':roll.note};return sum+score;},0);
     battle.leftScore=Math.round(scoreTeam(battle.leftIds,battle.rightIds)*10)/10;battle.rightScore=Math.round(scoreTeam(battle.rightIds,battle.leftIds)*10)/10;const draw=Math.abs(battle.leftScore-battle.rightScore)<.5;battle.winner=draw?null:battle.leftScore>battle.rightScore?'left':'right';
-    const reward=(ids,won)=>ids.forEach(id=>{const row=session.studentResults[id];const floorDelta=draw?2:won?3:1;const bananaDelta=draw?4:won?6:3;row.floors+=floorDelta;row.bananas+=bananaDelta;row.earnedBananas=(row.earnedBananas||0)+bananaDelta;if(draw)row.battleDraws+=1;else if(won)row.battleWins+=1;else row.battleLosses+=1;battle.memberAwards[id]={floorDelta,bananaDelta};});reward(battle.leftIds,battle.winner==='left');reward(battle.rightIds,battle.winner==='right');
-    const boss=session.studentResults[battle.bossId];battle.line=draw?'两队公文同时落地，全员上 2 层并各得 4 根香蕉。':(battle.winner==='left'?'少人队':'满员队')+'拿下组队乱斗，全队各冲 3 层并得 6 根；另一队也上 1 层并得 3 根。'+(boss?'临时大魔王 '+boss.name+' 的加成已公开记账。':'');battle.resolved=true;return battle;
+    const reward=(ids,won)=>ids.forEach(id=>{const row=session.studentResults[id];const floorDelta=draw?2:won?3:1;const bananaDelta=draw?4:won?6:3;advanceTourRow(row,floorDelta);row.bananas+=bananaDelta;row.earnedBananas=(row.earnedBananas||0)+bananaDelta;if(draw)row.battleDraws+=1;else if(won)row.battleWins+=1;else row.battleLosses+=1;battle.memberAwards[id]={floorDelta,bananaDelta};});reward(battle.leftIds,battle.winner==='left');reward(battle.rightIds,battle.winner==='right');
+    const boss=session.studentResults[battle.bossId];battle.line=draw?'两队公文同时落地，全员前进 2 格并各得 4 根香蕉。':(battle.winner==='left'?'少人队':'满员队')+'拿下组队乱斗，全队各冲 3 格并得 6 根；另一队也前进 1 格并得 3 根。'+(boss?'临时大魔王 '+boss.name+' 的加成已公开记账。':'');battle.resolved=true;return battle;
   }
   function configureBattleMode(session,mode,rng=Math.random,randomize=false){const inter=session.intermission;const presentCount=presentParticipantIds(session,currentClass()).size;inter.battleMode=mode==='team'&&presentCount>=2?'team':'duel';inter.battleReady=true;inter.battleShowIndex=0;inter.battleShowBeat=0;if(inter.battleMode==='team'){inter.teamBattle=makeTeamBattle(session,currentClass(),rng);inter.pairs=[];}else{inter.pairs=makeBattlePairs(session,currentClass(),rng,randomize);inter.teamBattle=null;}return inter;}
   function prepareBattles(session){const inter=session.intermission;Object.assign(inter,{pairs:[],teamBattle:null,battleMode:null,battleReady:false,battleStarted:false,battleShowIndex:0,battleShowBeat:0,instant:false});session.phase='battle';saveState();render();openIntermission();}
-  function openInstantBattleModal(){const session=activeSession();if(!session||session.phase!=='answer')return;if(session.currentCall||session.pendingCall||drawing){showToast('先登记当前答题结果，再开启即时乱斗。');return;}openModal('instantBattleModal');}
+  function openInstantBattleModal(){const session=activeSession();if(!session||session.phase!=='answer')return;if(session.currentCall||session.pendingCall||drawing||session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('先完整结清当前题目，再开启即时乱斗。');return;}openModal('instantBattleModal');}
   function startInstantBattle(mode){const session=activeSession();if(!session||session.phase!=='answer'||session.currentCall||session.pendingCall||drawing)return;session.intermission={section:session.section,shopOrder:[],shopIndex:0,offersById:{},rerolled:{},purchased:{},purchaseCounts:{},mysteryStudentId:null,pairs:[],teamBattle:null,battleMode:null,battleReady:false,battleStarted:false,battleShowIndex:0,battleShowBeat:0,instant:true};session.phase='battle';configureBattleMode(session,mode,Math.random,true);closeModals();saveState();render();openIntermission();}
-  function battleSide(row){const totals=gearTotals(row);const gear=repairGearList(row.gear);const names=gear.length?gear.slice(-3).map(item=>item.name+' '+gearLevelText(item.level)).join('、'):'空手但有尊严';const sets=activeGearSets(row).map(id=>GEAR_SET_NAMES[id]).join('、')||'尚未成套';return '<div class="battle-side">'+characterSvg(row.character,null,'')+'<div><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><span>楼层 '+row.floors+' · 冲 '+totals.atk+' 稳 '+totals.guard+' 运 '+totals.luck+' 乱 '+totals.chaos+'<br>套装：'+esc(sets)+'<br>携带：'+esc(names)+'</span></div></div>';}
-  function battleFighter(row,score,floorDelta,bananaDelta,winner,beat){const totals=gearTotals(row);return '<div class="battle-fighter '+(winner&&beat>=2?'is-winner':'')+'">'+characterSvg(row.character,null,'')+'<strong>'+esc(row.name)+'</strong><span>'+(beat===0?'亮出 '+repairGearList(row.gear).length+' 件装备 · 冲 '+totals.atk+' 稳 '+totals.guard:beat===1?'乱斗签 '+Number(score||0).toFixed(1):'楼层 +'+floorDelta+' · 香蕉 +'+bananaDelta)+'</span></div>';}
-  function teamPanel(session,ids,title,battle,side,beat){const winner=battle.winner===side;return '<section class="battle-team '+(winner&&beat>=2?'is-winner':'')+'"><h3>'+esc(title)+' · '+Number(battle[side+'Score']||0).toFixed(1)+'</h3><div class="battle-team-list">'+ids.map(id=>{const row=session.studentResults[id];const award=battle.memberAwards[id]||{};return '<div class="battle-team-row">'+characterSvg(row.character,null,'')+'<span><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><small>'+(beat===0?'装备 '+repairGearList(row.gear).length+' 件':beat===1?esc(battle.memberScores[id]?.note||'账面实力到场'):'楼层 +'+(award.floorDelta||0)+' · 香蕉 +'+(award.bananaDelta||0))+'</small></span>'+(id===battle.bossId?'<span class="boss-seal">临时大魔王</span>':'')+'</div>';}).join('')+'</div></section>';}
+  function battleSide(row){const totals=gearTotals(row);const gear=repairGearList(row.gear);const names=gear.length?gear.slice(-3).map(item=>item.name+' '+gearLevelText(item.level)).join('、'):'空手但有尊严';const sets=activeGearSets(row).map(id=>GEAR_SET_NAMES[id]).join('、')||'尚未成套';return '<div class="battle-side">'+characterSvg(row.character,null,'')+'<div><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><span>里程 '+(row.tourDistance||row.floors)+' · 冲 '+totals.atk+' 稳 '+totals.guard+' 运 '+totals.luck+' 乱 '+totals.chaos+'<br>套装：'+esc(sets)+'<br>携带：'+esc(names)+'</span></div></div>';}
+  function battleFighter(row,score,floorDelta,bananaDelta,winner,beat){const totals=gearTotals(row);return '<div class="battle-fighter '+(winner&&beat>=2?'is-winner':'')+'">'+characterSvg(row.character,null,'')+'<strong>'+esc(row.name)+'</strong><span>'+(beat===0?'亮出 '+repairGearList(row.gear).length+' 件装备 · 冲 '+totals.atk+' 稳 '+totals.guard:beat===1?'乱斗签 '+Number(score||0).toFixed(1):'里程 +'+floorDelta+' · 香蕉 +'+bananaDelta)+'</span></div>';}
+  function teamPanel(session,ids,title,battle,side,beat){const winner=battle.winner===side;return '<section class="battle-team '+(winner&&beat>=2?'is-winner':'')+'"><h3>'+esc(title)+' · '+Number(battle[side+'Score']||0).toFixed(1)+'</h3><div class="battle-team-list">'+ids.map(id=>{const row=session.studentResults[id];const award=battle.memberAwards[id]||{};return '<div class="battle-team-row">'+characterSvg(row.character,null,'')+'<span><strong>'+esc(row.name)+' · '+esc(characterInfo(row.character).name)+'</strong><small>'+(beat===0?'装备 '+repairGearList(row.gear).length+' 件':beat===1?esc(battle.memberScores[id]?.note||'账面实力到场'):'里程 +'+(award.floorDelta||0)+' · 香蕉 +'+(award.bananaDelta||0))+'</small></span>'+(id===battle.bossId?'<span class="boss-seal">临时大魔王</span>':'')+'</div>';}).join('')+'</div></section>';}
   function battleCardsHtml(session){const inter=session.intermission;if(inter.battleMode==='team'&&inter.teamBattle){const battle=inter.teamBattle;return '<div class="battle-pairs"><article class="battle-card is-resolved"><div class="battle-title">随机组队 · '+(battle.bossId?'奇数大魔王局':'均衡组队局')+'</div><div class="battle-result">'+esc(battle.line||'两队正在核对装备。')+'</div></article></div>';}
     return '<div class="battle-pairs">'+(inter.pairs||[]).map((pair,index)=>{const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;return '<article class="battle-card '+(pair.resolved?'is-resolved':'')+'"><div class="battle-title">第 '+pad(index+1,2)+' 桌 · '+(right?'公文互殴':'影印件特别席')+'</div>'+battleSide(left)+(right?battleSide(right):'<div class="battle-side"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/><path d="M28 31h44M28 45h31M28 59h38" stroke="#a7977c" stroke-width="4"/></svg><div><strong>灵光局影印件</strong><span>没有角色，也没有本机存档</span></div></div>')+(pair.resolved?'<div class="battle-result">'+esc(pair.line)+'</div>':'')+'</article>';}).join('')+'</div>';}
-  function renderBattleShow(session){const inter=session.intermission;const beat=inter.battleShowBeat||0;const phaseName=['装备亮相','技能触发','楼层震荡'][beat]||'楼层震荡';let stage='';let result='';if(inter.battleMode==='team'){const battle=inter.teamBattle;stage='<div class="team-battle-stage">'+teamPanel(session,battle.leftIds,battle.bossId?'少人队 · 魔王增幅':'随机 A 队',battle,'left',beat)+'<div class="battle-versus"><b>战</b><span>'+battle.leftScore.toFixed(1)+'<br>对<br>'+battle.rightScore.toFixed(1)+'</span></div>'+teamPanel(session,battle.rightIds,'随机 B 队',battle,'right',beat)+'</div>';result=beat<2?'两队正在公开核对 '+phaseName+'。':battle.line;}else{const pair=inter.pairs[inter.battleShowIndex];const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;stage='<div class="battle-stage">'+battleFighter(left,pair.leftScore,pair.leftFloorDelta,pair.leftBananaDelta,pair.winnerId===left.id,beat)+'<div class="battle-versus"><b>斗</b><span>'+(pair.leftScore??'免')+'<br>对<br>'+(pair.rightScore??'免')+'</span></div>'+(right?battleFighter(right,pair.rightScore,pair.rightFloorDelta,pair.rightBananaDelta,pair.winnerId===right.id,beat):'<div class="battle-fighter"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/></svg><strong>影印件</strong><span>本机存档缺席</span></div>')+'</div>';result=beat<2?'第 '+(inter.battleShowIndex+1)+' 场正在公开 '+phaseName+'。':pair.line;}
+  function renderBattleShow(session){const inter=session.intermission;const beat=inter.battleShowBeat||0;const phaseName=['装备亮相','技能触发','赛道震荡'][beat]||'赛道震荡';let stage='';let result='';if(inter.battleMode==='team'){const battle=inter.teamBattle;stage='<div class="team-battle-stage">'+teamPanel(session,battle.leftIds,battle.bossId?'少人队 · 魔王增幅':'随机 A 队',battle,'left',beat)+'<div class="battle-versus"><b>战</b><span>'+battle.leftScore.toFixed(1)+'<br>对<br>'+battle.rightScore.toFixed(1)+'</span></div>'+teamPanel(session,battle.rightIds,'随机 B 队',battle,'right',beat)+'</div>';result=beat<2?'两队正在公开核对 '+phaseName+'。':battle.line;}else{const pair=inter.pairs[inter.battleShowIndex];const left=session.studentResults[pair.leftId];const right=pair.rightId?session.studentResults[pair.rightId]:null;stage='<div class="battle-stage">'+battleFighter(left,pair.leftScore,pair.leftFloorDelta,pair.leftBananaDelta,pair.winnerId===left.id,beat)+'<div class="battle-versus"><b>斗</b><span>'+(pair.leftScore??'免')+'<br>对<br>'+(pair.rightScore??'免')+'</span></div>'+(right?battleFighter(right,pair.rightScore,pair.rightFloorDelta,pair.rightBananaDelta,pair.winnerId===right.id,beat):'<div class="battle-fighter"><svg viewBox="0 0 100 100"><rect x="18" y="13" width="64" height="74" rx="5" fill="#fffdf6" stroke="#2f5148" stroke-width="4"/></svg><strong>影印件</strong><span>本机存档缺席</span></div>')+'</div>';result=beat<2?'第 '+(inter.battleShowIndex+1)+' 场正在公开 '+phaseName+'。':pair.line;}
     $('intermissionMain').innerHTML='<div class="battle-arena"><div class="battle-live-head"><span><small>'+(inter.instant?'即时震荡局':'本节终局')+'</small><br><b>'+phaseName+'</b></span><span>'+(inter.battleMode==='team'?1:inter.battleShowIndex+1)+' / '+(inter.battleMode==='team'?1:inter.pairs.length)+'</span></div>'+stage+'<div class="battle-live-result"><span>'+esc(result)+'</span><button class="btn-quiet" data-skip-battle-show>跳到战报</button></div></div>';scheduleBattleAdvance();}
   function renderBattle(session){
-    const inter=session.intermission;const done=session.phase==='round-summary';$('intermissionKicker').textContent=(inter.instant?'即时乱斗':'第 '+session.section+' 节结束')+' · '+(done?'战报归档':'楼层震荡');$('intermissionTitle').textContent=done?'本轮乱斗已经公开停笔':'灵光塔高能乱斗现场';$('intermissionMeta').innerHTML='全员都有楼层与香蕉。<br>赢家只是冲得更高、更响。';if(session.phase==='battle-show'){renderBattleShow(session);return;}
-    if(!done&&!inter.battleReady){$('intermissionMain').innerHTML='<div class="battle-mode-picker"><article class="battle-mode-card"><b>保留模式 · 个人乱斗</b><p>按当前楼层顺序两两交锋。胜者冲 3 层并得 6 根，另一方也上 1 层并得 3 根。</p><button class="btn-red" data-battle-mode="duel">选择个人乱斗</button></article><article class="battle-mode-card"><b>新模式 · 随机组队</b><p>每节重新洗队；奇数局的少人队产生一位临时大魔王，实力乘 1.85 后再加 14。</p><button class="btn-primary" data-battle-mode="team">选择随机组队</button></article></div>';return;}
-    const cards=battleCardsHtml(session);if(!done)$('intermissionMain').innerHTML=cards+'<div class="toolbar"><button class="btn-red" data-start-battle>开始可视乱斗</button><button class="btn-quiet" data-battle-mode="'+(inter.battleMode==='team'?'duel':'team')+'">切换为'+(inter.battleMode==='team'?'个人乱斗':'随机组队')+'</button><span class="section-note">演出分为装备亮相、技能触发、楼层震荡三段；全员都有奖励。</span></div>';
-    else{$('intermissionMain').innerHTML=cards+'<div class="battle-summary"><div><small>第 '+session.section+' 节战报</small><h3>'+(inter.instant?'即时震荡完成，继续答题':'下一节继续豪爽爬楼')+'</h3><p>'+(inter.instant?'公平洗牌袋与本节答题进度原样保留。':'装备与香蕉全部保留，公平袋将为下一节重新封装。')+'最终排名只有点击“最终结算”才会封存。</p><button class="btn-primary" data-next-section>'+(inter.instant?'回到第 '+session.section+' 节答题':'进入第 '+(session.section+1)+' 节答题')+'</button></div></div>';}
+    const inter=session.intermission;const done=session.phase==='round-summary';$('intermissionKicker').textContent=(inter.instant?'即时乱斗':'第 '+session.section+' 节结束')+' · '+(done?'战报归档':'赛道震荡');$('intermissionTitle').textContent=done?'本轮乱斗已经公开停笔':'灵光大巡游高能乱斗现场';$('intermissionMeta').innerHTML='全员都有里程与香蕉。<br>赢家只是冲得更远、更响。';if(session.phase==='battle-show'){renderBattleShow(session);return;}
+    if(!done&&!inter.battleReady){$('intermissionMain').innerHTML='<div class="battle-mode-picker"><article class="battle-mode-card"><b>个人乱斗</b><p>按当前巡游名次两两交锋。胜者冲 3 格并得 6 根，另一方也前进 1 格并得 3 根。</p><button class="btn-red" data-battle-mode="duel">选择个人乱斗</button></article><article class="battle-mode-card"><b>随机组队</b><p>每节重新洗队；奇数局的少人队产生一位临时大魔王，公开获得绝对加成。</p><button class="btn-primary" data-battle-mode="team">选择随机组队</button></article></div>';return;}
+    const cards=battleCardsHtml(session);if(!done)$('intermissionMain').innerHTML=cards+'<div class="toolbar"><button class="btn-red" data-start-battle>开始可视乱斗</button><button class="btn-quiet" data-battle-mode="'+(inter.battleMode==='team'?'duel':'team')+'">切换为'+(inter.battleMode==='team'?'个人乱斗':'随机组队')+'</button><span class="section-note">演出分为装备亮相、技能触发、赛道震荡三段；全员都有奖励。</span></div>';
+    else{$('intermissionMain').innerHTML=cards+'<div class="battle-summary"><div><small>第 '+session.section+' 节战报</small><h3>'+(inter.instant?'即时震荡完成，继续答题':'下一节继续豪爽巡游')+'</h3><p>'+(inter.instant?'公平洗牌袋与本节答题进度原样保留。':'装备与香蕉全部保留，公平袋将为下一节重新封装。')+'最终排名只有点击“最终结算”才会封存。</p><button class="btn-primary" data-next-section>'+(inter.instant?'回到第 '+session.section+' 节答题':'进入第 '+(session.section+1)+' 节答题')+'</button></div></div>';}
   }
   function startBattles(){
     const session=activeSession();if(!session||session.phase!=='battle'||!session.intermission?.battleReady)return;const before=Object.fromEntries(session.participantIds.map(id=>[id,{bananas:session.studentResults[id].bananas,wins:session.studentResults[id].battleWins}]));const inter=session.intermission;if(inter.battleMode==='team')resolveTeamBattle(session,inter.teamBattle);else inter.pairs.forEach(pair=>resolveBattlePair(session,pair));
@@ -1377,6 +1489,16 @@
     const specialEvents=(session.events||[]).filter(event=>event.event&&event.event!=='standard');const donkeyCount=(session.events||[]).filter(event=>event.outcome==='wrong').length;const airdrops=session.airdropLog||[];const rituals=session.surpriseLog||[];
     const surpriseNames=[...new Set(specialEvents.map(event=>({fish:'鱼小姐代答',snake:'蛇台方向',fertilizer:'黑化肥专场'}[event.event])).filter(Boolean).concat(rituals.map(item=>item.ritualName),airdrops.map(drop=>drop.name),donkeyCount?['驴的鉴定意见']:[]))];
     const battleTop=Math.max(0,...rows.map(row=>row.battleWins||0));const fighters=rows.filter(row=>(row.battleWins||0)===battleTop&&battleTop>0).map(row=>row.name);const gearCount=rows.reduce((sum,row)=>sum+(row.gear?.length||0),0);
+    if(session.mode==='grand-tour'){
+      rows.forEach(repairTourRow);const stampTop=Math.max(0,...rows.map(row=>row.tourStamps));const stampKings=rows.filter(row=>row.tourStamps===stampTop&&stampTop>0).map(row=>row.name);const distanceTop=Math.max(0,...rows.map(row=>row.tourDistance));const distanceKings=rows.filter(row=>row.tourDistance===distanceTop&&distanceTop>0).map(row=>row.name);const overtakeTop=Math.max(0,...rows.map(row=>row.tourOvertakes));const overtakers=rows.filter(row=>row.tourOvertakes===overtakeTop&&overtakeTop>0).map(row=>row.name);
+      return [
+        {label:'六地巡游总章王',names:stampKings.length?stampKings.join('、'):'印章还在预热',line:stampKings.length?stampTop+' 枚巡游章，公文包已经开始下坠。':'下一题将产生第一枚正式章。'},
+        {label:'宝驴发动机疑似改装',names:distanceKings.length?distanceKings.join('、'):'全员仍在起跑礼仪区',line:distanceKings.length?'累计 '+distanceTop+' 格，豪车库拒绝说明排量。':'赛道正在等待第一枚骰子。'},
+        {label:'红鲤鱼绿鲤鱼驴全勤答题员',names:attendance.length?attendance.join('、'):'本场暂无符合对象',line:attendance.length?attendance.length+' 位在岗玩家完成答题登记。':'全勤科仍在等第一份材料。'},
+        {label:'同格碰杯大型社交奖',names:overtakers.length?overtakers.join('、'):'大家暂时保持礼貌车距',line:overtakers.length?'累计触发 '+overtakeTop+' 次同格碰杯，香蕉均为正向流通。':'赛道尚未出现第一次快乐堵车。'},
+        {label:'彩蛋与装备科联合失控奖',names:surpriseNames.length?surpriseNames.join('、'):'惊喜仍在下一秒',line:'特殊事件 '+specialEvents.length+' 次，惊喜机 '+rituals.length+' 次，共流转装备 '+gearCount+' 件。'}
+      ];
+    }
     return [
       {label:'本日楼王，电梯仍未批准',names:kings.length?kings.join('、'):'本节尚无人上楼',line:kings.length?top+' 层，楼梯间已形成传说。':'大堂保持了令人安心的稳定。'},
       {label:'加盖速度超出图纸',names:improvers.length?improvers.join('、'):'本节从零起步',line:improvers.length?'比上一次多爬 '+bestGain+' 层。加盖工程部正在补图。':'下一节课将拥有第一条进步基线。'},
@@ -1385,12 +1507,12 @@
       {label:'彩蛋与装备科联合失控奖',names:surpriseNames.length?surpriseNames.join('、'):'惊喜仍在下一秒',line:'特殊事件 '+specialEvents.length+' 次，惊喜机 '+rituals.length+' 次，共流转装备 '+gearCount+' 件。'}
     ];
   }
-  function archiveCompetitionSnapshot(session,endedAt=Date.now()){return {id:session.id,classId:session.classId,participantIds:deepClone(session.participantIds),startedAt:session.startedAt,endedAt,section:session.section,noticeNo:session.noticeNo,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog||[]),surpriseLog:deepClone(session.surpriseLog||[]),battleLog:deepClone(session.battleLog||[]),previousFloors:deepClone(session.previousFloors||{}),studentResults:session.participantIds.map(id=>deepClone(session.studentResults[id])).filter(Boolean),awards:buildAwards(session)};}
+  function archiveCompetitionSnapshot(session,endedAt=Date.now()){return {id:session.id,classId:session.classId,participantIds:deepClone(session.participantIds),mode:session.mode||'legacy-tower',tourVersion:session.tourVersion||0,startedAt:session.startedAt,endedAt,section:session.section,noticeNo:session.noticeNo,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog||[]),surpriseLog:deepClone(session.surpriseLog||[]),battleLog:deepClone(session.battleLog||[]),previousFloors:deepClone(session.previousFloors||{}),studentResults:session.participantIds.map(id=>deepClone(session.studentResults[id])).filter(Boolean),awards:buildAwards(session)};}
   function finalConfirmationReady(now,until){return Number(until)>Number(now);}
   function renderFinalButtons(){const armed=finalConfirmationReady(Date.now(),finalConfirmUntil);const label=armed?'再次点击确认结算':'最终结算';const top=$('liveSettlement');if(top){top.textContent=label;top.classList.toggle('btn-final-confirm',armed);}document.querySelectorAll('[data-final-settlement]').forEach(button=>{button.textContent=label;button.classList.toggle('btn-final-confirm',armed);});}
   function requestFinalSettlement(){
     const session=activeSession();if(!session)return;
-    if(session.currentCall||session.pendingCall||drawing){showToast('当前约谈还没登记，请先判定、免答或等待盖章完成。');return;}
+    if(session.currentCall||session.pendingCall||drawing||session.tour?.pendingMove||session.tour?.pendingDraft){resumeTourPending(session);showToast('当前题目还没完整结清，请先完成判定、巡游与奇遇。');return;}
     const now=Date.now();if(!finalConfirmationReady(now,finalConfirmUntil)){finalConfirmUntil=now+3600;renderFinalButtons();showToast('最终结算会封存整场比赛。请在 3 秒内再次点击确认。');clearTimeout(finalConfirmTimer);finalConfirmTimer=setTimeout(()=>{if(Date.now()>=finalConfirmUntil){finalConfirmUntil=0;renderFinalButtons();}},3700);return;}
     finalConfirmUntil=0;clearTimeout(finalConfirmTimer);finishCompetition();
   }
@@ -1405,12 +1527,13 @@
   }
   function showSettlement(session){
     viewedSession=session;$('intermission').classList.add('hidden');$('settlement').classList.remove('hidden');
-    $('settlementTitle').textContent=currentClass().name+' · 整场比赛最终结算';
+    const grand=session.mode==='grand-tour';$('settlementTitle').textContent=currentClass().name+' · '+(grand?'灵光大巡游最终结算':'楼层赛历史结算');
     $('settlementMeta').innerHTML=esc(formatDate(session.startedAt))+' 开始<br>'+esc(formatDate(session.endedAt||Date.now()))+' 结束 · '+(session.section||1)+' 节 · '+session.noticeNo+' 份通知';
     const awards=session.awards||buildAwards(session);
     $('awardGrid').innerHTML=awards.map((award,index)=>'<article class="award-card"><small>课堂称号 '+pad(index+1,2)+'</small><strong>'+esc(award.label)+'</strong><p><b>'+esc(award.names)+'</b><br>'+esc(award.line)+'</p></article>').join('');
-    const rows=(Array.isArray(session.studentResults)?session.studentResults:Object.values(session.studentResults||{})).slice().sort((a,b)=>b.floors-a.floors||(b.battleWins||0)-(a.battleWins||0)||(b.earnedBananas||b.bananas)-(a.earnedBananas||a.bananas)||a.name.localeCompare(b.name,'zh-CN'));
-    $('settlementBody').innerHTML=rows.map((row,index)=>'<tr><td>'+pad(index+1,2)+'</td><td><b>'+esc(row.name)+'</b></td><td>'+esc(characterInfo(row.character).name)+'</td><td>'+esc(row.group)+'</td><td class="num">'+row.floors+'</td><td class="num">'+row.bananas+'</td><td class="num">'+(row.earnedBananas??row.bananas)+'</td><td class="num">'+(row.battleWins||0)+'胜</td><td class="num">'+(row.gear?.length||0)+'</td><td class="num">'+(row.answers?Math.round(row.correct/row.answers*100):0)+'%</td></tr>').join('');
+    document.querySelector('#settlement .settlement-table thead').innerHTML='<tr><th>名次</th><th>同学</th><th>角色</th><th>部门</th><th class="num">'+(grand?'巡游章':'楼层')+'</th><th class="num">'+(grand?'里程':'余粮')+'</th><th class="num">总赚</th><th class="num">乱斗</th><th class="num">装备</th><th class="num">答对率</th></tr>';
+    const rows=(Array.isArray(session.studentResults)?session.studentResults:Object.values(session.studentResults||{})).slice();if(grand)rows.forEach(repairTourRow);rows.sort((a,b)=>grand?((b.tourStamps||0)-(a.tourStamps||0)||(b.tourDistance||0)-(a.tourDistance||0)||(b.earnedBananas||b.bananas)-(a.earnedBananas||a.bananas)):b.floors-a.floors||(b.battleWins||0)-(a.battleWins||0)||(b.earnedBananas||b.bananas)-(a.earnedBananas||a.bananas)||a.name.localeCompare(b.name,'zh-CN'));
+    $('settlementBody').innerHTML=rows.map((row,index)=>'<tr><td>'+pad(index+1,2)+'</td><td><b>'+esc(row.name)+'</b></td><td>'+esc(characterInfo(row.character).name)+'</td><td>'+esc(row.group)+'</td><td class="num">'+(grand?row.tourStamps:row.floors)+'</td><td class="num">'+(grand?row.tourDistance:row.bananas)+'</td><td class="num">'+(row.earnedBananas??row.bananas)+'</td><td class="num">'+(row.battleWins||0)+'胜</td><td class="num">'+(row.gear?.length||0)+'</td><td class="num">'+(row.answers?Math.round(row.correct/row.answers*100):0)+'%</td></tr>').join('');
   }
   function closeSettlement(){$('settlement').classList.add('hidden');viewedSession=null;}
   function playTone(kind){
@@ -1508,7 +1631,7 @@
     const cls=currentClass();const session=activeSession();
     if(!drawing)$('suspense').classList.add('hidden');
     $('classSelect').innerHTML=state.classes.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===cls.id?' selected':'')+'>'+esc(item.name)+'</option>').join('');$('classSelect').disabled=Boolean(session);
-    $('buildingName').textContent=cls.name+' · 联合办公楼';
+    $('buildingName').textContent=cls.name+' · 灵光大巡游环线';
     const present=cls.students.filter(student=>!student.absent);const participants=sessionStudents(cls,session);const activePresent=participants.filter(student=>!student.absent);$('presentLabel').textContent=session?'本场在岗':'名册在岗';$('presentMetric').textContent=session?activePresent.length+'/'+participants.length:present.length+'/'+cls.students.length;
     $('sessionToggle').textContent=!session?'开始比赛':session.phase==='answer'?'结束本节 · 进入乱斗':'继续课间流程';$('sessionToggle').className=session?'btn-red':'btn-primary';
     $('liveSettlement').classList.toggle('hidden',!session);renderFinalButtons();
@@ -1520,45 +1643,35 @@
     if(!$('rosterModal').classList.contains('hidden'))renderRosterModal();
     if(!$('historyModal').classList.contains('hidden'))renderHistory();
   }
+  function tourCellHtml(cell){const label=cell.type==='landmark'?cell.name:cell.type==='plain'?'':cell.name;return '<div class="tour-cell is-'+cell.type+'" data-tour-cell="'+cell.index+'" title="第 '+cell.index+' 格 · '+esc(cell.name)+'">'+esc(cell.mark)+(label?'<span>'+esc(label)+'</span>':'')+'</div>';}
+  function tourPoint(index,width,height){const insetX=Math.max(34,Math.min(58,width*.075));const insetY=Math.max(34,Math.min(54,height*.12));const left=insetX,right=width-insetX,top=insetY,bottom=height-insetY;let x=left,y=top;if(index<=9){x=left+(right-left)*(index/9);}else if(index<=15){x=right;y=top+(bottom-top)*((index-9)/6);}else if(index<=24){x=right-(right-left)*((index-15)/9);y=bottom;}else{y=bottom-(bottom-top)*((index-24)/6);}return {x,y};}
   function renderBuilding(cls,session){
-    const rows=lessonRows(cls,session);const topFloor=Math.max(0,...rows.map(row=>row.floors||0));const bananas=rows.reduce((sum,row)=>sum+(row.bananas||0),0);
-    $('topFloorMetric').textContent=topFloor+'F';$('bananaMetric').textContent=bananas;
+    const rows=lessonRows(cls,session).map(repairTourRow);const leadDistance=Math.max(0,...rows.map(row=>row.tourDistance||0));const bananas=rows.reduce((sum,row)=>sum+(row.bananas||0),0);
+    $('topFloorMetric').textContent=leadDistance+' 格';$('bananaMetric').textContent=bananas;
     const currentId=session?.currentCall?.studentId||null;
     const displayStudents=sessionStudents(cls,session);
     $('monkeyLayer').innerHTML=displayStudents.map(student=>{
       const row=session?.studentResults?.[student.id]||emptyLessonStudent(student);
       const classes=['monkey-token'];if(student.absent)classes.push('is-absent');if(currentId===student.id)classes.push('is-current');if(row.streak>=state.settings.streakAt)classes.push('has-gold-aura');
-      return '<button class="'+classes.join(' ')+'" data-student-id="'+esc(student.id)+'" data-floor="'+Number(row.floors||0)+'" title="'+esc(student.name)+'，'+esc(characterInfo(row.character).name)+'，'+Number(row.floors||0)+' 层，'+Number(row.bananas||0)+' 香蕉，'+(row.gear?.length||0)+' 件装备"><span class="token-aura"></span>'+characterSvg(row.character,null)+'<span class="token-name">'+esc(student.name)+'</span></button>';
+      if(row.tourLastMove>0)classes.push('has-moved');return '<button class="'+classes.join(' ')+'" data-student-id="'+esc(student.id)+'" data-position="'+Number(row.tourPosition||0)+'" title="'+esc(student.name)+'，'+esc(characterInfo(row.character).name)+'，巡游 '+Number(row.tourDistance||0)+' 格，'+Number(row.tourStamps||0)+' 枚章，'+Number(row.bananas||0)+' 香蕉"><span class="token-aura"></span><span class="tour-last-move">+'+Number(row.tourLastMove||0)+'</span>'+characterSvg(row.character,null)+'<span class="token-name">'+esc(student.name)+'</span></button>';
     }).join('');
-    const ranked=displayStudents.map(student=>({student,row:session?.studentResults?.[student.id]||emptyLessonStudent(student)})).sort((a,b)=>b.row.floors-a.row.floors||b.row.bananas-a.row.bananas||a.student.name.localeCompare(b.student.name,'zh-CN'));
-    $('rankList').innerHTML=ranked.map((item,index)=>'<div class="rank-row"><span class="rank-no">'+pad(index+1,2)+'</span><span class="rank-name">'+esc(item.student.name)+(item.student.absent?' · 缺席':'')+'</span><span class="rank-score"><b>'+item.row.floors+'F</b><span>'+item.row.bananas+' 香蕉 · '+(item.row.gear?.length||0)+' 件</span></span></div>').join('');
+    $('floorGrid').innerHTML=TOUR_CELLS.map(tourCellHtml).join('')+'<div class="tour-center"><div><small>三十格循环巡游</small><strong>答题者选骰 · 全员都前进</strong><p>六大地标盖章，纸箱挡陷阱<br>香蕉、近路、碰杯与怪装备随时插队</p></div></div>';
+    const ranked=displayStudents.map(student=>({student,row:repairTourRow(session?.studentResults?.[student.id]||emptyLessonStudent(student))})).sort((a,b)=>(b.row.tourStamps||0)-(a.row.tourStamps||0)||(b.row.tourDistance||0)-(a.row.tourDistance||0)||b.row.bananas-a.row.bananas||a.student.name.localeCompare(b.student.name,'zh-CN'));
+    $('rankList').innerHTML=ranked.map((item,index)=>'<div class="rank-row"><span class="rank-no">'+pad(index+1,2)+'</span><span class="rank-name">'+esc(item.student.name)+(item.student.absent?' · 缺席':'')+'<small class="tour-card-summary">'+item.row.tourCards.length+' 卡 · '+item.row.tourShields+' 护</small></span><span class="rank-score"><b>'+item.row.tourStamps+' 章</b><span>'+item.row.tourDistance+' 格 · '+item.row.bananas+' 蕉</span></span></div>').join('');
     if(session){const pool=sessionPool(cls,session);reconcileBag(pool);const bag=pool.bag;$('roundNote').textContent='比赛第 '+session.section+' 节 · '+(bag.round?'公平袋第 '+bag.round+' 轮：已点 '+bag.served.length+'，剩余 '+bag.remaining.length:'公平袋待首次签发时开封');}
     else $('roundNote').textContent='开始本节后，从 2～6 位参战同学中开封公平袋';
-    requestAnimationFrame(()=>layoutBuilding(topFloor));
+    requestAnimationFrame(()=>layoutBuilding());
   }
-  function layoutBuilding(topFloor){
+  function layoutBuilding(){
     const stage=$('floorStage');if(!stage.clientWidth||!stage.clientHeight)return;
-    const narrow=innerWidth<=700;
-    const bands=narrow?6:8;
-    const maximum=Math.max(bands,Math.ceil((topFloor+1)/5)*5);
-    $('floorGrid').innerHTML=Array.from({length:bands+1},(_,index)=>{
-      const floor=Math.round(maximum*index/bands);const bottom=8+(stage.clientHeight-36)*index/bands;const dept=FLOOR_DEPARTMENTS[floor%FLOOR_DEPARTMENTS.length];
-      return '<div class="floor-line" style="bottom:'+bottom+'px"><span class="floor-label">'+floor+'F · '+esc(dept)+'</span></div>';
-    }).join('');
-    const tokens=[...$('monkeyLayer').children];const groups=new Map();tokens.forEach(token=>{const floor=Number(token.dataset.floor||0);if(!groups.has(floor))groups.set(floor,[]);groups.get(floor).push(token);});
-    const horizontalInset=narrow?18:29;const topInset=narrow?28:34;const bottomInset=narrow?26:34;const tokenWidth=narrow?34:46;const usableWidth=Math.max(40,stage.clientWidth-horizontalInset*2);
-    groups.forEach((floorTokens,floor)=>{
-      const perRow=Math.max(1,Math.floor(usableWidth/tokenWidth));const rowCount=Math.ceil(floorTokens.length/perRow);const baseTop=stage.clientHeight-bottomInset-(floor/maximum)*(stage.clientHeight-topInset-bottomInset);
-      floorTokens.sort((a,b)=>a.dataset.studentId.localeCompare(b.dataset.studentId)).forEach((token,index)=>{
-        const row=Math.floor(index/perRow);const inRow=index%perRow;const count=Math.min(perRow,floorTokens.length-row*perRow);const x=horizontalInset+(inRow+.5)*usableWidth/count;const rowOffset=(row-(rowCount-1)/2)*(narrow?22:29);
-        token.style.left=x+'px';token.style.top=clamp(baseTop-rowOffset,topInset,stage.clientHeight-bottomInset)+'px';
-      });
-    });
+    [...$('floorGrid').querySelectorAll('[data-tour-cell]')].forEach(cell=>{const point=tourPoint(Number(cell.dataset.tourCell),stage.clientWidth,stage.clientHeight);cell.style.left=point.x+'px';cell.style.top=point.y+'px';});
+    const tokens=[...$('monkeyLayer').children];const groups=new Map();tokens.forEach(token=>{const position=Number(token.dataset.position||0);if(!groups.has(position))groups.set(position,[]);groups.get(position).push(token);});
+    groups.forEach((positionTokens,position)=>{const point=tourPoint(position,stage.clientWidth,stage.clientHeight);positionTokens.sort((a,b)=>a.dataset.studentId.localeCompare(b.dataset.studentId)).forEach((token,index)=>{const angle=(Math.PI*2*index/Math.max(1,positionTokens.length))-.7;const radius=positionTokens.length>1?(innerWidth<=700?14:20):0;token.style.left=(point.x+Math.cos(angle)*radius)+'px';token.style.top=(point.y+Math.sin(angle)*radius)+'px';});});
   }
   function renderActiveControl(cls,session){
     const pool=sessionPool(cls,session);reconcileBag(pool);$('noticeMetric').textContent=pad(session.noticeNo);$('bagMetric').textContent=pool.bag.remaining.length;$('answerMetric').textContent=session.events.filter(event=>['correct','partial','wrong'].includes(event.outcome)).length;
     const hasCall=Boolean(session.currentCall);$('readyControl').classList.toggle('hidden',hasCall);$('callControl').classList.toggle('hidden',!hasCall);
-    $('readyHeading').textContent=session.rushNext?'黑化肥专场已经备案':'可以点名，也可以直接指定';$('readyCopy').textContent=session.rushNext?'下一题进入全班抢答，记分归属可在通知下方选择。':'点楼里的角色或“自由记分”可直接安排；公平袋已点 '+pool.bag.served.length+' 位，刷新不会重洗。';
+    $('readyHeading').textContent=session.rushNext?'黑化肥专场已经备案':'可以点名，也可以直接指定';$('readyCopy').textContent=session.rushNext?'下一题进入全班抢答，记分归属可在通知下方选择。':'点赛道角色或“自由记分”可直接安排；每次判题全员先走，答题者再选骰。公平袋已点 '+pool.bag.served.length+' 位。';
     const pendingDrop=session.airdropEffect;$('airdropPending').classList.toggle('hidden',!pendingDrop);if(pendingDrop)$('airdropPending').innerHTML='<b>待生效空投：</b>'+esc(pendingDrop.name)+'。'+esc(pendingDrop.line);
     if(hasCall)renderCall(cls,session);
     const last=session.lastResult;$('lastResult').classList.toggle('hidden',!last);if(last)$('lastResult').innerHTML='<b>上一笔：</b>'+esc(last.message)+' <button class="btn-small btn-quiet" data-action="undo-last">撤销</button>';
@@ -1569,7 +1682,7 @@
     const result=session.studentResults[student.id];const role=characterInfo(result.character);
     $('noticeNo').textContent='约谈通知第 '+pad(call.noticeNo)+' 号';$('calledName').textContent=student.name;$('noticePortrait').innerHTML=characterSvg(result.character,student.outfit,'');
     const rules={
-      standard:{dept:'灵光局签发',sentence:'请 '+student.name+' 同学即刻上楼答题。',text:'常规约谈：答对上一层，香蕉按设置入账。',className:''},
+      standard:{dept:'灵光巡游签发',sentence:'请 '+student.name+' 同学即刻答题并选择巡游骰。',text:'常规通知：判题先记香蕉，再由全员基础步与答题者主骰推进。',className:''},
       fish:{dept:'鱼小姐临时代办',sentence:'鱼小姐已经代答，'+student.name+' 同学本次免答。',text:'鱼小姐代答：全班笑一次，原约谈对象不加分也不扣分。',className:'is-fish'},
       snake:{dept:'蛇台方向处',sentence:'请 '+student.name+' 同学参考方向后自行判断。',text:'方向仅供参考：答对香蕉翻倍，答错不扣。',className:'is-snake'},
       fertilizer:{dept:'黑化肥专场',sentence:'全班抢答，'+student.name+' 同学保留优先权。',text:'连续三次答错已触发全班抢答。谁抢到，就把记分归属改成谁。',className:'is-fertilizer'}
@@ -1635,10 +1748,13 @@
     for(let index=0;index<samples;index++){const lead=rollGear(0,6,leadRng);const trail=rollGear(5,6,trailRng);const mystery=rollMysteryGear(trailRng);leadPower+=rarityPower(lead.rarity);trailPower+=rarityPower(trail.rarity);normalCost+=lead.cost;normalStrength+=lead.atk+lead.guard+lead.luck+lead.chaos;mysteryCost+=mystery.cost;mysteryStrength+=mystery.atk+mystery.guard+mystery.luck+mystery.chaos;}
     leadPower/=samples;trailPower/=samples;normalCost/=samples;normalStrength/=samples;mysteryCost/=samples;mysteryStrength/=samples;record('落后位稀有度扶持有力但不保送',trailPower-leadPower>=.45&&trailPower-leadPower<=1.15,'领先均值 '+fixed(leadPower)+'；落后均值 '+fixed(trailPower)+'；差值 '+fixed(trailPower-leadPower));
     const mysteryRatio=mysteryStrength/normalStrength;record('神秘神器强度与高价相称且未失控',mysteryRatio>=1.3&&mysteryRatio<=2.8,'普通均价 '+fixed(normalCost)+'、四维 '+fixed(normalStrength)+'；神器均价 '+fixed(mysteryCost)+'、四维 '+fixed(mysteryStrength)+'；强度比 '+fixed(mysteryRatio));
-    const economyRng=seededRandom(2718);const roleRows=[];for(const role of CHARACTERS){let bananaSum=0,floorSum=0;for(let section=0;section<4000;section++){let row=emptyLessonStudent(createStudent('模拟'),role.id);for(let q=0;q<5;q++){const roll=economyRng();const outcome=roll<.64?'correct':roll<.82?'partial':'wrong';const event=economyRng()<.08?'snake':'standard';row=applyOutcome(row,outcome,4+economyRng()*16,event,DEFAULT_SETTINGS).next;}bananaSum+=row.bananas;floorSum+=row.floors;}roleRows.push({name:role.name,banana:bananaSum/4000,floors:floorSum/4000});}
-    const composite=roleRows.map(row=>row.banana+row.floors*2.5);const spread=(Math.max(...composite)-Math.min(...composite))/(composite.reduce((sum,value)=>sum+value,0)/composite.length);record('六角色五题期望处于同一竞争带',spread<=.24,roleRows.map(row=>row.name+' '+fixed(row.banana)+'蕉/'+fixed(row.floors)+'层').join('；')+'；综合差 '+fixed(spread*100)+'%');
+    const economyRng=seededRandom(2718);const roleRows=[];for(const role of CHARACTERS){let bananaSum=0;for(let section=0;section<4000;section++){let row=emptyLessonStudent(createStudent('模拟'),role.id);for(let q=0;q<5;q++){const roll=economyRng();const outcome=roll<.64?'correct':roll<.82?'partial':'wrong';const event=economyRng()<.08?'snake':'standard';row=applyOutcome(row,outcome,4+economyRng()*16,event,DEFAULT_SETTINGS).next;}bananaSum+=row.bananas;}roleRows.push({name:role.name,banana:bananaSum/4000});}
+    const composite=roleRows.map(row=>row.banana);const spread=(Math.max(...composite)-Math.min(...composite))/(composite.reduce((sum,value)=>sum+value,0)/composite.length);record('六角色五题香蕉期望处于同一竞争带',spread<=.24,roleRows.map(row=>row.name+' '+fixed(row.banana)+'蕉').join('；')+'；差 '+fixed(spread*100)+'%');
     const averageBananas=roleRows.reduce((sum,row)=>sum+row.banana,0)/roleRows.length;record('一轮五题收入支持三连购与高价神器',averageBananas+SHOP_ENTRY_BONUS>=mysteryCost*3&&averageBananas+SHOP_ENTRY_BONUS<=mysteryCost*4.2,'含采购红包后角色平均 '+fixed(averageBananas+SHOP_ENTRY_BONUS)+' 蕉；神器均价 '+fixed(mysteryCost)+' 蕉');
     const eventRng=seededRandom(31415);let mysteryHits=0,duplicateHits=0;for(let index=0;index<20000;index++){if(eventRng()<.22)mysteryHits++;if(eventRng()<.48)duplicateHits++;}const mysteryRate=mysteryHits/20000;const duplicateRate=duplicateHits/20000;record('神秘商店保持偶发而非每轮必见',mysteryRate>=.205&&mysteryRate<=.235,'两万节命中 '+fixed(mysteryRate*100)+'%');record('同名融合候选稳定但不挤占全部货架',duplicateRate>=.46&&duplicateRate<=.50,'有可升级装备时命中 '+fixed(duplicateRate*100)+'%');
+    const dieMeans=Object.fromEntries(Object.values(TOUR_DICE).flat().map(die=>[die.id,die.faces.reduce((sum,value)=>sum+value,0)/die.faces.length]));record('六种巡游骰均值分层清晰且答错不倒退',dieMeans.precise>=4&&dieMeans.burst>=dieMeans.precise&&dieMeans.steady>=2.4&&dieMeans.shortcut>=3&&dieMeans.dignity>=2&&dieMeans.filing>=2&&Object.values(TOUR_DICE).flat().every(die=>Math.min(...die.faces)>=0),Object.entries(dieMeans).map(([id,value])=>id+' '+fixed(value)).join('；'));
+    const publicRng=seededRandom(20260817);let publicTotal=0;for(let index=0;index<20000;index++)publicTotal+=publicRng()<.48?2:1;const publicMean=publicTotal/20000;record('全员基础步保持高参与但不压过答题主骰',publicMean>=1.45&&publicMean<=1.55&&publicMean<dieMeans.steady,'两万次基础步均值 '+fixed(publicMean)+'；最低主骰均值 '+fixed(dieMeans.steady));
+    const maxCardLevel=3;const strongestPermanent={public:Math.min(2,Math.ceil(maxCardLevel/2)),main:maxCardLevel,landing:maxCardLevel,catchup:Math.min(2,maxCardLevel)};record('III 级旅途卡有明显成长但单项增幅受控',strongestPermanent.public<=2&&strongestPermanent.main<=3&&strongestPermanent.landing<=3&&strongestPermanent.catchup<=2,Object.entries(strongestPermanent).map(([id,value])=>id+' +'+value).join('；'));
     const rescueRng=seededRandom(9527);let rescueWins=0;for(let index=0;index<5000;index++){const trail=emptyLessonStudent(createStudent('落后'),'fish');const lead=emptyLessonStudent(createStudent('领先'),'monkey');trail.floors=3;lead.floors=4;trail.answers=lead.answers=5;trail.bananas=lead.bananas=8;trail.gear=[rollGear(5,6,rescueRng,'prop-badge')];lead.gear=[rollGear(0,6,rescueRng,'prop-stapler')];const a=battleScore(trail,lead,rescueRng).score;const b=battleScore(lead,trail,rescueRng).score;if(a>b)rescueWins++;}const rescueRate=rescueWins/5000;record('落后一层的反超构筑有机会但非必中',rescueRate>=.36&&rescueRate<=.72,'五千场胜率 '+fixed(rescueRate*100)+'%');
     const soloPaces=Object.values(SOLO_DIFFICULTIES).map(item=>item.pace);record('单人三档难度具有清晰且不过度跳变的速度梯度',soloPaces[0]<soloPaces[1]&&soloPaces[1]<soloPaces[2]&&Math.max(soloPaces[1]-soloPaces[0],soloPaces[2]-soloPaces[1])<1.4,soloPaces.map(fixed).join(' -> '));
     const soloLeadRng=seededRandom(816);const soloTrailRng=seededRandom(816);const soloItemTier=id=>SOLO_ITEMS.find(item=>item.id===id)?.tier||0;let soloLeadStrong=0,soloTrailStrong=0;for(let index=0;index<10000;index++){if(soloItemTier(rollSoloItemForRank(1,soloLeadRng))===2)soloLeadStrong++;if(soloItemTier(rollSoloItemForRank(6,soloTrailRng))===2)soloTrailStrong++;}const leadStrongRate=soloLeadStrong/10000;const trailStrongRate=soloTrailStrong/10000;record('单人追赶道具扶持明显但不保证强力件',leadStrongRate>=.2&&leadStrongRate<=.28&&trailStrongRate>=.72&&trailStrongRate<=.8,'领先强力 '+fixed(leadStrongRate*100)+'%；落后强力 '+fixed(trailStrongRate*100)+'%');
@@ -1649,8 +1765,8 @@
     $('qaPanel').querySelector('strong').textContent='课堂答题器 QA 自检';const lines=[];const tests=[];
     function record(name,positive,negativeBlocked){const pass=Boolean(positive&&negativeBlocked);lines.push((pass?'[过] ':'[败] ')+name+'：正向'+(positive?'通过':'失败')+'；反向破坏'+(negativeBlocked?'已拦截':'未拦截'));tests.push({name,pass,positive:Boolean(positive),negativeBlocked:Boolean(negativeBlocked)});}
     const fixture=createClass('QA公平袋',['甲','乙','丙','丁','戊','己']);const rng=seededRandom(7);const draws=fixture.students.map(()=>claimFromBag(fixture,rng));const ids=fixture.students.map(student=>student.id);const fair=draws.length===ids.length&&new Set(draws).size===ids.length&&ids.every(id=>draws.includes(id));const brokenDraws=ids.map(()=>ids[0]);const brokenFair=brokenDraws.length===ids.length&&new Set(brokenDraws).size===ids.length&&ids.every(id=>brokenDraws.includes(id));record('洗牌袋一轮无重复且全员覆盖',fair,!brokenFair);
-    const scoreStudent=createStudent('甲');scoreStudent.character='egg';const result=emptyLessonStudent(scoreStudent,'egg');const scored=applyOutcome(result,'correct',3,'standard',DEFAULT_SETTINGS);let persisted=false;let brokenPersisted=true;try{localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(scored.next));persisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(result));brokenPersisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.removeItem(QA_STORAGE_KEY);}catch(_){persisted=false;brokenPersisted=true;}record('分数增减与 localStorage 持久化',scored.delta===11&&scored.next.floors===1&&persisted,!brokenPersisted);
-    const manualBase=emptyLessonStudent(createStudent('附加题'));const manualStats=emptyStats();const manualApplied=applyManualBanana(manualBase,manualStats,3);const manualBroken=applyOutcome(manualBase,'correct',1,'standard',DEFAULT_SETTINGS);record('自由香蕉不点名也不增加答题与楼层',manualApplied.next.bananas===3&&manualApplied.next.earnedBananas===3&&manualApplied.next.answers===0&&manualApplied.next.floors===0&&manualApplied.nextStats.totalBananas===3,manualBroken.next.answers!==0&&manualBroken.next.floors!==0);
+    const scoreStudent=createStudent('甲');scoreStudent.character='egg';const result=emptyLessonStudent(scoreStudent,'egg');const scored=applyOutcome(result,'correct',3,'standard',DEFAULT_SETTINGS);let persisted=false;let brokenPersisted=true;try{localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(scored.next));persisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.setItem(QA_STORAGE_KEY,JSON.stringify(result));brokenPersisted=JSON.parse(localStorage.getItem(QA_STORAGE_KEY)).bananas===scored.delta;localStorage.removeItem(QA_STORAGE_KEY);}catch(_){persisted=false;brokenPersisted=true;}record('分数增减与 localStorage 持久化',scored.delta===11&&scored.next.answers===1&&scored.next.tourDistance===0&&persisted,!brokenPersisted);
+    const manualBase=emptyLessonStudent(createStudent('附加题'));const manualStats=emptyStats();const manualApplied=applyManualBanana(manualBase,manualStats,3);const manualBroken=applyOutcome(manualBase,'correct',1,'standard',DEFAULT_SETTINGS);record('自由香蕉不点名也不触发巡游',manualApplied.next.bananas===3&&manualApplied.next.earnedBananas===3&&manualApplied.next.answers===0&&manualApplied.next.tourDistance===0&&manualApplied.nextStats.totalBananas===3,manualBroken.next.answers!==0);
     const untouchedBag={round:1,remaining:['乙'],served:['甲'],last:'甲'};const beforeBag=JSON.stringify(untouchedBag);applyOutcome(manualBase,'partial',6,'standard',DEFAULT_SETTINGS);const brokenBag=deepClone(untouchedBag);brokenBag.remaining.shift();record('指定答题不消耗公平洗牌袋',JSON.stringify(untouchedBag)===beforeBag,JSON.stringify(brokenBag)!==beforeBag);
     const absentClass=createClass('QA缺席',['甲','乙','丙']);absentClass.students[1].absent=true;const absentId=absentClass.students[1].id;const absentDraws=[claimFromBag(absentClass,seededRandom(2)),claimFromBag(absentClass,seededRandom(3))];const skipsAbsent=absentDraws.every(id=>id!==absentId);const brokenAbsent=[absentId,absentClass.students[0].id].every(id=>id!==absentId);record('缺席同学自动跳过',skipsAbsent,!brokenAbsent);
     const oldRoster=[createStudent('甲',0),createStudent('乙',1)];const merged=mergeRoster(oldRoster,['乙','丙']);const rosterOk=merged.length===2&&merged[0].id===oldRoster[1].id&&!merged.some(student=>student.name==='甲')&&merged.some(student=>student.name==='丙');const brokenRoster=oldRoster;const brokenRosterOk=brokenRoster.length===2&&brokenRoster[0].id===oldRoster[1].id&&!brokenRoster.some(student=>student.name==='甲')&&brokenRoster.some(student=>student.name==='丙');record('名册新增与删除保持身份边界',rosterOk,!brokenRosterOk);
@@ -1659,7 +1775,7 @@
     const strictWrong=Object.assign({},DEFAULT_SETTINGS,{wrong:-2});const fishStudent=createStudent('鱼');fishStudent.character='fish';const fishBase=emptyLessonStudent(fishStudent,'fish');const fishFirst=applyOutcome(fishBase,'wrong',20,'standard',strictWrong);const fishSecond=applyOutcome(fishFirst.next,'wrong',20,'standard',strictWrong);const eggStudent=createStudent('蛋');eggStudent.character='egg';const eggPartial=applyOutcome(emptyLessonStudent(eggStudent,'egg'),'partial',20,'standard',DEFAULT_SETTINGS);const brokenFish=applyOutcome(Object.assign({},fishBase,{character:'monkey'}),'wrong',20,'standard',strictWrong);record('六角色被动按角色触发且不串线',fishFirst.delta===0&&fishSecond.delta===strictWrong.wrong&&eggPartial.delta===DEFAULT_SETTINGS.partial+1,brokenFish.delta!==0);
     const migratedRewards=migrateSettings({correct:3,partial:1,wrong:-1,fastBonus:1,streakBonus:1});const preservedCustom=migrateSettings({correct:5,partial:2,wrong:-2,fastBonus:2,streakBonus:4});const brokenRewards={correct:3,partial:1,wrong:-1};record('旧建议分值自动升级为豪爽版且自定义分值保留',migratedRewards.correct===8&&migratedRewards.partial===4&&migratedRewards.wrong===0&&preservedCustom.correct===5&&preservedCustom.wrong===-2,brokenRewards.correct!==8);
     const ritualIds=SURPRISE_RITUALS.map(item=>item.id);const ritualOk=ritualIds.length===5&&new Set(ritualIds).size===5&&ritualIds.every(id=>ritualSvg(id).includes('<svg'));const brokenRituals=[ritualIds[0],ritualIds[0],...ritualIds.slice(2)];record('五种惊喜仪式双重随机入口',ritualOk,new Set(brokenRituals).size!==brokenRituals.length);
-    const crateBase=emptyLessonStudent(createStudent('箱',0));const crateApplied=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,AIRDROPS.find(item=>item.effect==='extraFloor'));const crateBroken=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,null);const crateEventSafe=chooseEvent({rushNext:false},()=>.01,true)==='standard';const crateWouldBeSkipped=chooseEvent({rushNext:false},()=>.01,false)==='fish';record('惊喜结果只作用于下一题',crateApplied.next.floors===2&&crateBroken.next.floors===1&&crateEventSafe,crateBroken.next.floors!==2&&crateWouldBeSkipped);
+    const crateBase=emptyLessonStudent(createStudent('箱',0));const crateApplied=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,AIRDROPS.find(item=>item.effect==='extraFloor'));const crateBroken=applyOutcome(crateBase,'correct',20,'standard',DEFAULT_SETTINGS,null);const crateEventSafe=chooseEvent({rushNext:false},()=>.01,true)==='standard';const crateWouldBeSkipped=chooseEvent({rushNext:false},()=>.01,false)==='fish';record('惊喜结果只作用于下一题巡游',crateApplied.tourBonus===1&&crateBroken.tourBonus===0&&crateEventSafe,crateBroken.tourBonus!==1&&crateWouldBeSkipped);
     const plainCap=characterSvg('monkey','cap','');const plainCrown=characterSvg('monkey','crown','');const wornCap=monkeySvg('cap','');const brokenRoleArt=monkeySvg('cap','')===monkeySvg('crown','');record('角色本体不再被行头遮挡',plainCap===plainCrown&&plainCap!==wornCap,!brokenRoleArt);
     const lootRng=seededRandom(33);const lootRolls=Array.from({length:180},()=>rollGear(5,6,lootRng));const variedSame=lootRolls.some((item,index)=>lootRolls.some((other,otherIndex)=>otherIndex!==index&&other.baseId===item.baseId&&(other.rarity!==item.rarity||other.atk!==item.atk||other.guard!==item.guard)));const malformedLoot=lootRolls.some(item=>!RARITIES.some(rarity=>rarity.id===item.rarity)||item.cost<2||![item.atk,item.guard,item.luck,item.chaos].every(Number.isFinite));const brokenLoot=[{baseId:'same',rarity:'common',atk:1,guard:1},{baseId:'same',rarity:'common',atk:1,guard:1}];const brokenVaried=brokenLoot.some((item,index)=>brokenLoot.some((other,otherIndex)=>otherIndex!==index&&other.baseId===item.baseId&&(other.rarity!==item.rarity||other.atk!==item.atk||other.guard!==item.guard)));record('同名装备可刷出不同稀有度与属性',variedSame&&!malformedLoot,!brokenVaried);
     const rarityValue=id=>RARITIES.findIndex(item=>item.id===id);const leadRng=seededRandom(91);const trailRng=seededRandom(91);const leadAverage=Array.from({length:400},()=>rarityValue(rollRarity(0,6,leadRng).id)).reduce((a,b)=>a+b,0)/400;const trailAverage=Array.from({length:400},()=>rarityValue(rollRarity(5,6,trailRng).id)).reduce((a,b)=>a+b,0)/400;const brokenCatchup=leadAverage>leadAverage+.25;record('落后位获得更高的翻盘稀有度权重',trailAverage>leadAverage+.25,!brokenCatchup);
@@ -1670,8 +1786,8 @@
     const luxuryPool=LUXURY_GEARS.concat(MYSTERY_GEARS);const luxuryIds=luxuryPool.map(item=>item.id);const luxuryNames=luxuryPool.map(item=>item.name);const brokenLuxury=luxuryPool.concat([deepClone(luxuryPool[0])]);record('夸张奢侈品与神器形成超大原创装备池',GEAR_BASES.length>=80&&LUXURY_GEARS.length>=30&&MYSTERY_GEARS.length>=12&&new Set(luxuryIds).size===luxuryIds.length&&new Set(luxuryNames).size===luxuryNames.length&&luxuryPool.every(item=>luxurySvg(item).includes('<svg')),new Set(brokenLuxury.map(item=>item.id)).size!==brokenLuxury.length);
     const mysterySession=repairState(deepClone(persistCandidate)).activeSession;enterShopPhase(mysterySession,()=>0,persistClass);const mysteryId=mysterySession.intermission.mysteryStudentId;const mysteryOffers=mysterySession.intermission.offersById[mysteryId]||[];const ordinarySession=repairState(deepClone(persistCandidate)).activeSession;enterShopPhase(ordinarySession,()=>.99,persistClass);const ordinaryOffers=Object.values(ordinarySession.intermission.offersById).flat();const brokenOrdinaryOffers=ordinaryOffers.concat([rollMysteryGear(seededRandom(73))]);record('神秘商店每节至多一次且只给落后位三选一',mysteryId===mysterySession.intermission.shopOrder[0]&&mysteryOffers.length===3&&new Set(mysteryOffers.map(item=>item.baseId)).size===3&&mysteryOffers.every(item=>item.rarity==='mythic')&&!ordinarySession.intermission.mysteryStudentId&&ordinaryOffers.every(item=>item.rarity!=='mythic'),brokenOrdinaryOffers.some(item=>item.rarity==='mythic'));
     const counterA=emptyLessonStudent(createStudent('怪招方'),'monkey');const counterB=emptyLessonStudent(createStudent('防线方'),'fish');counterA.floors=1;counterB.floors=4;counterA.gear=[rollGear(2,6,seededRandom(61),'prop-peel')];counterB.gear=[rollGear(2,6,seededRandom(62),'prop-helmet')];const blockedRoll=battleScore(counterA,counterB,()=>0);const noShield=deepClone(counterB);noShield.gear=[];const openRoll=battleScore(counterA,noShield,()=>0);record('防线可反制怪招而非只比四项总数',blockedRoll.note.includes('怪招撞上')&&!blockedRoll.note.includes('香蕉皮公文补盖')&&openRoll.note.includes('香蕉皮公文补盖'),!openRoll.note.includes('怪招撞上'));
-    const fighterA=emptyLessonStudent(createStudent('甲方'),'monkey');const fighterB=emptyLessonStudent(createStudent('乙方'),'fish');fighterA.floors=4;fighterB.floors=2;fighterA.earnedBananas=fighterA.bananas=4;fighterB.earnedBananas=fighterB.bananas=4;fighterA.gear=[Object.assign({},cheap,{atk:8,guard:3,luck:0,chaos:0,effect:'steady'})];const fightSession={studentResults:{[fighterA.id]:fighterA,[fighterB.id]:fighterB}};const fightPair={leftId:fighterA.id,rightId:fighterB.id,resolved:false};resolveBattlePair(fightSession,fightPair,()=>.1);const untouched={leftId:fighterA.id,rightId:fighterB.id,resolved:false};record('乱斗同时计算实力装备与可控运气',fightPair.resolved&&fightPair.winnerId===fighterA.id&&fighterA.battleWins===1&&fighterA.bananas===10&&!untouched.resolved,!untouched.resolved&&untouched.winnerId==null);
-    const battleFloorSafe=fightPair.leftFloorDelta===3&&fightPair.rightFloorDelta===1&&fighterA.floors===7&&fighterB.floors===3&&fightPair.leftBananaDelta===6&&fightPair.rightBananaDelta===3;const brokenFloorAward={leftFloorDelta:0,rightFloorDelta:-1};record('乱斗胜负直接震动楼层且双方都有正奖励',battleFloorSafe,brokenFloorAward.leftFloorDelta<=0||brokenFloorAward.rightFloorDelta<=0);
+    const fighterA=emptyLessonStudent(createStudent('甲方'),'monkey');const fighterB=emptyLessonStudent(createStudent('乙方'),'fish');advanceTourRow(fighterA,4);advanceTourRow(fighterB,2);fighterA.earnedBananas=fighterA.bananas=4;fighterB.earnedBananas=fighterB.bananas=4;fighterA.gear=[Object.assign({},cheap,{atk:8,guard:3,luck:0,chaos:0,effect:'steady'})];const fightSession={studentResults:{[fighterA.id]:fighterA,[fighterB.id]:fighterB}};const fightPair={leftId:fighterA.id,rightId:fighterB.id,resolved:false};resolveBattlePair(fightSession,fightPair,()=>.1);const untouched={leftId:fighterA.id,rightId:fighterB.id,resolved:false};record('乱斗同时计算实力装备与可控运气',fightPair.resolved&&fightPair.winnerId===fighterA.id&&fighterA.battleWins===1&&fighterA.bananas===10&&!untouched.resolved,!untouched.resolved&&untouched.winnerId==null);
+    const battleFloorSafe=fightPair.leftFloorDelta===3&&fightPair.rightFloorDelta===1&&fighterA.tourDistance===7&&fighterB.tourDistance===3&&fightPair.leftBananaDelta===6&&fightPair.rightBananaDelta===3;const brokenFloorAward={leftFloorDelta:0,rightFloorDelta:-1};record('乱斗胜负直接震动赛道且双方都有正奖励',battleFloorSafe,brokenFloorAward.leftFloorDelta<=0||brokenFloorAward.rightFloorDelta<=0);
     const teamClass=createClass('QA组队',['甲','乙','丙','丁','戊']);const teamResults=Object.fromEntries(teamClass.students.map((student,index)=>{const row=emptyLessonStudent(student,CHARACTERS[index].id);row.floors=index;row.answers=3;row.bananas=row.earnedBananas=8;return [student.id,row];}));const teamSession={participantIds:teamClass.students.map(student=>student.id),studentResults:teamResults};const teamBattle=makeTeamBattle(teamSession,teamClass,seededRandom(2026));const teamIds=teamBattle.leftIds.concat(teamBattle.rightIds);const teamShape=teamBattle.leftIds.length===2&&teamBattle.rightIds.length===3&&teamBattle.leftIds.includes(teamBattle.bossId)&&new Set(teamIds).size===5;resolveTeamBattle(teamSession,teamBattle,seededRandom(2027));const teamRewarded=teamIds.every(id=>teamBattle.memberAwards[id].floorDelta>0&&teamBattle.memberAwards[id].bananaDelta>0)&&teamBattle.memberScores[teamBattle.bossId].note.includes('乘 1.85');const brokenTeamIds=teamIds.slice(1);record('奇数随机组队覆盖全员且少人队产生临时大魔王',teamShape&&teamRewarded,new Set(brokenTeamIds).size!==5);
     const simulatedPurchases={purchaseCounts:{qa:0}};const purchaseSteps=[];for(let step=0;step<SHOP_BUY_LIMIT;step++){purchaseSteps.push(simulatedPurchases.purchaseCounts.qa<SHOP_BUY_LIMIT);simulatedPurchases.purchaseCounts.qa+=1;}const brokenSingleBuyLimit=1;record('每位玩家一轮可连续购买三件并由上限收口',SHOP_BUY_LIMIT===3&&purchaseSteps.every(Boolean)&&simulatedPurchases.purchaseCounts.qa===3,brokenSingleBuyLimit<SHOP_BUY_LIMIT);
     const phaseCandidate=deepClone(persistCandidate);phaseCandidate.activeSession.phase='shop';phaseCandidate.activeSession.section=3;phaseCandidate.activeSession.intermission={shopOrder:persistIds,shopIndex:1,offersById:{}};const repairedPhase=repairState(phaseCandidate);const brokenPhase=deepClone(phaseCandidate);brokenPhase.activeSession.phase='teleport';const repairedInvalidPhase=repairState(brokenPhase);record('采购与乱斗阶段跨刷新持久化',repairedPhase.activeSession.phase==='shop'&&repairedPhase.activeSession.section===3&&repairedPhase.activeSession.intermission.shopIndex===1,repairedInvalidPhase.activeSession.phase==='answer');
@@ -1685,9 +1801,15 @@
     const soloCandidate=deepClone(persistCandidate);soloCandidate.activeSolo=soloRun;soloCandidate.soloRecords=[{id:'local_rank',endedAt:1,character:'fish',difficulty:'standard',place:2,turns:12,score:321,splits:[4,8]}];const repairedSolo=repairState(soloCandidate);const brokenSoloCandidate=deepClone(soloCandidate);brokenSoloCandidate.activeSolo.racers=[];record('单人赛与本地排行榜跨刷新持久化',repairedSolo.activeSolo.turn===2&&repairedSolo.soloRecords[0].score===321,repairState(brokenSoloCandidate).activeSolo===null);
     const economyRun=createSoloRun('egg','stroll',91);const openingLight=soloPlayer(economyRun).light;advanceSoloRun(economyRun,'collect');const afterCollect=soloPlayer(economyRun).light;advanceSoloRun(economyRun,'rush');const afterRush=soloPlayer(economyRun).light;const brokenEconomy=deepClone(economyRun);soloPlayer(brokenEconomy).light=-1;record('单人灵光按回合发放且采集与投资形成取舍',openingLight===4&&afterCollect>=10&&afterRush>=afterCollect-1&&afterRush<=afterCollect&&soloPlayer(economyRun).light>=0,soloPlayer(brokenEconomy).light<0);
     const finishRun=createSoloRun('monkey','stroll',33);for(let turn=0;turn<12&&finishRun.phase==='race';turn++)advanceSoloRun(finishRun,turn%3===0?'collect':turn%3===1?'rush':'chaos');const brokenFinish=deepClone(finishRun);brokenFinish.finalRecord.splits=[];record('十二回合完赛生成名次分数与本机幽灵线',finishRun.phase==='finished'&&finishRun.finalRecord.score>0&&finishRun.finalRecord.splits.length===12&&finishRun.finalRecord.routeCounts.collect===4,brokenFinish.finalRecord.splits.length!==12);
+    const mapIds=TOUR_CELLS.map(cell=>cell.index);const brokenMap=TOUR_CELLS.slice(1);record('三十格环线与六大地标使用唯一编号',TOUR_CELLS.length===30&&new Set(mapIds).size===30&&Object.keys(TOUR_LANDMARKS).length===6,brokenMap.length!==30);
+    const precise=TOUR_DICE.correct.find(die=>die.id==='precise');const dignity=TOUR_DICE.wrong.find(die=>die.id==='dignity');const brokenPrecise=Object.assign({},precise,{faces:[0,0,1,1,2,2]});record('答对稳准骰下限高于答错体面骰下限',Math.min(...precise.faces)>=3&&Math.min(...dignity.faces)>=1,Math.min(...brokenPrecise.faces)<3);
+    const tourClass=createClass('QA巡游',['甲','乙']);const tourRows=Object.fromEntries(tourClass.students.map((student,index)=>[student.id,emptyLessonStudent(student,CHARACTERS[index].id)]));const tourSession={participantIds:tourClass.students.map(student=>student.id),section:1,events:[],studentResults:tourRows,tour:{pendingMove:{id:'qa_move',targetId:tourClass.students[0].id,outcome:'correct',source:'qa',moveBonus:0,tourBonus:0,options:['precise']},pendingDraft:null,lastResolution:null}};const tourResolution=resolveTourMove('precise',()=>0,tourSession,tourClass);const tourDistances=tourSession.participantIds.map(id=>tourSession.studentResults[id].tourDistance);const brokenDistances=[5,0];record('每次判题全员先走、同格互动且答题者再走主骰',tourResolution.mainMove===3&&tourDistances[0]===5&&tourDistances[1]===2&&tourResolution.publicCollisions.length===1&&tourSession.participantIds.every(id=>tourSession.studentResults[id].bananas>=1),brokenDistances[1]===0);
+    const draftRow=emptyLessonStudent(createStudent('卡牌'));const draftSession={tour:{pendingDraft:null}};const draft=prepareTourDraft(draftSession,draftRow,'QA地标',seededRandom(88));const brokenDraft={offers:[draft.offers[0],draft.offers[0],draft.offers[1]]};record('十八张旅途卡以不重复三选一进入本场肉鸽构筑',TOUR_CARDS.length===18&&draft.offers.length===3&&new Set(draft.offers).size===3,new Set(brokenDraft.offers).size!==3);
+    draftRow.tourCards=[{id:'turbo',level:2}];repairTourRow(draftRow);const brokenCardRow=deepClone(draftRow);brokenCardRow.tourCards[0].level=4;record('同名旅途卡可融合到 III 级且读取真实技能等级',tourCardLevel(draftRow,'mainPlus')===2&&repairTourRow(brokenCardRow).tourCards[0].level===3,brokenCardRow.tourCards[0].level!==4);
+    const cardPersistCandidate=deepClone(persistCandidate);const cardPersistId=cardPersistCandidate.activeSession.participantIds[0];cardPersistCandidate.activeSession.studentResults[cardPersistId].tourCards=[{id:'turbo',level:2}];cardPersistCandidate.activeSession.tour={pendingMove:null,pendingDraft:{targetId:cardPersistId,reason:'刷新测试',offers:['turbo','stamp','alley']},lastResolution:null};const repairedCards=repairState(cardPersistCandidate);const brokenCardPersist=deepClone(repairedCards);brokenCardPersist.activeSession.studentResults[cardPersistId].tourCards=[];record('旅途卡与待选三选一跨刷新持久化',repairedCards.activeSession.studentResults[cardPersistId].tourCards[0].level===2&&repairedCards.activeSession.tour.pendingDraft.offers.length===3,brokenCardPersist.activeSession.studentResults[cardPersistId].tourCards.length===0);
     const catalogKinds=new Set(GEAR_BASES.map(handbookKind));const brokenCatalog=GEAR_BASES.slice(1);record('玩家图鉴与比赛共用八十四件装备正本',GEAR_BASES.length===84&&catalogKinds.size===5&&GEAR_BASES.every(base=>handbookCard(base).includes(esc(base.name))),brokenCatalog.length!==84);
-    const legacyBrand=['驯','猴办'].join('');const brandGate=text=>text.includes('猴与鱼 · 灵光塔')&&!text.includes(legacyBrand);const brandSource=document.title+'\n'+document.body.innerText+'\n'+GROUPS.join('|');record('品牌统一为猴与鱼灵光塔并迁移旧部门名',brandGate(brandSource)&&GROUPS.includes('灵光局'),!brandGate(brandSource+'\n'+legacyBrand));
-    const statDefinitions=[['冲','1.18'],['稳','0.92'],['运','0.55'],['乱','0.65']];const statCopy=$('statsModal').innerText;const statGate=copy=>statDefinitions.every(([name,value])=>copy.includes(name)&&copy.includes(value))&&copy.includes('不会改写答题成绩');record('冲稳运乱四维逐项解释且限定只作用于乱斗',statGate(statCopy),!statGate(statCopy.replace('0.65','')));
+    const legacyBrand=['驯','猴办'].join('');const brandGate=text=>text.includes('猴与鱼 · 灵光大巡游')&&!text.includes(legacyBrand);const brandSource=document.title+'\n'+document.body.innerText+'\n'+GROUPS.join('|');record('品牌统一为猴与鱼灵光大巡游并迁移旧部门名',brandGate(brandSource)&&GROUPS.includes('灵光局'),!brandGate(brandSource+'\n'+legacyBrand));
+    const statCopy=$('statsModal').innerText;const statGate=copy=>['主骰额外前进','陷阱自动被挡住','多发 1 根','抄近路 2 格','不会改写答题成绩'].every(part=>copy.includes(part));record('冲稳运乱四维解释赛道作用且不改写成绩',statGate(statCopy),!statGate(statCopy.replace('抄近路 2 格','')));
     const desktopGate=svg=>svg.includes('<svg')&&svg.includes('#3fab84')&&iconDataUrl().startsWith('data:image/svg+xml')&&!/<(?:image|script)[^>]+(?:https?:)?\/\//i.test(svg);record('桌面入口使用内嵌猴与鱼图标且保持零联网',desktopGate(APP_ICON_SVG),!desktopGate(APP_ICON_SVG+'<image href="https://example.com/icon.png">'));
     const source=document.documentElement.outerHTML;const badCall=['fet','ch'].join('')+'("/qa-break")';record('单文件零联网出口',networkGate(source),!networkGate(source+'\n'+badCall));
     const pictographic=/\p{Extended_Pictographic}/u;const flavored=/[\u2190-\u21ff\u2460-\u24ff]/u;const emojiFree=!pictographic.test(source)&&!flavored.test(source);const brokenEmoji=pictographic.test(source+' '+String.fromCodePoint(0x1f600));record('emoji 与装饰符号全局禁令',emojiFree,brokenEmoji);
@@ -1700,9 +1822,13 @@
     const session=activeSession();const cls=currentClass();
     if(kind==='notice'){
       const student=cls.students.find(item=>!item.absent);session.noticeNo=7;session.currentCall={studentId:student.id,event:'snake',noticeNo:7,startedAt:Date.now()-6200};session.pendingCall=null;render();requestAnimationFrame(()=>$('notice').classList.add('is-stamped'));
+    }else if(kind==='dice'){
+      const id=session.participantIds[0];session.currentCall=null;session.tour.pendingDraft=null;session.tour.pendingMove={id:'qa_dice',targetId:id,outcome:'correct',source:'qa',createdAt:Date.now(),moveBonus:1,tourBonus:0,options:['precise','burst']};saveState();render();renderTourDice();
+    }else if(kind==='draft'){
+      const id=session.participantIds[0];const row=session.studentResults[id];session.currentCall=null;session.tour.pendingMove=null;prepareTourDraft(session,row,'宝驴豪车库首次盖章',seededRandom(816));saveState();render();renderTourDraft();
     }else if(kind==='settlement'){
-      Object.values(session.studentResults).forEach((row,index)=>{row.floors=Math.max(0,9-index%8);row.bananas=row.floors*2+(index%3);row.earnedBananas=row.bananas+index+2;row.answers=Math.max(1,row.floors);row.correct=Math.max(0,row.answers-(index%3));row.partial=index%2;row.wrong=Math.max(0,row.answers-row.correct-row.partial);row.battleWins=index%3;row.gear=[rollGear(index,6,seededRandom(index+2))];});
-      session.noticeNo=24;session.events=[{event:'snake',outcome:'correct'},{event:'fish',outcome:'exempt'},{event:'standard',outcome:'wrong'}];session.airdropLog=[Object.assign({},AIRDROPS[0],{openedAt:Date.now()})];const fixture={id:'qa_settlement',startedAt:Date.now()-2700000,endedAt:Date.now(),section:3,noticeNo:24,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog),battleLog:[{section:1},{section:2}],previousFloors:deepClone(session.previousFloors||{}),studentResults:Object.values(session.studentResults)};fixture.awards=buildAwards(fixture);showSettlement(fixture);
+      Object.values(session.studentResults).forEach((row,index)=>{row.tourDistance=Math.max(0,49-index*5);row.tourPosition=row.tourDistance%TOUR_LENGTH;row.tourStamps=Math.max(1,6-index);row.tourLaps=Math.floor(row.tourDistance/TOUR_LENGTH);row.floors=row.tourDistance;row.bananas=26-index*2;row.earnedBananas=row.bananas+index+8;row.answers=Math.max(1,9-index);row.correct=Math.max(0,row.answers-(index%3));row.partial=index%2;row.wrong=Math.max(0,row.answers-row.correct-row.partial);row.battleWins=index%3;row.tourOvertakes=index%4;row.tourCards=[{id:TOUR_CARDS[index%TOUR_CARDS.length].id,level:1+index%3}];row.gear=[rollGear(index,6,seededRandom(index+2))];});
+      session.noticeNo=24;session.events=[{event:'snake',outcome:'correct'},{event:'fish',outcome:'exempt'},{event:'standard',outcome:'wrong'}];session.airdropLog=[Object.assign({},AIRDROPS[0],{openedAt:Date.now()})];const fixture={id:'qa_settlement',mode:'grand-tour',startedAt:Date.now()-2700000,endedAt:Date.now(),section:3,noticeNo:24,events:deepClone(session.events),airdropLog:deepClone(session.airdropLog),battleLog:[{section:1},{section:2}],previousFloors:deepClone(session.previousFloors||{}),studentResults:Object.values(session.studentResults)};fixture.awards=buildAwards(fixture);showSettlement(fixture);
     }else if(kind==='shop'){
       Object.values(session.studentResults).forEach((row,index)=>{row.floors=6-index;row.bananas=8-index%3;row.earnedBananas=row.bananas+index;row.gear=index?[rollGear(index,6,seededRandom(index+11))]:[];});session.phase='answer';session.currentCall=null;beginIntermission();
     }else if(kind==='mystery'){
@@ -1715,6 +1841,8 @@
   }
 
   document.addEventListener('click',event=>{
+    const tourCard=event.target.closest('[data-tour-card]');if(tourCard){chooseTourCard(tourCard.dataset.tourCard);return;}
+    const tourDie=event.target.closest('[data-tour-die]');if(tourDie){rollTourDice(tourDie.dataset.tourDie);return;}
     const soloCharacter=event.target.closest('[data-solo-character]');if(soloCharacter){soloDraft.character=soloCharacter.dataset.soloCharacter;renderSoloSetup();return;}
     const soloDifficulty=event.target.closest('[data-solo-difficulty]');if(soloDifficulty){soloDraft.difficulty=soloDifficulty.dataset.soloDifficulty;renderSoloSetup();return;}
     const soloUse=event.target.closest('[data-solo-use]');if(soloUse){useSoloItem(Number(soloUse.dataset.soloUse));return;}
@@ -1773,10 +1901,10 @@
   $('openHandbook').addEventListener('click',()=>openHandbook());$('closeHandbook').addEventListener('click',closeHandbook);$('handbookSearch').addEventListener('input',renderHandbook);$('handbookKind').addEventListener('change',renderHandbook);$('handbookSet').addEventListener('change',renderHandbook);addEventListener('popstate',()=>{if(new URLSearchParams(location.search).get('handbook')==='1')openHandbook(false);else $('handbook').classList.add('hidden');});
   $('closeQa').addEventListener('click',()=>$('qaPanel').classList.add('hidden'));
   addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;updateDesktopStatus();});addEventListener('appinstalled',()=>{deferredInstallPrompt=null;updateDesktopStatus();showToast('灵光塔已添加到桌面。');});
-  addEventListener('resize',()=>requestAnimationFrame(()=>layoutBuilding(Math.max(0,...lessonRows(currentClass(),activeSession()).map(row=>row.floors||0)))));
+  addEventListener('resize',()=>requestAnimationFrame(layoutBuilding));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInterval(answerClock);else if(activeSession()?.currentCall){updateAnswerClock();clearInterval(answerClock);answerClock=setInterval(updateAnswerClock,1000);}});
 
-  configureDesktopIcon();render();
+  configureDesktopIcon();render();if(activeSession()?.tour?.pendingMove||activeSession()?.tour?.pendingDraft)setTimeout(()=>resumeTourPending(),40);
   if(QA_MODE)setTimeout(()=>{runQa();const fixture=new URLSearchParams(location.search).get('fixture');if(fixture)setTimeout(()=>showFixture(fixture),40);},80);
   else if(BALANCE_MODE)setTimeout(runBalanceAudit,80);
   if(HANDBOOK_MODE)setTimeout(()=>openHandbook(false),40);
