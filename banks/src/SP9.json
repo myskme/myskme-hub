@@ -1,0 +1,159 @@
+{
+ "date": "2026-08-17",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "炼狱",
+ "tier": "free",
+ "name": "大雨那天 · 人物传 VOL.8（陷阱猎人版）",
+ "code": "SP9",
+ "desc": "2026 暑假特辑 SP9《大雨那天》陷阱猎人版语法命门 12 题，按 R / SR / SSR 三档标注难度。本卷的九宫格主图、看图与回读（13–17）、传记阅读（18–20）、对号入座、名册核对与密码显影依赖纸面图与原文，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "Nobody stopped to rest that afternoon, ___ ?",
+    "ops": [
+     "did they",
+     "didn't they",
+     "did he",
+     "didn't he"
+    ],
+    "ans": 0,
+    "why": "陈述部分含 nobody 已是否定，反意部分用肯定；nobody 指人，附加问句用 they。",
+    "lv": 1
+   },
+   {
+    "q": "The rain fell ___ hard that the path turned to mud in an hour.",
+    "ops": [
+     "such",
+     "so",
+     "very",
+     "too"
+    ],
+    "ans": 1,
+    "why": "so + 副词/形容词 + that 从句——hard 在这里是副词。",
+    "lv": 1
+   },
+   {
+    "q": "They ___ up the mountain since six this morning, and they are still walking.",
+    "ops": [
+     "have been climbing",
+     "climbed",
+     "are climbing",
+     "had climbed"
+    ],
+    "ans": 0,
+    "why": "since + 时间点 + 到现在仍在继续 → 现在完成进行时。",
+    "lv": 2
+   },
+   {
+    "q": "Jie is the one ___ clothes were wet through, but he never said a word.",
+    "ops": [
+     "who",
+     "which",
+     "whose",
+     "that"
+    ],
+    "ans": 2,
+    "why": "横线后面是名词 clothes，缺的是「他的」，用关系代词 whose。",
+    "lv": 2
+   },
+   {
+    "q": "That is the hut under ___ the cat was sitting, dry and quiet.",
+    "ops": [
+     "that",
+     "where",
+     "it",
+     "which"
+    ],
+    "ans": 3,
+    "why": "介词 + 关系代词，指物用 which——under which。",
+    "lv": 2
+   },
+   {
+    "q": "The name ___ on the last line was not there a month ago.",
+    "ops": [
+     "writing",
+     "written",
+     "write",
+     "wrote"
+    ],
+    "ans": 1,
+    "why": "过去分词作后置定语，表被动——名字是「被写上去的」。",
+    "lv": 2
+   },
+   {
+    "q": "The harder it rained, ___ the three of them walked.",
+    "ops": [
+     "the slower",
+     "slower",
+     "more slowly",
+     "the more slow"
+    ],
+    "ans": 0,
+    "why": "the + 比较级, the + 比较级——两个分句都必须带 the。",
+    "lv": 2
+   },
+   {
+    "q": "Chen ___ the umbrella properly — look at all the water sitting in it.",
+    "ops": [
+     "can't open",
+     "can't have opened",
+     "mustn't open",
+     "can't be opening"
+    ],
+    "ans": 1,
+    "why": "对过去的否定推测用 can't have done——他刚才一定没把伞撑好。",
+    "lv": 2
+   },
+   {
+    "q": "Before he left, Wen said he ___ back before the gate was locked.",
+    "ops": [
+     "will be",
+     "is",
+     "has been",
+     "would be"
+    ],
+    "ans": 3,
+    "why": "主句是过去时 said，宾语从句里的「将来」要退成过去将来 would be。",
+    "lv": 2
+   },
+   {
+    "q": "If the rain ___ before noon, they would have reached the town before dark.",
+    "ops": [
+     "stopped",
+     "stops",
+     "has stopped",
+     "had stopped"
+    ],
+    "ans": 3,
+    "why": "与过去事实相反的虚拟——从句用 had done，主句用 would have done。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "The wind was so cold that nobody spoke.",
+     "She is the girl whose bag was left behind.",
+     "Let's take the short way, will we?",
+     "That is the shelf on which the box stood."
+    ],
+    "ans": 2,
+    "why": "Let's 开头的祈使句，反意部分固定用 shall we。",
+    "lv": 2
+   },
+   {
+    "q": "下列四句中只有一句有语法错误。选出【错误】的一句：",
+    "ops": [
+     "They have been waiting outside for an hour.",
+     "She promised she would call before noon.",
+     "He can't have forgot his own birthday.",
+     "The letters posted last week never arrived."
+    ],
+    "ans": 2,
+    "why": "情态动词完成式要用过去分词 → can't have forgotten。",
+    "lv": 2
+   }
+  ]
+ }
+}
+
