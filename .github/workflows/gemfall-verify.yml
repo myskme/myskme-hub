@@ -11,6 +11,7 @@ on:
       - 'match/sw.js'
       - 'match/icons/**'
       - 'match/art/**'
+      - 'match/vendor/**'
       - 'match/ports/**'
       - 'leaderboard/worker.js'
       - 'leaderboard/*.test.mjs'

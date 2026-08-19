@@ -19,6 +19,7 @@ const runtimeEntries = [
   'art',
   'audio',
   'icons',
+  'vendor',
   'edge-functions',
 ];
 
@@ -70,6 +71,20 @@ try {
   ];
   for (const required of requiredFunctions) {
     if (!files.includes(required)) throw new Error(`发布包缺少函数：${required}`);
+  }
+
+  /* index.html 引用的本地脚本必须都在包里。
+     vendor/qrcode-generator.js 曾因不在白名单而漏发——线上分享卡从 0812 起
+     一直画不出二维码，页面却不报任何错（drawShareQr 静默回落）。
+     这类「页面要、包里没有」的缺口从此在打包时就拦下。 */
+  const html = await readFile(path.join(staging, 'index.html'), 'utf8');
+  for (const m of html.matchAll(/<script[^>]+src="([^"]+)"/g)) {
+    const src = m[1];
+    if (/^(https?:)?\/\//.test(src) || src.startsWith('data:')) continue;
+    const rel = src.replace(/^\.\//, '').split('?')[0];
+    if (!files.includes(path.join(...rel.split('/')))) {
+      throw new Error(`index.html 引用了 ${src}，但发布包里没有它——检查 runtimeEntries 白名单`);
+    }
   }
 
   let sourceBytes = 0;

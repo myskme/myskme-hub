@@ -21,6 +21,7 @@ on:
       - 'match/art/**'
       - 'match/audio/**'
       - 'match/icons/**'
+      - 'match/vendor/**'
       - '.github/workflows/deploy-edgeone.yml'
   workflow_dispatch: {}
 
