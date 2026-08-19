@@ -2093,6 +2093,30 @@ body{--shk:4px}
   </div>
 </div></div>
 
+<!-- 兑换码：大厅脚注品牌字样连点五次弹出。
+     经典彩蛋惯例（街机时代的 cheat code 一脉）：多数码给玩家发小奖励，
+     作者自留一个开发调试码打开督造台（下面那个面板），只改本机存档。 -->
+<div class="ovl" id="ovl-redeem"><div class="ovl-card">
+  <div class="ovl-kick">REDEEM</div>
+  <div class="ovl-title">兑 · <em>换</em></div>
+  <div style="text-align:center;font-size:13px;color:var(--ink2);margin:10px 0 12px">手里有码的话，念给矿上听。</div>
+  <div class="lb-form" style="max-width:240px;margin:0 auto">
+    <input id="redeem-in" maxlength="24" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="输入兑换码">
+  </div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="redeem-close">合上</button>
+    <button class="btn primary" id="redeem-go">兑 换</button>
+  </div>
+</div></div>
+
+<!-- 督造台：作者的开发调试面板（资源与进度直接写进本机存档，方便课堂演示与测试）。 -->
+<div class="ovl" id="ovl-forge"><div class="ovl-card">
+  <div class="ovl-kick">FOREMAN DESK</div>
+  <div class="ovl-title">督 · <em>造</em></div>
+  <div id="forge-body"></div>
+  <div class="ovl-btns"><button class="btn ghost" id="forge-close">合上</button></div>
+</div></div>
+
 <div class="ovl" id="ovl-how"><div class="ovl-card" style="text-align:left">
   <button class="ovl-top-close" id="how-top-close" data-close-target="#how-close" aria-label="合上手册"></button>
   <div class="ovl-kick" style="text-align:center">SCROLL OF RULES</div>
@@ -2133,6 +2157,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
      run=连续天数（只作展示，断了从头数，不惩罚），mile=已发放的七日里程碑数（高水位）。 */
   dv:{d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},
   welcomed:0,                                                  // 战书/邀请链接进来的新矿工礼，只发一次
+  redeemed:{},                                                 // 兑换码：一次性码的已兑记录
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
@@ -2273,6 +2298,7 @@ function loadSave(){
   for(const k of ['d','best','plays','n','run','lastD','mile'])out.dv[k]=Math.max(0,Math.floor(+out.dv[k]||0));
   out.dv.score=(out.dv.score==null)?null:Math.max(0,Math.floor(+out.dv.score||0));
   out.welcomed=out.welcomed?1:0;
+  out.redeemed=(s.redeemed&&typeof s.redeemed==='object')?s.redeemed:{};
   return out;
 }
 const SAVE=loadSave();
@@ -7390,9 +7416,13 @@ const LB={
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
     const rw=rushWeekState(),bb=SAVE.bossBest||{floor:0,progress:0,score:0,build:'',comp:''};
+    /* dvDay/dvBest：今日矿题的首挖成绩（正式成绩，不是练习最佳）。
+       老 worker 不认识这两个字段会安全忽略；新 worker 用它记日榜。 */
+    const _dv=SAVE.dv||{};
     return {score:best,rush:SAVE.rushBest||0,rushWeek:rw.best||0,rushWeekKey:rw.w,
             bossFloor:bb.floor||0,bossProgress:bb.progress||0,bossScore:bb.score||0,bossBuild:bb.build||'',bossComp:bb.comp||'',
             lv,stars,chain:SAVE.chainBest||0,
+            dvDay:_dv.d||0,dvBest:Math.max(0,Math.floor(+_dv.score||0)),
             runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
             mv:(SAVE.dig&&SAVE.dig.best)||0,luck:luckCount(),mastery:csMasteryCount()};
   },
@@ -7476,6 +7506,12 @@ const LB={
      后端 /gf/board?scope=class 与 class_tag 列保留不动，存量数据不丢。 */
   async board(scope){
     return await this.fetchJSON('/gf/board?scope='+scope+'&limit='+LB_LIMIT);
+  },
+  /* 矿题日榜。响应必须回带同一个 day 才算数——老 worker 不认识这个 scope
+     会落回矿力榜，靠这道校验静默降级，绝不把矿力榜错当日榜显示。 */
+  async dayBoard(day){
+    const d=await this.fetchJSON('/gf/board?scope=day&day='+(+day||0)+'&limit='+LB_LIMIT);
+    return (d&&d.ok&&+d.day===+day&&Array.isArray(d.rows))?d:null;
   },
   /* ────────── 上传管理器 ──────────
      成绩全是单调递增的最大值（最佳分/关卡/星数/连锁只增不减），
@@ -7738,7 +7774,8 @@ function shareCardInfo(){
   if(GS.mode==='daily'){
     const sky=GS.sky||skyOf(dayNum());
     return {mode:'daily',kick:'DAILY VEIN',title:'今日矿题',sub:'第 '+dvNo(dayNum())+' 期 · 天象 '+sky.nm,score:GS.score,
-      note:'全服同一副盘 · 最长连锁 '+GS.chainMax,rank:'今日战果'};
+      note:'全服同一副盘 · 最长连锁 '+GS.chainMax,
+      rank:DV_RANK>0?('今日全球第 '+DV_RANK+' 名'):'今日战果'};
   }
   if(GS.mode==='gauntlet')return {mode:'boss',kick:'TWELVE BOSS RUN',title:'十二层首领战',sub:'生命决定终点',score:GAUNTLET.lastPoints||0,
     note:'击破 '+(GAUNTLET.lastCleared||0)+' / '+GAUNTLET_MAX+' 层 · 剩余生命 '+Math.max(0,GAUNTLET.life),rank:'战果积分'};
@@ -7747,7 +7784,25 @@ function shareCardInfo(){
 }
 /* 结算时顺手查一次自己在矿灯榜上的名次。**不阻塞结算** ——
    查不到就不报名次，绝不让玩家等在那里看转圈。 */
-let RUSH_RANK=0;
+let RUSH_RANK=0,DV_RANK=0;
+/* 矿题日榜名次：同 fetchRushRank 的姿态——不阻塞结算，查不到就不报。
+   老 worker 下 dayBoard 恒为 null，这段静默什么都不做。 */
+async function fetchDayRank(){
+  DV_RANK=0;
+  if(!LB.registered())return;
+  try{
+    const day=dayNum();
+    const d=await LB.dayBoard(day);
+    if(!d)return;
+    const i=d.rows.findIndex(r=>r.alias===SAVE.lbAlias
+      &&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
+    if(i>=0){
+      DV_RANK=i+1;
+      const el=$('#dv-rank');if(el)el.innerHTML='　今日全球 <b>第 '+DV_RANK+' 名</b>';
+      const img=$('#wk-cardimg');if(img&&GS.mode==='daily')img.src=drawCard();
+    }
+  }catch(e){}
+}
 async function fetchRushRank(){
   RUSH_RANK=0;
   if(!LB.registered())return;
@@ -8087,12 +8142,29 @@ const daySeed=d=>'gemfall|day|'+d;
 const SKY_POOL=[
   {k:'calm', nm:'无象',   desc:'矿脉平静 · 纯粹比手艺'},
   {k:'echo', nm:'共鸣',   desc:'连锁的回响格外洪亮 · 连锁加成大幅提高', chain:.95},
-  {k:'rich', nm:'丰饶',   desc:'矿脉心情不错 · 开局赐两颗爆裂一颗疾风'},
+  {k:'rich', nm:'丰饶',   desc:'矿脉心情不错 · 开局赐两颗爆裂一颗疾风', give:['B','B','H']},
   {k:'pure', nm:'纯脉',   desc:'矿脉纯净得反常 · 全盘只有四色灵石', colors:4},
   {k:'still',nm:'静夜',   desc:'夜深脉沉 · 只有二十步，但每一下都更沉', moves:20, mul:1.5},
   {k:'gale', nm:'穿堂风', desc:'风在矿道里穿行 · 每第八手降下一道疾风'},
 ];
-function skyOf(d){return SKY_POOL[Math.floor(rngOf('gemfall|sky|'+d)()*SKY_POOL.length)]}
+/* 节日天象：命中当天直接顶替轮换池。全部用通用文化意象（岁时节令），
+   不做校园向命名——受众不止学生，校园梗既局限又容易起争议（王老师定）。
+   键两种：'MM-DD' 每年循环；'YYYY-MM-DD' 只此一天（农历节日公历日期逐年不同，
+   临近时查准了往表里加一行即可，宁缺毋错——日期写错比不做更糟）。 */
+const FEST_SKY={
+  '01-01':{k:'fyear', nm:'启岁', desc:'新岁启程 · 今天多五步', moves:30, fest:1},
+  '12-31':{k:'feve',  nm:'守岁', desc:'守岁之夜 · 每一下都更算数', mul:1.25, fest:1},
+  '2026-09-25':{k:'fmoon', nm:'满月', desc:'中秋月满 · 开局赐一颗万象灵珠', give:['O'], mul:1.2, fest:1},
+  '2026-12-21':{k:'fnight',nm:'长夜', desc:'一年最长的夜 · 十八步，每一下都更沉', moves:18, mul:1.8, fest:1},
+};
+function festOf(d){
+  /* dayNum 反推本地日期：与 orgText 同一套换算。 */
+  const ms=d*86400000+new Date().getTimezoneOffset()*60000;
+  const dt=new Date(ms);
+  const mm=String(dt.getMonth()+1).padStart(2,'0'), dd=String(dt.getDate()).padStart(2,'0');
+  return FEST_SKY[dt.getFullYear()+'-'+mm+'-'+dd]||FEST_SKY[mm+'-'+dd]||null;
+}
+function skyOf(d){return festOf(d)||SKY_POOL[Math.floor(rngOf('gemfall|sky|'+d)()*SKY_POOL.length)]}
 /* 日态。时钟回拨当存档损坏处理（colDay 同款防线），
    免得机器时钟跑到未来再校回来后，矿题永远「今天已挖过」。 */
 function dvState(){
@@ -8125,12 +8197,12 @@ function startDaily(){
   buildBoard(L,sd);
   GS.pasRng=rngOf(sd+'|pas');
   applyOpeningPassives();
-  /* 丰饶天开局注入。走独立天象流选位（被动流的消耗因同伴而异，
-     天象落点必须全服一致）；只改 k 不改色，不会凭空拼出三连。 */
-  if(sky.k==='rich'){
+  /* 天象开局注入（丰饶、节日天象等的 give 数组）。走独立天象流选位
+     （被动流的消耗因同伴而异，天象落点必须全服一致）；只改 k 不改色，
+     不会凭空拼出三连。 */
+  if(sky.give&&sky.give.length){
     const R=rngOf(sd+'|sky');
-    const kinds=['B','B','H'];
-    for(const kk of kinds){
+    for(const kk of sky.give){
       const sp=[];
       for(let r=0;r<N;r++)for(let c=0;c<N;c++)
         if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
@@ -8190,7 +8262,8 @@ function endDaily(){
   for(let i=0;i<3;i++)stars[i].classList.remove('lit');
   setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
   $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>'
-    +'　今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　累计已挖 <b>'+s.n+'</b> 天';
+    +'　今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　累计已挖 <b>'+s.n+'</b> 天'
+    +'<span id="dv-rank"></span>';
   $('#end-quip').textContent=first?'第一把是正式成绩，接下来随便练。':pick2(Q_RUSH_END);
   $('#end-next').textContent='再挖一次';
   $('#end-next').dataset.act='daily';
@@ -8199,7 +8272,8 @@ function endDaily(){
   $('#end-share').style.display='flex';
   $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
   duelVerdict('d',d);
-  setTimeout(()=>LB.flush('clear'),600);
+  /* 先把首挖成绩传上去，再查今日名次——顺序反了会查到上一局的榜。 */
+  setTimeout(async()=>{await LB.flush('clear');fetchDayRank()},600);
   ovl('end');
 }
 
@@ -8291,6 +8365,73 @@ function handleDeepLink(){
     if(live)GS.duel={k:z.k,n:z.n,sc:z.sc,a:z.a||''};
   };
   ovl('duel');
+}
+
+/* ==================================================================
+   [ 兑换码 · REDEEM ]
+   ------------------------------------------------------------------
+   街机时代的 cheat code 惯例，两层用途：
+   1. 对玩家：一次性小奖励码（可以印在卷子上、群里发），是明面；
+   2. 对作者：一个开发调试码打开「督造台」——课堂演示与测试时
+      直接改本机存档（资源/进度/成绩），不用改代码重发版。
+   码值只存 FNV 哈希，不存明文：翻源码也读不出码是什么；
+   误触入口的玩家只看到普通的兑换码功能，输错就提示无效。
+   ================================================================== */
+const redeemHash=s=>{let x=2166136261;for(let i=0;i<s.length;i++)x=Math.imul(x^s.charCodeAt(i),16777619);return (x>>>0).toString(36)};
+/* 一次性奖励码（键=码的大写形态哈希）。加新码：算好哈希往这里添一行。 */
+const REDEEM_GIFTS={'1yoj03n':{id:'brand',pow:300,txt:'来自矿上的一点心意'}};
+/* 作者调试码的哈希（区分大小写）。 */
+const FORGE_KEY='13kisqe';
+function tryRedeem(){
+  const raw=String($('#redeem-in').value||'').trim();
+  if(!raw)return;
+  if(redeemHash(raw)===FORGE_KEY){$('#redeem-in').value='';ovl(null);openForge();return}
+  const g=REDEEM_GIFTS[redeemHash(raw.toUpperCase())];
+  if(g){
+    SAVE.redeemed=SAVE.redeemed||{};
+    if(SAVE.redeemed[g.id]){toast('这个码已经兑换过了');return}
+    SAVE.redeemed[g.id]=1;SAVE.power=(SAVE.power||0)+g.pow;persist();renderMenu();
+    $('#redeem-in').value='';ovl(null);
+    SFX.made();toast('兑换成功 · 灵力 <b>+'+g.pow+'</b><br>'+g.txt,3200);
+    return;
+  }
+  toast('这串码没有对上任何东西');
+}
+function openForge(){
+  const b=$('#forge-body');
+  b.innerHTML='<div style="text-align:center;font-size:12.5px;color:var(--ink3);margin:6px 0 12px">'
+    +'作者调试台 · 改动直接写进本机存档</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">'
+    +'<button class="btn" data-f="pow">灵力 +10,000</button>'
+    +'<button class="btn" data-f="dust">星屑 +100</button>'
+    +'<button class="btn" data-f="box">典藏匣 +10</button>'
+    +'<button class="btn" data-f="tools">灵器各 +3</button>'
+    +'</div>'
+    +'<button class="btn" data-f="lv" style="width:100%;margin-top:8px">远征全通 · 开满 64 关</button>'
+    +'<div class="lb-form" style="display:flex;gap:8px;margin-top:12px;align-items:center">'
+    +'<input id="forge-rush" inputmode="numeric" maxlength="8" placeholder="90 秒成绩" style="flex:1;min-width:0">'
+    +'<button class="btn" id="forge-rush-go" style="flex:none">写 入</button></div>'
+    +'<div style="text-align:center;font-size:11.5px;color:var(--ink3);margin-top:8px">'
+    +'写入的 90 秒成绩会随下一次上传进入世界榜。</div>';
+  for(const btn of b.querySelectorAll('[data-f]'))btn.onclick=()=>{
+    const f=btn.dataset.f;SFX.made();
+    if(f==='pow')SAVE.power=(SAVE.power||0)+10000;
+    if(f==='dust'){colFix();COLS.dust+=100;colSave()}
+    if(f==='box'){giveBox(10,'督造台')}
+    if(f==='tools')for(const k of ['pick','swap','mix'])SAVE.tools[k]=Math.min(9,(SAVE.tools[k]||0)+3);
+    if(f==='lv')SAVE.lv=Math.max(SAVE.lv||1,65);
+    persist();renderMenu();
+    if(f!=='box')toast('已办妥');
+  };
+  $('#forge-rush-go').onclick=()=>{
+    const v=Math.floor(+$('#forge-rush').value||0);
+    if(v<=0){toast('先填个数');return}
+    SAVE.rushBest=Math.max(SAVE.rushBest||0,Math.min(18999999,v));
+    const rw=rushWeekState();rw.best=Math.max(rw.best||0,Math.min(18999999,v));
+    persist();renderMenu();SFX.made();
+    toast('90 秒成绩已写入 · <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>');
+  };
+  ovl('forge');
 }
 
 /* ---- 一键取名 ----
@@ -9388,6 +9529,21 @@ addEventListener('pagehide',()=>{
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
 $('#btn-daily-vein').addEventListener('click',()=>{AU.ensure();SFX.click();startDaily()});
 $('#duel-later').addEventListener('click',()=>{SFX.click();ovl(null)});
+/* 兑换码入口：大厅脚注的品牌字样，2.5 秒内连点五次。 */
+{
+  let tapN=0,tapT=0;
+  const brand=document.querySelector('.menu-foot-brand');
+  if(brand)brand.addEventListener('click',()=>{
+    const now=Date.now();
+    if(now-tapT>2500)tapN=0;
+    tapT=now;tapN++;
+    if(tapN>=5){tapN=0;$('#redeem-in').value='';ovl('redeem');setTimeout(()=>{try{$('#redeem-in').focus()}catch(e){}},80)}
+  });
+}
+$('#redeem-close').addEventListener('click',()=>{SFX.click();ovl(null)});
+$('#redeem-go').addEventListener('click',()=>{SFX.click();tryRedeem()});
+$('#redeem-in').addEventListener('keydown',e=>{if(e.key==='Enter')tryRedeem()});
+$('#forge-close').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#pt-round-dec').addEventListener('click',()=>ptAdjust('rounds',-1));
 $('#pt-round-inc').addEventListener('click',()=>ptAdjust('rounds',1));
 $('#pt-hint-open').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('pt-hint')});
@@ -10872,6 +11028,30 @@ window.__selftest=function(){
          &&(function(){renderQuest();return $('#quest-body').innerHTML.includes('data-go="daily"')})());
       ok('结算胜负对白只认对得上期号的战书',
          /du\.k!==kind\|\|du\.n!==no/.test(String(duelVerdict)));
+    }
+    /* 36. 节日天象、兑换码与矿题日榜。 */
+    {
+      ok('节日天象：循环项命中元旦与岁除，平日不外溢',
+         (festOf(20819)||{}).k==='fyear'&&(festOf(20818)||{}).k==='feve'&&festOf(20690)===null);
+      ok('节日天象顶替轮换池且带 fest 标记，平日仍从池里出',
+         skyOf(20819).fest===1&&SKY_POOL.includes(skyOf(20690)));
+      ok('单次节日项都是完整日期键，宁缺毋错',
+         Object.keys(FEST_SKY).every(k=>/^\d{2}-\d{2}$/.test(k)||/^\d{4}-\d{2}-\d{2}$/.test(k)));
+      ok('天象注入统一走 give 数组（丰饶与节日共用一条注入路）',
+         JSON.stringify((SKY_POOL.find(s=>s.k==='rich')||{}).give)==='["B","B","H"]'
+         &&/sky\.give/.test(String(startDaily)));
+      ok('兑换码只存哈希不存明文，一次性码有已兑记录',
+         redeemHash('TEST')==='1dme1np'
+         &&/^[a-z0-9]{4,8}$/.test(FORGE_KEY)
+         &&Object.keys(REDEEM_GIFTS).every(k=>/^[a-z0-9]{4,8}$/.test(k))
+         &&/redeemed\[g\.id\]/.test(String(tryRedeem)));
+      ok('督造台写入的 90 秒成绩不越过服务端安全闸',/18999999/.test(String(openForge)));
+      ok('兑换码与督造台面板齐整，入口是脚注品牌行连点',
+         !!$('#ovl-redeem')&&!!$('#redeem-in')&&!!$('#ovl-forge')&&!!$('#forge-body')
+         &&!!document.querySelector('.menu-foot-brand'));
+      ok('矿题日榜柔性降级：响应必须回带同一个 day 才算数',
+         /\+d\.day===\+day/.test(String(LB.dayBoard))&&/dvDay/.test(String(LB.stats)));
+      ok('矿题结算先传成绩再查今日名次',/LB\.flush\('clear'\);fetchDayRank\(\)/.test(String(endDaily)));
     }
     /* 长内容不再要求玩家滚到底才能退出；每个悬浮关闭键必须落到已有的安全关闭流程。 */
     {

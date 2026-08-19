@@ -607,6 +607,18 @@ async function gfEnsure(env) {
   await env.DB.prepare(
     "CREATE INDEX IF NOT EXISTS idx_gf_rush_week_rank ON gf_rush_week(week,best_rush DESC)"
   ).run();
+  /* 今日矿题日榜：每天一张榜、只记首挖成绩。独立小表，不动主表。
+     day 是客户端本地时区的日序号（与前端 dayNum 同口径）；服务端只做
+     ±1 天的宽容校验（时差两侧都可能先翻篇），每张榜按 day 各自成立。 */
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_day_best (
+       day INTEGER NOT NULL, id TEXT NOT NULL, alias TEXT NOT NULL,
+       best INTEGER NOT NULL DEFAULT 0, comp TEXT DEFAULT '', updated_at INTEGER DEFAULT 0,
+       PRIMARY KEY (day,id))`
+  ).run();
+  await env.DB.prepare(
+    "CREATE INDEX IF NOT EXISTS idx_gf_day_rank ON gf_day_best(day,best DESC)"
+  ).run();
   /* Boss 一命连战独立于 gemfall 主表，三项成绩始终作为同一趟纪录更新。
      不加主表列就不会触碰矿力七处同步链，也不会改变既有段位。 */
   await env.DB.prepare(
@@ -979,6 +991,7 @@ function gfMap(rows) {
     runs: r.runs || 0, days: r.days || 0, dbest: r.dbest || 0, mv: r.best_dig || 0,
     luck: r.luck || 0,
     comp: r.comp || "",
+    dayBest: r.day_best || 0,
     /* 90 秒资源奖只认 D1 真人名次。公开名次仍按所有条目的分数统一排序，
        客户端只拿到可领奖名次，不下发任何身份标签。 */
     rewardRank: r.reward_rank || 0,
@@ -1073,6 +1086,21 @@ async function gfSubmit(req, env, origin) {
        comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_rush_week.comp END,
        updated_at=excluded.updated_at`
   ).bind(rushWeekKey, id, alias, rushWeek, comp, now).run();
+  /* 矿题日榜：首挖成绩只增不减；day 允许与服务端相差一天（时区）。
+     太老或太新的 day 一律不收——那是重放或伪造，不是时差。 */
+  {
+    const dvDay = clampInt(st.dvDay, 0, 99999999);
+    const dvBest = clampInt(st.dvBest, 0, GF_CAP.score);
+    const serverDay = Math.floor(now / 86400000);
+    if (dvBest > 0 && Math.abs(dvDay - serverDay) <= 1) await env.DB.prepare(
+      `INSERT INTO gf_day_best(day,id,alias,best,comp,updated_at) VALUES(?,?,?,?,?,?)
+       ON CONFLICT(day,id) DO UPDATE SET
+         alias=excluded.alias,
+         best=MAX(COALESCE(gf_day_best.best,0),excluded.best),
+         comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_day_best.comp END,
+         updated_at=excluded.updated_at`
+    ).bind(dvDay, id, alias, dvBest, comp, now).run();
+  }
   if (boss.floor > 0) await env.DB.prepare(
     `INSERT INTO gf_boss_best(id,best_floor,best_progress,best_score,build,comp,updated_at)
      VALUES(?,?,?,?,?,?,?)
@@ -1204,6 +1232,8 @@ function gfBoardCmp(scope, a, b) {
     || (b.boss_progress || 0) - (a.boss_progress || 0)
     || (a.updated_at || 0) - (b.updated_at || 0)
     || String(a.alias).localeCompare(String(b.alias));
+  if (scope === "day") return (b.day_best || 0) - (a.day_best || 0)
+    || String(a.alias).localeCompare(String(b.alias));
   const key = (scope === "rush" || scope === "rushAll") ? "best_rush" : "power";
   return (b[key] || 0) - (a[key] || 0) || String(a.alias).localeCompare(String(b.alias));
 }
@@ -1241,6 +1271,19 @@ async function gfBoard(req, env, origin, url) {
       `SELECT ${cols} FROM gemfall WHERE hidden=0 AND best_rush>0
        ORDER BY best_rush DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
+  } else if (scope === "day") {
+    /* 矿题日榜：按客户端传来的 day 取那一天的榜。响应必须回带同一个 day——
+       老客户端不发这个 scope；新客户端靠回带的 day 校验自己没拿错榜。 */
+    const day = clampInt(url.searchParams.get("day") || 0, 0, 99999999);
+    rows = await env.DB.prepare(
+      `SELECT g.id,g.alias,g.power,g.best_score,g.best_rush,g.lv,g.stars,g.chain,
+              g.rank_name,g.badges,g.runs,g.days,g.dbest,g.best_dig,g.luck,
+              CASE WHEN d.comp!='' THEN d.comp ELSE g.comp END AS comp,
+              d.best AS day_best
+         FROM gf_day_best d JOIN gemfall g ON g.id=d.id
+        WHERE d.day=? AND g.hidden=0 AND d.best>0
+        ORDER BY d.best DESC,g.alias ASC LIMIT ?`
+    ).bind(day, limit).all();
   } else if (scope === "boss") {
     rows = await env.DB.prepare(
       `SELECT g.id,g.alias,g.power,g.best_score,g.best_rush,g.lv,g.stars,g.chain,
@@ -1285,12 +1328,16 @@ async function gfBoard(req, env, origin, url) {
       .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "depth" || (r.lv || 0) > 0)
       .filter(r => scope !== "boss" || (r.boss_score || 0) > 0)
+      /* 配速员没有日成绩，不进矿题日榜——新玩法先只看真人活性。 */
+      .filter(r => scope !== "day" || (r.day_best || 0) > 0)
       .sort((a,b)=>gfBoardCmp(scope,a,b));
     merged=merged.concat(bots).sort((a,b)=>gfBoardCmp(scope,a,b)).slice(0,limit);
   }
   const week = scope === "rush" ? gfRushWeekKey(Date.now()) : "";
   return json({ ok: true, season: sea, scope, count: merged.length, rows: gfMap(merged),
     week, weekLabel: week ? gfRushWeekLabel(week) : "",
+    /* 日榜回带请求的 day：客户端靠它确认没把别的榜错当日榜（老服务端不会带）。 */
+    day: scope === "day" ? clampInt(url.searchParams.get("day") || 0, 0, 99999999) : undefined,
     rewards: scope === "rush" ? GF_RUSH_REWARDS : [] }, 200, origin);
 }
 /* 月结算只返回阵营胜方与实力，不返回旧表中的 members 或旧门派记录。 */

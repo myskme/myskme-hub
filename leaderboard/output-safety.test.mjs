@@ -130,6 +130,26 @@ if (!src.includes('CREATE TABLE IF NOT EXISTS gf_boss_best')
   failures.push('Boss 连战没有独立持久化、成对更新、真实玩家排序或管理清理');
 if (src.includes('gf_rotate_week') || /DROP\s+TABLE/i.test(src))
   failures.push('退役轮转周榜仍在读写，或代码试图删除线上旧表');
+/* 矿题日榜：独立表、首挖只增不减、时区宽容窗、配速员不进、响应回带 day。 */
+const dayOrder = [
+  { alias: 'BB', day_best: 50000 },
+  { alias: 'CC', day_best: 90000 },
+  { alias: 'AA', day_best: 50000 },
+].sort((a, b) => gfBoardCmp('day', a, b));
+if (dayOrder.map(x => x.alias).join(',') !== 'CC,AA,BB')
+  failures.push('矿题日榜比较器没有按首挖成绩排、同分没按化名稳定排');
+if (!src.includes('CREATE TABLE IF NOT EXISTS gf_day_best')
+  || !src.includes('idx_gf_day_rank')
+  || !src.includes('best=MAX(COALESCE(gf_day_best.best,0),excluded.best)')
+  || !src.includes('Math.abs(dvDay - serverDay) <= 1')
+  || !src.includes('FROM gf_day_best d JOIN gemfall g ON g.id=d.id')
+  || !src.includes('ORDER BY d.best DESC,g.alias ASC')
+  || !src.includes('scope !== "day" || (r.day_best || 0) > 0')
+  || !src.includes('scope === "day" ? clampInt(url.searchParams.get("day")')
+  || gfMap([{ id: 'x', alias: '日榜人', day_best: 87654 }])[0].dayBest !== 87654
+  || !clientSrc.includes('dvDay:_dv.d||0')
+  || !clientSrc.includes('+d.day===+day'))
+  failures.push('矿题日榜的表、只增不减、时区窗、配速员隔离或客户端校验口径漂移');
 
 if (failures.length) {
   for (const failure of failures) console.error('FAIL ' + failure);
