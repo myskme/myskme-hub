@@ -258,7 +258,7 @@ body::before{display:none}
 #btn-gauntlet{border-color:color-mix(in srgb,var(--gold) 52%,var(--line));
   background:linear-gradient(180deg,color-mix(in srgb,var(--prism2) 9%,var(--panel2)),var(--panel))}
 #btn-gauntlet .mi{color:var(--gold2)}
-.menu-extras{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.menu-extras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .menu-extras .btn{min-height:38px;padding:6px 5px;font-size:12px;letter-spacing:.06em}
 .menu-extras .btn .sub{font-size:8.8px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .menu-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
@@ -1525,8 +1525,9 @@ body{--shk:4px}
         </div>
       </div>
       <div class="menu-extras">
+        <button class="btn ornate" id="btn-daily-vein">今日矿题<span id="dv-dot"></span><span class="sub" id="dv-sub">每天一盘 · 天象</span></button>
         <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人轮流</span></button>
-        <button class="btn ornate" id="btn-quest">本周挑战<span id="quest-dot"></span><span class="sub">同盘矿脉 · 悬赏 · 岁记</span></button>
+        <button class="btn ornate" id="btn-quest">本周挑战<span id="quest-dot"></span><span class="sub">矿脉 · 悬赏 · 岁记</span></button>
       </div>
       <div class="menu-dock">
         <button class="btn ghost" id="btn-pack">行囊<span id="pack-dot"></span></button>
@@ -2081,6 +2082,17 @@ body{--shk:4px}
   <div class="ovl-btns"><button class="btn ghost" id="quest-close">合上</button></div>
 </div></div>
 
+<!-- 战书：从分享二维码进来的人在这里落地 -->
+<div class="ovl" id="ovl-duel"><div class="ovl-card">
+  <div class="ovl-kick">CHALLENGE LETTER</div>
+  <div class="ovl-title">战 · <em>书</em></div>
+  <div id="duel-body" style="text-align:center;font-size:13.5px;color:var(--ink2);max-width:300px;margin:14px auto 4px;line-height:1.9"></div>
+  <div class="ovl-btns">
+    <button class="btn ghost" id="duel-later">先逛逛</button>
+    <button class="btn primary" id="duel-go">应 战</button>
+  </div>
+</div></div>
+
 <div class="ovl" id="ovl-how"><div class="ovl-card" style="text-align:left">
   <button class="ovl-top-close" id="how-top-close" data-close-target="#how-close" aria-label="合上手册"></button>
   <div class="ovl-kick" style="text-align:center">SCROLL OF RULES</div>
@@ -2116,6 +2128,11 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   guide:{n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0},
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
+  /* 今日矿题：每天全服同一副盘 + 当日天象。score=首挖成绩（正式），best=练习最佳，
+     n=累计挖题天数（每天只 +1，矿匣里程碑按它走——断签不清进度，同矿灯的取舍），
+     run=连续天数（只作展示，断了从头数，不惩罚），mile=已发放的七日里程碑数（高水位）。 */
+  dv:{d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},
+  welcomed:0,                                                  // 战书/邀请链接进来的新矿工礼，只发一次
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
@@ -2251,6 +2268,11 @@ function loadSave(){
   out.yjSeal=(s.yjSeal&&typeof s.yjSeal==='object')?s.yjSeal:{};
   if(!out.firstDay){out.firstDay=Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000)}
   out.gr=Object.assign({d:0,n:0,got:0},s.gr||{});
+  /* 今日矿题的消毒：字段全部压回非负整数；score 允许 null（今天还没首挖）。 */
+  out.dv=Object.assign({d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},s.dv||{});
+  for(const k of ['d','best','plays','n','run','lastD','mile'])out.dv[k]=Math.max(0,Math.floor(+out.dv[k]||0));
+  out.dv.score=(out.dv.score==null)?null:Math.max(0,Math.floor(+out.dv.score||0));
+  out.welcomed=out.welcomed?1:0;
   return out;
 }
 const SAVE=loadSave();
@@ -2542,6 +2564,7 @@ const ACHS=[
   {id:'a13',ic:'lamp', nm:'执灯之人', tip:'首次放出同伴大招'},
   {id:'a14',ic:'together', nm:'谷地同行', tip:'六位同伴各放出一次大招'},
   {id:'a15',ic:'scroll', nm:'编年史官', tip:'读完全部八段编年史片段'},
+  {id:'a16',ic:'lamp', nm:'传灯者', tip:'第一次把成绩战书送出手'},
 ];
 
 /* ---------- 布局图案（种子确定） ---------- */
@@ -4519,7 +4542,11 @@ async function settleBoard(firstChain){
     const ex=expandBlast(seed);
     playBlastFX(ex.fx);
     const res=clearCells(ex.cells,chain);
-    const base=Math.round(60*res.gems*(1+(chain-1)*.55)+res.specials*140);
+    /* 天象只在今日矿题里生效：条件带 mode 锁，别的模式即使 GS.sky 残留也回落原公式。
+       chain 项抬连锁乘区（共鸣天），mul 抬整体分值（静夜天）——都作用在这一处，
+       别处不许再另起一套天象得分。 */
+    const skyOn=(GS.mode==='daily'&&GS.sky)||null;
+    const base=Math.round((60*res.gems*(1+(chain-1)*((skyOn&&skyOn.chain)||.55))+res.specials*140)*((skyOn&&skyOn.mul)||1));
     total+=base;
     const anchor=seed[0]||[0,0];
     addScore(base,anchor[0],anchor[1],chain>=3?'#e8c768':null);
@@ -4598,7 +4625,7 @@ async function settleBoard(firstChain){
   /* 连锁流水：本周矿脉与限时局都记，两者的战报都要用它拼形状。
      ⚠ 每个模式开局必须清空 —— 不清的话，打完本周矿脉再去打 90 秒，
      战报上会画出**上一局留下的形状**，比空着更糟（那是在撒谎）。 */
-  if((GS.weekly||GS.mode==='rush')&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
+  if((GS.weekly||GS.mode==='rush'||GS.mode==='daily')&&chain>0)(GS.wkLog||(GS.wkLog=[])).push(chain);
   /* 狼先生·执灯人的被动「灯常亮」：连锁到 4 就点亮一颗疾风。
      这条原来是晓的，现在移交给狼先生 —— 因为它**正好喂他自己的大招**
      （「执灯」引爆全盘特殊石），造石与引爆形成自循环：
@@ -4733,6 +4760,25 @@ async function trySwap(a,b){
   }
   if(stale())return;
   ENG.lastMove=null;
+  /* 穿堂风天象（只属今日矿题）：每第 8 手降下一道疾风。
+     选点走独立的天象流（开局时由种子建好），不碰 pasRng 与 ENG.rng——
+     不同玩家带不同同伴消耗被动流的节奏不同，天象落点必须全服一致。
+     只改 k 不改色，不会凭空拼出三连，所以不用再走一轮结算。 */
+  if(GS.mode==='daily'&&GS.sky&&GS.sky.k==='gale'&&!GS.over){
+    GS.skyN=(GS.skyN||0)+1;
+    if(GS.skyN%8===0){
+      const sp=[];
+      for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+        if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
+      if(sp.length){
+        const R=GS.skyRng||rnd;
+        const [r,c]=sp[Math.floor(R()*sp.length)];
+        B[r][c].k=R()<.5?'H':'V';B[r][c].sc=.4;SFX.made();
+        floatNum(r,c,'穿堂风','#8fb8d8');
+        fxRing(cxOf(c),cyOf(r),GEMS[B[r][c].g].base,ENG.cs*2.2);
+      }
+    }
+  }
   /* 矿灯将熄：这一手打得好才回灯油。
      ⚠ 以前用的是 GS.chainMax（整局历史最大连锁），意味着只要全局打出过一次 3 连锁，
      此后每一步都无条件 +1.2 秒——90 秒的局能拖成好几分钟，榜单彻底失真。
@@ -4772,6 +4818,10 @@ async function checkEnd(){
   if(GS.party)return;                                         // 聚会赛由统一计时器交棒，不走通关结算
   if(GS.weekly){                                              // 本周矿脉：没有胜负，步数走完就报分
     if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endWeekly()}
+    return;
+  }
+  if(GS.mode==='daily'){                                      // 今日矿题：同矿脉，步数走完报分
+    if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endDaily()}
     return;
   }
   if(goalsMet()){
@@ -5339,7 +5389,7 @@ function csMasteryCount(){
 }
 const prismNameUnlocked=()=>csMasteryCount()===COMPANIONS.length;
 function csBump(k,n){
-  if(!GS.compDef||GS.party||GS.weekly)return;                 // 聚会是客人打的，周挑战另算成绩
+  if(!GS.compDef||GS.party||GS.weekly||GS.mode==='daily')return; // 聚会是客人打的，周挑战与矿题另算成绩
   const c=csOf(GS.compDef.id);c[k]=(c[k]||0)+(n||1);persist();
 }
 
@@ -7685,6 +7735,11 @@ function shareCardInfo(){
   if(GS.mode==='weekly'){
     const s=wkState();return {mode:'weekly',kick:'WEEKLY VEIN',title:'本周矿脉',sub:'第 '+s.w+' 期 · 全服同一副盘',score:GS.score,note:'同盘不剧透 · 最长连锁 '+GS.chainMax,rank:'本周战果'};
   }
+  if(GS.mode==='daily'){
+    const sky=GS.sky||skyOf(dayNum());
+    return {mode:'daily',kick:'DAILY VEIN',title:'今日矿题',sub:'第 '+dvNo(dayNum())+' 期 · 天象 '+sky.nm,score:GS.score,
+      note:'全服同一副盘 · 最长连锁 '+GS.chainMax,rank:'今日战果'};
+  }
   if(GS.mode==='gauntlet')return {mode:'boss',kick:'TWELVE BOSS RUN',title:'十二层首领战',sub:'生命决定终点',score:GAUNTLET.lastPoints||0,
     note:'击破 '+(GAUNTLET.lastCleared||0)+' / '+GAUNTLET_MAX+' 层 · 剩余生命 '+Math.max(0,GAUNTLET.life),rank:'战果积分'};
   return {mode:'adventure',kick:'GEMFALL EXPEDITION',title:'灵脉远征',sub:'第 '+Math.max(1,GS.L&&GS.L.n||SAVE.lv||1)+' 关',score:GS.score,
@@ -7709,7 +7764,14 @@ async function fetchRushRank(){
    不绘制完整盘面和走法，保留比分谈资，不泄露同盘解法。 */
 function shareCardUrl(info){
   const base=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||'https://play.myskme.com/';
-  try{const u=new URL(base,location.href);u.searchParams.set('from','poster');u.searchParams.set('mode',info.mode);return u.href}catch(e){return 'https://play.myskme.com/'}
+  /* 矿题与矿脉的码是战书（扫开直接进同一副盘应战）；
+     其余模式各打各的盘，分数不可复现，码是署名迎宾（k:'h'），不冒充可应战。
+     旧版 ?from=poster 参数落地后无人接收，一并退役——载荷统一走 hash。 */
+  const a=SAVE.lbAlias||'';
+  const z=info.mode==='daily' ?{k:'d',n:dayNum(),sc:Math.max(0,GS.score||0),a}
+        :info.mode==='weekly'?{k:'w',n:weekNum(),sc:Math.max(0,GS.score||0),a}
+        :{k:'h',n:0,sc:0,a};
+  try{const u=new URL(base,location.href);u.hash='z='+encodeDuel(z);return u.href}catch(e){return 'https://play.myskme.com/'}
 }
 function drawShareQr(ctx,url,x,y,size,ink,paper){
   if(typeof qrcode!=='function')return 0;
@@ -7747,7 +7809,8 @@ function drawCard(){
     roundRect(x,92+j*(w+g),y,w,22,8);x.fillStyle=n>=6?HI:n>=4?GOLD:'#8c6b4d';x.globalAlpha=.42+.58*(j+1)/cnt;x.fill();x.globalAlpha=1;
   }});
   const mark=shareCardMark(info),url=shareCardUrl(info);roundRect(x,92,1050,610,182,28);x.fillStyle='rgba(255,255,255,.42)';x.fill();x.strokeStyle='rgba(105,72,49,.22)';x.lineWidth=3;x.stroke();
-  x.textAlign='left';x.fillStyle=GOLD;x.font='900 25px system-ui,sans-serif';x.fillText('本局印记 '+mark,126,1105);x.fillStyle=INK;x.font='800 31px "Songti SC",serif';x.fillText('扫码进入正版远征',126,1162);x.fillStyle=DIM;x.font='700 21px system-ui,sans-serif';x.fillText('成绩图由本机生成',126,1202);
+  const duelable=(info.mode==='daily'||info.mode==='weekly');
+  x.textAlign='left';x.fillStyle=GOLD;x.font='900 25px system-ui,sans-serif';x.fillText('本局印记 '+mark,126,1105);x.fillStyle=INK;x.font='800 31px "Songti SC",serif';x.fillText(duelable?'扫码应战 · 同一副盘':'扫码进入正版远征',126,1162);x.fillStyle=DIM;x.font='700 21px system-ui,sans-serif';x.fillText(duelable?'这张图就是战书':'成绩图由本机生成',126,1202);
   const modules=drawShareQr(x,url,748,994,240,INK,'#fffdf6');
   x.textAlign='center';x.fillStyle=INK;x.font='800 20px system-ui,sans-serif';x.fillText(modules?'扫码挑战':'play.myskme.com',868,1260);
   x.fillStyle=DIM;x.font='700 18px system-ui,sans-serif';x.fillText('play.myskme.com',540,1305);
@@ -7846,6 +7909,7 @@ async function showCard(){
   p.innerHTML='<img id="wk-cardimg" alt="灵石远征成绩海报">'
     +'<div class="cardtip">图片已带正版二维码 · 浏览器不支持直接分享时，长按保存到相册</div>';
   SHARE_CARD_DATA=drawCard();$('#wk-cardimg').src=SHARE_CARD_DATA;
+  grant('a16');                                   // 传灯者：第一次把战书送出手
   if(typeof navigator.share==='function'&&typeof File!=='undefined')try{
     const file=shareCardFile(SHARE_CARD_DATA);
     if(!navigator.canShare||navigator.canShare({files:[file]})){await navigator.share({files:[file]});return}
@@ -7862,6 +7926,17 @@ function renderQuest(){
   const bs=bountyState();
   const yj=yjState();
   let h='';
+  /* 今日矿题 */
+  const dv=dvState(), sky=skyOf(dayNum()), dvFirst=(dv.score===null);
+  h+='<div class="qs-sec"><div class="qs-hd">今日矿题 · 第 '+dvNo(dayNum())+' 期'
+    +'<span class="qs-sub">天象 · '+esc(sky.nm)+'</span></div>'
+    +'<div class="qs-bd">'+esc(sky.desc)+'<br>'+(dvFirst
+      ?'每天一副全服同盘 · 第一把记成绩'
+      :'今日成绩 <b>'+dv.score.toLocaleString('en-US')+'</b>'
+        +(dv.best>dv.score?' · 练习最佳 '+dv.best.toLocaleString('en-US'):'')
+        +' · 累计已挖 '+dv.n+' 天')
+    +'</div><button class="btn primary qs-go" data-go="daily">'
+    +(dvFirst?'下 矿':'再挖一次（练习）')+'</button></div>';
   /* 本周矿脉 */
   h+='<div class="qs-sec"><div class="qs-hd">本周矿脉 · 第 '+s.w+' 期'
     +'<span class="qs-sub">还剩 '+left+' 天</span></div>'
@@ -7898,6 +7973,7 @@ function renderQuest(){
   for(const btn of $$('#quest-body .qs-go'))btn.onclick=()=>{
     SFX.click();ovl(null);
     if(btn.dataset.go==='weekly')startWeekly();
+    if(btn.dataset.go==='daily')startDaily();
   };
 }
 function startWeekly(){
@@ -7937,6 +8013,8 @@ function startWeekly(){
     +(L.s2/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderTools();renderAlly();renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent='本周';
+  /* 台词位要自己写：不写的话会残留上一局的（比如矿题的天象说明）。 */
+  $('#quip-line').innerHTML='<b>狼先生：</b>全服同一副盘，就看手艺了。';
   updHUD();
   const s=wkState();
   /* 报**实际步数**，不是常量 —— 带晰的人有 27 步，却看到「25 步」会以为界面错了 */
@@ -7980,8 +8058,239 @@ function endWeekly(){
   $('#end-continue').style.display='none';
   $('#end-share').style.display='flex';                       // 生成带正版二维码的成绩图
   $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
+  duelVerdict('w',s.w);
   setTimeout(()=>LB.flush('clear'),600);
   ovl('end');
+}
+
+/* ==================================================================
+   [ 今日矿题 · DAILY VEIN ]
+   ------------------------------------------------------------------
+   本周矿脉的日更姊妹篇：每天全服同一副盘，外加一条当日「天象」——
+   全球一致的规则扭曲。种子与天象都从日序号确定性推出，不联网也一样。
+
+   与矿脉的分工：矿脉是每周的正式竞技（纯净盘、比手艺），
+   矿题是每天的花活（天象让每天手感都不一样，图个乐也图个谈资）。
+   首挖记正式成绩、之后随便练——同矿脉，理由也相同：比手艺不比耐心。
+
+   天象的三条铁律：
+   1. 只在矿题局生效（得分公式与钩子都带 GS.mode==='daily' 锁）；
+   2. 全部从独立的天象流取随机（不碰被动流与补石流，落点全服一致）；
+   3. 只调乘区、步数、色数、注入——不发明第二套得分逻辑。
+   ================================================================== */
+const DV_EPOCH=20683;                       // 2026-08-19 = 第 1 期
+const DV_MOVES=25;
+const dvNo=d=>Math.max(1,(d==null?dayNum():d)-DV_EPOCH);
+const daySeed=d=>'gemfall|day|'+d;
+/* 天象池。desc 是给玩家看的一句话，写清「今天有什么不同」。
+   「无象」也是池子的一员——有平常的日子，特别的日子才显得特别。 */
+const SKY_POOL=[
+  {k:'calm', nm:'无象',   desc:'矿脉平静 · 纯粹比手艺'},
+  {k:'echo', nm:'共鸣',   desc:'连锁的回响格外洪亮 · 连锁加成大幅提高', chain:.95},
+  {k:'rich', nm:'丰饶',   desc:'矿脉心情不错 · 开局赐两颗爆裂一颗疾风'},
+  {k:'pure', nm:'纯脉',   desc:'矿脉纯净得反常 · 全盘只有四色灵石', colors:4},
+  {k:'still',nm:'静夜',   desc:'夜深脉沉 · 只有二十步，但每一下都更沉', moves:20, mul:1.5},
+  {k:'gale', nm:'穿堂风', desc:'风在矿道里穿行 · 每第八手降下一道疾风'},
+];
+function skyOf(d){return SKY_POOL[Math.floor(rngOf('gemfall|sky|'+d)()*SKY_POOL.length)]}
+/* 日态。时钟回拨当存档损坏处理（colDay 同款防线），
+   免得机器时钟跑到未来再校回来后，矿题永远「今天已挖过」。 */
+function dvState(){
+  const d=dayNum(), s=SAVE.dv||(SAVE.dv=Object.assign({},SAVE_DEF.dv));
+  if(s.d>d){s.d=0;s.lastD=0}
+  if(s.d!==d){s.d=d;s.score=null;s.best=0;s.plays=0;persist()}
+  return s;
+}
+function startDaily(){
+  const d=dayNum(), sd=daySeed(d), sky=skyOf(d);
+  GS.mode='daily';
+  /* 与本周矿脉同一副骨架改法：levelDef(3) 只当壳，改成纯计分无机关。 */
+  const L=levelDef(3);
+  L.n=0;L.endless=false;L.boss=null;L.bells=0;
+  L.ink=[];L.ink2=[];L.crates=[];L.crates2=[];L.cages=[];L.snakes=[];
+  L.colors=sky.colors||5;
+  L.moves=(sky.moves||DV_MOVES)+((compById(SAVE.comp).id==='xi')?2:0);
+  L.goals=[{type:'score',need:NO_SCORE_TARGET*10,got:0}];
+  L.chName='今日矿题';L.era='第 '+dvNo(d)+' 期';
+  L.s1=9000;L.s2=20000;L.s3=36000;
+  GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
+  GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
+  GS.boss=null;GS.rushOn=false;GS.tool=null;GS.toolFirst=null;GS.cont=0;
+  GS.party=false;GS.weekly=false;GS.paused=false;GS.usedTool=false;GS.wkLog=[];
+  GS.epoch=(GS.epoch||0)+1;GS.lastChain=0;GS.rushGiven=0;GS.won=false;
+  GS.sky=sky;GS.skyN=0;GS.skyRng=rngOf(sd+'|skyrun');
+  if(!SAVE.comp||!compUnlocked(compById(SAVE.comp)))SAVE.comp='wolf';
+  GS.compDef=compById(SAVE.comp);GS.charge=0;GS.xiaoN=0;
+  /* 种子贯穿整手，三条流各自独立——同矿脉，坑也相同，别省任何一条。 */
+  buildBoard(L,sd);
+  GS.pasRng=rngOf(sd+'|pas');
+  applyOpeningPassives();
+  /* 丰饶天开局注入。走独立天象流选位（被动流的消耗因同伴而异，
+     天象落点必须全服一致）；只改 k 不改色，不会凭空拼出三连。 */
+  if(sky.k==='rich'){
+    const R=rngOf(sd+'|sky');
+    const kinds=['B','B','H'];
+    for(const kk of kinds){
+      const sp=[];
+      for(let r=0;r<N;r++)for(let c=0;c<N;c++)
+        if(isGem(r,c)&&B[r][c].k==='n'&&!B[r][c].bell&&!B[r][c].cage)sp.push([r,c]);
+      if(!sp.length)break;
+      const [r,c]=sp[Math.floor(R()*sp.length)];
+      B[r][c].k=kk;B[r][c].sc=.4;
+    }
+  }
+  ENG.rng=rngOf(sd+'|play');
+  BGM.play('main');
+  show('game');fitCanvas();
+  $('#boss-bar').classList.remove('on');
+  $('#rush-bar').classList.remove('on');
+  $('#score-stars').innerHTML='<s style="left:'+(L.s1/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:'
+    +(L.s2/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
+  renderTools();renderAlly();renderGoals($('#goal-row'),30);
+  $('#goal-lbl').textContent='今日';
+  $('#quip-line').innerHTML='<b>天象 · '+sky.nm+'</b>　'+sky.desc;
+  updHUD();
+  const s=dvState();
+  toast('今日矿题 · 第 <b>'+dvNo(d)+'</b> 期 · 天象 <b>'+sky.nm+'</b><br>'+sky.desc
+    +'<br>全服同一盘 · '+L.moves+' 步'
+    +(s.best?'<br>今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>':''),4200);
+  GS.busy=false;GS.idle=PLAT.now();
+}
+function endDaily(){
+  $('#end-waystone').classList.remove('on');
+  $('#end-stars').style.display='';
+  $('#end-menu').textContent='回大厅';
+  GS.over=true;GS.busy=true;
+  markRun();
+  const d=dayNum(), s=dvState(), sky=GS.sky||skyOf(d);
+  const first=(s.score===null);
+  if(first){
+    s.score=GS.score;
+    /* 累计与连续分开记：n 只涨不清（矿匣里程碑按它走），run 断了从头数（只作展示）。 */
+    s.n++;
+    s.run=(s.lastD===d-1)?(s.run+1):1;
+    s.lastD=d;
+    /* 每累计挖题 7 天得一匣——同矿灯 7 次那条的取舍：断一天不清进度，刷也刷不出来。 */
+    const mile=Math.floor(s.n/7);
+    if(mile>s.mile){s.mile=mile;giveBox(1,'矿题已挖 '+s.n+' 天')}
+  }
+  const best=GS.score>s.best; if(best)s.best=GS.score;
+  s.plays++;
+  SAVE.power=(SAVE.power||0)+Math.round(GS.score/150);
+  persist();
+  q3Bump('play',1);q3Bump('chain',GS.chainMax);q3Bump('score',GS.score);
+  if(GS.score>=100000)grant('a8');
+  SFX.win();
+  applyArt($('#end-banner'),best?'end_win':'end_lose');
+  $('#end-kick').textContent='今日矿题 · 第 '+dvNo(d)+' 期 · 天象 '+sky.nm;
+  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'今日 · <em>矿题</em>';
+  countTo($('#end-score'),GS.score);
+  const stars=$('#end-stars').children;
+  const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
+  for(let i=0;i<3;i++)stars[i].classList.remove('lit');
+  setTimeout(()=>{for(let i=0;i<lv;i++)setTimeout(()=>{stars[i].classList.add('lit');SFX.star(i)},i*260)},200);
+  $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>'
+    +'　今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　累计已挖 <b>'+s.n+'</b> 天';
+  $('#end-quip').textContent=first?'第一把是正式成绩，接下来随便练。':pick2(Q_RUSH_END);
+  $('#end-next').textContent='再挖一次';
+  $('#end-next').dataset.act='daily';
+  $('#end-retry').style.display='none';
+  $('#end-continue').style.display='none';
+  $('#end-share').style.display='flex';
+  $('#wk-tablet').style.display='none';$('#wk-tablet').textContent='';
+  duelVerdict('d',d);
+  setTimeout(()=>LB.flush('clear'),600);
+  ovl('end');
+}
+
+/* ==================================================================
+   [ 战书 · DUEL LINK ]
+   ------------------------------------------------------------------
+   分享闭环的关键一环：分享图上的二维码从「进首页」升级为
+   「进同一副盘应战」。矿题与矿脉本来就是全服同盘，
+   战书只是把「这副盘」连同「我的分数」编进链接里。
+
+   载荷走 URL hash（#z=…）：hash 不发给服务器，
+   绕开 EdgeOne「带查询串会绕开响应头规则」的坑，也不脏缓存。
+   格式是点分紧凑串：v.k.n.sc.alias —— 比 JSON+base64 短一半，
+   二维码更疏、更好扫。
+   k: d=矿题战书（n=日序号） w=矿脉战书（n=周序号） h=迎宾（无对局）。
+
+   对等性约束：只有矿题与矿脉能立战书——发起者的分数必须
+   出自可复现的同一副盘。90 秒与冒险关各打各的盘，
+   它们的分享卡走 h 迎宾链接，不冒充可应战。
+   ================================================================== */
+function encodeDuel(o){
+  const a=encodeURIComponent(String(o.a||'').slice(0,12));
+  return ['1',o.k,Math.max(0,Math.floor(+o.n||0)),Math.max(0,Math.floor(+o.sc||0)),a].join('.');
+}
+function decodeDuel(str){
+  const p=String(str||'').split('.');
+  if(p.length<5||p[0]!=='1'||!['d','w','h'].includes(p[1]))return null;
+  const n=Math.floor(+p[2]),sc=Math.floor(+p[3]);
+  if(!Number.isFinite(n)||n<0||n>99999999)return null;
+  if(!Number.isFinite(sc)||sc<0||sc>99999999)return null;
+  let a='';try{a=decodeURIComponent(p.slice(4).join('.'))}catch(e){return null}
+  a=String(a).replace(/[<>&"'`]/g,'').slice(0,12);
+  return {k:p[1],n,sc,a};
+}
+/* 结算页的胜负对白。GS.duel 带着「这是对哪一期的应战」，
+   期号对不上就一声不吭——跨天残留的战书不会冒出错误的对比。 */
+function duelVerdict(kind,no){
+  const du=GS.duel;
+  if(!du||du.k!==kind||du.n!==no||!(du.sc>0))return;
+  const who=du.a||'一位矿工';
+  const line=GS.score>du.sc
+    ?'你压过了 '+who+' 的 '+du.sc.toLocaleString('en-US')+' 分 · 回敬一张战书吧'
+    :GS.score===du.sc
+      ?'与 '+who+' 同盘同分 · 这可比赢了还难得'
+      :'离 '+who+' 的 '+du.sc.toLocaleString('en-US')+' 分还差 '
+        +(du.sc-GS.score).toLocaleString('en-US')+' · 这盘还能再挖';
+  $('#end-quip').textContent=line;
+}
+/* 启动时读一次 hash。读完立刻抹掉，免得玩家刷新又弹一遍。 */
+function readDeepLink(){
+  const m=/[#&]z=([^&]*)/.exec(location.hash||'');
+  if(!m)return null;
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  return decodeDuel(m[1]);
+}
+function handleDeepLink(){
+  let z=null;
+  try{z=readDeepLink()}catch(e){return}
+  if(!z)return;
+  /* 新矿工礼：从任何战书/邀请链接第一次进来、且从没下过矿，发一份见面礼。
+     只看「有没有下过矿」，不记谁引来的——身份类字段能不加就不加。 */
+  let gift=false;
+  if(!SAVE.welcomed&&(SAVE.runs||0)===0){
+    SAVE.welcomed=1;SAVE.power=(SAVE.power||0)+600;
+    SAVE.tools.pick=Math.min(9,(SAVE.tools.pick||0)+1);
+    persist();gift=true;
+  }
+  const who=esc(z.a||'一位矿工');
+  if(z.k==='h'){
+    toast('<b>'+who+'</b> 邀你同下矿脉'+(gift?'<br>新矿工礼已入行囊：灵力 +600 · 矿镐 +1':''),4600);
+    return;
+  }
+  const today=(z.k==='d'), cur=today?dayNum():weekNum();
+  const live=(z.n===cur);
+  const name=today?'今日矿题':'本周矿脉';
+  const noTxt=today?('第 '+dvNo(z.n)+' 期'):('第 '+z.n+' 期');
+  const box=$('#duel-body');
+  if(!box)return;
+  box.innerHTML=(gift?'<div class="qs-dim" style="margin-bottom:8px">新矿工礼已入行囊：灵力 +600 · 矿镐 +1</div>':'')
+    +(live
+      ?'<b>'+who+'</b> 在'+name+' '+noTxt+'挖出 <b>'+z.sc.toLocaleString('en-US')+'</b> 分。<br>同一副盘就在眼前——应战吗？'
+      /* 过期战书不引期号：epoch 之前的日序算不出有意义的期号，硬写会和今天的撞号。 */
+      :'这份战书立的那副'+name+'盘已经封存。<br>不过——'+(today?'今天':'本周')+'的盘刚开，正好立一份新的。');
+  const go=$('#duel-go');
+  go.textContent=live?'应 战':(today?'挖今天的':'下本周的矿');
+  go.onclick=()=>{
+    SFX.click();ovl(null);
+    if(today)startDaily();else startWeekly();
+    if(live)GS.duel={k:z.k,n:z.n,sc:z.sc,a:z.a||''};
+  };
+  ovl('duel');
 }
 
 /* ---- 一键取名 ----
@@ -8407,6 +8716,10 @@ function renderMenu(){
   $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   /* 挑战点：本周矿脉没首挖、或悬赏没拿，就亮一颗——周一自然重亮，绝不闪烁催促 */
   $('#quest-dot').innerHTML=(wkState().score===null||!bountyState().done)?'<i class="dot"></i>':'';
+  /* 今日矿题的门脸：期号 + 当日天象名。红点只在今天还没首挖时亮。 */
+  const _dv=dvState(), _sky=skyOf(dayNum());
+  $('#dv-sub').textContent='第 '+dvNo(dayNum())+' 期 · 天象 '+_sky.nm;
+  $('#dv-dot').innerHTML=(_dv.score===null)?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
   $('#wolf-badge').dataset.pos='center 18%';applyArt($('#wolf-badge'),'hero');
@@ -9073,6 +9386,8 @@ addEventListener('pagehide',()=>{
   LB.beacon();
 });
 $('#btn-party').addEventListener('click',()=>{AU.ensure();SFX.click();show('party')});
+$('#btn-daily-vein').addEventListener('click',()=>{AU.ensure();SFX.click();startDaily()});
+$('#duel-later').addEventListener('click',()=>{SFX.click();ovl(null)});
 $('#pt-round-dec').addEventListener('click',()=>ptAdjust('rounds',-1));
 $('#pt-round-inc').addEventListener('click',()=>ptAdjust('rounds',1));
 $('#pt-hint-open').addEventListener('click',e=>{e.preventDefault();SFX.click();ovl('pt-hint')});
@@ -9240,7 +9555,7 @@ function maybeLore(after){
   $('#lore-close').onclick=()=>{SFX.click();ovl(null);after()};
   SFX.win();ovl('lore');
 }
-$('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'||GS.mode==='gauntlet'?show('menu'):show('map'))});
+$('#end-menu').addEventListener('click',()=>{SFX.click();ovl(null);maybeLore(()=>GS.mode==='rush'||GS.mode==='gauntlet'||GS.mode==='daily'?show('menu'):show('map'))});
 $('#end-retry').addEventListener('click',e=>{SFX.click();ovl(null);
   const act=e.currentTarget.dataset.act;
   if(act==='rush'){startRush();return}
@@ -9252,6 +9567,7 @@ $('#end-next').addEventListener('click',e=>{
   if(act==='rush'){startRush();return}
   if(act==='gauntlet'){openGauntletSetup();return}
   if(act==='weekly'){startWeekly();return}
+  if(act==='daily'){startDaily();return}          // GS.duel 不清：期号还对得上就继续比
   if(act==='retry'){openLevel(GS.L.n);return}
   const nx=Math.min(SAVE.lv,GS.L.n+1);
   maybeLore(()=>openLevel(nx));
@@ -10504,6 +10820,59 @@ window.__selftest=function(){
          COLS.box===b0+3&&COLS.dust===d0+180&&SAVE.rushWeek.claimed[oldWeek]===1);
       COLS=bakC;SAVE.rushWeek=bakR;colSave();persist();
     }
+    /* 35. 今日矿题与战书：日更同盘、天象只属矿题、深链编解码与新人礼。 */
+    {
+      const snapD=()=>B.map(r=>r.map(p=>p?p.g:'x').join('')).join('|');
+      const LD=levelDef(3);
+      LD.n=0;LD.endless=false;LD.boss=null;LD.bells=0;
+      LD.ink=[];LD.ink2=[];LD.crates=[];LD.crates2=[];LD.cages=[];LD.snakes=[];LD.colors=5;
+      buildBoard(LD,daySeed(20690)); const dA=snapD();
+      buildBoard(LD,daySeed(20690)); const dB=snapD();
+      buildBoard(LD,daySeed(20691)); const dC=snapD();
+      ok('矿题种子贯穿建盘：同日一致、跨日不同',dA===dB&&dA!==dC);
+      ok('天象池字段齐整且按日确定',SKY_POOL.length>=6
+         &&SKY_POOL.every(s=>s.k&&s.nm&&s.desc)
+         &&SKY_POOL.includes(skyOf(20690))&&skyOf(20690)===skyOf(20690)
+         &&[20690,20691,20692,20693,20694,20695,20696,20697].some(d=>skyOf(d)!==skyOf(20690)));
+      ok('天象只在矿题局生效：得分乘区与穿堂风钩子都带 mode 锁',
+         /GS\.mode==='daily'&&GS\.sky/.test(String(settleBoard))
+         &&/GS\.mode==='daily'&&GS\.sky&&GS\.sky\.k==='gale'/.test(String(trySwap)));
+      ok('矿题不计同伴衔位（同矿脉：另算成绩）',/GS\.mode==='daily'/.test(String(csBump)));
+      const du={k:'d',n:20690,sc:87654,a:'阿宸 A-1'};
+      const back=decodeDuel(encodeDuel(du));
+      ok('战书编解码往返一致，坏载荷一律回 null 不抛',
+         !!back&&back.k==='d'&&back.n===20690&&back.sc===87654&&back.a==='阿宸 A-1'
+         &&decodeDuel('')===null&&decodeDuel('x.y')===null&&decodeDuel('1.q.5.5.a')===null
+         &&decodeDuel('1.d.-3.5.a')===null&&decodeDuel('1.d.5.999999999.a')===null
+         &&decodeDuel('1.d.5.5.%E4%B8%'.slice(0))===null);
+      ok('分享二维码升级为战书深链：矿题与矿脉可应战，其余署名迎宾',
+         shareCardUrl({mode:'daily'}).includes('#z=1.d.')
+         &&shareCardUrl({mode:'weekly'}).includes('#z=1.w.')
+         &&shareCardUrl({mode:'rush'}).includes('#z=1.h.')
+         &&!shareCardUrl({mode:'daily'}).includes('?from='));
+      ok('深链载荷走 hash 不走查询串（EdgeOne 头规则按原始路径匹配）',
+         /location\.hash/.test(String(readDeepLink))&&!/searchParams/.test(String(readDeepLink)));
+      {
+        const bak=JSON.parse(JSON.stringify(SAVE.dv));
+        SAVE.dv={d:dayNum()-1,score:12345,best:12345,plays:3,n:6,run:6,lastD:dayNum()-1,mile:0};
+        const st=dvState();
+        ok('矿题跨日自动翻篇：昨天的成绩不占今天的首挖',st.d===dayNum()&&st.score===null&&st.plays===0&&st.n===6);
+        SAVE.dv={d:dayNum()+9000,score:1,best:1,plays:1,n:1,run:1,lastD:dayNum()+9000,mile:0};
+        const st2=dvState();
+        ok('矿题时钟回拨当存档损坏自愈，不把玩家锁在门外',st2.d===dayNum()&&st2.score===null);
+        SAVE.dv=bak;persist();
+      }
+      ok('新矿工礼只发一次且只发给没下过矿的人',
+         /SAVE\.welcomed&&\(SAVE\.runs\|\|0\)===0/.test(String(handleDeepLink).replace(/!SAVE/,'SAVE'))
+         &&/welcomed=1/.test(String(handleDeepLink)));
+      ok('传灯者成就在册，分享出手即点亮',
+         ACHS.some(a=>a.id==='a16')&&/grant\('a16'\)/.test(String(showCard)));
+      ok('大厅与挑战所都有矿题入口，战书面板齐整',
+         !!$('#btn-daily-vein')&&!!$('#dv-sub')&&!!$('#ovl-duel')&&!!$('#duel-go')&&!!$('#duel-body')
+         &&(function(){renderQuest();return $('#quest-body').innerHTML.includes('data-go="daily"')})());
+      ok('结算胜负对白只认对得上期号的战书',
+         /du\.k!==kind\|\|du\.n!==no/.test(String(duelVerdict)));
+    }
     /* 长内容不再要求玩家滚到底才能退出；每个悬浮关闭键必须落到已有的安全关闭流程。 */
     {
       const pairs=[
@@ -10578,6 +10947,8 @@ colFix(); shopFix(); colSync();     // 启动路径上的依赖：读之前先�
 buildBoard(levelDef(1));
 fitCanvas();
 show('menu');
+/* 战书与迎宾（#z=…）在大厅铺好之后落地；解析失败一声不吭，绝不拦启动。 */
+try{handleDeepLink()}catch(e){}
 /* iOS 的 apple-touch-startup-image 只在安装版、且命中精确机型时出现。
    这层是真正的 DOM 启动承接：浏览器打开也能看到，安装版则与系统启动图无缝衔接。 */
 const bootCover=$('#boot-cover');

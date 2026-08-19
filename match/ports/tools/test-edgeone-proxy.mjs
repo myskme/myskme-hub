@@ -34,7 +34,7 @@ try {
   const healthBody = await healthResponse.json();
   check('健康检查不触碰上游', healthResponse.status === 200
     && healthBody.service === 'myskme-edge-gateway'
-    && healthBody.namespaces?.join(',') === 'gf,quiz,game,publish'
+    && healthBody.namespaces?.join(',') === 'gf,monkey,quiz,game,publish'
     && calls.length === 0);
 
   calls = [];
