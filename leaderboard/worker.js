@@ -983,19 +983,30 @@ function pacerCamp(i) { return ["light", "dark"][i % 2]; }
    pacer.test.mjs 有一条守卫盯着它别再慢一个数量级。 */
 let _pacerCache = { h: -1, rows: null };
 
-/* 天象日榜的配速员成绩：按（成员,日）确定性生成——当天内查多少次都一样，
-   跨天重摇。约四分之一的日子轮休；到成员自己的活跃时段才出现，
-   别让玩家一早打开就见满榜。量级压在真人好手之下：上限约 6.5 万，
-   25 步天象局真人状态好能打 7 万以上——配速员是参照，不是天花板。 */
+/* 天象日榜的配速员成绩：按（成员,日）确定性生成——同一时刻查多少次都一样，
+   跨天重摇。约四分之一的日子轮休；到成员自己的活跃时段才出现。
+   分数不是一天一个死数：真人白天会越打越高，一个从早到晚纹丝不动的分
+   反而露馅。做成 2~4 段阶梯，按上线后的小时数逐段解锁——早上随手一把，
+   晚上认真冲分。量级压在真人好手之下（封顶 6.5 万，25 步天象局真人
+   状态好能打 7 万以上）——配速员是参照，不是天花板。
+   ⚠ 随机流的消耗次数必须与查询时刻无关（阶梯预生成再按时间应用），
+   否则不同时刻查询会漂移出不同的当日曲线。 */
 function pacerDayBest(pseed, day, nowMs) {
   const p = PACERS.find(x => x.seed === pseed);
   if (!p || !day) return 0;
   const r = pacerRnd(pseed * 31 + (day | 0));
   if (r() < 0.25) return 0;
-  const bjHour = new Date(nowMs + 8 * 3600000).getUTCHours();
-  if (bjHour < p.hour) return 0;
+  const bj = new Date(nowMs + 8 * 3600000);
+  const hoursOn = bj.getUTCHours() - p.hour;
+  if (hoursOn < 0) return 0;
   const grip = .62 + ((pseed * 37) % 100) / 100 * .38;
-  return Math.round((12000 + r() * 30000) * grip * 1.55);
+  let best = Math.round((9000 + r() * 18000) * grip * 1.4);
+  const steps = 2 + Math.floor(r() * 3);
+  const plan = [];
+  for (let i = 1; i < steps; i++) plan.push({ at: 3 + Math.floor(r() * 5), mul: 1.12 + r() * .25 });
+  let t = 0;
+  for (const s of plan) { t += s.at; if (hoursOn >= t) best = Math.round(best * s.mul); }
+  return Math.min(65000, best);
 }
 function pacerRows(nowMs) {
   const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));

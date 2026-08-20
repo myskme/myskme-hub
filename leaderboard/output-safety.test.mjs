@@ -167,6 +167,35 @@ if (!src.includes('CREATE TABLE IF NOT EXISTS gf_day_award')
   || !src.includes('dayAwards: (dayAwards.results || []).map')
   || !clientSrc.includes('dvClaimAwards(d.dayAwards)'))
   failures.push('天象日奖的封榜、发奖行、响应下发或客户端入账链路缺失');
+/* 配速员在日榜的伪装：分数不是一天一个死数——按小时阶梯提升，
+   且同一时刻确定、只增不减、封顶压在真人好手之下。 */
+{
+  const pacerDayBestFn = new Function(
+    fnOf(src, 'pacerRnd') + ';'
+    + slice(src, /const PACERS\s*=\s*\[/, '[', ']') + ';'
+    + fnOf(src, 'pacerDayBest') + ';return { pacerDayBest, PACERS };'
+  )();
+  const { pacerDayBest, PACERS } = pacerDayBestFn;
+  /* 选作息最早的成员：加 14 小时也不过零点，避免测试自己跨日归零。 */
+  const p = PACERS.slice().sort((a, b) => a.hour - b.hour)[0];
+  const at = h => Date.UTC(2026, 7, 21, p.hour + h - 8, 30);
+  let mono = true, capped = true, det = true, grew = false;
+  for (let day = 20690; day < 20720; day++) {
+    let prev = -1;
+    for (const h of [0, 4, 8, 14]) {
+      const v = pacerDayBest(p.seed, day, at(h));
+      if (v !== pacerDayBest(p.seed, day, at(h))) det = false;
+      if (v > 65000) capped = false;
+      if (prev >= 0 && v < prev && !(prev > 0 && v === 0)) mono = false;
+      if (prev > 0 && v > prev) grew = true;
+      prev = v;
+    }
+  }
+  if (!det || !capped || !mono || !grew)
+    failures.push('配速员日分曲线失真：应确定、只增不减、封顶 6.5 万且全天有提分');
+}
+if (/真人奖励|真人前三/.test(clientSrc))
+  failures.push('公开榜面出现「真人」区分性标签——虚拟成员被自曝');
 
 if (failures.length) {
   for (const failure of failures) console.error('FAIL ' + failure);

@@ -7714,9 +7714,12 @@ function lbRowHTML(r,mine){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
   const rush=LB.scope==='rush',rushAll=LB.scope==='rushAll',boss=LB.scope==='boss',day=LB.scope==='day';
-  const c=r.comp&&compById(r.comp),reward=rush&&rushRewardFor(r.rewardRank);
+  /* 榜面绝不标注谁有领奖资格：奖励按后台名次结算、以 toast 揭晓。
+     标出来等于把「榜上前三与领奖前三可能不同」摆到明面——
+     虚拟成员的全部意义是被当成普通玩家，任何区分性标签都是自曝。 */
+  const c=r.comp&&compById(r.comp);
   const sub=rush
-    ? [reward?('真人奖励 '+reward.rank+'档 · 匣 '+reward.boxes+' · 星屑 '+reward.dust):'',r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+    ? [r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
     :rushAll
       ?[r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):'','终身最高'].filter(Boolean).join(' · ')
     :boss
@@ -8572,7 +8575,8 @@ function openForge(){
     SAVE.rushBest=Math.max(SAVE.rushBest||0,Math.min(18999999,v));
     const rw=rushWeekState();rw.best=Math.max(rw.best||0,Math.min(18999999,v));
     persist();renderMenu();SFX.made();
-    toast('90 秒成绩已写入 · <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>');
+    LB.flush('forge');                                        // 写完立刻上榜，不等下一次唤醒
+    toast('90 秒成绩已写入并上传 · <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>');
   };
   $('#forge-dv-go').onclick=()=>{
     const v=Math.floor(+$('#forge-dv').value||0);
@@ -8582,7 +8586,8 @@ function openForge(){
     s.score=Math.max(Math.floor(+s.score||0),Math.min(18999999,v));
     s.best=Math.max(s.best||0,s.score);
     persist();renderMenu();SFX.made();
-    toast('今日天象成绩已写入 · <b>'+s.score.toLocaleString('en-US')+'</b>');
+    LB.flush('forge');                                        // 写完立刻上日榜，不等下一次唤醒
+    toast('今日天象成绩已写入并上传 · <b>'+s.best.toLocaleString('en-US')+'</b>');
   };
   ovl('forge');
 }
@@ -8744,7 +8749,7 @@ async function renderLB(){
     list.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e)}});
   }
   mine2.innerHTML=(LB.scope==='day'
-    ?'当天单局最高上榜 · 每日真人前三有奖：'+icTag('box')+' 匣 1 + 星屑 60 / 星屑 40 / 星屑 20，隔天自动入行囊。<br>'
+    ?'当天单局最高上榜 · 每日前三有奖：'+icTag('box')+' 匣 1 + 星屑 60 / 星屑 40 / 星屑 20，隔天自动入行囊。<br>'
     :'')+lbMineHTML(rows,myIdx);
 }
 /* ────────── 矿力三线（客户端镜像）──────────
@@ -8810,9 +8815,9 @@ function campEchoHTML(){
 const lbIsMe=r=>!!(r&&r.alias===SAVE.lbAlias&&(!SAVE.lbTag||!r.tag||r.tag===SAVE.lbTag));
 function rushRewardHTML(meta){
   const label=(meta&&meta.weekLabel)||rushWeekLabel((meta&&meta.week)||rushWeekKey());
-  return '<div class="rush-prizes"><div class="rp-hd"><span>90 秒周榜 · 真人前三奖励</span><small>'+esc(label)+'</small></div>'
+  return '<div class="rush-prizes"><div class="rp-hd"><span>90 秒周榜 · 每周前三有奖</span><small>'+esc(label)+'</small></div>'
     +'<div class="rp-list">'+RUSH_WEEK_REWARDS.map(r=>'<div class="rp"><b>第 '+r.rank+' 名</b>典藏匣 '+r.boxes+'<br>星屑 '+r.dust+'</div>').join('')+'</div>'
-    +'<div class="rp-note">所有成绩统一排位 · 真人前三结榜后自动入行囊 · 奖励不计入矿力</div></div>';
+    +'<div class="rp-note">结榜后自动入行囊 · 奖励不计入矿力</div></div>';
 }
 function lbBoardHTML(rows,myIdx,meta){
   const row=r=>lbRowHTML(r,lbIsMe(r),'');
@@ -11267,6 +11272,11 @@ window.__selftest=function(){
         ok('宿敌最多留 8 个，挤掉最久没交手的',Object.keys(SAVE.rivals).length<=8);
         SAVE.rivals=bakR;GS.duel=bakDuel;GS.score=bakSc;$('#end-quip').textContent=bakQuip;persist();
       }
+      /* 榜上混有虚拟成员，它们的全部意义是被当成普通玩家——
+         任何区分性标签（「真人」二字）出现在榜面渲染里都是自曝。 */
+      ok('公开榜面零区分性标签，不出现「真人」字样',
+         !/真人/.test(String(lbRowHTML))&&!/真人/.test(String(rushRewardHTML))
+         &&!/真人/.test(String(renderLB))&&!/真人/.test(String(lbCardHTML))&&!/真人/.test(String(lbMineHTML)));
     }
     /* 37. 聚会赛轮象与终局称号。 */
     {
