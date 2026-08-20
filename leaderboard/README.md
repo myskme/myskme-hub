@@ -37,7 +37,7 @@ MYSKME 题库书架的联网世界榜/班级榜/名人堂。免费、低维护�
 - `LB_KILL` = "0"：急停（设 "1" 立即停写）
 
 ## 部署（需 Cloudflare API token）
-1. 把 CF token 放到 `/tmp/cf_tok`（权限 Workers Scripts:Edit + D1:Edit）。
+1. 令牌就位（推荐长期令牌放 `~/.cf_tok`，建法与权限见 `取令牌步骤.md`；一次性放 `/tmp/cf_tok` 也行）。
 2. `python3 leaderboard/deploy.py` —— **会先跑 D1 迁移**（幂等：加 base_power 列 / 建 meta+hall_of_fame；一次性数据迁移仅首次加列时执行，重部署不会重置赛季起点），再部署 worker.js。
 3. 冒烟自测：`GET /`（应 v:2）、`GET /board?scope=world`、`POST /submit` 一条、`GET /hall`、控制台「封榜」一次看名人堂。
 - 全新库可直接 `schema.sql`；已上线库用 `migration_v2.sql`（或 deploy.py 内置迁移）。
@@ -100,7 +100,7 @@ MYSKME 题库工坊 / MYSKME × 英语王老师
 
 ### 部署
 
-和以前一样：把 Cloudflare token 放到 `/tmp/cf_tok`，然后
+令牌就位后（长期令牌 `~/.cf_tok`，见 `取令牌步骤.md`）：
 
 ```bash
 python3 leaderboard/deploy.py
