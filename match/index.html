@@ -691,7 +691,7 @@ body::before{display:none}
 #end-guide{flex:none;padding:8px 10px;font-size:12px}
 /* 排行榜：只留前列、我的位置与相邻名次，不再平铺 50 行。 */
 #ovl-lb .ovl-card{width:min(440px,94vw);max-height:calc(100dvh - 36px)}
-.lb-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0 7px}
+.lb-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:10px 0 7px}
 .lb-tabs button{min-width:0;font-family:var(--serif);font-size:13px;letter-spacing:.1em;padding:8px 4px;
   border:1px solid var(--line2);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .2s}
 .lb-tabs button.on{border-color:var(--gold);color:var(--gold2);background:color-mix(in srgb,var(--gold) 12%,var(--bg2))}
@@ -1525,8 +1525,8 @@ body{--shk:4px}
         </div>
       </div>
       <div class="menu-extras">
-        <button class="btn ornate" id="btn-daily-vein">今日矿题<span id="dv-dot"></span><span class="sub" id="dv-sub">每天一盘 · 天象</span></button>
-        <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人轮流</span></button>
+        <button class="btn ornate" id="btn-daily-vein">今日天象<span id="dv-dot"></span><span class="sub" id="dv-sub">每天一盘 · 全服同象</span></button>
+        <button class="btn ornate" id="btn-party"><svg class="ic mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3.2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="15" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg> 聚会赛<span class="sub">2–6 人 · 轮轮有象</span></button>
         <button class="btn ornate" id="btn-quest">本周挑战<span id="quest-dot"></span><span class="sub">矿脉 · 悬赏 · 岁记</span></button>
       </div>
       <div class="menu-dock">
@@ -2023,6 +2023,7 @@ body{--shk:4px}
     <button id="lb-group-depth" data-group="depth" class="on">远征</button>
     <button id="lb-group-rush" data-group="rush">90 秒</button>
     <button id="lb-group-boss" data-group="boss">首领</button>
+    <button id="lb-group-day" data-group="day">天象</button>
     <button id="lb-group-camp" data-group="camp">阵营</button>
   </div>
   <div class="lb-periods" id="lb-periods" aria-label="90 秒榜单范围">
@@ -2152,7 +2153,7 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   guide:{n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0},
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
-  /* 今日矿题：每天全服同一副盘 + 当日天象。score=首挖成绩（正式），best=练习最佳，
+  /* 今日天象：每天全服同一副盘 + 当日天象。score=首挖成绩（正式），best=练习最佳，
      n=累计挖题天数（每天只 +1，矿匣里程碑按它走——断签不清进度，同矿灯的取舍），
      run=连续天数（只作展示，断了从头数，不惩罚），mile=已发放的七日里程碑数（高水位）。 */
   dv:{d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},
@@ -2293,7 +2294,7 @@ function loadSave(){
   out.yjSeal=(s.yjSeal&&typeof s.yjSeal==='object')?s.yjSeal:{};
   if(!out.firstDay){out.firstDay=Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000)}
   out.gr=Object.assign({d:0,n:0,got:0},s.gr||{});
-  /* 今日矿题的消毒：字段全部压回非负整数；score 允许 null（今天还没首挖）。 */
+  /* 今日天象的消毒：字段全部压回非负整数；score 允许 null（今天还没首挖）。 */
   out.dv=Object.assign({d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},s.dv||{});
   for(const k of ['d','best','plays','n','run','lastD','mile'])out.dv[k]=Math.max(0,Math.floor(+out.dv[k]||0));
   out.dv.score=(out.dv.score==null)?null:Math.max(0,Math.floor(+out.dv.score||0));
@@ -4568,10 +4569,11 @@ async function settleBoard(firstChain){
     const ex=expandBlast(seed);
     playBlastFX(ex.fx);
     const res=clearCells(ex.cells,chain);
-    /* 天象只在今日矿题里生效：条件带 mode 锁，别的模式即使 GS.sky 残留也回落原公式。
-       chain 项抬连锁乘区（共鸣天），mul 抬整体分值（静夜天）——都作用在这一处，
+    /* 天象只在今日天象与聚会轮里生效：条件带 mode 锁，
+       别的模式即使 GS.sky 残留也回落原公式。
+       chain 项抬连锁乘区（共鸣），mul 抬整体分值（静夜/决胜）——都作用在这一处，
        别处不许再另起一套天象得分。 */
-    const skyOn=(GS.mode==='daily'&&GS.sky)||null;
+    const skyOn=((GS.mode==='daily'||GS.party)&&GS.sky)||null;
     const base=Math.round((60*res.gems*(1+(chain-1)*((skyOn&&skyOn.chain)||.55))+res.specials*140)*((skyOn&&skyOn.mul)||1));
     total+=base;
     const anchor=seed[0]||[0,0];
@@ -4786,11 +4788,11 @@ async function trySwap(a,b){
   }
   if(stale())return;
   ENG.lastMove=null;
-  /* 穿堂风天象（只属今日矿题）：每第 8 手降下一道疾风。
+  /* 穿堂风天象（今日天象局与聚会轮）：每第 8 手降下一道疾风。
      选点走独立的天象流（开局时由种子建好），不碰 pasRng 与 ENG.rng——
      不同玩家带不同同伴消耗被动流的节奏不同，天象落点必须全服一致。
      只改 k 不改色，不会凭空拼出三连，所以不用再走一轮结算。 */
-  if(GS.mode==='daily'&&GS.sky&&GS.sky.k==='gale'&&!GS.over){
+  if((GS.mode==='daily'||GS.party)&&GS.sky&&GS.sky.k==='gale'&&!GS.over){
     GS.skyN=(GS.skyN||0)+1;
     if(GS.skyN%8===0){
       const sp=[];
@@ -4846,7 +4848,7 @@ async function checkEnd(){
     if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endWeekly()}
     return;
   }
-  if(GS.mode==='daily'){                                      // 今日矿题：同矿脉，步数走完报分
+  if(GS.mode==='daily'){                                      // 今日天象：同矿脉，步数走完报分
     if(GS.moves<=0){GS.over=true;GS.busy=true;await sleep(420);endDaily()}
     return;
   }
@@ -5415,7 +5417,7 @@ function csMasteryCount(){
 }
 const prismNameUnlocked=()=>csMasteryCount()===COMPANIONS.length;
 function csBump(k,n){
-  if(!GS.compDef||GS.party||GS.weekly||GS.mode==='daily')return; // 聚会是客人打的，周挑战与矿题另算成绩
+  if(!GS.compDef||GS.party||GS.weekly||GS.mode==='daily')return; // 聚会是客人打的，周挑战与天象局另算成绩
   const c=csOf(GS.compDef.id);c[k]=(c[k]||0)+(n||1);persist();
 }
 
@@ -6882,6 +6884,41 @@ const PT_ARENAS=[
     ink:[[0,1],[1,2],[2,3],[3,4],[4,3],[5,2],[6,1],[7,0],[0,6],[1,5],[2,4],[4,4],[5,5],[6,6],[7,7]],
     ink2:[[2,3],[3,4],[4,3],[5,2],[2,4],[4,4],[5,5]],crates:[],crates2:[],cages:[]},
 ];
+/* 轮象：每轮开打前全场揭晓的规则扭曲——同一轮所有人同象，公平不破。
+   前几轮按局种子从池里确定性抽取；最后一轮固定「决胜 · 这一手值两手」——
+   给落后的人一个体面的翻盘口，也让终轮天然有悬念（王老师点名要的追赶感）。
+   参数与今日天象同一套（chain/mul/give/colors），得分乘区共用一处，不另起炉灶。 */
+const PT_SKY_POOL=[
+  {k:'calm', nm:'无象',   desc:'纯净一轮 · 各凭手艺'},
+  {k:'echo', nm:'共鸣',   desc:'连锁的回响格外洪亮', chain:.95},
+  {k:'rich', nm:'丰饶',   desc:'开局赐两颗爆裂一颗疾风', give:['B','B','H']},
+  {k:'pure', nm:'纯脉',   desc:'全盘只有四色灵石', colors:4},
+  {k:'gale', nm:'穿堂风', desc:'每第八手降下一道疾风'},
+  {k:'gild', nm:'鎏金',   desc:'开局赐一颗万象 · 分数上浮两成', give:['O'], mul:1.2},
+];
+const PT_SKY_FINAL={k:'final',nm:'决胜',desc:'终轮 · 这一手值两手',mul:2};
+function ptSkyAt(r){
+  if(r>=ptFmt().rounds-1)return PT_SKY_FINAL;
+  return PT_SKY_POOL[Math.floor(rngOf(PARTY.seed+'|sky|'+r)()*PT_SKY_POOL.length)];
+}
+/* 终局称号：人人有一个四字名号，全场不重复——只有冠军有面子的终局，
+   垫底的人下次就不来了（自鸣棋课堂模式验证过的取舍）。 */
+const PT_TITLES={champ:'今夜矿王',burst:'一鸣惊人',chain:'连脉如虹',steady:'稳若磐石',swift:'快手矿师',mate:'掌灯同行'};
+function ptTitlesFor(ranked){
+  const taken=new Set();
+  const give=(p,key)=>{if(p&&!p.title&&!taken.has(key)){p.title=PT_TITLES[key];taken.add(key)}};
+  for(const p of ranked)p.title='';
+  give(ranked[0],'champ');
+  let bp=null,bs=0;for(const p of ranked)for(const s of (p.scores||[]))if(s>bs){bs=s;bp=p}
+  give(bp,'burst');
+  let cp=null,cb=0;for(const p of ranked){const m=Math.max(0,...((p.chains&&p.chains.length)?p.chains:[0]));if(m>cb){cb=m;cp=p}}
+  give(cp,'chain');
+  let sp=null,sv=Infinity;for(const p of ranked){if((p.scores||[]).length<2)continue;const v=Math.max(...p.scores)-Math.min(...p.scores);if(v<sv){sv=v;sp=p}}
+  give(sp,'steady');
+  let qp=null,qv=Infinity;for(const p of ranked){if(!(p.scores||[]).length)continue;const u=p.scores.reduce((n,_,r)=>n+ptSecondsAt(r,p),0);if(u<qv){qv=u;qp=p}}
+  give(qp,'swift');
+  for(const p of ranked)if(!p.title)p.title=PT_TITLES.mate;
+}
 const PT_ROLE_DESC={
   wolf:'开局一颗疾风；打出 4 连锁再点亮一颗。灵技「执灯」引爆全盘特殊石。',
   jun:'爆裂范围扩大到 5×5。灵技「虎啸」震出两颗大爆裂。',
@@ -7129,7 +7166,7 @@ function startParty(){
   PARTY.seed='pt'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
   PARTY.players=PARTY.players.slice(0,PARTY.n).map((p,i)=>({
     name:(p.name||'').trim().slice(0,8)||ptDefaultName(i),seconds:ptSecondsAt(0,p),roundSeconds:[ptSecondsAt(0,p)],
-    comp:p.comp||COMPANIONS[i].id,scores:[],total:0,idx:i,
+    comp:p.comp||COMPANIONS[i].id,scores:[],chains:[],total:0,title:'',idx:i,
   }));
   ptHandoff();
 }
@@ -7151,13 +7188,14 @@ function ptScoreLines(){
 }
 function ptStartTurn(){
   const p=PARTY.players[PARTY.cur], c=ptComp(p), f=ptFmt(p), pact=PARTY.rules==='pact',a=ptArenaAt(PARTY.round);
+  const sky=ptSkyAt(PARTY.round);
   const L=levelDef(3);
   L.n=0;L.endless=false;L.boss=null;L.bells=0;
   L.ink=(a.ink||[]).map(x=>x.slice());L.ink2=(a.ink2||[]).map(x=>x.slice());
   L.crates=(a.crates||[]).map(x=>x.slice());L.crates2=(a.crates2||[]).map(x=>x.slice());
   L.cages=(a.cages||[]).map(x=>x.slice());L.snakes=[];
   const xiMs=(pact&&c.id==='xi')?5000:0;
-  L.colors=a.colors;L.moves=999;
+  L.colors=sky.colors||a.colors;L.moves=999;
   L.goals=[{type:'score',need:999999999,got:0}];
   L.chName='聚会赛 · '+a.name;L.era='第 '+(PARTY.round+1)+' 轮';
   L.s1=6000;L.s2=14000;L.s3=26000;
@@ -7173,6 +7211,20 @@ function ptStartTurn(){
   /* 灵契赛先保证基础盘相同，再按人物走各自确定性的开局被动。 */
   GS.pasRng=rngOf(PARTY.seed+'|r'+PARTY.round+'|'+a.id+'|pas|'+c.id);
   if(pact)ptApplyOpening(c);
+  /* 轮象注入走本轮公共流：镜盘赛全场同位；灵契赛因被动先动了盘，
+     落位可能有一两格出入——同象同量，公平的主体（同盘同补石）不受影响。 */
+  GS.sky=sky;GS.skyN=0;GS.skyRng=rngOf(PARTY.seed+'|r'+PARTY.round+'|skyrun|'+PARTY.cur);
+  if(sky.give&&sky.give.length){
+    const R=rngOf(PARTY.seed+'|r'+PARTY.round+'|give');
+    for(const kk of sky.give){
+      const sp=[];
+      for(let r=0;r<N;r++)for(let cc=0;cc<N;cc++)
+        if(isGem(r,cc)&&B[r][cc].k==='n'&&!B[r][cc].bell&&!B[r][cc].cage)sp.push([r,cc]);
+      if(!sp.length)break;
+      const [r,cc]=sp[Math.floor(R()*sp.length)];
+      B[r][cc].k=kk;B[r][cc].sc=.4;
+    }
+  }
   ENG.rng=rngOf(PARTY.seed+'|play'+PARTY.round+'|'+a.id);     // 补位/重排也吃同一条随机流
   show('game');fitCanvas();
   $('#boss-bar').classList.remove('on');
@@ -7186,23 +7238,25 @@ function ptStartTurn(){
   const dot=$('#ptb-dot');ptPaintRole(dot,p);ptStyle(bar,p.idx);
   $('#ptb-name').textContent=p.name+' · '+c.name;
   $('#ptb-sub').textContent='第 '+(PARTY.round+1)+' 轮 / 共 '+f.rounds+' 轮';
-  $('#ptb-mult').textContent=a.name+' · '+f.seconds+'秒';
+  $('#ptb-mult').textContent=a.name+' · '+f.seconds+'秒 · '+sky.nm;
   $('#score-stars').innerHTML='<s style="left:23%">'+ICONS.star+'</s><s style="left:54%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderGoals($('#goal-row'),30);$('#goal-lbl').textContent='本轮得分';
-  $('#quip-line').innerHTML=pact
-    ?'<b>被动已生效 · '+c.name+'：</b>'+PT_ROLE_DESC[c.id]
-    :'<b>镜盘赛：</b>'+a.name+'，同盘开局，各凭手艺。';
+  $('#quip-line').innerHTML='<b>轮象 · '+sky.nm+'</b>　'+sky.desc
+    +(pact?'<br><b>'+c.name+'：</b>'+PT_ROLE_DESC[c.id]:'');
   updHUD();renderAlly();
   ovl(null);GS.busy=false;GS.idle=PLAT.now();hintCell=null;selCell=null;
-  if(pact)setTimeout(()=>toast('<b>'+c.name+'</b> 被动已生效 · 灵技 '+Math.floor(GS.charge)+' / '+c.need,2600),120);
+  if(sky.k==='final')setTimeout(()=>toast('<b>决胜轮</b> · 这一手的分数按双倍记',2600),120);
+  else if(pact)setTimeout(()=>toast('<b>'+c.name+'</b> 被动已生效 · 灵技 '+Math.floor(GS.charge)+' / '+c.need,2600),120);
 }
 function ptTurnEnd(){
   ENG.rng=null;                                              // 交棒后把随机流还给全局
   GS.epoch=(GS.epoch||0)+1;                                  // 让上一位没跑完的连锁自己退出，别串进下一位的回合
   GS.rushOn=false;$('#rush-bar').classList.remove('on');
+  GS.sky=null;                                               // 轮象只活在这一手里，别漏进别的模式
   const p=PARTY.players[PARTY.cur];
-  const gained=GS.score;                                     // 无倍率，得多少记多少
+  const gained=GS.score;                                     // 轮象倍率已在得分公式里生效，这里得多少记多少
   p.scores.push(gained);p.total+=gained;
+  (p.chains||(p.chains=[])).push(GS.chainMax||0);            // 终局「连脉如虹」称号按它评
   SFX.win();
   PARTY.cur++;
   if(PARTY.cur>=PARTY.players.length){
@@ -7219,7 +7273,9 @@ function ptRankHTML(players){
     return '<div class="pd-row'+(i===0?' w1':'')+'">'
       +'<div class="rk">'+(i+1)+'</div>'
       +'<div class="dot" data-role="'+c.id+'" style="--pc-base:'+g.base+';--pg:'+hexA(g.base,.24)+'">'+c.g+'</div>'
-      +'<div class="nm">'+esc(q.name)+'<span style="color:var(--ink3);font-size:11px">　'+c.name+(used?' · '+used+'秒':'')+'</span></div>'
+      +'<div class="nm">'+esc(q.name)
+      +(q.title?' <span style="color:var(--gold2);font-size:11.5px">'+esc(q.title)+'</span>':'')
+      +'<span style="color:var(--ink3);font-size:11px">　'+c.name+(used?' · '+used+'秒':'')+'</span></div>'
       +'<div class="sc">'+q.total.toLocaleString('en-US')+'</div></div>';
   }).join('');
 }
@@ -7231,8 +7287,16 @@ function ptRoundBreak(){
     p.roundSeconds[PARTY.round]=null;
   }
   $('#ptr-title').innerHTML='第 '+PARTY.round+' 轮 · <em>战罢</em>';
-  $('#ptr-sub').textContent='下一轮：'+ptArenaAt(PARTY.round).name+' · 第 '+(PARTY.round+1)+' / '+ptFmt().rounds+' 轮';
-  const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  /* 轮间是这局的呼吸口：预告下一轮的场地与轮象，再给追赶者一句实话——
+     终轮双倍分，落后的差距要按「半个身位」读。 */
+  const nxSky=ptSkyAt(PARTY.round), lastNext=(PARTY.round>=ptFmt().rounds-1);
+  const rankedNow=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  const gap=rankedNow.length>1?(rankedNow[0].total-rankedNow[rankedNow.length-1].total):0;
+  $('#ptr-sub').innerHTML='下一轮：'+ptArenaAt(PARTY.round).name+' · 轮象 <b>'+nxSky.nm+'</b>（'+nxSky.desc+'）'
+    +' · 第 '+(PARTY.round+1)+' / '+ptFmt().rounds+' 轮'
+    +(lastNext&&gap>0?'<br><span style="color:var(--gold2)">决胜轮分数翻倍 —— 落后 '
+      +gap.toLocaleString('en-US')+' 也只差半个身位</span>':'');
+  const ranked=rankedNow;
   $('#ptr-board').innerHTML=ptRankHTML(ranked);ptPaintRoles($('#ptr-board'));
   ptRoundTimesRender();
   show('game');ovl('ptround');
@@ -7256,25 +7320,26 @@ function ptRoundTimesRender(){
    看上去像是把按钮点坏了。 */
 function ptQuit(){
   if(PARTY.players.some(p=>p.total>0||p.scores.length)){ptFinish();return}
-  PARTY.on=false;GS.party=false;
+  PARTY.on=false;GS.party=false;GS.sky=null;
   $('#toolbar').style.display='';
   $('#pt-bar').classList.remove('on');
   show('menu');
   toast('还没有人打完一手 · 本场不计名次',2800);
 }
 function ptFinish(){
-  PARTY.on=false;GS.party=false;GS.over=true;ENG.rng=null;
+  PARTY.on=false;GS.party=false;GS.over=true;ENG.rng=null;GS.sky=null;
   $('#toolbar').style.display='';
   $('#pt-bar').classList.remove('on');
   const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
+  ptTitlesFor(ranked);                                       // 人人一个四字名号，垫底也有面子
   const T=$('#pte-title'), S=$('#pte-sub'), P=$('#pt-podium');
   T.innerHTML='冠 · <em>军</em>';
-  S.textContent=ranked[0].name+' · '+ptComp(ranked[0]).name+' · '+ranked[0].total.toLocaleString('en-US');
+  S.textContent=ranked[0].name+' · '+(ranked[0].title||'')+' · '+ranked[0].total.toLocaleString('en-US');
   P.innerHTML=ptRankHTML(ranked);ptPaintRoles(P);
   /* 中途终结时，还没轮到的人一手都没打过。以前这里会输出「选手二：」后面空着，
      像是文案没写完；给他一句明话。 */
   $('#pt-rounds').innerHTML=ranked.map(p=>esc(p.name)+'：'+(p.scores.length
-    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')+'（'+ptSecondsAt(i,p)+'秒 · '+ptArenaAt(i).name+'）').join(' · ')
+    ? p.scores.map((s,i)=>'第'+(i+1)+'轮 '+s.toLocaleString('en-US')+'（'+ptSecondsAt(i,p)+'秒 · '+ptArenaAt(i).name+' · '+ptSkyAt(i).nm+'）').join(' · ')
     : '<span style="color:var(--ink3)">未出手</span>')).join('<br>');
   $('#pte-quip').textContent=pick2(Q_WIN);
   fxBurstDom(0);fxBurstDom(1);fxBurstDom(2);
@@ -7309,7 +7374,7 @@ function ptCardData(){
   c.textAlign='center';c.fillStyle='#9c9388';c.font='30px serif';c.fillText('GEMFALL · PARTY RESULT',540,132);
   c.fillStyle='#f0d07b';c.font='72px serif';c.fillText('灵 石 远 征',540,228);
   c.fillStyle='#f5eddf';c.font='38px serif';
-  c.fillText(ptRuleName()+' · '+PARTY.rounds+' 轮四盘轮换',540,292);
+  c.fillText(ptRuleName()+' · '+PARTY.rounds+' 轮 · 轮轮有象 · 终轮双倍',540,292);
   c.strokeStyle='#7f692d';c.lineWidth=2;c.beginPath();c.moveTo(130,330);c.lineTo(950,330);c.stroke();
   const ranked=PARTY.players.slice().sort((a,b)=>b.total-a.total);
   ranked.forEach((p,i)=>{
@@ -7318,7 +7383,8 @@ function ptCardData(){
     c.textAlign='left';c.fillStyle=i===0?'#f0d07b':'#9c9388';c.font='34px serif';c.fillText(String(i+1).padStart(2,'0'),142,y);
     c.fillStyle='#f5eddf';c.font='39px serif';c.fillText(p.name,235,y-8);
     const used=p.scores.reduce((n,_,r)=>n+ptSecondsAt(r,p),0);
-    c.fillStyle='#9c9388';c.font='24px serif';c.fillText(co.name+' · '+p.scores.length+' 手 · '+used+' 秒',235,y+26);
+    c.fillStyle='#9c9388';c.font='24px serif';
+    c.fillText((p.title?p.title+' · ':'')+co.name+' · '+p.scores.length+' 手 · '+used+' 秒',235,y+26);
     c.textAlign='right';c.fillStyle=i===0?'#f0d07b':'#c4b9aa';c.font='44px serif';c.fillText(p.total.toLocaleString('en-US'),922,y+4);
   });
   const base=390+ranked.length*105+20;
@@ -7326,7 +7392,7 @@ function ptCardData(){
   c.font='24px serif';
   ranked.slice(0,4).forEach((p,i)=>{
     c.fillStyle=i===0?'#f0d07b':'#c4b9aa';
-    const line=p.name+'　'+(p.scores.length?p.scores.map((s,j)=>'R'+(j+1)+' '+s.toLocaleString('en-US')+'/'+ptSecondsAt(j,p)+'秒').join('　'):'尚未完成');
+    const line=p.name+'　'+(p.scores.length?p.scores.map((s,j)=>'R'+(j+1)+' '+ptSkyAt(j).nm+' '+s.toLocaleString('en-US')).join('　'):'尚未完成');
     c.fillText(line.slice(0,48),130,base+48+i*38);
   });
   c.textAlign='center';c.fillStyle='#7f756c';c.font='23px serif';
@@ -7416,7 +7482,7 @@ const LB={
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
     const rw=rushWeekState(),bb=SAVE.bossBest||{floor:0,progress:0,score:0,build:'',comp:''};
-    /* dvDay/dvBest：今日矿题的首挖成绩（正式成绩，不是练习最佳）。
+    /* dvDay/dvBest：今日天象的首挖成绩（正式成绩，不是练习最佳）。
        老 worker 不认识这两个字段会安全忽略；新 worker 用它记日榜。 */
     const _dv=SAVE.dv||{};
     return {score:best,rush:SAVE.rushBest||0,rushWeek:rw.best||0,rushWeekKey:rw.w,
@@ -7507,7 +7573,7 @@ const LB={
   async board(scope){
     return await this.fetchJSON('/gf/board?scope='+scope+'&limit='+LB_LIMIT);
   },
-  /* 矿题日榜。响应必须回带同一个 day 才算数——老 worker 不认识这个 scope
+  /* 天象日榜。响应必须回带同一个 day 才算数——老 worker 不认识这个 scope
      会落回矿力榜，靠这道校验静默降级，绝不把矿力榜错当日榜显示。 */
   async dayBoard(day){
     const d=await this.fetchJSON('/gf/board?scope=day&day='+(+day||0)+'&limit='+LB_LIMIT);
@@ -7636,7 +7702,7 @@ function lbNameHTML(r,mine){
 function lbRowHTML(r,mine){
   const rank=Number(r.rank)||0;
   const medal=rank<=3&&rank>=1?['①','②','③'][rank-1]:rank;
-  const rush=LB.scope==='rush',rushAll=LB.scope==='rushAll',boss=LB.scope==='boss';
+  const rush=LB.scope==='rush',rushAll=LB.scope==='rushAll',boss=LB.scope==='boss',day=LB.scope==='day';
   const c=r.comp&&compById(r.comp),reward=rush&&rushRewardFor(r.rewardRank);
   const sub=rush
     ? [reward?('真人奖励 '+reward.rank+'档 · 匣 '+reward.boxes+' · 星屑 '+reward.dust):'',r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
@@ -7644,6 +7710,8 @@ function lbRowHTML(r,mine){
       ?[r.chain?('最长 '+r.chain+' 连'):'',c?('同行 '+c.name):'','终身最高'].filter(Boolean).join(' · ')
     :boss
       ?['完成 '+Math.min(GAUNTLET_MAX,Number(r.bossFloor)||0)+' / '+GAUNTLET_MAX,r.bossProgress?('当前 '+gauntletPct(r.bossProgress)+'%'):'',c?('同行 '+c.name):''].filter(Boolean).join(' · ')
+    :day
+      ?['第 '+dvNo(dayNum())+' 期 · '+skyOf(dayNum()).nm,c?('同行 '+c.name):''].filter(Boolean).join(' · ')
       :['星数 '+(Number(r.stars)||0),c?('同行 '+c.name):'',r.score?('最佳 '+Number(r.score).toLocaleString('en-US')):''].filter(Boolean).join(' · ');
   return '<div class="lb-row'+(rank<=3&&rank>=1?' top'+rank:'')+(mine?' me':'')+'" data-row="'+rank+'" role="button" tabindex="0">'
     +'<div class="rk">'+medal+'</div><div class="who"><div class="nm">'
@@ -7652,6 +7720,8 @@ function lbRowHTML(r,mine){
       ?'<div class="pw"><div class="pv">'+(Number(r.rush)||0).toLocaleString('en-US')+'</div><div class="pl">'+(rush?'本周':'历史')+'</div></div>'
       :boss
         ?'<div class="pw"><div class="pv">'+(Number(r.bossScore)||0).toLocaleString('en-US')+'</div><div class="pl">战果积分</div></div>'
+      :day
+        ?'<div class="pw"><div class="pv">'+(Number(r.dayBest)||0).toLocaleString('en-US')+'</div><div class="pl">今日</div></div>'
         :'<div class="pw"><div class="pv">第 '+(Number(r.lv)||0)+' 关</div><div class="pl">闯关</div></div>')+'</div>';
 }
 /* ────────── 矿工名片（点开榜单某一行）──────────
@@ -7672,6 +7742,9 @@ function lbCardHTML(r){
   }else if(me&&me!==r&&LB.registered()&&LB.scope==='boss'){
     const ds=(Number(r.bossScore)||0)-(Number(me.bossScore)||0);
     cmp='<div class="lc-cmp">'+(ds>0?'下一趟再多 <b>'+(ds+1).toLocaleString('en-US')+'</b> 积分可越过他':'你已不低于他的首领战积分')+'</div>';
+  }else if(me&&me!==r&&LB.registered()&&LB.scope==='day'){
+    const dg=(Number(r.dayBest)||0)-(Number(me.dayBest)||0);
+    cmp='<div class="lc-cmp">'+(dg>0?'同一副盘 · 差他 <b>'+dg.toLocaleString('en-US')+'</b> 分':'你已不低于他今天的成绩')+'</div>';
   }else if(me&&me!==r&&LB.registered()){
     const lvGap=(Number(r.lv)||0)-(Number(me.lv)||0),starGap=(Number(r.stars)||0)-(Number(me.stars)||0);
     cmp='<div class="lc-cmp">'+(lvGap>0?'再通 <b>'+lvGap+'</b> 关，就到他的远征位置':lvGap<0?'你已比他多走 <b>'+(-lvGap)+'</b> 关':starGap>0?'同关进度 · 再收 <b>'+starGap+'</b> 星可追平':'你们正在同一段地脉')+'</div>';
@@ -7680,11 +7753,13 @@ function lbCardHTML(r){
   const main=scope==='rush'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>本周矿灯</span>'
     :scope==='rushAll'?(Number(r.rush)||0).toLocaleString('en-US')+'<span>90 秒历史</span>'
     :scope==='boss'?(Number(r.bossScore)||0).toLocaleString('en-US')+'<span>首领战积分</span>'
+    :scope==='day'?(Number(r.dayBest)||0).toLocaleString('en-US')+'<span>今日天象</span>'
     :'第 '+(Number(r.lv)||0)+' 关<span>远征位置</span>';
-  const recordTitle=scope==='rush'?'90 秒本周记录':scope==='rushAll'?'90 秒历史记录':scope==='boss'?'首领战记录':'远征记录';
+  const recordTitle=scope==='rush'?'90 秒本周记录':scope==='rushAll'?'90 秒历史记录':scope==='boss'?'首领战记录':scope==='day'?'今日天象记录':'远征记录';
   const scoped=scope==='rush'?row('本周矿灯',r.rush?Number(r.rush).toLocaleString('en-US'):'')+row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
     :scope==='rushAll'?row('90 秒历史',r.rush?Number(r.rush).toLocaleString('en-US'):'')
     :scope==='boss'?row('完成层数',Math.min(GAUNTLET_MAX,Number(r.bossFloor)||0)+' / '+GAUNTLET_MAX)+row('当前首领',r.bossProgress?gauntletPct(r.bossProgress)+'%':'')+row('战果积分',r.bossScore?Number(r.bossScore).toLocaleString('en-US'):'')+row('强化组合',esc(gauntletBuildLabel(r.bossBuild)||'未记录'))
+    :scope==='day'?row('今日首挖',r.dayBest?Number(r.dayBest).toLocaleString('en-US'):'')+row('天象','第 '+dvNo(dayNum())+' 期 · '+skyOf(dayNum()).nm)
     :row('矿灯最佳',r.rush?Number(r.rush).toLocaleString('en-US'):'');
   return '<div class="lc"><button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div><div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div><div class="lc-tt">'+recordTitle+'</div>'
@@ -7773,7 +7848,7 @@ function shareCardInfo(){
   }
   if(GS.mode==='daily'){
     const sky=GS.sky||skyOf(dayNum());
-    return {mode:'daily',kick:'DAILY VEIN',title:'今日矿题',sub:'第 '+dvNo(dayNum())+' 期 · 天象 '+sky.nm,score:GS.score,
+    return {mode:'daily',kick:'DAILY VEIN',title:'今日天象',sub:'第 '+dvNo(dayNum())+' 期 · '+sky.nm,score:GS.score,
       note:'全服同一副盘 · 最长连锁 '+GS.chainMax,
       rank:DV_RANK>0?('今日全球第 '+DV_RANK+' 名'):'今日战果'};
   }
@@ -7785,7 +7860,7 @@ function shareCardInfo(){
 /* 结算时顺手查一次自己在矿灯榜上的名次。**不阻塞结算** ——
    查不到就不报名次，绝不让玩家等在那里看转圈。 */
 let RUSH_RANK=0,DV_RANK=0;
-/* 矿题日榜名次：同 fetchRushRank 的姿态——不阻塞结算，查不到就不报。
+/* 天象日榜名次：同 fetchRushRank 的姿态——不阻塞结算，查不到就不报。
    老 worker 下 dayBoard 恒为 null，这段静默什么都不做。 */
 async function fetchDayRank(){
   DV_RANK=0;
@@ -7819,7 +7894,7 @@ async function fetchRushRank(){
    不绘制完整盘面和走法，保留比分谈资，不泄露同盘解法。 */
 function shareCardUrl(info){
   const base=(window.MYSKME_GEMFALL_NETWORK&&window.MYSKME_GEMFALL_NETWORK.shareUrl)||'https://play.myskme.com/';
-  /* 矿题与矿脉的码是战书（扫开直接进同一副盘应战）；
+  /* 天象局与矿脉的码是战书（扫开直接进同一副盘应战）；
      其余模式各打各的盘，分数不可复现，码是署名迎宾（k:'h'），不冒充可应战。
      旧版 ?from=poster 参数落地后无人接收，一并退役——载荷统一走 hash。 */
   const a=SAVE.lbAlias||'';
@@ -7981,10 +8056,10 @@ function renderQuest(){
   const bs=bountyState();
   const yj=yjState();
   let h='';
-  /* 今日矿题 */
+  /* 今日天象 */
   const dv=dvState(), sky=skyOf(dayNum()), dvFirst=(dv.score===null);
-  h+='<div class="qs-sec"><div class="qs-hd">今日矿题 · 第 '+dvNo(dayNum())+' 期'
-    +'<span class="qs-sub">天象 · '+esc(sky.nm)+'</span></div>'
+  h+='<div class="qs-sec"><div class="qs-hd">今日天象 · 第 '+dvNo(dayNum())+' 期'
+    +'<span class="qs-sub">'+esc(sky.nm)+'</span></div>'
     +'<div class="qs-bd">'+esc(sky.desc)+'<br>'+(dvFirst
       ?'每天一副全服同盘 · 第一把记成绩'
       :'今日成绩 <b>'+dv.score.toLocaleString('en-US')+'</b>'
@@ -8068,7 +8143,7 @@ function startWeekly(){
     +(L.s2/L.s3*100)+'%">'+ICONS.star+'</s><s style="left:97%">'+ICONS.star+'</s>';
   renderTools();renderAlly();renderGoals($('#goal-row'),30);
   $('#goal-lbl').textContent='本周';
-  /* 台词位要自己写：不写的话会残留上一局的（比如矿题的天象说明）。 */
+  /* 台词位要自己写：不写的话会残留上一局的（比如天象局的天象说明）。 */
   $('#quip-line').innerHTML='<b>狼先生：</b>全服同一副盘，就看手艺了。';
   updHUD();
   const s=wkState();
@@ -8119,17 +8194,17 @@ function endWeekly(){
 }
 
 /* ==================================================================
-   [ 今日矿题 · DAILY VEIN ]
+   [ 今日天象 · DAILY VEIN ]
    ------------------------------------------------------------------
    本周矿脉的日更姊妹篇：每天全服同一副盘，外加一条当日「天象」——
    全球一致的规则扭曲。种子与天象都从日序号确定性推出，不联网也一样。
 
    与矿脉的分工：矿脉是每周的正式竞技（纯净盘、比手艺），
-   矿题是每天的花活（天象让每天手感都不一样，图个乐也图个谈资）。
+   天象局是每天的花活（天象让每天手感都不一样，图个乐也图个谈资）。
    首挖记正式成绩、之后随便练——同矿脉，理由也相同：比手艺不比耐心。
 
    天象的三条铁律：
-   1. 只在矿题局生效（得分公式与钩子都带 GS.mode==='daily' 锁）；
+   1. 只在天象局局生效（得分公式与钩子都带 GS.mode==='daily' 锁）；
    2. 全部从独立的天象流取随机（不碰被动流与补石流，落点全服一致）；
    3. 只调乘区、步数、色数、注入——不发明第二套得分逻辑。
    ================================================================== */
@@ -8166,7 +8241,7 @@ function festOf(d){
 }
 function skyOf(d){return festOf(d)||SKY_POOL[Math.floor(rngOf('gemfall|sky|'+d)()*SKY_POOL.length)]}
 /* 日态。时钟回拨当存档损坏处理（colDay 同款防线），
-   免得机器时钟跑到未来再校回来后，矿题永远「今天已挖过」。 */
+   免得机器时钟跑到未来再校回来后，天象局永远「今天已挖过」。 */
 function dvState(){
   const d=dayNum(), s=SAVE.dv||(SAVE.dv=Object.assign({},SAVE_DEF.dv));
   if(s.d>d){s.d=0;s.lastD=0}
@@ -8183,7 +8258,7 @@ function startDaily(){
   L.colors=sky.colors||5;
   L.moves=(sky.moves||DV_MOVES)+((compById(SAVE.comp).id==='xi')?2:0);
   L.goals=[{type:'score',need:NO_SCORE_TARGET*10,got:0}];
-  L.chName='今日矿题';L.era='第 '+dvNo(d)+' 期';
+  L.chName='今日天象';L.era='第 '+dvNo(d)+' 期';
   L.s1=9000;L.s2=20000;L.s3=36000;
   GS.L=L;GS.goals=L.goals.map(g=>Object.assign({},g,{got:0}));
   GS.moves=L.moves;GS.score=0;GS.over=false;GS.busy=true;GS.chainMax=0;GS.specials=0;
@@ -8223,7 +8298,7 @@ function startDaily(){
   $('#quip-line').innerHTML='<b>天象 · '+sky.nm+'</b>　'+sky.desc;
   updHUD();
   const s=dvState();
-  toast('今日矿题 · 第 <b>'+dvNo(d)+'</b> 期 · 天象 <b>'+sky.nm+'</b><br>'+sky.desc
+  toast('今日天象 · 第 <b>'+dvNo(d)+'</b> 期 · <b>'+sky.nm+'</b><br>'+sky.desc
     +'<br>全服同一盘 · '+L.moves+' 步'
     +(s.best?'<br>今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>':''),4200);
   GS.busy=false;GS.idle=PLAT.now();
@@ -8244,7 +8319,7 @@ function endDaily(){
     s.lastD=d;
     /* 每累计挖题 7 天得一匣——同矿灯 7 次那条的取舍：断一天不清进度，刷也刷不出来。 */
     const mile=Math.floor(s.n/7);
-    if(mile>s.mile){s.mile=mile;giveBox(1,'矿题已挖 '+s.n+' 天')}
+    if(mile>s.mile){s.mile=mile;giveBox(1,'天象局已挖 '+s.n+' 天')}
   }
   const best=GS.score>s.best; if(best)s.best=GS.score;
   s.plays++;
@@ -8254,8 +8329,8 @@ function endDaily(){
   if(GS.score>=100000)grant('a8');
   SFX.win();
   applyArt($('#end-banner'),best?'end_win':'end_lose');
-  $('#end-kick').textContent='今日矿题 · 第 '+dvNo(d)+' 期 · 天象 '+sky.nm;
-  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'今日 · <em>矿题</em>';
+  $('#end-kick').textContent='今日天象 · 第 '+dvNo(d)+' 期 · '+sky.nm;
+  $('#end-title').innerHTML=best?'新 · <em>纪录</em>':'今日 · <em>天象</em>';
   countTo($('#end-score'),GS.score);
   const stars=$('#end-stars').children;
   const lv=GS.score>=GS.L.s3?3:GS.score>=GS.L.s2?2:GS.score>=GS.L.s1?1:0;
@@ -8281,16 +8356,16 @@ function endDaily(){
    [ 战书 · DUEL LINK ]
    ------------------------------------------------------------------
    分享闭环的关键一环：分享图上的二维码从「进首页」升级为
-   「进同一副盘应战」。矿题与矿脉本来就是全服同盘，
+   「进同一副盘应战」。天象局与矿脉本来就是全服同盘，
    战书只是把「这副盘」连同「我的分数」编进链接里。
 
    载荷走 URL hash（#z=…）：hash 不发给服务器，
    绕开 EdgeOne「带查询串会绕开响应头规则」的坑，也不脏缓存。
    格式是点分紧凑串：v.k.n.sc.alias —— 比 JSON+base64 短一半，
    二维码更疏、更好扫。
-   k: d=矿题战书（n=日序号） w=矿脉战书（n=周序号） h=迎宾（无对局）。
+   k: d=天象局战书（n=日序号） w=矿脉战书（n=周序号） h=迎宾（无对局）。
 
-   对等性约束：只有矿题与矿脉能立战书——发起者的分数必须
+   对等性约束：只有天象局与矿脉能立战书——发起者的分数必须
    出自可复现的同一副盘。90 秒与冒险关各打各的盘，
    它们的分享卡走 h 迎宾链接，不冒充可应战。
    ================================================================== */
@@ -8348,7 +8423,7 @@ function handleDeepLink(){
   }
   const today=(z.k==='d'), cur=today?dayNum():weekNum();
   const live=(z.n===cur);
-  const name=today?'今日矿题':'本周矿脉';
+  const name=today?'今日天象':'本周矿脉';
   const noTxt=today?('第 '+dvNo(z.n)+' 期'):('第 '+z.n+' 期');
   const box=$('#duel-body');
   if(!box)return;
@@ -8411,8 +8486,11 @@ function openForge(){
     +'<div class="lb-form" style="display:flex;gap:8px;margin-top:12px;align-items:center">'
     +'<input id="forge-rush" inputmode="numeric" maxlength="8" placeholder="90 秒成绩" style="flex:1;min-width:0">'
     +'<button class="btn" id="forge-rush-go" style="flex:none">写 入</button></div>'
+    +'<div class="lb-form" style="display:flex;gap:8px;margin-top:8px;align-items:center">'
+    +'<input id="forge-dv" inputmode="numeric" maxlength="8" placeholder="今日天象成绩" style="flex:1;min-width:0">'
+    +'<button class="btn" id="forge-dv-go" style="flex:none">写 入</button></div>'
     +'<div style="text-align:center;font-size:11.5px;color:var(--ink3);margin-top:8px">'
-    +'写入的 90 秒成绩会随下一次上传进入世界榜。</div>';
+    +'写入的成绩会随下一次上传进入对应世界榜。</div>';
   for(const btn of b.querySelectorAll('[data-f]'))btn.onclick=()=>{
     const f=btn.dataset.f;SFX.made();
     if(f==='pow')SAVE.power=(SAVE.power||0)+10000;
@@ -8430,6 +8508,16 @@ function openForge(){
     const rw=rushWeekState();rw.best=Math.max(rw.best||0,Math.min(18999999,v));
     persist();renderMenu();SFX.made();
     toast('90 秒成绩已写入 · <b>'+SAVE.rushBest.toLocaleString('en-US')+'</b>');
+  };
+  $('#forge-dv-go').onclick=()=>{
+    const v=Math.floor(+$('#forge-dv').value||0);
+    if(v<=0){toast('先填个数');return}
+    /* 先 dvState() 把日期归到今天，再写首挖成绩——日榜只认今天的 score。 */
+    const s=dvState();
+    s.score=Math.max(Math.floor(+s.score||0),Math.min(18999999,v));
+    s.best=Math.max(s.best||0,s.score);
+    persist();renderMenu();SFX.made();
+    toast('今日天象成绩已写入 · <b>'+s.score.toLocaleString('en-US')+'</b>');
   };
   ovl('forge');
 }
@@ -8452,6 +8540,26 @@ function rollAlias(){
   return s.length<=12?s:b+'先生';                              // 超长就退回短式，别撞 maxlength
 }
 
+/* ---- 榜单快照缓存（弱网优化）----
+   打开榜先给上一次拿到的那份（标「正在刷新」），网络回来无缝换新；
+   拉不到时旧榜也比空屏强。独立 key 不进主存档；每个分类只留最近一份；
+   天象日榜只认今天的快照——昨天的榜隔夜就没有参考意义。 */
+const LB_CACHE_KEY='myskme-lb-cache-v1';
+function lbCacheGet(scope){
+  try{
+    const e=(JSON.parse(localStorage.getItem(LB_CACHE_KEY)||'{}')||{})[scope];
+    if(!e||!e.d||!e.d.ok)return null;
+    if(scope==='day'&&+e.d.day!==dayNum())return null;
+    return e.d;
+  }catch(err){return null}
+}
+function lbCachePut(scope,d){
+  try{
+    const all=JSON.parse(localStorage.getItem(LB_CACHE_KEY)||'{}')||{};
+    all[scope]={t:Date.now(),d};
+    localStorage.setItem(LB_CACHE_KEY,JSON.stringify(all));
+  }catch(err){}
+}
 async function renderLB(){
   const tok=++LB._tok;                                        // 代次：慢的那次返回后不许再覆盖 DOM
   const msg=$('#lb-msg'), list=$('#lb-list'), mine2=$('#lb-mine');
@@ -8517,19 +8625,30 @@ async function renderLB(){
       :'光明看深度，黑域看技巧。两边月末封存一次。';
     return;
   }
-  const d=await LB.board(LB.scope);
+  /* 先上快照，再等网络。 */
+  const cached=lbCacheGet(LB.scope);
+  if(cached&&(cached.rows||[]).length){
+    msg.textContent='正在刷新…';
+    LB_ROWS=cached.rows;
+    list.innerHTML=lbBoardHTML(cached.rows,cached.rows.findIndex(lbIsMe),cached);
+  }
+  const d=LB.scope==='day'?await LB.dayBoard(dayNum()):await LB.board(LB.scope);
   if(tok!==LB._tok)return;                                    // 期间又切了标签，这次结果作废
-  if(!d.ok){
-    msg.innerHTML=(d.offline?'连不上矿脉榜——<b>不影响你继续挖</b>，联网后再来看。'
-      :esc(d.err||'榜单暂时读不到'))+'<br><span style="font-size:11.5px">（榜单是加分项，离线一样能玩）</span>';
+  if(!d||!d.ok){
+    if(cached&&(cached.rows||[]).length){msg.innerHTML='暂时连不上——先看刚才拿到的榜。';return}
+    msg.innerHTML=((d&&d.offline)?'连不上矿脉榜——<b>不影响你继续挖</b>，联网后再来看。'
+      :esc((d&&d.err)||'榜单暂时读不到'))+'<br><span style="font-size:11.5px">（榜单是加分项，离线一样能玩）</span>';
     return;
   }
+  lbCachePut(LB.scope,d);
   const rows=d.rows||[];
   if(!rows.length){
     if(LB.scope==='rush'){
       msg.textContent='';list.innerHTML=rushRewardHTML(d);mine2.innerHTML=lbMineHTML([],-1);
     }else if(LB.scope==='rushAll'||LB.scope==='boss'){
       msg.textContent='';list.innerHTML='';mine2.innerHTML=lbMineHTML([],-1);
+    }else if(LB.scope==='day'){
+      msg.innerHTML='今天这副盘还没人交出成绩——<b>第一铲归你</b>。';
     }else msg.innerHTML='榜上还空着——<b>你可以是第一个</b>。';
     return;
   }
@@ -8857,9 +8976,9 @@ function renderMenu(){
   $('#lb-dot').innerHTML=wkState().plays===0?'<i class="dot"></i>':'';
   /* 挑战点：本周矿脉没首挖、或悬赏没拿，就亮一颗——周一自然重亮，绝不闪烁催促 */
   $('#quest-dot').innerHTML=(wkState().score===null||!bountyState().done)?'<i class="dot"></i>':'';
-  /* 今日矿题的门脸：期号 + 当日天象名。红点只在今天还没首挖时亮。 */
+  /* 今日天象的门脸：期号 + 当日天象名。红点只在今天还没首挖时亮。 */
   const _dv=dvState(), _sky=skyOf(dayNum());
-  $('#dv-sub').textContent='第 '+dvNo(dayNum())+' 期 · 天象 '+_sky.nm;
+  $('#dv-sub').textContent='第 '+dvNo(dayNum())+' 期 · '+_sky.nm;
   $('#dv-dot').innerHTML=(_dv.score===null)?'<i class="dot"></i>':'';
   $('#cat').classList.toggle('found',!!SAVE.cat);
   lbMenuStatus();
@@ -10976,7 +11095,7 @@ window.__selftest=function(){
          COLS.box===b0+3&&COLS.dust===d0+180&&SAVE.rushWeek.claimed[oldWeek]===1);
       COLS=bakC;SAVE.rushWeek=bakR;colSave();persist();
     }
-    /* 35. 今日矿题与战书：日更同盘、天象只属矿题、深链编解码与新人礼。 */
+    /* 35. 今日天象与战书：日更同盘、天象只属天象局、深链编解码与新人礼。 */
     {
       const snapD=()=>B.map(r=>r.map(p=>p?p.g:'x').join('')).join('|');
       const LD=levelDef(3);
@@ -10985,15 +11104,15 @@ window.__selftest=function(){
       buildBoard(LD,daySeed(20690)); const dA=snapD();
       buildBoard(LD,daySeed(20690)); const dB=snapD();
       buildBoard(LD,daySeed(20691)); const dC=snapD();
-      ok('矿题种子贯穿建盘：同日一致、跨日不同',dA===dB&&dA!==dC);
+      ok('天象局种子贯穿建盘：同日一致、跨日不同',dA===dB&&dA!==dC);
       ok('天象池字段齐整且按日确定',SKY_POOL.length>=6
          &&SKY_POOL.every(s=>s.k&&s.nm&&s.desc)
          &&SKY_POOL.includes(skyOf(20690))&&skyOf(20690)===skyOf(20690)
          &&[20690,20691,20692,20693,20694,20695,20696,20697].some(d=>skyOf(d)!==skyOf(20690)));
-      ok('天象只在矿题局生效：得分乘区与穿堂风钩子都带 mode 锁',
-         /GS\.mode==='daily'&&GS\.sky/.test(String(settleBoard))
-         &&/GS\.mode==='daily'&&GS\.sky&&GS\.sky\.k==='gale'/.test(String(trySwap)));
-      ok('矿题不计同伴衔位（同矿脉：另算成绩）',/GS\.mode==='daily'/.test(String(csBump)));
+      ok('天象只在天象局与聚会轮生效：得分乘区与穿堂风钩子都带 mode 锁',
+         /\(GS\.mode==='daily'\|\|GS\.party\)&&GS\.sky/.test(String(settleBoard))
+         &&/\(GS\.mode==='daily'\|\|GS\.party\)&&GS\.sky&&GS\.sky\.k==='gale'/.test(String(trySwap)));
+      ok('天象局不计同伴衔位（同矿脉：另算成绩）',/GS\.mode==='daily'/.test(String(csBump)));
       const du={k:'d',n:20690,sc:87654,a:'阿宸 A-1'};
       const back=decodeDuel(encodeDuel(du));
       ok('战书编解码往返一致，坏载荷一律回 null 不抛',
@@ -11001,7 +11120,7 @@ window.__selftest=function(){
          &&decodeDuel('')===null&&decodeDuel('x.y')===null&&decodeDuel('1.q.5.5.a')===null
          &&decodeDuel('1.d.-3.5.a')===null&&decodeDuel('1.d.5.999999999.a')===null
          &&decodeDuel('1.d.5.5.%E4%B8%'.slice(0))===null);
-      ok('分享二维码升级为战书深链：矿题与矿脉可应战，其余署名迎宾',
+      ok('分享二维码升级为战书深链：天象局与矿脉可应战，其余署名迎宾',
          shareCardUrl({mode:'daily'}).includes('#z=1.d.')
          &&shareCardUrl({mode:'weekly'}).includes('#z=1.w.')
          &&shareCardUrl({mode:'rush'}).includes('#z=1.h.')
@@ -11012,10 +11131,10 @@ window.__selftest=function(){
         const bak=JSON.parse(JSON.stringify(SAVE.dv));
         SAVE.dv={d:dayNum()-1,score:12345,best:12345,plays:3,n:6,run:6,lastD:dayNum()-1,mile:0};
         const st=dvState();
-        ok('矿题跨日自动翻篇：昨天的成绩不占今天的首挖',st.d===dayNum()&&st.score===null&&st.plays===0&&st.n===6);
+        ok('天象局跨日自动翻篇：昨天的成绩不占今天的首挖',st.d===dayNum()&&st.score===null&&st.plays===0&&st.n===6);
         SAVE.dv={d:dayNum()+9000,score:1,best:1,plays:1,n:1,run:1,lastD:dayNum()+9000,mile:0};
         const st2=dvState();
-        ok('矿题时钟回拨当存档损坏自愈，不把玩家锁在门外',st2.d===dayNum()&&st2.score===null);
+        ok('天象局时钟回拨当存档损坏自愈，不把玩家锁在门外',st2.d===dayNum()&&st2.score===null);
         SAVE.dv=bak;persist();
       }
       ok('新矿工礼只发一次且只发给没下过矿的人',
@@ -11023,13 +11142,13 @@ window.__selftest=function(){
          &&/welcomed=1/.test(String(handleDeepLink)));
       ok('传灯者成就在册，分享出手即点亮',
          ACHS.some(a=>a.id==='a16')&&/grant\('a16'\)/.test(String(showCard)));
-      ok('大厅与挑战所都有矿题入口，战书面板齐整',
+      ok('大厅与挑战所都有天象局入口，战书面板齐整',
          !!$('#btn-daily-vein')&&!!$('#dv-sub')&&!!$('#ovl-duel')&&!!$('#duel-go')&&!!$('#duel-body')
          &&(function(){renderQuest();return $('#quest-body').innerHTML.includes('data-go="daily"')})());
       ok('结算胜负对白只认对得上期号的战书',
          /du\.k!==kind\|\|du\.n!==no/.test(String(duelVerdict)));
     }
-    /* 36. 节日天象、兑换码与矿题日榜。 */
+    /* 36. 节日天象、兑换码与天象日榜。 */
     {
       ok('节日天象：循环项命中元旦与岁除，平日不外溢',
          (festOf(20819)||{}).k==='fyear'&&(festOf(20818)||{}).k==='feve'&&festOf(20690)===null);
@@ -11049,9 +11168,37 @@ window.__selftest=function(){
       ok('兑换码与督造台面板齐整，入口是脚注品牌行连点',
          !!$('#ovl-redeem')&&!!$('#redeem-in')&&!!$('#ovl-forge')&&!!$('#forge-body')
          &&!!document.querySelector('.menu-foot-brand'));
-      ok('矿题日榜柔性降级：响应必须回带同一个 day 才算数',
+      ok('天象日榜柔性降级：响应必须回带同一个 day 才算数',
          /\+d\.day===\+day/.test(String(LB.dayBoard))&&/dvDay/.test(String(LB.stats)));
-      ok('矿题结算先传成绩再查今日名次',/LB\.flush\('clear'\);fetchDayRank\(\)/.test(String(endDaily)));
+      ok('天象局结算先传成绩再查今日名次',/LB\.flush\('clear'\);fetchDayRank\(\)/.test(String(endDaily)));
+    }
+    /* 37. 聚会赛轮象与终局称号。 */
+    {
+      const bakSeed=PARTY.seed,bakRounds=PARTY.rounds;
+      PARTY.seed='pt-selftest';PARTY.rounds=3;
+      ok('轮象按局种子确定：同轮恒定、终轮恒为决胜双倍',
+         ptSkyAt(0)===ptSkyAt(0)&&PT_SKY_POOL.includes(ptSkyAt(0))
+         &&ptSkyAt(2).k==='final'&&ptSkyAt(2).mul===2
+         &&(function(){PARTY.rounds=2;const r=ptSkyAt(1).k==='final';PARTY.rounds=3;return r})());
+      ok('轮象池字段齐整且注入走 give 数组',
+         PT_SKY_POOL.every(s=>s.k&&s.nm&&s.desc)
+         &&JSON.stringify((PT_SKY_POOL.find(s=>s.k==='rich')||{}).give)==='["B","B","H"]'
+         &&/sky\.give/.test(String(ptStartTurn)));
+      ok('交棒与散局都会摘掉轮象，不漏进别的模式',
+         /GS\.sky=null/.test(String(ptTurnEnd))&&/GS\.sky=null/.test(String(ptFinish)));
+      {
+        const P=[
+          {name:'甲',scores:[9000,8000,20000],chains:[5,4,6],total:37000,roundSeconds:[60,60,60]},
+          {name:'乙',scores:[10000,9500,9800],chains:[9,3,4],total:29300,roundSeconds:[60,60,60]},
+          {name:'丙',scores:[3000,2800],chains:[2,3],total:5800,roundSeconds:[30,30]},
+        ];
+        ptTitlesFor(P);
+        const names=P.map(p=>p.title);
+        ok('终局称号人人有份且全场不重复',
+           names.every(Boolean)&&new Set(names).size===names.length
+           &&P[0].title==='今夜矿王'&&P[1].title==='连脉如虹');
+      }
+      PARTY.seed=bakSeed;PARTY.rounds=bakRounds;
     }
     /* 长内容不再要求玩家滚到底才能退出；每个悬浮关闭键必须落到已有的安全关闭流程。 */
     {

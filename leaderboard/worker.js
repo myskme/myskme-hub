@@ -607,7 +607,7 @@ async function gfEnsure(env) {
   await env.DB.prepare(
     "CREATE INDEX IF NOT EXISTS idx_gf_rush_week_rank ON gf_rush_week(week,best_rush DESC)"
   ).run();
-  /* 今日矿题日榜：每天一张榜、只记首挖成绩。独立小表，不动主表。
+  /* 天象日榜（今日天象玩法）：每天一张榜、只记首挖成绩。独立小表，不动主表。
      day 是客户端本地时区的日序号（与前端 dayNum 同口径）；服务端只做
      ±1 天的宽容校验（时差两侧都可能先翻篇），每张榜按 day 各自成立。 */
   await env.DB.prepare(
@@ -935,6 +935,20 @@ function pacerCamp(i) { return ["light", "dark"][i % 2]; }
    pacer.test.mjs 有一条守卫盯着它别再慢一个数量级。 */
 let _pacerCache = { h: -1, rows: null };
 
+/* 天象日榜的配速员成绩：按（成员,日）确定性生成——当天内查多少次都一样，
+   跨天重摇。约四分之一的日子轮休；到成员自己的活跃时段才出现，
+   别让玩家一早打开就见满榜。量级压在真人好手之下：上限约 6.5 万，
+   25 步天象局真人状态好能打 7 万以上——配速员是参照，不是天花板。 */
+function pacerDayBest(pseed, day, nowMs) {
+  const p = PACERS.find(x => x.seed === pseed);
+  if (!p || !day) return 0;
+  const r = pacerRnd(pseed * 31 + (day | 0));
+  if (r() < 0.25) return 0;
+  const bjHour = new Date(nowMs + 8 * 3600000).getUTCHours();
+  if (bjHour < p.hour) return 0;
+  const grip = .62 + ((pseed * 37) % 100) / 100 * .38;
+  return Math.round((12000 + r() * 30000) * grip * 1.55);
+}
 function pacerRows(nowMs) {
   const h = Math.max(0, Math.floor((nowMs - PACER_EPOCH) / 3600000));
   if (_pacerCache.h === h) return _pacerCache.rows;
@@ -1086,7 +1100,7 @@ async function gfSubmit(req, env, origin) {
        comp=CASE WHEN excluded.comp!='' THEN excluded.comp ELSE gf_rush_week.comp END,
        updated_at=excluded.updated_at`
   ).bind(rushWeekKey, id, alias, rushWeek, comp, now).run();
-  /* 矿题日榜：首挖成绩只增不减；day 允许与服务端相差一天（时区）。
+  /* 天象日榜：首挖成绩只增不减；day 允许与服务端相差一天（时区）。
      太老或太新的 day 一律不收——那是重放或伪造，不是时差。 */
   {
     const dvDay = clampInt(st.dvDay, 0, 99999999);
@@ -1272,7 +1286,7 @@ async function gfBoard(req, env, origin, url) {
        ORDER BY best_rush DESC, alias ASC LIMIT ?`
     ).bind(limit).all();
   } else if (scope === "day") {
-    /* 矿题日榜：按客户端传来的 day 取那一天的榜。响应必须回带同一个 day——
+    /* 天象日榜：按客户端传来的 day 取那一天的榜。响应必须回带同一个 day——
        老客户端不发这个 scope；新客户端靠回带的 day 校验自己没拿错榜。 */
     const day = clampInt(url.searchParams.get("day") || 0, 0, 99999999);
     rows = await env.DB.prepare(
@@ -1324,11 +1338,16 @@ async function gfBoard(req, env, origin, url) {
       const week=gfRushWeekKey(Date.now());
       bots=bots.map(r=>{const q=.80+pacerRnd((parseInt(String(r.id).split(':')[1],10)||1)+(parseInt(week,10)||0))()*.17;return Object.assign({},r,{best_rush:Math.round((r.best_rush||0)*q)})});
     }
+    if(scope==="day"){
+      const qday=clampInt(url.searchParams.get("day")||0,0,99999999);
+      bots=bots.map(r=>Object.assign({},r,
+        {day_best:pacerDayBest(parseInt(String(r.id).split(':')[1],10)||0,qday,Date.now())}));
+    }
     bots=bots.filter(r => scope !== "rushAll" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "rush" || (r.best_rush || 0) > 0)
       .filter(r => scope !== "depth" || (r.lv || 0) > 0)
       .filter(r => scope !== "boss" || (r.boss_score || 0) > 0)
-      /* 配速员没有日成绩，不进矿题日榜——新玩法先只看真人活性。 */
+      /* 配速员轮休或未到活跃时段时 day_best 为 0，这里一并滤掉。 */
       .filter(r => scope !== "day" || (r.day_best || 0) > 0)
       .sort((a,b)=>gfBoardCmp(scope,a,b));
     merged=merged.concat(bots).sort((a,b)=>gfBoardCmp(scope,a,b)).slice(0,limit);
