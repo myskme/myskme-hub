@@ -2153,12 +2153,18 @@ const SAVE_DEF={lv:1,stars:{},best:{},rushBest:0,ach:{},mute:false,power:0,cat:f
   guide:{n:0,earned:{},bypass:{},assist:0,deepN:0,deepCycle:0},
   q3:{d:0,q:null},                                             // 今日三桩：d=日序号，q=当天三条
   gr:{d:0,n:0,got:0},                                          // 今日深挖：n=今天通关数，got=已领到第几档
-  /* 今日天象：每天全服同一副盘 + 当日天象。score=首挖成绩（正式），best=练习最佳，
+  /* 今日天象：每天全服同一副盘 + 当日天象。score=第一把（到场标记与战书用），
+     best=当天单局最高（**上日榜的是它**，与 90 秒同口径），
      n=累计挖题天数（每天只 +1，矿匣里程碑按它走——断签不清进度，同矿灯的取舍），
      run=连续天数（只作展示，断了从头数，不惩罚），mile=已发放的七日里程碑数（高水位）。 */
   dv:{d:0,score:null,best:0,plays:0,n:0,run:0,lastD:0,mile:0},
   welcomed:0,                                                  // 战书/邀请链接进来的新矿工礼，只发一次
   redeemed:{},                                                 // 兑换码：一次性码的已兑记录
+  dvClaimed:{},                                                // 天象日奖已入账的日子（防同一响应重放）
+  /* 宿敌：应过战书的对手。键=化名，值 {w:胜,l:负,run:当前连胜(负数=连败),
+     last:最近交手日,sc:对方最近成绩,duel:'最近记过账的战书键'}。
+     每张战书只记首战（重打是练习，不改恩怨账）；最多留 8 个，挤掉最久没来往的。 */
+  rivals:{},
   /* 本周矿脉。score = **首挖**那一把的分（正式成绩），best = 练习里的最好成绩。
      两个分开存是有意的：首挖记榜才让所有人可比，之后重开当练习场。 */
   wk:{w:0,score:null,best:0,plays:0},
@@ -2300,6 +2306,8 @@ function loadSave(){
   out.dv.score=(out.dv.score==null)?null:Math.max(0,Math.floor(+out.dv.score||0));
   out.welcomed=out.welcomed?1:0;
   out.redeemed=(s.redeemed&&typeof s.redeemed==='object')?s.redeemed:{};
+  out.dvClaimed=(s.dvClaimed&&typeof s.dvClaimed==='object')?s.dvClaimed:{};
+  out.rivals=(s.rivals&&typeof s.rivals==='object'&&!Array.isArray(s.rivals))?s.rivals:{};
   return out;
 }
 const SAVE=loadSave();
@@ -7482,13 +7490,15 @@ const LB={
        没有它们，「今天打了十局但没破纪录」在服务端看来等于什么都没发生。
        mv = 深掘（步数局）最佳，喂矿力的技巧线；它和 rush 并列，不替代。 */
     const rw=rushWeekState(),bb=SAVE.bossBest||{floor:0,progress:0,score:0,build:'',comp:''};
-    /* dvDay/dvBest：今日天象的首挖成绩（正式成绩，不是练习最佳）。
+    /* dvDay/dvBest：今日天象的当天单局最高。
        老 worker 不认识这两个字段会安全忽略；新 worker 用它记日榜。 */
     const _dv=SAVE.dv||{};
     return {score:best,rush:SAVE.rushBest||0,rushWeek:rw.best||0,rushWeekKey:rw.w,
             bossFloor:bb.floor||0,bossProgress:bb.progress||0,bossScore:bb.score||0,bossBuild:bb.build||'',bossComp:bb.comp||'',
             lv,stars,chain:SAVE.chainBest||0,
-            dvDay:_dv.d||0,dvBest:Math.max(0,Math.floor(+_dv.score||0)),
+            /* 日榜记**当天单局最高**（best 含首挖与练习）。首版记首挖被玩家当成
+               bug 反馈——「后来打得更高了榜上不动」；90 秒榜也是单局最佳，口径对齐。 */
+            dvDay:_dv.d||0,dvBest:Math.max(0,Math.floor(+_dv.best||0)),
             runs:SAVE.runs||0,days:SAVE.days||0,dbest:(SAVE.daily&&SAVE.daily.best)||0,
             mv:(SAVE.dig&&SAVE.dig.best)||0,luck:luckCount(),mastery:csMasteryCount()};
   },
@@ -7554,6 +7564,7 @@ const LB={
       if(d.aliasMonth)SAVE.lbAliasMonth=String(d.aliasMonth);
       campLogParticipation();                                  // 只在服务端确认收到成绩后记当月参与
       rushClaimAwards(d.rushAwards);                           // 历史周奖只在本机入账一次
+      dvClaimAwards(d.dayAwards);                              // 天象日奖同款：claimed 拦重放
       SAVE.lbAt=Date.now();persist();
       if(!silent)toast('远征成绩已同步 · 闯关榜第 <b>'+(d.depthRank||d.rank)+'</b>',2600);
     }else{
@@ -7759,7 +7770,7 @@ function lbCardHTML(r){
   const scoped=scope==='rush'?row('本周矿灯',r.rush?Number(r.rush).toLocaleString('en-US'):'')+row('历史最佳',(r.rushAll||r.rush)?Number(r.rushAll||r.rush).toLocaleString('en-US'):'')
     :scope==='rushAll'?row('90 秒历史',r.rush?Number(r.rush).toLocaleString('en-US'):'')
     :scope==='boss'?row('完成层数',Math.min(GAUNTLET_MAX,Number(r.bossFloor)||0)+' / '+GAUNTLET_MAX)+row('当前首领',r.bossProgress?gauntletPct(r.bossProgress)+'%':'')+row('战果积分',r.bossScore?Number(r.bossScore).toLocaleString('en-US'):'')+row('强化组合',esc(gauntletBuildLabel(r.bossBuild)||'未记录'))
-    :scope==='day'?row('今日首挖',r.dayBest?Number(r.dayBest).toLocaleString('en-US'):'')+row('天象','第 '+dvNo(dayNum())+' 期 · '+skyOf(dayNum()).nm)
+    :scope==='day'?row('今日最佳',r.dayBest?Number(r.dayBest).toLocaleString('en-US'):'')+row('天象','第 '+dvNo(dayNum())+' 期 · '+skyOf(dayNum()).nm)
     :row('矿灯最佳',r.rush?Number(r.rush).toLocaleString('en-US'):'');
   return '<div class="lc"><button class="lc-x" id="lc-close" aria-label="收起">收起</button>'
     +'<div class="lc-hd"><div class="lc-rk">第 '+(Number(r.rank)||0)+' 名</div><div class="lc-nm'+(lbHasPrism(r,lbIsMe(r))?' prism-name':'')+'">'+esc(r.alias||'')+'</div><div class="lc-tt">'+recordTitle+'</div>'
@@ -7826,6 +7837,31 @@ function rushClaimAwards(rows){
   for(const k of Object.keys(s.claimed).sort().reverse().slice(52))delete s.claimed[k];
   persist();colSave();renderMenu();
   toast(icTag('box')+' 90 秒周榜奖励已入行囊<br>典藏匣 <b>+'+boxes+'</b>　星屑 <b>+'+dust+'</b>',3800);
+  return got.length;
+}
+/* 天象日榜每日前三奖。数值与 worker 的 gfDayReward 是同一份（output-safety 对账）；
+   服务端只回「哪天第几名」，数量由本地固定表决定，claimed 拦住同一响应重放。 */
+const DV_DAY_REWARDS=[
+  {rank:1,boxes:1,dust:60},
+  {rank:2,boxes:0,dust:40},
+  {rank:3,boxes:0,dust:20},
+];
+const dvRewardFor=rank=>DV_DAY_REWARDS.find(x=>x.rank===Number(rank))||null;
+function dvClaimAwards(rows){
+  if(!Array.isArray(rows)||!rows.length)return 0;
+  const c=SAVE.dvClaimed||(SAVE.dvClaimed={}),got=[];let boxes=0,dust=0;
+  colFix();
+  for(const a of rows){
+    const day=Math.floor(+(a&&a.day)||0),r=dvRewardFor(a&&a.rank);
+    if(day<=0||!r||c[day])continue;
+    c[day]=r.rank;boxes+=r.boxes;dust+=r.dust;got.push(r.rank);
+  }
+  if(!got.length)return 0;
+  COLS.box+=boxes;COLS.dust+=dust;
+  for(const k of Object.keys(c).sort((a,b)=>+a-+b).slice(0,-60))delete c[k];
+  persist();colSave();renderMenu();
+  toast(icTag('box')+' 天象日榜奖励已入行囊<br>'
+    +(boxes?('典藏匣 <b>+'+boxes+'</b>　'):'')+'星屑 <b>+'+dust+'</b>',3800);
   return got.length;
 }
 function wkState(){
@@ -8061,9 +8097,8 @@ function renderQuest(){
   h+='<div class="qs-sec"><div class="qs-hd">今日天象 · 第 '+dvNo(dayNum())+' 期'
     +'<span class="qs-sub">'+esc(sky.nm)+'</span></div>'
     +'<div class="qs-bd">'+esc(sky.desc)+'<br>'+(dvFirst
-      ?'每天一副全服同盘 · 第一把记成绩'
-      :'今日成绩 <b>'+dv.score.toLocaleString('en-US')+'</b>'
-        +(dv.best>dv.score?' · 练习最佳 '+dv.best.toLocaleString('en-US'):'')
+      ?'每天一副全服同盘 · 当天最高上榜 · 前三有奖'
+      :'今日最佳 <b>'+dv.best.toLocaleString('en-US')+'</b>'
         +' · 累计已挖 '+dv.n+' 天')
     +'</div><button class="btn primary qs-go" data-go="daily">'
     +(dvFirst?'下 矿':'再挖一次（练习）')+'</button></div>';
@@ -8199,12 +8234,15 @@ function endWeekly(){
    本周矿脉的日更姊妹篇：每天全服同一副盘，外加一条当日「天象」——
    全球一致的规则扭曲。种子与天象都从日序号确定性推出，不联网也一样。
 
-   与矿脉的分工：矿脉是每周的正式竞技（纯净盘、比手艺），
+   与矿脉的分工：矿脉是每周的正式竞技（纯净盘、比手艺、首挖记榜），
    天象局是每天的花活（天象让每天手感都不一样，图个乐也图个谈资）。
-   首挖记正式成绩、之后随便练——同矿脉，理由也相同：比手艺不比耐心。
+   日榜记**当天单局最高**——与 90 秒同口径。首版沿用矿脉的首挖制，
+   玩家当成 bug 反馈（「后来打得更高了榜上不动」）：日更盘只活一天，
+   「刷耐心」的空间本来就有 24 小时封顶，不值得为它违反直觉。
+   score 仍记第一把，作为到场标记；连续天数与七日匣按它走。
 
    天象的三条铁律：
-   1. 只在天象局局生效（得分公式与钩子都带 GS.mode==='daily' 锁）；
+   1. 只在天象局与聚会轮生效（得分公式与钩子都带 mode 锁）；
    2. 全部从独立的天象流取随机（不碰被动流与补石流，落点全服一致）；
    3. 只调乘区、步数、色数、注入——不发明第二套得分逻辑。
    ================================================================== */
@@ -8339,7 +8377,7 @@ function endDaily(){
   $('#end-detail').innerHTML='最长连锁 <b>'+GS.chainMax+'</b>　炼成灵石 <b>'+GS.specials+'</b>'
     +'　今日最佳 <b>'+s.best.toLocaleString('en-US')+'</b>　累计已挖 <b>'+s.n+'</b> 天'
     +'<span id="dv-rank"></span>';
-  $('#end-quip').textContent=first?'第一把是正式成绩，接下来随便练。':pick2(Q_RUSH_END);
+  $('#end-quip').textContent=first?'当天最高上榜 · 这一把只是开胃，还能再冲。':pick2(Q_RUSH_END);
   $('#end-next').textContent='再挖一次';
   $('#end-next').dataset.act='daily';
   $('#end-retry').style.display='none';
@@ -8389,13 +8427,34 @@ function duelVerdict(kind,no){
   const du=GS.duel;
   if(!du||du.k!==kind||du.n!==no||!(du.sc>0))return;
   const who=du.a||'一位矿工';
-  const line=GS.score>du.sc
+  const win=GS.score>du.sc, tie=GS.score===du.sc;
+  /* 宿敌恩怨账：互发战书的朋友是这个游戏最该留住的关系。
+     每张战书只记首战（重打是练习，不改账）；化名为空的战书不记；
+     最多留 8 个宿敌，挤掉最久没交手的。连胜连败让「明天再来一张」有由头。 */
+  let feud='';
+  if(du.a){
+    const R=SAVE.rivals||(SAVE.rivals={});
+    const key=du.k+'|'+du.n;
+    const r=R[du.a]||(R[du.a]={w:0,l:0,run:0,last:0,sc:0,duel:''});
+    if(r.duel!==key){
+      r.duel=key;
+      if(!tie){if(win){r.w++;r.run=r.run>0?r.run+1:1}else{r.l++;r.run=r.run<0?r.run-1:-1}}
+      r.last=dayNum();r.sc=du.sc;
+      const names=Object.keys(R);
+      if(names.length>8){names.sort((a,b)=>((R[a]&&R[a].last)||0)-((R[b]&&R[b].last)||0));delete R[names[0]]}
+      persist();
+    }
+    const rec=R[du.a];
+    if(rec&&(rec.w+rec.l)>1)feud=' · 你们 '+rec.w+' 胜 '+rec.l+' 负'
+      +(rec.run>=3?'，'+rec.run+' 连胜':rec.run<=-3?'，'+(-rec.run)+' 连败':'');
+  }
+  const line=win
     ?'你压过了 '+who+' 的 '+du.sc.toLocaleString('en-US')+' 分 · 回敬一张战书吧'
-    :GS.score===du.sc
+    :tie
       ?'与 '+who+' 同盘同分 · 这可比赢了还难得'
       :'离 '+who+' 的 '+du.sc.toLocaleString('en-US')+' 分还差 '
         +(du.sc-GS.score).toLocaleString('en-US')+' · 这盘还能再挖';
-  $('#end-quip').textContent=line;
+  $('#end-quip').textContent=line+feud;
 }
 /* 启动时读一次 hash。读完立刻抹掉，免得玩家刷新又弹一遍。 */
 function readDeepLink(){
@@ -8427,11 +8486,17 @@ function handleDeepLink(){
   const noTxt=today?('第 '+dvNo(z.n)+' 期'):('第 '+z.n+' 期');
   const box=$('#duel-body');
   if(!box)return;
+  /* 老对手的战书带恩怨账——「又是他」比「有人挑战你」上头得多。 */
+  const rec=z.a&&SAVE.rivals&&SAVE.rivals[z.a];
+  const feud=(rec&&(rec.w+rec.l)>0)
+    ?'<br><span style="color:var(--gold2);font-size:12.5px">宿敌 · 你对他 '+rec.w+' 胜 '+rec.l+' 负'
+      +(rec.run>=2?'，正 '+rec.run+' 连胜':rec.run<=-2?'，已 '+(-rec.run)+' 连败，该翻身了':'')+'</span>'
+    :'';
   box.innerHTML=(gift?'<div class="qs-dim" style="margin-bottom:8px">新矿工礼已入行囊：灵力 +600 · 矿镐 +1</div>':'')
     +(live
-      ?'<b>'+who+'</b> 在'+name+' '+noTxt+'挖出 <b>'+z.sc.toLocaleString('en-US')+'</b> 分。<br>同一副盘就在眼前——应战吗？'
+      ?'<b>'+who+'</b> 在'+name+' '+noTxt+'挖出 <b>'+z.sc.toLocaleString('en-US')+'</b> 分。<br>同一副盘就在眼前——应战吗？'+feud
       /* 过期战书不引期号：epoch 之前的日序算不出有意义的期号，硬写会和今天的撞号。 */
-      :'这份战书立的那副'+name+'盘已经封存。<br>不过——'+(today?'今天':'本周')+'的盘刚开，正好立一份新的。');
+      :'这份战书立的那副'+name+'盘已经封存。<br>不过——'+(today?'今天':'本周')+'的盘刚开，正好立一份新的。'+feud);
   const go=$('#duel-go');
   go.textContent=live?'应 战':(today?'挖今天的':'下本周的矿');
   go.onclick=()=>{
@@ -8512,7 +8577,7 @@ function openForge(){
   $('#forge-dv-go').onclick=()=>{
     const v=Math.floor(+$('#forge-dv').value||0);
     if(v<=0){toast('先填个数');return}
-    /* 先 dvState() 把日期归到今天，再写首挖成绩——日榜只认今天的 score。 */
+    /* 先 dvState() 把日期归到今天再写。日榜取当天最高（best），score 一并写上作到场标记。 */
     const s=dvState();
     s.score=Math.max(Math.floor(+s.score||0),Math.min(18999999,v));
     s.best=Math.max(s.best||0,s.score);
@@ -8678,7 +8743,9 @@ async function renderLB(){
     list.addEventListener('click',open);
     list.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e)}});
   }
-  mine2.innerHTML=lbMineHTML(rows,myIdx);
+  mine2.innerHTML=(LB.scope==='day'
+    ?'当天单局最高上榜 · 每日真人前三有奖：'+icTag('box')+' 匣 1 + 星屑 60 / 星屑 40 / 星屑 20，隔天自动入行囊。<br>'
+    :'')+lbMineHTML(rows,myIdx);
 }
 /* ────────── 矿力三线（客户端镜像）──────────
    ⚠ 必须与 leaderboard/worker.js 的 gfDepth/gfSkill/gfGrind **逐字一致**。
@@ -11171,6 +11238,35 @@ window.__selftest=function(){
       ok('天象日榜柔性降级：响应必须回带同一个 day 才算数',
          /\+d\.day===\+day/.test(String(LB.dayBoard))&&/dvDay/.test(String(LB.stats)));
       ok('天象局结算先传成绩再查今日名次',/LB\.flush\('clear'\);fetchDayRank\(\)/.test(String(endDaily)));
+      ok('日榜上传当天单局最高（best），不再是首挖——玩家把首挖制当 bug 反馈过',
+         /dvBest:Math\.max\(0,Math\.floor\(\+_dv\.best\|\|0\)\)/.test(String(LB.stats)));
+      {
+        const bak=JSON.parse(JSON.stringify(SAVE.dvClaimed||{}));
+        colFix();
+        const bakC=JSON.parse(JSON.stringify(COLS));
+        SAVE.dvClaimed={};
+        const b0=COLS.box,d0=COLS.dust;
+        dvClaimAwards([{day:19990,rank:1}]);dvClaimAwards([{day:19990,rank:1}]);
+        ok('天象日奖同一天重放只入账一次，数量按本地固定表',
+           COLS.box===b0+1&&COLS.dust===d0+60&&SAVE.dvClaimed[19990]===1
+           &&DV_DAY_REWARDS.map(x=>x.boxes+'/'+x.dust).join(',')==='1/60,0/40,0/20');
+        COLS=bakC;SAVE.dvClaimed=bak;colSave();persist();
+      }
+      {
+        const bakR=JSON.parse(JSON.stringify(SAVE.rivals||{})),bakDuel=GS.duel,bakSc=GS.score,bakQuip=$('#end-quip').textContent;
+        SAVE.rivals={};GS.score=90000;
+        GS.duel={k:'d',n:20690,sc:50000,a:'测试宿敌'};
+        duelVerdict('d',20690);duelVerdict('d',20690);       // 同一战书重打
+        const r1=Object.assign({},SAVE.rivals['测试宿敌']);  // 快照，别拿活引用当历史
+        GS.duel={k:'d',n:20691,sc:99000,a:'测试宿敌'};GS.score=1000;
+        duelVerdict('d',20691);                              // 第二张战书，输
+        const r2=Object.assign({},SAVE.rivals['测试宿敌']);
+        ok('宿敌恩怨账：每张战书只记首战，胜负连胜分开走',
+           r1&&r1.w===1&&r1.l===0&&r2.w===1&&r2.l===1&&r2.run===-1);
+        for(let i=0;i<12;i++){GS.duel={k:'d',n:20700+i,sc:5,a:'路人'+i};GS.score=9;duelVerdict('d',20700+i)}
+        ok('宿敌最多留 8 个，挤掉最久没交手的',Object.keys(SAVE.rivals).length<=8);
+        SAVE.rivals=bakR;GS.duel=bakDuel;GS.score=bakSc;$('#end-quip').textContent=bakQuip;persist();
+      }
     }
     /* 37. 聚会赛轮象与终局称号。 */
     {

@@ -150,6 +150,23 @@ if (!src.includes('CREATE TABLE IF NOT EXISTS gf_day_best')
   || !clientSrc.includes('dvDay:_dv.d||0')
   || !clientSrc.includes('+d.day===+day'))
   failures.push('天象日榜的表、只增不减、时区窗、配速员隔离或客户端校验口径漂移');
+/* 天象日榜口径升级：记当天单局最高（best），不再是首挖——首挖制被玩家当 bug 反馈。 */
+if (!clientSrc.includes('dvBest:Math.max(0,Math.floor(+_dv.best||0))'))
+  failures.push('日榜上传的不是当天单局最高（dvBest 应取 _dv.best）');
+/* 每日前三奖：两端固定表一致、懒封榜留足时区余量、领奖行防并发重发。 */
+const gfDayRewardFn = new Function(fnOf(src, 'gfDayReward') + ';return gfDayReward;')();
+const clientDayRewards = new Function(
+  slice(clientSrc, /const DV_DAY_REWARDS\s*=\s*\[/, '[', ']') + ';return DV_DAY_REWARDS;'
+)();
+if (JSON.stringify(clientDayRewards) !== JSON.stringify([1, 2, 3].map(gfDayRewardFn)))
+  failures.push('天象日奖在客户端与服务端不一致');
+if (!src.includes('CREATE TABLE IF NOT EXISTS gf_day_award')
+  || !src.includes('CREATE TABLE IF NOT EXISTS gf_day_seal')
+  || !src.includes('Math.floor(now / 86400000) - 1')
+  || !src.includes('INSERT OR IGNORE INTO gf_day_award')
+  || !src.includes('dayAwards: (dayAwards.results || []).map')
+  || !clientSrc.includes('dvClaimAwards(d.dayAwards)'))
+  failures.push('天象日奖的封榜、发奖行、响应下发或客户端入账链路缺失');
 
 if (failures.length) {
   for (const failure of failures) console.error('FAIL ' + failure);

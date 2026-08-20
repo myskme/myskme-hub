@@ -660,6 +660,18 @@ async function gfEnsure(env) {
     `CREATE TABLE IF NOT EXISTS gf_rush_seal (
        week TEXT PRIMARY KEY, sealed_at INTEGER NOT NULL DEFAULT 0)`
   ).run();
+  /* 天象日榜的每日前三奖：与周榜同一套「懒封榜 + 领奖行」管线，档次轻一档
+     （天天都有，重了会冲掉周榜的分量）。只从真实 D1 行结算，配速员不占奖。 */
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_day_award (
+       day INTEGER NOT NULL, id TEXT NOT NULL, rank INTEGER NOT NULL,
+       boxes INTEGER NOT NULL DEFAULT 0, dust INTEGER NOT NULL DEFAULT 0, created_at INTEGER DEFAULT 0,
+       PRIMARY KEY (day,id))`
+  ).run();
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS gf_day_seal (
+       day INTEGER PRIMARY KEY, sealed_at INTEGER NOT NULL DEFAULT 0)`
+  ).run();
   _gfReady = true;
 }
 
@@ -690,6 +702,42 @@ async function gfSealRushWeeks(env, now) {
     stmts.push(env.DB.prepare(
       "INSERT OR IGNORE INTO gf_rush_seal(week,sealed_at) VALUES(?,?)"
     ).bind(x.week, now));
+    await env.DB.batch(stmts);
+  }
+}
+/* 天象日榜每日前三奖：轻于周榜（天天发，重了会冲掉周榜分量）。
+   客户端有一份同数值的固定表，两边由 output-safety 对账。 */
+function gfDayReward(rank) {
+  return [{ rank: 1, boxes: 1, dust: 60 }, { rank: 2, boxes: 0, dust: 40 },
+          { rank: 3, boxes: 0, dust: 20 }].find(x => x.rank === Number(rank)) || null;
+}
+/* 懒封日榜。day 是客户端本地日序号，时区两侧各有一天余量——
+   只封 serverDay-2 及更早的日子，保证最慢的时区也已经打完那一天。 */
+async function gfSealDays(env, now) {
+  const cutoff = Math.floor(now / 86400000) - 1;
+  const old = await env.DB.prepare(
+    `SELECT DISTINCT d.day FROM gf_day_best d
+      LEFT JOIN gf_day_seal s ON s.day=d.day
+      WHERE d.day<? AND s.day IS NULL ORDER BY d.day ASC LIMIT 16`
+  ).bind(cutoff).all();
+  for (const x of (old.results || [])) {
+    const top = await env.DB.prepare(
+      `SELECT d.id FROM gf_day_best d
+        JOIN gemfall g ON g.id=d.id
+        WHERE d.day=? AND d.best>0 AND g.hidden=0
+        ORDER BY d.best DESC,g.alias ASC LIMIT 3`
+    ).bind(x.day).all();
+    const stmts = [];
+    for (let i = 0; i < (top.results || []).length; i++) {
+      const reward = gfDayReward(i + 1);
+      stmts.push(env.DB.prepare(
+        `INSERT OR IGNORE INTO gf_day_award(day,id,rank,boxes,dust,created_at)
+         VALUES(?,?,?,?,?,?)`
+      ).bind(x.day, top.results[i].id, reward.rank, reward.boxes, reward.dust, now));
+    }
+    stmts.push(env.DB.prepare(
+      "INSERT OR IGNORE INTO gf_day_seal(day,sealed_at) VALUES(?,?)"
+    ).bind(x.day, now));
     await env.DB.batch(stmts);
   }
 }
@@ -1169,9 +1217,14 @@ async function gfSubmit(req, env, origin) {
     "SELECT COUNT(*) AS c FROM gemfall WHERE hidden=0 AND power>?"
   ).bind(myPower).first();
   await gfSealRushWeeks(env, now);
+  await gfSealDays(env, now);
   const awards = await env.DB.prepare(
     `SELECT week,rank,boxes,dust FROM gf_rush_award WHERE id=?
      ORDER BY week DESC LIMIT 24`
+  ).bind(id).all();
+  const dayAwards = await env.DB.prepare(
+    `SELECT day,rank,boxes,dust FROM gf_day_award WHERE id=?
+     ORDER BY day DESC LIMIT 24`
   ).bind(id).all();
   return json({ ok: true, power: myPower, rank: ((aheadPower && aheadPower.c) || 0) + 1,
     depthRank: ((aheadDepth && aheadDepth.c) || 0) + 1,
@@ -1179,6 +1232,9 @@ async function gfSubmit(req, env, origin) {
     aliasMonth: rename.changed ? rename.month : ((aliasLog && aliasLog.changed_month) || ""),
     rushAwards: (awards.results || []).map(a => ({
       week: a.week, rank: a.rank, boxes: a.boxes, dust: a.dust,
+    })),
+    dayAwards: (dayAwards.results || []).map(a => ({
+      day: a.day, rank: a.rank, boxes: a.boxes, dust: a.dust,
     })),
     classJoined, season: sea }, 200, origin);
 }
@@ -1256,6 +1312,7 @@ async function gfBoard(req, env, origin, url) {
   await gfEnsure(env);
   await gfSealMonth(env);   // 访问量最大的入口，靠它把月初那一刻兜住
   await gfSealRushWeeks(env, Date.now());
+  await gfSealDays(env, Date.now());
   const sea = url.searchParams.get("season") || await getSeason(env);
   const scope = url.searchParams.get("scope") || "world";
   const limit = clampInt(url.searchParams.get("limit") || 50, 1, 100);
@@ -1401,6 +1458,8 @@ async function gfAdmin(req, env, origin) {
       env.DB.prepare("DELETE FROM gemfall_alias_month WHERE id=?").bind(id),
       env.DB.prepare("DELETE FROM gf_rush_week WHERE id=?").bind(id),
       env.DB.prepare("DELETE FROM gf_rush_award WHERE id=?").bind(id),
+      env.DB.prepare("DELETE FROM gf_day_best WHERE id=?").bind(id),
+      env.DB.prepare("DELETE FROM gf_day_award WHERE id=?").bind(id),
       env.DB.prepare("DELETE FROM gf_boss_best WHERE id=?").bind(id),
     ]);
     return json({ ok: true }, 200, origin);
@@ -1421,6 +1480,9 @@ async function gfAdmin(req, env, origin) {
       env.DB.prepare("DELETE FROM gf_rush_week"),
       env.DB.prepare("DELETE FROM gf_rush_award"),
       env.DB.prepare("DELETE FROM gf_rush_seal"),
+      env.DB.prepare("DELETE FROM gf_day_best"),
+      env.DB.prepare("DELETE FROM gf_day_award"),
+      env.DB.prepare("DELETE FROM gf_day_seal"),
       env.DB.prepare("DELETE FROM gf_boss_best"),
     ]);
     return json({ ok: true }, 200, origin);
