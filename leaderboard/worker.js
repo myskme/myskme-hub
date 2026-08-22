@@ -1516,37 +1516,102 @@ async function gfAdmin(req, env, origin) {
 const VOTE_POLL_RE = /^[a-z0-9][a-z0-9-]{1,39}$/;
 const VOTE_OPT_RE = /^[a-z0-9][a-z0-9-]{0,59}$/;
 const VOTE_CH_RE = /^[a-z0-9-]{0,12}$/;
-const VOTE_LIMITS = { polls: 50, options: 200, ballotsPerPoll: 50000, noteLen: 120, cooldownMs: 10000 };
+const VOTE_LIMITS = { polls: 50, options: 200, ballotsPerPoll: 50000, noteLen: 120, cooldownMs: 10000, ipDay: 600 };
+// 每题策略：至多选几项（max）、什么节奏（once=一票常驻可改 / daily=每天一期）。
+// 事实源在 vote/polls.json 的 max/cadence 字段，vote.test.mjs 盯着两边别漂。
+// 不在表里的议题走默认「单选一票常驻」——加普通新议题不用改这里、不用重新部署。
+const VOTE_POLICY = {
+  "daily-duel": { max: 1, cadence: "daily" },
+  "fav-character": { max: 3, cadence: "once" },
+  "fav-work": { max: 2, cadence: "once" },
+  "monkey-next": { max: 1, cadence: "once" }
+};
+const VOTE_POLICY_DEFAULT = { max: 1, cadence: "once" };
 let _voteReady = false, _voteAdminFails = 0, _voteAdminLockUntil = 0;
 
-function voteCleanCast(body) {
+// 议题家族：daily 议题实际落库的 id 带日期尾巴（如 daily-duel-20260822），
+// 策略与配额都按家族算——否则每天冒出一个新议题 id，几十天就把议题配额吃光。
+function votePollFam(pollId) { return String(pollId).replace(/-\d{8}$/, ""); }
+// 北京日期键 YYYYMMDD。now 由调用方传入，方便测试喂任意时刻。
+function voteDayKey(now) {
+  const d = new Date(now + 8 * 3600000);
+  return String(d.getUTCFullYear()) + String(d.getUTCMonth() + 1).padStart(2, "0")
+    + String(d.getUTCDate()).padStart(2, "0");
+}
+function voteCleanCast(body, now) {
+  now = now || Date.now();
   const pollId = String(body && body.pollId || "").trim();
-  const optionId = String(body && body.optionId || "").trim();
   if (!VOTE_POLL_RE.test(pollId)) return { ok: false, err: "议题编号无效" };
-  if (!VOTE_OPT_RE.test(optionId)) return { ok: false, err: "选项编号无效" };
+  const fam = votePollFam(pollId);
+  const policy = VOTE_POLICY[fam] || VOTE_POLICY_DEFAULT;
+  if (policy.cadence === "daily") {
+    // daily 议题只收「今天（北京日）」这一期：昨天的已封箱，明天的还没开箱——
+    // 这一条同时挡住了往历史里塞票。
+    if (pollId !== fam + "-" + voteDayKey(now)) return { ok: false, err: "这一期不在投票时段" };
+  } else if (pollId !== fam) {
+    // once 议题不许带日期尾巴冒充成「每日议题」绕开一人一票。
+    return { ok: false, err: "议题编号无效" };
+  }
+  // 多选：新页面发 optionIds 数组；老页面只发 optionId 字符串，等价于单元素数组。
+  const raw = Array.isArray(body && body.optionIds) && body.optionIds.length
+    ? body.optionIds : [body && body.optionId];
+  const optionIds = [];
+  for (const o of raw) {
+    const id = String(o || "").trim();
+    if (!VOTE_OPT_RE.test(id)) return { ok: false, err: "选项编号无效" };
+    if (!optionIds.includes(id)) optionIds.push(id);
+  }
+  if (optionIds.length > policy.max) return { ok: false, err: "这一题至多选 " + policy.max + " 项" };
   let ch = String(body && body.ch || "").trim().toLowerCase();
   if (!VOTE_CH_RE.test(ch)) ch = "";
   // 留言：剥控制字符、去首尾空白、封顶长度。空串等于没留。
   let note = String(body && body.note || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim();
   if (note.length > VOTE_LIMITS.noteLen) note = note.slice(0, VOTE_LIMITS.noteLen);
-  return { ok: true, pollId, optionId, ch, note };
+  return { ok: true, pollId, fam, optionIds, ch, note };
 }
 async function voteEnsure(env) {
   if (_voteReady) return;
+  // 老表留着：既是一次性搬运的来源，也是留档。新代码只写 vote_ballots2。
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS vote_ballots (
        poll_id TEXT NOT NULL, voter TEXT NOT NULL, option_id TEXT NOT NULL,
        ch TEXT DEFAULT '', at INTEGER DEFAULT 0, changed INTEGER DEFAULT 0,
        PRIMARY KEY (poll_id, voter))`
   ).run();
+  // v2：一人一票变「一人一套」，一行一个选中项，主键三元组。多选与每日议题都靠它。
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS vote_ballots2 (
+       poll_id TEXT NOT NULL, voter TEXT NOT NULL, option_id TEXT NOT NULL,
+       fam TEXT NOT NULL DEFAULT '', ch TEXT DEFAULT '', at INTEGER DEFAULT 0, changed INTEGER DEFAULT 0,
+       PRIMARY KEY (poll_id, voter, option_id))`
+  ).run();
   await env.DB.prepare(
     `CREATE TABLE IF NOT EXISTS vote_notes (
        poll_id TEXT NOT NULL, voter TEXT NOT NULL, option_id TEXT NOT NULL,
        ch TEXT DEFAULT '', note TEXT NOT NULL, at INTEGER DEFAULT 0)`
   ).run();
-  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_tally ON vote_ballots(poll_id,option_id)").run();
-  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_voter ON vote_ballots(voter,at)").run();
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS vote_meta (k TEXT PRIMARY KEY, v TEXT)").run();
+  // 当日 IP 限量表：只存「加盐哈希 + 当日」，原始 IP 不落库；键一天一换，攒不成跟踪档案。
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS vote_ip_guard (
+       day TEXT NOT NULL, iph TEXT NOT NULL, n INTEGER DEFAULT 0, PRIMARY KEY (day, iph))`
+  ).run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote2_tally ON vote_ballots2(poll_id,option_id)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote2_voter ON vote_ballots2(voter,at)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote2_fam ON vote_ballots2(fam,option_id)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_notes_at ON vote_notes(poll_id,at)").run();
+  // v1 -> v2 一次性搬运。搬运标记存 vote_meta：**不能**每次冷启动都搬——
+  // 用户后来改过的票会被老表里的旧行「复活」（OR IGNORE 只防重复，不防复活）。
+  const migrated = await env.DB.prepare("SELECT v FROM vote_meta WHERE k='ballots2_migrated'").first();
+  if (!migrated) {
+    await env.DB.prepare(
+      `INSERT OR IGNORE INTO vote_ballots2 (poll_id, voter, option_id, fam, ch, at, changed)
+       SELECT poll_id, voter, option_id, poll_id, ch, at, changed FROM vote_ballots`
+    ).run();
+    await env.DB.prepare("INSERT OR IGNORE INTO vote_meta (k,v) VALUES ('ballots2_migrated','1')").run();
+  }
+  // 顺手清两天前的 IP 计数——它只服务「当日限量」，攒着没用。
+  await env.DB.prepare("DELETE FROM vote_ip_guard WHERE day < ?").bind(voteDayKey(Date.now() - 2 * 86400000)).run();
   _voteReady = true;
 }
 async function voteVoterId(env, raw) {
@@ -1556,15 +1621,19 @@ async function voteVoterId(env, raw) {
 }
 async function voteTally(env, pollId) {
   const rows = await env.DB.prepare(
-    "SELECT option_id AS id, COUNT(*) AS n FROM vote_ballots WHERE poll_id=? GROUP BY option_id ORDER BY n DESC, id ASC"
+    "SELECT option_id AS id, COUNT(*) AS n FROM vote_ballots2 WHERE poll_id=? GROUP BY option_id ORDER BY n DESC, id ASC"
   ).bind(pollId).all();
   const options = (rows.results || []).map(r => ({ id: r.id, n: Number(r.n) || 0 }));
+  // total 是「获选次数」（多选一人贡献多次），voters 才是「投过的人数」——两个都报，报表两个都用。
+  const voters = await env.DB.prepare(
+    "SELECT COUNT(DISTINCT voter) AS n FROM vote_ballots2 WHERE poll_id=?"
+  ).bind(pollId).first();
   const chRows = await env.DB.prepare(
-    "SELECT ch, COUNT(*) AS n FROM vote_ballots WHERE poll_id=? GROUP BY ch"
+    "SELECT ch, COUNT(DISTINCT voter) AS n FROM vote_ballots2 WHERE poll_id=? GROUP BY ch"
   ).bind(pollId).all();
   const channels = {};
   for (const r of (chRows.results || [])) channels[r.ch || "direct"] = Number(r.n) || 0;
-  return { options, total: options.reduce((a, o) => a + o.n, 0), channels };
+  return { options, total: options.reduce((a, o) => a + o.n, 0), voters: Number(voters && voters.n) || 0, channels };
 }
 async function voteBoard(req, env, origin, url) {
   await voteEnsure(env);
@@ -1582,42 +1651,68 @@ async function voteCast(req, env, origin) {
   const voter = await voteVoterId(env, body.deviceUUID);
   if (!voter) return json({ ok: false, err: "设备标识无效" }, 400, origin);
   const now = Date.now();
-  // 同设备节流：改票合法（以最后一次为准），但连点要冷静一下。
-  const last = await env.DB.prepare("SELECT MAX(at) AS t FROM vote_ballots WHERE voter=?").bind(voter).first();
+  // 同设备同议题节流：改票合法（以最后一次为准），但对同一题连点要冷静一下。
+  // 按「设备 x 议题」算而不是按设备算——四个议题连着投是正常人干的事，不该罚等；
+  // 刷子反复改同一题照样被拦，批量刷另有当日 IP 限量兜底。
+  const last = await env.DB.prepare("SELECT MAX(at) AS t FROM vote_ballots2 WHERE voter=? AND poll_id=?").bind(voter, cast.pollId).first();
   if (last && Number(last.t) && now - Number(last.t) < VOTE_LIMITS.cooldownMs) {
     return json({ ok: false, err: "投得太快了，歇两秒再投" }, 429, origin);
   }
-  // 配额门：新议题/新选项/满议题各有上限，拦无限增殖，不拦正常使用。
-  const seen = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=? AND voter=?").bind(cast.pollId, voter).first();
+  // 当日 IP 限量：挡的是脚本批量刷（换设备标识绕不开它），不挡全班同网投票——
+  // 600 票/天/线路，一个班一天用不掉一半。计数只记当日加盐哈希。
+  const ip = req.headers.get("CF-Connecting-IP") || "";
+  if (ip) {
+    const day = voteDayKey(now);
+    const iph = await sha256("ip|" + ip + "|" + day + "|" + env.LB_SALT);
+    const g = await env.DB.prepare("SELECT n FROM vote_ip_guard WHERE day=? AND iph=?").bind(day, iph).first();
+    if (Number(g && g.n) >= VOTE_LIMITS.ipDay) {
+      return json({ ok: false, err: "今天这条线路的票额用完了，明天再来" }, 429, origin);
+    }
+    await env.DB.prepare(
+      "INSERT INTO vote_ip_guard (day, iph, n) VALUES (?,?,1) ON CONFLICT(day, iph) DO UPDATE SET n=n+1"
+    ).bind(day, iph).run();
+  }
+  // 配额门：新议题/新选项/满票箱各有上限，拦无限增殖，不拦正常使用。配额按家族算。
+  const seen = await env.DB.prepare(
+    "SELECT COUNT(*) AS n, MAX(changed) AS c FROM vote_ballots2 WHERE poll_id=? AND voter=?"
+  ).bind(cast.pollId, voter).first();
   const isNewBallot = !Number(seen && seen.n);
   if (isNewBallot) {
-    const polls = await env.DB.prepare("SELECT COUNT(DISTINCT poll_id) AS n FROM vote_ballots").first();
-    const known = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=?").bind(cast.pollId).first();
-    if (!Number(known && known.n) && Number(polls && polls.n) >= VOTE_LIMITS.polls) {
+    const fams = await env.DB.prepare("SELECT COUNT(DISTINCT fam) AS n FROM vote_ballots2").first();
+    const known = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots2 WHERE fam=?").bind(cast.fam).first();
+    if (!Number(known && known.n) && Number(fams && fams.n) >= VOTE_LIMITS.polls) {
       return json({ ok: false, err: "议题满了" }, 429, origin);
     }
     if (Number(known && known.n) >= VOTE_LIMITS.ballotsPerPoll) {
       return json({ ok: false, err: "这个议题的票箱满了" }, 429, origin);
     }
   }
-  const opts = await env.DB.prepare("SELECT COUNT(DISTINCT option_id) AS n FROM vote_ballots WHERE poll_id=?").bind(cast.pollId).first();
-  const optKnown = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=? AND option_id=?").bind(cast.pollId, cast.optionId).first();
-  if (!Number(optKnown && optKnown.n) && Number(opts && opts.n) >= VOTE_LIMITS.options) {
+  const opts = await env.DB.prepare("SELECT COUNT(DISTINCT option_id) AS n FROM vote_ballots2 WHERE fam=?").bind(cast.fam).first();
+  const ph = cast.optionIds.map(() => "?").join(",");
+  const mineKnown = await env.DB.prepare(
+    "SELECT COUNT(DISTINCT option_id) AS n FROM vote_ballots2 WHERE fam=? AND option_id IN (" + ph + ")"
+  ).bind(cast.fam, ...cast.optionIds).first();
+  if (Number(opts && opts.n) - Number(mineKnown && mineKnown.n) + cast.optionIds.length > VOTE_LIMITS.options) {
     return json({ ok: false, err: "选项满了" }, 429, origin);
   }
-  await env.DB.prepare(
-    `INSERT INTO vote_ballots (poll_id, voter, option_id, ch, at, changed) VALUES (?,?,?,?,?,0)
-     ON CONFLICT(poll_id, voter) DO UPDATE SET option_id=excluded.option_id, ch=excluded.ch,
-       at=excluded.at, changed=vote_ballots.changed+1`
-  ).bind(cast.pollId, voter, cast.optionId, cast.ch, now).run();
+  // 整套替换：一封传真就是一套完整选择——旧行删净、新行写入，一批原子提交。
+  // 用 UPSERT 攒补丁的话，「取消勾选」永远删不掉旧行。
+  const changed = isNewBallot ? 0 : (Number(seen && seen.c) || 0) + 1;
+  const stmts = [env.DB.prepare("DELETE FROM vote_ballots2 WHERE poll_id=? AND voter=?").bind(cast.pollId, voter)];
+  for (const oid of cast.optionIds) {
+    stmts.push(env.DB.prepare(
+      "INSERT INTO vote_ballots2 (poll_id, voter, option_id, fam, ch, at, changed) VALUES (?,?,?,?,?,?,?)"
+    ).bind(cast.pollId, voter, oid, cast.fam, cast.ch, now, changed));
+  }
+  await env.DB.batch(stmts);
   if (cast.note) {
     await env.DB.prepare(
       "INSERT INTO vote_notes (poll_id, voter, option_id, ch, note, at) VALUES (?,?,?,?,?,?)"
-    ).bind(cast.pollId, voter, cast.optionId, cast.ch, cast.note, now).run();
+    ).bind(cast.pollId, voter, cast.optionIds.join(","), cast.ch, cast.note, now).run();
   }
   // 投完立刻看（王老师拍板）：当场把最新计票带回去，页面不用再打一枪。
   const tally = await voteTally(env, cast.pollId);
-  return json({ ok: true, pollId: cast.pollId, optionId: cast.optionId, changed: !isNewBallot, ...tally }, 200, origin);
+  return json({ ok: true, pollId: cast.pollId, optionIds: cast.optionIds, changed: !isNewBallot, ...tally }, 200, origin);
 }
 async function voteAdmin(req, env, origin) {
   if (Date.now() < _voteAdminLockUntil) return json({ ok: false, err: "尝试过多，请稍后" }, 429, origin);
@@ -1642,6 +1737,8 @@ async function voteAdmin(req, env, origin) {
     if (String(body.confirm || "") !== "WIPE") return json({ ok: false, err: "需要 confirm:WIPE" }, 400, origin);
     const pollId = String(body.pollId || "").trim();
     if (!VOTE_POLL_RE.test(pollId)) return json({ ok: false, err: "议题编号无效" }, 400, origin);
+    // 三处一起清：v2 现役表按家族清（连历史各期一并），v1 留档表与留言表按同名清。
+    await env.DB.prepare("DELETE FROM vote_ballots2 WHERE fam=?").bind(votePollFam(pollId)).run();
     await env.DB.prepare("DELETE FROM vote_ballots WHERE poll_id=?").bind(pollId).run();
     await env.DB.prepare("DELETE FROM vote_notes WHERE poll_id=?").bind(pollId).run();
     return json({ ok: true }, 200, origin);

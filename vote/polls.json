@@ -1,10 +1,20 @@
 {
- "_注": "投票议题事实源。fav-character 的 options 是 characters.json 的镜像（口径体检盯着，39 人）。改议题就改这个文件并重新发布主页；worker 对议题零知识，只按格式计数。",
+ "_注": "投票议题事实源。fav-character 的 options 是 characters.json 的镜像（口径体检盯着，39 人）；fav-work 的 hubKey 对应主页 build_hub.py 的作品 key（口径体检盯完整性：在役 cat:game 一个都不能少）。每题的 max（至多选几项）与 cadence（once=一票常驻可改 / daily=每天一期）是计票端 VOTE_POLICY 的事实源，vote.test.mjs 盯两边别漂。改议题就改这个文件并重新发布主页；worker 对议题零知识，只按格式与策略计数。",
  "polls": [
+  {
+   "id": "daily-duel",
+   "title": "今日对决",
+   "subtitle": "每天早上换一对角色、换一个问题。今天投完，明天再来。",
+   "kind": "duel",
+   "max": 1,
+   "cadence": "daily",
+   "optionsFrom": "fav-character",
+   "options": []
+  },
   {
    "id": "fav-character",
    "title": "最喜爱的正典角色",
-   "subtitle": "三十九位正典角色，投给你心里的那一位。可以改票，以最后一次为准。",
+   "subtitle": "三十九位正典角色，至多选三位装进同一封传真。随时可改，以最后一封为准。",
    "kind": "character",
    "options": [
     {
@@ -241,40 +251,78 @@
      "meta": "跳蛛 · 天蝎座 · R",
      "tone": "黑域"
     }
-   ]
+   ],
+   "max": 3,
+   "cadence": "once"
   },
   {
    "id": "fav-work",
    "title": "最喜爱的作品",
-   "subtitle": "哪一部最让你上头？",
+   "subtitle": "全部在役作品都在架上，至多选两部你最上头的。",
    "kind": "plain",
    "options": [
     {
      "id": "monkey",
+     "hubKey": "monkey-upstairs",
      "label": "是猴就上100层",
      "meta": "荒诞休闲 · 百层挑战"
     },
     {
      "id": "zimingqi",
+     "hubKey": "zimingqi",
      "label": "自鸣棋",
      "meta": "课堂肉鸽自走棋"
     },
     {
      "id": "gemfall",
+     "hubKey": "gemfall",
      "label": "灵石远征",
      "meta": "三消 · 矿脉远征"
     },
     {
-     "id": "banks",
-     "label": "题库书架 · 词灵对决",
-     "meta": "英语题库与对决"
+     "id": "star-dungeon",
+     "hubKey": "star-dungeon",
+     "label": "星徒地牢",
+     "meta": "课堂像素战术地牢"
+    },
+    {
+     "id": "expedition",
+     "hubKey": "expedition",
+     "label": "远征录 · 笼中剑",
+     "meta": "动作肉鸽 · 宇宙旗舰"
+    },
+    {
+     "id": "starling",
+     "hubKey": "starling",
+     "label": "星灵远征",
+     "meta": "蛋到觉醒 · 寓言信"
+    },
+    {
+     "id": "chronicle",
+     "hubKey": "volvme",
+     "label": "世界编年史 II",
+     "meta": "八章正典故事线"
+    },
+    {
+     "id": "classroom",
+     "hubKey": "classroom-clicker",
+     "label": "猴与鱼 · 灵光塔",
+     "meta": "课堂点名记分乱斗"
     },
     {
      "id": "monkeyfish",
      "label": "猴与鱼 · 数字卷",
      "meta": "无厘头答题挑战"
+    },
+    {
+     "id": "banks",
+     "hubKey": "banks",
+     "label": "题库书架 · 词灵对决",
+     "meta": "英语题库与对决"
     }
-   ]
+   ],
+   "max": 2,
+   "cadence": "once"
   },
   {
    "id": "monkey-next",
@@ -307,7 +355,9 @@
      "label": "剧情彩蛋",
      "meta": "正典角色客串"
     }
-   ]
+   ],
+   "max": 1,
+   "cadence": "once"
   }
  ]
 }

@@ -7,17 +7,23 @@
 <link rel="canonical" href="https://myskme.com/vote/">
 <title>民意传真科 · MYSKME</title>
 <!--
-  民意传真科 —— MYSKME 投票亭（2026-08-15 立）
-  给王老师听见用户/玩家/学生的声音用：最喜爱角色、最喜爱作品、下一步想要什么。
+  民意传真科 —— MYSKME 投票亭（2026-08-15 立，0822 二期扩建）
+  给王老师听见用户/玩家/学生的声音用：今日对决、最喜爱角色（至多三位）、
+  最喜爱作品（全部在役作品，至多两部）、下一步想要什么。
 
   分工（每条事实只认一个源）：
   · 议题与选项的事实源：同目录 polls.json（fav-character 的选项是 characters.json 的
-    镜像，expedition 的口径体检盯着 39 人对不对）。改议题 = 改 polls.json 重发主页。
-  · 计票的事实源：品牌网关 /api/vote/*（Cloudflare D1）。worker 对议题零知识，只计数。
+    镜像，expedition 的口径体检盯着 39 人对不对；fav-work 的 hubKey 对齐主页作品表）。
+  · 每题「至多选几项 / 什么节奏」的策略：polls.json 的 max 与 cadence，
+    计票端 VOTE_POLICY 是它的镜像，vote.test.mjs 盯两边别漂。
+  · 今日对决的配对与问题：同目录 duel-pair.mjs 按北京日期算（页面与报表共用同一份，
+    计票端零知识；不合本期配对的票由报表丢弃并计异常）。
+  · 计票的事实源：品牌网关 /api/vote/*（Cloudflare D1）。
   · 报表：GitHub Actions 每天拉计票存快照进仓库（投票报表/），涨跌自动对比。
 
-  设计决定（王老师 0815 拍板）：投完立刻看结果；留言收集但只进管理端，公共页永不显示；
-  渠道用 ?ch= 标记（课堂二维码 ?ch=class、主页入口 ?ch=hub、海报 ?ch=poster），报表分开看。
+  设计决定（王老师拍板）：投完立刻看结果、投前不显示票数（防跟风）；
+  留言收集但只进管理端，公共页永不显示；渠道用 ?ch= 标记（课堂 class、主页 hub、
+  海报 poster、拉票 share），报表分开看；防刷三层（同题冷却 + 当日 IP 限量 + 报表异常标记）。
 
   这一页**必须联网才有意义**，与游戏的零联网原则不冲突：游戏坏了不能玩是事故，
   投票亭连不上只是「稍后再试」。断网时页面照常打开，投票按钮会说清楚状况。
@@ -32,15 +38,18 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--paper)}
-body{font-family:var(--sans);color:var(--ink);min-height:100svh;padding:18px 14px 40px}
+body{font-family:var(--sans);color:var(--ink);min-height:100svh;padding:18px 14px 40px;overflow-x:hidden}
 .wrap{max-width:560px;margin:0 auto}
-header{text-align:center;margin-bottom:14px}
+header{text-align:center;margin-bottom:10px;position:relative}
 .notice-no{display:inline-block;background:var(--red);color:#fffdf6;font-weight:1000;font-size:12px;
-  padding:4px 12px;border-radius:999px;border:2.5px solid var(--ink);transform:rotate(-2deg);letter-spacing:.06em}
+  padding:4px 12px;border-radius:999px;border:2.5px solid var(--ink);transform:rotate(-2deg);letter-spacing:.06em;cursor:pointer;user-select:none}
 h1{font-family:var(--serif);font-weight:1000;font-size:30px;margin:10px 0 4px}
 .sub{color:var(--muted);font-size:13px;font-weight:800}
+.ticker{margin:12px auto 0;max-width:520px;border:2px dashed #a7977c;border-radius:10px;background:#f8efd9;
+  color:var(--muted);font-size:12px;font-weight:800;padding:7px 10px;min-height:32px;transition:opacity .45s}
+.ticker.fade{opacity:0}
 .poll{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:var(--shadow);
-  padding:16px 14px;margin:16px 0}
+  padding:16px 14px;margin:16px 0;position:relative}
 .poll h2{font-family:var(--serif);font-size:20px;font-weight:1000}
 .poll .hint{color:var(--muted);font-size:12px;font-weight:800;margin:4px 0 10px}
 .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
@@ -52,15 +61,43 @@ h1{font-family:var(--serif);font-weight:1000;font-size:30px;margin:10px 0 4px}
 .opt .bar{position:absolute;left:0;top:0;bottom:0;background:rgba(245,183,49,.28);border-radius:9px 0 0 9px;
   width:0;transition:width .5s cubic-bezier(.2,.9,.2,1);pointer-events:none}
 /* 票数的位置分两种：宽卡（单列议题）挂在右侧；窄卡（角色三列格）绝对定位会压住
-   卡面文字（截图里「梅花鹿 · 灶女座」被「0 票」盖了半截），改成落在文字流里。 */
+   卡面文字，改成落在文字流里。 */
 .opts.plain .opt{padding-right:56px}
 .opts.plain .pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-weight:1000;font-size:12px;color:var(--muted)}
 .opts:not(.plain) .pct{display:block;position:relative;margin-top:3px;font-weight:1000;font-size:10px;color:var(--teal)}
 .opt.mine{background:#fff0af;outline:3px solid var(--banana)}
 .opt.mine::after{content:'已传真';position:absolute;right:-6px;top:-9px;background:var(--red);color:#fffdf6;
   font-size:10px;font-weight:1000;padding:2px 7px;border-radius:999px;border:2px solid var(--ink);transform:rotate(8deg)}
+.opt.sel{outline:3px dashed var(--teal);background:#eafaf4}
+.opt.sel::after{content:'待发送';position:absolute;right:-6px;top:-9px;background:var(--teal);color:#fffdf6;
+  font-size:10px;font-weight:1000;padding:2px 7px;border-radius:999px;border:2px solid var(--ink);transform:rotate(8deg)}
 .opt[disabled]{opacity:.55;cursor:default}
-.note-row{margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:7px}
+.send-row{margin-top:10px;display:none}
+.send-row.show{display:block}
+.send-row button{width:100%;border:3px solid var(--ink);border-radius:13px;background:var(--banana);
+  padding:11px 12px;font:1000 15px var(--sans);cursor:pointer;box-shadow:0 4px 0 rgba(40,33,26,.2)}
+.send-row button:active{transform:translateY(2px);box-shadow:none}
+/* 今日对决 */
+.duel-arena{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+.duel-opt{border:3px solid var(--ink);border-radius:14px;background:var(--card);cursor:pointer;
+  padding:14px 8px;text-align:center;font:1000 17px/1.3 var(--serif);box-shadow:0 4px 0 rgba(40,33,26,.18)}
+.duel-opt:active{transform:translateY(2px);box-shadow:none}
+.duel-opt small{display:block;font:800 10px var(--sans);color:var(--muted);margin-top:5px}
+.duel-opt.mine{background:#fff0af;outline:3px solid var(--banana)}
+.duel-vs{align-self:center;background:var(--ink);color:var(--paper);font:1000 13px var(--sans);
+  border-radius:999px;padding:7px 9px;transform:rotate(-6deg)}
+.duel-split{margin-top:10px;height:18px;border:2.5px solid var(--ink);border-radius:999px;overflow:hidden;display:none}
+.duel-split.show{display:flex}
+.duel-split i{display:block;height:100%;background:var(--teal)}
+.duel-split b{display:block;height:100%;background:var(--purple);flex:1}
+.duel-report{margin-top:8px;font-size:12px;font-weight:800;color:var(--muted)}
+.share-row{margin-top:9px;display:none}
+.share-row.show{display:block}
+.share-row button{border:2.5px solid var(--ink);border-radius:11px;background:var(--card);
+  padding:7px 12px;font-weight:1000;cursor:pointer;font-size:12px;color:var(--teal)}
+.note-row{margin-top:10px;display:grid;grid-template-columns:auto 1fr auto;gap:7px}
+.note-row select{border:2.5px solid var(--ink);border-radius:11px;background:var(--card);padding:0 6px;
+  font:900 12px var(--sans);color:var(--muted);max-width:92px}
 .note-row input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;background:var(--card);
   padding:9px 10px;font:900 16px var(--sans)}
 .note-row button{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);
@@ -72,15 +109,28 @@ footer{text-align:center;color:var(--muted);font-size:11px;font-weight:800;margi
 footer a{color:var(--teal)}
 #qaReport{display:none;white-space:pre-wrap;background:#101512;color:#d4ffe3;border:2px solid #7bea9a;
   border-radius:12px;padding:12px;font:12px/1.6 ui-monospace,monospace;margin-top:14px}
+/* 彩蛋们：纯装饰，出不出现不影响任何功能 */
+#hatDrift{position:fixed;top:8px;left:-80px;width:64px;pointer-events:none;z-index:9}
+#donkeyPeek{position:fixed;right:-96px;top:38%;width:92px;pointer-events:none;z-index:9;transition:right 1.2s cubic-bezier(.2,.9,.3,1)}
+#donkeyPeek.in{right:-34px}
+.egg-stamp{position:absolute;right:10px;bottom:8px;width:52px;pointer-events:none;opacity:.9;transform:rotate(9deg)}
+#repairLog{position:fixed;inset:0;background:rgba(40,33,26,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+#repairLog.show{display:flex}
+#repairLog .paper{max-width:420px;background:var(--card);border:3px solid var(--ink);border-radius:16px;
+  box-shadow:var(--shadow);padding:18px 16px;font-size:13px;font-weight:800;line-height:2}
+#repairLog h3{font-family:var(--serif);font-size:18px;margin-bottom:6px}
+@keyframes hat-drift{from{transform:translateX(0) rotate(-8deg)}to{transform:translateX(120vw) rotate(14deg)}}
+@media (prefers-reduced-motion: reduce){#hatDrift,#donkeyPeek{display:none}}
 @media (max-width:379px){.opts{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <span class="notice-no">民意采集第 0001 号</span>
+    <span class="notice-no" id="stamp">民意采集第 0002 号</span>
     <h1>民意传真科</h1>
-    <p class="sub">MYSKME 驯猴办直属 · 你的票会真的决定更新什么<br>匿名投票 · 可改票（以最后一次为准）· 投完立刻看结果</p>
+    <p class="sub">MYSKME 驯猴办直属 · 你的票会真的决定更新什么<br>匿名投票 · 可改票（以最后一封为准）· 投完立刻看结果</p>
+    <div class="ticker" id="ticker">传真机预热中……</div>
   </header>
   <main id="polls"></main>
   <footer>
@@ -89,11 +139,21 @@ footer a{color:var(--teal)}
   </footer>
   <pre id="qaReport"></pre>
 </div>
-<script>
+<div id="repairLog"><div class="paper">
+  <h3>传真机维修记录（节选）</h3>
+  <div>三月初二：卡纸。拍了一下，好了。<br>
+  四月十九：吐出一张没人发的传真，内容是一道数学题。已归档。<br>
+  五月廿五：驴先生靠着机器打盹，误发传真十四封。已道歉。<br>
+  六月三十：机器自己拨了个号，无人接听。观察中。<br>
+  今日：状态良好，请放心投票。</div>
+  <div style="margin-top:10px;text-align:right;color:var(--muted)">（点任意处关闭）</div>
+</div></div>
+<script type="module">
 'use strict';
+import { beijingDayKey, duelIssueNo, duelPollId, pairForDay, questionForDay } from './duel-pair.mjs';
 const API='/api/vote';
 const QA=new URLSearchParams(location.search).has('qa');
-// 渠道标记：课堂二维码 ?ch=class、主页 ?ch=hub、海报 ?ch=poster。只认白名单格式。
+// 渠道标记：课堂二维码 ?ch=class、主页 ?ch=hub、海报 ?ch=poster、拉票链接 ?ch=share。只认白名单格式。
 const CH=(new URLSearchParams(location.search).get('ch')||'').toLowerCase().match(/^[a-z0-9-]{0,12}$/)?.[0]||'';
 const VOTED_KEY='myskme_vote_cast_v1',DEV_KEY='myskme_vote_device_v1';
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v);}catch(_){return '';}}
@@ -103,74 +163,290 @@ function deviceUUID(){
   id=globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2,14);
   store(DEV_KEY,id);return id;
 }
-function votedMap(){try{const m=JSON.parse(store(VOTED_KEY)||'{}');return m&&typeof m==='object'?m:{};}catch(_){return {};}}
-function rememberVote(pollId,optionId){const m=votedMap();m[pollId]=optionId;store(VOTED_KEY,JSON.stringify(m));}
+// 投过什么：pollId -> [optionId,...]。一期页面存的是字符串，读的时候统一成数组。
+function votedMap(){
+  try{
+    const m=JSON.parse(store(VOTED_KEY)||'{}');
+    if(!m||typeof m!=='object')return {};
+    for(const k of Object.keys(m))if(typeof m[k]==='string')m[k]=[m[k]];
+    return m;
+  }catch(_){return {};}
+}
+function rememberVote(pollId,optionIds){const m=votedMap();m[pollId]=optionIds;store(VOTED_KEY,JSON.stringify(m));}
 
-const el={polls:document.getElementById('polls')};
+const el={polls:document.getElementById('polls'),ticker:document.getElementById('ticker')};
 let POLLS=[];
-const boards={};   // pollId -> {options:[{id,n}],total}
+const boards={};      // pollId -> {options:[{id,n}],total,voters}
+const sel={};         // pollId -> 当前勾选（多选题的未发送状态）
+const DAY=beijingDayKey(Date.now());
+let DUEL=null;        // {poll,pollId,issue,question,a,b} a/b 为角色选项对象
 
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function sameSet(a,b){return a.length===b.length&&a.every(x=>b.includes(x));}
 
+/* == 回执彩蛋：普通回执常见，稀有回执偶遇，里程碑必报 == */
+const RECEIPTS=['已收到你的传真。','传真妥收，已归档进今日票箱。','收到。你的意见已装订成册。','传真到了，机器还热着。'];
+const RARE_RECEIPTS=[
+  '回执：本传真由驴先生顺路送达。他说不顺路，但还是送了。',
+  '回执：鹦鹉教授把你的选择复述了三遍，一遍比一遍大声。',
+  '回执：小黑猫在回执角落踩了一个爪印，视为盖章生效。',
+  '回执：传真机吐纸时卡了一下，被值班员一巴掌拍好了。',
+  '回执：你的选票在途中被折成了纸飞机，落点准确，计数有效。',
+  '回执：黑化肥发灰——抱歉，串线了。你的票已妥收。',
+  '回执：本票盖了驯猴办三道章，其中一道是倒着盖的。',
+  '回执：值班员看了你的选择，点了点头，没有发表意见。',
+  '回执：蛋在收发室坚持要在回执上写 egg，已划掉。',
+  '回执：今晚的传真纸带一点茶渍，不影响法律效力。',
+];
+function receiptLine(total){
+  if(total===100||total===500||total===1000||total===5000)
+    return '你投下了这一题的第 '+total+' 张选票——传真科放了一挂无声的鞭炮。';
+  if(!QA&&Math.random()<0.15)return RARE_RECEIPTS[Math.floor(Math.random()*RARE_RECEIPTS.length)];
+  return RECEIPTS[Math.floor(Math.random()*RECEIPTS.length)];
+}
+
+/* == 渲染 == */
 function renderPoll(poll){
+  if(poll.kind==='duel')return renderDuel(poll);
   const section=document.createElement('section');section.className='poll';section.dataset.poll=poll.id;
-  const mine=votedMap()[poll.id]||'';
+  const mine=votedMap()[poll.id]||[];
+  const max=poll.max||1;
+  const cur=sel[poll.id]||(sel[poll.id]=mine.slice());
   const board=boards[poll.id];
   const byId=board?Object.fromEntries(board.options.map(o=>[o.id,o.n])):{};
   const total=board?board.total:0;
+  const showBars=!!mine.length;
   section.innerHTML=`<h2>${escapeHTML(poll.title)}</h2>`
-    +`<p class="hint">${escapeHTML(poll.subtitle||'')}${mine?'（你投过了，点别的可以改票）':''}</p>`
+    +`<p class="hint">${escapeHTML(poll.subtitle||'')}${mine.length?'（你投过了，随时可以改）':''}</p>`
     +`<div class="opts ${poll.kind==='plain'?'plain':''}">`
     +poll.options.map(o=>{
       const n=byId[o.id]||0,pct=total?Math.round(100*n/total):0;
-      // 结果只在「本人投过之后」显示——投前看不到，防跟风；投完立刻看，是王老师拍的板。
-      const showBars=!!mine;
-      return `<button class="opt ${o.id===mine?'mine':''}" data-opt="${o.id}">`
+      const cls=(mine.includes(o.id)&&cur.includes(o.id))?'mine':(cur.includes(o.id)?'sel':'');
+      return `<button class="opt ${cls}" data-opt="${o.id}">`
         +(showBars?`<span class="bar" style="width:${pct}%"></span>`:'')
         +`<span style="position:relative">${escapeHTML(o.label)}<small>${escapeHTML(o.meta||'')}</small></span>`
         +(showBars?`<span class="pct">${n} 票</span>`:'')
         +`</button>`;
     }).join('')
     +`</div>`
-    +`<div class="note-row"><input maxlength="120" placeholder="想附一句话给王老师？（可留空）" aria-label="给王老师的留言">`
+    +`<div class="send-row" data-role="send"><button type="button"></button></div>`
+    +`<div class="share-row ${mine.length?'show':''}" data-role="share"><button type="button">帮 TA 拉个票</button></div>`
+    +`<div class="note-row"><select aria-label="留言类型"><option value="">心里话</option>`
+    +`<option value="[发现] ">新发现</option><option value="[点子] ">好点子</option></select>`
+    +`<input maxlength="110" placeholder="附一句话给王老师？（可留空）" aria-label="给王老师的留言">`
     +`<button type="button" data-role="hint">?</button></div>`
-    +`<div class="status" data-role="status">${mine?'已收到你的传真。':'点一个选项即投票。'}</div>`;
+    +`<div class="status" data-role="status">${mine.length?'已收到你的传真。':(max>1?('点选至多 '+max+' 项，再按发送。'):'点一个选项即投票。')}</div>`;
   section.querySelector('[data-role="hint"]').addEventListener('click',()=>{
-    say(section,'留言随下一次投票一起发出，只有王老师本人看得到。',false);
+    say(section,'留言随下一次投票一起发出，只有王老师本人看得到。想报新发现或提点子，换一下左边的类型。',false);
   });
-  section.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>cast(poll,btn.dataset.opt,section)));
+  section.querySelector('[data-role="share"] button').addEventListener('click',()=>shareFor(poll,section));
+  const sendRow=section.querySelector('[data-role="send"]');
+  const refreshSend=()=>{
+    const dirty=!sameSet(cur,mine)&&cur.length>0;
+    sendRow.classList.toggle('show',dirty);
+    if(dirty)sendRow.querySelector('button').textContent=(mine.length?'改票传真':'发送传真')+'（已选 '+cur.length+'/'+max+'）';
+  };
+  refreshSend();
+  sendRow.querySelector('button').addEventListener('click',()=>cast(poll,cur.slice(),section));
+  section.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>{
+    const id=btn.dataset.opt;
+    if(max<=1){cast(poll,[id],section);return;}
+    const i=cur.indexOf(id);
+    if(i>=0)cur.splice(i,1);
+    else{
+      if(cur.length>=max){say(section,'这一题至多选 '+max+' 项——先取消一个再换。',true);return;}
+      cur.push(id);
+    }
+    btn.classList.remove('mine','sel');
+    if(mine.includes(id)&&cur.includes(id))btn.classList.add('mine');
+    else if(cur.includes(id))btn.classList.add('sel');
+    refreshSend();
+  }));
   return section;
+}
+function renderDuel(poll){
+  const section=document.createElement('section');section.className='poll';section.dataset.poll=poll.id;
+  if(!DUEL){section.style.display='none';return section;}
+  const mine=votedMap()[DUEL.pollId]||[];
+  const board=boards[DUEL.pollId];
+  const byId=board?Object.fromEntries(board.options.map(o=>[o.id,o.n])):{};
+  const na=byId[DUEL.a.id]||0,nb=byId[DUEL.b.id]||0,tot=na+nb;
+  const lead=na===nb?'战况胶着，一票定乾坤':'目前 '+(na>nb?DUEL.a.label:DUEL.b.label)+' 领先';
+  section.innerHTML=`<h2>${escapeHTML(poll.title)} · 第 ${DUEL.issue} 期</h2>`
+    +`<p class="hint">${escapeHTML(DUEL.question)}（每天一期，一人一票${mine.length?'，你投过了':''}）</p>`
+    +`<div class="duel-arena">`
+    +[DUEL.a,DUEL.b].map(o=>`<button class="duel-opt ${mine.includes(o.id)?'mine':''}" data-opt="${o.id}">`
+      +`${escapeHTML(o.label)}<small>${escapeHTML(o.meta||'')}</small>`
+      +(mine.length?`<small>${byId[o.id]||0} 票</small>`:'')
+      +`</button>`).join('<span class="duel-vs">VS</span>')
+    +`</div>`
+    +`<div class="duel-split ${mine.length&&tot?'show':''}"><i style="width:${tot?Math.round(100*na/tot):50}%"></i><b></b></div>`
+    +(mine.length?`<div class="duel-report">${escapeHTML(lead)} · 明天零点换新对手</div>`:'')
+    +`<div class="duel-report" data-role="yesterday"></div>`
+    +`<div class="share-row ${mine.length?'show':''}" data-role="share"><button type="button">拉人来对决</button></div>`
+    +`<div class="status" data-role="status">${mine.length?'已收到你的传真。':'点一边即投票，明天换新对手。'}</div>`;
+  section.querySelectorAll('.duel-opt').forEach(btn=>btn.addEventListener('click',()=>{
+    if((votedMap()[DUEL.pollId]||[]).includes(btn.dataset.opt))return;
+    castDuel(btn.dataset.opt,section);
+  }));
+  section.querySelector('[data-role="share"] button').addEventListener('click',()=>{
+    shareOut('今日对决第 '+DUEL.issue+' 期：'+DUEL.question+' '+DUEL.a.label+' VS '+DUEL.b.label
+      +'。来投出你的一票：https://myskme.com/vote/?ch=share',section);
+  });
+  renderYesterday(section);
+  return section;
+}
+async function renderYesterday(section){
+  const yKey=beijingDayKey(Date.now()-86400000);
+  if(duelIssueNo(yKey)<1)return;
+  const slot=section.querySelector('[data-role="yesterday"]');
+  try{
+    const data=await (await fetch(API+'/board?pollId='+encodeURIComponent(duelPollId(yKey)))).json();
+    if(!data||!data.ok)return;
+    const roster=rosterOf();if(!roster)return;
+    const [pa,pb]=pairForDay(yKey,roster.options.map(o=>o.id));
+    const label=id=>{const o=roster.options.find(x=>x.id===id);return o?o.label:id;};
+    const by=Object.fromEntries((data.options||[]).map(o=>[o.id,o.n]));
+    const na=by[pa]||0,nb=by[pb]||0;
+    if(!(na+nb)){slot.textContent='昨日第 '+duelIssueNo(yKey)+' 期无人应战，双方握手言和。';return;}
+    slot.textContent='昨日战报：'+label(pa)+' '+na+' 票 · '+label(pb)+' '+nb+' 票，'
+      +(na===nb?'平局收场':(na>nb?label(pa):label(pb))+' 胜出')+'。';
+  }catch(_){/* 拉不到就不显示，不挡投票 */}
 }
 function say(section,text,isErr){
   const s=section.querySelector('[data-role="status"]');
   s.textContent=text;s.classList.toggle('err',!!isErr);
 }
+function rosterOf(){return POLLS.find(p=>p.id==='fav-character');}
+
+/* == 投票 == */
 let casting=false;
-async function cast(poll,optionId,section){
+async function cast(poll,optionIds,section,pollIdOverride,retried){
   if(casting)return;casting=true;
-  const note=section.querySelector('input').value.trim();
+  const noteInput=section.querySelector('.note-row input');
+  const notePrefix=section.querySelector('.note-row select');
+  const note=noteInput?((notePrefix&&notePrefix.value||'')+noteInput.value.trim()).trim():'';
+  const pollId=pollIdOverride||poll.id;
   say(section,'传真发送中……',false);
   try{
     const res=await fetch(API+'/cast',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pollId:poll.id,optionId,deviceUUID:deviceUUID(),ch:CH,note})});
+      body:JSON.stringify({pollId,optionIds,optionId:optionIds[0],deviceUUID:deviceUUID(),ch:CH,note:noteInput&&noteInput.value.trim()?note:''})});
     const data=await res.json().catch(()=>({}));
-    if(!res.ok||!data.ok)throw new Error(data.err||('状态码 '+res.status));
-    rememberVote(poll.id,optionId);
-    boards[poll.id]={options:data.options,total:data.total};
-    if(note)section.querySelector('input').value='';
+    if(!res.ok||!data.ok){
+      // 同题 10 秒冷却：不让用户自己掐表，页面等一等替他重发一次。
+      if(res.status===429&&!retried&&/太快/.test(data.err||'')){
+        say(section,'传真机热着呢，十秒后自动重发这一封……',false);
+        casting=false;
+        setTimeout(()=>cast(poll,optionIds,section,pollIdOverride,true),10500);
+        return;
+      }
+      throw new Error(data.err||('状态码 '+res.status));
+    }
+    rememberVote(pollId,data.optionIds||optionIds);
+    boards[pollId]={options:data.options,total:data.total,voters:data.voters};
+    sel[poll.id]=(data.optionIds||optionIds).slice();
+    const hadNote=!!(noteInput&&noteInput.value.trim());
+    if(noteInput&&noteInput.value)noteInput.value='';
     const fresh=renderPoll(poll);section.replaceWith(fresh);
-    say(fresh,data.changed?'改票成功，以这一票为准。':'已收到你的传真。'+(note?'留言也一并送达。':''),false);
+    say(fresh,(data.changed?'改票成功，以这一封为准。':receiptLine(data.total))+(hadNote?'留言也一并送达。':''),false);
   }catch(e){
     // 失败不猜原因分类，如实转述——网络与服务端的话都原样给用户看。
-    say(section,'没发出去：'+(e&&e.message||'网络未接通')+'。成绩不会丢，稍后再点一次就行。',true);
+    say(section,'没发出去：'+(e&&e.message||'网络未接通')+'。票不会丢，稍后再点一次就行。',true);
   }
   casting=false;
 }
+function castDuel(optionId,section){
+  const poll=POLLS.find(p=>p.kind==='duel');
+  cast(poll,[optionId],section,DUEL.pollId);
+}
+
+/* == 拉票分享 == */
+function shareFor(poll,section){
+  const mine=votedMap()[poll.id]||[];
+  const labels=mine.map(id=>{const o=poll.options.find(x=>x.id===id);return o?o.label:id;});
+  shareOut('我在 MYSKME 民意传真科投了「'+labels.join('、')+'」——也来投出你的一票：https://myskme.com/vote/?ch=share',section);
+}
+async function shareOut(text,section){
+  try{
+    if(navigator.share){await navigator.share({text});say(section,'拉票词已发出。',false);return;}
+    await navigator.clipboard.writeText(text);
+    say(section,'拉票词已复制，去群里粘贴就行。',false);
+  }catch(_){say(section,'拉票词：'+text,false);}
+}
+
+/* == 新鲜事滚动条 == */
+function startTicker(){
+  const lines=[];
+  if(DUEL)lines.push('今日对决第 '+DUEL.issue+' 期：'+DUEL.question);
+  lines.push('小贴士：投过的题随时可以改票，以最后一封为准。');
+  lines.push('留言只有王老师本人看得到；报新发现记得选「新发现」。');
+  if(DUEL)lines.push('明天零点，对决换新对手——记得回来看战报。');
+  let i=0;
+  el.ticker.textContent=lines[0];
+  if(lines.length<2)return;
+  setInterval(()=>{
+    el.ticker.classList.add('fade');
+    setTimeout(()=>{i=(i+1)%lines.length;el.ticker.textContent=lines[i];el.ticker.classList.remove('fade');},450);
+  },7000);
+}
+
+/* == 视觉彩蛋（QA 模式不放，免得自检抓不稳）== */
+function maybeEgg(){
+  if(QA)return;
+  const roll=Math.random();
+  if(roll<0.06)hatDrift();
+  else if(roll<0.12)donkeyPeek();
+  else if(roll<0.18)eggStamp();
+}
+function hatDrift(){
+  const d=document.createElement('div');d.id='hatDrift';
+  d.innerHTML='<svg viewBox="0 0 64 40"><ellipse cx="32" cy="30" rx="30" ry="8" fill="#e0452c"/>'
+    +'<path d="M14 30 Q14 8 32 8 Q50 8 50 30 Z" fill="#e0452c"/>'
+    +'<rect x="14" y="24" width="36" height="5" fill="#28211a" opacity=".35"/></svg>';
+  d.style.animation='hat-drift 9s linear 1';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),9500);
+}
+function donkeyPeek(){
+  const d=document.createElement('div');d.id='donkeyPeek';
+  d.innerHTML='<svg viewBox="0 0 92 74">'
+    +'<ellipse cx="20" cy="16" rx="9" ry="20" fill="#8a7360" transform="rotate(-18 20 16)"/>'
+    +'<ellipse cx="52" cy="12" rx="9" ry="20" fill="#8a7360" transform="rotate(12 52 12)"/>'
+    +'<rect x="4" y="20" width="13" height="9" rx="2" fill="#f5b731" stroke="#28211a" stroke-width="1.5" transform="rotate(-18 10 24)"/>'
+    +'<text x="6" y="28" font-size="6" font-weight="900" fill="#28211a" transform="rotate(-18 10 24)">正版</text>'
+    +'<ellipse cx="46" cy="48" rx="34" ry="26" fill="#9c8471"/>'
+    +'<ellipse cx="60" cy="56" rx="20" ry="14" fill="#d9c7b4"/>'
+    +'<circle cx="34" cy="42" r="3.5" fill="#28211a"/><circle cx="56" cy="40" r="3.5" fill="#28211a"/>'
+    +'<circle cx="35" cy="41" r="1.2" fill="#fffdf6"/><circle cx="57" cy="39" r="1.2" fill="#fffdf6"/>'
+    +'<ellipse cx="54" cy="58" rx="2.5" ry="4" fill="#28211a"/><ellipse cx="66" cy="58" rx="2.5" ry="4" fill="#28211a"/></svg>';
+  document.body.appendChild(d);
+  requestAnimationFrame(()=>d.classList.add('in'));
+  setTimeout(()=>{d.classList.remove('in');setTimeout(()=>d.remove(),1300);},4200);
+}
+function eggStamp(){
+  const cards=document.querySelectorAll('.poll');
+  if(!cards.length)return;
+  const card=cards[Math.floor(Math.random()*cards.length)];
+  const d=document.createElement('div');d.className='egg-stamp';
+  d.innerHTML='<svg viewBox="0 0 52 40"><ellipse cx="26" cy="22" rx="16" ry="13" fill="#fffdf6" stroke="#28211a" stroke-width="2"/>'
+    +'<text x="26" y="20" text-anchor="middle" font-size="9" font-weight="900" fill="#6b5f4e">egg</text>'
+    +'<line x1="14" y1="19" x2="38" y2="16" stroke="#e0452c" stroke-width="2.5"/>'
+    +'<text x="26" y="32" text-anchor="middle" font-size="10" font-weight="900" fill="#28211a">蛋</text></svg>';
+  card.appendChild(d);
+}
+/* 盖章连点五下：传真机维修记录 */
+let stampTaps=0,repairShown=false;
+document.getElementById('stamp').addEventListener('click',()=>{
+  if(repairShown)return;
+  if(++stampTaps>=5){repairShown=true;document.getElementById('repairLog').classList.add('show');}
+});
+document.getElementById('repairLog').addEventListener('click',e=>e.currentTarget.classList.remove('show'));
+
+/* == 启动 == */
 async function loadBoard(pollId){
   try{
     const res=await fetch(API+'/board?pollId='+encodeURIComponent(pollId));
     const data=await res.json();
-    if(data&&data.ok)boards[pollId]={options:data.options,total:data.total};
+    if(data&&data.ok)boards[pollId]={options:data.options,total:data.total,voters:data.voters};
   }catch(_){/* 打不通就先不显示数字，页面照常能投 */}
 }
 async function boot(){
@@ -182,22 +458,50 @@ async function boot(){
     return;
   }
   POLLS=polls.polls||[];
+  const duelPoll=POLLS.find(p=>p.kind==='duel');
+  const roster=duelPoll&&POLLS.find(p=>p.id===duelPoll.optionsFrom);
+  if(duelPoll&&roster&&roster.options.length>=2){
+    const [ia,ib]=pairForDay(DAY,roster.options.map(o=>o.id));
+    DUEL={poll:duelPoll,pollId:duelPollId(DAY),issue:duelIssueNo(DAY),question:questionForDay(DAY),
+      a:roster.options.find(o=>o.id===ia),b:roster.options.find(o=>o.id===ib)};
+  }
   // 已投过的议题先拉计票，让「投完立刻看」跨刷新也成立。
-  await Promise.all(POLLS.filter(p=>votedMap()[p.id]).map(p=>loadBoard(p.id)));
+  const wants=POLLS.filter(p=>p.kind!=='duel'&&(votedMap()[p.id]||[]).length).map(p=>p.id);
+  if(DUEL&&(votedMap()[DUEL.pollId]||[]).length)wants.push(DUEL.pollId);
+  await Promise.all(wants.map(loadBoard));
   el.polls.innerHTML='';
   for(const poll of POLLS)el.polls.appendChild(renderPoll(poll));
+  startTicker();
+  maybeEgg();
   if(QA)runQA();
 }
 function runQA(){
   const checks=[];
   const check=(name,ok)=>checks.push([ok?'PASS':'FAIL',name]);
-  check('议题至少三个且编号合白名单',POLLS.length>=3&&POLLS.every(p=>/^[a-z0-9][a-z0-9-]{1,39}$/.test(p.id)));
+  check('议题至少四个且编号合白名单',POLLS.length>=4&&POLLS.every(p=>/^[a-z0-9][a-z0-9-]{1,39}$/.test(p.id)));
   check('角色议题选项数与页面渲染一致',(()=>{
     const p=POLLS.find(x=>x.id==='fav-character');
     return !!p&&document.querySelectorAll('[data-poll="fav-character"] .opt').length===p.options.length;
   })());
+  check('每题都有 max 与 cadence 策略',POLLS.every(p=>Number(p.max)>=1&&['once','daily'].includes(p.cadence)));
+  check('今日对决双方都在角色名单里且当天可复算',(()=>{
+    if(!DUEL)return false;
+    const ids=rosterOf().options.map(o=>o.id);
+    const p1=pairForDay(DAY,ids),p2=pairForDay(DAY,ids);
+    return p1[0]===p2[0]&&p1[1]===p2[1]&&ids.includes(DUEL.a.id)&&ids.includes(DUEL.b.id)
+      &&/^daily-duel-\d{8}$/.test(DUEL.pollId)&&DUEL.a.id!==DUEL.b.id;
+  })());
+  check('作品议题已补全（不少于 10 部且含旗舰）',(()=>{
+    const p=POLLS.find(x=>x.id==='fav-work');
+    return !!p&&p.options.length>=10&&['monkey','zimingqi','gemfall','expedition','star-dungeon'].every(id=>p.options.some(o=>o.id===id));
+  })());
   check('设备标识可持久化',(()=>{const a=deviceUUID();return a.length>=12&&a===deviceUUID();})());
   check('渠道标记只认白名单',/^[a-z0-9-]{0,12}$/.test(CH));
+  check('投票记录读写统一成数组',(()=>{
+    try{const bak=store(VOTED_KEY);store(VOTED_KEY,JSON.stringify({t1:'x',t2:['y']}));
+      const m=votedMap();store(VOTED_KEY,bak);
+      return Array.isArray(m.t1)&&m.t1[0]==='x'&&Array.isArray(m.t2);}catch(_){return false;}
+  })());
   check('页面没有 emoji 与装饰符',(()=>{
     for(const ch of document.documentElement.outerHTML){const c=ch.codePointAt(0);
       if((c>=0x2190&&c<=0x27bf)||(c>=0x2b00&&c<=0x2bff)||(c>=0x2460&&c<=0x24ff)||(c>=0x1f300&&c<=0x1faff))return false;}

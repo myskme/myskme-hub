@@ -98,6 +98,7 @@ try {
     path.join('banks', 'index.html'),
     path.join('vote', 'index.html'),
     path.join('vote', 'polls.json'),
+    path.join('vote', 'duel-pair.mjs'),
     path.join('edge-functions', 'api', 'index.js'),
     path.join('edge-functions', 'api', '[[default]].js'),
     path.join('edge-functions', 'q', '[[default]].js'),
