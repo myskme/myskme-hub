@@ -1,0 +1,313 @@
+{
+ "_注": "投票议题事实源。fav-character 的 options 是 characters.json 的镜像（口径体检盯着，39 人）。改议题就改这个文件并重新发布主页；worker 对议题零知识，只按格式计数。",
+ "polls": [
+  {
+   "id": "fav-character",
+   "title": "最喜爱的正典角色",
+   "subtitle": "三十九位正典角色，投给你心里的那一位。可以改票，以最后一次为准。",
+   "kind": "character",
+   "options": [
+    {
+     "id": "wolf",
+     "label": "狼先生",
+     "meta": "灰狼 · 天秤座 · UR",
+     "tone": "导师"
+    },
+    {
+     "id": "zi",
+     "label": "梓",
+     "meta": "梅花鹿 · 处女座 · UR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "zeng",
+     "label": "增",
+     "meta": "亚洲黑熊 · 水瓶座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "hai",
+     "label": "海",
+     "meta": "驼鹿 · 射手座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "hao",
+     "label": "浩",
+     "meta": "原牛 · 水瓶座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "jin",
+     "label": "瑾",
+     "meta": "赤狐 · 水瓶座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "lin",
+     "label": "琳",
+     "meta": "挪威森林猫 · 狮子座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "nuo",
+     "label": "诺",
+     "meta": "乌林鸮 · 天蝎座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "rui",
+     "label": "睿",
+     "meta": "雪豹 · 水瓶座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "xi",
+     "label": "晰",
+     "meta": "弗莱明巨兔 · 双鱼座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "yu",
+     "label": "屿",
+     "meta": "翻车鱼 · 白羊座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "yue",
+     "label": "月",
+     "meta": "白狐 · 天秤座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "ziyu",
+     "label": "子鱼",
+     "meta": "蝴蝶锦鲤 · 水瓶座 · SSR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "duo",
+     "label": "铎",
+     "meta": "蝮蛇 · 双子座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "han",
+     "label": "涵",
+     "meta": "帝企鹅 · 处女座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "jia",
+     "label": "佳",
+     "meta": "丹顶鹤 · 水瓶座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "lu",
+     "label": "璐",
+     "meta": "画眉鸟 · 处女座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "qi",
+     "label": "麒",
+     "meta": "大白鲨 · 白羊座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "wen",
+     "label": "文",
+     "meta": "雪狼 · 狮子座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "yang",
+     "label": "洋",
+     "meta": "大熊猫 · 射手座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "rong",
+     "label": "荣",
+     "meta": "游隼 · 双子座 · R",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "wei",
+     "label": "炜",
+     "meta": "小熊猫 · 天蝎座 · R",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "xiao",
+     "label": "晓",
+     "meta": "飞鼠 · 处女座 · R",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "xin",
+     "label": "欣",
+     "meta": "刺猬 · 射手座 · R",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "ye",
+     "label": "叶王",
+     "meta": "网纹蟒 · 水瓶座 · UR",
+     "tone": "黑域"
+    },
+    {
+     "id": "wan",
+     "label": "菀",
+     "meta": "星鸦 · 金牛座 · SR",
+     "tone": "黑域"
+    },
+    {
+     "id": "hang",
+     "label": "航",
+     "meta": "暗王蛇 · 水瓶座 · SPECIAL",
+     "tone": "黑域"
+    },
+    {
+     "id": "hui",
+     "label": "慧",
+     "meta": "西伯利亚虎 · 天秤座 · SPECIAL",
+     "tone": "黑域"
+    },
+    {
+     "id": "parrot",
+     "label": "鹦鹉教授",
+     "meta": "鹦鹉 · 处女座 · SPECIAL",
+     "tone": "黑域"
+    },
+    {
+     "id": "xuan",
+     "label": "璇",
+     "meta": "狞猫 · 摩羯座 · SPECIAL",
+     "tone": "黑域"
+    },
+    {
+     "id": "yin",
+     "label": "音",
+     "meta": "灰狼·双声 · 狮子座 · SPECIAL",
+     "tone": "黑域"
+    },
+    {
+     "id": "majun",
+     "label": "马将军",
+     "meta": "马 · 摩羯座 · N",
+     "tone": "中立"
+    },
+    {
+     "id": "blackcat",
+     "label": "小黑猫",
+     "meta": "黑猫 · 双鱼座 · SPECIAL",
+     "tone": "特殊"
+    },
+    {
+     "id": "one",
+     "label": "一",
+     "meta": "天鹅 · 摩羯座 · SPECIAL",
+     "tone": "特殊"
+    },
+    {
+     "id": "ke",
+     "label": "克",
+     "meta": "海豚 · 射手座 · SSR",
+     "tone": "黑域"
+    },
+    {
+     "id": "chen",
+     "label": "宸",
+     "meta": "猎豹 · 射手座 · SR",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "ming",
+     "label": "铭",
+     "meta": "狸花猫 · 双鱼座 · R",
+     "tone": "中立"
+    },
+    {
+     "id": "jun",
+     "label": "钧",
+     "meta": "华南虎 · 射手座 · R",
+     "tone": "光明学徒"
+    },
+    {
+     "id": "jie",
+     "label": "杰",
+     "meta": "跳蛛 · 天蝎座 · R",
+     "tone": "黑域"
+    }
+   ]
+  },
+  {
+   "id": "fav-work",
+   "title": "最喜爱的作品",
+   "subtitle": "哪一部最让你上头？",
+   "kind": "plain",
+   "options": [
+    {
+     "id": "monkey",
+     "label": "是猴就上100层",
+     "meta": "荒诞休闲 · 百层挑战"
+    },
+    {
+     "id": "zimingqi",
+     "label": "自鸣棋",
+     "meta": "课堂肉鸽自走棋"
+    },
+    {
+     "id": "gemfall",
+     "label": "灵石远征",
+     "meta": "三消 · 矿脉远征"
+    },
+    {
+     "id": "banks",
+     "label": "题库书架 · 词灵对决",
+     "meta": "英语题库与对决"
+    },
+    {
+     "id": "monkeyfish",
+     "label": "猴与鱼 · 数字卷",
+     "meta": "无厘头答题挑战"
+    }
+   ]
+  },
+  {
+   "id": "monkey-next",
+   "title": "《是猴就上100层》下一步最想要什么",
+   "subtitle": "你的票会直接决定更新顺序。",
+   "kind": "plain",
+   "options": [
+    {
+     "id": "more-outfits",
+     "label": "更多行头",
+     "meta": "香蕉商店上新"
+    },
+    {
+     "id": "more-floors",
+     "label": "更多楼层部门",
+     "meta": "新机关新段子"
+    },
+    {
+     "id": "new-mode",
+     "label": "全新玩法模式",
+     "meta": "比如限时挑战"
+    },
+    {
+     "id": "more-collect",
+     "label": "更多称号与奶茶",
+     "meta": "收集控福利"
+    },
+    {
+     "id": "story-eggs",
+     "label": "剧情彩蛋",
+     "meta": "正典角色客串"
+    }
+   ]
+  }
+ ]
+}

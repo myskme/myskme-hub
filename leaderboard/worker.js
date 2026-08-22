@@ -1503,7 +1503,153 @@ async function gfAdmin(req, env, origin) {
 
 /* ══════════════════════════════════════════════════════════════
    是猴就上100层 · 世界楼榜
-   独立表、独立路由 /monkey/*。三条榜分别量本周最好、生涯最好、
+   独立表、独立路由 /monkey/* ══════════════════════════════════════════════════════════════
+   民意传真科 · MYSKME 投票箱（2026-08-15）
+   独立表、独立路由 /vote/*。给王老师听见用户/玩家/学生的声音用。
+   worker 对议题内容**零知识**：议题与选项的事实源在 myskme-hub/vote/polls.json，
+   这里只按格式白名单计数——在服务端抄一份议题表，就是又一份会漂的镜像。
+   垃圾议题防不住也不用防：报表只读 polls.json 里登记过的议题，
+   没人引用的计数行只是安静地占几行库，配额门拦住无限增殖即可。
+   留言（note）只进 /vote/admin，公共接口永不返回——匿名留言公开展示
+   需要有人长期盯着删捣乱的，这个负担现在不接。
+   ══════════════════════════════════════════════════════════════ */
+const VOTE_POLL_RE = /^[a-z0-9][a-z0-9-]{1,39}$/;
+const VOTE_OPT_RE = /^[a-z0-9][a-z0-9-]{0,59}$/;
+const VOTE_CH_RE = /^[a-z0-9-]{0,12}$/;
+const VOTE_LIMITS = { polls: 50, options: 200, ballotsPerPoll: 50000, noteLen: 120, cooldownMs: 10000 };
+let _voteReady = false, _voteAdminFails = 0, _voteAdminLockUntil = 0;
+
+function voteCleanCast(body) {
+  const pollId = String(body && body.pollId || "").trim();
+  const optionId = String(body && body.optionId || "").trim();
+  if (!VOTE_POLL_RE.test(pollId)) return { ok: false, err: "议题编号无效" };
+  if (!VOTE_OPT_RE.test(optionId)) return { ok: false, err: "选项编号无效" };
+  let ch = String(body && body.ch || "").trim().toLowerCase();
+  if (!VOTE_CH_RE.test(ch)) ch = "";
+  // 留言：剥控制字符、去首尾空白、封顶长度。空串等于没留。
+  let note = String(body && body.note || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim();
+  if (note.length > VOTE_LIMITS.noteLen) note = note.slice(0, VOTE_LIMITS.noteLen);
+  return { ok: true, pollId, optionId, ch, note };
+}
+async function voteEnsure(env) {
+  if (_voteReady) return;
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS vote_ballots (
+       poll_id TEXT NOT NULL, voter TEXT NOT NULL, option_id TEXT NOT NULL,
+       ch TEXT DEFAULT '', at INTEGER DEFAULT 0, changed INTEGER DEFAULT 0,
+       PRIMARY KEY (poll_id, voter))`
+  ).run();
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS vote_notes (
+       poll_id TEXT NOT NULL, voter TEXT NOT NULL, option_id TEXT NOT NULL,
+       ch TEXT DEFAULT '', note TEXT NOT NULL, at INTEGER DEFAULT 0)`
+  ).run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_tally ON vote_ballots(poll_id,option_id)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_voter ON vote_ballots(voter,at)").run();
+  await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_vote_notes_at ON vote_notes(poll_id,at)").run();
+  _voteReady = true;
+}
+async function voteVoterId(env, raw) {
+  const dev = String(raw || "");
+  if (dev.length < 12 || dev.length > 120) return "";
+  return sha256("vote|" + dev + "|" + env.LB_SALT);
+}
+async function voteTally(env, pollId) {
+  const rows = await env.DB.prepare(
+    "SELECT option_id AS id, COUNT(*) AS n FROM vote_ballots WHERE poll_id=? GROUP BY option_id ORDER BY n DESC, id ASC"
+  ).bind(pollId).all();
+  const options = (rows.results || []).map(r => ({ id: r.id, n: Number(r.n) || 0 }));
+  const chRows = await env.DB.prepare(
+    "SELECT ch, COUNT(*) AS n FROM vote_ballots WHERE poll_id=? GROUP BY ch"
+  ).bind(pollId).all();
+  const channels = {};
+  for (const r of (chRows.results || [])) channels[r.ch || "direct"] = Number(r.n) || 0;
+  return { options, total: options.reduce((a, o) => a + o.n, 0), channels };
+}
+async function voteBoard(req, env, origin, url) {
+  await voteEnsure(env);
+  const pollId = String(url.searchParams.get("pollId") || "").trim();
+  if (!VOTE_POLL_RE.test(pollId)) return json({ ok: false, err: "议题编号无效" }, 400, origin);
+  const tally = await voteTally(env, pollId);
+  return json({ ok: true, pollId, ...tally }, 200, origin);
+}
+async function voteCast(req, env, origin) {
+  await voteEnsure(env);
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false, err: "请求格式不对" }, 400, origin); }
+  const cast = voteCleanCast(body);
+  if (!cast.ok) return json({ ok: false, err: cast.err }, 400, origin);
+  const voter = await voteVoterId(env, body.deviceUUID);
+  if (!voter) return json({ ok: false, err: "设备标识无效" }, 400, origin);
+  const now = Date.now();
+  // 同设备节流：改票合法（以最后一次为准），但连点要冷静一下。
+  const last = await env.DB.prepare("SELECT MAX(at) AS t FROM vote_ballots WHERE voter=?").bind(voter).first();
+  if (last && Number(last.t) && now - Number(last.t) < VOTE_LIMITS.cooldownMs) {
+    return json({ ok: false, err: "投得太快了，歇两秒再投" }, 429, origin);
+  }
+  // 配额门：新议题/新选项/满议题各有上限，拦无限增殖，不拦正常使用。
+  const seen = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=? AND voter=?").bind(cast.pollId, voter).first();
+  const isNewBallot = !Number(seen && seen.n);
+  if (isNewBallot) {
+    const polls = await env.DB.prepare("SELECT COUNT(DISTINCT poll_id) AS n FROM vote_ballots").first();
+    const known = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=?").bind(cast.pollId).first();
+    if (!Number(known && known.n) && Number(polls && polls.n) >= VOTE_LIMITS.polls) {
+      return json({ ok: false, err: "议题满了" }, 429, origin);
+    }
+    if (Number(known && known.n) >= VOTE_LIMITS.ballotsPerPoll) {
+      return json({ ok: false, err: "这个议题的票箱满了" }, 429, origin);
+    }
+  }
+  const opts = await env.DB.prepare("SELECT COUNT(DISTINCT option_id) AS n FROM vote_ballots WHERE poll_id=?").bind(cast.pollId).first();
+  const optKnown = await env.DB.prepare("SELECT COUNT(*) AS n FROM vote_ballots WHERE poll_id=? AND option_id=?").bind(cast.pollId, cast.optionId).first();
+  if (!Number(optKnown && optKnown.n) && Number(opts && opts.n) >= VOTE_LIMITS.options) {
+    return json({ ok: false, err: "选项满了" }, 429, origin);
+  }
+  await env.DB.prepare(
+    `INSERT INTO vote_ballots (poll_id, voter, option_id, ch, at, changed) VALUES (?,?,?,?,?,0)
+     ON CONFLICT(poll_id, voter) DO UPDATE SET option_id=excluded.option_id, ch=excluded.ch,
+       at=excluded.at, changed=vote_ballots.changed+1`
+  ).bind(cast.pollId, voter, cast.optionId, cast.ch, now).run();
+  if (cast.note) {
+    await env.DB.prepare(
+      "INSERT INTO vote_notes (poll_id, voter, option_id, ch, note, at) VALUES (?,?,?,?,?,?)"
+    ).bind(cast.pollId, voter, cast.optionId, cast.ch, cast.note, now).run();
+  }
+  // 投完立刻看（王老师拍板）：当场把最新计票带回去，页面不用再打一枪。
+  const tally = await voteTally(env, cast.pollId);
+  return json({ ok: true, pollId: cast.pollId, optionId: cast.optionId, changed: !isNewBallot, ...tally }, 200, origin);
+}
+async function voteAdmin(req, env, origin) {
+  if (Date.now() < _voteAdminLockUntil) return json({ ok: false, err: "尝试过多，请稍后" }, 429, origin);
+  await voteEnsure(env);
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ ok: false }, 400, origin); }
+  if (await sha256(String(body.pw || "")) !== env.LB_ADMIN_HASH) {
+    if (++_voteAdminFails >= 8) { _voteAdminLockUntil = Date.now() + 60000; _voteAdminFails = 0; }
+    return json({ ok: false, err: "密码不正确" }, 403, origin);
+  }
+  _voteAdminFails = 0;
+  const act = String(body.action || "");
+  if (act === "notes") {
+    const pollId = String(body.pollId || "").trim();
+    const limit = clampInt(body.limit, 1, 200) || 100;
+    const rows = VOTE_POLL_RE.test(pollId)
+      ? await env.DB.prepare("SELECT poll_id,option_id,ch,note,at FROM vote_notes WHERE poll_id=? ORDER BY at DESC LIMIT ?").bind(pollId, limit).all()
+      : await env.DB.prepare("SELECT poll_id,option_id,ch,note,at FROM vote_notes ORDER BY at DESC LIMIT ?").bind(limit).all();
+    return json({ ok: true, rows: rows.results || [] }, 200, origin);
+  }
+  if (act === "wipe_poll") {
+    if (String(body.confirm || "") !== "WIPE") return json({ ok: false, err: "需要 confirm:WIPE" }, 400, origin);
+    const pollId = String(body.pollId || "").trim();
+    if (!VOTE_POLL_RE.test(pollId)) return json({ ok: false, err: "议题编号无效" }, 400, origin);
+    await env.DB.prepare("DELETE FROM vote_ballots WHERE poll_id=?").bind(pollId).run();
+    await env.DB.prepare("DELETE FROM vote_notes WHERE poll_id=?").bind(pollId).run();
+    return json({ ok: true }, 200, origin);
+  }
+  return json({ ok: false, err: "未知操作" }, 400, origin);
+}
+
+/*。三条榜分别量本周最好、生涯最好、
    以及「不白摔」的累计局数；单局 runId 只记一次，断线重传不会重复加局。
    ══════════════════════════════════════════════════════════════ */
 const MONKEY_CAP = { height: 500000, score: 10000000, bananas: 1000000 };
@@ -1713,7 +1859,10 @@ export default {
       if (p === "/monkey/board" && request.method === "GET") return await monkeyBoard(request, env, origin, url);
       if (p === "/monkey/submit" && request.method === "POST") return await monkeySubmit(request, env, origin);
       if (p === "/monkey/admin" && request.method === "POST") return await monkeyAdmin(request, env, origin);
-      if (p === "/") return json({ ok: true, name: "MYSKME 排行榜", v: 5, games: ["wordduel", "gemfall", "monkey"], season: await getSeason(env) }, 200, origin);
+      if (p === "/vote/board" && request.method === "GET") return await voteBoard(request, env, origin, url);
+      if (p === "/vote/cast" && request.method === "POST") return await voteCast(request, env, origin);
+      if (p === "/vote/admin" && request.method === "POST") return await voteAdmin(request, env, origin);
+      if (p === "/") return json({ ok: true, name: "MYSKME 排行榜", v: 5, games: ["wordduel", "gemfall", "monkey", "vote"], season: await getSeason(env) }, 200, origin);
       return json({ ok: false, err: "not found" }, 404, origin);
     } catch (e) {
       console.error("LB worker error:", e && e.stack || e);

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="https://myskme.com/vote/">
+<title>民意传真科 · MYSKME</title>
+<!--
+  民意传真科 —— MYSKME 投票亭（2026-08-15 立）
+  给王老师听见用户/玩家/学生的声音用：最喜爱角色、最喜爱作品、下一步想要什么。
+
+  分工（每条事实只认一个源）：
+  · 议题与选项的事实源：同目录 polls.json（fav-character 的选项是 characters.json 的
+    镜像，expedition 的口径体检盯着 39 人对不对）。改议题 = 改 polls.json 重发主页。
+  · 计票的事实源：品牌网关 /api/vote/*（Cloudflare D1）。worker 对议题零知识，只计数。
+  · 报表：GitHub Actions 每天拉计票存快照进仓库（投票报表/），涨跌自动对比。
+
+  设计决定（王老师 0815 拍板）：投完立刻看结果；留言收集但只进管理端，公共页永不显示；
+  渠道用 ?ch= 标记（课堂二维码 ?ch=class、主页入口 ?ch=hub、海报 ?ch=poster），报表分开看。
+
+  这一页**必须联网才有意义**，与游戏的零联网原则不冲突：游戏坏了不能玩是事故，
+  投票亭连不上只是「稍后再试」。断网时页面照常打开，投票按钮会说清楚状况。
+-->
+<style>
+:root{
+  --paper:#faf3e2;--paper-2:#f0e3c4;--card:#fffdf6;--ink:#28211a;--muted:#6b5f4e;
+  --banana:#f5b731;--teal:#1f9e8e;--red:#e0452c;--purple:#8e6fd8;--green:#63b06b;
+  --shadow:0 5px 0 rgba(40,33,26,.22);
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  --serif:"Songti SC","STSong","Noto Serif CJK SC",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--paper)}
+body{font-family:var(--sans);color:var(--ink);min-height:100svh;padding:18px 14px 40px}
+.wrap{max-width:560px;margin:0 auto}
+header{text-align:center;margin-bottom:14px}
+.notice-no{display:inline-block;background:var(--red);color:#fffdf6;font-weight:1000;font-size:12px;
+  padding:4px 12px;border-radius:999px;border:2.5px solid var(--ink);transform:rotate(-2deg);letter-spacing:.06em}
+h1{font-family:var(--serif);font-weight:1000;font-size:30px;margin:10px 0 4px}
+.sub{color:var(--muted);font-size:13px;font-weight:800}
+.poll{background:var(--card);border:3px solid var(--ink);border-radius:18px;box-shadow:var(--shadow);
+  padding:16px 14px;margin:16px 0}
+.poll h2{font-family:var(--serif);font-size:20px;font-weight:1000}
+.poll .hint{color:var(--muted);font-size:12px;font-weight:800;margin:4px 0 10px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.opts.plain{grid-template-columns:1fr}
+.opt{position:relative;text-align:left;border:2.5px solid var(--ink);border-radius:12px;background:var(--card);
+  padding:8px 9px;font:900 13px/1.3 var(--sans);color:var(--ink);cursor:pointer;box-shadow:0 3px 0 rgba(40,33,26,.14)}
+.opt:active{transform:translateY(2px);box-shadow:none}
+.opt small{display:block;color:var(--muted);font-size:10px;font-weight:800;margin-top:2px}
+.opt .bar{position:absolute;left:0;top:0;bottom:0;background:rgba(245,183,49,.28);border-radius:9px 0 0 9px;
+  width:0;transition:width .5s cubic-bezier(.2,.9,.2,1);pointer-events:none}
+/* 票数的位置分两种：宽卡（单列议题）挂在右侧；窄卡（角色三列格）绝对定位会压住
+   卡面文字（截图里「梅花鹿 · 灶女座」被「0 票」盖了半截），改成落在文字流里。 */
+.opts.plain .opt{padding-right:56px}
+.opts.plain .pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-weight:1000;font-size:12px;color:var(--muted)}
+.opts:not(.plain) .pct{display:block;position:relative;margin-top:3px;font-weight:1000;font-size:10px;color:var(--teal)}
+.opt.mine{background:#fff0af;outline:3px solid var(--banana)}
+.opt.mine::after{content:'已传真';position:absolute;right:-6px;top:-9px;background:var(--red);color:#fffdf6;
+  font-size:10px;font-weight:1000;padding:2px 7px;border-radius:999px;border:2px solid var(--ink);transform:rotate(8deg)}
+.opt[disabled]{opacity:.55;cursor:default}
+.note-row{margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:7px}
+.note-row input{min-width:0;border:2.5px solid var(--ink);border-radius:11px;background:var(--card);
+  padding:9px 10px;font:900 16px var(--sans)}
+.note-row button{border:2.5px solid var(--ink);border-radius:11px;background:var(--banana);
+  padding:8px 12px;font-weight:1000;cursor:pointer;font-size:13px}
+.status{margin-top:9px;font-size:12px;font-weight:800;color:var(--muted);border:2px dashed #a7977c;
+  border-radius:10px;padding:7px 9px;background:#f8efd9}
+.status.err{color:var(--red);border-color:var(--red)}
+footer{text-align:center;color:var(--muted);font-size:11px;font-weight:800;margin-top:22px;line-height:1.7}
+footer a{color:var(--teal)}
+#qaReport{display:none;white-space:pre-wrap;background:#101512;color:#d4ffe3;border:2px solid #7bea9a;
+  border-radius:12px;padding:12px;font:12px/1.6 ui-monospace,monospace;margin-top:14px}
+@media (max-width:379px){.opts{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="notice-no">民意采集第 0001 号</span>
+    <h1>民意传真科</h1>
+    <p class="sub">MYSKME 驯猴办直属 · 你的票会真的决定更新什么<br>匿名投票 · 可改票（以最后一次为准）· 投完立刻看结果</p>
+  </header>
+  <main id="polls"></main>
+  <footer>
+    留言只有王老师本人看得到，不公开展示。<br>
+    <a href="https://myskme.com/">回 MYSKME 总目</a>
+  </footer>
+  <pre id="qaReport"></pre>
+</div>
+<script>
+'use strict';
+const API='/api/vote';
+const QA=new URLSearchParams(location.search).has('qa');
+// 渠道标记：课堂二维码 ?ch=class、主页 ?ch=hub、海报 ?ch=poster。只认白名单格式。
+const CH=(new URLSearchParams(location.search).get('ch')||'').toLowerCase().match(/^[a-z0-9-]{0,12}$/)?.[0]||'';
+const VOTED_KEY='myskme_vote_cast_v1',DEV_KEY='myskme_vote_device_v1';
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v);}catch(_){return '';}}
+function deviceUUID(){
+  let id=store(DEV_KEY);
+  if(id.length>=12)return id;
+  id=globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2,14);
+  store(DEV_KEY,id);return id;
+}
+function votedMap(){try{const m=JSON.parse(store(VOTED_KEY)||'{}');return m&&typeof m==='object'?m:{};}catch(_){return {};}}
+function rememberVote(pollId,optionId){const m=votedMap();m[pollId]=optionId;store(VOTED_KEY,JSON.stringify(m));}
+
+const el={polls:document.getElementById('polls')};
+let POLLS=[];
+const boards={};   // pollId -> {options:[{id,n}],total}
+
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function renderPoll(poll){
+  const section=document.createElement('section');section.className='poll';section.dataset.poll=poll.id;
+  const mine=votedMap()[poll.id]||'';
+  const board=boards[poll.id];
+  const byId=board?Object.fromEntries(board.options.map(o=>[o.id,o.n])):{};
+  const total=board?board.total:0;
+  section.innerHTML=`<h2>${escapeHTML(poll.title)}</h2>`
+    +`<p class="hint">${escapeHTML(poll.subtitle||'')}${mine?'（你投过了，点别的可以改票）':''}</p>`
+    +`<div class="opts ${poll.kind==='plain'?'plain':''}">`
+    +poll.options.map(o=>{
+      const n=byId[o.id]||0,pct=total?Math.round(100*n/total):0;
+      // 结果只在「本人投过之后」显示——投前看不到，防跟风；投完立刻看，是王老师拍的板。
+      const showBars=!!mine;
+      return `<button class="opt ${o.id===mine?'mine':''}" data-opt="${o.id}">`
+        +(showBars?`<span class="bar" style="width:${pct}%"></span>`:'')
+        +`<span style="position:relative">${escapeHTML(o.label)}<small>${escapeHTML(o.meta||'')}</small></span>`
+        +(showBars?`<span class="pct">${n} 票</span>`:'')
+        +`</button>`;
+    }).join('')
+    +`</div>`
+    +`<div class="note-row"><input maxlength="120" placeholder="想附一句话给王老师？（可留空）" aria-label="给王老师的留言">`
+    +`<button type="button" data-role="hint">?</button></div>`
+    +`<div class="status" data-role="status">${mine?'已收到你的传真。':'点一个选项即投票。'}</div>`;
+  section.querySelector('[data-role="hint"]').addEventListener('click',()=>{
+    say(section,'留言随下一次投票一起发出，只有王老师本人看得到。',false);
+  });
+  section.querySelectorAll('.opt').forEach(btn=>btn.addEventListener('click',()=>cast(poll,btn.dataset.opt,section)));
+  return section;
+}
+function say(section,text,isErr){
+  const s=section.querySelector('[data-role="status"]');
+  s.textContent=text;s.classList.toggle('err',!!isErr);
+}
+let casting=false;
+async function cast(poll,optionId,section){
+  if(casting)return;casting=true;
+  const note=section.querySelector('input').value.trim();
+  say(section,'传真发送中……',false);
+  try{
+    const res=await fetch(API+'/cast',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pollId:poll.id,optionId,deviceUUID:deviceUUID(),ch:CH,note})});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok||!data.ok)throw new Error(data.err||('状态码 '+res.status));
+    rememberVote(poll.id,optionId);
+    boards[poll.id]={options:data.options,total:data.total};
+    if(note)section.querySelector('input').value='';
+    const fresh=renderPoll(poll);section.replaceWith(fresh);
+    say(fresh,data.changed?'改票成功，以这一票为准。':'已收到你的传真。'+(note?'留言也一并送达。':''),false);
+  }catch(e){
+    // 失败不猜原因分类，如实转述——网络与服务端的话都原样给用户看。
+    say(section,'没发出去：'+(e&&e.message||'网络未接通')+'。成绩不会丢，稍后再点一次就行。',true);
+  }
+  casting=false;
+}
+async function loadBoard(pollId){
+  try{
+    const res=await fetch(API+'/board?pollId='+encodeURIComponent(pollId));
+    const data=await res.json();
+    if(data&&data.ok)boards[pollId]={options:data.options,total:data.total};
+  }catch(_){/* 打不通就先不显示数字，页面照常能投 */}
+}
+async function boot(){
+  let polls;
+  try{
+    polls=await (await fetch('polls.json',{cache:'no-store'})).json();
+  }catch(e){
+    el.polls.innerHTML='<section class="poll"><h2>议题没取到</h2><p class="hint">刷新一次试试。</p></section>';
+    return;
+  }
+  POLLS=polls.polls||[];
+  // 已投过的议题先拉计票，让「投完立刻看」跨刷新也成立。
+  await Promise.all(POLLS.filter(p=>votedMap()[p.id]).map(p=>loadBoard(p.id)));
+  el.polls.innerHTML='';
+  for(const poll of POLLS)el.polls.appendChild(renderPoll(poll));
+  if(QA)runQA();
+}
+function runQA(){
+  const checks=[];
+  const check=(name,ok)=>checks.push([ok?'PASS':'FAIL',name]);
+  check('议题至少三个且编号合白名单',POLLS.length>=3&&POLLS.every(p=>/^[a-z0-9][a-z0-9-]{1,39}$/.test(p.id)));
+  check('角色议题选项数与页面渲染一致',(()=>{
+    const p=POLLS.find(x=>x.id==='fav-character');
+    return !!p&&document.querySelectorAll('[data-poll="fav-character"] .opt').length===p.options.length;
+  })());
+  check('设备标识可持久化',(()=>{const a=deviceUUID();return a.length>=12&&a===deviceUUID();})());
+  check('渠道标记只认白名单',/^[a-z0-9-]{0,12}$/.test(CH));
+  check('页面没有 emoji 与装饰符',(()=>{
+    for(const ch of document.documentElement.outerHTML){const c=ch.codePointAt(0);
+      if((c>=0x2190&&c<=0x27bf)||(c>=0x2b00&&c<=0x2bff)||(c>=0x2460&&c<=0x24ff)||(c>=0x1f300&&c<=0x1faff))return false;}
+    return true;})());
+  check('除同源 polls.json 与 /api 外无外链',(()=>{
+    const html=document.documentElement.outerHTML;
+    const urls=html.match(/https?:\/\/[A-Za-z0-9.-]+/g)||[];
+    return urls.every(u=>u.startsWith('https://myskme.com'));})());
+  const bad=checks.filter(c=>c[0]==='FAIL').length;
+  const report=document.getElementById('qaReport');
+  report.style.display='block';
+  report.textContent=(bad?'FAIL':'PASS')+' · 民意传真科自检\n\n'+checks.map(c=>c[0]+'  '+c[1]).join('\n');
+}
+boot();
+</script>
+</body>
+</html>

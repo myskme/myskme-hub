@@ -15,6 +15,7 @@ on:
       - 'match/ports/**'
       - 'leaderboard/worker.js'
       - 'leaderboard/*.test.mjs'
+      - 'vote/**'
       - '.github/workflows/gemfall-verify.yml'
 
 permissions:
@@ -55,6 +56,9 @@ jobs:
 
       - name: 验证榜单公共响应不回流历史 emoji
         run: node leaderboard/output-safety.test.mjs
+
+      - name: 投票模块自检（清洗器双向 / polls.json 白名单 / 留言隐私）
+        run: node leaderboard/vote.test.mjs
 
       - name: 验证 EdgeOne 可重复发布包
         run: |
