@@ -82,6 +82,17 @@ for (const route of ['/vote/board', '/vote/cast', '/vote/admin']) {
   check(/FROM vote_notes/.test(fnOf(worker, 'voteAdmin')), '管理端反而读不到留言了');
 }
 
+// ---- 同步器（vote/build-polls.mjs）的选项白名单必须与 worker 同义 ----
+// 同步器按它放行的 id 会被计票端拒收，就是「页面发得出、服务端收不进」。
+// 判据：两处正则**字面一致**——语义等价但写法不同也算漂（没人会去证明等价性）。
+{
+  const builder = await readFile(new URL('../vote/build-polls.mjs', here), 'utf8');
+  const builderRe = (builder.match(/const OPT_RE = (\/[^\n]+\/);/) || [])[1];
+  const workerRe = (worker.match(/const VOTE_OPT_RE = (\/[^\n;]+\/);/) || [])[1];
+  check(!!builderRe && !!workerRe, '取不到同步器或 worker 的选项正则（写法变了先修本测试的取法）');
+  check(builderRe === workerRe, '同步器与计票端的选项白名单漂开了：' + builderRe + ' vs ' + workerRe);
+}
+
 if (failures.length) {
   console.error('[败] 投票模块自检 ' + failures.length + ' 条：');
   for (const f of failures) console.error('  - ' + f);
