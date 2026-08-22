@@ -25,6 +25,7 @@ const runtimeEntries = [
   'write',
   'wall',
   'print',
+  'vote',
 ];
 
 async function exists(target) {
@@ -95,6 +96,8 @@ try {
     path.join('assets', 'hero-wolf.webp'),
     path.join('classroom', 'index.html'),
     path.join('banks', 'index.html'),
+    path.join('vote', 'index.html'),
+    path.join('vote', 'polls.json'),
     path.join('edge-functions', 'api', 'index.js'),
     path.join('edge-functions', 'api', '[[default]].js'),
     path.join('edge-functions', 'q', '[[default]].js'),
