@@ -1,0 +1,134 @@
+{
+ "date": "2026-08-22",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "进阶",
+ "tier": "free",
+ "name": "寄自春天 · 人物传 VOL.9（学徒版）",
+ "code": "SP10M",
+ "desc": "2026 暑假特辑 SP10M《寄自春天》学徒版易混词命门 10 题，按 R / SR / SSR 三档标注难度。本卷的完形填空（1–10）、选词填空、找不同、两只手、这次你来批与密码显影依赖短文、词库与课堂投屏的两张画，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "The cat sat ___ the stone lantern and did not move for an hour.",
+    "ops": [
+     "nearly",
+     "nearby",
+     "next",
+     "near"
+    ],
+    "ans": 3,
+    "why": "说的是猫坐的位置「靠近石灯笼」，near 可以直接作介词接地点。",
+    "lv": 2
+   },
+   {
+    "q": "Please ___ this letter to me when you come tomorrow.",
+    "ops": [
+     "take",
+     "bring",
+     "carry",
+     "send"
+    ],
+    "ans": 1,
+    "why": "to me + when you come 说明东西是朝说话人这边来的，用 bring。",
+    "lv": 2
+   },
+   {
+    "q": "Be careful with the key. If you ___ it, we cannot open the door.",
+    "ops": [
+     "loose",
+     "lost",
+     "lose",
+     "losing"
+    ],
+    "ans": 2,
+    "why": "if 从句里需要一个动词，主语是 you，用一般现在时 lose（丢失）。",
+    "lv": 2
+   },
+   {
+    "q": "They ___ at the small gate just after six.",
+    "ops": [
+     "arrived",
+     "reached",
+     "got",
+     "came"
+    ],
+    "ans": 0,
+    "why": "arrive 是不及物动词，接地点要加介词，句中正好有 at，搭配成立。",
+    "lv": 1
+   },
+   {
+    "q": "___ people knew her name, so the yard stayed quiet all morning.",
+    "ops": [
+     "A few",
+     "Few",
+     "Little",
+     "A little"
+    ],
+    "ans": 1,
+    "why": "people 可数复数，用 few 系列；后半句「院子一上午都很安静」是否定的意思，所以用不带 a 的 Few（几乎没有）。",
+    "lv": 2
+   },
+   {
+    "q": "She did not write her name, and she did not write mine ___.",
+    "ops": [
+     "too",
+     "also",
+     "either",
+     "as well"
+    ],
+    "ans": 2,
+    "why": "这是否定句，句末的「也」用 either。",
+    "lv": 1
+   },
+   {
+    "q": "The sun ___ over the wall before we reached the gate.",
+    "ops": [
+     "raised",
+     "rose",
+     "rise",
+     "risen"
+    ],
+    "ans": 1,
+    "why": "太阳是自己升起来的，用不及物动词 rise，过去式是 rose，与 before we reached 的过去时呼应。",
+    "lv": 2
+   },
+   {
+    "q": "One letter was for her mother. The ___ were never sent.",
+    "ops": [
+     "others",
+     "other",
+     "another",
+     "the other"
+    ],
+    "ans": 0,
+    "why": "谓语 were 是复数，说明剩下的不止一封；the others 表示「其余那些」，这里 The 已在空前，填 others。",
+    "lv": 2
+   },
+   {
+    "q": "She ___ two hours looking for the second letter.",
+    "ops": [
+     "cost",
+     "took",
+     "paid",
+     "spent"
+    ],
+    "ans": 3,
+    "why": "主语是人，花的是时间，用 spend + 时间 + doing sth。",
+    "lv": 2
+   },
+   {
+    "q": "The old house looked ___ , but somebody was still living in it.",
+    "ops": [
+     "lonely",
+     "alone",
+     "only",
+     "along"
+    ],
+    "ans": 0,
+    "why": "looked 后面接形容词；lonely 除了「孤独的」还表示「荒凉的」，可以形容房子。",
+    "lv": 2
+   }
+  ]
+ }
+}
