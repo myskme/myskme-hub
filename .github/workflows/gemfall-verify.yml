@@ -16,6 +16,7 @@ on:
       - 'leaderboard/worker.js'
       - 'leaderboard/*.test.mjs'
       - 'vote/**'
+      - 'deploy/vote/**'
       - '.github/workflows/gemfall-verify.yml'
 
 permissions:
