@@ -1,0 +1,135 @@
+{
+ "date": "2026-08-22",
+ "cat": "人物传连载",
+ "pack": "2026 暑假特辑",
+ "level": "炼狱",
+ "tier": "free",
+ "name": "寄自春天 · 人物传 VOL.9（陷阱猎人版）",
+ "code": "SP10",
+ "desc": "2026 暑假特辑 SP10《寄自春天》陷阱猎人版易混词命门 10 题，按 R / SR / SSR 三档标注难度。本卷的完形填空（1–10）、选词填空、找不同、两只手、这次你来批与密码显影依赖短文、词库与课堂投屏的两张画，未进题库。",
+ "mods": {
+  "m5": [
+   {
+    "q": "She worked ___ all through the winter, and by March the whole book had been copied.",
+    "ops": [
+     "hardly",
+     "hard",
+     "hardly ever",
+     "harder"
+    ],
+    "ans": 1,
+    "why": "后半句说「到三月整本都抄完了」，说明她确实下了功夫；hard 作副词就是「努力地」。",
+    "lv": 2
+   },
+   {
+    "q": "I have not seen her ___ ; the last time was before the snow melted.",
+    "ops": [
+     "lately",
+     "late",
+     "later",
+     "latest"
+    ],
+    "ans": 0,
+    "why": "lately 是「最近」，与现在完成时 have not seen 搭配，正好接后半句「上一次还是在雪化之前」。",
+    "lv": 1
+   },
+   {
+    "q": "May I ___ your pen for a minute? I left mine at home.",
+    "ops": [
+     "lend",
+     "keep",
+     "borrow",
+     "hold"
+    ],
+    "ans": 2,
+    "why": "说话人是要把笔拿过来用，方向是「借入」，用 borrow；borrow sth (from sb) 结构也对。",
+    "lv": 2
+   },
+   {
+    "q": "There was ___ ink left in the bottle, so she could still finish the last line.",
+    "ops": [
+     "little",
+     "a few",
+     "few",
+     "a little"
+    ],
+    "ans": 3,
+    "why": "ink 不可数，用 little 系列；后半句说「还能写完最后一行」，是肯定的意思，所以用 a little（还有一点）。",
+    "lv": 1
+   },
+   {
+    "q": "The reading room was so ___ that I could hear the pen moving on the paper.",
+    "ops": [
+     "quite",
+     "quietly",
+     "quiet",
+     "quick"
+    ],
+    "ans": 2,
+    "why": "was 后面要接形容词作表语；能听见笔尖在纸上走，说明屋里很「安静」，用 quiet。",
+    "lv": 2
+   },
+   {
+    "q": "The loose sheet ___ on the desk all night, and nobody moved it.",
+    "ops": [
+     "lay",
+     "laid",
+     "lied",
+     "lain"
+    ],
+    "ans": 0,
+    "why": "句意是「（自己缉躺、放置着」，用不及物动词 lie；它的过去式是 lay，与 all night 这个过去时间搭配。",
+    "lv": 2
+   },
+   {
+    "q": "This brush writes better than ___ I used last spring.",
+    "ops": [
+     "it",
+     "the one",
+     "that",
+     "one"
+    ],
+    "ans": 1,
+    "why": "比较的是两支不同的笔，要用 the one 替代前面出现过的可数名词 brush，且后面带定语从句 I used last spring 加以限定。",
+    "lv": 2
+   },
+   {
+    "q": "He worked ___ that night; nobody came to help him.",
+    "ops": [
+     "alone",
+     "lonely",
+     "only",
+     "along"
+    ],
+    "ans": 0,
+    "why": "alone 作副词表示「独自地」，正好被后半句「没人来帮他」印证。",
+    "lv": 2
+   },
+   {
+    "q": "The old brush ___ her almost a month's pay, but she never used it again.",
+    "ops": [
+     "spent",
+     "took",
+     "paid",
+     "cost"
+    ],
+    "ans": 3,
+    "why": "主语是物（the old brush），花的是钱，用 cost sb + 钱；cost 的过去式与原形同形。",
+    "lv": 2
+   },
+   {
+    "q": "She promised to come back ___ in April, but she never said which day.",
+    "ops": [
+     "sometimes",
+     "sometime",
+     "some time",
+     "some times"
+    ],
+    "ans": 1,
+    "why": "sometime 是「在某个（不确定的）时候」，正好对上后半句「她从没说是哪一天」。",
+    "lv": 2
+   }
+  ]
+ }
+}
+
